@@ -334,6 +334,17 @@
         this.micServer.$on('vrtc_speaker_switch', msg => {
           this.setBigScreen(msg);
         });
+
+        // 监听全屏变化
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              this.interactiveServer.state.fullScreenType = false;
+            }
+          },
+          true
+        );
       },
 
       // 创建betterScroll
