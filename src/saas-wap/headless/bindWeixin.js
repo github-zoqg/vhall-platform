@@ -2,7 +2,7 @@ import { useRoomBaseServer, useInviteServer } from 'middle-domain';
 import { isWechat, getQueryString, replaceHtml } from '@/packages/app-shared/utils/tool';
 import { initWeChatSdk, initHideChatSdk } from '@/packages/app-shared/utils/wechat';
 
-export default function() {
+export default function () {
   const roomBaseServer = useRoomBaseServer();
   const inviteServer = useInviteServer();
   const isEmbed = getQueryString('embedclient');
