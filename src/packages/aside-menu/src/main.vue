@@ -18,7 +18,7 @@
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
-      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾？）
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
       roleName() {
         return this.roomBaseServer.state.watchInitData.join_info.role_name;
       },
