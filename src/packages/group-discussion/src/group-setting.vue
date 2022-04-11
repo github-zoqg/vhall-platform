@@ -16,6 +16,7 @@
           <div class="vmp-group-item__bd">
             将当前 {{ userNumber }} 观众分成
             <el-input
+              :disabled="way == 3"
               style="width: 60px; margin: 0 6px"
               clearable
               maxlength="2"
@@ -36,6 +37,9 @@
             </el-radio>
             <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）
+            </el-radio>
+            <el-radio class="group-radio" v-model="way" label="3" :disabled="mode == 2">
+              白名单预设分组（按照白名单观众组中的小组分配）
             </el-radio>
           </div>
         </div>
@@ -73,6 +77,10 @@
       this.memberServer = useMemberServer();
     },
     computed: {
+      //观看限制白名单，白名单预设分组可设置，其他则不可选
+      mode() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      },
       // 观众数量
       userNumber() {
         return this.memberServer.state.onlineUsers.filter(item => item.role_name == 2).length;
@@ -96,23 +104,27 @@
       // 开始分组
       handleGroup: async function () {
         console.log('this.count:', this.count);
-        if (isNaN(this.count) || this.count < 2 || this.count > 50) {
-          this.$message.warning('请输入正确分组数量');
-          return false;
-        }
-        try {
-          const result = await this.groupServer.groupCreate({
-            number: this.count,
-            way: this.way
-          });
-          if (result && result.code === 200) {
-            this.count = '';
-            this.close();
-          } else {
-            this.$message.warning(result.msg || '分组失败');
+        if (this.way == 2) {
+          console.log('白名单预设分组');
+        } else {
+          if (isNaN(this.count) || this.count < 2 || this.count > 50) {
+            this.$message.warning('请输入正确分组数量');
+            return false;
           }
-        } catch (ex) {
-          this.$message.warning(ex.messge || '分组出现异常');
+          try {
+            const result = await this.groupServer.groupCreate({
+              number: this.count,
+              way: this.way
+            });
+            if (result && result.code === 200) {
+              this.count = '';
+              this.close();
+            } else {
+              this.$message.warning(result.msg || '分组失败');
+            }
+          } catch (ex) {
+            this.$message.warning(ex.messge || '分组出现异常');
+          }
         }
       },
       // 取消
