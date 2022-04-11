@@ -108,7 +108,6 @@
       //当数据改变
       change(val, index) {
         console.log(val, index, '当前选中待确认的选项');
-        // this.$emit('change', val, index, this.resultValue);
       },
       //取消选择
       cancel(val, index) {
