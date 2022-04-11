@@ -264,7 +264,6 @@
           return;
         }
         // 校验是否有open_id,若没有重新微信登录授权
-        // const open_id = this.getQueryString('open_id') || sessionStorage.getItem('open_id');
         const open_id = sessionStorage.getItem('open_id');
         let payAuthStatus = 0; //默认支付流程为非授权或授权后
         // 重新微信授权
@@ -319,7 +318,7 @@
           this.$refs.NECaptcha.refreshNECaptha(); // 重置易盾
         };
         const callback = res => {
-          if (res && res.code === 200) {
+          if (res && res.code == 200) {
             this.initInterval();
             this.timer = setInterval(() => {
               this.countTime--;
@@ -488,70 +487,60 @@
 
       // 提现 测试验证码是8888
       async drawMoney() {
-        try {
-          if (this.validtorMoney() && this.validtorCode()) {
-            const bindCheck = await this.withdrawalWap();
-            console.log('自动绑定提现结果查看', bindCheck);
-            bindCheck &&
-              bindCheck.code === 200 &&
-              this.useCashServer
-                .withdraw({
-                  verification_code: this.cashForm.code,
-                  fee: this.cashForm.money,
-                  type: 1,
-                  user_type: 2
-                })
-                .then(res => {
-                  if (res && res.code == 200) {
-                    this.step = 3;
-                    this.drawErrorTip = this.$t('cash.cash_1036');
-                    this.useCashServer.getCashInfo();
-                    this.useCashServer.getCashList();
-                  } else {
-                    console.log(res);
-                    this.step = 4;
-                    this.drawErrorTip = this.$tec(res.code) || this.$t('cash.cash_1037');
-                  }
-                })
-                .catch(err => {
+        if (this.validtorMoney() && this.validtorCode()) {
+          const bindCheck = await this.withdrawalWap();
+          console.log('drawMoney 自动绑定提现结果查看--------->', bindCheck);
+          if (bindCheck && bindCheck.code == 200) {
+            this.useCashServer
+              .withdraw({
+                verification_code: this.cashForm.code,
+                fee: this.cashForm.money,
+                type: 1, // 0-直播收益提现，1-红包收益提现
+                user_type: 2 // 用户类型 1-B端用户(默认) 2-C端用户
+              })
+              .then(res => {
+                if (res && res.code == 200) {
+                  this.step = 3;
+                  this.drawErrorTip = this.$t('cash.cash_1036');
+                  this.useCashServer.getCashInfo();
+                  this.useCashServer.getCashList();
+                } else {
+                  console.log(res);
                   this.step = 4;
-                  this.drawErrorTip = this.$tec(err.code) || this.$t('cash.cash_1037');
-                });
+                  this.drawErrorTip = this.$tec(res.code) || this.$t('cash.cash_1037');
+                }
+              })
+              .catch(err => {
+                this.step = 4;
+                this.drawErrorTip = this.$tec(err.code) || this.$t('cash.cash_1037');
+              });
           }
-        } catch (err) {
-          console.log(err);
         }
-      },
-
-      // 获取open_id
-      getQueryString(name) {
-        const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
-        const r = window.location.search.substr(1).match(reg);
-        if (r != null) return unescape(r[2]);
-        return null;
       },
 
       // 自动绑定提现结果查看
       withdrawalWap() {
-        const p = new Promise((resolve, reject) => {
-          const open_id = this.getQueryString('open_id') || sessionStorage.getItem('open_id');
-          const params = open_id ? { open_id } : {};
-          this.useCashServer.withdrawalWap(params).then(
-            res => {
-              if (res.code === 200) {
-                resolve(res);
-              } else {
-                this.$toast(this.$tec(res.code) || this.$t('cash.cash_1040'));
-                reject(res);
+        return new Promise((resolve, reject) => {
+          const open_id = sessionStorage.getItem('open_id');
+          this.useCashServer
+            .withdrawalWap({
+              open_id: open_id
+            })
+            .then(
+              res => {
+                if (res.code == 200) {
+                  resolve(res);
+                } else {
+                  this.$toast(this.$tec(res.code) || this.$t('cash.cash_1040'));
+                  reject(res);
+                }
+              },
+              err => {
+                this.$toast(this.$tec(err.code) || this.$t('cash.cash_1040'));
+                reject(err);
               }
-            },
-            err => {
-              this.$toast(this.$tec(err.code) || this.$t('cash.cash_1040'));
-              reject(err);
-            }
-          );
+            );
         });
-        return p;
       }
     }
   };

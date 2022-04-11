@@ -387,6 +387,15 @@
         return false;
       }
       this.getWebinerStatus();
+      window.addEventListener(
+        'fullscreenchange',
+        () => {
+          if (!document.fullscreenElement) {
+            this.isFullscreen = false;
+          }
+        },
+        true
+      );
       // if (window.orientation == 90 || window.orientation == -90) {
       //   this.isOrientation = true;
       //   this.setFullscreen();

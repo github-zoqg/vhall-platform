@@ -1651,7 +1651,7 @@
     }
     .radio-item {
       position: relative;
-      padding: 0.267rem 0.2rem 0 0.2rem;
+      padding: 0 0.2rem 0 0.2rem;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1674,7 +1674,8 @@
       .radio-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        //line-height: 0.4rem;
+        line-height: 1.5;
         color: #1a1a1a;
         word-break: break-all;
         font-size: 0.37rem;
@@ -1683,7 +1684,8 @@
           display: block;
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1700,14 +1702,16 @@
       .checkbox-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        //line-height: 0.4rem;
+        line-height: 1.5;
         font-size: 0.37rem;
         color: #1a1a1a;
         word-break: break-all;
         .vh-line-check {
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
