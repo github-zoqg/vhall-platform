@@ -79,6 +79,8 @@ import VmpWapInsertFIle from '@/packages/stream-insert-file-wap';
 
 // 被邀请上麦的弹窗
 import VmpInviteHandup from '@/packages/inviteHandup';
+// 观看协议
+import VmpViewRestrictionWap from '@/packages/view-restriction-wap'
 
 // 全局注册组件
 export function initUse() {
@@ -125,4 +127,6 @@ export function initUse() {
   Vue.use(VmpWapDesktopScreen);
   Vue.use(VmpWapInsertFIle);
   Vue.use(VmpInviteHandup);
+  Vue.use(VmpViewRestrictionWap);
+
 }

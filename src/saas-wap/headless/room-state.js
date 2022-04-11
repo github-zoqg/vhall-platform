@@ -13,7 +13,7 @@ import {
   useVirtualAudienceServer
 } from 'middle-domain';
 
-export default async function () {
+export default async function() {
   console.log('%c------服务初始化 开始', 'color:blue');
 
   const msgServer = useMsgServer();
@@ -43,6 +43,7 @@ export default async function () {
         systemKey: 2
       });
     }),
+    // roomBaseServer.getAgreementStatus(),
     //多语言接口
     roomBaseServer.getLangList(),
     // 调用聚合接口
