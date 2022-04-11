@@ -988,7 +988,6 @@
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );
             resolve();
-            return;
           }
 
           this.interactiveServer
