@@ -748,7 +748,9 @@
             await this.$refs.imgPushStream.updateCanvasImg();
           }
 
-          if (this.localSpeaker.streamId) {
+          if (param.isRepublishMode) {
+            await this.startPush();
+          } else if (this.localSpeaker.streamId) {
             await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
             await this.startPush();
           }
