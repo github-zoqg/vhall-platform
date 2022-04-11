@@ -1815,6 +1815,21 @@
     .el-dialog__body {
       padding: 0;
     }
+    .el-radio {
+      white-space: normal;
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      .el-radio__label {
+        line-height: 19px;
+      }
+    }
+    .el-checkbox {
+      white-space: normal;
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+    }
     &__wrap {
       //padding-bottom: 87px;
     }
@@ -1933,7 +1948,20 @@
         width: 100%;
         padding-left: 0;
         > div {
-          padding: 10px 0;
+          padding-bottom: 10px;
+          &:last-child {
+            padding-bottom: 0;
+          }
+        }
+      }
+      .el-checkbox-group {
+        width: 100%;
+        padding-left: 0;
+        > div {
+          padding-bottom: 10px;
+          &:last-child {
+            padding-bottom: 0;
+          }
         }
       }
       .el-input__inner[maxlength='50'] {
