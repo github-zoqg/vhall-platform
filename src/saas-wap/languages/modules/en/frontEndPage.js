@@ -304,7 +304,8 @@ export default {
     chat_1078: 'There is a new message',
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
-    chat_1081: 'Q&A locked'
+    chat_1081: 'Q&A locked',
+    chat_1092: 'You have been muted'
   },
   form: {
     form_1001: 'Name',
