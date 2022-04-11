@@ -29,6 +29,7 @@
       :latestMessage="latestMessage"
       :join-info="joinInfo"
       @needLogin="handleLogin"
+      @sendMsgEnd="sendMsgEnd"
     ></chat-operate>
   </div>
 </template>
