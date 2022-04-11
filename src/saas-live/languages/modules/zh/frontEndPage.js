@@ -752,7 +752,8 @@ export default {
     interact_1032: '麦克风开启，对方将听到您的声音',
     interact_1033: '主画面',
     interact_1034: '主讲人',
-    interact_1035: '对方网络异常'
+    interact_1035: '对方网络异常',
+    interact_1036: '因网络问题导致直播中断，请刷新页面重连'
   },
   doc: {
     doc_1001: '文档加载中',

@@ -730,7 +730,9 @@ export default {
     interact_1031: '{n} invites you to open the microphone',
     interact_1033: '主画面',
     interact_1034: 'presenter',
-    interact_1035: 'Opposite party network exception'
+    interact_1035: 'Opposite party network exception',
+    interact_1036:
+      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect'
   },
   doc: {
     doc_1001: 'This documentation is loading',
