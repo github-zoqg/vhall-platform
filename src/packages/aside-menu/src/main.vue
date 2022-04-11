@@ -397,6 +397,15 @@
             } else {
               vn.setHiddenState(true);
             }
+          } else if (vn.kind === 'videoPolling') {
+            if (this.webinarType == 1) {
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            }
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
+            }
           }
         }
       },
