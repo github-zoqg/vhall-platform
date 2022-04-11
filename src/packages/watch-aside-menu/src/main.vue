@@ -67,7 +67,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useDocServer, useGroupServer } from 'middle-domain';
+  import { useRoomBaseServer, useDocServer, useChatServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import GroupInvitaion from './group-invitation.vue';
 
@@ -171,6 +171,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.docServer = useDocServer();
+      this.chatServer = useChatServer();
       this.groupServer = useGroupServer();
     },
     mounted() {
@@ -186,6 +187,16 @@
     },
     methods: {
       initEvent() {
+        // 监听禁言通知
+        this.chatServer.$on('banned', () => {
+          this.dialogVisibleInvite && (this.dialogVisibleInvite = false);
+        });
+
+        // 监听全体禁言通知
+        this.chatServer.$on('allBanned', () => {
+          this.dialogVisibleInvite && (this.dialogVisibleInvite = false);
+        });
+
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', msg => {
           if (this.groupServer.state.groupInitData.isInGroup) {

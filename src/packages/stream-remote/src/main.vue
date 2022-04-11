@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :class="{ fullscreen: isFullScreen }"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
@@ -122,6 +126,7 @@
               'vh-line-amplification': !isFullScreen,
               'vh-line-narrow': isFullScreen
             }"
+            v-show="stream.streamId"
             @click="fullScreen"
           ></span>
         </el-tooltip>
@@ -401,14 +406,15 @@
         );
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.stream.streamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeRemoteStream();
+          if (e.data.accountId == this.stream.accountId) {
+            this.isShowNetError = true;
+            // this.$message({
+            //   message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // this.subscribeRemoteStream();
           }
         });
 
@@ -619,6 +625,22 @@
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+        height: 24px;
+        bottom: 0;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-remote__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
+        }
       }
     }
     .vmp-stream-remote__container {

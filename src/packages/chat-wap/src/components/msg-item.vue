@@ -165,7 +165,11 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="source.content.text_content" style="display: block"></span>
+                <span
+                  v-html="source.content.text_content"
+                  style="display: block"
+                  class="aaa"
+                ></span>
                 <img
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"

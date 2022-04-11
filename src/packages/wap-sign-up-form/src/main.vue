@@ -873,7 +873,6 @@
           if (this.errMsgMap[item] != '') {
             this.refArr.forEach((refItem, index) => {
               if (refItem == item) {
-                console.log(item, refItem);
                 firstErrIndex == 'first'
                   ? (firstErrIndex = index)
                   : firstErrIndex > index && (firstErrIndex = index);
@@ -886,8 +885,6 @@
         firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
 
         if (isValidate) {
-          console.log(this.form);
-          // const refer = this.getQueryVariable('refer')
           this.formHandler();
           this.submitSignUpForm();
         } else {
@@ -1151,8 +1148,6 @@
           `/lives/entryform/${this.webinar_id}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
             const params = {
               appId: res.data.appId,
               timestamp: res.data.timestamp,
@@ -1396,8 +1391,6 @@
           if (sessionStorage.getItem('visitorId')) {
             params.visit_id = sessionStorage.getItem('visitorId');
           }
-
-          console.log(this.signUpFormServer);
 
           this.signUpFormServer
             .checkIsRegistered(params)
@@ -1658,7 +1651,7 @@
     }
     .radio-item {
       position: relative;
-      padding: 0.267rem 0.2rem 0 0.2rem;
+      padding: 0 0.2rem 0 0.2rem;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1681,7 +1674,8 @@
       .radio-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        //line-height: 0.4rem;
+        line-height: 1.5;
         color: #1a1a1a;
         word-break: break-all;
         font-size: 0.37rem;
@@ -1690,7 +1684,8 @@
           display: block;
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1707,14 +1702,16 @@
       .checkbox-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        //line-height: 0.4rem;
+        line-height: 1.5;
         font-size: 0.37rem;
         color: #1a1a1a;
         word-break: break-all;
         .vh-line-check {
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */

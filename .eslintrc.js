@@ -18,7 +18,8 @@ module.exports = {
     VhallReport: true,
     $: true,
     wx: true,
-    WeixinJSBridge: true
+    WeixinJSBridge: true,
+    Vlog: true
   },
   extends: [
     'plugin:vue/essential', // vue2核心的lint的规则
