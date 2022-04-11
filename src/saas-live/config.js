@@ -523,7 +523,12 @@ export const serverConfig = {
   },
   // 云导播播放器&本地流推送组件
   comPcPlayerLiveYun: {
-    component: 'VmpPcPlayerLiveYun'
+    component: 'VmpPcPlayerLiveYun',
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    }
   },
   // 远端流
   comStreamRemote: {
@@ -899,5 +904,10 @@ export const serverConfig = {
   // 邀请上麦弹窗
   comMicInvited: {
     component: 'VmpMicInvited'
+  },
+  // 【云导播页面】本地流&播放器
+  liveStreamYunRoot: {
+    component: 'VmpAirContainer',
+    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
   }
 };
