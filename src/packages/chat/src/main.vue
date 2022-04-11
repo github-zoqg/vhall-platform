@@ -248,9 +248,16 @@
       },
       noLoginKey() {
         return this.configList['ui.show_chat_without_login'];
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     watch: {
+      liveStatus: function () {
+        this.initInputStatus();
+      },
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
@@ -383,7 +390,10 @@
             disable = true;
           }
         }
-
+        if (this.liveStatus == 3 && this.roleName == 2) {
+          placeholder = this.$t('chat.chat_1092');
+          disable = true;
+        }
         this.inputStatus.placeholder = placeholder;
         this.inputStatus.disable = disable;
       },

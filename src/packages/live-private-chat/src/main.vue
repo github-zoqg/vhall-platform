@@ -409,7 +409,7 @@
         //将文本消息加入消息体
         curmsg.setText(this.inputText);
         //将图片消息加入消息体
-        curmsg.setImge(this.imgList);
+        curmsg.setImage(this.imgList);
         //发送消息
         useChatServer().sendMsg(curmsg);
         //清除发送后的消息

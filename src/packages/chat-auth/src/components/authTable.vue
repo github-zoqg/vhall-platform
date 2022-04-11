@@ -222,14 +222,14 @@
       };
     },
     computed: {
-      //判断未审核的禁言何踢出按钮是否展示
+      //判断未审核的禁言和踢出按钮是否展示
       showMutedAndKickedBtn() {
         return function (item) {
           const { third_party_user_id = '' } = item;
           const { baseChanelInfo = {}, hostUserId = '' } = this.$domainStore.state.chatAuthServer;
           return (
-            third_party_user_id !== hostUserId &&
-            baseChanelInfo.third_party_user_id !== third_party_user_id
+            third_party_user_id != hostUserId &&
+            baseChanelInfo.third_party_user_id != third_party_user_id
           );
         };
       }
