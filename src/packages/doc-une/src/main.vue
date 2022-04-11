@@ -1102,10 +1102,12 @@
         padding: 7px 10px;
         &:hover {
           color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {
           color: #fc5659;
+          cursor: pointer;
         }
       }
     }

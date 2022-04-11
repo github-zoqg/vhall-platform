@@ -227,7 +227,12 @@
     },
     methods: {
       showWelcomeTxt() {
-        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+        // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
+        this.welcomeText &&
+          this.$toast({
+            message: `${this.joinInfo.nickname}${this.welcomeText}`,
+            position: 'bottom'
+          });
       },
       //初始化视图数据
       initViewData() {
