@@ -408,7 +408,7 @@ export const serverConfig = {
       text: '视频轮巡',
       kind: 'videoPolling',
       auth: 'video_polling',
-      disable: false
+      disable: true
     },
     handleClick: [
       {
