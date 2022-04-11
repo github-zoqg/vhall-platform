@@ -882,6 +882,18 @@ export const serverConfig = {
   },
   // *******分屏页面****结束
 
+  // *******视频轮询页面****开始
+  // 【视频轮询页面】根组件
+  videoPollingRoot: {
+    component: 'VmpAirContainer',
+    children: ['videoPollingContainer']
+  },
+  // 【视频轮询页面】分屏组件
+  videoPollingContainer: {
+    component: 'VmpVideoPolling'
+  },
+  // *******分屏页面****结束
+
   // 客户端嵌入页组件
   embedClientRoot: {
     component: 'VmpEmbedClient',
