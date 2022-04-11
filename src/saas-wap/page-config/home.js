@@ -477,7 +477,7 @@ const serverConfig = {
   },
 
   comViewRestrictionWap: {
-    component: 'VmpViewRestrictionWap',
+    component: 'VmpViewRestrictionWap'
   }
   // *******单视频嵌入页面****结束
 };
