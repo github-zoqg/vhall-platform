@@ -156,6 +156,7 @@
         mediaState: this.mediaSettingServer.state,
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
+        isRepublishMode: false, // 设备异常重推流
         selectedMenuItem: 'basic-setting',
         alertText: this.$t('setting.setting_1031'),
         popAlert: {
@@ -218,14 +219,15 @@
        */
       handleCheck() {
         this.hostAlertVisible = false;
-        this.isShow = true;
-        this.reset();
+        this.isRepublishMode = true;
+        this.showMediaSetting();
       },
       /**
        * 关闭弹窗
        */
       closeMediaSetting() {
         this.isShow = false;
+        this.isRepublishMode = false;
         this?.$refs['videoSetting']?.destroyStream();
         this?.$refs['audioOutSetting']?.pauseAudio();
       },
@@ -347,6 +349,8 @@
       getDiffOptions() {
         const source = this._originCaptureState;
         let current = { ...this.mediaState };
+
+        if (this.isRepublishMode) current.isRepublishMode = true;
 
         const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
 
