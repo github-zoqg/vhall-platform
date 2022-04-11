@@ -624,7 +624,7 @@
             // 设置开始为未讨论状态
             useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
             console.warn('结束讨论成功');
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });
       },
@@ -636,7 +636,7 @@
       // 分配设置主动取消回调
       settingCancel() {
         this.groupServer.state.panelShow = false;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
       },
       // 结束讨论回调
       endDiscussion() {},
