@@ -19,7 +19,7 @@
         return this.roomBaseServer.state.watchInitData.webinar.mode;
       },
       // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾？）
-      role() {
+      roleName() {
         return this.roomBaseServer.state.watchInitData.join_info.role_name;
       },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
@@ -155,7 +155,7 @@
             }
 
             // 文档菜单
-            if (this.role == 4) {
+            if (this.roleName == 4) {
               // 嘉宾
               if (this.doc_permission == this.userId) {
                 vn.setDisableState(false);
@@ -185,7 +185,7 @@
               vn.setDisableState(true);
               continue;
             }
-            if (this.role == 4) {
+            if (this.roleName == 4) {
               // 嘉宾
               if (this.doc_permission == this.userId) {
                 vn.setDisableState(false);
@@ -210,7 +210,7 @@
               vn.setDisableState(false);
             }
 
-            if (this.role == 3) {
+            if (this.roleName == 3) {
               vn.setHiddenState(true);
               continue;
             }
@@ -228,7 +228,7 @@
             }
             vn.setText('桌面共享');
             vn.setSelectedState(false);
-            if (this.role === 1) {
+            if (this.roleName === 1) {
               // 主持人
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
@@ -251,7 +251,7 @@
                   vn.setDisableState(true);
                 }
               }
-            } else if (this.role == 4) {
+            } else if (this.roleName == 4) {
               if (this.doc_permission == this.userId) {
                 vn.setDisableState(false);
               } else {
@@ -279,7 +279,7 @@
             // 插播文件菜单
             if (!configList['waiting.video.file']) {
               vn.setHiddenState(true);
-            } else if (this.role == 4) {
+            } else if (this.roleName == 4) {
               // 是主讲人并且没有开启分屏的时候并且没有开启第三方推流，插播可用
               if (
                 this.doc_permission == this.userId &&
@@ -292,7 +292,7 @@
                 vn.setHiddenState(false);
                 vn.setDisableState(true);
               }
-            } else if (this.role == 1) {
+            } else if (this.roleName == 1) {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {
@@ -335,7 +335,7 @@
               vn.setHiddenState(true);
               continue;
             }
-            if (this.role == 4) {
+            if (this.roleName == 4) {
               if (this.doc_permission == this.userId) {
                 // 如果嘉宾为主讲人: 设置为可用
                 vn.setDisableState(false);
@@ -345,18 +345,17 @@
                 vn.setDisableState(true);
               }
             } else {
-              // 主持人不是主讲人、也不置灰
-              // if (this.role == 1 && this.doc_permission != this.userId) {
-              //   vn.setDisableState(true);
-              //   continue;
-              // }
               // 如果问答权限没有，隐藏互动工具栏
-              if (this.role == 3 && this.webinarMode == 5 && !configList['ui.is_hide_qa_button']) {
+              if (
+                this.roleName == 3 &&
+                this.webinarMode == 5 &&
+                !configList['ui.is_hide_qa_button']
+              ) {
                 vn.setHiddenState(true);
                 continue;
               }
               // 定时直播未开播时，互动工具置灰
-              if (this.role == 3 && this.webinarMode == 5 && this.webinarType == 2) {
+              if (this.roleName == 3 && this.webinarMode == 5 && this.webinarType == 2) {
                 vn.setDisableState(true);
                 continue;
               }
@@ -400,16 +399,18 @@
           }
         }
       },
+      /**
+       * 选择某个菜单
+       * @param {String} kind 菜单类型
+       *  document-文档，board-白板, desktopShare-桌面共享，insertMedia-插播文件，
+       *  interactTool-互动工具，group-分组讨论, share-分享, exitGroup-退出小组
+       */
       switchTo(kind) {
         for (const vn of this.$children) {
           if (vn.setSelectedState) {
             vn.setSelectedState(vn.kind === kind);
           }
         }
-      },
-      goWatchShare() {
-        window.vhallReportForProduct && window.vhallReportForProduct.report(110115);
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShareClick'));
       },
       // 判断是否是所有的互动工具都被禁用，如果全部被禁用，互动工具icon不显示
       isAllInteractToolsDisabled() {
