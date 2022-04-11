@@ -16,18 +16,19 @@
                 v-for="item in pollingNumList"
                 :key="item.value"
                 :label="item.label"
+                :disabled="item.label > surplusSpeakCount"
                 :value="item.value"
               ></el-option>
             </el-select>
           </div>
           <div class="polling_form_item">
-            <el-radio v-model="pollingForm.videoCheck" :label="1">
+            <el-radio v-model="pollingForm.videoAutoPolling" :label="1">
               手动轮巡
               <span class="item_color">
                 （需要手动点击“视频墙”页面中的“下一组”按钮，切换视频画面）
               </span>
             </el-radio>
-            <el-radio v-model="pollingForm.videoCheck" :label="2">
+            <el-radio v-model="pollingForm.videoAutoPolling" :label="2">
               自动轮巡
               <span class="item_color">（展示时间结束后，自动切换到下一组视频画面）</span>
             </el-radio>
@@ -54,6 +55,7 @@
   </div>
 </template>
 <script>
+  import { useVideoPollingServer } from 'middle-domain';
   export default {
     name: 'VmpPollingSetting',
     data() {
@@ -61,8 +63,8 @@
         pollingVisible: false,
         pollingForm: {
           videoNum: 1,
-          videoCheck: 1,
-          videoTime: 1
+          videoAutoPolling: 1,
+          videoTime: 0.5
         },
         pollingNumList: [
           {
@@ -80,38 +82,102 @@
         ],
         pollingTimeList: [
           {
-            value: 1,
+            value: 0.5,
             label: '0.5分钟'
           },
           {
-            value: 2,
+            value: 1,
             label: '1分钟'
           },
           {
-            value: 3,
+            value: 5,
             label: '5分钟'
           },
           {
-            value: 4,
+            value: 10,
             label: '10分钟'
           }
         ]
       };
     },
+    computed: {
+      surplusSpeakCount() {
+        return this.$domainStore.state.videoPollingServer.surplusSpeakCount;
+      }
+    },
+    beforeCreate() {
+      this.videoPollingServer = useVideoPollingServer();
+    },
     methods: {
       showVideoPollingSetting() {
-        this.pollingVisible = true;
+        this.getVideoPollingInfo();
+      },
+      getVideoPollingInfo() {
+        this.videoPollingServer.getVideoRoundInfo().then(res => {
+          if (res.code !== 200) {
+            this.$message.error(res.msg);
+            return;
+          }
+          let { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
+          if (account_id != '0') {
+            let title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
+            this.$alert(title, '', {
+              title: '提示',
+              confirmButtonText: '知道了',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+            });
+            return;
+          }
+          if (!surplus_speak_count) {
+            const h = this.$createElement;
+            this.$alert('', '', {
+              title: '提示',
+              message: h('div', null, [
+                h(
+                  'p',
+                  { style: 'padding-bottom: 5px' },
+                  `您的连麦数已达到${max_speak_count}上限，暂无法开启视频轮巡功能，您可将观众下麦，再开启视频轮巡功能`
+                ),
+                h('p', { style: 'color: #999' }, '注：每组调取的视频数<=当前活动连麦数-已上麦数')
+              ]),
+              confirmButtonText: '知道了',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+            });
+            return;
+          }
+          this.pollingVisible = true;
+        });
       },
       // 开始轮巡
-      startPolling() {},
+      startPolling() {
+        let params = {
+          round_video_count: this.pollingForm.videoNum,
+          is_auto: this.pollingForm.videoAutoPolling,
+          interval: this.pollingForm.videoTime
+        };
+        this.videoPollingServer.videoRoundStart(params).then(res => {
+          if (res.code === 200) {
+            this.resetFormData();
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
+          } else {
+            this.$message.error(res.msg);
+            return;
+          }
+        });
+      },
+      resetFormData() {
+        this.pollingForm = {
+          videoNum: 1,
+          videoAutoPolling: 1,
+          videoTime: 0.5
+        };
+      },
       // 重置表单
       closePolling() {
         this.pollingVisible = false;
-        this.pollingForm = {
-          videoNum: 1,
-          videoCheck: 1,
-          videoTime: 1
-        };
+        this.resetFormData();
       }
     }
   };
