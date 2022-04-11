@@ -623,14 +623,6 @@ export const serverConfig = {
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个
     },
-    // 分组设置取消
-    emitCancelGroup: [
-      {
-        cuid: ['comGroupMenu'],
-        method: 'setSelectedState',
-        args: false
-      }
-    ],
     // 触发画笔重置
     emitDocResetBrush: [
       {
