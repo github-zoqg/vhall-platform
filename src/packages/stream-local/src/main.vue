@@ -541,16 +541,6 @@
               this.startPushStreamOnce = false;
               return;
             }
-            // 只有主持人使用
-            if (
-              this.localStreamId &&
-              [1, 4].includes(+this.joinInfo.role_name) &&
-              this.mode === 3
-            ) {
-              await this.interactiveServer.unpublishStream();
-              this.startPush();
-              return;
-            }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
             if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
               this.speakOff();

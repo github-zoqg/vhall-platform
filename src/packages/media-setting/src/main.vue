@@ -82,6 +82,19 @@
     >
       <main slot="content">{{ popAlert.text }}</main>
     </saas-alert>
+    <!--主持人设备禁用弹窗 -->
+    <saas-alert
+      :visible="hostAlertVisible"
+      @onClose="hostAlertVisible = false"
+      @onSubmit="handleCheck"
+      retry="检查设备"
+    >
+      <main slot="content">
+        因设备问题导致直播中断，请检查设备。
+        <br />
+        注意：如果没有可用设备，建议使用图片推流
+      </main>
+    </saas-alert>
   </section>
 </template>
 
@@ -147,9 +160,9 @@
         alertText: this.$t('setting.setting_1031'),
         popAlert: {
           text: this.$t('interact.interact_1011'),
-          visible: false,
-          confirm: true
-        }
+          visible: false
+        },
+        hostAlertVisible: false
       };
     },
     computed: {
@@ -167,7 +180,7 @@
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
-
+      const role = watchInitData.join_info?.role_name;
       // 绑定confirm对应的视图操作
       mediaSettingConfirm.onShow(text => {
         this.alertText = text;
@@ -177,7 +190,11 @@
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
         if (+msg.data.streamType !== 3) {
           // 非桌面共享
-          this.popAlert.visible = true;
+          if (role == 1) {
+            this.hostAlertVisible = true;
+          } else {
+            this.popAlert.visible = true;
+          }
         }
       });
     },
@@ -193,6 +210,14 @@
        * 展示弹窗
        */
       showMediaSetting() {
+        this.isShow = true;
+        this.reset();
+      },
+      /**
+       * 设备被禁用，重新检查设备
+       */
+      handleCheck() {
+        this.hostAlertVisible = false;
         this.isShow = true;
         this.reset();
       },
