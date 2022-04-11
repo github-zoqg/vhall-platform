@@ -4,7 +4,8 @@ import {
   useInteractiveServer,
   useMicServer,
   useMediaCheckServer,
-  useMediaSettingServer
+  useMediaSettingServer,
+  useVideoPollingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -15,6 +16,7 @@ export default async function () {
   const mediaCheckServer = useMediaCheckServer();
   const micServer = useMicServer();
   const mediaSettingServer = useMediaSettingServer();
+  const videoPollingServer = useVideoPollingServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -39,7 +41,7 @@ export default async function () {
   });
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue', msgServer);
 
-  await interactiveServer.init();
+  await videoPollingServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
 
   mediaSettingServer.init();
