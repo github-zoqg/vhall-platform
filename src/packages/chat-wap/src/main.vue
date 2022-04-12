@@ -29,15 +29,15 @@
           }"
           @tobottom="toBottom"
         ></virtual-list>
-      </div>
 
-      <div
-        class="vmp-chat-wap__content__new-msg-tips"
-        v-show="isHasUnreadAtMeMsg"
-        @click="scrollToTarget"
-      >
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+        <div
+          class="vmp-chat-wap__content__new-msg-tips"
+          v-show="isHasUnreadAtMeMsg"
+          @click="scrollToTarget"
+        >
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -394,6 +394,7 @@
     .virtual-content {
       height: 100%;
       overflow: hidden;
+      position: relative;
       .virtual-list {
         height: 100%;
         overflow: auto;
