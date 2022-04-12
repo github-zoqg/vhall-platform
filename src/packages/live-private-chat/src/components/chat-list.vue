@@ -86,22 +86,12 @@
 </template>
 
 <script>
-  import { faceArr as emojiFace } from '@/packages/chat/src/js/emoji';
   import { uniqueId } from 'lodash';
   import { useChatServer, useMsgServer } from 'middle-domain';
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+
   export default {
     name: 'livePrivateChatList',
-    filters: {
-      //todo 考虑全局公共utils里处理这个
-      // chatTime(value) {
-      //   if (['', null, void 0].includes(value)) {
-      //     return;
-      //   }
-      //   if (value < 15) return value;
-      //   return value.substring(0, 16);
-      // }
-    },
     data() {
       return {
         //默认头像
@@ -151,12 +141,9 @@
     },
     watch: {
       selectUserId: {
-        handler(newVal, oldVal) {
-          // const _this = this;
-          console.log(oldVal);
+        handler(newVal) {
           if (newVal) {
             this.chatServer.setCurPrivateTarget && this.chatServer.setCurPrivateTarget(newVal);
-            // _this.init();
           }
         },
         immediate: true
@@ -168,9 +155,7 @@
     },
     mounted() {
       this.listenEvent();
-      // this.initEvent();
       this.initScroll();
-      // this.listenEvents();
     },
     methods: {
       listenEvent() {
@@ -196,7 +181,7 @@
         this.queryChatList();
         this.finishData = true;
       },
-      //todo 待替换
+      //初始化滚动条
       initScroll() {
         let preTop = 0;
         this.$chatDom = document.getElementById(this.id);
@@ -204,12 +189,7 @@
           if (this.scrollEnd) {
             return;
           }
-          let top = e.target.scrollTop;
-          if (top < preTop && top < 100) {
-            // 向上滚动到50px处
-            // this.nextPageChatList();
-          }
-          preTop = top;
+          preTop = e.target.scrollTop;
         };
       },
       nextPageChatList() {
@@ -229,7 +209,6 @@
           start_time: '',
           pos: this.page,
           limit: this.page_size,
-          // to_user: '16422715',
           to_user: this.selectUserId
         };
         return this.chatServer.getPrivateChatHistoryList(params).then(() => {
@@ -238,9 +217,9 @@
       },
       // 根据新消息数量计算滚动定位位置
       computeScrollPosition(count) {
-        let newChatEles = this.$chatDom.querySelectorAll('.chat-list-item');
-        let firstEle = newChatEles[0];
-        let lashEle = newChatEles[count - 1];
+        let newChatItems = this.$chatDom.querySelectorAll('.chat-list-item');
+        let firstEle = newChatItems[0];
+        let lashEle = newChatItems[count - 1];
         const offsetH = 100;
         if (firstEle && lashEle) {
           this.$chatDom.scrollTop = lashEle.offsetTop - firstEle.offsetTop + offsetH;
@@ -291,7 +270,6 @@
             line-height: 24px;
             text-align: center;
             border-radius: 50%;
-            //background-color: @color-default;
             vertical-align: middle;
             background-size: cover;
             background-position: center center;
