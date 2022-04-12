@@ -118,6 +118,9 @@
             this.initLoginStatus();
           }
         }
+      },
+      liveStatus: function () {
+        this.initInputStatus();
       }
     },
     beforeCreate() {
@@ -129,6 +132,10 @@
       //配置信息
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     mounted() {
@@ -184,6 +191,10 @@
         if (isVod && this.configList && this.configList['ui.watch_record_no_chatting'] == 1) {
           this.inputStatus.disable = true;
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
+        }
+        if (this.liveStatus == 3 && this.roleName == 2) {
+          this.inputStatus.disable = true;
+          this.inputStatus.placeholder = this.$t('chat.chat_1092');
         }
       },
       //处理唤起登录
