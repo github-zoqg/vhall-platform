@@ -52,7 +52,7 @@
       return {
         msgItem,
         defaultAvatar,
-        //私聊的列表 todo 假数据待移除，由domain维护
+        //私聊的列表
         chatList: useChatServer().state.privateChatList,
         //私聊是否需要登录
         chatLoginStatus: false,
@@ -97,16 +97,20 @@
         watchInitData: null,
         //房间号
         roomId: '',
-        isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁
+        //true禁言，false未禁言
+        isBanned: useChatServer().state.banned,
+        //true全体禁言，false未禁
+        allBanned: useChatServer().state.allBanned
       };
     },
     watch: {
+      //观察私聊列表变动，如果有新消息，滚动到底部
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
         }
       },
+      //观察黄金链路权限变化，更新输入框的状态
       configList: {
         deep: true,
         handler(val, oldVal) {
@@ -118,6 +122,7 @@
           }
         }
       },
+      //观察直播状态，更新输入框的状态
       liveStatus: function () {
         this.initInputStatus();
       }
@@ -142,7 +147,6 @@
       this.listenEvents();
       this.initInputStatus();
       this.initLoginStatus();
-      // this.getHistoryMsg();
     },
     methods: {
       //初始化视图数据
@@ -240,9 +244,6 @@
       sendMsgEnd() {
         this.scrollBottom();
       },
-      tobottom() {
-        this.unReadMessageCount = 0;
-      },
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
@@ -269,13 +270,10 @@
         line-height: 28px;
         border-radius: 14px;
         background-color: #363636;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
         color: @font-error;
         font-size: 14px;
         cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
         white-space: nowrap;
         .vh-d-arrow-down {
