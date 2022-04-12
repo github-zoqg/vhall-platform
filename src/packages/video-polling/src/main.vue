@@ -17,14 +17,27 @@
         ></span>
       </div>
     </div>
+    <!-- body -->
+    <div class="vmp-video-polling__body">
+      <!-- 左侧视频订阅区域 -->
+      <div class="vmp-video-polling__body-stream"></div>
+      <!-- 右侧用户列表 -->
+      <div class="vmp-video-polling__body-user">
+        <vmp-video-polling-member-list></vmp-video-polling-member-list>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   import { useVideoPollingServer } from 'middle-domain';
   import screenfull from 'screenfull';
+  import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
   export default {
     name: 'VmpVideoPolling',
+    components: {
+      VmpVideoPollingMemberList
+    },
     data() {
       return {
         childrenCom: [],
@@ -94,6 +107,18 @@
         font-size: 18px;
         color: #cccccc;
         margin-right: 16px;
+      }
+    }
+    &__body {
+      display: flex;
+      height: 100%;
+      &-stream {
+        flex: 1;
+      }
+      &-user {
+        width: 360px;
+        height: 100%;
+        background-color: #2a2a2a;
       }
     }
   }
