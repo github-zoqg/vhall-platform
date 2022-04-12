@@ -99,6 +99,7 @@
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import authBox from './components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
@@ -319,7 +320,8 @@
             this.isSubscribeShow = true;
             break;
           case 512523:
-            open_id = sessionStorage.getItem('open_id') || '';
+            this.webinarPayAuth();
+            /* open_id = sessionStorage.getItem('open_id') || '';
             userId = this.userInfo ? this.userInfo.user_id : '';
             if (!open_id && !userId) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -347,12 +349,87 @@
                   `/lives/watch/${this.webinarId}`
               };
               this.handlePay(params, 2);
-            }
+            } */
             break;
           default:
             this.$toast(this.$tec(code) || msg);
             break;
         }
+      },
+      webinarPayAuth() {
+        const open_id = sessionStorage.getItem('open_id');
+        let params = {};
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        const userId = this.userInfo ? this.userInfo.user_id : '';
+        if (!open_id && !userId) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+          return;
+        }
+        if (isWechat()) {
+          // 微信正常授权过
+          if (open_id) {
+            params = {
+              webinar_id: this.webinarId,
+              type: 2,
+              service_code: 'JSAPI',
+              code: open_id
+            };
+          } else {
+            //重新授权
+            payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
+            authWeixinAjax(this.$route, payUrl, () => {});
+          }
+        } else {
+          params = {
+            webinar_id: this.webinarId,
+            type: 1,
+            service_code: 'H5_PAY',
+            user_id: userId,
+            show_url:
+              window.location.origin +
+              process.env.VUE_APP_ROUTER_BASE_URL +
+              `/lives/watch/${this.webinarId}`
+          };
+        }
+        if (payAuthStatus == 0) {
+          this.newHandlePay(params);
+        }
+      },
+      newHandlePay(params) {
+        const that = this;
+        this.subscribeServer
+          .payWay({ ...params })
+          .then(res => {
+            if (res.code == 200) {
+              if (isWechat()) {
+                WeixinJSBridge.invoke(
+                  'getBrandWCPayRequest',
+                  {
+                    appId: res.data.appId,
+                    timeStamp: String(res.data.timeStamp), // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                    nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
+                    package: res.data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                    signType: res.data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                    paySign: res.data.paySign // 支付签名
+                  },
+                  function (res) {
+                    if (res.err_msg == 'get_brand_wcpay_request:ok') {
+                      window.location.reload();
+                    }
+                  }
+                );
+              } else {
+                window.location.href = res.data.link;
+              }
+            } else {
+              that.$toast(`${that.$tec(res.code) || res.msg}`);
+            }
+          })
+          .catch(e => {
+            console.log(e, '获取支付信息失败');
+            that.$toast(`${that.$tec(e.code) || e.msg}`);
+          });
       },
       handlePay(params, flag) {
         this.subscribeServer
