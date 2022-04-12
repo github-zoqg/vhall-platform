@@ -22,11 +22,11 @@
     ></div>
     <div class="restriction-control">
       <template v-if="!agreementInfo.rule">
-        <span @click.stop="agree">{{ $t('webinar.webinar_1044') }}</span>
-        <span @click.stop="disagree">{{ $t('webinar.webinar_1045') }}</span>
+        <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
+        <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
       </template>
       <span v-else @click.stop="agreementPopupVisible = false">
-        {{ $t('webinar.webinar_1046') }}
+        {{ $t('other.other_1019') }}
       </span>
     </div>
   </van-popup>
