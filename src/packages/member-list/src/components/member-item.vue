@@ -5,7 +5,7 @@
         width="28"
         height="28"
         class="vmp-member-item__avatar-wrapper__avatar"
-        :src="userInfo.avatar && userInfo.avatar !== '0' ? userInfo.avatar : defaultAvatar"
+        :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
       />
       <img
         v-show="[1, '1', 3, '3'].includes(userInfo.device_type)"

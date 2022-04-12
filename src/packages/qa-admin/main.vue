@@ -557,14 +557,14 @@
     },
     async created() {
       this.webinar_id = this.$router.currentRoute.params.id;
-      const { liveT = '' } = this.$route.query;
+      const { liveT = '', live_token = '' } = this.$route.query;
       if (location.search.includes('assistant_token=')) {
         sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
       }
       await new Domain({
         plugins: ['chat'],
         requestBody: {
-          live_token: liveT
+          live_token: liveT || live_token
         },
         isNotInitRoom: true
       });

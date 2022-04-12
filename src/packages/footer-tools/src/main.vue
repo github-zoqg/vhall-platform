@@ -19,7 +19,10 @@
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
+      <div
+        class="vmp-footer-tools__left-language"
+        v-if="isEmbed && languageList.length > 1 && !isInGroup"
+      >
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
