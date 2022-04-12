@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-container-right-wap">
-    <div class="base-box" v-if="!groupInitData.isInGroup" v-show="!showDoc">
+    <div class="base-box" v-if="!isInGroup" v-show="!showDoc">
       <div class="icon-wrap">
         <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
       </div>
@@ -48,15 +48,15 @@
       };
     },
     computed: {
-      groupInitData() {
-        return this.$domainStore.state.groupServer.groupInitData;
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
-      'groupInitData.isInGroup': {
+      isInGroup: {
         handler: function (val) {
           if (val) {
             this.$domainStore.state.roomBaseServer.timerInfo = {};
