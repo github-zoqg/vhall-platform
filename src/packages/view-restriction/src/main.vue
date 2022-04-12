@@ -47,6 +47,7 @@
     },
     created() {
       this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
+      this.roomServer.getAgreementStatus();
     },
     destroyed() {
       this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
