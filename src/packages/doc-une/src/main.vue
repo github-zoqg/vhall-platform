@@ -6,6 +6,7 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
+      { 'vmp-doc-une--embed': isEmbed },
       { 'has-stream-list': hasStreamList },
       { 'no-delay-layout': isUseNoDelayLayout }
     ]"
@@ -178,6 +179,10 @@
       // 是不是单视频嵌入
       isEmbedVideo() {
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
@@ -1218,8 +1223,10 @@
       width: calc(100% - 380px);
       height: auto;
       min-height: auto;
+      &.vmp-doc-une--embed {
+        width: calc(100% - 360px);
+      }
     }
-
     // 观看端结束演示按钮
     .end-demonstrate {
       position: absolute;
