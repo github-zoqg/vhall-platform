@@ -17,15 +17,18 @@
   export default {
     name: 'VmpContainer',
     props: {
-      cuid: String,
-      componentType: {
+      cuid: {
         type: String,
-        default: () => {
-          return 'CONTAINER'; // 容器类型
+        default() {
+          return '';
         }
       }
     },
     computed: {
+      /***
+       * 最外层容器的class名称
+       * 支持直接配置className或options属性中配置className，如果两个都配置则合并去重
+       */
       className() {
         let arr = [];
         let outCls = this.widget?.className;
@@ -42,6 +45,7 @@
         }
         return Array.from(new Set(arr)).join(' ');
       },
+      // 渲染配置组件的children
       subWidgets() {
         const rlt = [];
         const list = (this.widget && this.widget.children) || [];
