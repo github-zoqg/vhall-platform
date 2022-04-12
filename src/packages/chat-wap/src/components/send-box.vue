@@ -25,13 +25,11 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned">
-              {{ $t('chat.chat_1006') }}
-            </span>
-            <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
-            <span v-else-if="isMuted">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>{{ $t('chat.chat_1042') }}</span>
+            <span v-else>
+              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
+            </span>
           </div>
         </template>
       </div>
