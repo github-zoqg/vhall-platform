@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="agreementPopupVisible && agreementInfo.rule"
+    v-if="agreementPopupVisible"
     :class="['vmp-view-restriction', { 'force-agree': !agreementInfo.rule }]"
   >
     <div class="vmp-view-restriction-wrap">
@@ -12,7 +12,7 @@
         v-html="agreementInfo.content"
       ></div>
       <div class="restriction-law" v-html="agreementInfo.statement_content"></div>
-      <div v-if="agreementInfo.statement_status" class="restriction-control">
+      <div v-if="agreementInfo.statement_content" class="restriction-control">
         <template v-if="!agreementInfo.rule">
           <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
           <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
@@ -37,7 +37,8 @@
           title: '',
           content: '',
           rule: 0, //协议规则 0:同意后进入 1:阅读后进入(每次进入直播间都弹出)
-          statement_content: '' // 协议声明
+          statement_content: '', // 协议声明
+          statement_status: 0
         }
       };
     },
