@@ -144,6 +144,9 @@
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
+      isStreamYun() {
+        return true;
       }
     },
     components: {
@@ -167,8 +170,8 @@
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
         this.liveStep = 2;
-        // 如果开启了分屏
-        if (this.splitScreenServer.state.isOpenSplitScreen) {
+        // 如果开启了分屏 或者是 云导播
+        if (this.splitScreenServer.state.isOpenSplitScreen || this.isStreamYun) {
           this.handlePublishComplate();
         }
       }
@@ -370,8 +373,13 @@
       // 开始直播/录制事件
       handleStartClick() {
         this.liveStep = 2;
-        // 派发推流事件
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        // 云导播无需推流 直接调用开播接口即可
+        if (this.isStreamYun) {
+          this.handlePublishComplate();
+        } else {
+          // 派发推流事件
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        }
       },
       // 结束直播/录制
       handleEndClick() {
@@ -399,8 +407,8 @@
           return;
         }
 
-        if (res.code == 200 && interactToolStatus.start_type == 4) {
-          // 如果是第三方推流直接生成回放
+        // 如果是第三方推流直接生成回放 云导播逻辑相同
+        if (res.code == 200 && (interactToolStatus.start_type == 4 || this.isStreamYun)) {
           this.handleSaveVodInLive();
           this.liveStep = 1;
         } else {

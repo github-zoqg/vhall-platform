@@ -21,7 +21,12 @@
       <div id="stream-yun-box" class="stream_box_content">
         <div class="floatLayer">
           <!-- 摄像头 -->
-          <el-tooltip :content="$t('interact.interact_1006')" placement="top">
+          <el-tooltip
+            :content="
+              localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
+            "
+            placement="top"
+          >
             <span
               class="vmp-stream-local__shadow-icon"
               @click="handleClickMuteDevice('video')"
@@ -34,7 +39,12 @@
           </el-tooltip>
 
           <!-- 麦克风 -->
-          <el-tooltip :content="$t('interact.interact_1015')" placement="top">
+          <el-tooltip
+            :content="
+              localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
+            "
+            placement="top"
+          >
             <span
               class="vmp-stream-local__shadow-icon vh-iconfont"
               @click="handleClickMuteDevice('audio')"
@@ -102,6 +112,7 @@
       this.interactiveServer = useInteractiveServer();
     },
     mounted() {
+      console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
       this.init();
       setInterval(() => {
         this.time++;
@@ -125,9 +136,19 @@
         console.log('云导播初始化播放器');
         return this.playerServer
           .init({
-            videoNode: 'vmp-player-yun'
+            videoNode: 'vmp-player-yun',
+            // type: 'vod',
+            liveOption: {
+              type:
+                this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1'
+                  ? 'hls'
+                  : 'flv',
+              roomId: this.roomBaseServer.state.watchInitData.interact.room_id // 互动应用ID，必填
+            }
           })
-          .then(() => {});
+          .then(() => {
+            console.log('%c云导播播放器初始化成功', 'color:blue');
+          });
       },
       // 创建本地流
       async createLocalStream() {

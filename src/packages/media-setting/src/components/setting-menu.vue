@@ -65,7 +65,6 @@
        */
       filterMenuList() {
         return this.menuList.filter(item => {
-          console.log(this.menuList, 'this.menuList');
           // 云导播推流页媒体设置菜单
           if (/lives\/yun/.test(location.pathname)) {
             return !['basic-setting', 'audio-out-setting'].includes(item.id);
