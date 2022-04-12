@@ -46,29 +46,29 @@
         popHeight: ''
       };
     },
-    // watch: {
-    //   signinInfo: {
-    //     immediate: true,
-    //     deep: true,
-    //     handler: function () {
-    //       this.init();
-    //     }
-    //   },
-    //   signInVisible(newValue) {
-    //     // EventBus.$emit('signShow', newValue);
-    //   },
-    //   roomBaseData: {
-    //     immediate: true,
-    //     deep: true,
-    //     handler: function (val) {
-    //       this.signinInfo = val.signInfo;
-    //     }
-    //   }
-    // },
-    computed: {
-      // roomBaseData() {
-      //   return this.$domainStore.state.roomBaseServer;
+    watch: {
+      // signinInfo: {
+      //   immediate: true,
+      //   deep: true,
+      //   handler: function () {
+      //     this.init();
+      //   }
       // },
+      // signInVisible(newValue) {
+      //   // EventBus.$emit('signShow', newValue);
+      // },
+      isInGroup: {
+        handler: function (val) {
+          if (val) {
+            this.closeSignIn();
+          }
+        }
+      }
+    },
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
       signinInfo() {
         return this.roomBaseServer.state.signInfo;
       }
