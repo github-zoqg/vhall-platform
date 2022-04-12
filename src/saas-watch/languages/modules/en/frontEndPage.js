@@ -304,7 +304,8 @@ export default {
     chat_1078: 'There is a new message',
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
-    chat_1081: 'Q&A locked'
+    chat_1081: 'Q&A locked',
+    chat_1092: 'You have been muted'
   },
   form: {
     form_1001: 'Name',
@@ -730,7 +731,9 @@ export default {
     interact_1031: '{n} invites you to open the microphone',
     interact_1033: '主画面',
     interact_1034: 'presenter',
-    interact_1035: 'Opposite party network exception'
+    interact_1035: 'Opposite party network exception',
+    interact_1036:
+      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect'
   },
   doc: {
     doc_1001: 'This documentation is loading',
