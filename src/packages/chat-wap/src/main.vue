@@ -29,15 +29,15 @@
           }"
           @tobottom="toBottom"
         ></virtual-list>
-      </div>
 
-      <div
-        class="vmp-chat-wap__content__new-msg-tips"
-        v-show="isHasUnreadAtMeMsg"
-        @click="scrollToTarget"
-      >
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+        <div
+          class="vmp-chat-wap__content__new-msg-tips"
+          v-show="isHasUnreadAtMeMsg"
+          @click="scrollToTarget"
+        >
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -249,6 +249,7 @@
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
           if (!this.isBottom()) {
+            debugger;
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
@@ -394,6 +395,7 @@
     .virtual-content {
       height: 100%;
       overflow: hidden;
+      position: relative;
       .virtual-list {
         height: 100%;
         overflow: auto;
