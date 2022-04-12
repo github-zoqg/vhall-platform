@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-footer-tools">
     <div class="vmp-footer-tools__left">
-      <div class="vmp-footer-tools__left-setting" v-if="isInteractLive" @click="settingShow">
+      <div class="vmp-footer-tools__left-setting" @click="settingShow()">
         <i class="vh-iconfont vh-line-setting"></i>
         {{ $t('account.account_1005') }}
       </div>
@@ -278,9 +278,14 @@
       });
     },
     methods: {
-      // 媒体查询
       settingShow() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
+        if (this.isInteractLive) {
+          // 互动直播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
+        } else {
+          // 视频直播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickCameraCheck'));
+        }
       },
       // 开启视频轮训，设置弹窗
       settingPollingShow() {

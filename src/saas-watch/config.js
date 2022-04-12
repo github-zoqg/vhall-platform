@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comMicInvited'
+      'comMicInvited',
+      'comCameraCheck'
     ]
   },
 
@@ -310,6 +311,11 @@ export const serverConfig = {
       cuid: 'comMediaSetting',
       method: 'showMediaSetting'
     },
+    // 打开摄像头检测
+    emitClickCameraCheck: {
+      cuid: 'comCameraCheck',
+      method: 'showCameraCheck'
+    },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
       method: 'openModal'
@@ -501,6 +507,15 @@ export const serverConfig = {
         cuid: 'comStreamLocal',
         method: 'switchStreamType',
         args: ['$0']
+      }
+    ]
+  },
+  // 摄像头检测及设置
+  comCameraCheck: {
+    component: 'VmpCameraCheck',
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal'
       }
     ]
   },
