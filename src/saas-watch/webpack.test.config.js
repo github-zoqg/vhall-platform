@@ -7,7 +7,7 @@ const htmlConfig = {
     MiddleEventSdk:
       '//t-alistatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain:
-      '//t-alistatic01.e.vhall.com/common-static/middle/middle-domain/1.2.23/middle-domain.js'
+      '//t-alistatic01.e.vhall.com/common-static/middle/middle-domain/1.2.26-beta/middle-domain.js'
   }
 };
 
