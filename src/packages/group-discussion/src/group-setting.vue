@@ -104,7 +104,7 @@
       // 开始分组
       handleGroup: async function () {
         console.log('this.count:', this.count);
-        if (this.way == 2) {
+        if (this.way == 3) {
           console.log('白名单预设分组');
         } else {
           if (isNaN(this.count) || this.count < 2 || this.count > 50) {
