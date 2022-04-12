@@ -249,7 +249,6 @@
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
           if (!this.isBottom()) {
-            debugger;
             this.isHasUnreadAtMeMsg = true;
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
