@@ -5,8 +5,7 @@
 </template>
 
 <script>
-  import roomState from '../../headless/room-state.js';
-  import { Domain } from 'middle-domain';
+  import { Domain, useInteractiveServer } from 'middle-domain';
   export default {
     data() {
       return {
@@ -14,8 +13,9 @@
       };
     },
     async created() {
+      const interactiveServer = useInteractiveServer();
       const domain = await this.init();
-      await roomState();
+      await interactiveServer.init();
       domain.initVhallReport(
         {
           bu: 0,
@@ -47,7 +47,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
+          plugins: ['interaction'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },

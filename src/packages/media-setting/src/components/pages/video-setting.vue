@@ -1,7 +1,7 @@
 <template>
   <section class="vmp-media-setting-video">
     <main>
-      <section class="vmp-media-setting-item">
+      <section class="vmp-media-setting-item" v-if="!isStreamYun">
         <label class="vmp-media-setting-item__label">{{ $t('setting.setting_1006') }}</label>
         <section class="vmp-media-setting-item__content vmp-media-setting-item__video-type">
           <el-radio-group v-model="mediaState.videoType" @change="onVideoTypeChange">
@@ -89,6 +89,10 @@
       },
       devices() {
         return this.mediaState.devices.videoInputDevices;
+      },
+      // 是否为云导播页面
+      isStreamYun() {
+        return /lives\/yun/.test(location.pathname);
       }
     },
     watch: {

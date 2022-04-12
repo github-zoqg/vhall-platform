@@ -6,6 +6,7 @@
       <div class="err_tip">云导播推流异常 {{ errarTime }}</div>
       <div class="stream_people_name">GMIC大会悟空</div>
     </div>
+
     <!-- 本地推流区域 -->
     <div v-else class="stream_box">
       <div class="stream_box_header">
