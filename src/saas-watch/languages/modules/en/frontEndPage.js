@@ -794,6 +794,10 @@ export default {
     webinar_1041: 'Pay{n}'
   },
   color: {},
+  polling: {
+    polling_1001:
+      'The organizer has turned on the video tour function, and you will see your video screen on the hosts side. Please ensure that the video equipment is all normal, and click {n} to set the media.'
+  },
   other: {
     other_1001: 'Preview image',
     other_1002: 'Enter the password!',
@@ -813,7 +817,7 @@ export default {
     other_1016: 'K value verification failed',
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
-    other_1019: 'I got it',
+    other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
   }
 };

@@ -111,6 +111,27 @@
         ></Pay>
       </li>
     </ul>
+    <el-dialog
+      :title="$t('account.account_1061')"
+      :visible.sync="pollingVisible"
+      :close-on-click-modal="true"
+      :modal-append-to-body="true"
+      custom-class="polling-dialog"
+      width="400px"
+    >
+      <div class="polling-dialog_warp">
+        <i18n path="polling.polling_1001">
+          <span place="n" class="polling-dialog_color" @click="settingPollingShow">
+            {{ $t('account.account_1005') }}
+          </span>
+        </i18n>
+        <div class="polling-dialog_btn">
+          <el-button type="primary" round @click="pollingVisible = false">
+            {{ $t('other.other_1019') }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -120,7 +141,8 @@
     useZIndexServer,
     useMicServer,
     useChatServer,
-    useGroupServer
+    useGroupServer,
+    useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
   import reward from './component/reward/index.vue';
@@ -156,6 +178,7 @@
         showTimer: false,
         groupInitData: {},
         showPay: false,
+        pollingVisible: false,
         zfQr: '',
         wxQr: '',
         lang: {},
@@ -225,6 +248,7 @@
       this.zIndexServer = useZIndexServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
@@ -242,10 +266,25 @@
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
+      const liveMode = this.roomBaseServer.state.watchInitData.webinar.mode;
+      // 视频、直播支持视频轮巡
+      if (this.roomBaseServer.state.configList['video_polling'] == 1 && [2, 3].includes(liveMode)) {
+        this.videoPollingServer._addListeners();
+      }
+    },
+    mounted() {
+      this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
+        this.pollingVisible = true;
+      });
     },
     methods: {
+      // 媒体查询
       settingShow() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
+      },
+      // 开启视频轮训，设置弹窗
+      settingPollingShow() {
+        this.pollingVisible = false;
       },
       changeStatus(data, status) {
         console.log(data, status, 'data, status');
@@ -397,6 +436,23 @@
     }
     .pr {
       position: relative;
+    }
+    .polling-dialog {
+      .el-dialog__header {
+        padding: 24px;
+      }
+      line-height: 22px;
+      &_color {
+        color: #3562fa;
+      }
+      &_btn {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 24px;
+        .el-button.is-round {
+          padding: 7px 28px;
+        }
+      }
     }
   }
 </style>

@@ -83,8 +83,12 @@ export default async function () {
 
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(liveMode) && liveType == 1) {
+  const configList = roomBaseServer.state.configList;
+  // 互动、分组直播进行设备检测 或者是视频直播并且开启了视频轮巡权限
+  if (
+    ([3, 6].includes(liveMode) && liveType == 1) ||
+    (liveMode == 2 && configList['video_polling'] == 1)
+  ) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }

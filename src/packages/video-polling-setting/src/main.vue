@@ -32,7 +32,7 @@
               自动轮巡
               <span class="item_color">（展示时间结束后，自动切换到下一组视频画面）</span>
             </el-radio>
-            <div class="item_time">
+            <div class="item_time" v-show="pollingForm.videoAutoPolling == 2">
               展示时间
               <el-select v-model="pollingForm.videoTime" placeholder="请选择" style="width: 120px">
                 <el-option
@@ -118,34 +118,18 @@
             this.$message.error(res.msg);
             return;
           }
-          let { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
+          const { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
+          let title = '';
+          if (max_speak_count == 0) {
+            title = '您尚未配置连麦数，请联系工作人员';
+            this.setPollingAlert(title);
+          }
           if (account_id != '0') {
-            let title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
-            this.$alert(title, '', {
-              title: '提示',
-              confirmButtonText: '知道了',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
-            });
-            return;
+            title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
+            this.setPollingAlert(title);
           }
           if (!surplus_speak_count) {
-            const h = this.$createElement;
-            this.$alert('', '', {
-              title: '提示',
-              message: h('div', null, [
-                h(
-                  'p',
-                  { style: 'padding-bottom: 5px' },
-                  `您的连麦数已达到${max_speak_count}上限，暂无法开启视频轮巡功能，您可将观众下麦，再开启视频轮巡功能`
-                ),
-                h('p', { style: 'color: #999' }, '注：每组调取的视频数<=当前活动连麦数-已上麦数')
-              ]),
-              confirmButtonText: '知道了',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
-            });
-            return;
+            this.setSpeakCountAlert(max_speak_count);
           }
           this.pollingVisible = true;
         });
@@ -161,11 +145,43 @@
           if (res.code === 200) {
             this.resetFormData();
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
+          } else if (res.code === 13342) {
+            this.setSpeakCountAlert();
           } else {
             this.$message.error(res.msg);
             return;
           }
         });
+      },
+      // 已经开启了轮巡
+      setPollingAlert(title) {
+        this.$alert(title, '', {
+          title: '提示',
+          confirmButtonText: '知道了',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        });
+        return;
+      },
+      // 上麦人数已满弹窗
+      setSpeakCountAlert(speakCount) {
+        const maxSpeakCount = speakCount || this.videoPollingServer.state.maxSpeakCount;
+        const h = this.$createElement;
+        this.$alert('', '', {
+          title: '提示',
+          message: h('div', null, [
+            h(
+              'p',
+              { style: 'padding-bottom: 5px' },
+              `您的连麦数已达到${maxSpeakCount}上限，暂无法开启视频轮巡功能，您可将观众下麦，再开启视频轮巡功能`
+            ),
+            h('p', { style: 'color: #999' }, '注：每组调取的视频数<=当前活动连麦数-已上麦数')
+          ]),
+          confirmButtonText: '知道了',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        });
+        return;
       },
       resetFormData() {
         this.pollingForm = {
