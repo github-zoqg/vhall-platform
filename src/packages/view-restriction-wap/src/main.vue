@@ -22,10 +22,12 @@
     ></div>
     <div class="restriction-control">
       <template v-if="!agreementInfo.rule">
-        <span @click.stop="close(0)">{{ $t('webinar.webinar_1044') }}</span>
-        <span @click.stop="close(-1)">{{ $t('webinar.webinar_1045') }}</span>
+        <span @click.stop="agree">{{ $t('webinar.webinar_1044') }}</span>
+        <span @click.stop="disagree">{{ $t('webinar.webinar_1045') }}</span>
       </template>
-      <span v-else @click.stop="close(1)">{{ $t('webinar.webinar_1046') }}</span>
+      <span v-else @click.stop="agreementPopupVisible = false">
+        {{ $t('webinar.webinar_1046') }}
+      </span>
     </div>
   </van-popup>
 </template>
@@ -41,7 +43,7 @@
           // 协议信息
           title: '',
           content: '',
-          rule: 0,
+          rule: 0, //协议规则 0:同意后进入 1:阅读后进入(每次进入直播间都弹出)
           statement_content: '' // 协议声明
         }
       };
@@ -62,38 +64,19 @@
         this.agreementInfo = payload;
         this.agreementPopupVisible = true;
       },
-      close(rule) {
-        const session = sessionStorage.getItem('restrictionStore')
-          ? JSON.parse(sessionStorage.getItem('restrictionStore'))
-          : [];
-        const webinarId = this.$route.params.id;
-        const bool = session.length > 0 ? session.includes(webinarId) : false;
-        if (rule < 0) {
-          // 时间派发 展示错误页面
-          const roomServer = useRoomBaseServer();
-          roomServer.$emit('VIEW_RESTRICTION_ERROR_PAGE');
-          return;
-        } else if (!rule) {
-          if (!bool) {
-            session.push(webinarId);
-          }
-          console.log(991, session, typeof session);
-          sessionStorage.setItem('restrictionStore', JSON.stringify(session));
-        }
-        this.showRestriction = false;
+      agree() {
+        this.roomServer.agreeWitthTerms();
+        this.agreementPopupVisible = false;
+      },
+      disagree() {
+        this.roomServer.refusesTerms();
+        this.agreementPopupVisible = false;
       }
     }
   };
 </script>
 <style lang="less">
   .vmp-view-restriction-wap {
-    // width: 100%;
-    // height: 100%;
-    // position: fixed;
-    // top: 0px;
-    // left: 0px;
-    // background: rgba(0, 0, 0, 0.6);
-    // z-index: 2000;
     width: 670px;
     height: 760px;
     background: #fff;
@@ -171,20 +154,6 @@
         color: #fb3a32;
       }
     }
-  }
-
-  .vmp-view-restriction-wrap {
-    width: 600px;
-    height: 360px;
-    background: #ffffff;
-    box-shadow: 0px 8px 16px 0px rgba(51, 51, 51, 0.24), 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 24px 32px 0px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
   }
   .force-agree {
     background: rgba(0, 0, 0, 1);
