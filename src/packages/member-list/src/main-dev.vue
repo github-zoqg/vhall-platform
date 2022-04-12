@@ -295,9 +295,7 @@
     updated() {
       //hack处理BsScroll不能滚动的问题
       this.$nextTick(() => {
-        if (this.$refs && this.$refs.scroll) {
-          this.$refs.scroll.refresh();
-        }
+        this.refresh();
       });
     },
     watch: {
@@ -431,6 +429,12 @@
       },
       //初始化房间消息回调监听
       listenEvents() {
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
+        });
+
         //加入房间
         this.memberServer.$on('JOIN', this.handleJoinRoom);
 
@@ -662,13 +666,9 @@
           .then(res => {
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
-              this.$refs.scroll.refresh();
-              // this.onlineUsers = this.memberServer.state.onlineUsers || [];
               if (!res?.data?.list?.length) {
                 this.pageConfig.page--;
               }
-              //在线总人数
-              // this.totalNum = this.memberServer.state.totalNum;
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -676,6 +676,9 @@
           })
           .catch(() => {
             this.pageConfig.page--;
+          })
+          .finally(() => {
+            this.refresh();
           });
       },
       //刷新在线人数
@@ -932,7 +935,6 @@
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
-              console.log(res, 'presentation');
             })
             .catch(err => {
               this.$message.warning(err.msg);
@@ -1102,21 +1104,7 @@
       },
       //删除用户
       _deleteUser(accountId, list = [], key = '') {
-        // const index = list.findIndex(
-        //   item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
-        // );
-        //
-        // if (index !== -1) {
-        //   list.splice(index, 1);
-        //   this.memberServer.updateState(key, list);
-        // }
         this.memberServer._deleteUser(accountId, list);
-      },
-      //查找用户在数组的索引号
-      _getUserIndex(accountId, list) {
-        return list.findIndex(
-          item => item.account_id === accountId || item.accountId === accountId
-        );
       },
       //加载更多
       loadMore() {
