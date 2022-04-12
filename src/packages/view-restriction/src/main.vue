@@ -55,13 +55,6 @@
       if (statement_info.length > 0) {
         statement_info.forEach(state => {
           const index = statement_content.indexOf(state.title);
-          console.log(
-            1111,
-            index,
-            statement_content.substring(0, index),
-            statement_content.substring(index + state.title.length),
-            statement_content
-          );
           this.restrictionOpts.statement_content =
             statement_content.substring(0, index) +
             `<a class="law-link" href=${state.link}>${state.title}</a>` +
