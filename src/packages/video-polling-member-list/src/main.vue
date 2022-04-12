@@ -93,6 +93,7 @@
       //获取在线人员列表
       getOnlineUserList(pos) {
         const params = {
+          room_id: useRoomBaseServer().state.watchInitData?.interact?.room_id,
           pos: pos || this.pageConfig.page,
           limit: this.pageConfig.limit
         };
