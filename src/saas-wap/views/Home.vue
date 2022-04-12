@@ -42,7 +42,7 @@
     },
     data() {
       return {
-        state: 0,
+        state: 2,
         liveErrorTip: ''
       };
     },
@@ -154,11 +154,12 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -166,6 +167,11 @@
         const roomBaseServer = useRoomBaseServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
+        });
+        // 不同意观看协议
+        roomBaseServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
+          this.state = 2;
+          this.liveErrorTip = 'view_restriction';
         });
         // 浏览器或者页面关闭时上报
         window.addEventListener('beforeunload', function (e) {

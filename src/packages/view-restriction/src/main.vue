@@ -29,7 +29,7 @@
     name: 'VmpViewRestriction',
     data() {
       return {
-        showRestriction: false,
+        showRestriction: true,
         restrictionOpts: {
           rule: 0, // rule: 0 强制同意  rule: 1 非强制同意
           statement_status: 1, // 是否开启观看限制
@@ -47,7 +47,7 @@
     },
     created() {
       const roomServer = useRoomBaseServer();
-      this.restrictionOpts = roomServer.state.viewRestrictionOpts;
+      this.restrictionOpts = roomServer.state.agreementInfo;
       const { is_open, rule, statement_content, statement_info } = this.restrictionOpts;
       const storeOpts = sessionStorage.getItem('restrictionStore')
         ? JSON.parse(sessionStorage.getItem('restrictionStore'))
