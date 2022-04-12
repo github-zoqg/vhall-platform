@@ -40,7 +40,7 @@
   import MsgItem from './components/msg-item.vue';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import { useRoomBaseServer, useQaServer, useChatServer, useMenuServer } from 'middle-domain';
-  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpQaWap',
