@@ -221,9 +221,14 @@
       },
       // 主屏流   和产品佳佳沟通：显示全屏按钮条件：存在视频流  条件：先判断远端流内是否存在主屏 || 本地流是否是主屏 || {}
       mainScreenStream() {
-        let _stream = this.remoteSpeakers.find(ele => ele.accountId == this.mainScreen) || {};
+        let _stream =
+          this.remoteSpeakers.find(ele => {
+            ele.streamSource = 'remote';
+            return ele.accountId == this.mainScreen;
+          }) || {};
         if (this.localSpeaker.accountId == this.mainScreen) {
           _stream = this.localSpeaker;
+          _stream.streamSource = 'local';
         }
         return _stream;
       },
