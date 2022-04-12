@@ -5,7 +5,7 @@
         <virtual-list
           v-if="virtual.showlist"
           class="qalist"
-          ref="qalist1"
+          ref="qalist"
           :style="{ height: virtual.contentHeight + 'px' }"
           :keeps="15"
           :estimate-size="100"
@@ -58,7 +58,7 @@
         watchInitData: useRoomBaseServer().state.watchInitData,
         //虚拟列表配置
         virtual: {
-          showlist: true,
+          showlist: false,
           contentHeight: 0
         }
       };
@@ -84,11 +84,11 @@
       }
     },
     components: { SendBox },
-    watch: {
-      qaList: function () {
-        this.scrollBottom();
-      }
-    },
+    // watch: {
+    //   qaList: function () {
+    //     this.scrollBottom();
+    //   }
+    // },
     created() {
       this.menuServer = useMenuServer();
       this.getQAHistroy();
@@ -172,7 +172,7 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          this.$refs && this.$refs.qalist1 && this.$refs.qalist1.scrollToBottom();
+          this.$refs && this.$refs.qalist && this.$refs.qalist.scrollToBottom();
           this.unReadMessageCount = 0;
         });
       },
@@ -211,9 +211,10 @@
       overflow: hidden;
       .qa-content {
         height: 100%;
-        overflow: auto;
+        overflow: hidden;
         .qalist {
           height: 100%;
+          overflow: auto;
         }
         .qa-item-wrapper {
           padding: 0 30px;

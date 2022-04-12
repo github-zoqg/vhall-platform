@@ -259,9 +259,9 @@
             <p v-show="!!errMsgMap.code" class="err-msg">{{ errMsgMap.code }}</p>
           </li>
           <li v-if="privacy" class="tab-content-li">
-            <div class="provicyBox clearfix" @click="handleClickPrivacy(privacy)">
+            <div class="privacy-box clearfix" @click="handleClickPrivacy(privacy)">
               <i
-                class="privicyitem vh-iconfont vh-line-check"
+                class="privacy-item vh-iconfont vh-line-check"
                 :class="{ active: form[privacy.id] }"
               ></i>
               <span v-html="privacyText"></span>
@@ -462,11 +462,11 @@
         privacyText: '',
         //答案
         answer: {},
-        //
+        //是否显示云盾验证码
         codeEnable: false,
         verifyCodeEnable: false,
         showCaptcha: false, // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用
-        captchakey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
+        captchaKey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
         mobileKey: '', // 云盾值
         captcha1: null, // 云盾实例
         captcha2: null, // 云盾实例
@@ -777,13 +777,11 @@
         const that = this;
         // eslint-disable-next-line
         initNECaptcha({
-          captchaId: that.captchakey,
+          captchaId: that.captchaKey,
           element: id,
           mode: 'float',
           lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
-          onReady(instance) {
-            console.log(instance);
-          },
+          onReady() {},
           onVerify(err, data) {
             if (data) {
               that.mobileKey = data.validate;
@@ -873,7 +871,6 @@
           if (this.errMsgMap[item] != '') {
             this.refArr.forEach((refItem, index) => {
               if (refItem == item) {
-                console.log(item, refItem);
                 firstErrIndex == 'first'
                   ? (firstErrIndex = index)
                   : firstErrIndex > index && (firstErrIndex = index);
@@ -886,8 +883,6 @@
         firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
 
         if (isValidate) {
-          console.log(this.form);
-          // const refer = this.getQueryVariable('refer')
           this.formHandler();
           this.submitSignUpForm();
         } else {
@@ -957,7 +952,6 @@
                 process.env.VUE_APP_WAP_WATCH +
                 process.env.VUE_APP_WEB_KEY +
                 `/lives/watch/${this.webinar_id}${queryString}`;
-              // this.$router.push(`/lives/watch/${this.webinar_id}`)
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
@@ -988,10 +982,8 @@
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
                     `/lives/watch/${this.webinar_id}${queryString}`;
-                  // this.$router.push(`/lives/watch/${this.webinar_id}`)
                 });
             } else {
-              // this.$router.push(`/lives/watch/${this.webinar_id}`)
               window.location.href =
                 window.location.protocol +
                 process.env.VUE_APP_WAP_WATCH +
@@ -1093,7 +1085,7 @@
           } else if (item.type === 5) {
             // 地域
             !answer.address && (answer.address = []);
-            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+            const province = this.provinces.find(ele => ele.value == this.province) || {
               label: '',
               value: ''
             };
@@ -1107,11 +1099,11 @@
                 : { label: '', value: '' };
             answer.address.push({
               id: item.id,
-              content: `${provinec.label}${city.label}${county.label}`,
+              content: `${province.label}${city.label}${county.label}`,
               contentDe: [
                 {
-                  id: provinec.value,
-                  content: provinec.label
+                  id: province.value,
+                  content: province.label
                 },
                 {
                   id: city.value,
@@ -1151,8 +1143,6 @@
           `/lives/entryform/${this.webinar_id}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
             const params = {
               appId: res.data.appId,
               timestamp: res.data.timestamp,
@@ -1396,8 +1386,6 @@
           if (sessionStorage.getItem('visitorId')) {
             params.visit_id = sessionStorage.getItem('visitorId');
           }
-
-          console.log(this.signUpFormServer);
 
           this.signUpFormServer
             .checkIsRegistered(params)
@@ -1658,7 +1646,7 @@
     }
     .radio-item {
       position: relative;
-      padding: 0.267rem 0.2rem 0 0.2rem;
+      padding: 0 0.2rem 0 0.2rem;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1681,7 +1669,7 @@
       .radio-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        line-height: 1.5;
         color: #1a1a1a;
         word-break: break-all;
         font-size: 0.37rem;
@@ -1690,7 +1678,8 @@
           display: block;
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1707,14 +1696,15 @@
       .checkbox-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        line-height: 1.5;
         font-size: 0.37rem;
         color: #1a1a1a;
         word-break: break-all;
         .vh-line-check {
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1772,7 +1762,7 @@
         background-size: 100%;
       }
     }
-    .provicyBox {
+    .privacy-box {
       min-height: 0.5rem;
       span {
         float: left;
@@ -1781,7 +1771,7 @@
         width: calc(100% - 0.52rem);
       }
     }
-    .privicyitem {
+    .privacy-item {
       &.vh-line-check {
         float: left;
         width: 0.38rem;
@@ -1854,9 +1844,6 @@
       ::v-deep .yidun_tips {
         color: #999999 !important;
         line-height: 1.05rem !important;
-        // .yidun_tips__text {
-        // vertical-align: initial!important;
-        // }
       }
       ::v-deep .yidun_slide_indicator {
         line-height: 1.07rem !important;
@@ -1890,7 +1877,6 @@
       }
       ::v-deep .yidun.yidun--light.yidun--success {
         .yidun_control {
-          // border-color: #3562FA!important;
           .yidun_slider__icon {
             background-image: url(./img/icon-succeed.png) !important;
           }

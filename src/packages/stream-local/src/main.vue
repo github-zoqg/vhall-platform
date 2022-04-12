@@ -459,7 +459,7 @@
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
-       * 此问题产生原因：由于在频繁上下麦过程中，异步问题
+       * 此问题产生原因：由于在频繁上下麦过程中，异步问题。为了解决问题2出现的
        *      上麦成功消息 ---> 创建本地流,此时存下streamId ----> 推流
        *      下麦成功消息 ---> 销毁互动实例 --------> 进而导致上麦未走完的推流报错，互动实例不存在错误
        *   出现错误后，再执行上麦   --->  上麦成功消息  --->  由于有streamID，直接return     ===> 此逻辑是出现此问题的原因
@@ -467,7 +467,7 @@
        * 期间更改过上麦方案：  所有创建流、推流、销毁流等都是通过上下麦成功消息处理的
        *
        * 问题2： 增加存在StreamId直接return原因是因为: 开始直播 emitClickStartLive[ header-right 组件] -> startPush执行一次 --> 收到上麦成功,再执行一次startpush --> 出现推双流问题。
-       * 此tapd地址：后续由北红补充
+       * 此tapd地址：https://www.tapd.cn/tapd_fe/58046813/bug/list?page=1&queryToken=b5ef2acbcbdd27b69fe8fcbeeeb61e56&dialog_preview_id=bug_1158046813001005944
        *
        * 具体想看产生问题1排查修改记录：可查看文件的git提交历史
        *
@@ -539,12 +539,6 @@
           if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
             if (this.startPushStreamOnce) {
               this.startPushStreamOnce = false;
-              return;
-            }
-            // 只有主持人使用
-            if ([1, 4].includes(+this.joinInfo.role_name) && this.mode === 3) {
-              await this.interactiveServer.unpublishStream(this.localStreamId);
-              this.startPush();
               return;
             }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
@@ -713,14 +707,16 @@
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
           if (e.data.accountId == this.joinInfo.third_party_user_id) {
-            this.$message({
-              message: this.$t('因网络问题推流失败，正在重新推流'),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            await this.stopPush();
-            this.startPush();
+            this.PopAlertOffline.text = this.$t('interact.interact_1036');
+            this.PopAlertOffline.visible = true;
+            // this.$message({
+            //   message: this.$t('因网络问题推流失败，正在重新推流'),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // await this.stopPush();
+            // this.startPush();
           }
         });
 
@@ -752,7 +748,9 @@
             await this.$refs.imgPushStream.updateCanvasImg();
           }
 
-          if (this.localSpeaker.streamId) {
+          if (param.isRepublishMode) {
+            await this.startPush();
+          } else if (this.localSpeaker.streamId) {
             await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
             await this.startPush();
           }
@@ -990,7 +988,6 @@
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );
             resolve();
-            return;
           }
 
           this.interactiveServer

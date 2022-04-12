@@ -272,17 +272,17 @@
           this.interactiveServer.resetLayout();
         });
 
-        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1013`),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeStream();
-          }
-        });
+        // this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+        //   if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+        //     this.$message({
+        //       message: this.$t(`interact.interact_1013`),
+        //       showClose: true,
+        //       type: 'warning',
+        //       customClass: 'zdy-info-box'
+        //     });
+        //     this.subscribeStream();
+        //   }
+        // });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
@@ -444,7 +444,7 @@
     background: #2d2d2d;
     position: relative;
     display: flex;
-    z-index: 3;
+    z-index: 11;
     &__tip {
       text-align: center;
       position: absolute;
