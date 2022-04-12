@@ -802,21 +802,36 @@
               this.docServer.nextStep();
             }
             break;
+          // 放大、缩小、还原还原自动开启可移动功能（sdk逻辑）
           // 放大
           case 'zoomIn':
             this.docServer.zoomIn();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 缩小
           case 'zoomOut':
             this.docServer.zoomOut();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 还原
           case 'zoomReset':
             this.docServer.zoomReset();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 移动
           case 'move':
-            this.$refs.docToolbar.changeTool('move');
+            if (this.canMove) {
+              if (this.hasDocPermission) {
+                this.$refs.docToolbar.changeTool(this.$refs.docToolbar.lastEditBrush);
+              } else {
+                this.$refs.docToolbar.changeTool('');
+              }
+            } else {
+              this.$refs.docToolbar.changeTool('move');
+            }
             break;
           // 全屏
           case 'fullscreen':
@@ -837,7 +852,6 @@
        * 重新设置当前画笔
        */
       resetCurrentBrush() {
-        console.log('---resetCurrentBrush---');
         this.$refs.docToolbar.resetCurrentBrush();
       },
 
