@@ -59,7 +59,7 @@
       'groupInitData.isInGroup': {
         handler: function (val) {
           if (val) {
-            this.roomBaseServer.state.timerInfo = {};
+            this.$domainStore.state.roomBaseServer.timerInfo = {};
           }
         }
       }
