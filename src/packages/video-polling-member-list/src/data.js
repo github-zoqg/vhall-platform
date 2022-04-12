@@ -5,7 +5,8 @@ export default {
       room_id: 'lss_28e846d6',
       account_id: '16423152',
       nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
-      avatar: '',
+      avatar:
+        'https://t-alistatic01.e.vhall.com/upload/users/face-imgs/eb/c5/ebc59fcf52fa726a4c076f5bf93251c5.jpg',
       role_name: '1',
       is_banned: 0,
       is_kicked: 0,
@@ -26,7 +27,7 @@ export default {
       join_id: 1314311,
       room_id: 'lss_28e846d6',
       account_id: '164231523',
-      nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
+      nickname: '很长昵称很长昵称很长昵称很长昵称很长昵称长昵称很长昵称很长昵称很长昵称很长昵称',
       avatar: '',
       role_name: '1',
       is_banned: 0,

@@ -64,7 +64,7 @@
         margin-right: 10px;
       }
       &-nickname {
-        max-width: 55px;
+        max-width: 224px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
