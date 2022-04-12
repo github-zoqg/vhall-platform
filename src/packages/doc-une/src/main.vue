@@ -6,6 +6,7 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
+      { 'vmp-doc-une--embed': isEmbed },
       { 'has-stream-list': hasStreamList },
       { 'no-delay-layout': isUseNoDelayLayout }
     ]"
@@ -175,9 +176,13 @@
       };
     },
     computed: {
+      // 是不是单视频嵌入
       isEmbedVideo() {
-        // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
@@ -238,10 +243,11 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
-      // 角色
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
+      // 是否在屏幕共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
@@ -264,18 +270,9 @@
           } else {
             return false;
           }
-          // return (
-          //   this.docServer.state.switchStatus ||
-          //   this.groupServer.state.isInGroup ||
-          //   this.hasDocPermission
-          // );
         } else {
           if (this.isShareScreen) {
             return this.roleName == 3;
-
-            // return (
-            //   (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn)
-            // );
           } else {
             return true;
           }
@@ -364,6 +361,7 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      // 当前用户的上麦信息
       localSpeaker() {
         return (
           this.$domainStore.state.micServer.speakerList.find(
@@ -371,8 +369,8 @@
           ) || {}
         );
       },
+      // 1：无延迟直播
       isNoDelay() {
-        // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       // 互动无延迟 未上麦观众是否使用类似旁路布局
@@ -401,8 +399,6 @@
             this.docServer.state.isChannelChanged = false;
             // 初始化事件
             this.initEvents();
-            // 清空
-            // this.docServer.resetContainer();
             // 恢复上一次的文档数据;
             this.recoverLastDocs();
           }
@@ -441,7 +437,7 @@
     },
     methods: {
       /**
-       * 全屏
+       * 全屏切换
        */
       fullscreen() {
         screenfull.toggle(this.$refs.docWrapper);
@@ -459,6 +455,11 @@
           }
         }
       },
+      /**
+       * 设置文档的展示模式
+       * @param {String} mode
+       * normal-常规模式, mini-小屏模式, fullscreen-全屏模式
+       */
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
         if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
@@ -485,7 +486,6 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
-        console.log('----resize-----');
         this.resize();
       },
       /**
@@ -585,8 +585,8 @@
           });
         }
 
+        // 直播开始
         useMsgServer().$onMsg('ROOM_MSG', msg => {
-          // 直播开始
           if (msg.data.type === 'live_start') {
             // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
@@ -597,7 +597,6 @@
 
         // 直播结束
         useMsgServer().$on('live_over', () => {
-          console.log('[doc]---直播结束 live_over---');
           // 设置观众不可见
           this.docServer.state.switchStatus = false;
           if (this.isWatch) {
@@ -753,14 +752,7 @@
        * @param switchStatus 观众可见：true/false
        */
       async demonstrate(docId, docType, switchStatus) {
-        console.log(
-          '[doc] 演示文档:docId=',
-          docId,
-          ';docType=',
-          docType,
-          '; switchStatu:',
-          switchStatus
-        );
+        console.log(`[doc] 演示文档:docId=${docId};docType=${docType};switchStatu:${switchStatus}`);
         this.docServer.setDocLoadComplete(false);
         this.docServer.setSwitchStatus(switchStatus);
 
@@ -1231,8 +1223,10 @@
       width: calc(100% - 380px);
       height: auto;
       min-height: auto;
+      &.vmp-doc-une--embed {
+        width: calc(100% - 360px);
+      }
     }
-
     // 观看端结束演示按钮
     .end-demonstrate {
       position: absolute;

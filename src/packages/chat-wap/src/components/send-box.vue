@@ -9,9 +9,12 @@
       </div>
       <div class="content-input">
         <template v-if="chatShow">
+          <div class="content-input__placeholder" v-if="liveStatus == 3">
+            <span>{{ $t('chat.chat_1092') }}</span>
+          </div>
           <div
             class="content-input__placeholder"
-            v-if="!isLogin && !noChatLogin && !isEmbed"
+            v-else-if="!isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -22,17 +25,19 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned">
-              {{ $t('chat.chat_1006') }}
-            </span>
-            <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
-            <span v-else-if="isMuted">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>{{ $t('chat.chat_1042') }}</span>
+            <span v-else>
+              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
+            </span>
           </div>
         </template>
       </div>
-      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+      <span
+        @click="showMyQA"
+        :class="[{ 'only-my': isShowMyQA }, 'only-my-default']"
+        v-if="currentTab == 'qa'"
+      >
         {{ $t('chat.chat_1018') }}
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
@@ -258,6 +263,10 @@
       isLogin() {
         const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
         return user_id != 0;
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     watch: {
@@ -520,6 +529,9 @@
       }
       .only-my {
         color: #fb3a32;
+      }
+      .only-my-default {
+        margin-left: 16px;
       }
     }
   }
