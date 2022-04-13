@@ -1,6 +1,6 @@
 <template>
-  <div class="vmp-container-right-wap">
-    <div class="base-box" v-if="!isInGroup" v-show="!showDoc">
+  <div class="vmp-container-right-wap" v-if="!isInGroup">
+    <div class="base-box" v-show="!showDoc">
       <div class="icon-wrap">
         <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
       </div>

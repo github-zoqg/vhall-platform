@@ -68,7 +68,7 @@
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="isLiving">
+      <li v-if="isLiving || isEnding">
         <!-- 抽奖 -->
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
@@ -187,6 +187,10 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否结束直播
+      isEnding() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;
