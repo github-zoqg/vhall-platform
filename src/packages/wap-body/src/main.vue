@@ -189,7 +189,7 @@
             title = who + '解散了分组，您将返回主直播间';
             break;
           case 5:
-            title = this.$t('chat.chat_1007');
+            title = '您已被踢出该小组';
             break;
           case 7:
             title = '组长身份已变更';

@@ -12,7 +12,7 @@
           :extra-props="{
             userId: userId
           }"
-          @tobottom="tobottom"
+          @tobottom="toBottom"
         ></virtual-list>
       </div>
     </div>
@@ -29,7 +29,6 @@
   import msgItem from './components/msg-item';
   import { useChatServer, useRoomBaseServer, useUserServer, useMsgServer } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
-  // import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
@@ -53,8 +52,10 @@
         userId: '',
         //房间id
         roomId: '',
-        isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
+        //true禁言，false未禁言
+        isBanned: useChatServer().state.banned,
+        //true全体禁言，false未禁言
+        allBanned: useChatServer().state.allBanned
       };
     },
     computed: {
@@ -107,13 +108,13 @@
       },
       //发送消息
       sendMsg(value) {
-        const curmsg = useChatServer().createCurMsg();
+        const currentMsg = useChatServer().createCurMsg();
         const target = useChatServer().state.curPrivateTargetId;
-        curmsg.setTarget(target);
+        currentMsg.setTarget(target);
         //将文本消息加入消息体
-        curmsg.setText(value);
+        currentMsg.setText(value);
         //发送消息
-        useChatServer().sendMsg(curmsg);
+        useChatServer().sendMsg(currentMsg);
         //清除发送后的消息
         useChatServer().clearCurMsg();
         this.scrollBottom();
@@ -134,7 +135,8 @@
           this.isHasUnreadAtMeMsg = false;
         });
       },
-      tobottom() {
+      //滚动到底部的回调，重置未读消息数量
+      toBottom() {
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
