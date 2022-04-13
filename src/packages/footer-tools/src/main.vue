@@ -1,7 +1,11 @@
 <template>
   <div class="vmp-footer-tools">
     <div class="vmp-footer-tools__left">
-      <div class="vmp-footer-tools__left-setting" @click="settingShow()">
+      <div
+        class="vmp-footer-tools__left-setting"
+        v-if="isInteractLive || (isVideoLive && isVideoPolling)"
+        @click="settingShow()"
+      >
         <i class="vh-iconfont vh-line-setting"></i>
         {{ $t('account.account_1005') }}
       </div>
@@ -204,6 +208,15 @@
           watchInitData.webinar.type == 1
         );
       },
+      // 是否是视频直播
+      isVideoLive() {
+        const { watchInitData } = this.roomBaseState;
+        return watchInitData.webinar.mode == 2;
+      },
+      // 是否开启视频轮巡
+      isVideoPolling() {
+        return this.roomBaseServer.state.configList['video_polling'] == 1;
+      },
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
@@ -268,7 +281,7 @@
       }
       const liveMode = this.roomBaseServer.state.watchInitData.webinar.mode;
       // 视频、直播支持视频轮巡
-      if (this.roomBaseServer.state.configList['video_polling'] == 1 && [2, 3].includes(liveMode)) {
+      if (this.isVideoPolling && [2, 3].includes(liveMode)) {
         this.videoPollingServer._addListeners();
       }
     },
