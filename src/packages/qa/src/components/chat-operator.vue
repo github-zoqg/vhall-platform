@@ -292,7 +292,7 @@
               this.lock = sessionStorage.getItem('QALock');
               this.questionGap = 15;
               if (!this.questionGapInterval) {
-                window.setInterval(() => {
+                this.questionGapInterval = window.setInterval(() => {
                   if (this.questionGap > 0) {
                     if (!this.lock || this.lock == 'false') {
                       sessionStorage.setItem('QALock', true);
