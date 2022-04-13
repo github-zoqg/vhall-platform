@@ -360,9 +360,8 @@
         height: 100%;
         display: flex;
         align-items: center;
-        // background: #2d2d2d;
         flex-direction: column;
-        padding-top: 2.13rem;
+        justify-content: center;
         i {
           color: #7c7c7c;
           font-size: 2rem;
