@@ -870,7 +870,7 @@
         }
       },
       // 开始推流
-      async startPush({ videoPolling = false }) {
+      async startPush({ videoPolling = false } = {}) {
         // 第三方推流直接开始直播
         if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
           // 派发事件
