@@ -2,10 +2,11 @@
   <!-- 分组直播才有该组件 -->
   <div class="vmp-watch-aside-menu" v-if="webinarMode === 6">
     <ul class="menu-list" v-show="!isCollapse">
+      <!-- 展开/折叠按钮 -->
       <li class="menu-item" @click="handleToggle()">
         <i class="vh-iconfont vh-line-s-fold"></i>
       </li>
-      <vmp-air-container :cuid="cuid"></vmp-air-container>
+      <!-- 文档按钮 -->
       <li
         @click="handleClickItem('document')"
         class="menu-item"
@@ -17,6 +18,7 @@
         <i class="vh-iconfont vh-line-document"></i>
         <span>文档</span>
       </li>
+      <!-- 白板按钮 -->
       <li
         @click="handleClickItem('board')"
         class="menu-item"
@@ -28,6 +30,7 @@
         <i class="vh-saas-iconfont vh-saas-line-whiteboard"></i>
         <span>白板</span>
       </li>
+      <!-- 桌面共享按钮 -->
       <li
         @click="handleClickItem('desktopShare')"
         class="menu-item"
@@ -39,6 +42,7 @@
         <i class="vh-saas-iconfont vh-saas-a-line-Desktopsharing"></i>
         <span>{{ isShareScreen ? '关闭共享' : '桌面共享' }}</span>
       </li>
+      <!-- 请求协助按钮 -->
       <li
         v-if="isInGroup"
         @click="handleClickItem('assistance')"
@@ -87,9 +91,11 @@
       };
     },
     computed: {
+      // 当前容器id
       currentCid() {
         return this.docServer.state.currentCid;
       },
+      // 禁用菜单数组
       disableMenus() {
         if (this.hasDocPermission) {
           if (this.isShareScreen) {
@@ -99,6 +105,7 @@
         }
         return ['document', 'board', 'desktopShare'];
       },
+      // 直播模式：1-音频直播、2-视频直播、3-互动直播 6-分组直播 5 定时直播
       webinarMode() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
       },
@@ -163,6 +170,7 @@
         if (newval) {
           const t = newval.split('-')[0];
           if (t) {
+            // t=document 或 board
             this.selectedMenu = t;
           }
         }

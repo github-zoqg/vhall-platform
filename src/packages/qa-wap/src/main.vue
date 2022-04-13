@@ -19,10 +19,10 @@
             length: qaList.length
           }"
         ></virtual-list>
-      </div>
-      <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+        <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -212,6 +212,7 @@
       .qa-content {
         height: 100%;
         overflow: hidden;
+        position: relative;
         .qalist {
           height: 100%;
           overflow: auto;

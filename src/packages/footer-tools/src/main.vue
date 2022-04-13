@@ -19,7 +19,10 @@
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
+      <div
+        class="vmp-footer-tools__left-language"
+        v-if="isEmbed && languageList.length > 1 && !isInGroup"
+      >
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -65,7 +68,7 @@
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="isLiving">
+      <li v-if="isLiving || isEnding">
         <!-- 抽奖 -->
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
@@ -93,7 +96,9 @@
       <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <!-- 打赏 -->
         <div class="vh-icon-box">
-          <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          <div class="vmp-reward-icon">
+            <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          </div>
           <reward ref="reward" />
         </div>
       </li>
@@ -184,6 +189,10 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否结束直播
+      isEnding() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;
@@ -375,6 +384,20 @@
       .vh-gifts-wrap {
         border-radius: 16px;
         position: relative;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+        border-radius: 16px;
+        cursor: pointer;
+        margin-left: 16px;
+        img {
+          width: 32px;
+          height: 32px;
+          -webkit-transform-origin: left center;
+          transform-origin: left center;
+          margin: -1px 0 0 0;
+        }
       }
     }
     &__center {
@@ -397,6 +420,22 @@
     }
     .pr {
       position: relative;
+    }
+  }
+  .vmp-reward-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #ff9d30 0%, #ff9e31 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: -1px 0 0 0;
     }
   }
 </style>

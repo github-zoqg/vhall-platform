@@ -111,6 +111,14 @@
           clearInterval(this.timer);
         }
       });
+      // 收到结束签到的消息
+      this.signServer.$on('live_over', e => {
+        this.showSign = false;
+        this.isShowCircle = false;
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+      });
     },
     computed: {
       roomId() {
@@ -205,13 +213,21 @@
 <style lang="less">
   .vmp-sign-watch {
     &_icon {
+      position: relative;
       width: 32px;
       height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      margin-left: 16px;
       line-height: 32px;
+      background: linear-gradient(180deg, #878eff 0%, #5565ff 100%);
+      border-radius: 16px;
+      cursor: pointer;
+      margin-left: 16px;
+      img {
+        width: 32px;
+        height: 32px;
+        -webkit-transform-origin: left center;
+        transform-origin: left center;
+        margin: -1px 0 0 0;
+      }
       .sign-circle {
         position: absolute;
         top: -2px;

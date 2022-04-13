@@ -1,7 +1,10 @@
 <template>
-  <div class="vmp-screen-post-wap" v-if="screenShow" @click="handleLink">
+  <div
+    class="vmp-screen-post-wap"
+    v-if="screenShow && useRoomBaseServer.state.screenPosterInfo.m_img"
+    @click="handleLink"
+  >
     <img
-      v-if="useRoomBaseServer.state.screenPosterInfo.m_img"
       :src="useRoomBaseServer.state.screenPosterInfo.m_img"
       alt=""
       class="vmp-screen-post-wap-img"
