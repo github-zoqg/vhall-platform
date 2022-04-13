@@ -98,7 +98,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
-  import { boxEventOpitons, browserType, isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import authBox from './components/confirm.vue';
   export default {
@@ -327,7 +327,7 @@
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
             }
-            if (browserType() && open_id) {
+            if (isWechat() && open_id) {
               // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
               // const open_id = sessionStorage.getItem('open_id');
               params = {
@@ -436,7 +436,7 @@
           .payWay({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType() && flag == 1) {
+              if (isWechat() && flag == 1) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
