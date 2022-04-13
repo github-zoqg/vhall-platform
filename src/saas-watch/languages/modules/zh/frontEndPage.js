@@ -222,7 +222,9 @@ export default {
     login_1059: '请先校验图形验证码',
     login_1060: '图形验证码错误'
   },
-  undefined: {},
+  undefined: {
+    undefined_1028: '取消移动'
+  },
   register: {
     register_1001: '欢迎注册微吼直播',
     register_1002: '注册新用户',
