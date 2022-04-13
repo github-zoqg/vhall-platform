@@ -93,7 +93,9 @@
       <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <!-- 打赏 -->
         <div class="vh-icon-box">
-          <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          <div class="vmp-reward-icon">
+            <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          </div>
           <reward ref="reward" />
         </div>
       </li>
@@ -375,6 +377,20 @@
       .vh-gifts-wrap {
         border-radius: 16px;
         position: relative;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+        border-radius: 16px;
+        cursor: pointer;
+        margin-left: 16px;
+        img {
+          width: 32px;
+          height: 32px;
+          -webkit-transform-origin: left center;
+          transform-origin: left center;
+          margin: 0 0;
+        }
       }
     }
     &__center {
@@ -397,6 +413,22 @@
     }
     .pr {
       position: relative;
+    }
+  }
+  .vmp-reward-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #ff9d30 0%, #ff9e31 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: 0 0;
     }
   }
 </style>

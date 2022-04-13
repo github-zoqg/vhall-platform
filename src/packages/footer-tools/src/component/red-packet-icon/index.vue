@@ -42,6 +42,20 @@
   .vmp-red-packet-icon {
     color: #fff;
     position: relative;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #ff765a 0%, #f6261d 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: 0 0;
+    }
     .vmp-dot {
       position: absolute;
       display: inline-block;
