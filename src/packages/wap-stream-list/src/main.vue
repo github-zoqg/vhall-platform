@@ -39,7 +39,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -57,9 +57,10 @@
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
+        v-if="languageList.length > 1 && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
-        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
+        <span @click.stop.prevent="openLanguage">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
@@ -261,12 +262,12 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
-      useMediaCheckServer().checkSystemRequirements();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
     },
 
     async created() {
+      await useMediaCheckServer().checkSystemRequirements();
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;

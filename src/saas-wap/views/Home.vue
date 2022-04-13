@@ -204,9 +204,9 @@
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
         } else if (err.code == 611001) {
-          this.liveErrorTip = '互动初始化失败，' + err.message;
+          this.liveErrorTip = '互动初始化失败，' + err.msg;
         } else {
-          this.liveErrorTip = this.$tec(err.code) || err.message;
+          this.liveErrorTip = this.$tec(err.code) || err.msg;
         }
       },
       goSubscribePage(clientType) {
