@@ -39,7 +39,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -57,9 +57,10 @@
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
+        v-if="languageList.length > 1 && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
-        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
+        <span @click.stop.prevent="openLanguage">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
@@ -221,9 +222,14 @@
       },
       // 主屏流   和产品佳佳沟通：显示全屏按钮条件：存在视频流  条件：先判断远端流内是否存在主屏 || 本地流是否是主屏 || {}
       mainScreenStream() {
-        let _stream = this.remoteSpeakers.find(ele => ele.accountId == this.mainScreen) || {};
+        let _stream =
+          this.remoteSpeakers.find(ele => {
+            ele.streamSource = 'remote';
+            return ele.accountId == this.mainScreen;
+          }) || {};
         if (this.localSpeaker.accountId == this.mainScreen) {
           _stream = this.localSpeaker;
+          _stream.streamSource = 'local';
         }
         return _stream;
       },
