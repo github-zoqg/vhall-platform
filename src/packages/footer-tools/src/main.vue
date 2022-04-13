@@ -290,6 +290,13 @@
       // 开启视频轮训，设置弹窗
       settingPollingShow() {
         this.pollingVisible = false;
+        if (this.isInteractLive) {
+          // 互动直播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
+        } else {
+          // 视频直播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickCameraCheck'));
+        }
       },
       changeStatus(data, status) {
         console.log(data, status, 'data, status');
