@@ -433,7 +433,7 @@
       },
       // 是否开启视频轮巡
       isVideoPolling() {
-        return this.roomBaseServer.state.configList['video_polling'] == 1;
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
     },
     beforeCreate() {
@@ -451,6 +451,17 @@
     },
     async mounted() {
       this.checkStartPush();
+      this.videoPollingServer.$on('VIDEO_POLLING_START', async () => {
+        if (this.joinInfo.role_name !== 2) return;
+        try {
+          // 轮询判断是否有互动实例
+          await this.checkVRTCInstance();
+        } catch (error) {
+          console.log(error);
+          await this.interactiveServer.init({ videoPolling: true });
+        }
+        this.startPush({ videoPolling: true });
+      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -459,24 +470,6 @@
       }
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
-      }
-    },
-    watch: {
-      // 是否开启视频轮巡
-      async isVideoPolling(val) {
-        if (this.joinInfo.role_name !== 2) return;
-        if (val) {
-          try {
-            // 轮询判断是否有互动实例
-            await this.checkVRTCInstance();
-          } catch (error) {
-            console.log(error);
-            await this.interactiveServer.init({ videoPolling: true });
-          }
-          this.startPush({ videoPolling: true });
-        } else {
-          this.stopPush();
-        }
       }
     },
     methods: {
