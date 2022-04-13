@@ -11,8 +11,12 @@
         :class="['restriction-content', { 'more-content': agreementInfo.rule == 1 }]"
         v-html="agreementInfo.content"
       ></div>
-      <div class="restriction-law" v-html="agreementInfo.statement_content"></div>
-      <div v-if="agreementInfo.statement_content" class="restriction-control">
+      <div
+        v-if="agreementInfo.statement_content"
+        class="restriction-law"
+        v-html="agreementInfo.statement_content"
+      ></div>
+      <div class="restriction-control">
         <template v-if="!agreementInfo.rule">
           <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
           <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
@@ -93,7 +97,7 @@
     transform: translate(-50%, -50%);
     .restriction-title {
       width: 100%;
-      height: 28px;
+      min-height: 28px;
       font-size: 20px;
       font-weight: 500;
       color: #1a1a1a;
