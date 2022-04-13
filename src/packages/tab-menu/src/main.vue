@@ -248,12 +248,14 @@
             this.setVisible({ visible: false, type: 'private' });
             this.setVisible({ visible: false, type: 'notice' });
           } else {
+            this.initMenu();
             if (interactToolStatus.question_status == 1) {
               this.setVisible({ visible: true, type: 'v5' });
             } else {
               this.setVisible({ visible: false, type: 'v5' });
             }
             this.setVisible({ visible: true, type: 'notice' });
+            this.selectDefault();
           }
         });
       },
@@ -263,7 +265,7 @@
       initMenu() {
         const roomState = this.$domainStore.state.roomBaseServer;
         let list = [];
-
+        this.menu = [];
         // 从接口拉取的配置
         if (roomState.clientType === 'send') {
           list = [...this.menuServer.state.list];
@@ -275,7 +277,6 @@
         for (const item of list) {
           this.addItem(item);
         }
-
         this.addSpecialItem();
       },
       /**

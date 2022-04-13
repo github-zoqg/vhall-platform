@@ -208,6 +208,10 @@
         // 组长改变的消息
         function handleGroupLeaderChange(msg) {
           console.log(msg, '组长改变的消息');
+          if (!_this.groupInitData.isInGroup) {
+            return;
+          }
+          _this.updateOnlineUserList();
         }
         // 人员身份更改
         function handleGroupJoinInfoChange(msg) {
