@@ -807,7 +807,7 @@
               this.docServer.nextStep();
             }
             break;
-          // 放大、缩小、还原还原自动开启可移动功能（sdk逻辑）
+          // 放大、缩小、还原操作会自动开启可移动功能（sdk逻辑）
           // 放大
           case 'zoomIn':
             this.docServer.zoomIn();
