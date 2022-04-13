@@ -2,7 +2,7 @@
  * Created by yangxy on 2022/01/13.
  * 通用工具类
  */
-export const hasOwnProperty = function (obj, key) {
+export const hasOwnProperty = function(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 
@@ -11,7 +11,7 @@ export const hasOwnProperty = function (obj, key) {
  * @param {*} ms 毫秒数
  * @returns {Promise}
  */
-export const sleep = function (ms) {
+export const sleep = function(ms) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
@@ -20,7 +20,7 @@ export const sleep = function (ms) {
 //防抖
 export function debounce(fn, t = 300) {
   let lastTime;
-  return function () {
+  return function() {
     window.clearTimeout(lastTime);
     const [that, args] = [this, arguments];
     lastTime = window.setTimeout(() => {
@@ -33,13 +33,13 @@ export function debounce(fn, t = 300) {
 export function throttle(fn, t = 300) {
   let last;
   let timer;
-  return function () {
+  return function() {
     let th = this;
     let args = arguments;
     let now = +new Date();
     if (last && now - last < t) {
       window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
+      timer = window.setTimeout(function() {
         last = now;
         fn.apply(th, args);
       }, t);
@@ -94,7 +94,10 @@ const ua = navigator.userAgent.toLowerCase();
 
 // 是否微信
 export function isWechat() {
-  return ua.indexOf('micromessenger') > -1;
+  // return ua.indexOf('micromessenger') > -1;
+  const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  console.log('isWechat 是否为微信', isWechat);
+  return isWechat;
 }
 // 是否qq浏览器
 export function isQQ() {
@@ -102,7 +105,10 @@ export function isQQ() {
 }
 // 是否企业微信
 export function isWechatCom() {
-  return ua.indexOf('wxwork') > -1;
+  // return ua.indexOf('wxwork') > -1;
+  const isWechatCom = ua.indexOf('wxwork') > -1;
+  console.log('isWechatCom 是否为企业微信', isWechatCom);
+  return isWechatCom;
 }
 
 // 是否移动端
@@ -117,20 +123,6 @@ export function getQueryString(name) {
   const r = window.location.search.substr(1).match(reg);
   if (r != null) return unescape(r[2]);
   return null;
-}
-
-/**
- * @description 区分浏览器类型 是微信还是普通浏览器
- * @returns null
- */
-export function browserType() {
-  const ua = window.navigator.userAgent.toLowerCase();
-  if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-    /* 是微信浏览器 */
-    return true;
-  } else {
-    return false;
-  }
 }
 
 // 返回四位版本数
@@ -291,9 +283,9 @@ export function getBrowserType() {
     shell === 'none'
       ? {}
       : {
-          shell, // wechat qq uc 2345 sougou liebao maxthon baidu 360
-          shellVs
-        }
+        shell, // wechat qq uc 2345 sougou liebao maxthon baidu 360
+        shellVs
+      }
   );
 }
 

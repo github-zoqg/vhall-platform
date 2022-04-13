@@ -42,7 +42,7 @@
     },
     data() {
       return {
-        state: 0,
+        state: 2,
         liveErrorTip: ''
       };
     },
@@ -167,6 +167,11 @@
         const roomBaseServer = useRoomBaseServer();
         roomBaseServer.$on('ROOM_KICKOUT', () => {
           this.handleKickout();
+        });
+        // 不同意观看协议
+        roomBaseServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
+          this.state = 2;
+          this.liveErrorTip = this.$t('other.other_1020');
         });
         // 浏览器或者页面关闭时上报
         window.addEventListener('beforeunload', function (e) {
