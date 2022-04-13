@@ -247,7 +247,8 @@
     useMediaCheckServer,
     useChatServer,
     useDocServer,
-    useMsgServer
+    useMsgServer,
+    useVideoPollingServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -429,6 +430,10 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
+      },
+      // 是否开启视频轮巡
+      isVideoPolling() {
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
     },
     beforeCreate() {
@@ -439,12 +444,24 @@
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this.listenEvents();
     },
     async mounted() {
       this.checkStartPush();
+      this.videoPollingServer.$on('VIDEO_POLLING_START', async () => {
+        if (this.joinInfo.role_name !== 2) return;
+        try {
+          // 轮询判断是否有互动实例
+          await this.checkVRTCInstance();
+        } catch (error) {
+          console.log(error);
+          await this.interactiveServer.init({ videoPolling: true });
+        }
+        this.startPush({ videoPolling: true });
+      });
     },
     beforeDestroy() {
       // 清空计时器
@@ -853,7 +870,7 @@
         }
       },
       // 开始推流
-      async startPush() {
+      async startPush({ videoPolling }) {
         // 第三方推流直接开始直播
         if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
           // 派发事件
@@ -864,7 +881,7 @@
         }
         try {
           // 创建本地流
-          await this.createLocalStream();
+          await this.createLocalStream(videoPolling);
           // 推流
           await this.publishLocalStream();
           // 实时获取网络状况
@@ -885,7 +902,7 @@
           }
           console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
-          if (this.autoSpeak) {
+          if (this.autoSpeak || videoPolling) {
             this.interactiveServer.setDeviceStatus({
               device: 1, // 1:audio    2:video
               status: 0, // 0:禁音    1:打开麦克风
@@ -901,12 +918,13 @@
         }
       },
       // 创建本地流
-      async createLocalStream() {
+      async createLocalStream(videoPolling) {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
           await this.interactiveServer
             .createLocalVideoStream({
-              videoNode: `stream-${this.joinInfo.third_party_user_id}`
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`,
+              streamType: videoPolling ? 5 : null
             })
             .catch(e => {
               if (e && e?.name == 'NotAllowed') {
