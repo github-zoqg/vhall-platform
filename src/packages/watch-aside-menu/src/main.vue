@@ -317,7 +317,8 @@
           if (this.userId == msg.data.target_id) {
             this.senderId = msg.sender_id; // 邀请人id
             // 邀请人身份
-            this.inviteName = msg.data.room_role == 20 ? '组长' : '主持人';
+            this.inviteName =
+              msg.data.room_role == 20 ? this.$getRoleName(20) : this.$getRoleName(1);
             // 被邀请人当时所在小组
             this.inviteGroupId = this.groupServer.state.groupInitData?.group_id;
             this.dialogVisibleInvite = true;
