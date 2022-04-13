@@ -194,7 +194,9 @@ export default {
     login_1031: 'Terms of service',
     login_1032: 'Wechat login'
   },
-  undefined: {},
+  undefined: {
+    undefined_1028: 'Cancel Move'
+  },
   register: {
     register_1001: 'Welcome to register for VHALL live-streaming',
     register_1002: 'Register to be a new user',
