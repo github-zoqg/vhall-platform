@@ -392,7 +392,7 @@
           height: 32px;
           -webkit-transform-origin: left center;
           transform-origin: left center;
-          margin: 0 0;
+          margin: -1px 0 0 0;
         }
       }
     }
@@ -431,7 +431,7 @@
       height: 32px;
       -webkit-transform-origin: left center;
       transform-origin: left center;
-      margin: 0 0;
+      margin: -1px 0 0 0;
     }
   }
 </style>
