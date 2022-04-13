@@ -209,7 +209,7 @@
       width: 32px;
       height: 32px;
       line-height: 32px;
-      background: linear-gradient(180deg, #878EFF 0%, #5565FF 100%);
+      background: linear-gradient(180deg, #878eff 0%, #5565ff 100%);
       border-radius: 16px;
       cursor: pointer;
       margin-left: 16px;
