@@ -111,6 +111,14 @@
           clearInterval(this.timer);
         }
       });
+      // 收到结束签到的消息
+      this.signServer.$on('live_over', e => {
+        this.showSign = false;
+        this.isShowCircle = false;
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+      });
     },
     computed: {
       roomId() {
