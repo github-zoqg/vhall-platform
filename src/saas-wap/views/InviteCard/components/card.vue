@@ -1,29 +1,17 @@
 <template>
   <section class="vmp-invitation">
     <template v-if="isInviteVisible">
-      <img
-        style="display: none"
-        :src="webinarInfo.showImg"
-        alt
-        class="hsrc vh-invitation__show-img"
-      />
-      <img style="display: none" :src="invite_qr_url" alt class="hsrc" />
       <div class="vh-invitation__down-warp">
         <img v-show="canvasImgUrl" :src="canvasImgUrl" alt />
       </div>
       <div class="vh-invitation__card-preview-content-download" ref="drawCanvasDom">
         <div class="vh-invitation__card-preview-content-warp">
-          <div
-            class="watch-img"
-            :style="`backgroundImage: url(${webinarInfo.showImg})`"
-            v-if="webinarInfo.show_type == 1"
-            id="shopInvent"
-          >
+          <div class="watch-img" v-if="webinarInfo.show_type == 1" id="shopInvent">
+            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
             <div class="watch-bg">
               <div class="watch-header">
                 <div class="watch-avator">
-                  <img :src="webinarInfo.avatar" alt="" />
-                  <!-- <img src="./images/111.png" alt=""> -->
+                  <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
                 <p>{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
@@ -46,8 +34,7 @@
               </div>
               <div class="watch-footer">
                 <div class="watch-code">
-                  <!-- <img src="./images/qr.png" alt=""> -->
-                  <img :src="invite_qr_url" alt="" />
+                  <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="watch-action">
                   <p class="qr-value">{{ $t('nav.nav_1046') }}</p>
@@ -57,16 +44,11 @@
               </div>
             </div>
           </div>
-          <div
-            class="look-img"
-            :style="`backgroundImage: url(${webinarInfo.showImg})`"
-            v-else-if="webinarInfo.show_type == 2"
-            id="shopInvent"
-          >
+          <div class="look-img" v-else-if="webinarInfo.show_type == 2" id="shopInvent">
+            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
             <div class="look-header">
               <div class="look-avator">
-                <img :src="webinarInfo.avatar" alt="" />
-                <!-- <img src="./images/1.jpg" alt=""> -->
+                <img class="hsrc" :src="webinarInfo.avatar" alt="" />
               </div>
               <p>{{ webinarInfo.nick_name }}</p>
               <p>{{ $t('nav.nav_1044') }}</p>
@@ -78,8 +60,7 @@
               </div>
               <div class="look-footer">
                 <div class="look-code">
-                  <img :src="invite_qr_url" alt="" />
-                  <!-- <img src="./images/qr.png" alt=""> -->
+                  <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="look-action">
                   <p>{{ webinarInfo.date }}</p>
@@ -89,18 +70,13 @@
             </div>
           </div>
 
-          <div
-            class="show-img"
-            :style="`backgroundImage: url(${webinarInfo.showImg})`"
-            v-else
-            id="shopInvent"
-          >
+          <div class="show-img" v-else id="shopInvent">
+            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
             <div class="show-img-shadow"></div>
             <div class="show-container">
               <div class="show-header">
                 <div class="show-avator">
-                  <img :src="webinarInfo.avatar" alt="" />
-                  <!-- <img src="./images/1.jpg" alt=""> -->
+                  <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
                 <p>{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
@@ -127,8 +103,7 @@
               </div>
               <div class="show-footer">
                 <div class="show-code">
-                  <!-- <img src="./images/qr.png" alt=""> -->
-                  <img :src="invite_qr_url" alt="" />
+                  <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="show-action">
                   <p class="qr-value">{{ $t('nav.nav_1046') }}</p>
@@ -319,11 +294,6 @@
             imaObj.onload = () => {
               count++;
               img.src = getBase64Image(imaObj);
-
-              if (img.getAttribute('class') == 'hsrc invitation__show__show-img') {
-                this.webinarInfo.showImg = getBase64Image(imaObj);
-              }
-
               if (imgList.length === count) {
                 Html2canvas(dom, {
                   allowTaint: true,
@@ -357,12 +327,12 @@
     height: 100%;
     position: relative;
     z-index: 1;
-    .hsrc {
-      width: 560px;
-      left: 0;
-      position: absolute;
-      opacity: 0;
-    }
+    // .hsrc {
+    //   width: 560px;
+    //   left: 0;
+    //   position: absolute;
+    //   opacity: 0;
+    // }
     .vh-invitation__down-warp {
       width: 100%;
       height: 100%;
@@ -382,11 +352,18 @@
       .vh-invitation__card-preview-content-warp {
         width: 100%;
         height: 100%;
+        .vh-invitation__show-img {
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          width: 100%;
+          z-index: 1;
+        }
         .show-img {
           width: 100%;
           border-radius: 4px;
           border: 1px solid #e2e2e2;
-          background-size: 100% 100%;
           height: 100%;
           position: relative;
           .show-img-shadow {
@@ -396,6 +373,7 @@
             top: 0;
             left: 0;
             background: rgba(0, 0, 0, 0.2);
+            z-index: 2;
           }
           .show-container {
             padding: 24px;
@@ -404,6 +382,7 @@
             position: relative;
             // background-color: #fff;
             // box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
+            z-index: 2;
             .show-header {
               padding: 10px 24px 10px;
               text-align: center;
@@ -555,7 +534,6 @@
           width: 100%;
           border-radius: 4px;
           border: 1px solid #e2e2e2;
-          background-size: 100% 100%;
           height: 100%;
           .watch-bg {
             width: calc(100% - 100px);
@@ -564,7 +542,9 @@
             background: #ffffff;
             position: relative;
             border-radius: 4px;
+            border: 1px solid #e2e2e2;
             box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.2);
+            z-index: 2;
             .watch-header {
               padding: 34px 24px 20px;
               text-align: center;
@@ -700,12 +680,14 @@
           width: 100%;
           border-radius: 4px;
           border: 1px solid #e2e2e2;
-          background-size: 100% 100%;
           height: 100%;
           .look-header {
             height: calc(100% - 600px);
             padding: 20px 24px;
             text-align: center;
+            position: absolute;
+            z-index: 2;
+            width: 100%;
             .look-avator {
               margin: auto;
               margin-bottom: 10px;
@@ -729,6 +711,7 @@
             position: absolute;
             bottom: 0;
             background: #ffffff;
+            z-index: 2;
           }
           .look-text {
             width: calc(100% - 84px);
