@@ -3,7 +3,9 @@
     <!-- 播放器区域 -->
     <div id="vmp-player-yun" class="player_box" v-if="roleName == 1 && !pushStream">
       <div class="top_tip" :class="streamStatus ? 'success' : 'warning'">{{ tipText }}</div>
-      <div class="err_tip">云导播推流异常 {{ errarTime }}</div>
+      <div class="err_tip" v-if="false">
+        <div class="err_text">云导播推流异常 {{ errarTime }}</div>
+      </div>
       <div class="stream_people_name">GMIC大会悟空</div>
     </div>
 
@@ -22,16 +24,14 @@
         <div class="floatLayer">
           <!-- 摄像头 -->
           <el-tooltip
-            :content="
-              localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
-            "
+            :content="videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
             placement="top"
           >
             <span
               class="vmp-stream-local__shadow-icon"
               @click="handleClickMuteDevice('video')"
               :class="
-                localSpeaker.videoMuted
+                videoMuted
                   ? 'vh-iconfont vh-line-turn-off-video-camera'
                   : 'vh-iconfont vh-line-video-camera'
               "
@@ -40,19 +40,13 @@
 
           <!-- 麦克风 -->
           <el-tooltip
-            :content="
-              localSpeaker.audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')
-            "
+            :content="audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
             placement="top"
           >
             <span
               class="vmp-stream-local__shadow-icon vh-iconfont"
               @click="handleClickMuteDevice('audio')"
-              :class="
-                localSpeaker.audioMuted
-                  ? 'vh-line-turn-off-microphone'
-                  : `vh-microphone${audioLevel}`
-              "
+              :class="audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
             ></span>
           </el-tooltip>
         </div>
@@ -73,7 +67,9 @@
         showFloatLayer: false,
         tipText: '未检测到云导播推流',
         streamStatus: null,
-        time: 3580
+        time: 3580,
+        videoMuted: localStorage.getItem('videoMuted') || 0,
+        audioMuted: localStorage.getItem('audioMuted') || 0
       };
     },
     computed: {
@@ -90,18 +86,20 @@
       roleName() {
         return this.$domainStore.state.roomBaseServer.watchInitData?.join_info?.role_name;
       },
+      // 是否为推流页面
       pushStream() {
-        return /lives\/yun/.test(location.pathname);
+        return /lives\/yun/.test(location.pathname) && true;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
+      speakerList() {
+        return this.$domainStore.state.micServer.speakerList;
+      },
       localSpeaker() {
         console.log('-------localSpeaker更新--------');
         return (
-          this.$domainStore.state.micServer.speakerList.find(
-            item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {}
+          this.speakerList.find(item => item.accountId == this.joinInfo.third_party_user_id) || {}
         );
       }
     },
@@ -245,12 +243,28 @@
       },
       // 点击mute按钮事件
       handleClickMuteDevice(deviceType) {
+        console.log(this.localSpeaker, this.interactiveServer, deviceType, 'this.localSpeaker');
         const status = this.localSpeaker[`${deviceType}Muted`] ? 1 : 0;
         this.interactiveServer.setDeviceStatus({
           device: deviceType == 'video' ? 2 : 1,
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        if (deviceType == 'audio') {
+          console.log(123);
+          this.interactiveServer.muteAudio({
+            streamId: this.localSpeaker.streamId,
+            isMute: this[`${deviceType}Muted`] == 1
+          });
+        } else {
+          console.log(456);
+          this.interactiveServer.muteVideo({
+            streamId: this.localSpeaker.streamId,
+            isMute: this[`${deviceType}Muted`] == 1
+          });
+        }
+        this[`${deviceType}Muted`] = this[`${deviceType}Muted`] ? 0 : 1;
+        localStorage.setItem(`${deviceType}Muted`, this[`${deviceType}Muted`]);
         // 110136关闭    110137 开启
         if (deviceType == 'video') {
           window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
@@ -296,10 +310,15 @@
         position: absolute;
         color: #fc5659;
         width: 100%;
+        height: 100%;
         text-align: center;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        background: #000000;
+        .err_text {
+          position: relative;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
       }
       .stream_people_name {
         position: absolute;

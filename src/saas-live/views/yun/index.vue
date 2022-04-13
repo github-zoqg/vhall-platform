@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import { Domain, useInteractiveServer } from 'middle-domain';
+  import { Domain, useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
   export default {
     data() {
       return {
@@ -15,7 +15,9 @@
     async created() {
       const interactiveServer = useInteractiveServer();
       const domain = await this.init();
-      await interactiveServer.init();
+      await useRoomBaseServer().getInavToolStatus();
+      await useMicServer().init();
+      await interactiveServer.baseInit();
       domain.initVhallReport(
         {
           bu: 0,
