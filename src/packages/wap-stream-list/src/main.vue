@@ -262,12 +262,12 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
-      useMediaCheckServer().checkSystemRequirements();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
     },
 
     async created() {
+      await useMediaCheckServer().checkSystemRequirements();
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;

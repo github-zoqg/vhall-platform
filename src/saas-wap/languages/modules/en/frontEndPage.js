@@ -194,7 +194,9 @@ export default {
     login_1031: 'Terms of service',
     login_1032: 'Wechat login'
   },
-  undefined: {},
+  undefined: {
+    undefined_1028: 'Cancel Move'
+  },
   register: {
     register_1001: 'Welcome to register for VHALL live-streaming',
     register_1002: 'Register to be a new user',
@@ -792,7 +794,8 @@ export default {
     webinar_1038: 'Share success',
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
-    webinar_1041: 'Pay{n}'
+    webinar_1041: 'Pay{n}',
+    webinar_1042: 'The content you want has not been searched yet'
   },
   color: {},
   other: {
