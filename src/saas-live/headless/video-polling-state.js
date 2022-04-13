@@ -32,7 +32,7 @@ export default async function () {
   await mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false });
 
   // 获取房间互动工具状态
-  // await roomBaseServer.getInavToolStatus();
+  await roomBaseServer.getInavToolStatus();
 
   micServer.init();
 

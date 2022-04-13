@@ -20,7 +20,17 @@
     <!-- body -->
     <div class="vmp-video-polling__body">
       <!-- 左侧视频订阅区域 -->
-      <div class="vmp-video-polling__body-stream"></div>
+      <div class="vmp-video-polling__body-stream">
+        <div
+          class="vmp-split-screen__stream-container"
+          v-for="speaker in pollingList"
+          :key="speaker.id"
+        >
+          <div class="vmp-split-screen__stream-container-box">
+            <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
+          </div>
+        </div>
+      </div>
       <!-- 右侧用户列表 -->
       <div class="vmp-video-polling__body-user">
         <vmp-video-polling-member-list></vmp-video-polling-member-list>
@@ -44,10 +54,15 @@
         isFullscreen: false // 是否进入全屏
       };
     },
-    computed: {},
+    computed: {
+      // 轮询列表
+      pollingList() {
+        return this.$domainStore.state.videoPollingServer.pollingList;
+      }
+    },
     watch: {},
     beforeCreate() {
-      this.videoPolling = useVideoPollingServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;

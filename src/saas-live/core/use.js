@@ -51,6 +51,8 @@ import VmpSplitScreen from '@/packages/split-screen';
 import VmpVideoPolling from '@/packages/video-polling';
 // 视频轮巡设置弹窗
 import VmpPollingSetting from '@/packages/video-polling-setting';
+// 视频轮询流订阅
+import VmpStreamPollingRemote from '@/packages/stream-polling-remote';
 // 客户端嵌入页
 import VmpEmbedClient from '@/packages/embed-client-live';
 // 邀请上麦
@@ -103,6 +105,7 @@ export function initUse() {
   Vue.use(VmpSplitScreen);
   Vue.use(VmpVideoPolling);
   Vue.use(VmpPollingSetting);
+  Vue.use(VmpStreamPollingRemote);
 
   //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
   Vue.use(OverlayScrollbarsPlugin);

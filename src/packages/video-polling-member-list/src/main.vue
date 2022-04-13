@@ -25,7 +25,6 @@
 <script>
   import memberItem from './components/member-item';
   import scroll from '@/packages/member-list/src/components/scroll';
-  import data1 from './data.js';
   import {
     useMicServer,
     useRoomBaseServer,
@@ -65,16 +64,15 @@
     },
     computed: {
       onlineUsers() {
-        // TODO: 测试代码，删掉 false
-        return this.memberServer.state.onlineUsers || data1.list;
+        return this.$domainStore.state.memberServer.onlineUsers;
       },
       //上麦列表
       speakerList() {
-        return this.micServer.state.speakerList;
+        return this.$domainStore.state.micServer.speakerList;
       },
       // 轮询列表
       pollingList() {
-        return this.videoPollingServer.state.pollingList;
+        return this.$domainStore.state.videoPollingServer.pollingList;
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
@@ -168,7 +166,7 @@
           );
           if (index > -1) {
             const user = this.memberServer.state.onlineUsers[index];
-            this.memberServer.state.onlineUsers.splice(index, {
+            this.memberServer.state.onlineUsers.splice(index, 1, {
               ...user,
               is_speak: 1
             });
@@ -178,7 +176,7 @@
           const index = this.getUserIndex(msg.data.target_id, this.memberServer.state.onlineUsers);
           if (index > -1) {
             const user = this.memberServer.state.onlineUsers[index];
-            this.memberServer.state.onlineUsers.splice(index, {
+            this.memberServer.state.onlineUsers.splice(index, 1, {
               ...user,
               is_speak: 0
             });
