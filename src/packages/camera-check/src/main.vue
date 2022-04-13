@@ -182,24 +182,13 @@
 
       /**
        * 保存操作
-       * (中途会弹窗确认，否决将不执行真实保存操作)
        */
       async saveMediaSetting() {
         this._diffOptions = this.getDiffOptions();
-
-        this.$confirm(this.$t('setting.setting_1031'), '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        })
-          .then(res => {
-            this.$message.success(this.$t('common.common_1034'));
-            this.closeVideoSetting();
-            this.sendChangeEvent();
-            this.getStateCapture(); // 更新快照
-          })
-          .catch(err => console.log(err));
+        this.$message.success(this.$t('common.common_1034'));
+        this.closeVideoSetting();
+        this.sendChangeEvent();
+        this.getStateCapture(); // 更新快照
       },
       /**
        * 发送变化事件
