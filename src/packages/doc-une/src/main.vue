@@ -89,7 +89,7 @@
         ></li>
         <li
           data-value="move"
-          :title="$t('doc.doc_1007')"
+          :title="canMove ? $t('doc.doc_1028') : $t('doc.doc_1007')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
