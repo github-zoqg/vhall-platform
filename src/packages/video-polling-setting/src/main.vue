@@ -117,21 +117,25 @@
           if (res.code !== 200) {
             this.$message.error(res.msg);
             return;
+          } else {
+            const { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
+            let title = '';
+            if (max_speak_count == 0) {
+              title = '您尚未配置连麦数，请联系工作人员';
+              this.setPollingAlert(title);
+              return;
+            }
+            if (account_id != '0') {
+              title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
+              this.setPollingAlert(title);
+              return;
+            }
+            if (!surplus_speak_count) {
+              this.setSpeakCountAlert(max_speak_count);
+              return;
+            }
+            this.pollingVisible = true;
           }
-          const { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
-          let title = '';
-          if (max_speak_count == 0) {
-            title = '您尚未配置连麦数，请联系工作人员';
-            this.setPollingAlert(title);
-          }
-          if (account_id != '0') {
-            title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
-            this.setPollingAlert(title);
-          }
-          if (!surplus_speak_count) {
-            this.setSpeakCountAlert(max_speak_count);
-          }
-          this.pollingVisible = true;
         });
       },
       // 开始轮巡
