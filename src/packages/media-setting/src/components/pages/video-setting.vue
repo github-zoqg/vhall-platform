@@ -140,6 +140,7 @@
        */
       async createPreview() {
         if (this.mediaState.videoType !== 'camera') return;
+        if (this.mediaState.video === '') return;
 
         await this.destroyStream();
 
