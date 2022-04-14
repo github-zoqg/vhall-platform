@@ -95,8 +95,11 @@ export function uuid() {
 
 // 是否微信
 export function isWechat() {
+  // return ua.indexOf('micromessenger') > -1 && !isWechatCom();
   const ua = navigator.userAgent.toLowerCase();
-  return ua.indexOf('micromessenger') > -1;
+  const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  console.log('isWechat 是否为微信', isWechat);
+  return isWechat;
 }
 // 是否qq浏览器
 export function isQQ() {
@@ -105,8 +108,11 @@ export function isQQ() {
 }
 // 是否企业微信
 export function isWechatCom() {
+  // return ua.indexOf('wxwork') > -1;
   const ua = navigator.userAgent.toLowerCase();
-  return ua.indexOf('wxwork') > -1;
+  const isWechatCom = ua.indexOf('wxwork') > -1;
+  console.log('isWechatCom 是否为企业微信', isWechatCom);
+  return isWechatCom;
 }
 
 // 是否移动端
