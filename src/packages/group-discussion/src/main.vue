@@ -13,6 +13,16 @@
               size="small"
               :round="true"
               class="btn-group-op"
+              :disabled="!groupedUserExists && way == 3"
+              @click="initData"
+            >
+              重新导入
+            </el-button>
+            <el-button
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
               :disabled="isOpenSwitch != 1"
               @click="handleNotice"
             >
@@ -281,6 +291,7 @@
         changeGroupFlag: 1, //1-待分配的换组，2-某个组的换组
         needChangeList: [], // 某个组选择要换组人员
         showItem: null,
+        way: 1, //分组方式
         isInvitedId: '' // 演示人id(受邀请人Id)
       };
     },
@@ -634,8 +645,9 @@
         return !!obj;
       },
       // 分配设置主动取消回调
-      settingCancel() {
+      settingCancel(way) {
         this.groupServer.state.panelShow = false;
+        this.way = way;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
       },
       // 结束讨论回调
