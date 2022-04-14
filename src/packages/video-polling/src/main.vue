@@ -109,11 +109,11 @@
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
       });
-    },
-    beforeDestroy() {
-      // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
-      if (this._isExitPolling) return;
-      localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+      window.addEventListener('beforeunload', () => {
+        // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
+        if (this._isExitPolling) return;
+        localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+      });
     },
     methods: {
       // 下一组
