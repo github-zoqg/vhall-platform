@@ -4,11 +4,13 @@
     <div class="vmp-video-polling__tip">
       <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
       <div class="vmp-video-polling__tip-wrap">
-        <span class="vmp-video-polling__tip-auto">
-          距离展示下一组 10:00
-          <el-button type="primary" size="medium" round>继续轮巡</el-button>
+        <span class="vmp-video-polling__tip-auto" v-if="isAutoPolling">
+          距离展示下一组 {{ zeroPadding(minute) }}: {{ zeroPadding(second) }}
+          <el-button type="primary" size="medium" round @click="autoPolling">
+            {{ isPausedPolling ? '继续轮巡' : '暂停轮巡' }}
+          </el-button>
         </span>
-        <span @click="nextGroup" class="vmp-video-polling__tip-next">下一组</span>
+        <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
         <span
           class="vmp-video-polling__tip-btn vh-iconfont"
           :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
@@ -64,14 +66,27 @@
       return {
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
-        downTime: '10:00',
-        layoutLevel: 1
+        layoutLevel: 1,
+        nextTime: 10,
+        isPausedPolling: false,
+        countTimer: null,
+        minute: '10',
+        second: '00',
+        time: 60
       };
     },
     computed: {
       // 轮询列表
       pollingList() {
         return this.$domainStore.state.videoPollingServer.pollingList;
+      },
+      // 是否是自动轮巡
+      isAutoPolling() {
+        return this.$domainStore.state.videoPollingServer.isAutoPolling;
+      },
+      // 轮巡时间
+      downTime() {
+        return this.$domainStore.state.videoPollingServer.downTime;
       }
     },
     watch: {
@@ -95,24 +110,86 @@
       this._isExitPolling = false;
       // 进入时，重置为0
       localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 0);
+      if (this.isAutoPolling) {
+        this.changeTime();
+      }
     },
     mounted() {
       // 限定特定的组件的全屏更改
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
       });
-    },
-    beforeDestroy() {
-      // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
-      if (this._isExitPolling) return;
-      localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+      window.addEventListener('beforeunload', () => {
+        // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
+        if (this._isExitPolling) return;
+        localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+      });
     },
     methods: {
       // 下一组
-      nextGroup() {
-        this.videoPollingServer.getVideoRoundUsers({
-          is_next: 1
-        });
+      nextPolling() {
+        if (this.nextTime < 10) {
+          this.$message.error('请勿频繁操作');
+          return;
+        } else {
+          this.videoPollingServer.getVideoRoundUsers({
+            is_next: 1
+          });
+        }
+        this.nextTimer = setInterval(() => {
+          this.nextTime--;
+          if (this.nextTime == 0) {
+            this.nextTime = 10;
+            clearInterval(this.nextTimer);
+            return false;
+          }
+        }, 1000);
+      },
+      changeTime() {
+        this.minute = (((this.time / 60) % 60 >> 0) + '').padStart(2, 0);
+        this.second = ((this.time % 60 >> 0) + '').padStart(2, 0);
+        this.counterTime(this.minute, this.second);
+      },
+      autoPolling() {
+        this.isPausedPolling = !this.isPausedPolling;
+        if (this.isPausedPolling) {
+          clearInterval(this.countTimer);
+        } else {
+          this.counterTime(this.minute, this.second);
+        }
+      },
+      counterTime(minute, second) {
+        this.countTimer = setInterval(() => {
+          second--;
+          if (second < 0) {
+            minute--;
+            second = 59;
+          }
+          if (minute == 0 && second == 0) {
+            clearInterval(this.countTimer);
+            this.videoPollingServer
+              .getVideoRoundUsers({
+                is_next: 1
+              })
+              .then(res => {
+                if (res.code === 200) {
+                  this.changeTime();
+                } else {
+                  clearInterval(this.countTimer);
+                }
+              });
+          }
+          this.minute = minute;
+          this.second = second;
+        }, 1000);
+      },
+      zeroPadding(num) {
+        num = Number(num);
+        if (isNaN(num)) return num;
+        if (num >= 0 && num < 10) {
+          return `0${num}`;
+        }
+        return num;
       },
       // 退出视频轮询
       exitVideoPolling() {
