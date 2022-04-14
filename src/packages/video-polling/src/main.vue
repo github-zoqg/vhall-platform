@@ -8,7 +8,7 @@
           距离展示下一组 10:00
           <el-button type="primary" size="medium" round>继续轮巡</el-button>
         </span>
-        <span class="vmp-video-polling__tip-next">下一组</span>
+        <span class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
         <span
           class="vmp-video-polling__tip-btn vh-iconfont"
           :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
@@ -88,6 +88,23 @@
       localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
     },
     methods: {
+      // 下一组
+      nextPolling() {
+        // let _time = 0;
+        // if (_time > 0 && _time < 10) {
+        //   this.$message.error('请勿频繁操作');
+        //   return;
+        // }
+        // this.nextTimer = setInterval(() => {
+        //   _time += 1;
+        //   console.log(_time, '???!3124');
+        //   if (_time >= 10) {
+        //     _time = 0;
+        //     clearInterval(this.nextTimer);
+        //     return false;
+        //   }
+        // }, 1000);
+      },
       // 退出视频轮询
       exitVideoPolling() {
         this.$confirm('关闭后将结束视频轮巡功能', '提示', {
