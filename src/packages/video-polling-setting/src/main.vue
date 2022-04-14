@@ -28,11 +28,11 @@
                 （需要手动点击“视频墙”页面中的“下一组”按钮，切换视频画面）
               </span>
             </el-radio>
-            <el-radio v-model="pollingForm.videoAutoPolling" :label="2">
+            <el-radio v-model="pollingForm.videoAutoPolling" :label="0">
               自动轮巡
               <span class="item_color">（展示时间结束后，自动切换到下一组视频画面）</span>
             </el-radio>
-            <div class="item_time" v-show="pollingForm.videoAutoPolling == 2">
+            <div class="item_time" v-show="pollingForm.videoAutoPolling == 0">
               展示时间
               <el-select v-model="pollingForm.videoTime" placeholder="请选择" style="width: 120px">
                 <el-option
@@ -82,7 +82,7 @@
         ],
         pollingTimeList: [
           {
-            value: 0.5,
+            value: 0,
             label: '0.5分钟'
           },
           {
@@ -157,6 +157,12 @@
           interval: this.pollingForm.videoTime
         };
         this.videoPollingServer.videoRoundStart(params).then(res => {
+          window.vhallReportForProduct?.report(
+            this.pollingForm.videoAutoPolling == 1 ? 110149 : 110150
+          );
+          window.vhallReportForProduct?.report(110151, {
+            report_extra: { count: this.pollingForm.videoNum }
+          });
           if (res.code === 200) {
             this.resetFormData();
             this.goPollingPage();
@@ -206,7 +212,7 @@
         this.pollingForm = {
           videoNum: 1,
           videoAutoPolling: 1,
-          videoTime: 0.5
+          videoTime: 0
         };
       },
       // 重置表单
