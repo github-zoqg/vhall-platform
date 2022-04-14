@@ -56,7 +56,6 @@
 <script>
   import { useVideoPollingServer } from 'middle-domain';
   import screenfull from 'screenfull';
-  import moment from 'moment';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
   export default {
     name: 'VmpVideoPolling',
