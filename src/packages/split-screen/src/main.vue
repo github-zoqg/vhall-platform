@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import { useSplitScreenServer } from 'middle-domain';
+  import { useSplitScreenServer, useInteractiveServer } from 'middle-domain';
   import screenfull from 'screenfull';
   export default {
     name: 'VmpSplitScreen',
@@ -97,6 +97,7 @@
     },
     beforeCreate() {
       this.splitScreenServer = useSplitScreenServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
@@ -105,6 +106,22 @@
       // TODO: 限定特定的组件的全屏更改
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
+      });
+      // 订阅流播放失败    监听到播放失败, 然后展示按钮
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+        this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+        if (this.playboartCount > 1) {
+          return;
+        }
+        this.$alert('您已进入直播房间，马上开始互动吧', '', {
+          title: '提示',
+          confirmButtonText: '立即开始',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel',
+          callback: () => {
+            this.interactiveServer.playAbortStreams();
+          }
+        });
       });
     },
     methods: {

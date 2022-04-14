@@ -674,7 +674,6 @@
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
             if (isLive) {
-              console.log('context:::::', msg, context);
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
@@ -999,7 +998,6 @@
         }
         //互动连麦成功断开链接
         function handleSuccessDisconnect(msg) {
-          // const { member_info = { is_speak: 0, is_apply: 0 } } = msg.data;
           _this.changeUserStatus(
             msg.data.target_id,
             _this.onlineUsers,
@@ -1009,7 +1007,6 @@
             },
             'onlineUsers'
           );
-          console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
             this.timer && clearTimeout(this.timer);
@@ -1506,7 +1503,6 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
           case 'setBanned':
@@ -1597,9 +1593,7 @@
                 receive_account_id: accountId
               })
               .then(res => {
-                console.warn(res, '邀请上麦');
                 if (res.code == 200) {
-                  //todo 这里需要上报埋点
                   this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
                   this.$message.error(res.msg);
@@ -1673,7 +1667,6 @@
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
-              console.log(res, 'presentation');
             })
             .catch(err => {
               this.$message.warning(err.msg);
