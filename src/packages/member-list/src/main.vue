@@ -529,8 +529,6 @@
           }
           const { type = '' } = temp.data || {};
 
-          console.log('【成员列表房间消息】', type, temp);
-
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
