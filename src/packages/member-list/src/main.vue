@@ -1111,10 +1111,6 @@
               //重新获取最新的groupInitData
               isLive && changeGroupInitData(temp);
               break;
-            case 'vrtc_connect_presentation_agree':
-              //用户被邀请演示-同意演示
-              isWatch && agreePresentation(temp);
-              break;
             case 'vrtc_connect_presentation_success':
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
@@ -1142,11 +1138,6 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-
-        //开始分组讨论
-        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
-        //   handleStartGroupDiscuss(msg);
-        // });
 
         // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
@@ -1287,23 +1278,6 @@
           }
         }
 
-        //用户被邀请演示-同意演示
-        function agreePresentation(msg) {
-          // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
-          // 已和产品确认，接受邀请不提示
-          // if (
-          //   msg.data.extra_params ==
-          //   useRoomBaseServer().state.watchInitData?.join_info?.third_party_user_id
-          // ) {
-          //   _this.$message({
-          //     message: '对方已接受邀请',
-          //     showClose: true,
-          //     // duration: 0,
-          //     type: 'success',
-          //     customClass: 'zdy-info-box'
-          //   });
-          // }
-        }
         //演示权限变更
         function handlePresentationPermissionChange(msg) {
           _this.onlineUsers.forEach(item => {
