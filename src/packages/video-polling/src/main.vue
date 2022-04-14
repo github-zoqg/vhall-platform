@@ -4,6 +4,11 @@
     <div class="vmp-video-polling__tip">
       <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
       <div class="vmp-video-polling__tip-wrap">
+        <span class="vmp-video-polling__tip-auto">
+          距离展示下一组 10:00
+          <el-button type="primary" size="medium" round>继续轮巡</el-button>
+        </span>
+        <span class="vmp-video-polling__tip-next">下一组</span>
         <span
           class="vmp-video-polling__tip-btn vh-iconfont"
           :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
@@ -51,7 +56,8 @@
     data() {
       return {
         childrenCom: [],
-        isFullscreen: false // 是否进入全屏
+        isFullscreen: false, // 是否进入全屏
+        downTime: '10:00'
       };
     },
     computed: {
@@ -122,13 +128,14 @@
     &__tip {
       display: flex;
       width: 100%;
-      height: 72px;
+      height: 48px;
+      line-height: 48px;
       background-color: #434343;
       align-items: center;
       justify-content: space-between;
       &-txt {
         font-size: 18px;
-        font-weight: 500;
+        font-weight: 400;
         color: #e6e6e6;
         line-height: 24px;
         margin-left: 20px;
@@ -136,19 +143,50 @@
       &-wrap {
         padding-right: 8px;
       }
+      &-auto {
+        color: #fff;
+        line-height: 20px;
+        font-size: 14px;
+        margin-right: 32px;
+        .el-button.el-button--medium {
+          padding: 3px 23px;
+          margin-left: 16px;
+        }
+      }
+      &-next {
+        margin-right: 32px;
+        display: inline-block;
+        width: 88px;
+        height: 32px;
+        text-align: center;
+        line-height: 32px;
+        border: 1px solid #979797;
+        border-radius: 20px;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        &:hover {
+          border: 1px solid #fb3a32;
+          color: #fb3a32;
+        }
+      }
       &-btn {
         cursor: pointer;
         display: inline-block;
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         border-radius: 100%;
         background: #e2e2e2;
         background-color: rgba(226, 226, 226, 0.15);
-        line-height: 40px;
+        line-height: 32px;
         text-align: center;
         font-size: 18px;
         color: #cccccc;
         margin-right: 16px;
+        &:hover {
+          background: #e2e2e2;
+          background-color: rgba(226, 226, 226, 0.3);
+        }
       }
     }
     &__body {
