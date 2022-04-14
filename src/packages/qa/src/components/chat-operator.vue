@@ -308,7 +308,12 @@
                     window.clearInterval(this.questionGapInterval);
                     this.questionGapInterval = null;
                     // this.inputStatus.placeholder = '说点什么吧';
-                    this.$emit('onInputStatus', this.$t('chat.chat_1003'));
+                    this.$emit(
+                      'onInputStatus',
+                      this.inputStatus.disable
+                        ? this.$t('chat.chat_1079')
+                        : this.$t('chat.chat_1003')
+                    );
                     sessionStorage.setItem('QALock', false);
                   }
                 }, 1000);
