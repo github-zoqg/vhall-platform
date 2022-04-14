@@ -65,7 +65,8 @@
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
         downTime: '10:00',
-        layoutLevel: 1
+        layoutLevel: 1,
+        nextTime: 10
       };
     },
     computed: {
@@ -110,23 +111,21 @@
     methods: {
       // 下一组
       nextPolling() {
-        this.videoPollingServer.getVideoRoundUsers({
-          is_next: 1
-        });
-        // let _time = 0;
-        // if (_time > 0 && _time < 10) {
-        //   this.$message.error('请勿频繁操作');
-        //   return;
-        // }
-        // this.nextTimer = setInterval(() => {
-        //   _time += 1;
-        //   console.log(_time, '???!3124');
-        //   if (_time >= 10) {
-        //     _time = 0;
-        //     clearInterval(this.nextTimer);
-        //     return false;
-        //   }
-        // }, 1000);
+        if (this.nextTime < 10) {
+          this.$message.error('请勿频繁操作');
+          return;
+        } else {
+          this.videoPollingServer.getVideoRoundUsers({
+            is_next: 1
+          });
+        }
+        this.nextTimer = setInterval(() => {
+          if (this.nextTime == 0) {
+            this.nextTime = 10;
+            clearInterval(this.nextTimer);
+            return false;
+          }
+        }, 1000);
       },
       // 退出视频轮询
       exitVideoPolling() {
