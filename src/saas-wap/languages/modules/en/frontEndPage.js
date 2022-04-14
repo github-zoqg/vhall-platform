@@ -745,7 +745,8 @@ export default {
     doc_1007: 'Move',
     doc_1008: 'Restore',
     doc_1009: 'Exit full screen mode',
-    doc_1010: 'Full screen mode'
+    doc_1010: 'Full screen mode',
+    doc_1028: 'Cancel Move'
   },
   webinar: {
     webinar_1001: 'Close',
@@ -792,7 +793,8 @@ export default {
     webinar_1038: 'Share success',
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
-    webinar_1041: 'Pay{n}'
+    webinar_1041: 'Pay{n}',
+    webinar_1042: 'The content you want has not been searched yet'
   },
   color: {},
   other: {
@@ -814,7 +816,7 @@ export default {
     other_1016: 'K value verification failed',
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
-    other_1019: 'I got it',
+    other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
   }
 };

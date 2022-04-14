@@ -390,8 +390,8 @@
           <div class="pagination" v-show="activeObj.count > 20">
             <el-pagination
               :total="activeObj.count"
-              :current-page.sync="searchParams.page"
-              :page-size="searchParams.page_size"
+              :current-page.sync="activeObj.page"
+              :page-size="page_size"
               @current-change="currentChangeHandler"
               align="center"
             ></el-pagination>
@@ -488,10 +488,7 @@
         ],
         // openReply: true, // 文字回复之公开
         // privacyReply: true, // 文字回复之隐私
-        searchParams: {
-          page_size: 20,
-          page: 0
-        },
+        page_size: 20,
         webinar_id: null
       };
     },
@@ -590,6 +587,8 @@
 
       this.qaServer.initQaAdmin();
       this.ready = true;
+      this.qaServer.setState('pageSize', this.page_size);
+      this.select(0);
     },
     methods: {
       /**
@@ -632,8 +631,9 @@
         this.handleSearchQaList();
       },
       select(index) {
-        this.searchParams.page = 1;
+        this.List[index].page = 1;
         this.qaServer.setState('activeIndex', index);
+        this.qaServer.setState('activeObj', this.List[index]);
         this.qaServer.setState('isSearch', false);
         const searchContent = this.exactSearch[`exactSearch${this.activeIndex}`];
         if (searchContent) {
@@ -663,7 +663,7 @@
           this.qaServer.setState('isSearch', true);
         }
         if (this.activeIndex == 2) {
-          this.setReply((val - 1) * 20, searchContent);
+          this.setReply((val - 1) * this.page_size, searchContent);
         } else {
           let type;
           switch (this.activeIndex) {
@@ -677,7 +677,7 @@
               type = 1;
               break;
           }
-          this.getChat(type, (val - 1) * 20, searchContent);
+          this.getChat(type, (val - 1) * this.page_size, searchContent);
         }
       },
       getChat(type, pagePos, str) {
@@ -685,7 +685,7 @@
           .getQuestionByStatus({
             room_id: this.baseObj.interact.room_id,
             type: type,
-            limit: 20,
+            limit: this.page_size,
             keyword: str,
             pos: pagePos || 0,
             sort_sequence: 1 // 是否按序号正序排列 0 否 1 是
@@ -811,14 +811,25 @@
           })
           .then(res => {
             if (res.code == 200) {
-              if (this.activeIndex == 2) {
-                //发送回复后延时调用拉取列表接口，防止后端入库未完成，列表未更新
-                setTimeout(() => {
-                  this.setReply(0);
-                }, 1000);
-              }
+              setTimeout(() => {
+                if (this.activeIndex == 2) {
+                  //发送回复后延时调用拉取列表接口，防止后端入库未完成，列表未更新
+                  this.setReply((this.activeObj.page - 1) * this.page_size);
+                } else {
+                  this.resetCurList();
+                }
+              }, 1000);
             }
           });
+      },
+      //更新当前tab当前页列表
+      resetCurList() {
+        const type = this.activeIndex == 1 ? 2 : this.activeIndex == 3 ? 1 : 0;
+        this.getChat(
+          type,
+          (this.activeObj.page - 1) * this.page_size,
+          this.exactSearch[`exactSearch${this.activeIndex}`]
+        );
       }
     }
   };
