@@ -443,6 +443,10 @@
     background: #2d2d2d;
     position: relative;
     display: flex;
+    #vmp-desktop-screen-subscribe {
+      width: 100%;
+      height: 100%;
+    }
     &.share-screen {
       width: 100%;
       height: 100%;
