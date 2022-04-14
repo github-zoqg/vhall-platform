@@ -108,22 +108,24 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul
-        class="vmp-doc-thumbnailbar"
-        @click="handleThumbnail"
-        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
-      >
-        <li
-          class="doc-thumbnailbar__opt"
-          v-for="(item, index) in docServer.state.thumbnailList"
-          :key="'thum' + index"
-          :data-value="index"
-          :class="{ selected: pageNum - 1 === index }"
+      <transition name="el-fade-in-linear">
+        <ul
+          class="vmp-doc-thumbnailbar"
+          @click="handleThumbnail"
+          v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
         >
-          <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
-          <img :src="item" />
-        </li>
-      </ul>
+          <li
+            class="doc-thumbnailbar__opt"
+            v-for="(item, index) in docServer.state.thumbnailList"
+            :key="'thum' + index"
+            :data-value="index"
+            :class="{ selected: pageNum - 1 === index }"
+          >
+            <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
+            <img :src="item" />
+          </li>
+        </ul>
+      </transition>
     </div>
 
     <!-- 文档加载时的遮罩和进度,观看端才用 -->
@@ -1157,7 +1159,7 @@
       bottom: 0;
       right: 0;
       width: 144px;
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1167,7 +1169,7 @@
         width: 6px;
         height: 6px;
         border-radius: 0;
-        background-color: #000 !important;
+        background-color: transparent;
       }
       &::-webkit-scrollbar-track {
         background-color: transparent;
@@ -1176,8 +1178,8 @@
       &::-webkit-scrollbar-thumb {
         height: 60px;
         border-radius: 10px;
-        border: 1px solid #333;
-        background: #333 !important;
+        border: 1px solid #666;
+        background: #666 !important;
       }
 
       li.doc-thumbnailbar__opt {
