@@ -353,10 +353,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.chatlist &&
           this.$refs.chatlist.$el.scrollHeight -
             this.$refs.chatlist.$el.scrollTop -
             this.$refs.chatlist.getClientSize() <
-          5
+            5
         );
       },
       showUserPopup() {
