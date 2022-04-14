@@ -64,7 +64,7 @@
         pollingForm: {
           videoNum: 1,
           videoAutoPolling: 1,
-          videoTime: 0.5
+          videoTime: 0
         },
         pollingNumList: [
           {
@@ -129,7 +129,7 @@
               this.setPollingAlert(title);
               return;
             }
-            if (account_id != '0') {
+            if (account_id) {
               if (
                 localStorage.getItem(`isVideoPolling_${this.$route.params.id}`) == 1 &&
                 this.roleName == role_name
