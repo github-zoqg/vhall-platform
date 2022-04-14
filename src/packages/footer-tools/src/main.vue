@@ -81,7 +81,7 @@
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
-          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
+          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" class="show_img" />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
           <vh-gifts
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
@@ -97,7 +97,7 @@
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <div class="vmp-reward-icon">
-            <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+            <img src="./img/reward-icon.png" alt="" @click="onClickReward" class="show_img" />
           </div>
           <reward ref="reward" />
         </div>
@@ -391,7 +391,7 @@
         border-radius: 16px;
         cursor: pointer;
         margin-left: 16px;
-        img {
+        img.show_img {
           width: 32px;
           height: 32px;
           -webkit-transform-origin: left center;
@@ -430,7 +430,7 @@
     border-radius: 16px;
     cursor: pointer;
     margin-left: 16px;
-    img {
+    img.show_img {
       width: 32px;
       height: 32px;
       -webkit-transform-origin: left center;

@@ -4,7 +4,7 @@
     v-if="redPacketServerState.iconVisible"
     @click="checkRedPacketIcon"
   >
-    <img src="./images/icon-red-packet.png" alt="" />
+    <img src="./images/icon-red-packet.png" alt="" class="show_img" />
     <i class="vmp-dot" v-if="redPacketServerState.dotVisible" />
   </div>
 </template>
@@ -49,7 +49,7 @@
     border-radius: 16px;
     cursor: pointer;
     margin-left: 16px;
-    img {
+    img.show_img {
       width: 32px;
       height: 32px;
       -webkit-transform-origin: left center;
