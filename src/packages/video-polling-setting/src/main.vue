@@ -16,23 +16,23 @@
                 v-for="item in pollingNumList"
                 :key="item.value"
                 :label="item.label"
-                :disabled="item.label > surplusSpeakCount"
+                :disabled="item.value > surplusSpeakCount"
                 :value="item.value"
               ></el-option>
             </el-select>
           </div>
           <div class="polling_form_item">
-            <el-radio v-model="pollingForm.videoAutoPolling" :label="1">
+            <el-radio v-model="pollingForm.videoAutoPolling" :label="0">
               手动轮巡
               <span class="item_color">
                 （需要手动点击“视频墙”页面中的“下一组”按钮，切换视频画面）
               </span>
             </el-radio>
-            <el-radio v-model="pollingForm.videoAutoPolling" :label="0">
+            <el-radio v-model="pollingForm.videoAutoPolling" :label="1">
               自动轮巡
               <span class="item_color">（展示时间结束后，自动切换到下一组视频画面）</span>
             </el-radio>
-            <div class="item_time" v-show="pollingForm.videoAutoPolling == 0">
+            <div class="item_time" v-show="pollingForm.videoAutoPolling == 1">
               展示时间
               <el-select v-model="pollingForm.videoTime" placeholder="请选择" style="width: 120px">
                 <el-option
@@ -63,8 +63,8 @@
         pollingVisible: false,
         pollingForm: {
           videoNum: 1,
-          videoAutoPolling: 1,
-          videoTime: 0
+          videoAutoPolling: 0,
+          videoTime: 30
         },
         pollingNumList: [
           {
@@ -125,16 +125,19 @@
             const { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
             let title = '';
             if (max_speak_count == 0) {
+              this.pollingVisible = false;
               title = '您尚未配置连麦数，请联系工作人员';
               this.setPollingAlert(title);
               return;
             }
             if (account_id) {
+              this.pollingVisible = false;
               if (
                 localStorage.getItem(`isVideoPolling_${this.$route.params.id}`) == 1 &&
                 this.roleName == role_name
               ) {
                 this.goPollingPage();
+                return;
               } else {
                 title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
                 this.setPollingAlert(title);
@@ -142,6 +145,7 @@
               }
             }
             if (!surplus_speak_count) {
+              this.pollingVisible = false;
               this.setSpeakCountAlert(max_speak_count);
               return;
             }
@@ -164,8 +168,8 @@
             report_extra: { count: this.pollingForm.videoNum }
           });
           if (res.code === 200) {
-            this.resetFormData();
             this.goPollingPage();
+            this.resetFormData();
           } else if (res.code === 13342) {
             this.setSpeakCountAlert();
           } else {
@@ -175,6 +179,7 @@
         });
       },
       goPollingPage() {
+        this.pollingVisible = false;
         const href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
         window.open(href, '_blank');
       },
@@ -211,8 +216,8 @@
       resetFormData() {
         this.pollingForm = {
           videoNum: 1,
-          videoAutoPolling: 1,
-          videoTime: 0
+          videoAutoPolling: 0,
+          videoTime: 30
         };
       },
       // 重置表单

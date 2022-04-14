@@ -5,8 +5,10 @@
       <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
       <div class="vmp-video-polling__tip-wrap">
         <span class="vmp-video-polling__tip-auto" v-if="isAutoPolling">
-          距离展示下一组 10:00
-          <el-button type="primary" size="medium" round>继续轮巡</el-button>
+          距离展示下一组 {{ zeroPadding(minute) }}: {{ zeroPadding(second) }}
+          <el-button type="primary" size="medium" round @click="autoPolling">
+            {{ isPausedPolling ? '继续轮巡' : '暂停轮巡' }}
+          </el-button>
         </span>
         <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
         <span
@@ -65,7 +67,12 @@
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
         layoutLevel: 1,
-        nextTime: 10
+        nextTime: 10,
+        isPausedPolling: false,
+        countTimer: null,
+        minute: '10',
+        second: '00',
+        time: 60
       };
     },
     computed: {
@@ -103,6 +110,9 @@
       this._isExitPolling = false;
       // 进入时，重置为0
       localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 0);
+      if (this.isAutoPolling) {
+        this.changeTime();
+      }
     },
     mounted() {
       // 限定特定的组件的全屏更改
@@ -134,6 +144,52 @@
             return false;
           }
         }, 1000);
+      },
+      changeTime() {
+        this.minute = (((this.time / 60) % 60 >> 0) + '').padStart(2, 0);
+        this.second = ((this.time % 60 >> 0) + '').padStart(2, 0);
+        this.counterTime(this.minute, this.second);
+      },
+      autoPolling() {
+        this.isPausedPolling = !this.isPausedPolling;
+        if (this.isPausedPolling) {
+          clearInterval(this.countTimer);
+        } else {
+          this.counterTime(this.minute, this.second);
+        }
+      },
+      counterTime(minute, second) {
+        this.countTimer = setInterval(() => {
+          second--;
+          if (second < 0) {
+            minute--;
+            second = 59;
+          }
+          if (minute == 0 && second == 0) {
+            clearInterval(this.countTimer);
+            this.videoPollingServer
+              .getVideoRoundUsers({
+                is_next: 1
+              })
+              .then(res => {
+                if (res.code === 200) {
+                  this.changeTime();
+                } else {
+                  clearInterval(this.countTimer);
+                }
+              });
+          }
+          this.minute = minute;
+          this.second = second;
+        }, 1000);
+      },
+      zeroPadding(num) {
+        num = Number(num);
+        if (isNaN(num)) return num;
+        if (num >= 0 && num < 10) {
+          return `0${num}`;
+        }
+        return num;
       },
       // 退出视频轮询
       exitVideoPolling() {
