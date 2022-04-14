@@ -166,6 +166,7 @@
             second = 59;
           }
           if (minute == 0 && second == 0) {
+            clearInterval(this.countTimer);
             this.videoPollingServer
               .getVideoRoundUsers({
                 is_next: 1
