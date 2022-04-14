@@ -7,6 +7,27 @@
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
       <div class="stream_people_name">GMIC大会悟空</div>
+      <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
+        <p class="vmp-stream-local__shadow-second-line">
+          <span class="vmp-stream-local__shadow-label">视图</span>
+          <el-tooltip content="切换" placement="bottom">
+            <span
+              class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
+              @click="exchange"
+            ></span>
+          </el-tooltip>
+          <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
+            <span
+              class="vmp-stream-local__shadow-icon vh-iconfont"
+              :class="{
+                'vh-line-amplification': !isFullScreen,
+                'vh-line-narrow': isFullScreen
+              }"
+              @click="fullScreenPlayer"
+            ></span>
+          </el-tooltip>
+        </p>
+      </section>
     </div>
 
     <!-- 本地推流区域 -->
@@ -52,6 +73,11 @@
             ></span>
           </el-tooltip>
         </div>
+
+        <span
+          class="vmp-stream-local__bottom-signal"
+          :class="`vmp-stream-local__bottom-signal__${networkStatus}`"
+        ></span>
       </div>
     </div>
   </div>
@@ -66,7 +92,10 @@
     data() {
       return {
         audioLevel: 1,
+        networkStatus: 2,
         showFloatLayer: false,
+        isFullScreen: false,
+        isMiniDoc: false,
         tipText: '未检测到云导播推流',
         streamStatus: null,
         time: 3580,
@@ -149,6 +178,24 @@
             console.log('%c云导播播放器初始化成功', 'color:blue');
           });
       },
+      // 切换大小窗
+      exchange() {
+        const roomBaseServer = useRoomBaseServer();
+        let miniElement = '';
+        miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
+        roomBaseServer.setChangeElement(miniElement);
+        window.vhallReportForProduct?.report(110135);
+        this.isMiniDoc = true;
+      },
+      // 播放器全屏
+      fullScreenPlayer() {
+        if (this.isFullScreen) {
+          this.playerServer.exitFullScreen();
+        } else {
+          this.playerServer.enterFullScreen();
+        }
+        this.isFullScreen = !this.isFullScreen;
+      },
       // 创建本地流
       async createLocalStream() {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
@@ -187,25 +234,6 @@
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
-        // 麦克风音量查询计时器
-        this._audioLeveInterval = setInterval(() => {
-          if (
-            !this.localSpeaker.streamId ||
-            !this.$domainStore.state.interactiveServer.isInstanceInit
-          )
-            return clearInterval(this._audioLeveInterval);
-          // 获取音量
-          this.interactiveServer
-            .getAudioLevel({ streamId: this.localSpeaker.streamId })
-            .then(level => {
-              this.audioLevel = calculateAudioLevel(level);
-            })
-            .catch(() => {
-              clearInterval(this._audioLeveInterval);
-              this.audioLevel = 0;
-            });
-        }, 1000);
-
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
           if (
@@ -264,7 +292,7 @@
             isMute: this[`${deviceType}Muted`] == 0
           });
         }
-        this[`${deviceType}Muted`] = this[`${deviceType}Muted`] ? 0 : 1;
+        this[`${deviceType}Muted`] = this[`${deviceType}Muted`] == 1 ? 0 : 1;
         localStorage.setItem(`${deviceType}Muted`, this[`${deviceType}Muted`]);
         // 110136关闭    110137 开启
         if (deviceType == 'video') {
@@ -290,6 +318,11 @@
     }
     .player_box {
       position: relative;
+      &:hover {
+        .vmp-stream-local__shadow-box {
+          display: flex;
+        }
+      }
       .top_tip {
         position: absolute;
         padding: 6px 16px;
@@ -328,6 +361,57 @@
         color: white;
         font-size: 12px;
       }
+      .vmp-stream-local__shadow-box {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 5;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .vmp-stream-local__shadow-label {
+          display: inline-block;
+          width: 54px;
+          margin-right: 10px;
+          text-align: right;
+          color: #ffffff;
+          font-size: 12px;
+        }
+        .vmp-stream-local__shadow-icon {
+          cursor: pointer;
+          text-align: center;
+          display: inline-block;
+          color: #fff;
+          font-size: 16px;
+          width: 28px;
+          height: 28px;
+          line-height: 28px;
+          background: hsla(0, 0%, 100%, 0.3);
+          border-radius: 100%;
+          margin-right: 10px;
+
+          &.vh-line-copy-document {
+            font-size: 14px;
+          }
+          &:hover {
+            background-color: #fb3a32;
+          }
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+      .bigScreen {
+        top: initial;
+        display: flex;
+        height: 40px;
+        bottom: 10px;
+        background-color: initial;
+      }
     }
     .stream_box_header {
       height: 56px;
@@ -351,6 +435,26 @@
     }
     .stream_box_content {
       position: relative;
+      .vmp-stream-local__bottom-signal {
+        position: absolute;
+        right: 10px;
+        bottom: 68px;
+        margin-left: 5px;
+        margin-top: 4px;
+        background-size: contain;
+        height: 16px;
+        width: 16px;
+        background-image: url(./img/network0.png);
+        &__0 {
+          background-image: url(./img/network0.png);
+        }
+        &__1 {
+          background-image: url(./img/network1.png);
+        }
+        &__2 {
+          background-image: url(./img/network2.png);
+        }
+      }
       &:hover {
         .floatLayer {
           display: flex;
