@@ -198,8 +198,8 @@ export const replaceHtml = str => {
  * @param {*} string
  * @returns string
  */
-export const replaceXss = str => {
-  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi
+export const replaceXss = htmltext => {
+  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g
   const styleReg = /<style(([\s\S])*?)<\/style>/g
-  return `${str}`.replace(scriptReg, '').replace(styleReg, '')
+  return `${htmltext}`.replace(scriptReg, '').replace(styleReg, '')
 };
