@@ -450,18 +450,13 @@
       this.listenEvents();
     },
     async mounted() {
-      this.checkStartPush();
-      this.videoPollingServer.$on('VIDEO_POLLING_START', async () => {
-        if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
-        if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
-        try {
-          // 轮询判断是否有互动实例
-          await this.checkVRTCInstance();
-        } catch (error) {
-          console.log(error);
-          await this.interactiveServer.init({ videoPolling: true });
-        }
-        this.startPush({ videoPolling: true });
+      await this.checkStartPush();
+      // 刷新页面检测轮训是否开启
+      if (this.isVideoPolling) {
+        this.videoStartPush();
+      }
+      this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
+        this.videoStartPush();
       });
     },
     beforeDestroy() {
@@ -499,6 +494,19 @@
       startPushOnce() {
         this.startPushStreamOnce = true;
         this.startPush();
+      },
+      async videoStartPush() {
+        if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
+        if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
+        if (this.localStreamId) return; // 判断当前是否在推流中
+        try {
+          // 轮询判断是否有互动实例
+          await this.checkVRTCInstance();
+        } catch (error) {
+          console.log(error);
+          await this.interactiveServer.init({ videoPolling: true });
+        }
+        this.startPush({ videoPolling: true });
       },
       // 检查推流
       async checkStartPush() {

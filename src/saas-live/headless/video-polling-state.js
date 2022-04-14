@@ -51,4 +51,5 @@ export default async function () {
   window.roomBaseServer = roomBaseServer;
   window.interactiveServer = interactiveServer;
   window.micServer = micServer;
+  window.videoPollingServer = videoPollingServer;
 }

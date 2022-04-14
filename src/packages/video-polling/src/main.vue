@@ -25,14 +25,21 @@
     <!-- body -->
     <div class="vmp-video-polling__body">
       <!-- 左侧视频订阅区域 -->
-      <div class="vmp-video-polling__body-stream">
-        <div
-          class="vmp-split-screen__stream-container"
-          v-for="speaker in pollingList"
-          :key="speaker.id"
-        >
-          <div class="vmp-split-screen__stream-container-box">
-            <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
+      <div class="vmp-video-polling__body-stream-box">
+        <div class="vmp-video-polling__body-stream">
+          <div
+            class="vmp-video-polling__stream-list"
+            :class="`vmp-video-polling__stream-list__${layoutLevel}`"
+          >
+            <div
+              class="vmp-video-polling__stream-container"
+              v-for="speaker in pollingList"
+              :key="speaker.accountId"
+            >
+              <div class="vmp-video-polling__stream-container-box">
+                <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -57,7 +64,8 @@
       return {
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
-        downTime: '10:00'
+        downTime: '10:00',
+        layoutLevel: 1
       };
     },
     computed: {
@@ -66,7 +74,20 @@
         return this.$domainStore.state.videoPollingServer.pollingList;
       }
     },
-    watch: {},
+    watch: {
+      'pollingList.length': {
+        immediate: true,
+        handler(newVal) {
+          if (newVal == 1) {
+            this.layoutLevel = 1;
+          } else if (newVal <= 4) {
+            this.layoutLevel = 2;
+          } else if (newVal <= 9) {
+            this.layoutLevel = 3;
+          }
+        }
+      }
+    },
     beforeCreate() {
       this.videoPollingServer = useVideoPollingServer();
     },
@@ -74,7 +95,6 @@
       this._isExitPolling = false;
       // 进入时，重置为0
       localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 0);
-      this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
       // 限定特定的组件的全屏更改
@@ -90,6 +110,9 @@
     methods: {
       // 下一组
       nextPolling() {
+        this.videoPollingServer.getVideoRoundUsers({
+          is_next: 1
+        });
         // let _time = 0;
         // if (_time > 0 && _time < 10) {
         //   this.$message.error('请勿频繁操作');
@@ -119,7 +142,7 @@
               this._isExitPolling = true;
               // this.$message.success('退出成功');
               localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
-              window.close();
+              window.open(location, '_self').close();
             } else {
               this.$message.error(res.msg);
             }
@@ -138,7 +161,6 @@
   .vmp-video-polling {
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: #2d2d2d;
     display: flex;
     flex-direction: column;
@@ -208,9 +230,54 @@
     }
     &__body {
       display: flex;
-      height: 100%;
-      &-stream {
+      height: calc(100% - 48px);
+      &-stream-box {
         flex: 1;
+        height: 100%;
+        overflow: auto;
+      }
+      .vmp-video-polling__body-stream {
+        flex: 1;
+        display: flex;
+        height: 100%;
+        align-items: center;
+        background-color: #000;
+        .vmp-video-polling__stream-list {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          .vmp-video-polling__stream-container {
+            box-sizing: border-box;
+            border: 1px solid #000;
+            background-color: skyblue;
+            &-box {
+              padding-top: 56.25%;
+              position: relative;
+              .vmp-polling-stream-remote {
+                position: absolute;
+                top: 0;
+                left: 0;
+              }
+            }
+          }
+          &__1 {
+            .vmp-video-polling__stream-container {
+              width: 100%;
+              border: none;
+            }
+          }
+          &__2 {
+            .vmp-video-polling__stream-container {
+              width: 50%;
+            }
+          }
+          &__3 {
+            .vmp-video-polling__stream-container {
+              width: 33.3%;
+            }
+          }
+        }
       }
       &-user {
         width: 360px;
