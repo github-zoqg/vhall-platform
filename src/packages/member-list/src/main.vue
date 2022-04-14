@@ -556,10 +556,6 @@
               //互动连麦断开成功
               handleSuccessDisconnect(temp);
               break;
-            case 'vrtc_speaker_switch':
-              //互动设置主讲人
-              handleChangeSpeaker(temp);
-              break;
             case 'vrtc_connect_device_check':
               //设备检测
               handleDeviceCheck(temp);
@@ -568,19 +564,12 @@
             case 'room_kickout':
               handleKicked(temp);
               break;
-            case 'vrtc_disconnect_presentation_success':
-              //用户主动结束演示
-              handleUserEndPresentation(temp);
-              break;
             case 'main_room_join_change':
               handleMainRoomJoinChange(temp);
               break;
             case 'endLive':
               handleEndLive(temp);
               break;
-            // case 'live_over':
-            //   handleLiveOver(temp);
-            //   break;
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
@@ -1037,10 +1026,6 @@
             }
           }
         }
-        //互动设置主讲人
-        function handleChangeSpeaker(msg) {
-          console.log(msg, '互动设置主讲人');
-        }
         //处理踢出人员
         function handleKicked(msg) {
           _this._deleteUser(msg.accountId, _this.onlineUsers, 'onlineUsers');
@@ -1048,10 +1033,6 @@
           //刷新下受限列表
           _this.getLimitUserList();
           _this.refreshList();
-        }
-        //用户主动结束演示
-        function handleUserEndPresentation(msg) {
-          console.log(msg);
         }
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
@@ -1115,10 +1096,6 @@
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
               break;
-            case 'room_vrtc_disconnect_success':
-              //下麦成功
-              isWatch && handleRoomDisconnectSuccess(temp);
-              break;
             case 'group_switch_start':
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
               _this.updateOnlineUserList();
@@ -1172,10 +1149,6 @@
         // 频道变更-开始讨论(刷新数据)
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
           isWatch && _this.updateOnlineUserList(msg);
-        });
-        // 下麦成功
-        this.micServer.$on('vrtc_disconnect_success', msg => {
-          isWatch && handleRoomDisconnectSuccess(msg);
         });
 
         //为上线的分组成员添加身份
@@ -1285,10 +1258,6 @@
               item.is_speak = 1;
             }
           });
-        }
-        //下麦成功
-        function handleRoomDisconnectSuccess(msg) {
-          console.log(msg);
         }
       },
       //刷新当前列表数据
