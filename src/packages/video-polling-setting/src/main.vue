@@ -103,6 +103,10 @@
     computed: {
       surplusSpeakCount() {
         return this.$domainStore.state.videoPollingServer.surplusSpeakCount;
+      },
+      // 当前登录的角色 主持人/助理
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       }
     },
     beforeCreate() {
@@ -126,9 +130,16 @@
               return;
             }
             if (account_id != '0') {
-              title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
-              this.setPollingAlert(title);
-              return;
+              if (
+                localStorage.getItem(`isVideoPolling_${this.$route.params.id}`) == 1 &&
+                this.roleName == role_name
+              ) {
+                this.goPollingPage();
+              } else {
+                title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
+                this.setPollingAlert(title);
+                return;
+              }
             }
             if (!surplus_speak_count) {
               this.setSpeakCountAlert(max_speak_count);
@@ -148,7 +159,7 @@
         this.videoPollingServer.videoRoundStart(params).then(res => {
           if (res.code === 200) {
             this.resetFormData();
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
+            this.goPollingPage();
           } else if (res.code === 13342) {
             this.setSpeakCountAlert();
           } else {
@@ -156,6 +167,10 @@
             return;
           }
         });
+      },
+      goPollingPage() {
+        const href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
+        window.open(href, '_blank');
       },
       // 已经开启了轮巡
       setPollingAlert(title) {

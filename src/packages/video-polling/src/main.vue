@@ -13,7 +13,7 @@
         <span
           class="vmp-video-polling__tip-btn vh-iconfont vh-line-switch-button"
           @click="exitVideoPolling"
-          title="退出分屏"
+          title="退出轮巡"
         ></span>
       </div>
     </div>
@@ -65,6 +65,9 @@
       this.videoPollingServer = useVideoPollingServer();
     },
     created() {
+      this._isExitPolling = false;
+      // 进入时，重置为0
+      localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 0);
       this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
@@ -73,9 +76,33 @@
         this.isFullscreen = screenfull.isFullscreen;
       });
     },
+    beforeDestroy() {
+      // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
+      if (this._isExitPolling) return;
+      localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+    },
     methods: {
       // 退出视频轮询
-      exitVideoPolling() {},
+      exitVideoPolling() {
+        this.$confirm('关闭后将结束视频轮巡功能', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          lockScroll: false,
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          this.videoPollingServer.videoRoundEnd().then(res => {
+            if (res.code === 200) {
+              this._isExitPolling = true;
+              // this.$message.success('退出成功');
+              localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
+              window.close();
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+        });
+      },
       // 切换全屏
       enterFullScreen() {
         screenfull.toggle(this.$refs.videoPolling);
