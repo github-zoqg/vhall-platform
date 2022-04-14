@@ -26,6 +26,23 @@
         :class="`vmp-polling-stream__bottom-signal__${networkStatus}`"
       ></span>
     </section>
+
+    <section class="vmp-polling-stream-remote__shadow-box">
+      <el-tooltip
+        :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+        placement="bottom"
+      >
+        <span
+          class="vmp-polling-stream-remote__shadow-icon vh-iconfont"
+          :class="{
+            'vh-line-amplification': !isFullScreen,
+            'vh-line-narrow': isFullScreen
+          }"
+          v-show="stream.streamId"
+          @click="fullScreen"
+        ></span>
+      </el-tooltip>
+    </section>
   </div>
 </template>
 
@@ -157,27 +174,27 @@
           });
       },
 
-      // fullScreen() {
-      //   if (!this.isFullScreen) {
-      //     this.interactiveServer
-      //       .setStreamFullscreen({
-      //         streamId: this.stream.streamId,
-      //         vNode: `vmp-polling-stream-remote__${this.stream.streamId}`
-      //       })
-      //       .then(() => {
-      //         this.isFullScreen = true;
-      //       });
-      //   } else {
-      //     this.interactiveServer
-      //       .exitStreamFullscreen({
-      //         streamId: this.stream.streamId,
-      //         vNode: `vmp-polling-stream-remote__${this.stream.streamId}`
-      //       })
-      //       .then(() => {
-      //         this.isFullScreen = false;
-      //       });
-      //   }
-      // },
+      fullScreen() {
+        if (!this.isFullScreen) {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-polling-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = true;
+            });
+        } else {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.stream.streamId,
+              vNode: `vmp-polling-stream-remote__${this.stream.streamId}`
+            })
+            .then(() => {
+              this.isFullScreen = false;
+            });
+        }
+      },
 
       getLevel() {
         // 网络信号查询计时器
@@ -215,16 +232,21 @@
       .vmp-polling-stream-remote__shadow-box {
         display: flex;
         height: 24px;
-        bottom: 0;
+        bottom: 24px;
         flex-direction: row;
         top: auto;
         background: rgba(0, 0, 0, 0);
         .vmp-polling-stream-remote__shadow-icon {
-          background: none;
+          // background: none;
           &:hover {
             background-color: #fb3a32;
           }
         }
+      }
+      .vmp-polling-stream__bottom {
+        background: none;
+        padding: 0 25px;
+        bottom: 19px;
       }
     }
     .vmp-polling-stream-remote__container {
@@ -309,6 +331,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      .vmp-polling-stream-remote__shadow-icon {
+        cursor: pointer;
+        text-align: center;
+        display: inline-block;
+        color: #fff;
+        font-size: 16px;
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        background: hsla(0, 0%, 100%, 0.3);
+        border-radius: 100%;
+        &:hover {
+          background-color: #fb3a32;
+        }
+      }
     }
   }
 </style>
