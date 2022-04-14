@@ -1,0 +1,81 @@
+<mxfile host="65bd71144e">
+    <diagram id="hNHlzco4m0wY0Fr4J7jx" name="第 1 页">
+        <mxGraphModel dx="664" dy="477" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="mounted" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="347.5" y="150" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="99" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="96">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="监听上麦邀请" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="345" y="240" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="402.5" y="580" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="16" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="5" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="是否同意上麦" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="480" width="165" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="上麦" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="547.5" y="490" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Y" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="507.5" y="470" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="N" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="370" y="550" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="81" value="&lt;meta charset=&quot;utf-8&quot;&gt;&lt;div style=&quot;color: rgb(171, 178, 191); background-color: rgb(40, 44, 52); font-family: menlo, monaco, &amp;quot;courier new&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 21px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #98c379&quot;&gt;vrtc_connect_invite&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="477.5" y="240" width="190" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="84" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="82" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" value="开始倒计时30s" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="390" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="88" value="&lt;meta charset=&quot;utf-8&quot;&gt;&lt;div style=&quot;color: rgb(171, 178, 191); background-color: rgb(40, 44, 52); font-family: menlo, monaco, &amp;quot;courier new&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 21px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #61afef&quot;&gt;userAgreeInvite&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="650" y="490" width="150" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="&lt;meta charset=&quot;utf-8&quot;&gt;&lt;div style=&quot;color: rgb(171, 178, 191); background-color: rgb(40, 44, 52); font-family: menlo, monaco, &amp;quot;courier new&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 21px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #61afef&quot;&gt;userRejectInvite&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="485" y="580" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="92" value="拒绝 || 30s未响应" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="580" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="102" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="94" target="101">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="94" value="监听禁言通知" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="240" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="96" target="82">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="96" value="弹出邀请提示" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="320" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="101" value="隐藏邀请提示框" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="320" width="115" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="104" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="103" target="94">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="103" value="mounted" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="152.5" y="150" width="110" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -194,9 +194,7 @@ export default {
     login_1031: 'Terms of service',
     login_1032: 'Wechat login'
   },
-  undefined: {
-    undefined_1028: 'Cancel Move'
-  },
+  undefined: {},
   register: {
     register_1001: 'Welcome to register for VHALL live-streaming',
     register_1002: 'Register to be a new user',
@@ -747,7 +745,8 @@ export default {
     doc_1007: 'Move',
     doc_1008: 'Restore',
     doc_1009: 'Exit full screen mode',
-    doc_1010: 'Full screen mode'
+    doc_1010: 'Full screen mode',
+    doc_1028: 'Cancel Move'
   },
   webinar: {
     webinar_1001: 'Close',
@@ -822,7 +821,7 @@ export default {
     other_1016: 'K value verification failed',
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
-    other_1019: 'I got it',
+    other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
   }
 };
