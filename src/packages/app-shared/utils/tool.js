@@ -4,7 +4,7 @@ import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
  * Created by yangxy on 2022/01/13.
  * 通用工具类
  */
-export const hasOwnProperty = function (obj, key) {
+export const hasOwnProperty = function(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 
@@ -13,7 +13,7 @@ export const hasOwnProperty = function (obj, key) {
  * @param {*} ms 毫秒数
  * @returns {Promise}
  */
-export const sleep = function (ms) {
+export const sleep = function(ms) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
@@ -22,7 +22,7 @@ export const sleep = function (ms) {
 //防抖
 export function debounce(fn, t = 300) {
   let lastTime;
-  return function () {
+  return function() {
     window.clearTimeout(lastTime);
     const [that, args] = [this, arguments];
     lastTime = window.setTimeout(() => {
@@ -35,13 +35,13 @@ export function debounce(fn, t = 300) {
 export function throttle(fn, t = 300) {
   let last;
   let timer;
-  return function () {
+  return function() {
     let th = this;
     let args = arguments;
     let now = +new Date();
     if (last && now - last < t) {
       window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
+      timer = window.setTimeout(function() {
         last = now;
         fn.apply(th, args);
       }, t);
@@ -191,4 +191,15 @@ export const replaceHtml = str => {
   desc = desc.replace(/<[^>]+>/g, ''); // 截取html标签
   desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
   return desc;
+};
+
+/**
+ * 转换html文本中的xss(仅替换script与style标签)
+ * @param {*} string
+ * @returns string
+ */
+export const replaceXss = str => {
+  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi
+  const styleReg = /<style(([\s\S])*?)<\/style>/g
+  return `${str}`.replace(scriptReg, '').replace(styleReg, '')
 };

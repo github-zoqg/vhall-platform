@@ -30,7 +30,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { replaceHtml } from '@/packages/app-shared/utils/tool';
+  import { replaceXss } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpViewRestriction',
@@ -60,7 +60,7 @@
     methods: {
       handlePopupMsg(payload) {
         this.agreementInfo = payload;
-        this.agreementInfo.content = replaceHtml(this.agreementInfo.content); // 与简介相同的xss处理
+        this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
         this.agreementPopupVisible = true;
       },
       agree() {
