@@ -82,19 +82,19 @@
         ],
         pollingTimeList: [
           {
-            value: 0,
+            value: 30,
             label: '0.5分钟'
           },
           {
-            value: 1,
+            value: 60,
             label: '1分钟'
           },
           {
-            value: 5,
+            value: 300,
             label: '5分钟'
           },
           {
-            value: 10,
+            value: 600,
             label: '10分钟'
           }
         ]
