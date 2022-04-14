@@ -222,9 +222,7 @@ export default {
     login_1059: '请先校验图形验证码',
     login_1060: '图形验证码错误'
   },
-  undefined: {
-    undefined_1028: '取消移动'
-  },
+  undefined: {},
   register: {
     register_1001: '欢迎注册微吼直播',
     register_1002: '注册新用户',
@@ -785,7 +783,8 @@ export default {
     doc_1024: '四边形',
     doc_1025: '单向箭头',
     doc_1026: '双向箭头',
-    doc_1027: '上传'
+    doc_1027: '上传',
+    doc_1028: '取消移动'
   },
   webinar: {
     webinar_1001: '关闭',
@@ -868,7 +867,7 @@ export default {
     other_1016: 'k 值验证失败',
     other_1017: '同意并继续',
     other_1018: '拒绝',
-    other_1019: '我知道了',
+    other_1019: '知道了',
     other_1020: '很遗憾无法继续为您提供服务，您可以手动关闭页面'
   }
 };
