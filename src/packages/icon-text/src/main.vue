@@ -73,6 +73,9 @@
             window.vhallReportForProduct?.report(110026);
             break;
           }
+          case 'videoPolling': {
+            window.vhallReportForProduct?.report(110148);
+          }
         }
       }
     }

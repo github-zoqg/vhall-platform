@@ -4,11 +4,11 @@
     <div class="vmp-video-polling__tip">
       <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
       <div class="vmp-video-polling__tip-wrap">
-        <span class="vmp-video-polling__tip-auto">
+        <span class="vmp-video-polling__tip-auto" v-if="isAutoPolling">
           距离展示下一组 10:00
           <el-button type="primary" size="medium" round>继续轮巡</el-button>
         </span>
-        <span @click="nextGroup" class="vmp-video-polling__tip-next">下一组</span>
+        <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
         <span
           class="vmp-video-polling__tip-btn vh-iconfont"
           :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
@@ -64,14 +64,22 @@
       return {
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
-        downTime: '10:00',
-        layoutLevel: 1
+        layoutLevel: 1,
+        nextTime: 10
       };
     },
     computed: {
       // 轮询列表
       pollingList() {
         return this.$domainStore.state.videoPollingServer.pollingList;
+      },
+      // 是否是自动轮巡
+      isAutoPolling() {
+        return this.$domainStore.state.videoPollingServer.isAutoPolling;
+      },
+      // 轮巡时间
+      downTime() {
+        return this.$domainStore.state.videoPollingServer.downTime;
       }
     },
     watch: {
@@ -109,10 +117,23 @@
     },
     methods: {
       // 下一组
-      nextGroup() {
-        this.videoPollingServer.getVideoRoundUsers({
-          is_next: 1
-        });
+      nextPolling() {
+        if (this.nextTime < 10) {
+          this.$message.error('请勿频繁操作');
+          return;
+        } else {
+          this.videoPollingServer.getVideoRoundUsers({
+            is_next: 1
+          });
+        }
+        this.nextTimer = setInterval(() => {
+          this.nextTime--;
+          if (this.nextTime == 0) {
+            this.nextTime = 10;
+            clearInterval(this.nextTimer);
+            return false;
+          }
+        }, 1000);
       },
       // 退出视频轮询
       exitVideoPolling() {
