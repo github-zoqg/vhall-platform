@@ -24,14 +24,14 @@
         <div class="floatLayer">
           <!-- 摄像头 -->
           <el-tooltip
-            :content="videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')"
+            :content="videoMuted == 1 ? $t('interact.interact_1022') : $t('interact.interact_1006')"
             placement="top"
           >
             <span
               class="vmp-stream-local__shadow-icon"
               @click="handleClickMuteDevice('video')"
               :class="
-                videoMuted
+                videoMuted == 1
                   ? 'vh-iconfont vh-line-turn-off-video-camera'
                   : 'vh-iconfont vh-line-video-camera'
               "
@@ -40,13 +40,15 @@
 
           <!-- 麦克风 -->
           <el-tooltip
-            :content="audioMuted ? $t('interact.interact_1015') : $t('interact.interact_1005')"
+            :content="audioMuted == 1 ? $t('interact.interact_1015') : $t('interact.interact_1005')"
             placement="top"
           >
             <span
               class="vmp-stream-local__shadow-icon vh-iconfont"
               @click="handleClickMuteDevice('audio')"
-              :class="audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
+              :class="
+                audioMuted == 1 ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`
+              "
             ></span>
           </el-tooltip>
         </div>
@@ -68,8 +70,8 @@
         tipText: '未检测到云导播推流',
         streamStatus: null,
         time: 3580,
-        videoMuted: localStorage.getItem('videoMuted') || 0,
-        audioMuted: localStorage.getItem('audioMuted') || 0
+        videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
+        audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
       };
     },
     computed: {
@@ -131,7 +133,6 @@
       },
       // 初始化播放器
       async initPlayer() {
-        console.log('云导播初始化播放器');
         return this.playerServer
           .init({
             videoNode: 'vmp-player-yun',
@@ -154,7 +155,8 @@
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
           await this.interactiveServer
             .createLocalVideoStream({
-              videoNode: `stream-yun-box`
+              videoNode: `stream-yun-box`,
+              mute: { audio: this.audioMuted == 1, video: this.videoMuted == 1 }
             })
             .catch(e => {
               if (e && e?.name == 'NotAllowed') {
@@ -238,7 +240,6 @@
       },
       // 打开媒体设置
       setInteractive() {
-        console.log(12321321);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickMediaSetting'));
       },
       // 点击mute按钮事件
@@ -254,13 +255,13 @@
           console.log(123);
           this.interactiveServer.muteAudio({
             streamId: this.localSpeaker.streamId,
-            isMute: this[`${deviceType}Muted`] == 1
+            isMute: this[`${deviceType}Muted`] == 0
           });
         } else {
           console.log(456);
           this.interactiveServer.muteVideo({
             streamId: this.localSpeaker.streamId,
-            isMute: this[`${deviceType}Muted`] == 1
+            isMute: this[`${deviceType}Muted`] == 0
           });
         }
         this[`${deviceType}Muted`] = this[`${deviceType}Muted`] ? 0 : 1;
