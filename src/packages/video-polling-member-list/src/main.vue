@@ -78,6 +78,15 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
     },
+    watch: {
+      pollingList: {
+        deep: true,
+        immediate: true,
+        handler: function () {
+          this.videoPollingServer.updateOnlineUsers();
+        }
+      }
+    },
     methods: {
       //获取在线人员列表
       getOnlineUserList(pos) {
@@ -91,6 +100,7 @@
           .getOnlineUserList(params)
           .then(res => {
             if (res.code === 200) {
+              this.videoPollingServer.updateOnlineUsers();
               this.$refs.scroll.finishPullUp();
 
               if (!res?.data?.list?.length) {
