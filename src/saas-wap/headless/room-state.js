@@ -46,35 +46,6 @@ export default async function () {
     // roomBaseServer.getAgreementStatus(),
     //多语言接口
     roomBaseServer.getLangList(),
-    // 调用聚合接口
-    roomBaseServer
-      .getCommonConfig({
-        tags: [
-          'skin',
-          'screen-poster',
-          'like',
-          'keywords',
-          'public-account',
-          'webinar-tag',
-          'menu',
-          'adv-default',
-          'invite-card',
-          'red-packet',
-          'room-tool',
-          'goods-default',
-          'announcement',
-          'sign',
-          'timer'
-        ]
-      })
-      .then(async () => {
-        // 如果是回放，调互动工具状态接口，互动状态以这个为准
-        if (roomBaseServer.state.watchInitData.webinar.type == 5) {
-          await roomBaseServer.getInavToolStatus({
-            webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
-          });
-        }
-      }),
     roomBaseServer.getCustomRoleName()
   ];
   virtualAudienceServer.init();
@@ -94,8 +65,37 @@ export default async function () {
   }
   await Promise.all(promiseList);
 
-  // 互动、分组直播初始化micServer
-  micServer.init();
+  // 调用聚合接口
+  await roomBaseServer
+    .getCommonConfig({
+      tags: [
+        'skin',
+        'screen-poster',
+        'like',
+        'keywords',
+        'public-account',
+        'webinar-tag',
+        'menu',
+        'adv-default',
+        'invite-card',
+        'red-packet',
+        'room-tool',
+        'goods-default',
+        'announcement',
+        'sign',
+        'timer'
+      ]
+    })
+    .then(async () => {
+      // 如果是回放，调互动工具状态接口，互动状态以这个为准
+      if (roomBaseServer.state.watchInitData.webinar.type == 5) {
+        await roomBaseServer.getInavToolStatus({
+          webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
+        });
+      }
+    }),
+    // 互动、分组直播初始化micServer
+    micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });

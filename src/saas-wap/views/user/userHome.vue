@@ -125,7 +125,7 @@
 </template>
 
 <script>
-  import { initWeChat } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import { useHomepageServer } from 'middle-domain';
   export default {
     name: 'userHome',
@@ -461,7 +461,7 @@
               desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
               console.log(9191, desc);
 
-              initWeChat(
+              initWeChatSdk(
                 { ...params },
                 {
                   title: this.userHomeVo.title,
