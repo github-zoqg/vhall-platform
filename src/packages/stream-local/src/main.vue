@@ -452,7 +452,8 @@
     async mounted() {
       this.checkStartPush();
       this.videoPollingServer.$on('VIDEO_POLLING_START', async () => {
-        if (this.joinInfo.role_name !== 2) return;
+        if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
+        if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
         try {
           // 轮询判断是否有互动实例
           await this.checkVRTCInstance();
