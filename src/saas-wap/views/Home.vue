@@ -42,7 +42,7 @@
     },
     data() {
       return {
-        state: 2,
+        state: 0,
         liveErrorTip: ''
       };
     },
