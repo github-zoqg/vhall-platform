@@ -2,7 +2,7 @@
   <div class="vmp-sign-watch">
     <div v-show="isShowCircle" class="vmp-sign-watch_icon" @click="reShowSignBox">
       <i class="sign-circle"></i>
-      <img src="./img/icon@2x.png" alt="" />
+      <img src="./img/icon@2x.png" alt="" class="show_img" />
     </div>
     <div
       v-show="showSign"
@@ -221,7 +221,7 @@
       border-radius: 16px;
       cursor: pointer;
       margin-left: 16px;
-      img {
+      img.show_img {
         width: 32px;
         height: 32px;
         -webkit-transform-origin: left center;

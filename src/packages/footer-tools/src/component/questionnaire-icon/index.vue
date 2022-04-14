@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-questionnaire-icon" v-if="questionnaireServerState.iconVisible">
-    <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" />
+    <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" class="show_img" />
     <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
   </div>
 </template>
@@ -43,7 +43,7 @@
     border-radius: 16px;
     cursor: pointer;
     margin-left: 16px;
-    img {
+    img.show_img {
       width: 32px;
       height: 32px;
       -webkit-transform-origin: left center;
