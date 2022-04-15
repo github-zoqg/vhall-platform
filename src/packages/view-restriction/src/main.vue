@@ -48,6 +48,7 @@
     },
     beforeCreate() {
       this.roomServer = useRoomBaseServer();
+      console.log(99999, this.roomServer);
     },
     created() {
       this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
@@ -59,7 +60,12 @@
     methods: {
       handlePopupMsg(payload) {
         this.agreementInfo = payload;
-        this.agreementPopupVisible = true;
+        const webinarInitData = this.roomServer.state.watchInitData;
+        if (webinarInitData.webinar.type == 4) {
+          this.agreementPopupVisible = false;
+        } else {
+          this.agreementPopupVisible = true;
+        }
       },
       agree() {
         this.roomServer.agreeWitthTerms();
