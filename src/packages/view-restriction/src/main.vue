@@ -49,6 +49,7 @@
     },
     beforeCreate() {
       this.roomServer = useRoomBaseServer();
+      console.log(99999, this.roomServer);
     },
     created() {
       this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
@@ -61,7 +62,12 @@
       handlePopupMsg(payload) {
         this.agreementInfo = payload;
         this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
-        this.agreementPopupVisible = true;
+        const webinarInitData = this.roomServer.state.watchInitData;
+        if (webinarInitData.webinar.type == 4) {
+          this.agreementPopupVisible = false;
+        } else {
+          this.agreementPopupVisible = true;
+        }
       },
       agree() {
         this.roomServer.agreeWitthTerms();
