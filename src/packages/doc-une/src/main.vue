@@ -89,7 +89,7 @@
         ></li>
         <li
           data-value="move"
-          :title="$t('doc.doc_1007')"
+          :title="canMove ? $t('doc.doc_1028') : $t('doc.doc_1007')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
@@ -108,22 +108,24 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul
-        class="vmp-doc-thumbnailbar"
-        @click="handleThumbnail"
-        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
-      >
-        <li
-          class="doc-thumbnailbar__opt"
-          v-for="(item, index) in docServer.state.thumbnailList"
-          :key="'thum' + index"
-          :data-value="index"
-          :class="{ selected: pageNum - 1 === index }"
+      <transition name="el-fade-in-linear">
+        <ul
+          class="vmp-doc-thumbnailbar"
+          @click="handleThumbnail"
+          v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
         >
-          <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
-          <img :src="item" />
-        </li>
-      </ul>
+          <li
+            class="doc-thumbnailbar__opt"
+            v-for="(item, index) in docServer.state.thumbnailList"
+            :key="'thum' + index"
+            :data-value="index"
+            :class="{ selected: pageNum - 1 === index }"
+          >
+            <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
+            <img :src="item" />
+          </li>
+        </ul>
+      </transition>
     </div>
 
     <!-- 文档加载时的遮罩和进度,观看端才用 -->
@@ -172,7 +174,9 @@
         keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
         hasStreamList: false, // 是否展示流列表
-        canMove: false //文档能否拖拽
+        canMove: false, //文档能否拖拽
+        rebroadcastStartTimer: null,
+        rebroadcastStopTimer: null
       };
     },
     computed: {
@@ -614,18 +618,49 @@
         const reBroadcastServer = useRebroadcastServer();
         // 转播开始事件
         reBroadcastServer.$on('live_broadcast_start', () => {
-          this.docServer.setRole(VHDocSDK.RoleType.HOST);
-          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
-          this.recoverLastDocs();
+          // 文档角色设置成观众
+          this.docServer.setRole(VHDocSDK.RoleType.SPECTATOR);
+          // 设置转播中
+          this.docServer.setRelay(true);
+          // 清除存在的定时器
+          if (this.rebroadcastStartTimer) {
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }
+          this.rebroadcastStartTimer = setTimeout(() => {
+            // 设置播放流模式为FLV模式
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+            this.recoverLastDocs();
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }, 1000);
         });
+
         // 转播结束事件
         reBroadcastServer.$on('live_broadcast_stop', () => {
-          // 如果当前人拥有直播间文档操作权限，设为 host 角色
-          if (this.hasDocPermission) {
-            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
-            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          // 设置非转播
+          this.docServer.setRelay(false);
+          if (this.rebroadcastStopTimer) {
+            clearTimeout(this.rebroadcastStopTimer);
+            this.rebroadcastStopTimer = null;
           }
-          this.recoverLastDocs();
+          this.rebroadcastStopTimer = setTimeout(() => {
+            // 重置状态
+            this.docServer.resetState();
+            // 设置文档角色 （观众不需要设置，观众的文档角色没有变化）
+            if (this.hasDocPermission) {
+              // 如果当前人拥有直播间文档操作权限，设为 HOST 角色
+              this.docServer.setRole(VHDocSDK.RoleType.HOST);
+            } else if (this.roleName == 3) {
+              // 助理
+              this.docServer.setRole(VHDocSDK.RoleType.ASSISTANT);
+            } else if (this.roleName == 4) {
+              // 嘉宾
+              this.docServer.setRole(VHDocSDK.RoleType.GUEST);
+            }
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+            this.recoverLastDocs();
+          }, 1000);
         });
 
         // 监控文档区域大小改变事件
@@ -807,7 +842,7 @@
               this.docServer.nextStep();
             }
             break;
-          // 放大、缩小、还原还原自动开启可移动功能（sdk逻辑）
+          // 放大、缩小、还原操作会自动开启可移动功能（sdk逻辑）
           // 放大
           case 'zoomIn':
             this.docServer.zoomIn();
@@ -1124,7 +1159,7 @@
       bottom: 0;
       right: 0;
       width: 144px;
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1134,7 +1169,7 @@
         width: 6px;
         height: 6px;
         border-radius: 0;
-        background-color: #000 !important;
+        background-color: transparent;
       }
       &::-webkit-scrollbar-track {
         background-color: transparent;
@@ -1143,8 +1178,8 @@
       &::-webkit-scrollbar-thumb {
         height: 60px;
         border-radius: 10px;
-        border: 1px solid #333;
-        background: #333 !important;
+        border: 1px solid #666;
+        background: #666 !important;
       }
 
       li.doc-thumbnailbar__opt {

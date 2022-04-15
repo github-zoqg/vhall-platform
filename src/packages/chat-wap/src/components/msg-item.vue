@@ -125,7 +125,7 @@
               </p>
               <div class="msg-content_body">
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="source.content.text_content"></span>
+                <span v-html="msgContent"></span>
                 <img
                   @click="$emit('preview', img)"
                   class="msg-content_chat-img"
@@ -165,11 +165,7 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span
-                  v-html="source.content.text_content"
-                  style="display: block"
-                  class="aaa"
-                ></span>
+                <span v-html="msgContent" style="display: block" class="aaa"></span>
                 <img
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
@@ -271,32 +267,39 @@
       //处理@消息
       handleAt() {
         //@用户
-        if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
-          this.msgContent = this.source.content.text_content;
-        } else if (this.source.atList && this.source.atList.length) {
+        //todo 可以考虑domaint提供统一的处理 实现@用户
+        if (!this.source.atList || !this.source.atList.length) {
+          this.msgContent = this.urlToLink(this.source.content.text_content);
+        } else {
           let at = false;
-          (this.source.atList || []).forEach(a => {
-            const userName = `@${a.nick_name} `;
+          this.source.atList.forEach(a => {
+            // TODO历史列表aList与直播中格式不一致作
+            const userName = `@${a.nick_name || a.nickName} `;
             const match =
               this.source.content &&
               this.source.content.text_content &&
               this.source.content.text_content.indexOf(userName) != -1;
-            console.log(match);
             if (match) {
               if (at) {
-                this.msgContent = this.msgContent.replace(
-                  userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.msgContent.replace(
+                    userName,
+                    `<span style='color:#3562fa'>${userName}</span>`
+                  )
                 );
               } else {
-                this.msgContent = this.source.content.text_content.replace(
-                  userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.source.content.text_content.replace(
+                    userName,
+                    `<span style='color:#3562fa'>${userName}</span>`
+                  )
                 );
               }
               at = true;
             } else {
-              this.msgContent = at ? this.msgContent : this.source.content.text_content;
+              this.msgContent = at
+                ? this.urlToLink(this.msgContent)
+                : this.urlToLink(this.source.content.text_content);
             }
           });
         }
@@ -321,6 +324,39 @@
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
         }
+      },
+      // 将聊天消息中的链接用 a 标签包裹
+      urlToLink(str) {
+        if (!str) return '';
+
+        // 提取聊天内容中的 img 标签
+        const regImg = /<img.*?(?:>|\/>)/g;
+        const imgArr = str.match(regImg);
+
+        // 提取聊天内容中除去 img 标签以外的部分
+        const strArr = str.split(regImg);
+        // eslint-disable-next-line no-useless-escape
+        const regUrl =
+          /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+
+        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
+        strArr.forEach((item, index) => {
+          const tempStr = item.replace(regUrl, function (match) {
+            return `<a class='msg-item__content-body__content-link' href='${match}' target='_blank'>${match}</a>`;
+          });
+          strArr[index] = tempStr;
+        });
+
+        // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
+        if (imgArr) {
+          const imgArrLength = imgArr.length;
+          let imgIndex = 0;
+          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+            imgIndex++;
+          }
+        }
+        return strArr.join('');
       }
     }
   };
@@ -546,6 +582,10 @@
       display: inline-block;
       padding: 2px 30px;
       border-radius: 20px;
+    }
+    .msg-item__content-body__content-link {
+      color: #3562fa;
+      text-decoration: underline #3562fa !important;
     }
   }
 </style>

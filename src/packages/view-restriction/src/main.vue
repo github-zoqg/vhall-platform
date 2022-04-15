@@ -30,6 +30,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { replaceXss } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpViewRestriction',
@@ -60,6 +61,7 @@
     methods: {
       handlePopupMsg(payload) {
         this.agreementInfo = payload;
+        this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
         const webinarInitData = this.roomServer.state.watchInitData;
         if (webinarInitData.webinar.type == 4) {
           this.agreementPopupVisible = false;

@@ -33,7 +33,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-
+  import { replaceXss } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpViewRestrictionWap',
     data() {
@@ -62,6 +62,7 @@
       // server监听
       handlePopupMsg(payload) {
         this.agreementInfo = payload;
+        this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
         this.agreementPopupVisible = true;
       },
       agree() {
