@@ -166,7 +166,11 @@
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        this.liveStep = 2;
+        if (!useMicServer().getSpeakerStatus()) {
+          this.liveStep = 3;
+        } else {
+          this.liveStep = 2;
+        }
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
           this.handlePublishComplate();

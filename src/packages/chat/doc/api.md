@@ -27,7 +27,7 @@
 | OverlayScrollbars | 输入框滚动条 | <https://kingsora.github.io/OverlayScrollbars/#!documentation/method-scroll> |
 
 ####关联接口
-| 接口说明 | domain 中位置 | 方法名 |
+| 接口说明 | domain 中路径 | 方法名 |
 | ---- | ---- | ---- |
 | 获取房间聊天历史 | request/im/chat | getChatList |
 | 删除聊天消息 | request/im/chat | deleteMessage |
@@ -36,3 +36,4 @@
 | 设置 / 取消用户禁言 | request/im/chat | setBanned |
 | 设置 / 取消全体用户禁言 | request/im/chat | setAllBanned |
 | 踢出用户 / 取消踢出 | request/im/chat | setKicked |
+| 获取敏感词列表 | request/im/chat | getKeyWordsList |

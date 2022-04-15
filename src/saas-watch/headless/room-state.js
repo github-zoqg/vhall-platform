@@ -75,12 +75,6 @@ export default async function () {
       }),
     roomBaseServer.getCustomRoleName()
   ];
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    promiseList.push(groupServer.init());
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
-
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
   // 互动、分组直播进行设备检测
@@ -94,10 +88,12 @@ export default async function () {
   console.log(roomBaseServer.state.configList);
   console.log('%c------多语言请求配置', 'color:pink');
   console.log(roomBaseServer.state.languages);
-  // TODO 设置观看端测试权限数据
-  // roomBaseServer.state.configList = {
-  //   hasToolbar: false
-  // };
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
 
   micServer.init();
 
