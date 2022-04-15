@@ -65,7 +65,6 @@ export const serverConfig = {
       'comShare',
       'comWatchAuth',
       'comSignUpForm',
-      'comViewRestriciton',
       'comUserAccount',
       'comCash',
       'comScreenPost',
@@ -426,10 +425,6 @@ export const serverConfig = {
   // 登录注册组件
   compRegLogin: {
     component: 'VmpRegLogin'
-  },
-  // 观看限制弹窗组件
-  comViewRestriciton: {
-    component: 'VmpViewRestriction'
   },
   // 互动工具计时器
   comWatchTimer: {

@@ -337,6 +337,15 @@
           this.setBigScreen(msg);
         });
 
+        // 下麦成功 - 移除BScroll
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.disable();
+          }
+        });
+
         // 监听全屏变化
         window.addEventListener(
           'fullscreenchange',
@@ -353,6 +362,7 @@
       createBScroll() {
         this.$nextTick(() => {
           if (this.scroll) {
+            if (!this.scroll.enabled) this.scroll.enabled = true;
             this.scroll.refresh();
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
