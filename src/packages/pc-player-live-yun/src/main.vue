@@ -7,6 +7,7 @@
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
       <div class="stream_people_name">GMIC大会悟空</div>
+
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
         <p class="vmp-stream-local__shadow-second-line">
           <span class="vmp-stream-local__shadow-label">视图</span>
@@ -73,7 +74,7 @@
             ></span>
           </el-tooltip>
         </div>
-
+        <!-- 信号图片 -->
         <span
           class="vmp-stream-local__bottom-signal"
           :class="`vmp-stream-local__bottom-signal__${networkStatus}`"

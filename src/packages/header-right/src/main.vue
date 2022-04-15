@@ -298,6 +298,11 @@
           this.interactiveServer.$on('live_over', () => {
             this.liveStep = 1;
           });
+
+          // 云导播开播按钮是否可点
+          useSubscribeServer().$on('director_stream', msg => {
+            this.liveStep = 2;
+          });
         }
       },
       initConfig() {
