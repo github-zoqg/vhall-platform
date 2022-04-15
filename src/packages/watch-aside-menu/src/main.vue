@@ -352,7 +352,7 @@
         this.groupServer.$on('VRTC_DISCONNECT_PRESENTATION_SUCCESS', msg => {
           if (msg.data.room_role == 1 && msg.sender_id == msg.data.room_join_id) {
             // 主持人结束了主持人自己的演示
-            this.groupMessage(`${this.getRoleName(1)}结束了演示`);
+            this.groupMessage(`${this.$getRoleName(1)}结束了演示`);
           } else if (
             msg.data.room_role == 2 &&
             msg.sender_id == this.roomBaseServer.state.watchInitData.webinar.userinfo.user_id
