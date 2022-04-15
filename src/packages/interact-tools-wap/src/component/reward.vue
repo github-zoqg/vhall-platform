@@ -347,7 +347,7 @@
         flex-grow: 1;
         input {
           width: 100%;
-          height: 100%;
+          height: 99%;
           // padding: 20px 0 20px 20px;
           border-radius: 8px;
           border: 1px solid #979797;
@@ -375,11 +375,12 @@
         position: relative;
         input {
           width: 100%;
-          height: 100%;
+          height: 99%;
           border-radius: 8px;
           border: 1px solid #979797;
           line-height: normal;
           padding-left: 20px;
+          padding-right: 120px;
         }
         input[type='text']::-webkit-input-placeholder {
           color: #a0a0a0;
