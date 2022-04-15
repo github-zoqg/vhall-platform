@@ -226,6 +226,13 @@ export function initHideChatSdk(initData = {}, failedCb = () => {}) {
       ]
     });
     wx.error(function (res) {
+      // alert(JSON.stringify(res));
+      window.vhallLog({
+        tag: 'wx', // 日志所属功能模块
+        data: res,
+        type: 'log' // log 日志埋点，event 业务数据埋点
+      });
+      wx.hideAllNonBaseMenuItem();
       failedCb(res);
     });
   });
