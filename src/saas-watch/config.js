@@ -621,7 +621,7 @@ export const serverConfig = {
   // 单视频嵌入页面配置
   embedVideoLayerRoot: {
     component: 'VmpAirContainer',
-    children: ['embedVideoLayerBody', 'comWatchAuth']
+    children: ['embedVideoLayerBody']
   },
   // 中间主区域容器
   embedVideoLayerBody: {

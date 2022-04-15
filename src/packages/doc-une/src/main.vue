@@ -591,7 +591,12 @@
 
         // 直播开始
         useMsgServer().$onMsg('ROOM_MSG', msg => {
+          console.log('live_start');
           if (msg.data.type === 'live_start') {
+            if (this.roleName == 1) {
+              // 如果是主持人 TODO 补偿消息
+            }
+
             // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
               this.recoverLastDocs();
@@ -1147,7 +1152,7 @@
         }
 
         &.selected {
-          color: #fb3a32;
+          color: #fc5659;
           cursor: pointer;
         }
       }
