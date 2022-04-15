@@ -1,27 +1,27 @@
 <template>
   <van-popup
     v-model="agreementPopupVisible"
-    :closeable="agreementInfo.rule === 1"
+    :closeable="agreement.rule === 1"
     :class="['vmp-view-restriction-wap']"
-    overlay-class="vmp-view-restriction-wap-overlay "
+    :overlay-class="agreement.rule === 0 ? 'vmp-view-restriction-wap-overlay' : ''"
     get-container="body"
   >
     <!-- 标题 -->
     <div class="restriction-title">
-      {{ agreementInfo.title }}
+      {{ agreement.title }}
     </div>
     <!-- 内容 -->
-    <div :class="['scroll-content', { 'more-content': agreementInfo.rule === 1 }]">
-      <div class="restriction-content" v-html="agreementInfo.content"></div>
+    <div :class="['scroll-content', { 'more-content': agreement.rule === 1 }]">
+      <div class="restriction-content" v-html="agreement.content"></div>
       <!-- 声明协议 -->
       <div
-        v-if="agreementInfo.statement_content"
+        v-if="agreement.statement_content"
         class="restriction-law"
-        v-html="agreementInfo.statement_content"
+        v-html="agreement.statement_content"
       ></div>
     </div>
     <div class="restriction-control">
-      <template v-if="!agreementInfo.rule">
+      <template v-if="!agreement.rule">
         <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
         <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
       </template>
@@ -33,46 +33,68 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { replaceXss } from '@/packages/app-shared/utils/tool';
+  // import { replaceXss } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpViewRestrictionWap',
+    props: {
+      value: {
+        type: Boolean,
+        required: true,
+        default() {
+          return false;
+        }
+      },
+      agreement: {
+        type: Object,
+        required: true,
+        default() {
+          return {};
+        }
+      }
+    },
     data() {
       return {
-        agreementPopupVisible: true, // 协议弹窗的显示
-        agreementInfo: {
-          // 协议信息
-          title: '',
-          content: '',
-          rule: 0, //协议规则 0:同意后进入 1:阅读后进入(每次进入直播间都弹出)
-          statement_content: '' // 协议声明
-        }
+        agreementPopupVisible: false // 协议弹窗的显示
       };
+    },
+    watch: {
+      value(val) {
+        if (val) {
+          this.agreementPopupVisible = true;
+        }
+      }
     },
     beforeCreate() {
       this.roomServer = useRoomBaseServer();
     },
-    created() {
-      this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
-      // this.roomServer.getAgreementStatus();
-    },
-    destroyed() {
-      this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
-    },
+    // created() {
+    //   this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
+    //   // this.roomServer.getAgreementStatus();
+    // },
+    // destroyed() {
+    //   this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
+    // },
     methods: {
       // server监听
-      handlePopupMsg(payload) {
-        this.agreementInfo = payload;
-        this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
-        this.agreementPopupVisible = true;
-      },
+      // handlePopupMsg(payload) {
+      //   this.agreementInfo = payload;
+      //   this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
+      //   this.agreementPopupVisible = true;
+      // },
       agree() {
-        this.roomServer.agreeWitthTerms();
-        this.agreementPopupVisible = false;
+        // this.roomServer.agreeWitthTerms();
+        // this.agreementPopupVisible = false;
+        this.close();
         this.$emit('agree');
       },
       disagree() {
         this.$emit('disagree');
         // this.roomServer.refusesTerms();
+        // this.agreementPopupVisible = false;
+        this.close();
+      },
+      close() {
+        this.$emit('input', false);
         this.agreementPopupVisible = false;
       }
     }

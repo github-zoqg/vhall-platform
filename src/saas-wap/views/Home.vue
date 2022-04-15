@@ -24,7 +24,12 @@
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
-    <view-restriction @agree="hanleAgree" @disagree="hanleDisagree" />
+    <view-restriction
+      v-model="agreementVisible"
+      :agreement="agreement"
+      @agree="hanleAgree"
+      @disagree="hanleDisagree"
+    />
   </div>
 </template>
 
@@ -36,6 +41,10 @@
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
   import MsgTip from './MsgTip.vue';
   import ViewRestriction from '@/packages/view-restriction-wap/src/main.vue';
+  import {
+    saveCookieAgreeCurDay,
+    getCookieAgreeCurDay
+  } from '@/packages/app-shared/utils/agreement';
 
   export default {
     name: 'Home',
@@ -47,7 +56,9 @@
       return {
         state: 0,
         liveErrorTip: '',
-        domain: null
+        domain: null,
+        agreement: {},
+        agreementVisible: false
       };
     },
     computed: {
@@ -100,11 +111,7 @@
           this.goSubscribePage(clientType);
           return;
         }
-        const { data: agreementData } = await roomBaseServer.getAgreementStatus();
-        if (agreementData?.popup !== true || agreementData?.rule !== 0) {
-          // 不弹窗或者不是强制同意的情况则
-          this.initRoomState();
-        }
+        await this.getAgreementStatus();
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
         console.error(err);
@@ -234,9 +241,61 @@
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       },
+      async getAgreementStatus() {
+        const roomBaseServer = useRoomBaseServer();
+        await roomBaseServer
+          .getAgreementStatus()
+          .then(res => {
+            if (res.code === 200) {
+              const data = res.data;
+              if (data.is_open !== 1) {
+                // 未开启,阻断后续执行
+                return this.initRoomState();
+              }
+              if (data.rule === 0) {
+                const { id } = this.$route.params;
+                const agreed = getCookieAgreeCurDay(id); // 打cookie
+                if (agreed) {
+                  // 已经同意过了,未过有效期
+                  return this.initRoomState();
+                }
+              }
+              if (data.rule !== 0) {
+                this.initRoomState(); // 非强制同意协议不阻断房间初始化
+              }
+              // 组织数据
+              let statement_content = '';
+              if (data.statement_status && Array.isArray(data.statement_info)) {
+                statement_content = data.statement_content;
+                data.statement_info.forEach(statement => {
+                  const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
+                  statement_content = statement_content.replace(statement.title, txtHtml);
+                });
+              }
+              this.agreement = {
+                statement_content,
+                rule: data.rule,
+                title: data.title,
+                content: data.content
+              };
+              this.agreementVisible = true;
+            } else {
+              this.initRoomState();
+            }
+          })
+          .catch(err => {
+            console.error(err.msg || err);
+            this.initRoomState();
+          });
+        // if (agreementData?.popup !== true || agreementData?.rule !== 0) {
+        //   // 不弹窗或者不是强制同意的情况则
+        //   this.initRoomState();
+        // }
+      },
       // 同意观看协议
       hanleAgree() {
-        console.log('agree');
+        const { id } = this.$route.params;
+        saveCookieAgreeCurDay(id); // 打cookie
         this.initRoomState();
       },
       // 不同意观看协议
