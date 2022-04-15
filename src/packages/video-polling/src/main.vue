@@ -71,8 +71,7 @@
         isPausedPolling: false,
         countTimer: null,
         minute: '10',
-        second: '00',
-        time: 60
+        second: '00'
       };
     },
     computed: {
@@ -114,6 +113,10 @@
         this.changeTime();
       }
     },
+    beforeDestroy() {
+      this.countTimer && clearInterval(this.countTimer);
+      this.nextTimer && clearInterval(this.nextTimer);
+    },
     mounted() {
       // 限定特定的组件的全屏更改
       screenfull.on('change', () => {
@@ -146,8 +149,8 @@
         }, 1000);
       },
       changeTime() {
-        this.minute = (((this.time / 60) % 60 >> 0) + '').padStart(2, 0);
-        this.second = ((this.time % 60 >> 0) + '').padStart(2, 0);
+        this.minute = (((this.downTime / 60) % 60 >> 0) + '').padStart(2, 0);
+        this.second = ((this.downTime % 60 >> 0) + '').padStart(2, 0);
         this.counterTime(this.minute, this.second);
       },
       autoPolling() {

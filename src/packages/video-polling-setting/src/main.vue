@@ -161,15 +161,11 @@
           interval: this.pollingForm.videoTime
         };
         this.videoPollingServer.videoRoundStart(params).then(res => {
-          window.vhallReportForProduct?.report(
-            this.pollingForm.videoAutoPolling == 1 ? 110149 : 110150
-          );
-          window.vhallReportForProduct?.report(110151, {
-            report_extra: { count: this.pollingForm.videoNum }
-          });
           if (res.code === 200) {
+            // 上报数据
+            this.setReportData();
+            // 跳转页面
             this.goPollingPage();
-            this.resetFormData();
           } else if (res.code === 13342) {
             this.setSpeakCountAlert();
           } else {
@@ -180,6 +176,7 @@
       },
       goPollingPage() {
         this.pollingVisible = false;
+        this.resetFormData();
         const href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/video-polling/${this.$route.params.id}${window.location.search}`;
         window.open(href, '_blank');
       },
@@ -213,6 +210,16 @@
         });
         return;
       },
+      // 上报数据
+      setReportData() {
+        window.vhallReportForProduct?.report(
+          this.pollingForm.videoAutoPolling == 1 ? 110149 : 110150
+        );
+        window.vhallReportForProduct?.report(110151, {
+          report_extra: { count: this.pollingForm.videoNum }
+        });
+      },
+      // 重置表单
       resetFormData() {
         this.pollingForm = {
           videoNum: 1,
@@ -220,7 +227,7 @@
           videoTime: 30
         };
       },
-      // 重置表单
+      // 关闭弹窗
       closePolling() {
         this.pollingVisible = false;
         this.resetFormData();

@@ -304,7 +304,8 @@ export default {
     chat_1078: 'There is a new message',
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
-    chat_1081: 'Q&A locked'
+    chat_1081: 'Q&A locked',
+    chat_1092: 'You have been muted'
   },
   form: {
     form_1001: 'Name',
@@ -732,7 +733,11 @@ export default {
     interact_1034: 'presenter',
     interact_1035: 'Opposite party network exception',
     interact_1036:
-      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect'
+      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect',
+    interact_1037:
+      'Currently on display, cannot apply for video connection at the moment, please try again later',
+    interact_1038:
+      'The organizer has turned on the video tour function, and you will see your video screen on the host\'s side. Please ensure that the video equipment is all normal, and click "{n}" to set the media.'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -744,7 +749,8 @@ export default {
     doc_1007: 'Move',
     doc_1008: 'Restore',
     doc_1009: 'Exit full screen mode',
-    doc_1010: 'Full screen mode'
+    doc_1010: 'Full screen mode',
+    doc_1028: 'Cancel Move'
   },
   webinar: {
     webinar_1001: 'Close',
@@ -791,13 +797,10 @@ export default {
     webinar_1038: 'Share success',
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
-    webinar_1041: 'Pay{n}'
+    webinar_1041: 'Pay{n}',
+    webinar_1042: 'The content you want has not been searched yet'
   },
   color: {},
-  polling: {
-    polling_1001:
-      'The organizer has turned on the video tour function, and you will see your video screen on the hosts side. Please ensure that the video equipment is all normal, and click {n} to set the media.'
-  },
   other: {
     other_1001: 'Preview image',
     other_1002: 'Enter the password!',
