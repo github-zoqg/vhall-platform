@@ -124,7 +124,7 @@
       width="400px"
     >
       <div class="polling-dialog_warp">
-        <i18n path="polling.polling_1001">
+        <i18n path="interact.interact_1038">
           <span place="n" class="polling-dialog_color" @click="settingPollingShow">
             {{ $t('account.account_1005') }}
           </span>
