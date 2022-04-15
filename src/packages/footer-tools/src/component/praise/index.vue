@@ -176,7 +176,6 @@
         width: 32px;
         height: 32px;
         transform-origin: left center;
-        margin: -1px 0 0 0;
         &.active {
           animation: praise 0.5s ease-in;
         }
