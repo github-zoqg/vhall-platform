@@ -128,6 +128,10 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // Vue history模式 微信分享IOS无效解决办法---最终章
+  if (to.path !== location.pathname) {
+    location.assign(to.fullPath);
+  }
   const res = await grayInit(to);
   if (res) {
     console.log('---grayInit---', res);
