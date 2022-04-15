@@ -3,6 +3,7 @@
     v-model="agreementPopupVisible"
     :closeable="agreementInfo.rule === 1"
     :class="['vmp-view-restriction-wap']"
+    overlay-class="vmp-view-restriction-wap-overlay "
     get-container="body"
   >
     <!-- 标题 -->
@@ -10,16 +11,15 @@
       {{ agreementInfo.title }}
     </div>
     <!-- 内容 -->
-    <div
-      :class="['restriction-content', { 'more-content': agreementInfo.rule === 1 }]"
-      v-html="agreementInfo.content"
-    ></div>
-    <!-- 声明协议 -->
-    <div
-      v-if="agreementInfo.statement_content"
-      class="restriction-law"
-      v-html="agreementInfo.statement_content"
-    ></div>
+    <div :class="['scroll-content', { 'more-content': agreementInfo.rule === 1 }]">
+      <div class="restriction-content" v-html="agreementInfo.content"></div>
+      <!-- 声明协议 -->
+      <div
+        v-if="agreementInfo.statement_content"
+        class="restriction-law"
+        v-html="agreementInfo.statement_content"
+      ></div>
+    </div>
     <div class="restriction-control">
       <template v-if="!agreementInfo.rule">
         <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
@@ -38,7 +38,7 @@
     name: 'VmpViewRestrictionWap',
     data() {
       return {
-        agreementPopupVisible: false, // 协议弹窗的显示
+        agreementPopupVisible: true, // 协议弹窗的显示
         agreementInfo: {
           // 协议信息
           title: '',
@@ -53,7 +53,7 @@
     },
     created() {
       this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
-      this.roomServer.getAgreementStatus();
+      // this.roomServer.getAgreementStatus();
     },
     destroyed() {
       this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
@@ -68,15 +68,20 @@
       agree() {
         this.roomServer.agreeWitthTerms();
         this.agreementPopupVisible = false;
+        this.$emit('agree');
       },
       disagree() {
-        this.roomServer.refusesTerms();
+        this.$emit('disagree');
+        // this.roomServer.refusesTerms();
         this.agreementPopupVisible = false;
       }
     }
   };
 </script>
 <style lang="less">
+  .vmp-view-restriction-wap-overlay {
+    // background: #fff;
+  }
   .vmp-view-restriction-wap {
     width: 670px;
     height: 760px;
@@ -92,11 +97,13 @@
     color: #1a1a1a;
     line-height: 50px;
   }
-  .restriction-content {
-    width: 100%;
-    max-height: 350px;
+  .scroll-content {
+    max-height: 400px;
     margin-bottom: 10px;
     overflow-y: auto;
+  }
+  .restriction-content {
+    width: 100%;
     font-size: 28px;
     color: #1a1a1a;
     line-height: 40px;
