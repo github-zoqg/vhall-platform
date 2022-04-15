@@ -20,7 +20,7 @@
         v-html="agreement.statement_content"
       ></div>
     </div>
-    <div class="restriction-control">
+    <div :class="['restriction-control', { 'more-btn': agreement.rule === 1 }]">
       <template v-if="!agreement.rule">
         <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
         <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
@@ -110,7 +110,7 @@
     background: #fff;
     box-shadow: 0px -2px 10px 0px rgba(0, 0, 0, 0.1);
     border-radius: 32px;
-    padding: 60px 56px 32px;
+    padding: 60px 0 56px 56px;
   }
 
   .restriction-title {
@@ -118,11 +118,21 @@
     font-weight: 500;
     color: #1a1a1a;
     line-height: 50px;
+    word-break: break-all;
+    word-wrap: break-word;
+    padding-right: 56px;
+    margin-bottom: 40px;
   }
   .scroll-content {
-    max-height: 400px;
-    margin-bottom: 10px;
+    max-height: 325px;
+    margin-bottom: 29px;
     overflow-y: auto;
+    word-break: break-all;
+    word-wrap: break-word;
+    padding-right: 56px;
+    &.more-content {
+      max-height: 400px;
+    }
   }
   .restriction-content {
     width: 100%;
@@ -133,16 +143,17 @@
       display: block;
       object-fit: scale-down;
       margin: 10px 0px;
+      max-width: 100%;
     }
-  }
-  .more-content {
-    max-height: 188px;
   }
   .restriction-law {
     font-size: 28px;
     line-height: 40px;
     color: #666666;
     line-height: 40px;
+    word-break: break-all;
+    word-wrap: break-word;
+    margin-top: 16px;
     .law-link {
       color: #3562fa;
       &:hover {
@@ -159,7 +170,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 24px;
+    padding-bottom: 6px;
+    &.more-btn {
+      padding-bottom: 20px;
+    }
     text-align: center;
     & > span {
       display: inline-block;
@@ -177,7 +191,6 @@
       }
     }
     & > span:nth-child(2) {
-      margin-top: 10px;
       background: #fff;
       color: #1a1a1a;
       &:hover {
