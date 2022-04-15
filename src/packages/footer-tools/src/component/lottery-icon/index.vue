@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-lottery-icon" v-if="showIcon" @click="checkLotteryIcon">
-    <img src="./images/lottery-icon.png" alt="" />
+    <img src="./images/lottery-icon.png" alt="" class="show_img" />
     <i class="vmp-dot" v-if="dotVisible" />
   </div>
 </template>
@@ -76,6 +76,21 @@
   .vmp-lottery-icon {
     color: #fff;
     position: relative;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #fca810 0%, #ff9e31 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img.show_img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: -1px 0 0 0;
+    }
+
     .vmp-dot {
       position: absolute;
       display: inline-block;
