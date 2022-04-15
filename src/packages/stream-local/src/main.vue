@@ -74,9 +74,18 @@
       v-show="isShowShadowBtn"
     >
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
+        <el-tooltip
+          v-if="[1, 3, 4].includes(joinInfo.role_name)"
+          :content="joinInfo.role_name | roleFilter"
+          placement="top"
+        >
+          <span class="vmp-stream-local__shadow-label">
+            {{ joinInfo.role_name | roleFilter }}
+          </span>
+        </el-tooltip>
+        <!-- <span class="vmp-stream-local__shadow-label">
           {{ joinInfo.role_name | roleFilter }}
-        </span>
+        </span> -->
         <el-tooltip
           :content="
             localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
@@ -1409,6 +1418,11 @@
         text-align: right;
         color: #ffffff;
         font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 14px;
+        vertical-align: middle;
       }
       .vmp-stream-local__shadow-icon {
         cursor: pointer;
