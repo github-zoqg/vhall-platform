@@ -74,9 +74,18 @@
       v-show="isShowShadowBtn"
     >
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
+        <el-tooltip
+          v-if="[1, 3, 4].includes(joinInfo.role_name)"
+          :content="joinInfo.role_name | roleFilter"
+          placement="top"
+        >
+          <span class="vmp-stream-local__shadow-label">
+            {{ joinInfo.role_name | roleFilter }}
+          </span>
+        </el-tooltip>
+        <!-- <span class="vmp-stream-local__shadow-label">
           {{ joinInfo.role_name | roleFilter }}
-        </span>
+        </span> -->
         <el-tooltip
           :content="
             localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
@@ -250,7 +259,7 @@
     useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -564,6 +573,8 @@
               // 如果成功，销毁播放器
               this.playerServer.destroy();
 
+              // 收到消息执行可能比 收到响应赋值 autoSpeak为true快，造成初始化2次互动，需要在收到消息执行时，延迟执行
+              await sleep(500);
               if (!this.interactiveServer.state.autoSpeak) {
                 //  初始化互动实例
                 await this.interactiveServer.init();
@@ -1407,6 +1418,11 @@
         text-align: right;
         color: #ffffff;
         font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 14px;
+        vertical-align: middle;
       }
       .vmp-stream-local__shadow-icon {
         cursor: pointer;
