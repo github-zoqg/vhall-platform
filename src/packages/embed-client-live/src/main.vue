@@ -36,7 +36,7 @@
     useDocServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { browserSupport } from '@/packages/app-shared/utils/tool.js';
   import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';

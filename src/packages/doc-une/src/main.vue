@@ -1152,7 +1152,7 @@
         }
 
         &.selected {
-          color: #fb3a32;
+          color: #fc5659;
           cursor: pointer;
         }
       }

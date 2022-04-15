@@ -1,4 +1,4 @@
-export function getBrowserType() {
+export default function getBrowserType() {
   // 权重：系统 + 系统版本 > 平台 > 内核 + 载体 + 内核版本 + 载体版本 > 外壳 + 外壳版本
   const ua = navigator.userAgent.toLowerCase();
   const testUa = regexp => regexp.test(ua);
@@ -157,7 +157,7 @@ function versionPadding(num, length) {
 /**
  * @return {Boolean}  true 为支持 false不支持
  */
-export function browserSupport() {
+const browserSupport = function () {
   const ua = navigator.userAgent;
   const { supporter, shell } = getBrowserType();
   const chromeTest = ua.match(/chrome\/([\d.]+)/i);
@@ -165,6 +165,8 @@ export function browserSupport() {
   const safariTest = ua.match(/Version\/([\d.]+).*Safari/);
   const safariVersion = safariTest ? safariTest[1].replace(/\./g, '') : 0;
   const safariVersion4 = versionPadding(safariVersion, 4);
+  // const shells = ['qq', 'wechat', 'uc', '2345', 'sougou', 'liebao', 'maxthon', 'baidu', '360']
+  // if ((((supporter == 'chrome' && chromeVersion && (chromeVersion.split('.')[0] >= 74)) || (supporter == 'safari' && Number(safariVersion4) > 1303)) && !shells.includes(shell)) && !is360()) {
   const shells = ['qq', 'wechat', 'uc', '2345', 'sougou', 'liebao', 'maxthon', 'baidu'];
   if (
     ((supporter == 'chrome' && chromeVersion && chromeVersion.split('.')[0] >= 74) ||
@@ -175,4 +177,6 @@ export function browserSupport() {
   } else {
     return false;
   }
-}
+};
+
+export { browserSupport };
