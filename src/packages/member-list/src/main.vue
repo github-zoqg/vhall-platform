@@ -529,8 +529,6 @@
           }
           const { type = '' } = temp.data || {};
 
-          console.log('【成员列表房间消息】', type, temp);
-
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
@@ -556,10 +554,6 @@
               //互动连麦断开成功
               handleSuccessDisconnect(temp);
               break;
-            case 'vrtc_speaker_switch':
-              //互动设置主讲人
-              handleChangeSpeaker(temp);
-              break;
             case 'vrtc_connect_device_check':
               //设备检测
               handleDeviceCheck(temp);
@@ -568,19 +562,12 @@
             case 'room_kickout':
               handleKicked(temp);
               break;
-            case 'vrtc_disconnect_presentation_success':
-              //用户主动结束演示
-              handleUserEndPresentation(temp);
-              break;
             case 'main_room_join_change':
               handleMainRoomJoinChange(temp);
               break;
             case 'endLive':
               handleEndLive(temp);
               break;
-            // case 'live_over':
-            //   handleLiveOver(temp);
-            //   break;
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
@@ -674,7 +661,6 @@
             const speakIndex = _this._getUserIndex(msg.sender_id, _this.getCurrentSpeakerList);
 
             if (isLive) {
-              console.log('context:::::', msg, context);
               const user = {
                 account_id: msg.sender_id,
                 avatar: context.avatar,
@@ -999,7 +985,6 @@
         }
         //互动连麦成功断开链接
         function handleSuccessDisconnect(msg) {
-          // const { member_info = { is_speak: 0, is_apply: 0 } } = msg.data;
           _this.changeUserStatus(
             msg.data.target_id,
             _this.onlineUsers,
@@ -1009,7 +994,6 @@
             },
             'onlineUsers'
           );
-          console.log('互动连麦成功断开链接', msg);
           //提示语
           if (msg.data.target_id == _this.userId) {
             this.timer && clearTimeout(this.timer);
@@ -1040,10 +1024,6 @@
             }
           }
         }
-        //互动设置主讲人
-        function handleChangeSpeaker(msg) {
-          console.log(msg, '互动设置主讲人');
-        }
         //处理踢出人员
         function handleKicked(msg) {
           _this._deleteUser(msg.accountId, _this.onlineUsers, 'onlineUsers');
@@ -1051,10 +1031,6 @@
           //刷新下受限列表
           _this.getLimitUserList();
           _this.refreshList();
-        }
-        //用户主动结束演示
-        function handleUserEndPresentation(msg) {
-          console.log(msg);
         }
         //主房间人员变动
         function handleMainRoomJoinChange(msg) {
@@ -1114,17 +1090,9 @@
               //重新获取最新的groupInitData
               isLive && changeGroupInitData(temp);
               break;
-            case 'vrtc_connect_presentation_agree':
-              //用户被邀请演示-同意演示
-              isWatch && agreePresentation(temp);
-              break;
             case 'vrtc_connect_presentation_success':
               //演示权限变更
               isWatch && handlePresentationPermissionChange(temp);
-              break;
-            case 'room_vrtc_disconnect_success':
-              //下麦成功
-              isWatch && handleRoomDisconnectSuccess(temp);
               break;
             case 'group_switch_start':
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
@@ -1145,11 +1113,6 @@
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
           handleSetUserJoinInfo(msg);
         });
-
-        //开始分组讨论
-        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
-        //   handleStartGroupDiscuss(msg);
-        // });
 
         // 切换channel
         this.groupServer.$on('GROUP_MSG_CREATED', msg => {
@@ -1184,10 +1147,6 @@
         // 频道变更-开始讨论(刷新数据)
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
           isWatch && _this.updateOnlineUserList(msg);
-        });
-        // 下麦成功
-        this.micServer.$on('vrtc_disconnect_success', msg => {
-          isWatch && handleRoomDisconnectSuccess(msg);
         });
 
         //为上线的分组成员添加身份
@@ -1290,23 +1249,6 @@
           }
         }
 
-        //用户被邀请演示-同意演示
-        function agreePresentation(msg) {
-          // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
-          // 已和产品确认，接受邀请不提示
-          // if (
-          //   msg.data.extra_params ==
-          //   useRoomBaseServer().state.watchInitData?.join_info?.third_party_user_id
-          // ) {
-          //   _this.$message({
-          //     message: '对方已接受邀请',
-          //     showClose: true,
-          //     // duration: 0,
-          //     type: 'success',
-          //     customClass: 'zdy-info-box'
-          //   });
-          // }
-        }
         //演示权限变更
         function handlePresentationPermissionChange(msg) {
           _this.onlineUsers.forEach(item => {
@@ -1314,10 +1256,6 @@
               item.is_speak = 1;
             }
           });
-        }
-        //下麦成功
-        function handleRoomDisconnectSuccess(msg) {
-          console.log(msg);
         }
       },
       //刷新当前列表数据
@@ -1506,7 +1444,6 @@
       },
       //响应人员操作
       handleOperateUser({ type = '', params = {} }) {
-        console.log('[member] handleOperateUser:', type, params);
         const { account_id = '', is_kicked, is_banned } = params;
         switch (type) {
           case 'setBanned':
@@ -1597,9 +1534,7 @@
                 receive_account_id: accountId
               })
               .then(res => {
-                console.warn(res, '邀请上麦');
                 if (res.code == 200) {
-                  //todo 这里需要上报埋点
                   this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
                   this.$message.error(res.msg);
@@ -1673,7 +1608,6 @@
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
-              console.log(res, 'presentation');
             })
             .catch(err => {
               this.$message.warning(err.msg);

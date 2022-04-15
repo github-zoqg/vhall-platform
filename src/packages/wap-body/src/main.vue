@@ -152,7 +152,9 @@
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          this.gobackHome(7, '', msg);
+          if (this.isInGroup && msg.data.original_account_id) {
+            this.gobackHome(7, '', msg);
+          }
         });
 
         // 监听消息移动
@@ -189,7 +191,7 @@
             title = who + '解散了分组，您将返回主直播间';
             break;
           case 5:
-            title = this.$t('chat.chat_1007');
+            title = '您已被踢出该小组';
             break;
           case 7:
             title = '组长身份已变更';

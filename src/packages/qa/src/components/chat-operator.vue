@@ -104,7 +104,9 @@
         showWordLimit: false,
         overlayScrollbar: null, // 滚动条实例
         onlyMine: false,
-        questionGap: 0 // 每次发送问答成功以后需要等待15秒才能再此发送问答
+        questionGap: 0, // 每次发送问答成功以后需要等待15秒才能再此发送问答
+        //限频定时器
+        questionGapInterval: null
       };
     },
     computed: {
@@ -271,7 +273,7 @@
           if (this.lock && this.lock == 'true') {
             this.$emit('onInputStatus', this.$t('chat.chat_1080', { n: this.questionGap }));
           } else {
-            this.$emit('onInputStatus', this.$t('chat.chat_1042'));
+            this.$emit('onInputStatus', this.$t('chat.chat_1003'));
           }
         } else {
           console.warn('获取发送问答--------');
@@ -289,22 +291,33 @@
               console.warn('获取发送问答-----成功---', res);
               this.lock = sessionStorage.getItem('QALock');
               this.questionGap = 15;
-              this.questionGapInterval = window.setInterval(() => {
-                if (this.questionGap > 0) {
-                  if (!this.lock || this.lock == 'false') {
-                    sessionStorage.setItem('QALock', true);
+              if (!this.questionGapInterval) {
+                this.questionGapInterval = window.setInterval(() => {
+                  if (this.questionGap > 0) {
+                    if (!this.lock || this.lock == 'false') {
+                      sessionStorage.setItem('QALock', true);
+                    } else {
+                      // this.inputStatus.placeholder = `太频繁啦，还有${this.questionGap}秒后才能发送`;
+                      this.$emit(
+                        'onInputStatus',
+                        this.$t('chat.chat_1080', { n: this.questionGap })
+                      );
+                    }
+                    this.questionGap = this.questionGap - 1;
                   } else {
-                    // this.inputStatus.placeholder = `太频繁啦，还有${this.questionGap}秒后才能发送`;
-                    this.$emit('onInputStatus', this.$t('chat.chat_1080', { n: this.questionGap }));
+                    window.clearInterval(this.questionGapInterval);
+                    this.questionGapInterval = null;
+                    // this.inputStatus.placeholder = '说点什么吧';
+                    this.$emit(
+                      'onInputStatus',
+                      this.inputStatus.disable
+                        ? this.$t('chat.chat_1079')
+                        : this.$t('chat.chat_1003')
+                    );
+                    sessionStorage.setItem('QALock', false);
                   }
-                  this.questionGap = this.questionGap - 1;
-                } else {
-                  window.clearInterval(this.questionGapInterval);
-                  // this.inputStatus.placeholder = '说点什么吧';
-                  this.$emit('onInputStatus', this.$t('chat.chat_1042'));
-                  sessionStorage.setItem('QALock', false);
-                }
-              }, 1000);
+                }, 1000);
+              }
             })
             .catch(res => {
               this.$message({

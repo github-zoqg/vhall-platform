@@ -467,30 +467,43 @@
           audioOutputDevices = []
         } = this.devices;
 
+        const getCurSelect = (devices, id) => {
+          if (id && !devices.find(item => item.deviceId === id)) {
+            return '';
+          }
+
+          return id;
+        };
+
         // 视频
         if (videoInputDevices.length > 0) {
           const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
-          this.mediaState.video =
-            this.mediaState.video || sessionVideoId || videoInputDevices[0].deviceId;
+          const curSelect = getCurSelect(videoInputDevices, this.mediaState.video);
+          this.mediaState.video = curSelect || sessionVideoId || videoInputDevices[0].deviceId;
         } else {
+          this.mediaState.video = '';
           sessionStorage.removeItem('selectedVideoDeviceId');
         }
 
         // 麦克风
         if (audioInputDevices.length > 0) {
           const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
-          this.mediaState.audioInput =
-            this.mediaState.audioInput || sessionAudioId || audioInputDevices[0].deviceId;
+          const curSelect = getCurSelect(audioInputDevices, this.mediaState.audioInput);
+          this.mediaState.audioInput = curSelect || sessionAudioId || audioInputDevices[0].deviceId;
         } else {
+          this.mediaState.audioInput = '';
           sessionStorage.removeItem('selectedAudioDeviceId');
         }
 
         // 扬声器
         if (audioOutputDevices.length > 0) {
           const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
+          const curSelect = getCurSelect(audioOutputDevices, this.mediaState.audioOutput);
+
           this.mediaState.audioOutput =
-            this.mediaState.audioOutput || sessionAudioOutputId || audioOutputDevices[0].deviceId;
+            curSelect || sessionAudioOutputId || audioOutputDevices[0].deviceId;
         } else {
+          this.mediaState.audioOutput = '';
           sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }
       }

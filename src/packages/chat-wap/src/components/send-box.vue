@@ -9,7 +9,7 @@
       </div>
       <div class="content-input">
         <template v-if="chatShow">
-          <div class="content-input__placeholder" v-if="liveStatus == 3">
+          <div class="content-input__placeholder" v-if="currentTab != 'qa' && liveStatus == 3">
             <span>{{ $t('chat.chat_1092') }}</span>
           </div>
           <div
@@ -33,7 +33,11 @@
           </div>
         </template>
       </div>
-      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+      <span
+        @click="showMyQA"
+        :class="[{ 'only-my': isShowMyQA }, 'only-my-default']"
+        v-if="currentTab == 'qa'"
+      >
         {{ $t('chat.chat_1018') }}
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
@@ -525,6 +529,9 @@
       }
       .only-my {
         color: #fb3a32;
+      }
+      .only-my-default {
+        margin-left: 16px;
       }
     }
   }

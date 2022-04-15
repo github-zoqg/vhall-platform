@@ -103,6 +103,8 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/packages/app-shared/mixins/emitter';
+  //消息提示定时器
+  let tipMsgTimer;
   export default {
     name: 'VmpChat',
     mixins: [emitter],
@@ -321,6 +323,7 @@
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
             if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
+              tipMsgTimer && clearTimeout(tipMsgTimer);
               this.isHasUnreadAtMeMsg = true;
               this.unReadMessageCount++;
               this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
@@ -333,6 +336,10 @@
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1075');
+            tipMsgTimer && clearTimeout(tipMsgTimer);
+            tipMsgTimer = setTimeout(() => {
+              this.isHasUnreadAtMeMsg = false;
+            }, 10000);
           }
         });
         //监听回复我的消息
@@ -340,6 +347,10 @@
           if (!this.isBottom()) {
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1076');
+            tipMsgTimer && clearTimeout(tipMsgTimer);
+            tipMsgTimer = setTimeout(() => {
+              this.isHasUnreadAtMeMsg = false;
+            }, 10000);
           }
         });
         //监听禁言通知
@@ -591,10 +602,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.chatlist &&
           this.$refs.chatlist.$el.scrollHeight -
             this.$refs.chatlist.$el.scrollTop -
             this.$refs.chatlist.getClientSize() <
-          5
+            5
         );
       },
       //自己发送消息后的回调
