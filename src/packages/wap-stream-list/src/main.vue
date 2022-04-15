@@ -337,6 +337,15 @@
           this.setBigScreen(msg);
         });
 
+        // 下麦成功 - 移除BScroll
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.scroll && this.scroll.scrollX != 0) {
+            this.scroll.scrollTo(0);
+            this.scroll.destroy();
+            this.scroll = null;
+          }
+        });
+
         // 监听全屏变化
         window.addEventListener(
           'fullscreenchange',
