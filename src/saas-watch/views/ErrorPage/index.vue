@@ -35,7 +35,12 @@
         <!-- 加密视频无法观看提示 -->
         <img v-else-if="propType == 'encrypt_error'" src="./img/encrypt_error.png" alt="" />
         <!-- 观看限制提示 -->
-        <img v-else-if="propType == 'view_restriction'" src="./img/view_restriction.png" alt="" />
+        <img
+          v-else-if="propType == 'view_restriction'"
+          src="./img/view_restriction.png"
+          alt=""
+          style="margin-left: 120px"
+        />
         <slot v-else name="image">
           <!-- 空页面，网络开小差 network -->
           <img src="./img/network.png" alt="" />
@@ -107,7 +112,7 @@
           transcoding: this.$t('message.message_1014'),
           active_lost: this.$t('message.message_1004'),
           no_entry: this.$t('message.message_1016'),
-          view_restriction: this.$t('message.message_1043')
+          view_restriction: this.$t('other.other_1020')
         }
       };
     },
