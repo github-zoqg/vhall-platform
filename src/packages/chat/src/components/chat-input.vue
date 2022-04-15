@@ -382,11 +382,11 @@
         this.$refs.chatTextarea.focus();
       },
       //处理@某人
-      atUser(accountId) {
+      atUser(count) {
         this.replyMsg = {};
         const msgToAt =
           this.chatList.find(chatMsg => {
-            return chatMsg.sendId == accountId;
+            return chatMsg.count == count;
           }) || {};
         if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
           this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickname} `;
