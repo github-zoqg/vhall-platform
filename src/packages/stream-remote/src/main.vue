@@ -192,7 +192,10 @@
           <span
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
             v-show="
-              !isInGroup && (stream.attributes.roleName == 4 || stream.attributes.roleName == 1)
+              !isInGroup &&
+              (stream.attributes.roleName == 4 ||
+                stream.attributes.roleName == 1 ||
+                stream.role == 4)
             "
             @click="setOwner(stream.accountId)"
           ></span>
