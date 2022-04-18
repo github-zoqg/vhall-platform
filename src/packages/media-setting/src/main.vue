@@ -475,8 +475,6 @@
           return id;
         };
 
-        debugger;
-
         // 视频
         if (videoInputDevices.length > 0) {
           const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
