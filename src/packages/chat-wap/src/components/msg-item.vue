@@ -60,18 +60,14 @@
     </template>
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
-      <div
-        v-if="source.content.gift_name"
-        class="msg-item interact new-gift"
-        :class="Math.random() * 10 > 3 ? 'purpose' : 'red'"
-      >
+      <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box">
-          <p class="new-gift-name">
+          <span class="new-gift-name">
             {{ source.nickname | overHidden(10) }}
-          </p>
-          <p class="new-gift-content">
+          </span>
+          <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
-          </p>
+          </span>
         </div>
         <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
@@ -518,11 +514,11 @@
     }
     .new-gift {
       padding-left: 0;
-      width: 350px;
-      margin-top: 26px;
+      padding-top: 26px;
       height: 72px;
-      border-top-left-radius: 36px;
-      border-bottom-left-radius: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: relative;
       &.interact {
         justify-content: unset;
@@ -537,7 +533,7 @@
         padding-left: 24px;
         margin-right: 10px;
         text-align: left;
-        width: 100%;
+        // width: 100%;
         display: inline-block;
         border: none;
         p {
@@ -551,26 +547,19 @@
           line-height: 28px;
           padding-left: 8px;
           margin-bottom: 6px;
+          color: #8c8c8c;
         }
         .new-gift-content {
           font-size: 18px;
           transform: scale(0.9);
           line-height: 22px;
           margin-left: -4px;
+          color: #262626;
         }
       }
       .new-gift-img,
       .new-award-img {
-        position: absolute;
-        right: -36px;
-        bottom: 0;
-        display: inline-block;
-        width: 74px;
-        height: 74px;
-        border-radius: 40px;
-        border: 1px solid #f7f7f7;
-        background: #f7f7f7;
-        object-fit: scale-down;
+        width: 38px;
       }
     }
     .margin-top-bottom {
