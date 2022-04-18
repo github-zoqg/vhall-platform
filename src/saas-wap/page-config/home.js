@@ -14,7 +14,7 @@ const serverConfig = {
       'layerBodyCenter',
       'comAllDialog',
       'comGoodsDetail',
-      'comUserAccountWap',
+      'comUserAccountWap'
     ]
     // children: ['layerHeader', 'layerBody', 'comAllDialog']
   },
