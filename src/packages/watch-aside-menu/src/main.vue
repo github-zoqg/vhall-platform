@@ -1,6 +1,6 @@
 <template>
   <!-- 分组直播才有该组件 -->
-  <div class="vmp-watch-aside-menu" v-if="webinarMode === 6">
+  <div class="vmp-watch-aside-menu" v-if="webinarMode == 6 && webinarType != 5">
     <ul class="menu-list" v-show="!isCollapse">
       <!-- 展开/折叠按钮 -->
       <li class="menu-item" @click="handleToggle()">
