@@ -399,6 +399,10 @@
           params.live_token = params.liveT;
         }
 
+        if (!params.live_token && params.assistant_token) {
+          params.live_token = params.assistant_token;
+        }
+
         if (params.live_token) {
           setRequestBody({
             live_token: params.live_token
