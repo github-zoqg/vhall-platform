@@ -41,18 +41,18 @@ export default async function () {
     roomBaseServer.getCustomRoleName()
   ];
 
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    promiseList.push(groupServer.init());
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
-
   // 如果存在rebroadcast
   if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {
     promiseList.push(rebroadcastServer.init());
     console.log('%c------服务初始化 rebroadcastServer 初始化完成', 'color:blue', rebroadcastServer);
   }
   await Promise.all(promiseList);
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
 
   // 依赖于roombase返回
   micServer.init();
@@ -81,12 +81,6 @@ export default async function () {
   console.log('%c------服务初始化 docServer 初始化完成', 'color:blue', docServer);
 
   mediaSettingServer.init();
-
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
 
   // TODO 方便查询数据，后面会删除
   window.msgServer = msgServer;

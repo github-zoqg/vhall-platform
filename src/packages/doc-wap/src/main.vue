@@ -52,12 +52,12 @@
     </div>
 
     <!-- 全屏切换 -->
-    <div @click="fullscreen" class="btn-doc-fullscreen">
+    <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
       <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
       <i v-else class="vh-iconfont vh-line-amplification"></i>
     </div>
     <!-- 文档拖动后还原 -->
-    <div @click="restore" class="btn-doc-restore">
+    <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
       <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
     </div>
   </div>
@@ -84,7 +84,9 @@
         docViewRect: {
           width: 0,
           height: 0
-        }
+        },
+        rebroadcastStartTimer: null,
+        rebroadcastStopTimer: null
       };
     },
     computed: {
@@ -151,6 +153,9 @@
       // 初始化文档server的getDocViewRect方法
       this.docServer.getDocViewRect = this.getDocViewRect;
 
+      // 初始计算一次文档区域
+      this.getDocViewRect();
+
       this.initEvents();
 
       if (this.roomBaseServer.state.watchInitData.webinar.type == 1) {
@@ -199,18 +204,37 @@
         const reBroadcastServer = useRebroadcastServer();
         // 转播开始事件
         reBroadcastServer.$on('live_broadcast_start', () => {
-          this.docServer.setRole(VHDocSDK.RoleType.HOST);
-          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
-          this.recoverLastDocs();
+          // 文档角色设置成观众，实际上wap端只能是观众
+          this.docServer.setRole(VHDocSDK.RoleType.SPECTATOR);
+          // 设置转播中
+          this.docServer.setRelay(true);
+          // 清除存在的定时器
+          if (this.rebroadcastStartTimer) {
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }
+          this.rebroadcastStartTimer = setTimeout(() => {
+            // 设置播放流模式为FLV模式
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+            this.recoverLastDocs();
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }, 1000);
         });
         // 转播结束事件
         reBroadcastServer.$on('live_broadcast_stop', () => {
-          // 如果当前人拥有直播间文档操作权限，设为 host 角色
-          if (this.hasDocPermission) {
-            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
-            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          // 设置非转播
+          this.docServer.setRelay(false);
+          if (this.rebroadcastStopTimer) {
+            clearTimeout(this.rebroadcastStopTimer);
+            this.rebroadcastStopTimer = null;
           }
-          this.recoverLastDocs();
+          this.rebroadcastStopTimer = setTimeout(() => {
+            // 重置状态
+            this.docServer.resetState();
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+            this.recoverLastDocs();
+          }, 1000);
         });
       },
 
@@ -244,6 +268,7 @@
         }
         h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
+        console.log('[doc] ', this.docViewRect);
         return { width: w, height: h };
       },
       /**
@@ -409,7 +434,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.4);
       width: 64px;
       height: 64px;
       border-radius: 100px;

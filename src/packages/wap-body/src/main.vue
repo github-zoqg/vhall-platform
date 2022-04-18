@@ -152,7 +152,9 @@
 
         // 组长变更
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          this.gobackHome(7, '', msg);
+          if (this.isInGroup && msg.data.original_account_id) {
+            this.gobackHome(7, '', msg);
+          }
         });
 
         // 监听消息移动

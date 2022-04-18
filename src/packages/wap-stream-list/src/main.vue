@@ -25,7 +25,11 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-stream-list__main-screen-doubleRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 6,
+            'vmp-stream-list__main-screen-threeRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -333,6 +337,15 @@
           this.setBigScreen(msg);
         });
 
+        // 下麦成功 - 移除BScroll
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.disable();
+          }
+        });
+
         // 监听全屏变化
         window.addEventListener(
           'fullscreenchange',
@@ -349,6 +362,7 @@
       createBScroll() {
         this.$nextTick(() => {
           if (this.scroll) {
+            if (!this.scroll.enabled) this.scroll.enabled = true;
             this.scroll.refresh();
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
@@ -708,6 +722,13 @@
         top: 0;
         width: 100%;
         height: calc(100% - 85px);
+      }
+      // 未上麦执行旁路布局模式，会根据上麦人数进行修改主屏的高度
+      .vmp-stream-list__main-screen-doubleRow {
+        height: calc(100% - 170px);
+      }
+      .vmp-stream-list__main-screen-threeRow {
+        height: calc(100% - 255px);
       }
     }
     // 铺满全屏

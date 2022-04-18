@@ -30,7 +30,7 @@
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
-        <div>
+        <div style="border: none">
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
@@ -108,22 +108,24 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul
-        class="vmp-doc-thumbnailbar"
-        @click="handleThumbnail"
-        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
-      >
-        <li
-          class="doc-thumbnailbar__opt"
-          v-for="(item, index) in docServer.state.thumbnailList"
-          :key="'thum' + index"
-          :data-value="index"
-          :class="{ selected: pageNum - 1 === index }"
+      <transition name="el-fade-in-linear">
+        <ul
+          class="vmp-doc-thumbnailbar"
+          @click="handleThumbnail"
+          v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
         >
-          <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
-          <img :src="item" />
-        </li>
-      </ul>
+          <li
+            class="doc-thumbnailbar__opt"
+            v-for="(item, index) in docServer.state.thumbnailList"
+            :key="'thum' + index"
+            :data-value="index"
+            :class="{ selected: pageNum - 1 === index }"
+          >
+            <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
+            <img :src="item" />
+          </li>
+        </ul>
+      </transition>
     </div>
 
     <!-- 文档加载时的遮罩和进度,观看端才用 -->
@@ -586,32 +588,10 @@
             }
           });
         }
-
         // 直播开始
-        useMsgServer().$onMsg('ROOM_MSG', msg => {
-          if (msg.data.type === 'live_start') {
-            // 3-助理，4-嘉宾
-            if ([3, 4].includes(this.roleName)) {
-              this.recoverLastDocs();
-            }
-          }
-        });
-
+        this.docServer.$on('live_start', this.liveStart);
         // 直播结束
-        useMsgServer().$on('live_over', () => {
-          // 设置观众不可见
-          this.docServer.state.switchStatus = false;
-          if (this.isWatch) {
-            useRoomBaseServer().setChangeElement('doc');
-          } else {
-            this.setDisplayMode('normal');
-            // 通知默认菜单和工具栏默认为文档
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
-            );
-          }
-          this.hasStreamList = false;
-        });
+        this.docServer.$on('live_over', this.liveOver);
 
         const reBroadcastServer = useRebroadcastServer();
         // 转播开始事件
@@ -996,6 +976,28 @@
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
+      },
+
+      // 直播开始
+      liveStart() {
+        // 3-助理，4-嘉宾
+        if ([3, 4].includes(this.roleName)) {
+          this.recoverLastDocs();
+        }
+      },
+
+      // 直播结束
+      liveOver() {
+        if (this.isWatch) {
+          useRoomBaseServer().setChangeElement('doc');
+        } else {
+          this.setDisplayMode('normal');
+          // 通知默认菜单和工具栏默认为文档
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
+        }
+        this.hasStreamList = false;
       }
     },
     mounted() {
@@ -1023,6 +1025,8 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_page_change', this.dispatchDocPageChange);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('live_start', this.liveStart);
+      this.docServer.$off('live_over', this.liveOver);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -1113,6 +1117,12 @@
         position: absolute;
         transform: translate(-50%, -50%);
         overflow: visible !important;
+
+        // 不显示图片还未加载时的白边（设置border无效）
+        img[src=''],
+        img:not([src]) {
+          opacity: 0;
+        }
       }
     }
     .vmp-doc-pagebar {
@@ -1157,7 +1167,7 @@
       bottom: 0;
       right: 0;
       width: 144px;
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1167,7 +1177,7 @@
         width: 6px;
         height: 6px;
         border-radius: 0;
-        background-color: #000 !important;
+        background-color: transparent;
       }
       &::-webkit-scrollbar-track {
         background-color: transparent;
@@ -1176,8 +1186,8 @@
       &::-webkit-scrollbar-thumb {
         height: 60px;
         border-radius: 10px;
-        border: 1px solid #333;
-        background: #333 !important;
+        border: 1px solid #666;
+        background: #666 !important;
       }
 
       li.doc-thumbnailbar__opt {
