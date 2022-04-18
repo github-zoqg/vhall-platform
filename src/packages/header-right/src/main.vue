@@ -399,7 +399,6 @@
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
@@ -407,9 +406,6 @@
           // 如果是第三方推流直接生成回放
           this.handleSaveVodInLive();
           this.liveStep = 1;
-        } else {
-          // 如果不是第三方推流,派发结束直播事件,停止推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       // 录制页 点击结束录制
