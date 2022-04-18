@@ -132,16 +132,14 @@
         }
       });
       window.addEventListener('beforeunload', () => {
+        // 通知客户端关闭视频轮询页面
+        clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
         // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
         if (this._isExitPolling) {
-          // 关闭视频轮巡功能
-          clientMsgApi.JsCallQtMsg({ type: 'exitVideoRound' });
           return;
-        } else {
-          // 关闭视频轮巡页面，但是没有关闭视频轮巡功能
-          clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
-          localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
         }
+
+        localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
       });
       clientMsgApi.onQtCallFunctionPage(msg => {
         // 客户端关闭全屏事件
