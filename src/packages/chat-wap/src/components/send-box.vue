@@ -343,14 +343,14 @@
 
         if (this.currentTab == 3) {
           if (this.waitTimeFlag) {
-            this.$refs.chatWapInputModal.openModal();
+            this.$refs.chatWapInput.openModal();
           } else {
             this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
         } else if (this.currentTab == 'qa' && this.time != 0) {
           this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
-          this.$refs.chatWapInputModal.openModal();
+          this.$refs.chatWapInput.openModal();
         }
       },
       //计算延迟时间
@@ -422,6 +422,8 @@
 </script>
 <style lang="less" scoped>
   .vmp-send-box {
+    background-color: #fff;
+
     &::after {
       content: '';
       position: absolute;
@@ -444,9 +446,8 @@
 
     &__content {
       width: 100%;
-      height: 120px;
-      background-color: #fff;
-      padding: 0 30px;
+      height: 94px;
+      padding: 0 32px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -461,8 +462,8 @@
           color: #444;
           border-radius: 40px;
           width: 100%;
-          height: 80px;
-          line-height: 80px;
+          height: 60px;
+          line-height: 60px;
           padding: 2px 20px;
 
           .login-btn {
