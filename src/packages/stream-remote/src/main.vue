@@ -195,7 +195,7 @@
               !isInGroup &&
               (stream.attributes.roleName == 4 ||
                 stream.attributes.roleName == 1 ||
-                stream.role == 4)
+                stream.attributes.role == 4)
             "
             @click="setOwner(stream.accountId)"
           ></span>
