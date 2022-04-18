@@ -5,7 +5,8 @@
 <script type="text/jsx">
   export default {
     name: 'VmpAirContainer',
-    functional: true,
+    functional: true, //设置为函数式组件
+    // 实现render函数，渲染dom
     render(createElement, { props }) {
       let widgets = [];
       if (props.cuid && window.$serverConfig && window.$serverConfig[props.cuid]) {
@@ -32,12 +33,14 @@
       })
     },
     props: {
+      // 组件的唯一标识
       cuid: {
         type: String,
         default() {
           return ''
         }
       },
+      // 是否渲染组件本身（默认渲染组件的children）
       oneself: {
         type: Boolean,
         default() {

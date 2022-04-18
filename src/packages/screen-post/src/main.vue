@@ -1,11 +1,10 @@
 <template>
-  <div class="vmp-screen-post" v-if="screenShow" @click="handleLink">
-    <img
-      v-if="useRoomBaseServer.state.screenPosterInfo.img"
-      :src="useRoomBaseServer.state.screenPosterInfo.img"
-      alt=""
-      class="vmp-screen-post-img"
-    />
+  <div
+    class="vmp-screen-post"
+    v-if="screenShow && useRoomBaseServer.state.screenPosterInfo.img"
+    @click="handleLink"
+  >
+    <img :src="useRoomBaseServer.state.screenPosterInfo.img" alt="" class="vmp-screen-post-img" />
     <div
       class="vmp-screen-post-close-tip"
       :class="{ time: useRoomBaseServer.state.screenPosterInfo.shutdown_type }"
@@ -87,7 +86,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 49;
+    z-index: 120;
     background: #333;
 
     .vmp-screen-post-img {

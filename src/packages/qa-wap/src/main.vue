@@ -19,10 +19,10 @@
             length: qaList.length
           }"
         ></virtual-list>
-      </div>
-      <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+        <div class="new-msg-tips" v-show="unReadMessageCount > 0" @click="scrollToTarget">
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -39,8 +39,14 @@
 <script>
   import MsgItem from './components/msg-item.vue';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
-  import { useRoomBaseServer, useQaServer, useChatServer, useMenuServer } from 'middle-domain';
-  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import {
+    useRoomBaseServer,
+    useQaServer,
+    useChatServer,
+    useMenuServer,
+    useGroupServer
+  } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpQaWap',
@@ -81,6 +87,9 @@
       },
       isEmbed() {
         return this.embedObj.embed || this.embedObj.embedVideo;
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     components: { SendBox },
@@ -142,6 +151,11 @@
             this.scrollBottom();
           });
         });
+        useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!this.isInGroup) {
+            this.getQAHistroy();
+          }
+        });
       },
       //切换到当前tab时
       switchToBack() {
@@ -188,10 +202,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.qalist &&
           this.$refs.qalist.$el.scrollHeight -
             this.$refs.qalist.$el.scrollTop -
             this.$refs.qalist.getClientSize() <
-          5
+            5
         );
       },
       showMyQA(status) {
@@ -212,6 +227,7 @@
       .qa-content {
         height: 100%;
         overflow: hidden;
+        position: relative;
         .qalist {
           height: 100%;
           overflow: auto;

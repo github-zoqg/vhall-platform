@@ -145,6 +145,12 @@
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
+      },
+      //活动状态(直播未开始，已开始，已结束)
+      liveStatus() {
+        const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
+        const { webinar = {} } = watchInitData;
+        return webinar.type;
       }
     },
     props: {
@@ -231,6 +237,10 @@
       },
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
+        if (this.liveStatus !== 1) {
+          this.$message.error('直播未开始禁止调用');
+          return;
+        }
         this.$emit('changeAllBanned', val);
         window.vhallReportForProduct?.report(val ? 110116 : 110117);
       },

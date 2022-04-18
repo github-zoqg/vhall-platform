@@ -29,15 +29,15 @@
           }"
           @tobottom="toBottom"
         ></virtual-list>
-      </div>
 
-      <div
-        class="vmp-chat-wap__content__new-msg-tips"
-        v-show="isHasUnreadAtMeMsg"
-        @click="scrollToTarget"
-      >
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+        <div
+          class="vmp-chat-wap__content__new-msg-tips"
+          v-show="isHasUnreadAtMeMsg"
+          @click="scrollToTarget"
+        >
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -353,10 +353,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.chatlist &&
           this.$refs.chatlist.$el.scrollHeight -
             this.$refs.chatlist.$el.scrollTop -
             this.$refs.chatlist.getClientSize() <
-          5
+            5
         );
       },
       showUserPopup() {
@@ -394,6 +395,7 @@
     .virtual-content {
       height: 100%;
       overflow: hidden;
+      position: relative;
       .virtual-list {
         height: 100%;
         overflow: auto;

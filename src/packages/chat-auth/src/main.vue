@@ -164,6 +164,7 @@
   import autoSettingModal from './components/autoSettingModal';
   import authTable from './components/authTable';
   import { useChatAuthServer, useMsgServer } from 'middle-domain';
+  import { setRequestBody } from 'middle-domain';
   export default {
     name: 'VmpChatAuth',
     components: {
@@ -396,6 +397,12 @@
             ['', null, void 0].includes(params['live_token']))
         ) {
           params.live_token = params.liveT;
+        }
+
+        if (params.live_token) {
+          setRequestBody({
+            live_token: params.live_token
+          });
         }
 
         return this.chatAuthServer
