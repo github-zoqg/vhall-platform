@@ -24,12 +24,6 @@
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
-    <view-restriction
-      v-model="agreementVisible"
-      :agreement="agreement"
-      @agree="hanleAgree"
-      @disagree="hanleDisagree"
-    />
   </div>
 </template>
 
@@ -40,25 +34,16 @@
   import { getQueryString } from '@/packages/app-shared/utils/tool';
   import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
   import MsgTip from './MsgTip.vue';
-  import ViewRestriction from '@/packages/view-restriction-wap/src/main.vue';
-  import {
-    saveCookieAgreeCurDay,
-    getCookieAgreeCurDay
-  } from '@/packages/app-shared/utils/agreement';
 
   export default {
     name: 'Home',
     components: {
-      MsgTip,
-      ViewRestriction
+      MsgTip
     },
     data() {
       return {
         state: 0,
-        liveErrorTip: '',
-        domain: null,
-        agreement: {},
-        agreementVisible: false
+        liveErrorTip: ''
       };
     },
     computed: {
@@ -105,13 +90,44 @@
         } catch (e) {
           console.log('嵌入', e);
         }
-        this.domain = await this.initReceiveLive(clientType);
+        const domain = await this.initReceiveLive(clientType);
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
           // 是否跳转预约页
           this.goSubscribePage(clientType);
           return;
         }
-        await this.getAgreementStatus();
+        await roomState();
+        bindWeiXin();
+        console.log('%c---初始化直播房间 完成', 'color:blue');
+
+        const roomBaseState = roomBaseServer.state;
+        document.title = roomBaseState.languages.curLang.subject;
+        let lang = roomBaseServer.state.languages.lang;
+        this.$i18n.locale = lang.type;
+        // 初始化数据上报
+        console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
+        // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
+        domain.initVhallReport(
+          {
+            bu: 0,
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            webinar_id: this.$route.params.id,
+            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            os: getVhallReportOs(),
+            type: 2, //播放平台 2: wap
+            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            pf: 3, // wap
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          },
+          {
+            namespace: 'saas', //业务线
+            env: 'test', // 环境
+            method: 'post' // 上报方式
+          }
+        );
+        window.vhallReport.report('ENTER_WATCH');
+        this.state = 1;
+        this.addEventListener();
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
         console.error(err);
@@ -146,47 +162,6 @@
             ...this.$route.query // 第三方地址栏传参
           }
         });
-      },
-      async initRoomState() {
-        try {
-          await roomState();
-          bindWeiXin();
-          console.log('%c---初始化直播房间 完成', 'color:blue');
-          const roomBaseServer = useRoomBaseServer();
-          const roomBaseState = roomBaseServer.state;
-          document.title = roomBaseState.languages.curLang.subject;
-          let lang = roomBaseServer.state.languages.lang;
-          this.$i18n.locale = lang.type;
-          // 初始化数据上报
-          console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
-          // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
-          this.domain.initVhallReport(
-            {
-              bu: 0,
-              user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-              webinar_id: this.$route.params.id,
-              t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-              os: getVhallReportOs(),
-              type: 2, //播放平台 2: wap
-              entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-              pf: 3, // wap
-              env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-            },
-            {
-              namespace: 'saas', //业务线
-              env: 'test', // 环境
-              method: 'post' // 上报方式
-            }
-          );
-          window.vhallReport.report('ENTER_WATCH');
-          this.state = 1;
-          this.addEventListener();
-        } catch (err) {
-          console.error('---初始化直播房间出现异常--', err);
-          console.error(err);
-          this.state = 2;
-          this.handleErrorCode(err);
-        }
       },
       addEventListener() {
         const roomBaseServer = useRoomBaseServer();
@@ -240,68 +215,6 @@
           pageUrl = '/embedclient';
         }
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
-      },
-      async getAgreementStatus() {
-        const roomBaseServer = useRoomBaseServer();
-        await roomBaseServer
-          .getAgreementStatus()
-          .then(res => {
-            if (res.code === 200) {
-              const data = res.data;
-              if (data.is_open !== 1) {
-                // 未开启,阻断后续执行
-                return this.initRoomState();
-              }
-              if (data.rule === 0) {
-                const { id } = this.$route.params;
-                const agreed = getCookieAgreeCurDay(id); // 打cookie
-                if (agreed) {
-                  // 已经同意过了,未过有效期
-                  return this.initRoomState();
-                }
-              }
-              if (data.rule !== 0) {
-                this.initRoomState(); // 非强制同意协议不阻断房间初始化
-              }
-              // 组织数据
-              let statement_content = '';
-              if (data.statement_status && Array.isArray(data.statement_info)) {
-                statement_content = data.statement_content;
-                data.statement_info.forEach(statement => {
-                  const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
-                  statement_content = statement_content.replace(statement.title, txtHtml);
-                });
-              }
-              this.agreement = {
-                statement_content,
-                rule: data.rule,
-                title: data.title,
-                content: data.content
-              };
-              this.agreementVisible = true;
-            } else {
-              this.initRoomState();
-            }
-          })
-          .catch(err => {
-            console.error(err.msg || err);
-            this.initRoomState();
-          });
-        // if (agreementData?.popup !== true || agreementData?.rule !== 0) {
-        //   // 不弹窗或者不是强制同意的情况则
-        //   this.initRoomState();
-        // }
-      },
-      // 同意观看协议
-      hanleAgree() {
-        const { id } = this.$route.params;
-        saveCookieAgreeCurDay(id); // 打cookie
-        this.initRoomState();
-      },
-      // 不同意观看协议
-      hanleDisagree() {
-        this.state = 2;
-        this.liveErrorTip = this.$t('other.other_1020');
       }
     }
   };

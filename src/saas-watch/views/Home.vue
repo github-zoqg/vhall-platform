@@ -126,14 +126,9 @@
       }
     },
     mounted() {
-      const roomServer = useRoomBaseServer();
-      roomServer.$on('ROOM_SIGNLE_LOGIN', () => {
+      useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;
         this.errorData.errorPageTitle = 'it_end';
-      });
-      roomServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
-        this.state = 2;
-        this.errorData.errorPageTitle = 'view_restriction';
       });
     },
     beforeDestroy() {
