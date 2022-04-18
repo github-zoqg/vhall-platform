@@ -1,109 +1,107 @@
 <template>
   <van-popup
-    v-model="agreementPopupVisible"
-    :closeable="agreement.rule === 1"
+    v-model="popupVisible"
+    closeable
     :class="['vmp-view-restriction-wap']"
-    :overlay-class="agreement.rule === 0 ? 'vmp-view-restriction-wap-overlay' : ''"
     get-container="body"
   >
     <!-- 标题 -->
     <div class="restriction-title">
-      {{ agreement.title }}
+      {{ agreementInfo.title }}
     </div>
     <!-- 内容 -->
-    <div :class="['scroll-content', { 'more-content': agreement.rule === 1 }]">
-      <div class="restriction-content" v-html="agreement.content"></div>
+    <div :class="['scroll-content', { 'more-content': agreementInfo.rule === 1 }]">
+      <div class="restriction-content" v-html="agreementInfo.content"></div>
       <!-- 声明协议 -->
       <div
-        v-if="agreement.statement_content"
+        v-if="agreementInfo.statement_content"
         class="restriction-law"
-        v-html="agreement.statement_content"
+        v-html="agreementInfo.statement_content"
       ></div>
     </div>
-    <div :class="['restriction-control', { 'more-btn': agreement.rule === 1 }]">
-      <template v-if="!agreement.rule">
-        <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
-        <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
-      </template>
-      <span v-else @click.stop="agreementPopupVisible = false">
-        {{ $t('other.other_1019') }}
-      </span>
+    <div class="restriction-control more-btn">
+      <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
     </div>
   </van-popup>
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  // import { replaceXss } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpViewRestrictionWap',
-    props: {
-      value: {
-        type: Boolean,
-        required: true,
-        default() {
-          return false;
-        }
-      },
-      agreement: {
-        type: Object,
-        required: true,
-        default() {
-          return {};
-        }
-      }
-    },
     data() {
       return {
-        agreementPopupVisible: false // 协议弹窗的显示
+        popupVisible: false, // 协议弹窗的显示
+        agreementInfo: {}
       };
-    },
-    watch: {
-      value(val) {
-        if (val) {
-          this.agreementPopupVisible = true;
-        }
-      }
     },
     beforeCreate() {
       this.roomServer = useRoomBaseServer();
     },
-    // created() {
-    //   this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
-    //   // this.roomServer.getAgreementStatus();
-    // },
-    // destroyed() {
-    //   this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
-    // },
+    created() {
+      this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
+    },
+    destroyed() {
+      this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
+    },
     methods: {
       // server监听
-      // handlePopupMsg(payload) {
-      //   this.agreementInfo = payload;
-      //   this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
-      //   this.agreementPopupVisible = true;
-      // },
+      handlePopupMsg() {
+        const failure = err => {
+          console.warn(err.msg);
+          this.$toast(err.msg);
+        };
+        this.roomServer
+          .getAgreementStatus()
+          .then(res => {
+            if (res.code === 200) {
+              const data = res.data;
+              let statement_content = '';
+              if (data.statement_status && Array.isArray(data.statement_info)) {
+                statement_content = data.statement_content;
+                data.statement_info.forEach(statement => {
+                  const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
+                  statement_content = statement_content.replace(statement.title, txtHtml);
+                });
+              }
+              this.agreementInfo = {
+                statement_content,
+                rule: data.rule,
+                title: data.title,
+                content: data.content
+              };
+              this.popupVisible = true;
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
+      },
+      // 同意观看协议
       agree() {
-        // this.roomServer.agreeWitthTerms();
-        // this.agreementPopupVisible = false;
-        this.close();
-        this.$emit('agree');
-      },
-      disagree() {
-        this.$emit('disagree');
-        // this.roomServer.refusesTerms();
-        // this.agreementPopupVisible = false;
-        this.close();
-      },
-      close() {
-        this.$emit('input', false);
-        this.agreementPopupVisible = false;
+        const failure = err => {
+          console.warn(err.msg);
+          this.$toast(err.msg);
+        };
+        this.roomServer
+          .agreeWitthTerms()
+          .then(res => {
+            if (res.code === 200) {
+              this.popupVisible = false;
+              // 还要处理auth回调
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
       }
     }
   };
 </script>
 <style lang="less">
-  .vmp-view-restriction-wap-overlay {
-    // background: #fff;
-  }
   .vmp-view-restriction-wap {
     width: 670px;
     height: 760px;

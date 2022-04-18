@@ -43,9 +43,12 @@
     </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
+        <div v-if="needAgreement" @click="showAgreement">
+          <span>观看验证</span>
+        </div>
         <div
           class="vmp-subscribe-body-auth-two"
-          v-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
+          v-else-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
         >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
@@ -126,7 +129,8 @@
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
-        languageList: []
+        languageList: [],
+        needAgreement: true
       };
     },
     components: {
@@ -652,6 +656,10 @@
           clearInterval(this.countDowntimer);
           this.countDownTime = '';
         }
+      },
+      showAgreement() {
+        console.log('showAgreement showAgreement');
+        this.roomBaseServer.$emit('POPUP_AGREEMENT');
       }
     }
   };

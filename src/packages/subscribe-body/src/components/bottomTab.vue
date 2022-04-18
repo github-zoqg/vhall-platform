@@ -20,21 +20,25 @@
           <span class="num" place="n">{{ num }}</span>
         </i18n>
       </div>
-      <button
-        v-if="type != 3 && (verify != 0 || (verify == 0 && subOption.hide_subscribe != 0))"
-        class="sub-auth"
-        :class="{ disableClick: disabled }"
-        :disabled="disabled"
-        @click="authCheck"
-      >
-        {{ btnText }}
-      </button>
-      <button v-if="addText && type != 3" class="sub-auth add-auth" @click="payMore">
-        {{ addText }}
-      </button>
-      <div v-if="type == 3" class="end-tip">
-        {{ $t('player.player_1017') }}
-      </div>
+      <!-- 观看协议 -->
+      <button v-if="needAgreement" class="sub-auth add-auth" @click="agreement">观看验证</button>
+      <template v-else>
+        <button
+          v-if="type != 3 && (verify != 0 || (verify == 0 && subOption.hide_subscribe != 0))"
+          class="sub-auth"
+          :class="{ disableClick: disabled }"
+          :disabled="disabled"
+          @click="authCheck"
+        >
+          {{ btnText }}
+        </button>
+        <button v-if="addText && type != 3" class="sub-auth add-auth" @click="payMore">
+          {{ addText }}
+        </button>
+        <div v-if="type == 3" class="end-tip">
+          {{ $t('player.player_1017') }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -72,7 +76,8 @@
         fee: 0,
         verified: 0,
         is_subscribe: 0,
-        disabled: false
+        disabled: false,
+        needAgreement: true
       };
     },
     watch: {
@@ -261,6 +266,9 @@
       },
       payMore() {
         this.$emit('payMore', { type: 3 });
+      },
+      agreement() {
+        this.$emit('agreement');
       }
     }
   };
