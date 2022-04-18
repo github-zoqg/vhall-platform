@@ -1,15 +1,19 @@
-## 底部工具栏 设置和互动工具
+####订阅消息通知
+| 事件名称 | 事件说明 |
+| ---- | ---- |
+| receiveMsg | 收到聊天消息 |
+| atMe | @我的消息 |
+| replyMe | 回复我的消息 |
+| banned | 禁言我 |
+| allBanned | 禁言全员 |
+| roomKickout | 把我踢出房间 |
 
-用于 wap 观看端页面、主要功能:
+####第三方依赖
+| 依赖包名称 | 功能 | 文档 |
+| ---- | ---- | ---- |
+| vue-virtual-scroll-list | 虚拟列表 | <https://tangbc.github.io/vue-virtual-scroll-list/#/chat-room>|
 
-1. 上麦 [上麦流程](http://wiki.vhallops.com/pages/viewpage.action?pageId=219611642)
-
-### 输入 api(向其他组件发送的指令)
-
-| 方法名 | 参数 1 | 描述 | 代码块 |
-| ------ | ------ | ---- | ------ |
-
-### 使用接口地址
-
-| 模块 | 参数（必传） | 描述 | 接口地址 |
-| ---- | ------------ | ---- | -------- |
+####关联接口
+| 接口说明 | domain 中路径 | 方法名 |
+| ---- | ---- | ---- |
+| 获取房间聊天历史 | request/im/chat | getChatList |

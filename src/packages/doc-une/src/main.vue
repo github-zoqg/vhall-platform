@@ -30,7 +30,7 @@
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
-        <div>
+        <div style="border: none">
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
@@ -591,7 +591,12 @@
 
         // 直播开始
         useMsgServer().$onMsg('ROOM_MSG', msg => {
+          console.log('live_start');
           if (msg.data.type === 'live_start') {
+            if (this.roleName == 1) {
+              // 如果是主持人 TODO 补偿消息
+            }
+
             // 3-助理，4-嘉宾
             if ([3, 4].includes(this.roleName)) {
               this.recoverLastDocs();
@@ -1115,6 +1120,12 @@
         position: absolute;
         transform: translate(-50%, -50%);
         overflow: visible !important;
+
+        // 不显示图片还未加载时的白边（设置border无效）
+        img[src=''],
+        img:not([src]) {
+          opacity: 0;
+        }
       }
     }
     .vmp-doc-pagebar {
@@ -1147,7 +1158,7 @@
         }
 
         &.selected {
-          color: #fb3a32;
+          color: #fc5659;
           cursor: pointer;
         }
       }
