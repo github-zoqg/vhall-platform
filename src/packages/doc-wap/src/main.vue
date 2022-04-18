@@ -444,10 +444,10 @@
       z-index: 10;
 
       &--prev {
-        left: 0;
+        left: 32px;
       }
       &--next {
-        right: 0;
+        right: 32px;
       }
     }
 
