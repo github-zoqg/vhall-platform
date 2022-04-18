@@ -57,6 +57,7 @@
   import { useVideoPollingServer } from 'middle-domain';
   import screenfull from 'screenfull';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
+  import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
   export default {
     name: 'VmpVideoPolling',
     components: {
@@ -121,11 +122,33 @@
       // 限定特定的组件的全屏更改
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
+        // 通知客户端全屏和退出全屏事件
+        if (this.isFullscreen) {
+          // 网页进入全屏
+          clientMsgApi.JsCallQtMsg({ type: 'videoRoundFull' });
+        } else {
+          // 网页退出全屏
+          clientMsgApi.JsCallQtMsg({ type: 'videoRoundExitFull' });
+        }
       });
       window.addEventListener('beforeunload', () => {
         // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
-        if (this._isExitPolling) return;
-        localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+        if (this._isExitPolling) {
+          // 关闭视频轮巡功能
+          clientMsgApi.JsCallQtMsg({ type: 'exitVideoRound' });
+          return;
+        } else {
+          // 关闭视频轮巡页面，但是没有关闭视频轮巡功能
+          clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
+          localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+        }
+      });
+      clientMsgApi.onQtCallFunctionPage(msg => {
+        // 客户端关闭全屏事件
+        if (msg === 13) {
+          // 退出全屏
+          this.enterFullScreen();
+        }
       });
     },
     methods: {
@@ -135,9 +158,17 @@
           this.$message.error('请勿频繁操作');
           return;
         } else {
-          this.videoPollingServer.getVideoRoundUsers({
-            is_next: 1
-          });
+          this.videoPollingServer
+            .getVideoRoundUsers({
+              is_next: 1
+            })
+            .then(res => {
+              if (res.code !== 200) {
+                // 如果下一组报错了，报给客户端
+                // TODO: 后端可能需要给出一个特定的code码，告诉前端当前已经有人开始视频轮询了，如果提供，直接改成该 code 码即可
+                clientMsgApi.JsCallQtMsg({ type: 'videoRoundErr', msg: res });
+              }
+            });
         }
         this.nextTimer = setInterval(() => {
           this.nextTime--;
