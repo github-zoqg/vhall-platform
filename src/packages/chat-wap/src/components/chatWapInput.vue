@@ -39,6 +39,7 @@
 
 <script>
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
+  import EventBus from '../js/Events.js';
 
   export default {
     name: 'VmpChatWapInputModal',
@@ -59,6 +60,11 @@
         //是否显示表情弹窗
         showEmoji: false
       };
+    },
+    watch: {
+      showEmoji() {
+        EventBus.$emit('showEmoji', this.showEmoji);
+      }
     },
     methods: {
       //显示模态窗

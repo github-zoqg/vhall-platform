@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap">
-    <div class="vmp-chat-wap__content">
+    <div class="vmp-chat-wap__content" ref="chatContent">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
         v-if="hideChatHistory && !chatList.length && !historyLoaded"
@@ -12,7 +12,7 @@
       </p>
       <virtual-list
         ref="chatlist"
-        style="height: 100%; overflow: auto"
+        :style="{ height: chatlistHeight, overflow: 'auto' }"
         :keeps="30"
         :data-key="'count'"
         :data-sources="chatList"
@@ -35,6 +35,7 @@
       </div>
     </div>
     <send-box
+      ref="sendBox"
       :currentTab="3"
       :isAllBanned="allBanned"
       :isBanned="isBanned"
@@ -57,6 +58,9 @@
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
+  import EventBus from './js/Events.js';
+  import { isMse } from './js/utils.js';
+
   export default {
     name: 'VmpChatWap',
     components: {
@@ -101,7 +105,11 @@
         //true全体禁言，false未禁言
         allBanned: useChatServer().state.allBanned,
         //是否加载完聊天历史
-        historyLoaded: false
+        historyLoaded: false,
+        //聊天内容高度
+        chatlistHeight: '100%',
+        //android的内初始部高度
+        innerHeight: 0
       };
     },
     watch: {
@@ -207,8 +215,60 @@
       if (!this.hideChatHistory) {
         this.getHistoryMessage();
       }
+      const IsMse = isMse();
+      if (IsMse.os === 'android') {
+        this.innerHeight = window.innerHeight;
+        window.addEventListener('resize', this.resizeAndroid);
+      } else if (IsMse.os === 'ios') {
+        window.addEventListener('focusin', this.focusinIOS);
+        window.addEventListener('focusout', this.focusoutIOS);
+      }
+      this.initEvent();
+    },
+    beforeDestroy() {
+      //移除事件
+      window.removeEventListener('resize', this.resizeAndroid);
+      window.removeEventListener('focusin', this.focusinIOS);
+      window.removeEventListener('focusout', this.focusoutIOS);
     },
     methods: {
+      //初始化eventbus
+      initEvent() {
+        EventBus.$on('showEmoji', e => {
+          this.$nextTick(() => {
+            if (e) {
+              this.chatlistHeight =
+                this.$refs.chatContent.clientHeight -
+                this.$refs.sendBox.$el.clientHeight +
+                60 +
+                'px';
+              this.scrollBottom();
+            } else {
+              this.chatlistHeight = '100%';
+            }
+          });
+        });
+      },
+      resizeAndroid() {
+        const newInnerHeight = window.innerHeight;
+        if (this.innerHeight > newInnerHeight) {
+          // 键盘弹出事件处理
+          // alert('android 键盘弹窗事件');
+          this.scrollBottom();
+        } else {
+          // 键盘收起事件处理
+          // alert('android 键盘收起事件处理');
+        }
+      },
+      focusoutIOS() {
+        // 键盘收起事件处理
+        // alert('iphone 键盘收起事件处理');
+      },
+      focusinIOS() {
+        // 键盘弹出事件处理
+        // alert('iphone 键盘弹出事件处理');
+        this.scrollBottom();
+      },
       showWelcomeTxt() {
         this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
       },
