@@ -312,6 +312,7 @@
     }
     ul {
       display: flex;
+      box-sizing: border-box;
       padding: 0 30px;
       justify-content: space-between;
       li {
@@ -322,6 +323,7 @@
         line-height: 84px;
         color: #444444;
         border-radius: 8px;
+        box-sizing: border-box;
         border: 1px solid #979797;
         font-size: 36px;
         &.active {
@@ -367,7 +369,7 @@
       font-size: 30px;
       font-family: PingFangSC;
       font-weight: 400;
-      height: 90px;
+      height: 91px;
       color: rgba(68, 68, 68, 1);
       margin-bottom: 170px;
       > div {
@@ -375,7 +377,7 @@
         position: relative;
         input {
           width: 100%;
-          height: 99%;
+          height: 100%;
           border-radius: 8px;
           border: 1px solid #979797;
           line-height: normal;
