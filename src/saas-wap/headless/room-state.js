@@ -48,11 +48,6 @@ export default async function () {
     roomBaseServer.getCustomRoleName()
   ];
   virtualAudienceServer.init();
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
 
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
@@ -92,9 +87,16 @@ export default async function () {
           webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
         });
       }
-    }),
-    // 互动、分组直播初始化micServer
-    micServer.init();
+    });
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
+
+  // 互动、分组直播初始化micServer
+  micServer.init();
 
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
