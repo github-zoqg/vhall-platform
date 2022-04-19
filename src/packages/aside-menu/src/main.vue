@@ -314,7 +314,7 @@
             } else {
               if (this.isInGroup) {
                 vn.setHiddenState(true);
-              } else if (this.presenterId != this.doc_permission) {
+              } else if (this.presenterId != this.doc_permission || this.isThirdStream) {
                 // 主讲人和演示人，不是同一个人，说面有人在演示，就禁用助理的插播
                 vn.setHiddenState(false);
                 vn.setDisableState(true);
