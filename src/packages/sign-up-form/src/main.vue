@@ -1008,21 +1008,21 @@
           1: [
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             },
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             }
           ],
           2: [
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             },
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             }
           ]
         };
@@ -1189,6 +1189,18 @@
         this.signUpFormServer.getFormBaseInfo(params).then(res => {
           const { code = '', data = {} } = res || {};
           if ([200, '200'].includes(code)) {
+            if (res.data.tab_form_title) {
+              res.data.tab_form_title =
+                this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                  : res.data.tab_form_title;
+            }
+            if (res.data.tab_verify_title) {
+              res.data.tab_verify_title =
+                this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                  : res.data.tab_verify_title;
+            }
             this.formInfo = data;
             this.$nextTick(() => {
               this.calculateText();
