@@ -222,9 +222,6 @@
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
-
-        webinar.agreement && webinar.agreement.is_open === 1 && webinar.agreement.is_agree !== 1;
-        console.log(this.subOption, 'subOption');
         if (webinar.type == 2) {
           // 嵌入页没有预约页
           if (this.isEmbed) {
