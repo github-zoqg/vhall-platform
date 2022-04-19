@@ -629,9 +629,14 @@
             this.splitScreenServer.state.isOpenSplitScreen &&
             this.splitScreenServer.state.role == 'hostPage'
           ) {
-            return;
+            // 如果开启了分屏，并且是主页面
+            //  初始化互动实例
+            this.splitScreenServer.state.isOpenSplitScreen = false;
+            this.splitScreenServer.shadowWin = null;
+            this.interactiveServer.init();
+          } else {
+            await this.stopPush({ source: 'live_over' });
           }
-          await this.stopPush({ source: 'live_over' });
 
           clearInterval(this._audioLeveInterval);
           clearInterval(this._netWorkStatusInterval);
@@ -1005,10 +1010,8 @@
             .unpublishStream()
             .then(() => {
               clearInterval(this._audioLeveInterval);
-              if (
-                this.joinInfo.role_name == 1 &&
-                this.doc_permission == this.joinInfo.third_party_user_id
-              ) {
+              // 如果是主持人，并且是结束直播导致的停止推流，需要派发事件改变开始直播按钮状态
+              if (this.joinInfo.role_name == 1 && options?.source === 'live_over') {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );

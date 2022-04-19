@@ -434,7 +434,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.4);
       width: 64px;
       height: 64px;
       border-radius: 100px;
@@ -444,10 +444,10 @@
       z-index: 10;
 
       &--prev {
-        left: 0;
+        left: 32px;
       }
       &--next {
-        right: 0;
+        right: 32px;
       }
     }
 

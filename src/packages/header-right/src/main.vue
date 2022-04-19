@@ -87,7 +87,8 @@
     useInteractiveServer,
     useSubscribeServer,
     useSplitScreenServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    useRebroadcastServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -158,6 +159,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.rebroadcastServer = useRebroadcastServer();
       this.initConfig();
       this.listenEvents();
     },
@@ -169,7 +171,11 @@
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        this.liveStep = 2;
+        if (!useMicServer().getSpeakerStatus()) {
+          this.liveStep = 3;
+        } else {
+          this.liveStep = 2;
+        }
         // 如果开启了分屏 或者是 云导播
         if (this.splitScreenServer.state.isOpenSplitScreen || this.isStreamYun) {
           this.handlePublishComplate();
@@ -402,13 +408,22 @@
         const { watchInitData, interactToolStatus } = this.roomBaseServer.state;
 
         this.liveStep = 4;
+
+        // 如果正在开启转播
+        if (watchInitData.rebroadcast.id) {
+          // 先结束转播
+          await this.rebroadcastServer.stop({
+            webinar_id: watchInitData.webinar.id,
+            source_id: this.rebroadcastServer.state.sourceWebinarId
+          });
+        }
+
         const res = await this.roomBaseServer.endLive({
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
@@ -416,9 +431,6 @@
         if (res.code == 200 && (interactToolStatus.start_type == 4 || this.isStreamYun)) {
           this.handleSaveVodInLive();
           this.liveStep = 1;
-        } else {
-          // 如果不是第三方推流,派发结束直播事件,停止推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       // 录制页 点击结束录制
