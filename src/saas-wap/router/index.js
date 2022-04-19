@@ -133,8 +133,7 @@ router.beforeEach(async (to, from, next) => {
   const { system } = getBrowserType();
   if (
     system == 'ios' &&
-    `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` !=
-      `${process.env.VUE_APP_ROUTER_BASE_URL}${location.pathname}`
+    `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
   ) {
     location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
   }
