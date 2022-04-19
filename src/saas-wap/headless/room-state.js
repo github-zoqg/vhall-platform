@@ -43,7 +43,6 @@ export default async function () {
         systemKey: 2
       });
     }),
-    // roomBaseServer.getAgreementStatus(),
     //多语言接口
     roomBaseServer.getLangList(),
     roomBaseServer.getCustomRoleName()

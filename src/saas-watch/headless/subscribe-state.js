@@ -20,7 +20,6 @@ export default async function () {
         systemKey: 2
       });
     }),
-    // roomBaseServer.getViewRestrictions(),
     //多语言接口
     roomBaseServer.getLangList(),
     // 调用聚合接口
