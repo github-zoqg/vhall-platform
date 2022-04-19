@@ -303,7 +303,6 @@
         this.handleAuthCheck();
       },
       popupAgreement() {
-        console.log('popupAgreement');
         this.roomBaseServer.$emit('POPUP_AGREEMENT');
       },
       handleAgreeWitthTerms() {

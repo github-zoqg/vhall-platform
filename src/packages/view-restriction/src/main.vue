@@ -56,6 +56,7 @@
             customClass: 'zdy-info-box'
           });
         };
+
         this.roomServer
           .getAgreementStatus()
           .then(res => {
@@ -95,8 +96,13 @@
             customClass: 'zdy-info-box'
           });
         };
+        const { third_user_id = '', email = '' } = this.$route.query;
+        const params = {
+          third_user_id,
+          email
+        };
         this.roomServer
-          .agreeWitthTerms()
+          .agreeWitthTerms(params)
           .then(res => {
             if (res.code === 200) {
               this.popupVisible = false;
