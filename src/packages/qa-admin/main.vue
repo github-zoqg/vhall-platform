@@ -444,7 +444,14 @@
 </template>
 
 <script>
-  import { useRoomBaseServer, useQaAdminServer, Domain, useMsgServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useQaAdminServer,
+    Domain,
+    useMsgServer,
+    setRequestBody,
+    setRequestHeaders
+  } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
   import { debounce, getQueryString } from '@/packages/app-shared/utils/tool';
@@ -556,13 +563,30 @@
       this.webinar_id = this.$router.currentRoute.params.id;
       const { liveT = '', live_token = '' } = this.$route.query;
       if (location.search.includes('assistant_token=')) {
-        sessionStorage.setItem('vhall_client_token', getQueryString('assistant_token') || '');
+        const assistant_token = getQueryString('assistant_token');
+        sessionStorage.setItem('vhall_client_token', assistant_token || '');
+        if (location.search.includes('token_type=')) {
+          // 1: livetoken   0:token
+          if (getQueryString('token_type') == 1) {
+            setRequestBody({
+              live_token: assistant_token
+            });
+          } else {
+            setRequestHeaders({
+              token: assistant_token
+            });
+          }
+        }
       }
+
+      if (liveT || live_token) {
+        setRequestBody({
+          live_token: liveT || live_token
+        });
+      }
+
       await new Domain({
         plugins: ['chat'],
-        requestBody: {
-          live_token: liveT || live_token
-        },
         isNotInitRoom: true
       });
       const watchInitData = await this.qaServer
