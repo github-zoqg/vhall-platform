@@ -59,8 +59,8 @@
       if (
         hasRebroadCast ||
         (watchInitData.webinar.start_type != 1 &&
-          this.state.watchInitData.join_info.role_name == 3 &&
-          this.state.watchInitData.webinar.no_delay_webinar != 1)
+          watchInitData.join_info.role_name == 3 &&
+          watchInitData.webinar.no_delay_webinar != 1)
       ) {
         this.open();
       }
