@@ -1072,7 +1072,7 @@
           } else if (item.type === 4) {
             // 下拉
             !answer.select && (answer.select = []);
-            const element = item.items.find(elem => elem.subject === this.form[item.id]);
+            const element = item.items.find(elem => elem.id === this.form[item.id]);
             element &&
               answer.select.push({
                 id: item.id,
