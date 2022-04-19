@@ -94,6 +94,7 @@ const ua = navigator.userAgent.toLowerCase();
 
 // 是否微信
 export function isWechat() {
+  // return ua.indexOf('micromessenger') > -1; // 返回以前对微信环境的ua识别(阻止企业微信)
   // return ua.indexOf('micromessenger') > -1 && !isWechatCom();
   const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
   console.log('isWechat 是否为微信', isWechat);

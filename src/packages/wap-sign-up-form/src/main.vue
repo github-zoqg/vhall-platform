@@ -346,7 +346,7 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { useSignUpFormServer, useRoomBaseServer } from 'middle-domain';
+  import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
@@ -514,21 +514,21 @@
           1: [
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             },
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             }
           ],
           2: [
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             },
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             }
           ]
         };
@@ -623,6 +623,9 @@
       document.title = roomBaseState.languages.curLang.subject;
       let lang = roomBaseState.languages.lang;
       this.$i18n.locale = lang.type;
+      setRequestHeaders({
+        token: localStorage.getItem('token') || ''
+      });
       // if (localStorage.getItem('lang')) {
       //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
       // } else {
