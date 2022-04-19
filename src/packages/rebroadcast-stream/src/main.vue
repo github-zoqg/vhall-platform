@@ -41,7 +41,7 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       roleName() {
-        return this.$domainStore.state.roomBaseServer.join_info.role_name;
+        return this.$domainStore.state.roomBaseServer?.join_info?.role_name;
       }
     },
     beforeCreate() {
