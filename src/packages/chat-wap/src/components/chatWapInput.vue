@@ -2,7 +2,12 @@
   <div class="chat-input-modal" v-show="visible">
     <div class="input-info">
       <div class="send-box" @click="operateEmoji">
-        <i class="vh-iconfont vh-line-expression" title="表情"></i>
+        <i class="vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
+        <i
+          class="vh-iconfont vh-saas-iconfont vh-saas-jianpan_icon"
+          v-show="showEmoji"
+          title="键盘"
+        ></i>
       </div>
       <el-input
         type="textarea"
@@ -14,7 +19,7 @@
             ? $t('chat.chat_1066')
             : showTabType == 'private'
             ? $t('chat.chat_1045')
-            : $t('webinar.webinar_1011')
+            : $t('chat.chat_1021')
         "
         v-model="inputValue"
         id="textareaChat"
@@ -22,10 +27,9 @@
         :maxlength="140"
         @blur="handleOnBlur"
         @focus="handleOnFocus"
-        @keyup.enter.native="send"
       ></el-input>
       <div class="send-box">
-        <div class="send-menu" @click="closeSendBox">
+        <div class="send-menu" @click="send">
           <span class="vh-iconfont vh-line-send"></span>
         </div>
       </div>
@@ -41,9 +45,9 @@
       </div>
       <div class="tools">
         <div class="btn" @click="delInput">
-          <span class="vh-iconfont vh-line-close"></span>
+          <span class="vh-iconfont vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn" @click="send">发送</div>
+        <div class="btn send" @click="send">发送</div>
       </div>
     </div>
   </div>
@@ -103,6 +107,7 @@
       //取消
       cancel() {
         this.inputValue = '';
+        this.showEmoji = false;
         this.visible = false;
       },
       //处理失去焦点
@@ -205,7 +210,7 @@
         align-items: center;
         justify-content: center;
 
-        .vh-line-expression {
+        > .vh-iconfont {
           font-size: 50px;
         }
 
@@ -219,7 +224,7 @@
           background-color: #fff;
 
           .vh-iconfont {
-            font-size: 28px;
+            font-size: 34px;
           }
         }
       }
@@ -248,35 +253,49 @@
       height: 456px;
       box-sizing: border-box;
       overflow-y: scroll;
-      background-color: #fff;
+      background-color: #f0f0f0;
       padding: 30px 30px 80px;
       .imgs {
         display: grid;
         justify-content: space-between;
         grid-template-columns: repeat(auto-fill, 60px);
-        grid-gap: 20px;
+        grid-gap: 30px;
         img {
-          width: 70px;
-          height: 70px;
+          width: 60px;
+          height: 60px;
         }
       }
       .tools {
-        width: 200px;
+        width: 280px;
+        height: 120px;
         display: flex;
         justify-content: flex-end;
-        background-color: #fff;
+        background-color: transparent;
         z-index: 99;
-        padding-top: 10px;
         position: fixed;
         right: 20px;
         bottom: 20px;
+        align-items: flex-end;
         .btn {
-          width: 80px;
+          width: 104px;
+          height: 84px;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 10px;
-          padding: 10px 0;
+          border-radius: 8px;
+          background-color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #666;
+          .vh-iconfont {
+            font-size: 44px;
+          }
+          &.send {
+            background-color: #fb3a32;
+            color: #fff;
+          }
         }
       }
     }

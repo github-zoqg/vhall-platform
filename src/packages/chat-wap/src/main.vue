@@ -427,7 +427,7 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 120px;
+      bottom: 94px;
       overflow-x: hidden;
       overflow-y: auto;
       &__get-list-btn-container {
