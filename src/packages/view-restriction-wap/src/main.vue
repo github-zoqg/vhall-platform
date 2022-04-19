@@ -26,6 +26,8 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpViewRestrictionWap',
     data() {
@@ -90,6 +92,9 @@
             if (res.code === 200) {
               this.popupVisible = false;
               // 还要处理auth回调
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitAgreeWitthTerms')
+              );
             } else {
               failure(res);
             }

@@ -476,7 +476,14 @@ const serverConfig = {
     children: ['comWapPlayer']
   },
   comViewRestrictionWap: {
-    component: 'VmpViewRestrictionWap'
+    component: 'VmpViewRestrictionWap',
+    emitAgreeWitthTerms: [
+      //登录弹窗
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'handleAgreeWitthTerms'
+      }
+    ],
   }
   // *******单视频嵌入页面****结束
 };
