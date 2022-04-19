@@ -49,7 +49,7 @@
       // server监听
       handlePopupMsg() {
         const failure = err => {
-          console.warn(err.msg);
+          console.log(err);
           this.$toast(err.msg);
         };
         this.roomServer
@@ -83,7 +83,7 @@
       // 同意观看协议
       agree() {
         const failure = err => {
-          console.warn(err.msg);
+          console.log(err);
           this.$toast(err.msg);
         };
         this.roomServer

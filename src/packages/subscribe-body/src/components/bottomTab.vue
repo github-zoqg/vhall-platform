@@ -21,7 +21,9 @@
         </i18n>
       </div>
       <!-- 观看协议 -->
-      <button v-if="needAgreement" class="sub-auth add-auth" @click="agreement">观看验证</button>
+      <button v-if="subOption.needAgreement" class="sub-auth add-auth" @click="agreement">
+        观看验证
+      </button>
       <template v-else>
         <button
           v-if="type != 3 && (verify != 0 || (verify == 0 && subOption.hide_subscribe != 0))"
@@ -76,8 +78,7 @@
         fee: 0,
         verified: 0,
         is_subscribe: 0,
-        disabled: false,
-        needAgreement: true
+        disabled: false
       };
     },
     watch: {

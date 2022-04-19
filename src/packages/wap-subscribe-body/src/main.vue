@@ -667,7 +667,8 @@
       // 同意观看协议后回调
       handleAgreeWitthTerms() {
         this.subOption.needAgreement = false;
-        this.authCheck(this.subOption.verify);
+        const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        this.authCheck(type);
       }
     }
   };

@@ -1,42 +1,30 @@
 <template>
-  <div
-    v-if="agreementPopupVisible"
-    :class="['vmp-view-restriction', { 'force-agree': !agreementInfo.rule }]"
-  >
+  <div v-if="popupVisible" class="vmp-view-restriction">
     <div class="vmp-view-restriction-wrap">
       <div class="restriction-title">
         {{ agreementInfo.title }}
       </div>
-      <div
-        :class="['restriction-content', { 'more-content': agreementInfo.rule == 1 }]"
-        v-html="agreementInfo.content"
-      ></div>
+      <div class="restriction-content more-content" v-html="agreementInfo.content"></div>
       <div
         v-if="agreementInfo.statement_content"
         class="restriction-law"
         v-html="agreementInfo.statement_content"
       ></div>
       <div class="restriction-control">
-        <template v-if="!agreementInfo.rule">
-          <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
-          <span @click.stop="disagree">{{ $t('other.other_1018') }}</span>
-        </template>
-        <span v-else @click.stop="agreementPopupVisible = false">
-          {{ $t('other.other_1019') }}
-        </span>
+        <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
       </div>
     </div>
   </div>
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { replaceXss } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpViewRestriction',
     data() {
       return {
-        agreementPopupVisible: false, // 协议弹窗的显示
+        popupVisible: false, // 协议弹窗的显示
         agreementInfo: {
           // 协议信息
           title: '',
@@ -49,33 +37,80 @@
     },
     beforeCreate() {
       this.roomServer = useRoomBaseServer();
-      console.log(99999, this.roomServer);
     },
     created() {
       this.roomServer.$on('POPUP_AGREEMENT', this.handlePopupMsg);
-      this.roomServer.getAgreementStatus();
     },
     destroyed() {
       this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
     },
     methods: {
-      handlePopupMsg(payload) {
-        this.agreementInfo = payload;
-        this.agreementInfo.content = replaceXss(this.agreementInfo.content); // 与简介相同的xss处理
-        const webinarInitData = this.roomServer.state.watchInitData;
-        if (webinarInitData.webinar.type == 4 || webinarInitData.webinar.type == 5) {
-          this.agreementPopupVisible = false;
-        } else {
-          this.agreementPopupVisible = true;
-        }
+      // server监听
+      handlePopupMsg() {
+        const failure = err => {
+          console.log(err);
+          this.$message({
+            message: this.$tec(err.code) || err.msg,
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        };
+        this.roomServer
+          .getAgreementStatus()
+          .then(res => {
+            if (res.code === 200) {
+              const data = res.data;
+              let statement_content = '';
+              if (data.statement_status && Array.isArray(data.statement_info)) {
+                statement_content = data.statement_content;
+                data.statement_info.forEach(statement => {
+                  const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
+                  statement_content = statement_content.replace(statement.title, txtHtml);
+                });
+              }
+              this.agreementInfo = {
+                statement_content,
+                rule: data.rule,
+                title: data.title,
+                content: data.content
+              };
+              this.popupVisible = true;
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
       },
+      // 同意观看协议
       agree() {
-        this.roomServer.agreeWitthTerms();
-        this.agreementPopupVisible = false;
-      },
-      disagree() {
-        this.roomServer.refusesTerms();
-        this.agreementPopupVisible = false;
+        const failure = err => {
+          console.log(err);
+          this.$message({
+            message: this.$tec(err.code) || err.msg,
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+        };
+        this.roomServer
+          .agreeWitthTerms()
+          .then(res => {
+            if (res.code === 200) {
+              this.popupVisible = false;
+              // 还要处理auth回调
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitAgreeWitthTerms')
+              );
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
       }
     }
   };
