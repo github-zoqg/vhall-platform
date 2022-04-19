@@ -9,7 +9,12 @@
         <i class="vh-iconfont vh-line-copy-document"></i>
       </el-tooltip>
     </span>
-    <video-preview ref="videoPreview" v-if="isShow" :videoParam="videoParam" />
+    <video-preview
+      ref="videoPreview"
+      v-if="isShow"
+      :isShowController="true"
+      :videoParam="videoParam"
+    />
   </section>
 </template>
 
@@ -57,10 +62,11 @@
       const hasRebroadCast = watchInitData.rebroadcast.id;
 
       if (
-        hasRebroadCast ||
-        (watchInitData.webinar.start_type != 1 &&
-          watchInitData.join_info.role_name == 3 &&
-          watchInitData.webinar.no_delay_webinar != 1)
+        watchInitData.webinar.type == 1 &&
+        (hasRebroadCast ||
+          (watchInitData.switch.start_type != 1 &&
+            watchInitData.join_info.role_name == 3 &&
+            watchInitData.webinar.no_delay_webinar != 1))
       ) {
         this.open();
       }
