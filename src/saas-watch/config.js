@@ -646,7 +646,7 @@ export const serverConfig = {
         method: 'handleAgreeWitthTerms'
       }
     ]
-  },
+  }
 
   // *******单视频嵌入页面****结束
 };
