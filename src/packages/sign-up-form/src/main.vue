@@ -1008,21 +1008,21 @@
           1: [
             {
               code: 1,
-              text: this.$tdefault(this.formInfo.tab_form_title) || this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             },
             {
               code: 2,
-              text: this.$tdefault(this.formInfo.tab_verify_title) || this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             }
           ],
           2: [
             {
               code: 2,
-              text: this.$tdefault(this.formInfo.tab_verify_title) || this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             },
             {
               code: 1,
-              text: this.$tdefault(this.formInfo.tab_form_title) || this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             }
           ]
         };
