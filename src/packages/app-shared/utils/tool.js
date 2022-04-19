@@ -130,7 +130,6 @@ export function getQueryString(name) {
   return null;
 }
 
-
 /**
  * 获取上报os操作系统
  */
