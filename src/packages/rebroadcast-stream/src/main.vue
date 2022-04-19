@@ -9,7 +9,12 @@
         <i class="vh-iconfont vh-line-copy-document"></i>
       </el-tooltip>
     </span>
-    <video-preview ref="videoPreview" v-if="isShow" :videoParam="videoParam" />
+    <video-preview
+      ref="videoPreview"
+      v-if="isShow"
+      :isShowController="true"
+      :videoParam="videoParam"
+    />
   </section>
 </template>
 
