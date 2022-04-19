@@ -295,7 +295,7 @@
             // 观看端背景颜色
             if (bottomContent && background) {
               bottomContent.style.background = `url(${background}) no-repeat`;
-              bottomContent.style.backgroundSize = '100% 100%';
+              bottomContent.style.backgroundSize = 'cover';
               bottomContent.style.backgroundPosition = 'center';
             } else if (bottomContent && bgColor) {
               bottomContent.style.background = `${bgColor}`;
