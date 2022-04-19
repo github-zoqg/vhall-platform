@@ -1,6 +1,6 @@
 import { useMsgServer, useRoomBaseServer, useUserServer } from 'middle-domain';
 
-export default async function() {
+export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
   const roomBaseServer = useRoomBaseServer();
   const msgServer = useMsgServer();
