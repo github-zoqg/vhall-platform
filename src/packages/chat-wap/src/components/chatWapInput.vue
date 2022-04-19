@@ -251,13 +251,13 @@
       background-color: #fff;
       padding: 30px 30px 80px;
       .imgs {
-        display: flex;
+        display: grid;
         justify-content: space-between;
-        flex-wrap: wrap;
+        grid-template-columns: repeat(auto-fill, 60px);
+        grid-gap: 20px;
         img {
           width: 70px;
           height: 70px;
-          margin: 10px;
         }
       }
       .tools {
