@@ -10,7 +10,7 @@ const resolve = dir => path.join(__dirname, dir);
 const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ReorganizePlugin = require('./scripts/plugins/reorganize-webpack-plugin');
-const SentryCliPlugin = require('@sentry/webpack-plugin');
+// const SentryCliPlugin = require('@sentry/webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 
@@ -128,13 +128,13 @@ function getPlugins() {
     // }
 
     plugins.push(
-      new SentryCliPlugin({
-        release: `${argv.version}`, // 版本号
-        include: projectResourceDir, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
-        // ignore: ['node_modules'], // 忽略文件目录,当然我们在inlcude中制定了文件路径,这个忽略目录可以不加
-        configFile: `sentry/${argv.project}/sentry.properties`,
-        urlPrefix: `~/${argv.project}/static/js/` //  线上对应的url资源的相对路径 比如我的域名是 http://XXX.com/,静态资源都在 static文件夹里面
-      }),
+      // new SentryCliPlugin({
+      //   release: `${argv.version}`, // 版本号
+      //   include: projectResourceDir, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
+      //   // ignore: ['node_modules'], // 忽略文件目录,当然我们在inlcude中制定了文件路径,这个忽略目录可以不加
+      //   configFile: `sentry/${argv.project}/sentry.properties`,
+      //   urlPrefix: `~/${argv.project}/static/js/` //  线上对应的url资源的相对路径 比如我的域名是 http://XXX.com/,静态资源都在 static文件夹里面
+      // }),
       new FileManagerPlugin({
         events: {
           onEnd: {
