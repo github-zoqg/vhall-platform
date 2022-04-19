@@ -56,21 +56,27 @@
       const { watchInitData, isThirdStream } = this.roomBaseServer.state;
       const hasRebroadCast = watchInitData.rebroadcast.id;
 
-      if (hasRebroadCast || (isThirdStream && this.roleName == 3)) {
+      if (
+        hasRebroadCast ||
+        (watchInitData.webinar.start_type != 1 &&
+          this.state.watchInitData.join_info.role_name == 3 &&
+          this.state.watchInitData.webinar.no_delay_webinar != 1)
+      ) {
         this.open();
       }
     },
     methods: {
       listenEvents() {
         const msgServer = useMsgServer();
-        // 只有第三方推流时才会触发这个事件
-        this.roomBaseServer.$on('LIVE_START', () => {
-          if (this.roleName != 3) return;
+        this.roomBaseServer.$on('LIVE_BROADCAST_START', () => {
           this.open();
         });
 
-        this.roomBaseServer.$on('LIVE_OVER', () => {
-          if (this.roleName != 3) return;
+        this.rebroadcastServer.$on('live_broadcast_start', () => {
+          this.open();
+        });
+
+        this.rebroadcastServer.$on('live_broadcast_stop', () => {
           this.close();
         });
 
@@ -85,8 +91,9 @@
        * 调起转播
        */
       async open() {
-        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
-
+        if (this.isShow) {
+          return;
+        }
         const { watchInitData } = this.roomBaseServer.state;
         const token = watchInitData.interact.paas_access_token;
         const appId = watchInitData.interact.paas_app_id;
@@ -117,7 +124,6 @@
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
         await this.$nextTick(0);
-        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
       },
       exchangeScreen() {
         const miniElement =
