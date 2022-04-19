@@ -514,21 +514,21 @@
           1: [
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$tdefault(this.formInfo.tab_form_title) || this.$t('form.form_1025')
             },
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$tdefault(this.formInfo.tab_verify_title) || this.$t('form.form_1024')
             }
           ],
           2: [
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$tdefault(this.formInfo.tab_verify_title) || this.$t('form.form_1024')
             },
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$tdefault(this.formInfo.tab_form_title) || this.$t('form.form_1025')
             }
           ]
         };
