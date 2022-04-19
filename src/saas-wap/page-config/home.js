@@ -483,7 +483,7 @@ const serverConfig = {
         cuid: 'comSubcribeWapBody',
         method: 'handleAgreeWitthTerms'
       }
-    ],
+    ]
   }
   // *******单视频嵌入页面****结束
 };
