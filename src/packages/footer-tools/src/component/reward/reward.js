@@ -1,4 +1,4 @@
-import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+// import { fboxEventOpitons } from '@/packages/app-shared/utils/tool.js';
 import {
   useRoomBaseServer,
   useWatchRewardServer,
