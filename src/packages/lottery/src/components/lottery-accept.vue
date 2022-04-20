@@ -219,7 +219,7 @@
       margin-bottom: 5px;
     }
     .winner-info-form {
-      max-height: 194px;
+      max-height: 156px;
       overflow-y: auto;
       overflow-x: hidden;
       .el-form-item__content {
