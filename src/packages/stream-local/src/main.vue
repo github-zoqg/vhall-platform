@@ -276,9 +276,7 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        },
-        // 是否在参与视频轮训中
-        videoPollingStatus: 0 // 0:未参与； 1:参与
+        }
       };
     },
     components: {
@@ -445,23 +443,12 @@
       // 是否开启视频轮巡
       isVideoPolling() {
         return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
-      /**
-       * pollingList() {
-        return this.videoPollingServer.state.pollingList;
-      }*/
     },
-    /*watch: {
-      pollingList: {
-        handler(val) {
-          console.log('watch-videos-polling', val);
-          if (val && val.length && Array.isArray(val)) {
-            this.videoStartPush(val);
-          }
-        },
-        deep: true
-      }
-    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -484,14 +471,21 @@
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
-        console.log('停止视频轮巡', this.videoPollingStatus);
-        if (this.videoPollingStatus) {
+        if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
           await this.stopPush();
-          if (this.joinInfo.role_name == 2) {
-            await this.interactiveServer.destroy();
-          }
+          await this.interactiveServer.destroy();
         }
       });
+      console.log('轮训列表更新消息---1', this.isSpeakOn);
+      if (!this.isSpeakOn) {
+        let res = await this.videoPollingServer.getVideoRoundUsers();
+        if (res.code !== 200 || !res.data.list.length) return;
+        let users = res.data.list.map(el => {
+          return el.account_id;
+        });
+        console.log('videos__users::::', users);
+        this.videoStartPush(users);
+      }
     },
     beforeDestroy() {
       // 清空计时器
@@ -551,11 +545,9 @@
             console.log('视频轮巡初始化互动实例error', error);
           }
           await this.startPush({ videoPolling: true });
-          this.videoPollingStatus = 1;
         } else {
-          if (this.videoPollingStatus) {
+          if (!this.isSpeakOn) {
             await this.stopPush();
-            this.videoPollingStatus = 0;
           }
         }
       },
