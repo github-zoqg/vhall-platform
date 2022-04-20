@@ -518,7 +518,6 @@
     .new-gift {
       padding-left: 0;
       padding-top: 26px;
-      height: 72px;
       position: relative;
       display: block;
       &.interact {
