@@ -184,6 +184,7 @@
         }
         window.vhallReportForProduct && window.vhallReportForProduct.report(120002);
         this.$emit('thirdPushStream', true);
+        this.$domainStore.state.roomBaseServer.isThirdpartyInitiated = true;
         this.roomBaseServer.setInavToolStatus('start_type', 4);
       },
       thirdPartyClose() {
@@ -193,6 +194,7 @@
           return;
         }
         this.$emit('thirdPushStream', false);
+        this.$domainStore.state.roomBaseServer.isThirdpartyInitiated = false;
         this.roomBaseServer.setInavToolStatus('start_type', 1);
       },
       openVirtualAudience() {
