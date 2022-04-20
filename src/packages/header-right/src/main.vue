@@ -173,7 +173,7 @@
        * 补充：第三方发起时，不在进行设备状态的相关提示
        *    若助理，则无需进行提示，助理是不存在上麦的
        */
-      if (this.deviceStatus == 2 && (!this.isThirdStream || this.roleName != 3)) {
+      if (this.deviceStatus == 2 && this.roleName != 3 && !this.isThirdStream) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
