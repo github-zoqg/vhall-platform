@@ -24,15 +24,20 @@
       <span class="des">{{ second }}</span>
       <span>{{ $t('appointment.appointment_1029') }}</span>
     </div>
-    <button
-      v-if="btnText"
-      class="sub-auth"
-      :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
-      :disabled="btnText == $t('webinar.webinar_1036')"
-      @click="authCheck"
-    >
-      {{ btnText }}
+    <button v-if="subOption.needAgreement" class="sub-auth add-auth" @click="agreement">
+      观看验证
     </button>
+    <template v-else>
+      <button
+        v-if="btnText"
+        class="sub-auth"
+        :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
+        :disabled="btnText == $t('webinar.webinar_1036')"
+        @click="authCheck"
+      >
+        {{ btnText }}
+      </button>
+    </template>
   </div>
 </template>
 <script>
@@ -102,6 +107,9 @@
       this.handleSubscribeProcess();
     },
     methods: {
+      agreement() {
+        this.$emit('agreement');
+      },
       handleSubscribeProcess() {
         this.clearTimer();
         this.handleTips();

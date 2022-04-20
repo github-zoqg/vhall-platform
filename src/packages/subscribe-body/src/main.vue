@@ -30,7 +30,12 @@
         </el-dropdown>
       </div>
       <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
-        <EmbedTime ref="embedTime" :sub-option="subOption" @authFetch="handleAuthCheck"></EmbedTime>
+        <EmbedTime
+          ref="embedTime"
+          :sub-option="subOption"
+          @authFetch="handleAuthCheck"
+          @agreement="popupAgreement"
+        ></EmbedTime>
       </div>
       <!--活动时间信息-->
       <div class="subscribe-img-bottom" v-if="!isEmbed">
