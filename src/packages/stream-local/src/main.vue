@@ -443,19 +443,12 @@
       // 是否开启视频轮巡
       isVideoPolling() {
         return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
-    /*watch: {
-      pollingList: {
-        handler(val) {
-          console.log('watch-videos-polling', val);
-          if (val && val.length && Array.isArray(val)) {
-            this.videoStartPush(val);
-          }
-        },
-        deep: true
-      }
-    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -478,19 +471,17 @@
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
-        console.log('停止视频轮巡', sessionStorage.getItem('videoPollingStatus'));
-        if (sessionStorage.getItem('videoPollingStatus') == 1 && this.joinInfo.role_name == 2) {
+        if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
           await this.stopPush();
-          sessionStorage.setItem('videoPollingStatus', 0);
           await this.interactiveServer.destroy();
         }
       });
-      console.log('sessionStorage视频轮巡', sessionStorage.getItem('videoPollingStatus'));
-      if (sessionStorage.getItem('videoPollingStatus') == 1) {
+      console.log('轮训列表更新消息---1', this.isSpeakOn);
+      if (!this.isSpeakOn) {
         let res = await this.videoPollingServer.getVideoRoundUsers();
         if (res.code !== 200 || !res.data.list.length) return;
         let users = res.data.list.map(el => {
-          return el.accountId;
+          return el.account_id;
         });
         console.log('videos__users::::', users);
         this.videoStartPush(users);
@@ -554,11 +545,9 @@
             console.log('视频轮巡初始化互动实例error', error);
           }
           await this.startPush({ videoPolling: true });
-          sessionStorage.setItem('videoPollingStatus', 1);
         } else {
-          if (sessionStorage.getItem('videoPollingStatus') == 1) {
+          if (!this.isSpeakOn) {
             await this.stopPush();
-            sessionStorage.setItem('videoPollingStatus', 0);
           }
         }
       },
