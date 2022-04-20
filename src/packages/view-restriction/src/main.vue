@@ -1,5 +1,5 @@
 <template>
-  <div v-if="popupVisible" class="vmp-view-restriction">
+  <div v-if="popupVisible" class="vmp-view-restriction" ref="mask">
     <div class="vmp-view-restriction-wrap">
       <div class="restriction-close vh-iconfont vh-line-close" @click="popupVisible = false"></div>
       <div class="restriction-content">
@@ -46,6 +46,13 @@
     },
     destroyed() {
       this.roomServer.$off('POPUP_AGREEMENT', this.handlePopupMsg);
+    },
+    watch: {
+      popupVisible: async function (val) {
+        if (val) {
+          await this.initEvent();
+        }
+      }
     },
     methods: {
       // server监听
@@ -120,6 +127,15 @@
           .catch(err => {
             failure(err);
           });
+      },
+      async initEvent() {
+        await this.$nextTick();
+        const dom = this.$refs.mask;
+        if (dom) {
+          dom.addEventListener('onscroll', function (e) {
+            e.preventDefault();
+          });
+        }
       }
     }
   };
