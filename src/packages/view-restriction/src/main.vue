@@ -1,15 +1,18 @@
 <template>
   <div v-if="popupVisible" class="vmp-view-restriction">
     <div class="vmp-view-restriction-wrap">
-      <div class="restriction-title">
-        {{ agreementInfo.title }}
+      <div class="restriction-close vh-iconfont vh-line-close" @click="popupVisible = false"></div>
+      <div class="restriction-content">
+        <div class="restriction-content-title">
+          {{ agreementInfo.title }}
+        </div>
+        <div class="restriction-content-text" v-html="agreementInfo.content"></div>
+        <div
+          v-if="agreementInfo.statement_content"
+          class="restriction-content-law"
+          v-html="agreementInfo.statement_content"
+        ></div>
       </div>
-      <div class="restriction-content more-content" v-html="agreementInfo.content"></div>
-      <div
-        v-if="agreementInfo.statement_content"
-        class="restriction-law"
-        v-html="agreementInfo.statement_content"
-      ></div>
       <div class="restriction-control">
         <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
       </div>
@@ -139,62 +142,76 @@
     box-shadow: 0px 8px 16px 0px rgba(51, 51, 51, 0.24), 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
     border-radius: 4px;
     box-sizing: border-box;
-    padding: 24px 32px 0px;
+    padding: 24px 0px 0px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    .restriction-title {
-      width: 100%;
-      min-height: 28px;
-      font-size: 20px;
-      font-weight: 500;
-      color: #1a1a1a;
-      line-height: 28px;
-      margin-bottom: 24px;
-    }
-    .restriction-content {
-      width: 100%;
-      height: auto;
-      max-height: 120px;
-      margin-bottom: 10px;
-      font-size: 14px;
-      font-weight: 400;
-      color: #1a1a1a;
-      line-height: 20px;
-      overflow-y: scroll;
-      img {
-        display: block;
-        object-fit: scale-down;
-        margin: 10px 0px;
+    .restriction-close {
+      display: block;
+      width: 16px;
+      height: 16px;
+      // background: #333;
+      float: right;
+      margin-right: 32px;
+      &:hover {
+        cursor: pointer;
+      }
+      &:after {
+        clear: both;
       }
     }
-    .more-content {
-      max-height: 188px;
-    }
-    .restriction-law {
+    .restriction-content {
+      padding: 0px 32px;
+      box-sizing: border-box;
       width: 100%;
-      font-size: 14px;
-      font-weight: 400;
-      color: #666666;
-      line-height: 20px;
-      .law-link {
-        color: #3562fa;
-        &:hover {
-          cursor: pointer;
+      width: 100%;
+      height: 242px;
+      overflow-y: scroll;
+      &-title {
+        width: 100%;
+        min-height: 28px;
+        font-size: 20px;
+        font-weight: 500;
+        color: #1a1a1a;
+        line-height: 23px;
+        margin-bottom: 16px;
+      }
+      &-text {
+        font-size: 14px;
+        font-weight: 400;
+        color: #1a1a1a;
+        line-height: 20px;
+        margin-bottom: 10px;
+        img {
+          display: block;
+          // width: 100%;
+          object-fit: scale-down;
+          margin: 10px 0px;
+        }
+      }
+      &-law {
+        width: 100%;
+        font-size: 14px;
+        font-weight: 400;
+        color: #666666;
+        line-height: 20px;
+        .law-link {
+          color: #3562fa;
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
     }
     .restriction-control {
       width: 100%;
-      min-height: 40px;
+      height: 40px;
       position: absolute;
       bottom: 0px;
       left: 0px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       padding-bottom: 24px;
+      text-align: center;
       & > span {
         display: inline-block;
         width: 152px;
@@ -209,14 +226,6 @@
         font-size: 14px;
         &:hover {
           cursor: pointer;
-        }
-      }
-      & > span:nth-child(2) {
-        margin-top: 10px;
-        background: #fff;
-        color: #1a1a1a;
-        &:hover {
-          color: #fb3a32;
         }
       }
     }
