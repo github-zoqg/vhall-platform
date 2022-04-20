@@ -5,7 +5,7 @@ import { initWeChatSdk, initHideChatSdk } from '@/packages/app-shared/utils/wech
 export default function () {
   const roomBaseServer = useRoomBaseServer();
   const inviteServer = useInviteServer();
-  const isEmbed = getQueryString('embedclient');
+  const isEmbed = location.pathname.indexOf('embedclient') != -1;
 
   // 是否绑定邀请卡信息
   const open_id = sessionStorage.getItem('open_id');
@@ -29,7 +29,6 @@ export default function () {
   ) {
     bindInvite(inviteCode);
   }
-
   // 获取微信分享信息
   if (isWechatBrowser && !isEmbed) {
     getShareSettingInfo();
