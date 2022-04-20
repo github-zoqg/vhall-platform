@@ -41,7 +41,7 @@
         </template>
       </template>
     </div>
-    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
+    <template v-if="(showBottomBtn && subOption.hide_subscribe == 1) || subOption.needAgreement">
       <div class="vmp-subscribe-body-auth">
         <div v-if="subOption.needAgreement" @click="showAgreement">
           <span>观看验证</span>
