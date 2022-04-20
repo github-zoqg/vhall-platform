@@ -276,9 +276,7 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        },
-        // 是否在参与视频轮训中
-        videoPollingStatus: 0 // 0:未参与； 1:参与
+        }
       };
     },
     components: {
@@ -446,10 +444,6 @@
       isVideoPolling() {
         return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
-      /**
-       * pollingList() {
-        return this.videoPollingServer.state.pollingList;
-      }*/
     },
     /*watch: {
       pollingList: {
@@ -484,14 +478,23 @@
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
-        console.log('停止视频轮巡', this.videoPollingStatus);
-        if (this.videoPollingStatus) {
+        console.log('停止视频轮巡', sessionStorage.getItem('videoPollingStatus'));
+        if (sessionStorage.getItem('videoPollingStatus') == 1 && this.joinInfo.role_name == 2) {
           await this.stopPush();
-          if (this.joinInfo.role_name == 2) {
-            await this.interactiveServer.destroy();
-          }
+          sessionStorage.setItem('videoPollingStatus', 0);
+          await this.interactiveServer.destroy();
         }
       });
+      console.log('sessionStorage视频轮巡', sessionStorage.getItem('videoPollingStatus'));
+      if (sessionStorage.getItem('videoPollingStatus') == 1) {
+        let res = await this.videoPollingServer.getVideoRoundUsers();
+        if (res.code !== 200 || !res.data.list.length) return;
+        let users = res.data.list.map(el => {
+          return el.accountId;
+        });
+        console.log('videos__users::::', users);
+        this.videoStartPush(users);
+      }
     },
     beforeDestroy() {
       // 清空计时器
@@ -551,11 +554,11 @@
             console.log('视频轮巡初始化互动实例error', error);
           }
           await this.startPush({ videoPolling: true });
-          this.videoPollingStatus = 1;
+          sessionStorage.setItem('videoPollingStatus', 1);
         } else {
-          if (this.videoPollingStatus) {
+          if (sessionStorage.getItem('videoPollingStatus') == 1) {
             await this.stopPush();
-            this.videoPollingStatus = 0;
+            sessionStorage.setItem('videoPollingStatus', 0);
           }
         }
       },
