@@ -26,7 +26,7 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bottom">
+    <section class="vmp-stream-local__bottom" v-show="stream.streamId">
       <span
         v-show="showRole"
         class="vmp-stream-local__bottom-role"
