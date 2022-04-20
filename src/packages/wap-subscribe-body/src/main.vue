@@ -43,9 +43,12 @@
     </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
+        <div v-if="subOption.needAgreement" @click="showAgreement">
+          <span>观看验证</span>
+        </div>
         <div
           class="vmp-subscribe-body-auth-two"
-          v-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
+          v-else-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
         >
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
@@ -122,7 +125,8 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          hide_subscribe: 1
+          hide_subscribe: 1,
+          needAgreement: false
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
@@ -204,7 +208,7 @@
         });
       },
       handlerInitInfo() {
-        const { webinar, join_info, warmup } = this.roomBaseServer.state.watchInitData;
+        const { webinar, join_info, warmup, agreement } = this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.verify = webinar.verify;
         this.subOption.fee = webinar.fee || 0;
@@ -214,6 +218,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
+          // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
+          this.subOption.needAgreement = true;
+        }
         if (webinar.type == 2) {
           // 嵌入页没有预约页
           if (this.isEmbed) {
@@ -652,6 +660,15 @@
           clearInterval(this.countDowntimer);
           this.countDownTime = '';
         }
+      },
+      showAgreement() {
+        this.roomBaseServer.$emit('POPUP_AGREEMENT');
+      },
+      // 同意观看协议后回调
+      handleAgreeWitthTerms() {
+        this.subOption.needAgreement = false;
+        const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        this.authCheck(type);
       }
     }
   };

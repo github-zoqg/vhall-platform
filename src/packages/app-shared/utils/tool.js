@@ -375,3 +375,14 @@ export const replaceHtml = str => {
   desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
   return desc;
 };
+
+/**
+ * 转换html文本中的xss(仅替换script与style标签)
+ * @param {*} string
+ * @returns string
+ */
+export const replaceXss = htmltext => {
+  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
+  const styleReg = /<style(([\s\S])*?)<\/style>/g;
+  return `${htmltext}`.replace(scriptReg, '').replace(styleReg, '');
+};

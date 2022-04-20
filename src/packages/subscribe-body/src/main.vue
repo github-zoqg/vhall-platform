@@ -40,6 +40,7 @@
           :sub-option="subOption"
           @payMore="feeAuth"
           @authFetch="handleAuthCheck"
+          @agreement="popupAgreement"
         ></bottom-tab>
       </div>
     </div>
@@ -80,7 +81,8 @@
           is_subscribe: 0,
           actual_start_time: '',
           show: 1,
-          num: 0
+          num: 0,
+          needAgreement: false
         }
       };
     },
@@ -159,7 +161,8 @@
         });
       },
       handlerInitInfo() {
-        const { webinar, subscribe, join_info, warmup } = this.roomBaseServer.state.watchInitData;
+        const { webinar, subscribe, join_info, warmup, agreement } =
+          this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.startTime = webinar.start_time;
         this.subOption.verify = webinar.verify;
@@ -172,6 +175,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
+          // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
+          this.subOption.needAgreement = true;
+        }
         if (this.isEmbed) {
           // 嵌入的暖场视频只有免费的时候显示
           if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
@@ -293,6 +300,13 @@
         }
       },
       livingLink() {
+        this.handleAuthCheck();
+      },
+      popupAgreement() {
+        this.roomBaseServer.$emit('POPUP_AGREEMENT');
+      },
+      handleAgreeWitthTerms() {
+        this.subOption.needAgreement = false;
         this.handleAuthCheck();
       }
     }
