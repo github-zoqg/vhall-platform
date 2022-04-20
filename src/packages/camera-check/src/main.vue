@@ -174,6 +174,11 @@
       // 展示弹窗
       showCameraCheck() {
         this.isShow = true;
+        if (!this._isFirstShow) {
+          this._isFirstShow = true;
+        } else {
+          this.createPreview();
+        }
       },
       closeVideoSetting() {
         this.isShow = false;
@@ -185,10 +190,21 @@
        */
       async saveMediaSetting() {
         this._diffOptions = this.getDiffOptions();
+        this.saveSelected();
         this.$message.success(this.$t('common.common_1034'));
         this.closeVideoSetting();
         this.sendChangeEvent();
         this.getStateCapture(); // 更新快照
+      },
+      /**
+       * 缓存设置字段
+       */
+      saveSelected() {
+        const sessionMap = new Map([['selectedVideoDeviceId', this.mediaState.video || '']]);
+
+        for (const [key, value] of sessionMap) {
+          sessionStorage.setItem(key, value);
+        }
       },
       /**
        * 发送变化事件
