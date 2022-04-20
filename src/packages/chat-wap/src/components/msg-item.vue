@@ -45,17 +45,20 @@
     </template>
     <!-- 打赏 -->
     <template v-else-if="source.type == 'reward_pay_ok'">
-      <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
+      <div class="msg-item new-gift">
         <div class="interact-gift-box">
           <p class="new-gift-name">
             {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
             {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
-            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | overHidden(6) }}
+            }}{{ $t('cash.cash_1003') }}
           </p>
+          <img class="new-award-img" src="../img/red-package.png" />
         </div>
-        <img class="new-award-img" src="../img/red-package.png" />
+        <p class="reward_txt">
+          {{ source.content.text_content | overHidden(10) }}
+        </p>
       </div>
     </template>
     <!-- 送礼物 -->
@@ -68,8 +71,8 @@
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
+          <img class="new-gift-img" :src="source.content.gift_url" />
         </div>
-        <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
     <!-- 聊天消息 -->
@@ -516,10 +519,8 @@
       padding-left: 0;
       padding-top: 26px;
       height: 72px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: relative;
+      display: block;
       &.interact {
         justify-content: unset;
       }
@@ -529,12 +530,15 @@
       &.red {
         background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
       }
+
       .interact-gift-box {
         padding-left: 24px;
         margin-right: 10px;
         text-align: left;
-        // width: 100%;
-        display: inline-block;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border: none;
         p {
           text-align: left;
@@ -542,24 +546,28 @@
           color: #fff;
         }
         .new-gift-name {
-          font-size: 24px;
-          width: 240px;
+          font-size: 28px;
+          max-width: 240px;
           line-height: 28px;
-          padding-left: 8px;
-          margin-bottom: 6px;
+          margin-right: 8px;
           color: #8c8c8c;
         }
         .new-gift-content {
-          font-size: 18px;
+          font-size: 28px;
           transform: scale(0.9);
           line-height: 22px;
-          margin-left: -4px;
           color: #262626;
         }
       }
       .new-gift-img,
       .new-award-img {
-        width: 38px;
+        width: 32px;
+      }
+      .reward_txt {
+        color: #ffd11a;
+        font-size: 28px;
+        line-height: 40px;
+        text-align: center;
       }
     }
     .margin-top-bottom {
