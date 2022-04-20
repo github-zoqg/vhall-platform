@@ -2,10 +2,11 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
-      <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="deviceStatus == 2">
+      <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
+      <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
         <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
@@ -112,8 +113,7 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        },
-        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
+        }
       };
     },
     computed: {
@@ -148,6 +148,14 @@
       },
       isStreamYun() {
         return true;
+      },
+      // 是否为第三方发起
+      isThirdStream() {
+        return this.roomBaseServer.state.isThirdStream;
+      },
+      // 设备状态
+      deviceStatus() {
+        return useMediaCheckServer().state.deviceInfo?.device_status;
       }
     },
     components: {
@@ -164,14 +172,19 @@
       this.listenEvents();
     },
     mounted() {
-      if (this.deviceStatus == 2) {
+      /*
+       * 补充：第三方发起时，不在进行设备状态的相关提示
+       *    若助理，则无需进行提示，助理是不存在上麦的
+       */
+      if (this.deviceStatus == 2 && (!this.isThirdStream || this.roleName != 3)) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        if (!useMicServer().getSpeakerStatus()) {
+        // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
+        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
           this.liveStep = 3;
         } else {
           this.liveStep = 2;
@@ -246,7 +259,6 @@
       async handleRecheck() {
         await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
-          this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
           );
@@ -384,8 +396,8 @@
       // 开始直播/录制事件
       handleStartClick() {
         this.liveStep = 2;
-        // 云导播无需推流 直接调用开播接口即可
-        if (this.isStreamYun) {
+        if (this.isThirdStream || this.isStreamYun) {
+          // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
           this.handlePublishComplate();
         } else {
           // 派发推流事件
