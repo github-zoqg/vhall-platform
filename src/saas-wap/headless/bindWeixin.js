@@ -29,8 +29,8 @@ export default function () {
   ) {
     bindInvite(inviteCode);
   }
-  // 获取微信分享信息
-  if (isWechatBrowser && !isEmbed) {
+  // 获取微信分享信息 只在微信打开能分享
+  if (isWechatBrowser) {
     getShareSettingInfo();
   }
 
