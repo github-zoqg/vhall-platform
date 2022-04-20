@@ -382,9 +382,13 @@
         height: 100%;
         width: 100%;
         position: relative;
+        input {
+          padding-right: 120px;
+        }
         .text-limit {
           position: absolute;
-          top: 30px;
+          line-height: 88px;
+          top: 0px;
           right: 20px;
           font-size: 30px;
         }
