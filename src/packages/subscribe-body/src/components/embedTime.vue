@@ -24,8 +24,15 @@
       <span class="des">{{ second }}</span>
       <span>{{ $t('appointment.appointment_1029') }}</span>
     </div>
-    <button v-if="subOption.needAgreement" class="sub-auth add-auth" @click="agreement">
-      观看验证
+    <span>{{ subOption.needAgreement }}</span>
+    <button
+      v-if="subOption.needAgreement && ((!btnText && type == 1) || btnText)"
+      :disabled="type != 1"
+      :class="{ disabledBtn: type != 1 }"
+      class="sub-auth add-auth"
+      @click="agreement"
+    >
+      {{ $t('appointment.appointment_1025') }}
     </button>
     <template v-else>
       <button
