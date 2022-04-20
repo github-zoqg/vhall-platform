@@ -145,6 +145,7 @@
 </script>
 <style lang="less">
   .vmp-subscribe-container {
+    height: 100vh;
     .vmp-basic-container {
       width: 100%;
       height: 100%;

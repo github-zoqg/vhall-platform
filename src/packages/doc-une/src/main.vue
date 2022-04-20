@@ -588,37 +588,10 @@
             }
           });
         }
-
         // 直播开始
-        useMsgServer().$onMsg('ROOM_MSG', msg => {
-          console.log('live_start');
-          if (msg.data.type === 'live_start') {
-            if (this.roleName == 1) {
-              // 如果是主持人 TODO 补偿消息
-            }
-
-            // 3-助理，4-嘉宾
-            if ([3, 4].includes(this.roleName)) {
-              this.recoverLastDocs();
-            }
-          }
-        });
-
+        this.docServer.$on('live_start', this.liveStart);
         // 直播结束
-        useMsgServer().$on('live_over', () => {
-          // 设置观众不可见
-          this.docServer.state.switchStatus = false;
-          if (this.isWatch) {
-            useRoomBaseServer().setChangeElement('doc');
-          } else {
-            this.setDisplayMode('normal');
-            // 通知默认菜单和工具栏默认为文档
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
-            );
-          }
-          this.hasStreamList = false;
-        });
+        this.docServer.$on('live_over', this.liveOver);
 
         const reBroadcastServer = useRebroadcastServer();
         // 转播开始事件
@@ -1003,6 +976,28 @@
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
+      },
+
+      // 直播开始
+      liveStart() {
+        // 3-助理，4-嘉宾
+        if ([3, 4].includes(this.roleName)) {
+          this.recoverLastDocs();
+        }
+      },
+
+      // 直播结束
+      liveOver() {
+        if (this.isWatch) {
+          useRoomBaseServer().setChangeElement('doc');
+        } else {
+          this.setDisplayMode('normal');
+          // 通知默认菜单和工具栏默认为文档
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
+        }
+        this.hasStreamList = false;
       }
     },
     mounted() {
@@ -1030,6 +1025,8 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_page_change', this.dispatchDocPageChange);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('live_start', this.liveStart);
+      this.docServer.$off('live_over', this.liveOver);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
