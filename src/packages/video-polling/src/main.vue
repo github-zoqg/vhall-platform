@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-video-polling" ref="videoPolling">
+  <div class="vmp-video-polling" ref="videoPolling" id="videoPollingWrap">
     <!-- 头部悬浮区 -->
     <div class="vmp-video-polling__tip">
       <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-  import { useVideoPollingServer } from 'middle-domain';
+  import { useVideoPollingServer, useInteractiveServer } from 'middle-domain';
   import screenfull from 'screenfull';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
   import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
@@ -105,6 +105,7 @@
     },
     beforeCreate() {
       this.videoPollingServer = useVideoPollingServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this._isExitPolling = false;
@@ -119,8 +120,10 @@
       this.nextTimer && clearInterval(this.nextTimer);
     },
     mounted() {
-      // 限定特定的组件的全屏更改
-      screenfull.on('change', () => {
+      // 全屏/退出全屏事件
+      screenfull.onchange(ev => {
+        if (ev.target.id !== 'videoPollingWrap') return;
+
         this.isFullscreen = screenfull.isFullscreen;
         // 通知客户端全屏和退出全屏事件
         if (this.isFullscreen) {
@@ -132,8 +135,6 @@
         }
       });
       window.addEventListener('beforeunload', () => {
-        // 通知客户端关闭视频轮询页面
-        clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
         // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
         if (this._isExitPolling) {
           return;
@@ -147,6 +148,29 @@
           // 退出全屏
           this.enterFullScreen();
         }
+      });
+      if (this.$route.query.embed === 'client') {
+        window.addEventListener('keydown', e => {
+          if (e.keyCode == 27 && this.isFullscreen) {
+            this.enterFullScreen();
+          }
+        });
+      }
+      // 订阅流播放失败    监听到播放失败, 然后展示按钮
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+        this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+        if (this.playboartCount > 1) {
+          return;
+        }
+        this.$alert('您已进入直播房间，马上开始互动吧', '', {
+          title: '提示',
+          confirmButtonText: '立即开始',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel',
+          callback: () => {
+            this.interactiveServer.playAbortStreams();
+          }
+        });
       });
     },
     methods: {
@@ -225,6 +249,12 @@
       },
       // 退出视频轮询
       exitVideoPolling() {
+        // 通知客户端关闭视频轮询页面
+        if (this.$route.query.embed === 'client') {
+          clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
+          return;
+        }
+
         this.$confirm('关闭后将结束视频轮巡功能', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

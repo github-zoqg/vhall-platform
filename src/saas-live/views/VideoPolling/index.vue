@@ -85,10 +85,10 @@
           token_type = '',
           assistant_token = ''
         } = this.$route.query;
-        if (token_type === 1 && !liveT && assistant_token) {
+        if (token_type === '1' && !liveT && assistant_token) {
           liveT = assistant_token;
         }
-        if (token_type === 0 && !token && assistant_token) {
+        if (token_type === '0' && !token && assistant_token) {
           token = assistant_token;
         }
         if (token) {

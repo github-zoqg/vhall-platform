@@ -144,6 +144,14 @@
             this.fullScreen();
           }
         });
+
+        if (this.$route.query.embed === 'client') {
+          window.addEventListener('keydown', e => {
+            if (e.keyCode == 27 && this.isFullScreen) {
+              this.fullScreen();
+            }
+          });
+        }
       },
 
       // 监听离开加入房间事件，显示网络异常占位图
