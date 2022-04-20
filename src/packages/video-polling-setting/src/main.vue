@@ -213,7 +213,7 @@
       // 上报数据
       setReportData() {
         window.vhallReportForProduct?.report(
-          this.pollingForm.videoAutoPolling == 1 ? 110149 : 110150
+          this.pollingForm.videoAutoPolling == 1 ? 110150 : 110149
         );
         window.vhallReportForProduct?.report(110151, {
           report_extra: { count: this.pollingForm.videoNum }
