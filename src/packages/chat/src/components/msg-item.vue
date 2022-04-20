@@ -694,6 +694,7 @@
             font-size: 14px;
             color: @font-dark-normal;
             line-height: 20px;
+            word-break: break-word;
             .normal-msg__content-wrapper__label {
               color: #fa9a32;
             }
