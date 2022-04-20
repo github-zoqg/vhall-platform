@@ -58,7 +58,8 @@
           },
           initRoom: {
             webinar_id: il_id, //活动id
-            clientType: 'send', //客户端类型
+            seat_id: 900009,
+            clientType: 'sendYun', //客户端类型
             nickname,
             email,
             check_online: 0 // 不检查主持人是否在房间
