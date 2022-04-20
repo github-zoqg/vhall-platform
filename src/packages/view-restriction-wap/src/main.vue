@@ -5,12 +5,12 @@
     :class="['vmp-view-restriction-wap']"
     get-container="body"
   >
-    <!-- 标题 -->
-    <div class="restriction-title">
-      {{ agreementInfo.title }}
-    </div>
-    <!-- 内容 -->
-    <div :class="['scroll-content', { 'more-content': agreementInfo.rule === 1 }]">
+    <div class="scroll-content">
+      <!-- 标题 -->
+      <div class="restriction-title">
+        {{ agreementInfo.title }}
+      </div>
+      <!-- 内容 -->
       <div class="restriction-content" v-html="agreementInfo.content"></div>
       <!-- 声明协议 -->
       <div
@@ -19,7 +19,7 @@
         v-html="agreementInfo.statement_content"
       ></div>
     </div>
-    <div class="restriction-control more-btn">
+    <div class="restriction-control">
       <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
     </div>
   </van-popup>
@@ -118,7 +118,7 @@
     background: #fff;
     box-shadow: 0px -2px 10px 0px rgba(0, 0, 0, 0.1);
     border-radius: 32px;
-    padding: 60px 0 56px 56px;
+    padding: 64px 0 48px;
   }
 
   .restriction-title {
@@ -132,15 +132,12 @@
     margin-bottom: 40px;
   }
   .scroll-content {
-    max-height: 325px;
-    margin-bottom: 29px;
+    max-height: 540px;
+    margin-bottom: 24px;
     overflow-y: auto;
     word-break: break-all;
     word-wrap: break-word;
-    padding-right: 56px;
-    &.more-content {
-      max-height: 400px;
-    }
+    padding: 0 56px;
   }
   .restriction-content {
     width: 100%;
@@ -173,15 +170,12 @@
     width: 100%;
     min-height: 40px;
     position: absolute;
-    bottom: 0px;
+    bottom: 48px;
     left: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 6px;
-    &.more-btn {
-      padding-bottom: 20px;
-    }
     text-align: center;
     & > span {
       display: inline-block;
