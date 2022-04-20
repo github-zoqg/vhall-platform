@@ -49,6 +49,7 @@
 <script>
   import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
   export default {
     name: 'VmpStreamPollingRemote',
     data() {
@@ -118,6 +119,8 @@
             if (!document.fullscreenElement) {
               // 离开全屏
               this.isFullScreen = false;
+              // 网页退出全屏
+              clientMsgApi.JsCallQtMsg({ type: 'videoRoundExitFull' });
             }
           },
           true
@@ -132,6 +135,15 @@
         // 加入房间
         useMsgServer().$onMsg('JOIN', this.handleUserJoin);
         useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+
+        // 客户端关闭全屏事件
+        clientMsgApi.onQtCallFunctionPage(msg => {
+          // 客户端关闭全屏事件
+          if (msg === 13) {
+            // 退出全屏
+            this.fullScreen();
+          }
+        });
       },
 
       // 监听离开加入房间事件，显示网络异常占位图
@@ -183,6 +195,8 @@
             })
             .then(() => {
               this.isFullScreen = true;
+              // 网页进入全屏
+              clientMsgApi.JsCallQtMsg({ type: 'videoRoundFull' });
             });
         } else {
           this.interactiveServer
@@ -192,6 +206,8 @@
             })
             .then(() => {
               this.isFullScreen = false;
+              // 网页退出全屏
+              clientMsgApi.JsCallQtMsg({ type: 'videoRoundExitFull' });
             });
         }
       },

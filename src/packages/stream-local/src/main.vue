@@ -74,9 +74,18 @@
       v-show="isShowShadowBtn"
     >
       <p class="vmp-stream-local__shadow-first-line">
-        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
+        <el-tooltip
+          v-if="[1, 3, 4].includes(joinInfo.role_name)"
+          :content="joinInfo.role_name | roleFilter"
+          placement="top"
+        >
+          <span class="vmp-stream-local__shadow-label">
+            {{ joinInfo.role_name | roleFilter }}
+          </span>
+        </el-tooltip>
+        <!-- <span class="vmp-stream-local__shadow-label">
           {{ joinInfo.role_name | roleFilter }}
-        </span>
+        </span> -->
         <el-tooltip
           :content="
             localSpeaker.videoMuted ? $t('interact.interact_1022') : $t('interact.interact_1006')
@@ -251,7 +260,7 @@
     useVideoPollingServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -267,7 +276,9 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        }
+        },
+        // 是否在参与视频轮训中
+        videoPollingStatus: 0 // 0:未参与； 1:参与
       };
     },
     components: {
@@ -435,7 +446,22 @@
       isVideoPolling() {
         return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
+      /**
+       * pollingList() {
+        return this.videoPollingServer.state.pollingList;
+      }*/
     },
+    /*watch: {
+      pollingList: {
+        handler(val) {
+          console.log('watch-videos-polling', val);
+          if (val && val.length && Array.isArray(val)) {
+            this.videoStartPush(val);
+          }
+        },
+        deep: true
+      }
+    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -451,12 +477,20 @@
     },
     async mounted() {
       await this.checkStartPush();
-      // 刷新页面检测轮训是否开启
-      if (this.isVideoPolling) {
-        this.videoStartPush();
-      }
-      this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
-        this.videoStartPush();
+      // 轮训列表更新消息
+      this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
+        console.log('轮训列表更新消息', msg);
+        this.videoStartPush(msg.data.uids);
+      });
+      // 停止视频轮巡
+      this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        console.log('停止视频轮巡', this.videoPollingStatus);
+        if (this.videoPollingStatus) {
+          await this.stopPush();
+          if (this.joinInfo.role_name == 2) {
+            await this.interactiveServer.destroy();
+          }
+        }
       });
     },
     beforeDestroy() {
@@ -495,18 +529,35 @@
         this.startPushStreamOnce = true;
         this.startPush();
       },
-      async videoStartPush() {
-        if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
-        if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
-        if (this.localStreamId) return; // 判断当前是否在推流中
-        try {
-          // 轮询判断是否有互动实例
-          await this.checkVRTCInstance();
-        } catch (error) {
-          console.log(error);
-          await this.interactiveServer.init({ videoPolling: true });
+      /**
+       *
+       * @description: 视频轮巡推流
+       * @param arr {Array} 当前参与轮巡的观众流列表
+       */
+      async videoStartPush(arr) {
+        if (arr.includes(this.joinInfo.third_party_user_id)) {
+          if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
+          if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
+          if (this.localStreamId) return; // 判断当前是否在推流中
+          try {
+            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+              // 如果存在互动实例需要销毁，重新初始化
+              await this.interactiveServer.destroy();
+            }
+            await this.interactiveServer.init({ videoPolling: true });
+            // 轮询判断是否有互动实例
+            await this.checkVRTCInstance();
+          } catch (error) {
+            console.log('视频轮巡初始化互动实例error', error);
+          }
+          await this.startPush({ videoPolling: true });
+          this.videoPollingStatus = 1;
+        } else {
+          if (this.videoPollingStatus) {
+            await this.stopPush();
+            this.videoPollingStatus = 0;
+          }
         }
-        this.startPush({ videoPolling: true });
       },
       // 检查推流
       async checkStartPush() {
@@ -590,6 +641,8 @@
               // 如果成功，销毁播放器
               this.playerServer.destroy();
 
+              // 收到消息执行可能比 收到响应赋值 autoSpeak为true快，造成初始化2次互动，需要在收到消息执行时，延迟执行
+              await sleep(500);
               if (!this.interactiveServer.state.autoSpeak) {
                 //  初始化互动实例
                 await this.interactiveServer.init();
@@ -644,9 +697,14 @@
             this.splitScreenServer.state.isOpenSplitScreen &&
             this.splitScreenServer.state.role == 'hostPage'
           ) {
-            return;
+            // 如果开启了分屏，并且是主页面
+            //  初始化互动实例
+            this.splitScreenServer.state.isOpenSplitScreen = false;
+            this.splitScreenServer.shadowWin = null;
+            this.interactiveServer.init();
+          } else {
+            await this.stopPush({ source: 'live_over' });
           }
-          await this.stopPush({ source: 'live_over' });
 
           clearInterval(this._audioLeveInterval);
           clearInterval(this._netWorkStatusInterval);
@@ -1015,17 +1073,14 @@
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );
             resolve();
-            return;
           }
 
           this.interactiveServer
             .unpublishStream()
             .then(() => {
               clearInterval(this._audioLeveInterval);
-              if (
-                this.joinInfo.role_name == 1 &&
-                this.doc_permission == this.joinInfo.third_party_user_id
-              ) {
+              // 如果是主持人，并且是结束直播导致的停止推流，需要派发事件改变开始直播按钮状态
+              if (this.joinInfo.role_name == 1 && options?.source === 'live_over') {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );
@@ -1435,6 +1490,11 @@
         text-align: right;
         color: #ffffff;
         font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 14px;
+        vertical-align: middle;
       }
       .vmp-stream-local__shadow-icon {
         cursor: pointer;

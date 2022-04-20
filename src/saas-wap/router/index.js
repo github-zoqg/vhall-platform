@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import grayInit from '@/packages/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
 import { wxAuthCheck } from '../../packages/app-shared/utils/wechat';
+import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 Vue.use(VueRouter);
 
@@ -128,6 +129,15 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // Vue history模式 微信分享IOS无效解决办法---最终章
+  const { system } = getBrowserType();
+  if (
+    system == 'ios' &&
+    `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` !=
+      `${process.env.VUE_APP_ROUTER_BASE_URL}${location.pathname}`
+  ) {
+    location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+  }
   const res = await grayInit(to);
   if (res) {
     console.log('---grayInit---', res);

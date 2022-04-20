@@ -1,5 +1,5 @@
 import { useRoomBaseServer, useInviteServer } from 'middle-domain';
-import { browserType, getQueryString, replaceHtml } from '@/packages/app-shared/utils/tool';
+import { isWechat, getQueryString, replaceHtml } from '@/packages/app-shared/utils/tool';
 import { initWeChatSdk, initHideChatSdk } from '@/packages/app-shared/utils/wechat';
 
 export default function () {
@@ -9,7 +9,7 @@ export default function () {
 
   // 是否绑定邀请卡信息
   const open_id = sessionStorage.getItem('open_id');
-  const isWechatBrowser = browserType();
+  const isWechatBrowser = isWechat();
   const inviteCode = getQueryString('invite');
 
   // 判断是否是微信分享来的

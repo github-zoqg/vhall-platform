@@ -63,12 +63,7 @@ export const serverConfig = {
   layerBodyRightBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd',
-    children: [
-      // 'comMemberList'
-      // 'comChat',
-      'comPcRewardEffect',
-      'comTabMenu'
-    ]
+    children: ['comPcRewardEffect', 'comTabMenu']
   },
   /*** 布局定义end */
 
@@ -464,10 +459,7 @@ export const serverConfig = {
       hasChatFilterBtn: false,
       //是否开启聊天设置功能
       enableChatSetting: true,
-      //todo 预留的聊天审核跳转地址
-      chatAuthUrl: '',
       //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
-      //todo  这里预留，后续可能针对里面的操作也进行控制
       userControlOptions: {
         enable: true
       }
@@ -643,14 +635,6 @@ export const serverConfig = {
       method: 'setSelectedState',
       args: ['$0'] // 获取动态参数的第一个
     },
-    // 分组设置取消
-    emitCancelGroup: [
-      {
-        cuid: ['comGroupMenu'],
-        method: 'setSelectedState',
-        args: false
-      }
-    ],
     // 触发画笔重置
     emitDocResetBrush: [
       {

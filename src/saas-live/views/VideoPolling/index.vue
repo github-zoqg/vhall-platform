@@ -77,7 +77,20 @@
       // 初始化直播房间
       initSendLive() {
         const { id } = this.$route.params;
-        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
+        let {
+          token,
+          nickname = '',
+          email = '',
+          liveT = '',
+          token_type = '',
+          assistant_token = ''
+        } = this.$route.query;
+        if (token_type === 1 && !liveT && assistant_token) {
+          liveT = assistant_token;
+        }
+        if (token_type === 0 && !token && assistant_token) {
+          token = assistant_token;
+        }
         if (token) {
           localStorage.setItem('token', token);
         }

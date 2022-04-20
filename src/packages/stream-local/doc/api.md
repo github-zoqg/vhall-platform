@@ -4,9 +4,11 @@
 
 ### 输入 api(向其他组件发送的指令)
 
-| 方法名     | 参数 1   | 描述     | 代码块                                                                                               |
-| ---------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| initPlayer | autoPlay | 自动播放 | `window.$middleEventSdk?.event?.send( boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true }))` |
+| 方法名                     | 参数 1   | 描述         | 代码块                                                                                               |
+| -------------------------- | -------- | ------------ | ---------------------------------------------------------------------------------------------------- |
+| initPlayer                 | autoPlay | 自动播放     | `window.$middleEventSdk?.event?.send( boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true }))` |
+| emitClickPublishComplate   | -        | 推流完成     | ` window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickPublishComplate'));`      |
+| emitClickUnpublishComplate | -        | 取消推流完成 | ` window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickUnpublishComplate'));`    |
 
 ### 输出 api(暴露给其他组件使用的方法)
 

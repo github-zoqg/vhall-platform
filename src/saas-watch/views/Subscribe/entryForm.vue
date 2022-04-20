@@ -26,7 +26,7 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
-      await this.getGrayConfig();
+      // await this.getGrayConfig();
       this.getFormOpenLinkStatus();
       //多语言接口
       await this.roomBaseServer.getLangList(this.webinar_id);

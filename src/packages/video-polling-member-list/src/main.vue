@@ -145,6 +145,9 @@
           const user = {
             account_id: msg.sender_id,
             avatar: msg.context.avatar,
+            device_type: !['', void 0, null].includes(msg.context.device_type)
+              ? msg.context.device_type
+              : 2,
             device_status: !['', void 0, null].includes(msg.context.device_status)
               ? msg.context.device_status
               : 1,

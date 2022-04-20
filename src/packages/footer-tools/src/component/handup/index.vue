@@ -145,6 +145,10 @@
           .then(res => {
             this.loading = false;
             if (res.code != 200) {
+              if (res.code == 513346) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+                return;
+              }
               this.$message.error(res.msg);
               return;
             }

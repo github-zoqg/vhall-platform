@@ -25,7 +25,11 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-stream-list__main-screen-doubleRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 6,
+            'vmp-stream-list__main-screen-threeRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -39,7 +43,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -57,18 +61,17 @@
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
+        v-if="languageList.length > 1 && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
-        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
+        <span @click.stop.prevent="openLanguage">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[
-          iconShow && isShowMainScreen && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase'
-        ]"
+        :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -221,19 +224,18 @@
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
-      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
-      isShowMainScreen() {
-        let _flag = false;
-        _flag =
-          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
-          this.joinInfo.third_party_user_id == this.mainScreen;
-        return _flag;
-      },
-      // 主屏流   和产品佳佳沟通：显示全屏按钮条件： 主画面 + 存在视频流
+      // 主屏流   和产品佳佳沟通：显示全屏按钮条件：存在视频流  条件：先判断远端流内是否存在主屏 || 本地流是否是主屏 || {}
       mainScreenStream() {
-        let allStream = this.interactiveServer.getRoomStreams();
-        let stream = allStream.find(stream => stream.accountId == this.mainScreen) || {};
-        return stream;
+        let _stream =
+          this.remoteSpeakers.find(ele => {
+            ele.streamSource = 'remote';
+            return ele.accountId == this.mainScreen;
+          }) || {};
+        if (this.localSpeaker.accountId == this.mainScreen) {
+          _stream = this.localSpeaker;
+          _stream.streamSource = 'local';
+        }
+        return _stream;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -245,7 +247,7 @@
           !this.isInGroup &&
           this.is_host_in_group &&
           this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
-          !this.isShowMainScreen &&
+          !this.mainScreenStream.accountId &&
           !this.isShareScreen
         );
       },
@@ -264,12 +266,12 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
-      useMediaCheckServer().checkSystemRequirements();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
     },
 
     async created() {
+      await useMediaCheckServer().checkSystemRequirements();
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
@@ -335,6 +337,15 @@
           this.setBigScreen(msg);
         });
 
+        // 下麦成功 - 移除BScroll
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.disable();
+          }
+        });
+
         // 监听全屏变化
         window.addEventListener(
           'fullscreenchange',
@@ -351,6 +362,7 @@
       createBScroll() {
         this.$nextTick(() => {
           if (this.scroll) {
+            if (!this.scroll.enabled) this.scroll.enabled = true;
             this.scroll.refresh();
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
@@ -710,6 +722,13 @@
         top: 0;
         width: 100%;
         height: calc(100% - 85px);
+      }
+      // 未上麦执行旁路布局模式，会根据上麦人数进行修改主屏的高度
+      .vmp-stream-list__main-screen-doubleRow {
+        height: calc(100% - 170px);
+      }
+      .vmp-stream-list__main-screen-threeRow {
+        height: calc(100% - 255px);
       }
     }
     // 铺满全屏
