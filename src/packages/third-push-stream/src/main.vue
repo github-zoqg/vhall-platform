@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-third-stream" v-if="isShowThirdStream">
+  <div class="vmp-third-stream" v-show="isShowThirdStream">
     <!-- 第三方推流 -->
     <div class="vmp-third-stream-box">
       <div class="vmp-third-stream-title">推流设置</div>
@@ -93,14 +93,19 @@
         return this.roomBaseServer.state.isThirdStream;
       }
     },
-    mounted() {
+    created() {
+      if (this.roomBaseServer.state.watchInitData.join_info.role_name != 1) return;
       if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
         this.isShowThirdStream = true;
+        this.getThirdPushStream();
         this.changePushImage(true);
       }
+    },
+    mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
         if (msg.data.type == 'live_over') {
           this.changePushImage(false);
+          this.isShowThirdStream = false;
         }
       });
     },
@@ -125,7 +130,6 @@
         } else {
           thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
         }
-        this.isShowThirdStream = false;
         thirdBackground.style.backgroundSize = '100% 100%';
         thirdBackground.style.backgroundPosition = 'center';
       },
