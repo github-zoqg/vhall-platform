@@ -51,8 +51,7 @@
             {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
-            }}{{ $t('cash.cash_1003') }}
+            {{ $t('chat.chat_1029') }}
           </p>
           <img class="new-award-img" src="../img/red-package.png" />
         </div>
