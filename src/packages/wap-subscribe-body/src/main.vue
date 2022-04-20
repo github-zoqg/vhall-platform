@@ -382,7 +382,7 @@
             authWeixinAjax(this.$route, payUrl, () => {});
           }
         } else {
-          //TODO: 如果是企业微信环境
+          //如果是企业微信环境
           if (isWechatCom()) {
             params = {
               webinar_id: this.webinarId,

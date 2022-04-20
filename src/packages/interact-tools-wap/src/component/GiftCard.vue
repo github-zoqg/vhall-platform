@@ -262,7 +262,7 @@
             }
           }
         } else {
-          //TODO: 如果是企业微信环境,需要启动微信h5支付相关参数
+          //如果是企业微信环境,需要启动微信h5支付相关参数
           if (isWechatCom()) {
             params = {
               gift_id: this.currentGift.id,
