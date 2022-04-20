@@ -120,60 +120,63 @@
       this.nextTimer && clearInterval(this.nextTimer);
     },
     mounted() {
-      // 全屏/退出全屏事件
-      screenfull.onchange(ev => {
-        if (ev.target.id !== 'videoPollingWrap') return;
+      this.addEventListeners();
+    },
+    methods: {
+      addEventListeners() {
+        // 全屏/退出全屏事件
+        screenfull.onchange(ev => {
+          if (ev.target.id !== 'videoPollingWrap') return;
 
-        this.isFullscreen = screenfull.isFullscreen;
-        // 通知客户端全屏和退出全屏事件
-        if (this.isFullscreen) {
-          // 网页进入全屏
-          clientMsgApi.JsCallQtMsg({ type: 'videoRoundFull' });
-        } else {
-          // 网页退出全屏
-          clientMsgApi.JsCallQtMsg({ type: 'videoRoundExitFull' });
-        }
-      });
-      window.addEventListener('beforeunload', () => {
-        // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
-        if (this._isExitPolling) {
-          return;
-        }
+          this.isFullscreen = screenfull.isFullscreen;
+          // 通知客户端全屏和退出全屏事件
+          if (this.isFullscreen) {
+            // 网页进入全屏
+            clientMsgApi.JsCallQtMsg({ type: 'videoRoundFull' });
+          } else {
+            // 网页退出全屏
+            clientMsgApi.JsCallQtMsg({ type: 'videoRoundExitFull' });
+          }
+        });
+        window.addEventListener('beforeunload', () => {
+          // 如果是主动退出视频轮巡，就不存 当前轮巡页面的状态
+          if (this._isExitPolling) {
+            return;
+          }
 
-        localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
-      });
-      clientMsgApi.onQtCallFunctionPage(msg => {
-        // 客户端关闭全屏事件
-        if (msg === 13) {
-          // 退出全屏
-          this.enterFullScreen();
-        }
-      });
-      if (this.$route.query.embed === 'client') {
-        window.addEventListener('keydown', e => {
-          if (e.keyCode == 27 && this.isFullscreen) {
+          localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 1);
+        });
+        clientMsgApi.onQtCallFunctionPage(msg => {
+          // 客户端关闭全屏事件
+          if (msg === 13) {
+            // 退出全屏
             this.enterFullScreen();
           }
         });
-      }
-      // 订阅流播放失败    监听到播放失败, 然后展示按钮
-      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
-        this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
-        if (this.playboartCount > 1) {
-          return;
+        if (this.$route.query.embed === 'client') {
+          window.addEventListener('keydown', e => {
+            if (e.keyCode == 27 && this.isFullscreen) {
+              this.enterFullScreen();
+            }
+          });
         }
-        this.$alert('您已进入直播房间，马上开始互动吧', '', {
-          title: '提示',
-          confirmButtonText: '立即开始',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel',
-          callback: () => {
-            this.interactiveServer.playAbortStreams();
+        // 订阅流播放失败    监听到播放失败, 然后展示按钮
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+          this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+          if (this.playboartCount > 1) {
+            return;
           }
+          this.$alert('您已进入直播房间，马上开始互动吧', '', {
+            title: '提示',
+            confirmButtonText: '立即开始',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel',
+            callback: () => {
+              this.interactiveServer.playAbortStreams();
+            }
+          });
         });
-      });
-    },
-    methods: {
+      },
       // 下一组
       nextPolling() {
         if (this.nextTime < 10) {
