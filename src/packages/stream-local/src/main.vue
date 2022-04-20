@@ -276,7 +276,9 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        }
+        },
+        // 是否在参与视频轮训中
+        videoPollingStatus: 0 // 0:未参与； 1:参与
       };
     },
     components: {
@@ -444,7 +446,22 @@
       isVideoPolling() {
         return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
+      /**
+       * pollingList() {
+        return this.videoPollingServer.state.pollingList;
+      }*/
     },
+    /*watch: {
+      pollingList: {
+        handler(val) {
+          console.log('watch-videos-polling', val);
+          if (val && val.length && Array.isArray(val)) {
+            this.videoStartPush(val);
+          }
+        },
+        deep: true
+      }
+    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -460,12 +477,20 @@
     },
     async mounted() {
       await this.checkStartPush();
-      // 刷新页面检测轮训是否开启
-      if (this.isVideoPolling) {
-        this.videoStartPush();
-      }
-      this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
-        this.videoStartPush();
+      // 轮训列表更新消息
+      this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
+        console.log('轮训列表更新消息', msg);
+        this.videoStartPush(msg.data.uids);
+      });
+      // 停止视频轮巡
+      this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        console.log('停止视频轮巡', this.videoPollingStatus);
+        if (this.videoPollingStatus) {
+          await this.stopPush();
+          if (this.joinInfo.role_name == 2) {
+            await this.interactiveServer.destroy();
+          }
+        }
       });
     },
     beforeDestroy() {
@@ -504,18 +529,35 @@
         this.startPushStreamOnce = true;
         this.startPush();
       },
-      async videoStartPush() {
-        if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
-        if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
-        if (this.localStreamId) return; // 判断当前是否在推流中
-        try {
-          // 轮询判断是否有互动实例
-          await this.checkVRTCInstance();
-        } catch (error) {
-          console.log(error);
-          await this.interactiveServer.init({ videoPolling: true });
+      /**
+       *
+       * @description: 视频轮巡推流
+       * @param arr {Array} 当前参与轮巡的观众流列表
+       */
+      async videoStartPush(arr) {
+        if (arr.includes(this.joinInfo.third_party_user_id)) {
+          if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
+          if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
+          if (this.localStreamId) return; // 判断当前是否在推流中
+          try {
+            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+              // 如果存在互动实例需要销毁，重新初始化
+              await this.interactiveServer.destroy();
+            }
+            await this.interactiveServer.init({ videoPolling: true });
+            // 轮询判断是否有互动实例
+            await this.checkVRTCInstance();
+          } catch (error) {
+            console.log('视频轮巡初始化互动实例error', error);
+          }
+          await this.startPush({ videoPolling: true });
+          this.videoPollingStatus = 1;
+        } else {
+          if (this.videoPollingStatus) {
+            await this.stopPush();
+            this.videoPollingStatus = 0;
+          }
         }
-        this.startPush({ videoPolling: true });
       },
       // 检查推流
       async checkStartPush() {
