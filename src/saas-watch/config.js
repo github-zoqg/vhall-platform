@@ -515,7 +515,9 @@ export const serverConfig = {
     component: 'VmpCameraCheck',
     saveOptions: [
       {
-        cuid: 'comStreamLocal'
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
       }
     ]
   },

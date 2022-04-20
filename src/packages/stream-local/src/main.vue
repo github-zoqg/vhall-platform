@@ -321,7 +321,9 @@
         return (
           this.$domainStore.state.micServer.speakerList.find(
             item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {}
+          ) ||
+          this.$domainStore.state.videoPollingServer.localPollinger ||
+          {}
         );
       },
       remoteSpeakers() {
@@ -467,7 +469,7 @@
       // 轮训列表更新消息
       this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
         console.log('轮训列表更新消息', msg);
-        this.videoStartPush(msg.data.uids);
+        this.videoStartPush();
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
@@ -476,15 +478,8 @@
           await this.interactiveServer.destroy();
         }
       });
-      console.log('轮训列表更新消息---1', this.isSpeakOn);
       if (!this.isSpeakOn) {
-        let res = await this.videoPollingServer.getVideoRoundUsers();
-        if (res.code !== 200 || !res.data.list.length) return;
-        let users = res.data.list.map(el => {
-          return el.account_id;
-        });
-        console.log('videos__users::::', users);
-        this.videoStartPush(users);
+        this.videoStartPush();
       }
     },
     beforeDestroy() {
@@ -528,8 +523,8 @@
        * @description: 视频轮巡推流
        * @param arr {Array} 当前参与轮巡的观众流列表
        */
-      async videoStartPush(arr) {
-        if (arr.includes(this.joinInfo.third_party_user_id)) {
+      async videoStartPush() {
+        if (this.videoPollingServer.state.isPolling) {
           if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
           if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
           if (this.localStreamId) return; // 判断当前是否在推流中
@@ -544,12 +539,19 @@
           } catch (error) {
             console.log('视频轮巡初始化互动实例error', error);
           }
-          await this.startPush({ videoPolling: true });
+          this.startPollingPush();
         } else {
           if (!this.isSpeakOn) {
             await this.stopPush();
           }
         }
+      },
+      // 视频轮巡开始推流
+      async startPollingPush() {
+        const res = await this.interactiveServer.createVideoPollingStream({
+          videoNode: `stream-${this.joinInfo.third_party_user_id}`
+        });
+        this.interactiveServer.publishStream(res);
       },
       // 检查推流
       async checkStartPush() {
@@ -827,12 +829,16 @@
           if (param.isRepublishMode) {
             await this.startPush();
           } else if (this.localSpeaker.streamId) {
-            await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
-            await this.startPush();
+            await this.interactiveServer.unpublishStream(this.localSpeaker);
+            if (this.videoPollingServer.state.isPolling) {
+              await this.videoStartPush();
+            } else {
+              await this.startPush();
+            }
           }
         } else {
-          // 不在麦上直接return
-          if (!this.micServer.getSpeakerStatus()) {
+          // (不在麦上 || 非视频轮巡状态中)  直接return
+          if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
             return;
           }
           // 无缝切换音视频
@@ -929,7 +935,7 @@
         }
       },
       // 开始推流
-      async startPush({ videoPolling = false } = {}) {
+      async startPush() {
         // 第三方推流直接开始直播
         if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
           // 派发事件
@@ -940,7 +946,7 @@
         }
         try {
           // 创建本地流
-          await this.createLocalStream(videoPolling);
+          await this.createLocalStream();
           // 推流
           await this.publishLocalStream();
           // 实时获取网络状况
@@ -961,7 +967,7 @@
           }
           console.log('paltForm 自动静音上麦 ', this.autoSpeak);
           // 分组活动 自动上麦默认禁音
-          if (this.autoSpeak || videoPolling) {
+          if (this.autoSpeak) {
             this.interactiveServer.setDeviceStatus({
               device: 1, // 1:audio    2:video
               status: 0, // 0:禁音    1:打开麦克风
@@ -977,13 +983,12 @@
         }
       },
       // 创建本地流
-      async createLocalStream(videoPolling) {
+      async createLocalStream() {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
           await this.interactiveServer
             .createLocalVideoStream({
-              videoNode: `stream-${this.joinInfo.third_party_user_id}`,
-              streamType: videoPolling ? 5 : null
+              videoNode: `stream-${this.joinInfo.third_party_user_id}`
             })
             .catch(e => {
               if (e && e?.name == 'NotAllowed') {
