@@ -13,7 +13,7 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-if="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
+      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
         <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
         <RewardCard
           ref="reward"
