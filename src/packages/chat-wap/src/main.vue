@@ -34,6 +34,7 @@
         <i class="vh-iconfont vh-line-arrow-down"></i>
       </div>
     </div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -109,7 +110,9 @@
         //聊天内容高度
         chatlistHeight: '100%',
         //android的内初始部高度
-        innerHeight: 0
+        innerHeight: 0,
+        //显示输入组件
+        showSendBox: false
       };
     },
     watch: {
@@ -224,6 +227,7 @@
         window.addEventListener('focusout', this.focusoutIOS);
       }
       this.initEvent();
+      this.eventListener();
     },
     beforeDestroy() {
       //移除事件
@@ -412,6 +416,17 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      // eventBus监听
+      eventListener() {
+        //监听聊天组件是否打开
+        EventBus.$on('showSendBox', e => {
+          this.showSendBox = e;
+        });
+      },
+      //关闭遮罩层
+      closeOverlay() {
+        EventBus.$emit('showSendBox', false);
       }
     }
   };
@@ -457,6 +472,15 @@
           margin-left: 19px;
         }
       }
+    }
+    > .overlay {
+      width: 100vw;
+      height: 100vh;
+      z-index: 21;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: transparent;
     }
   }
 </style>

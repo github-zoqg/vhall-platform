@@ -343,6 +343,7 @@
 
         if (this.currentTab == 3) {
           if (this.waitTimeFlag) {
+            EventBus.$emit('showSendBox', true);
             this.$refs.chatWapInput.openModal();
           } else {
             this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
@@ -350,6 +351,7 @@
         } else if (this.currentTab == 'qa' && this.time != 0) {
           this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
+          EventBus.$emit('showSendBox', true);
           this.$refs.chatWapInput.openModal();
         }
       },

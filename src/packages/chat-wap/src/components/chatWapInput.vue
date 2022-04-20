@@ -82,6 +82,9 @@
         EventBus.$emit('showEmoji', this.showEmoji);
       }
     },
+    mounted() {
+      this.eventListener();
+    },
     methods: {
       //显示模态窗
       openModal(text = '') {
@@ -101,6 +104,7 @@
           // this.$message(this.$t('chat.chat_1057'));
           return;
         }
+        EventBus.$emit('showSendBox', false);
         this.$emit('sendMsg', inputValue);
         this.cancel();
       },
@@ -169,6 +173,15 @@
         // setTimeout(() => {
         //   this.$refs.textareaChat.$el.removeAttribute('readonly', 'readonly');
         // }, 200);
+      },
+      // eventBus监听
+      eventListener() {
+        //监听聊天组件是否打开
+        EventBus.$on('showSendBox', e => {
+          if (!e) {
+            this.cancel();
+          }
+        });
       }
     }
   };
