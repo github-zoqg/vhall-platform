@@ -41,7 +41,7 @@
         </template>
       </template>
     </div>
-    <template v-if="(showBottomBtn && subOption.hide_subscribe == 1) || subOption.needAgreement">
+    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
         <div v-if="subOption.needAgreement" @click="showAgreement">
           <span>观看验证</span>
@@ -218,7 +218,14 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
-        if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
+        if (
+          agreement &&
+          agreement.is_open === 1 &&
+          agreement.is_agree !== 1 &&
+          webinar.type !== 2 &&
+          webinar.type !== 3
+        ) {
+          // 预约和结束状态也不显示
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
@@ -598,13 +605,9 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-
         const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
-
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
-
         const url = `${location}${inviteUrl}`;
-
         window.location.href = url;
       },
       /**
