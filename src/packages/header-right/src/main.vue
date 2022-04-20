@@ -3,7 +3,7 @@
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
-      <template v-if="deviceStatus == 2 && !isThirdpartyInitiated && roleName != 3">
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
       <!-- 主持人显示开始结束直播按钮 -->
@@ -147,8 +147,8 @@
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
       // 是否为第三方发起
-      isThirdpartyInitiated() {
-        return this.$domainStore.state.roomBaseServer.isThirdpartyInitiated;
+      isThirdStream() {
+        return this.roomBaseServer.state.isThirdStream;
       },
       // 设备状态
       deviceStatus() {
@@ -173,7 +173,7 @@
        * 补充：第三方发起时，不在进行设备状态的相关提示
        *    若助理，则无需进行提示，助理是不存在上麦的
        */
-      if (this.deviceStatus == 2 && (!this.isThirdpartyInitiated || this.roleName != 3)) {
+      if (this.deviceStatus == 2 && (!this.isThirdStream || this.roleName != 3)) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
@@ -181,7 +181,7 @@
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
         // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
-        if (!useMicServer().getSpeakerStatus() || this.isThirdpartyInitiated) {
+        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
           this.liveStep = 3;
         } else {
           this.liveStep = 2;
@@ -369,8 +369,6 @@
           this.handleSaveVodInLive();
         }
         this.liveStep = 1;
-        // 停止推流成功，还原非第三方发起
-        this.roomBaseServer.state.isThirdpartyInitiated = false;
       },
       // 调开始录制接口
       postStartRecord() {
@@ -390,7 +388,7 @@
       // 开始直播/录制事件
       handleStartClick() {
         this.liveStep = 2;
-        if (this.isThirdpartyInitiated) {
+        if (this.isThirdStream) {
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态
           this.handlePublishComplate();
         } else {
