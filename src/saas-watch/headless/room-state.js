@@ -41,7 +41,7 @@ export default async function () {
         staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
         environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
         systemKey: 2
-      })
+      });
     }),
     //多语言接口
     roomBaseServer.getLangList(),
@@ -81,7 +81,8 @@ export default async function () {
   // 互动、分组直播进行设备检测 或者是视频直播并且开启了视频轮巡权限
   if (
     liveType == 1 &&
-    ([3, 6].includes(liveMode) || (liveMode == 2 && roomBaseServer.state.configList['video_polling'] == 1))
+    ([3, 6].includes(liveMode) ||
+      (liveMode == 2 && roomBaseServer.state.configList['video_polling'] == 1))
   ) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
@@ -92,7 +93,11 @@ export default async function () {
   console.log('%c------多语言请求配置', 'color:pink');
   console.log(roomBaseServer.state.languages);
   // 互动进行设备检测 或者是视频直播并且开启了视频轮巡权限
-  if (liveType == 1 && roomBaseServer.state.configList['video_polling'] == 1 && (liveMode == 3 || liveMode == 2)) {
+  if (
+    liveType == 1 &&
+    roomBaseServer.state.configList['video_polling'] == 1 &&
+    (liveMode == 3 || liveMode == 2)
+  ) {
     // 获取媒体许可，设置设备状态
     useVideoPollingServer().init({ isWatch: true });
   }
