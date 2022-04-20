@@ -378,7 +378,6 @@
           .vmp-video-polling__stream-container {
             box-sizing: border-box;
             border: 1px solid #000;
-            background-color: skyblue;
             &-box {
               padding-top: 56.25%;
               position: relative;

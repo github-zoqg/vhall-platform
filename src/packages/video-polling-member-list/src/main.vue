@@ -158,7 +158,9 @@
           };
 
           this.memberServer.state.onlineUsers.push(user);
-          this.memberServer._sortUsers(this.memberServer.state.onlineUsers);
+          this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+            this.memberServer.state.onlineUsers
+          );
 
           setTimeout(() => {
             this.refresh();
@@ -169,7 +171,9 @@
           // 判断存在直接删除
           if (index > -1) {
             this.memberServer.state.onlineUsers.splice(index, 1);
-            this.memberServer._sortUsers(this.memberServer.state.onlineUsers);
+            this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+              this.memberServer.state.onlineUsers
+            );
           }
         };
         const handleVrtcConnectSuccess = msg => {
