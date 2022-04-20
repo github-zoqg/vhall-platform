@@ -172,10 +172,6 @@
     position: absolute;
     bottom: 48px;
     left: 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 6px;
     text-align: center;
     & > span {
       display: inline-block;
