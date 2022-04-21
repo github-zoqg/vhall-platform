@@ -63,8 +63,10 @@
       this.micServer = useMicServer();
     },
     methods: {
+      // 打开对话框
       handleOpen() {
         this.second = 30;
+        // 用户选择“同意”或“拒绝”，有30秒倒计时
         this.timer = setInterval(() => {
           this.second--;
           if (this.second <= 0) {
@@ -72,6 +74,7 @@
           }
         }, 1000);
       },
+      // 关闭对话框
       close() {
         this.timer && clearInterval(this.timer);
         this.timer = 0;

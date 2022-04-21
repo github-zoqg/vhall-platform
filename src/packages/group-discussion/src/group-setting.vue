@@ -67,7 +67,7 @@
       return {
         dialogVisible: this.show,
         count: '', // 分组数量，2~50 之间
-        way: '1' // 分组方式，1=随机分配|2=手动分配
+        way: '1' // 分组方式，1=随机分配|2=手动分配|3=预分组
       };
     },
 
@@ -104,33 +104,32 @@
       // 开始分组
       handleGroup: async function () {
         console.log('this.count:', this.count);
-        if (this.way == 3) {
-          console.log('白名单预设分组');
-        } else {
-          if (isNaN(this.count) || this.count < 2 || this.count > 50) {
-            this.$message.warning('请输入正确分组数量');
-            return false;
+        if (this.way != 3 && (isNaN(this.count) || this.count < 2 || this.count > 50)) {
+          this.$message.warning('请输入正确分组数量');
+          return false;
+        }
+        try {
+          const { watchInitData = {} } = this.roomBaseServer.state;
+          const result = await this.groupServer.groupCreate({
+            number: this.count,
+            way: this.way,
+            switch_id: watchInitData.switch.switch_id,
+            webinar_id: watchInitData.webinar.id
+          });
+          if (result && result.code === 200) {
+            this.count = '';
+            this.close();
+          } else {
+            this.$message.warning(result.msg || '分组失败');
           }
-          try {
-            const result = await this.groupServer.groupCreate({
-              number: this.count,
-              way: this.way
-            });
-            if (result && result.code === 200) {
-              this.count = '';
-              this.close();
-            } else {
-              this.$message.warning(result.msg || '分组失败');
-            }
-          } catch (ex) {
-            this.$message.warning(ex.messge || '分组出现异常');
-          }
+        } catch (ex) {
+          this.$message.warning(ex.messge || '分组出现异常');
         }
       },
       // 取消
       handleClose() {
         this.close();
-        this.$emit('settingCancel');
+        this.$emit('settingCancel', this.way);
       },
       close() {
         this.dialogVisible = false;

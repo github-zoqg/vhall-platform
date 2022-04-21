@@ -114,7 +114,7 @@
       // 初始化直播房间
       initSendLive() {
         const { id } = this.$route.params;
-        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
+        const { token, nickname = '', email = '', liveT = '', live_token = '' } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
@@ -124,7 +124,7 @@
             token: localStorage.getItem('token') || ''
           },
           requestBody: {
-            live_token: liveT
+            live_token: liveT || live_token
           },
           initRoom: {
             webinar_id: id, //活动id

@@ -776,7 +776,7 @@
         //是否手机验证
         isPhoneValidate: false,
         // 云盾key
-        captchakey: 'b7982ef659d64141b7120a6af27e19a0',
+        captchaKey: 'b7982ef659d64141b7120a6af27e19a0',
         // 云盾值
         mobileKey: '',
         // 云盾实例
@@ -1008,21 +1008,21 @@
           1: [
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             },
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             }
           ],
           2: [
             {
               code: 2,
-              text: this.$t('form.form_1024')
+              text: this.$t(this.formInfo.tab_verify_title)
             },
             {
               code: 1,
-              text: this.$t('form.form_1025')
+              text: this.$t(this.formInfo.tab_form_title)
             }
           ]
         };
@@ -1062,7 +1062,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
     },
-    async mounted() {
+    mounted() {
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
       if (this.isEntryForm) {
         this.init();
@@ -1189,18 +1189,24 @@
         this.signUpFormServer.getFormBaseInfo(params).then(res => {
           const { code = '', data = {} } = res || {};
           if ([200, '200'].includes(code)) {
+            if (res.data.tab_form_title) {
+              res.data.tab_form_title =
+                this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                  : res.data.tab_form_title;
+            }
+            if (res.data.tab_verify_title) {
+              res.data.tab_verify_title =
+                this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                  : res.data.tab_verify_title;
+            }
             this.formInfo = data;
             this.$nextTick(() => {
               this.calculateText();
             });
           } else {
-            this.$message({
-              message: this.$t('form.form_1031'),
-              showClose: true,
-              // duration: 0,
-              type: 'error',
-              customClass: 'zdy-info-box'
-            });
+            this.$message.error(this.$t('form.form_1031'));
           }
         });
       },
@@ -1451,11 +1457,7 @@
           phone = this.form[phoneItem.id];
           // 点击获取短信验证码之前验证手机号
           this.$refs.form.validateField('' + phoneItem.id, err => {
-            if (!err) {
-              isPhoneValid = true;
-            } else {
-              isPhoneValid = false;
-            }
+            isPhoneValid = !err;
           });
         } else {
           phone = this.verifyForm.phone;
@@ -1513,13 +1515,11 @@
         const that = this;
         // eslint-disable-next-line
         initNECaptcha({
-          captchaId: that.captchakey,
+          captchaId: that.captchaKey,
           element: id,
           lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           mode: 'float',
-          onReady(instance) {
-            console.log('instance', instance);
-          },
+          onReady() {},
           onVerify(err, data) {
             if (data) {
               that.mobileKey = data.validate;
@@ -1601,22 +1601,10 @@
                 // 报名成功的操作，跳转到直播间
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
-                this.$message({
-                  message: this.$t('form.form_1033'),
-                  showClose: true,
-                  // duration: 0,
-                  type: 'success',
-                  customClass: 'zdy-info-box'
-                });
+                this.$message.success(this.$t('form.form_1033'));
                 this.getWebinarStatus();
               } else {
-                this.$message({
-                  message: this.$tec(res.code) || res.msg,
-                  showClose: true,
-                  // duration: 0,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
+                this.$message.error(this.$tec(res.code) || res.msg);
               }
             });
           } else {
@@ -1644,23 +1632,11 @@
                   // 已报名，跳转到直播间
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
-                  this.$message({
-                    message: this.$t('form.form_1033'),
-                    showClose: true,
-                    // duration: 0,
-                    type: 'success',
-                    customClass: 'zdy-info-box'
-                  });
+                  this.$message.success(this.$t('form.form_1033'));
                   // 判断当前直播状态，进行相应的跳转
                   this.getWebinarStatus();
                 } else {
-                  this.$message({
-                    message: this.$t('form.form_1034'),
-                    showClose: true,
-                    // duration: 0,
-                    type: 'warning',
-                    customClass: 'zdy-info-box'
-                  });
+                  this.$message.warning(this.$t('form.form_1034'));
                   this.activeTab = 1;
                 }
               } else if (res.code == 512809 || res.code == 512570) {
@@ -1672,13 +1648,7 @@
                   this.isVerifyCodeErr = false;
                 });
               } else {
-                this.$message({
-                  message: this.$tec(res.code) || res.msg,
-                  showClose: true,
-                  // duration: 0,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
+                this.$message.error(this.$tec(res.code) || res.msg);
               }
             });
           } else {
@@ -1831,7 +1801,6 @@
       align-items: center;
     }
     &__wrap {
-      //padding-bottom: 87px;
     }
     &__banner {
       width: 100%;
@@ -1874,7 +1843,7 @@
         background-color: #fff;
         color: #3562fa;
         .isEllipsis {
-          color: #666666;
+          color: #666;
         }
       }
     }
@@ -2034,7 +2003,6 @@
         }
         ::v-deep .yidun.yidun--light.yidun--success {
           .yidun_control {
-            // border-color: #3562FA!important;
             .yidun_slider__icon {
               background-image: url(./img/icon-succeed.png) !important;
             }
