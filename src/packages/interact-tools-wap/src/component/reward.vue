@@ -84,11 +84,18 @@
         popHeight: '60%',
         money: '',
         btnMoney: '', // 选中按钮上面的金额
-        note: '',
-        btnTxt: isWechat()
-          ? this.$t('interact_tools.interact_tools_1049')
-          : this.$t('interact_tools.interact_tools_1069')
+        note: ''
       };
+    },
+    computed: {
+      // 支付按钮文案
+      btnTxt() {
+        if (isWechat() || isWechatCom()) {
+          return this.$t('interact_tools.interact_tools_1049');
+        } else {
+          return this.$t('interact_tools.interact_tools_1069');
+        }
+      }
     },
     mounted() {
       this.chatServer = useChatServer();
