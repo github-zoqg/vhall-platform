@@ -100,6 +100,7 @@
       }
       this.msgServer.$onMsg('ROOM_MSG', msg => {
         if (msg.data.type == 'live_over') {
+          this.isShowThirdStream = false;
           this.changePushImage(false);
         }
       });
@@ -125,7 +126,6 @@
         } else {
           thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
         }
-        this.isShowThirdStream = false;
         thirdBackground.style.backgroundSize = '100% 100%';
         thirdBackground.style.backgroundPosition = 'center';
       },
