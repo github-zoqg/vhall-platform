@@ -155,9 +155,6 @@
       padding-bottom: 400px;
     }
   }
-  .van-popup {
-    z-index: 2000 !important;
-  }
 </style>
 <style lang="less">
   .close-btn {
