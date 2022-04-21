@@ -43,13 +43,10 @@
     </div>
     <template v-if="(showBottomBtn && subOption.hide_subscribe == 1) || subOption.needAgreement">
       <div class="vmp-subscribe-body-auth">
-        <div v-if="subOption.needAgreement" @click="showAgreement">
-          <span>观看验证</span>
+        <div v-if="showViewRestriction" @click="showAgreement">
+          <span>{{ $t('other.other_1017') }}</span>
         </div>
-        <div
-          class="vmp-subscribe-body-auth-two"
-          v-else-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
-        >
+        <div class="vmp-subscribe-body-auth-two" v-else-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
@@ -137,6 +134,28 @@
       authBox
     },
     computed: {
+      /**
+       * 观看协议展示条件
+       * 非单视频嵌入
+       * 直播 type == 1
+       */
+      showViewRestriction() {
+        const agreement = this.subOption.needAgreement;
+        const isEmbed = this.roomBaseServer.state.embedObj.embedVideo;
+        const isLive = this.webinarType == 1 || this.webinarType == 5;
+        if (agreement && !isEmbed && isLive) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      showSubscribeBtn() {
+        if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
