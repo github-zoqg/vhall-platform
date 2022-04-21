@@ -60,7 +60,7 @@
         await this.initReceiveLive(this.clientType);
         await subscribeState();
         if (this.clientType != 'embed') {
-          await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
+          await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
         }
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
