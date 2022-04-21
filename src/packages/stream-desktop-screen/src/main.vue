@@ -5,7 +5,8 @@
     :class="[
       miniElement === 'screen' ? 'mini' : 'normal',
       { 'is-watch': isWatch },
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'share-screen': isShareScreen }
     ]"
   >
     <!-- 结束演示按钮 -->
@@ -439,12 +440,17 @@
 
 <style lang="less">
   .vmp-desktop-screen {
-    width: 100%;
-    height: 100%;
     background: #2d2d2d;
     position: relative;
     display: flex;
-    z-index: 3;
+    #vmp-desktop-screen-subscribe {
+      width: 100%;
+      height: 100%;
+    }
+    &.share-screen {
+      width: 100%;
+      height: 100%;
+    }
     &__tip {
       text-align: center;
       position: absolute;

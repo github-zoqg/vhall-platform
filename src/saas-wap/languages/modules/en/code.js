@@ -129,5 +129,6 @@ export default {
   516824: "Application amount can't be greater than account balance",
   516825: 'User account balance is less than ¥0',
   516826: 'Failed to send SMS verification code',
-  516829: 'Withdrawal failed'
+  516829: 'Withdrawal failed',
+  511087: 'User is not registered'
 };

@@ -223,20 +223,6 @@ export function getQueryString(name) {
   if (r != null) return unescape(r[2]);
   return null;
 }
-/**
- * @description 区分浏览器类型 是微信还是普通浏览器
- * @returns null
- */
-export const browserType = () => {
-  const ua = window.navigator.userAgent.toLowerCase();
-  // console.log('ua', ua, ua.match(/MicroMessenger/i) == 'micromessenger')
-  if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-    /* 是微信浏览器 */
-    return true;
-  } else {
-    return false;
-  }
-};
 
 /**
  * 计算uuid唯一标识

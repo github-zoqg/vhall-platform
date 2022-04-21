@@ -2,7 +2,12 @@
   <section class="vmp-tab-container">
     <!-- 主菜单区域 -->
     <section class="vmp-tab-container-mainarea" ref="mainArea">
-      <section v-for="tab of filterMenu" :key="tab.cuid" v-show="curItem.cuid === tab.cuid">
+      <section
+        :class="'type-' + tab.type"
+        v-for="tab of filterMenu"
+        :key="tab.cuid"
+        v-show="curItem.cuid === tab.cuid"
+      >
         <vmp-air-container :cuid="tab.cuid" :oneself="true" />
       </section>
     </section>
@@ -52,7 +57,6 @@
 
           return true;
         });
-
         return [...set];
       }
     },
@@ -94,6 +98,11 @@
       // overflow: auto;
       & > section {
         height: 100%;
+
+        // 文档容器
+        &.type-2 {
+          background-color: #f2f2f2;
+        }
       }
     }
   }

@@ -45,43 +45,9 @@ export default async function () {
     }),
     //多语言接口
     roomBaseServer.getLangList(),
-    // 调用聚合接口
-    roomBaseServer
-      .getCommonConfig({
-        tags: [
-          'skin',
-          'screen-poster',
-          'like',
-          'keywords',
-          'public-account',
-          'webinar-tag',
-          'menu',
-          'adv-default',
-          'invite-card',
-          'red-packet',
-          'room-tool',
-          'goods-default',
-          'announcement',
-          'sign',
-          'timer'
-        ]
-      })
-      .then(async () => {
-        // 如果是回放，调互动工具状态接口，互动状态以这个为准
-        if (roomBaseServer.state.watchInitData.webinar.type == 5) {
-          await roomBaseServer.getInavToolStatus({
-            webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
-          });
-        }
-      }),
     roomBaseServer.getCustomRoleName()
   ];
   virtualAudienceServer.init();
-  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    // 如果是分组直播，初始化分组信息
-    await groupServer.init();
-    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
-  }
 
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
@@ -92,6 +58,42 @@ export default async function () {
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
   await Promise.all(promiseList);
+
+  // 调用聚合接口
+  await roomBaseServer
+    .getCommonConfig({
+      tags: [
+        'skin',
+        'screen-poster',
+        'like',
+        'keywords',
+        'public-account',
+        'webinar-tag',
+        'menu',
+        'adv-default',
+        'invite-card',
+        'red-packet',
+        'room-tool',
+        'goods-default',
+        'announcement',
+        'sign',
+        'timer'
+      ]
+    })
+    .then(async () => {
+      // 如果是回放，调互动工具状态接口，互动状态以这个为准
+      if (roomBaseServer.state.watchInitData.webinar.type == 5) {
+        await roomBaseServer.getInavToolStatus({
+          webinar_switch_id: roomBaseServer.state.watchInitData.switch.switch_id
+        });
+      }
+    });
+
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    // 如果是分组直播，初始化分组信息
+    await groupServer.init();
+    console.log('%c------服务初始化 groupServer 初始化完成', 'color:blue', groupServer);
+  }
 
   // 互动、分组直播初始化micServer
   micServer.init();
