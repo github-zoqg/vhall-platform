@@ -342,7 +342,7 @@
           if (this.scroll && this.scroll.scrollX != 0) {
             window.sc = this.scroll;
             this.scroll.scrollTo(0);
-            this.scroll.disable();
+            // this.scroll.disable();
           }
         });
 
@@ -377,6 +377,11 @@
             this.mainScreenDom.style.left = `${1.02667}rem`;
           }
           this.scroll.on('scroll', ({ x }) => {
+            // 更改禁止方案
+            if (!this.micServer.getSpeakerStatus()) {
+              this.scroll.scrollTo(0);
+              return;
+            }
             if (this.mainScreenDom) {
               this.mainScreenDom.style.left = `${30 + -x}px`;
             }
