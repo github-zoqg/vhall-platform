@@ -5,6 +5,7 @@
     position="bottom"
     :overlay="false"
     style="height: 100vh"
+    class="qa_popup"
     get-container="body"
   > -->
     <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
