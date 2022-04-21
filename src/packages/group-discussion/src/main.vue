@@ -14,7 +14,7 @@
               :round="true"
               class="btn-group-op"
               :disabled="!groupedUserExists && way == 3"
-              @click="initData"
+              @click="groupPresetImport"
             >
               重新导入
             </el-button>
@@ -435,6 +435,20 @@
       async initData() {
         await this.groupServer.getWaitingUserList();
         await this.groupServer.getGroupedUserList();
+      },
+      async groupPresetImport() {
+        try {
+          const result = await this.groupServer.groupPresetImport();
+          if (result && result.code === 200) {
+            // 重新导入成功
+            this.$message.success('重新导入成功');
+            this.initData();
+          } else {
+            this.$message.error(result.msg || '重新导入失败');
+          }
+        } catch (ex) {
+          this.$message.error(ex.messge || '重新导入出现异常');
+        }
       },
       handleNotice() {
         this.noticeDialogVisible = true;

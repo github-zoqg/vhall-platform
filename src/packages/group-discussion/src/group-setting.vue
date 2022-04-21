@@ -109,9 +109,12 @@
           return false;
         }
         try {
+          const { watchInitData = {} } = this.roomBaseServer.state;
           const result = await this.groupServer.groupCreate({
             number: this.count,
-            way: this.way
+            way: this.way,
+            switch_id: watchInitData.switch.switch_id,
+            webinar_id: watchInitData.webinar.id
           });
           if (result && result.code === 200) {
             this.count = '';
