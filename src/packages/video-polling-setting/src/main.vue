@@ -139,7 +139,11 @@
                 this.goPollingPage();
                 return;
               } else {
-                title = `${role_name == 3 ? '助理' : ''}已开启了视频轮巡功能`;
+                if (this.roleName == role_name) {
+                  title = '已开启了视频轮巡功能';
+                } else {
+                  title = `${this.$getRoleName(role_name)}已开启了视频轮巡功能`;
+                }
                 this.setPollingAlert(title);
                 return;
               }
