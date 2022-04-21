@@ -4,6 +4,7 @@
     position="bottom"
     :overlay="false"
     style="height: 100vh"
+    class="qa_popup"
     get-container="body"
   >
     <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
@@ -155,8 +156,10 @@
       padding-bottom: 400px;
     }
   }
-  .van-popup {
-    z-index: 2000 !important;
+  .qa_popup {
+    .van-popup {
+      z-index: 2000 !important;
+    }
   }
 </style>
 <style lang="less">
