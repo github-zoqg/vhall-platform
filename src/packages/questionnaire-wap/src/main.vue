@@ -1,15 +1,17 @@
 <template>
-  <van-popup
+  <div class="vmp-question-wap" v-show="popupVisible">
+    <!-- <van-popup
     v-model="popupVisible"
     position="bottom"
     :overlay="false"
     style="height: 100vh"
     get-container="body"
-  >
+  > -->
     <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
     <!-- 问卷标题 -->
     <div id="qs-content-box"></div>
-  </van-popup>
+  </div>
+  <!-- </van-popup> -->
 </template>
 <script>
   import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
@@ -155,11 +157,17 @@
       padding-bottom: 400px;
     }
   }
-  .van-popup {
-    z-index: 2000 !important;
-  }
 </style>
 <style lang="less">
+  .vmp-question-wap {
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+  }
   .close-btn {
     position: fixed;
     color: black;
