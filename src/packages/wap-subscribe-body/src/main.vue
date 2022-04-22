@@ -43,8 +43,8 @@
     </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
-        <div v-if="showViewRestriction" @click="showAgreement">
-          <span>{{ $t('other.other_1017') }}</span>
+        <div v-if="subOption.needAgreement" @click="showAgreement">
+          <span>{{ $t('appointment.appointment_1025') }}</span>
         </div>
         <div class="vmp-subscribe-body-auth-two" v-else-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -174,7 +174,7 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
-      // 是否为嵌入页
+      // 是否为完全嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
@@ -242,9 +242,10 @@
           agreement.is_open === 1 &&
           agreement.is_agree !== 1 &&
           webinar.type !== 2 &&
-          webinar.type !== 3
+          webinar.type !== 3 &&
+          !this.roomBaseServer.state?.embedObj?.embedVideo
         ) {
-          // 预约和结束状态也不显示
+          // 预约和结束状态不显示,视频嵌入页不显示
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
