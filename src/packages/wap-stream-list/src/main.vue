@@ -54,7 +54,7 @@
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
         <img :src="coverImgUrl" alt />
-        <p @click.stop="replayPlay">
+        <p class="preventClick" @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
@@ -342,7 +342,8 @@
           if (this.scroll && this.scroll.scrollX != 0) {
             window.sc = this.scroll;
             this.scroll.scrollTo(0);
-            this.scroll.disable();
+            this.scroll.destroy();
+            this.scroll = null;
           }
         });
 
@@ -362,13 +363,15 @@
       createBScroll() {
         this.$nextTick(() => {
           if (this.scroll) {
-            if (!this.scroll.enabled) this.scroll.enabled = true;
             this.scroll.refresh();
           } else {
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
               scrollX: true,
               click: true,
-              probeType: 3 // listening scroll event
+              probeType: 3, // listening scroll event
+              preventDefaultException: {
+                className: /(^|\s)preventClick(\s|$)/
+              }
             });
           }
           // 在创建时，需获取主屏Dom并设置left值，防止出现布局混乱
@@ -377,6 +380,7 @@
             this.mainScreenDom.style.left = `${1.02667}rem`;
           }
           this.scroll.on('scroll', ({ x }) => {
+            // 更改禁止方案
             if (this.mainScreenDom) {
               this.mainScreenDom.style.left = `${30 + -x}px`;
             }
@@ -386,10 +390,16 @@
 
       // 恢复播放
       replayPlay() {
+        console.log('点击了恢复播放------', this.playAbort);
         this.playAbort.forEach(stream => {
-          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
-            this.showPlayIcon = false;
-          });
+          this.interactiveServer
+            .setPlay({ streamId: stream.streamId })
+            .then(() => {
+              this.showPlayIcon = false;
+            })
+            .catch(e => {
+              console.error('恢复播放失败----', e);
+            });
         });
         this.playAbort = [];
       },
