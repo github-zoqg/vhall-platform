@@ -176,6 +176,11 @@
             }
           });
         });
+        // 直播结束
+        this.videoPollingServer.$on('VIDEO_POLLING_OVER', () => {
+          localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
+          window.open(location, '_self').close();
+        });
       },
       // 下一组
       nextPolling() {
