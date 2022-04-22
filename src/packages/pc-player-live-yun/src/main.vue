@@ -2,11 +2,13 @@
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
     <div id="vmp-player-yun" class="player_box" v-if="roleName == 1 && !pushStream">
-      <div class="top_tip" :class="streamStatus ? 'success' : 'warning'">{{ tipText }}</div>
-      <div class="err_tip" v-if="false">
+      <div class="top_tip" :class="director_stream ? 'success' : 'warning'">
+        {{ tipText }}
+      </div>
+      <div class="err_tip" v-if="liveStart && !director_stream">
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
-      <div class="stream_people_name">
+      <div class="stream_people_name" v-if="liveStart && director_stream">
         {{ $domainStore.state.roomBaseServer.watchInitData.join_info.nickname }}
       </div>
 
@@ -88,7 +90,12 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { useRoomBaseServer, usePlayerServer, useInteractiveServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    usePlayerServer,
+    useInteractiveServer,
+    useSubscribeServer
+  } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpPcPlayerLiveYun',
@@ -101,7 +108,8 @@
         isFullScreen: false,
         isMiniDoc: false,
         tipText: '未检测到云导播推流',
-        streamStatus: null,
+        liveStart: false,
+        director_stream: 0,
         time: 3580,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
         audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
@@ -133,7 +141,14 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
     },
-    watch: {},
+    watch: {
+      liveStart(val) {
+        this.liveStart = val;
+        if (val) {
+          this.tipText = '正在使用云导播推流';
+        }
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.playerServer = usePlayerServer();
@@ -142,15 +157,26 @@
     mounted() {
       console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
       this.init();
-      setInterval(() => {
-        this.time++;
-      }, 1000);
+      this.liveStart = this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      // 云导播台流变化消息
+      this.roomBaseServer.$on('director_stream', msg => {
+        this.director_stream = msg.status;
+      });
+
+      // 开始直播
+      useSubscribeServer().$on('live_start', () => {
+        this.liveStart = true;
+      });
     },
     methods: {
       async init() {
         // 主持人初始化播放器
         if (this.roleName == 1 && !this.pushStream) {
-          this.initPlayer();
+          await this.initPlayer();
+          // 获取云导播台是否有流
+          this.roomBaseServer.getStreamStatus().then(res => {
+            this.director_stream = res.data.director_stream;
+          });
         } else {
           // 其他人创建本地流&推流
           await this.createLocalStream();

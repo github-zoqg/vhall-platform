@@ -48,7 +48,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['interaction'],
+          plugins: [/embed/.test(location.search) ? 'player' : 'interaction'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
