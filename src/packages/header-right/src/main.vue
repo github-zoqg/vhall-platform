@@ -25,7 +25,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving && !isInGroup">
+      <template v-if="roleName == 4 && isLiving && !isInGroup && deviceStatus != 2">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
