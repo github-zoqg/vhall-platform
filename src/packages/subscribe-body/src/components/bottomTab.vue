@@ -21,8 +21,8 @@
         </i18n>
       </div>
       <!-- 观看协议 -->
-      <button v-if="subOption.needAgreement" class="sub-auth add-auth" @click="agreement">
-        观看验证
+      <button v-if="showAgreement" class="sub-auth add-auth" @click="agreement">
+        {{ $t('appointment.appointment_1025') }}
       </button>
       <template v-else>
         <button
@@ -45,6 +45,7 @@
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'BottomTab',
     props: {
@@ -80,6 +81,25 @@
         is_subscribe: 0,
         disabled: false
       };
+    },
+    computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      showAgreement() {
+        const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
+        const agreement = this.subOption.needAgreement;
+        const isLive = this.webinarType != 2 && this.webinarType != 3;
+        if (agreement && isLive && !isEmbedVideo) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
     },
     watch: {
       subOption: {

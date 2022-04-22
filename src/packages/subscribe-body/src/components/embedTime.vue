@@ -24,14 +24,7 @@
       <span class="des">{{ second }}</span>
       <span>{{ $t('appointment.appointment_1029') }}</span>
     </div>
-    <span>{{ subOption.needAgreement }}</span>
-    <button
-      v-if="subOption.needAgreement && ((!btnText && type == 1) || btnText)"
-      :disabled="type != 1"
-      :class="{ disabledBtn: type != 1 }"
-      class="sub-auth add-auth"
-      @click="agreement"
-    >
+    <button v-if="showAgreement" class="sub-auth add-auth" @click="agreement">
       {{ $t('appointment.appointment_1025') }}
     </button>
     <template v-else>
@@ -48,6 +41,8 @@
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
+
   export default {
     name: 'EmbedTime',
     props: {
@@ -55,6 +50,26 @@
         type: Object,
         required: true,
         default: () => {}
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      showAgreement() {
+        const isAgreement = this.subOption.needAgreement;
+        const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
+        const isLive = this.webinarType != 2 && this.webinarType != 3;
+        if (isAgreement && isLive && !isEmbedVideo) {
+          return true;
+        } else {
+          return false;
+        }
+        // if (isAgreement && ((!btnText && type == 1) || btnText))
       }
     },
     data() {

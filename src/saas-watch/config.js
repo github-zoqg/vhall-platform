@@ -644,6 +644,10 @@ export const serverConfig = {
       {
         cuid: 'comVmpSubscribeBody',
         method: 'handleAgreeWitthTerms'
+      },
+      {
+        cuid: 'comPcPlayer',
+        method: 'handleAgreeWitthTerms'
       }
     ]
   }
