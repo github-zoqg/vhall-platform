@@ -201,7 +201,7 @@
         margin-bottom: 10px;
         img {
           display: block;
-          // width: 100%;
+          max-width: 100%;
           object-fit: scale-down;
           margin: 10px 0px;
         }
