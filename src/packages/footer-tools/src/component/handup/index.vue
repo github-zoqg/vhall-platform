@@ -147,9 +147,11 @@
             if (res.code != 200) {
               if (res.code == 513346) {
                 this.$message.warning(this.$t('interact.interact_1037'));
-                return;
+              } else if (res.code == 513025) {
+                this.$message.error(
+                  this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
+                );
               }
-              this.$message.error(res.msg);
               return;
             }
             this.isApplyed = true;
