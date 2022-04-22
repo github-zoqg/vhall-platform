@@ -129,9 +129,9 @@
       // 取消
       handleClose() {
         this.close();
-        this.$emit('settingCancel', this.way);
       },
       close() {
+        this.$emit('settingCancel', this.way);
         this.dialogVisible = false;
         this.$emit('update:show', false);
       }
