@@ -8,12 +8,13 @@
         <div class="vmp-group-split__hd">
           <span class="split-title">分组设置</span>
           <div class="split-op">
+            <!-- 有观众&&白名单&&没有开启讨论&&白名单预分组模式 -->
             <el-button
               type="default"
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!groupedUserExists || verify != 2 || isOpenSwitch == 1"
+              :disabled="!(groupedUserExists && verify == 2 && isOpenSwitch != 1 && presetWay)"
               @click="groupPresetImport"
             >
               重新导入
@@ -291,7 +292,7 @@
         changeGroupFlag: 1, //1-待分配的换组，2-某个组的换组
         needChangeList: [], // 某个组选择要换组人员
         showItem: null,
-        way: 1, //分组方式
+        presetWay: 1, //是否是白名单预分组
         isInvitedId: '' // 演示人id(受邀请人Id)
       };
     },
@@ -439,6 +440,7 @@
       async initData() {
         await this.groupServer.getWaitingUserList();
         await this.groupServer.getGroupedUserList();
+        this.presetWay = this.groupServer.state.presetWay;
       },
       async groupPresetImport() {
         try {
@@ -665,7 +667,7 @@
       // 分配设置主动取消回调
       settingCancel(way) {
         this.groupServer.state.panelShow = false;
-        this.way = way;
+        this.presetWay = way == 3 ? true : false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
       },
       // 结束讨论回调
