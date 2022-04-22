@@ -38,7 +38,7 @@
             <el-radio class="group-radio" v-model="way" label="2">
               手动分组（按照实际情况及个人意愿分配）
             </el-radio>
-            <el-radio class="group-radio" v-model="way" label="3" :disabled="mode == 2">
+            <el-radio class="group-radio" v-model="way" label="3" :disabled="verify != 2">
               白名单预设分组（按照白名单观众组中的小组分配）
             </el-radio>
           </div>
@@ -78,8 +78,8 @@
     },
     computed: {
       //观看限制白名单，白名单预设分组可设置，其他则不可选
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
+      verify() {
+        return this.roomBaseServer.state.watchInitData.webinar.verify;
       },
       // 观众数量
       userNumber() {
