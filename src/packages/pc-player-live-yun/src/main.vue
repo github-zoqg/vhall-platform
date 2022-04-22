@@ -6,7 +6,9 @@
       <div class="err_tip" v-if="false">
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
-      <div class="stream_people_name">GMIC大会悟空</div>
+      <div class="stream_people_name">
+        {{ $domainStore.state.roomBaseServer.watchInitData.join_info.nickname }}
+      </div>
 
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
         <p class="vmp-stream-local__shadow-second-line">
@@ -34,7 +36,7 @@
     <!-- 本地推流区域 -->
     <div v-else class="stream_box">
       <div class="stream_box_header">
-        <span class="header_left">视频推流到云导播台 — 机位2</span>
+        <span class="header_left">视频推流到云导播台 — {{ $route.query.seat_name }}</span>
         <span class="header_right">
           <span class="vh-iconfont vh-line-setting" @click="setInteractive"></span>
           <span class="vh-iconfont vh-a-line-fullscreen" @click="fullScreen"></span>
@@ -92,6 +94,7 @@
     name: 'VmpPcPlayerLiveYun',
     data() {
       return {
+        localSpeaker: {},
         audioLevel: 1,
         networkStatus: 2,
         showFloatLayer: false,
@@ -120,19 +123,14 @@
       },
       // 是否为推流页面
       pushStream() {
-        return /lives\/yun/.test(location.pathname) && true;
+        return (
+          /lives\/yun/.test(location.pathname) &&
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          !/embed/.test(location.search)
+        );
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
-      },
-      speakerList() {
-        return this.$domainStore.state.micServer.speakerList;
-      },
-      localSpeaker() {
-        console.log('-------localSpeaker更新--------');
-        return (
-          this.speakerList.find(item => item.accountId == this.joinInfo.third_party_user_id) || {}
-        );
       }
     },
     watch: {},
@@ -166,12 +164,9 @@
         return this.playerServer
           .init({
             videoNode: 'vmp-player-yun',
-            // type: 'vod',
+            type: 'live',
             liveOption: {
-              type:
-                this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1'
-                  ? 'hls'
-                  : 'flv',
+              type: 'auto',
               roomId: this.roomBaseServer.state.watchInitData.interact.room_id // 互动应用ID，必填
             }
           })
@@ -205,6 +200,9 @@
             .createLocalVideoStream({
               videoNode: `stream-yun-box`,
               mute: { audio: this.audioMuted == 1, video: this.videoMuted == 1 }
+            })
+            .then(res => {
+              this.localSpeaker.streamId = res.streamId;
             })
             .catch(e => {
               if (e && e?.name == 'NotAllowed') {

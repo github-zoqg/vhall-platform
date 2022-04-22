@@ -15,7 +15,6 @@
     async created() {
       const interactiveServer = useInteractiveServer();
       const domain = await this.init();
-      await useRoomBaseServer().getInavToolStatus();
       await useMicServer().init();
       await interactiveServer.baseInit();
       domain.initVhallReport(
@@ -58,7 +57,7 @@
           },
           initRoom: {
             webinar_id: il_id, //活动id
-            seat_id: 900009,
+            seat_id: this.$route.query.seat_id,
             clientType: 'sendYun', //客户端类型
             nickname,
             email,

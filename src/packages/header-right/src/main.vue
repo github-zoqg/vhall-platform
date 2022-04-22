@@ -8,7 +8,12 @@
       </template>
       <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
-        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+        <div
+          v-if="liveStep == 1"
+          class="vmp-header-right_btn"
+          :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+          @click="handleStartClick"
+        >
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
         <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
@@ -113,7 +118,8 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        }
+        },
+        director_stream: 0 // 云导播台是否有流
       };
     },
     computed: {
@@ -147,7 +153,7 @@
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
       isStreamYun() {
-        return true;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       },
       // 是否为第三方发起
       isThirdStream() {
@@ -193,6 +199,11 @@
         if (this.splitScreenServer.state.isOpenSplitScreen || this.isStreamYun) {
           this.handlePublishComplate();
         }
+      }
+      if (this.isStreamYun) {
+        this.roomBaseServer.getStreamStatus().then(res => {
+          this.director_stream = res.data.director_stream;
+        });
       }
     },
     methods: {
@@ -319,7 +330,7 @@
 
           // 云导播开播按钮是否可点
           useSubscribeServer().$on('director_stream', msg => {
-            this.liveStep = 2;
+            this.director_stream = msg;
           });
         }
       },
@@ -395,6 +406,8 @@
       },
       // 开始直播/录制事件
       handleStartClick() {
+        // 如果是云导播活动 并且没有流
+        if (this.isStreamYun && !this.director_stream) return false;
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
@@ -602,6 +615,10 @@
       padding: 0 10px;
       cursor: pointer;
       background-color: @bg-error-light;
+    }
+    .right_btn_dis {
+      background: #fc5659;
+      opacity: 0.5;
     }
     .vmp-header-right_duration {
       &-end {

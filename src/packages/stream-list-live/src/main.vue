@@ -209,7 +209,7 @@
         );
       },
       isStreamYun() {
-        return true;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
 
