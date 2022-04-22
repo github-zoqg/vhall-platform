@@ -13,7 +13,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!groupedUserExists && way == 3"
+              :disabled="!groupedUserExists || way != 3 || isOpenSwitch == 1"
               @click="groupPresetImport"
             >
               重新导入
