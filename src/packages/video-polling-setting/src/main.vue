@@ -118,18 +118,9 @@
       },
       getVideoPollingInfo() {
         this.videoPollingServer.getVideoRoundInfo().then(res => {
-          if (res.code !== 200) {
-            this.$message.error(res.msg);
-            return;
-          } else {
+          if (res.code === 200) {
             const { account_id, role_name, max_speak_count, surplus_speak_count } = res.data;
             let title = '';
-            if (max_speak_count == 0) {
-              this.pollingVisible = false;
-              title = '您尚未配置连麦数，请联系工作人员';
-              this.setPollingAlert(title);
-              return;
-            }
             if (account_id) {
               this.pollingVisible = false;
               if (
@@ -154,6 +145,14 @@
               return;
             }
             this.pollingVisible = true;
+          } else if (res.code === 513560) {
+            this.pollingVisible = false;
+            let title = '您尚未配置连麦数，请联系工作人员';
+            this.setPollingAlert(title);
+            return;
+          } else {
+            this.$message.error(res.msg);
+            return;
           }
         });
       },
