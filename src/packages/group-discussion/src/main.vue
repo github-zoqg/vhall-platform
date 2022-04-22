@@ -13,7 +13,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!groupedUserExists || way != 3 || isOpenSwitch == 1"
+              :disabled="!groupedUserExists || verify != 2 || isOpenSwitch == 1"
               @click="groupPresetImport"
             >
               重新导入
@@ -303,6 +303,10 @@
       this.docServer = useDocServer();
     },
     computed: {
+      //观看限制白名单，白名单预设分组可设置，其他则不可选
+      verify() {
+        return this.roomBaseServer.state.watchInitData.webinar.verify;
+      },
       userId() {
         return this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id;
       },
