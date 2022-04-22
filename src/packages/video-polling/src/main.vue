@@ -11,17 +11,22 @@
           </el-button>
         </span>
         <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
-        <span
-          class="vmp-video-polling__tip-btn vh-iconfont"
-          :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
-          @click="enterFullScreen"
-          title="全屏"
-        ></span>
-        <span
-          class="vmp-video-polling__tip-btn vh-iconfont vh-line-switch-button"
-          @click="exitVideoPolling"
-          title="退出轮巡"
-        ></span>
+        <el-tooltip
+          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="bottom"
+        >
+          <span
+            class="vmp-video-polling__tip-btn vh-iconfont"
+            :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
+            @click="enterFullScreen"
+          ></span>
+        </el-tooltip>
+        <el-tooltip content="退出轮巡" placement="bottom">
+          <span
+            class="vmp-video-polling__tip-btn vh-iconfont vh-line-switch-button"
+            @click="exitVideoPolling"
+          ></span>
+        </el-tooltip>
       </div>
     </div>
     <!-- body -->
