@@ -287,9 +287,8 @@
         let params = {
           type: type,
           webinar_id: this.webinarId,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
-          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query
         };
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
@@ -504,9 +503,8 @@
           type: type,
           webinar_id: this.webinarId,
           verify_value: value,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
-          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query
         };
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {

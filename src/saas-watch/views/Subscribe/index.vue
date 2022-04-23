@@ -17,6 +17,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
   export default {
     name: 'vmpSubscribe',
@@ -33,6 +34,7 @@
     components: {
       ErrorPage
     },
+    mixins: [authCheck],
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
@@ -57,6 +59,9 @@
         }
         await this.initReceiveLive(this.clientType);
         await subscribeState();
+        if (this.clientType != 'embed') {
+          await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
+        }
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
