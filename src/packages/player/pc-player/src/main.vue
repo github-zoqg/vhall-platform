@@ -629,7 +629,9 @@
       handleAgreeWitthTerms() {
         this.agreement = false;
         this.getShiPreview();
-        this.authTryWatch();
+        const verify = this.roomBaseServer.state.watchInitData.webinar.verify;
+        const type = verify === 6 ? 4 : verify;
+        this.authTryWatch(type);
       },
       // handleAuthCheck() {
       //   let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
