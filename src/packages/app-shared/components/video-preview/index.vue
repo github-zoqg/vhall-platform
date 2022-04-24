@@ -153,7 +153,7 @@
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
       },
       isVod() {
-        return this.videoParam.type == 'vod' || !this.videoParam.type
+        return this.videoParam.type == 'vod' || !this.videoParam.type;
       }
     },
     beforeCreate() {

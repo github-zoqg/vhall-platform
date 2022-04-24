@@ -64,7 +64,10 @@
     ></div>
 
     <!-- 音频插播封面图 -->
-    <div v-if="isAudio && ((isLiving&&isFullScreen || !isLiving) || mode == 1)" class="vmp-insert-stream-audio-poster"></div>
+    <div
+      v-if="isAudio && ((isLiving && isFullScreen) || !isLiving || mode == 1)"
+      class="vmp-insert-stream-audio-poster"
+    ></div>
 
     <!-- 远端视频插播的播放器容器 -->
     <div id="vmp-insert-remote-stream" class="vmp-insert-remote-stream">
