@@ -12,7 +12,7 @@
         </span>
         <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
         <el-tooltip
-          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          :content="isFullscreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
           placement="bottom"
         >
           <span
