@@ -23,6 +23,7 @@ project: 项目
 project
 │
 ├── script  # 项目编译工具
+│    ├────...
 │    ├────btool.js # 项目编译辅助工具
 │    └────cli-service.js  # 实际编译启动工具
 │
@@ -31,9 +32,6 @@ project
 │    └────...
 │
 ├── src
-│    ├────demo-live # demoPC直播项目
-│    │    ├────...
-│    │
 │    ├────saas-live # saasPC直播端
 │    │    ├────...
 │    │    ├────...
@@ -43,7 +41,12 @@ project
 │    │    ├────webpack.dev.config #项目开发环境配置
 │    │    └────webpack.prod.config #项目生产环境配置
 │    │
-│    ├────saas-watch # saasPC观看端
+│    ├────saas-wap # saas wap观看端
+│    │    ├────...
+│    │    ├────...
+│    │    └────...
+│    │
+│    ├────saas-watch # saas PC观看端
 │    │    ├────...
 │    │    ├────...
 │    │    └────...
@@ -84,14 +87,8 @@ project
 
 ```shell
 
-## [demo-live]项目启动
-yarn demo
-
-## [saas-live]项目启动
-yarn run serve 或 yarn run serve:saas-live
-
-## [zhike-live]项目启动
-yarn run serve:zhike-live
+## [saas-live]项目331任务启动
+npm run serve:saas-live:331 或 yarn serve:saas-live:331
 
 ## ...
 
@@ -101,11 +98,12 @@ yarn run serve:zhike-live
 
 ```shell
 
-## 编译[demo-live]项目
-npm run build:demo-live
-
 ## 编译[saas-live]项目
 npm run build:saas-live
+
+## jenkins持续集成（运维支持）
+node scripts/cli-service.js build --project=${project} --mode=${mode}
+> 其中：${project} 表示要构建的项目，${mode} 表示构建环境，会从根目录读取.en.${mode} 文件配置信息
 
 ```
 
@@ -137,17 +135,17 @@ node scripts/cli-service.js build --project=${项目} --mode=${环境} --hash=${
 #### <font color=blue size=3 >1、组件开发`</font>`
 
 (1) 多数情况项组件在 packages 目录下编写。
- (2) 组件如果是多单词，采用短横线连接.
- 例如： 语言切换组件 language-choice
- (3) packages 目录下组件名称导出名称统一采用 vmp 开头
- 例如： 语言切换组件 name: 'VmpLanguageChoice'
- (4) 组件名称采用 UpperCamelCase(大驼峰)命名法。
- 例如： 语言切换组件 VmpLanguageChoice
+(2) 组件如果是多单词，采用短横线连接.
+例如： 语言切换组件 language-choice
+(3) packages 目录下组件名称导出名称统一采用 vmp 开头
+例如： 语言切换组件 name: 'VmpLanguageChoice'
+(4) 组件名称采用 UpperCamelCase(大驼峰)命名法。
+例如： 语言切换组件 VmpLanguageChoice
 
 #### <font color=blue size=3 >2、主题皮肤`</font>`
 
 (1) 约定在每个项目的 assets/styles/skins 目录下写皮肤样式
- (2) 在每个项目的 config.js 中配置初始主题皮肤，名称和 skins 目录下的样式名称一致。
+(2) 在每个项目的 config.js 中配置初始主题皮肤，名称和 skins 目录下的样式名称一致。
 
 ```js
 export const globalConfig = {
