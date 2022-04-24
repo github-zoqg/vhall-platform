@@ -11,10 +11,7 @@
           </el-button>
         </span>
         <span v-else class="vmp-video-polling__tip-next" @click="nextPolling">下一组</span>
-        <el-tooltip
-          :content="isFullscreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
-          placement="bottom"
-        >
+        <el-tooltip content="全屏" placement="bottom">
           <span
             class="vmp-video-polling__tip-btn vh-iconfont"
             :class="isFullscreen ? 'vh-line-narrow' : 'vh-line-amplification'"
