@@ -128,9 +128,10 @@
               } else {
                 this.$message.error(res.msg);
               }
+            } else {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
+              useMicServer().userSpeakOn();
             }
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
-            useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');

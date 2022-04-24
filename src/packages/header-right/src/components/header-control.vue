@@ -47,7 +47,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="isShowThirdPushStream"
+            v-if="isShowThirdPushStream && !thirtPushStreamimg"
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -56,7 +56,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             @click="thirdPartyClose"
-            v-if="webinarInfo.mode == 2 && thirtPushStreamimg"
+            v-if="isShowThirdPushStream && thirtPushStreamimg"
           >
             <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
@@ -117,12 +117,7 @@
       //是否显示第三方推流组件
       isShowThirdPushStream() {
         // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
-        return (
-          this.configList['btn_thirdway'] &&
-          this.webinarInfo.no_delay_webinar == 0 &&
-          this.webinarInfo.mode == 2 &&
-          !this.thirtPushStreamimg
-        );
+        return this.configList['btn_thirdway'] && this.webinarInfo.no_delay_webinar == 0;
       }
     },
     data() {
