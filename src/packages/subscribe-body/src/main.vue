@@ -189,6 +189,7 @@
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query,
           ...params
         };
         this.subscribeServer.watchAuth(data).then(res => {

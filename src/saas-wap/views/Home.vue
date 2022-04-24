@@ -199,6 +199,7 @@
         ) {
           this.liveErrorTip = this.$t('message.message_1004');
         } else if (err.code == 512503 || err.code == 512502) {
+          // 跳转到老saas
           window.location.href = `${window.location.origin}/${this.$route.params.id}`;
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
