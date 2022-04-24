@@ -476,6 +476,9 @@
         if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
           await this.stopPush();
           await this.interactiveServer.destroy();
+          if (this.isNoDelay == 1) {
+            await this.interactiveServer.init();
+          }
         }
       });
       if (!this.isSpeakOn) {
