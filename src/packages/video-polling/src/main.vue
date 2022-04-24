@@ -56,7 +56,7 @@
 </template>
 
 <script>
-  import { useVideoPollingServer, useInteractiveServer } from 'middle-domain';
+  import { useVideoPollingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
   import screenfull from 'screenfull';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
   import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
@@ -108,8 +108,11 @@
     beforeCreate() {
       this.videoPollingServer = useVideoPollingServer();
       this.interactiveServer = useInteractiveServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
+      // 是否是客户端嵌入页面的标识
+      this._isClientEmbed = this.$route.query.embed === 'client';
       this._isExitPolling = false;
       // 进入时，重置为0
       localStorage.setItem(`isVideoPolling_${this.$route.params.id}`, 0);
@@ -155,7 +158,7 @@
             this.enterFullScreen();
           }
         });
-        if (this.$route.query.embed === 'client') {
+        if (this._isClientEmbed) {
           window.addEventListener('keydown', e => {
             if (e.keyCode == 27 && this.isFullscreen) {
               this.enterFullScreen();
@@ -195,11 +198,29 @@
               is_next: 1
             })
             .then(res => {
-              if (res.code !== 200) {
-                // 如果下一组报错了，报给客户端
-                // TODO: 后端可能需要给出一个特定的code码，告诉前端当前已经有人开始视频轮询了，如果提供，直接改成该 code 码即可
-                clientMsgApi.JsCallQtMsg({ type: 'videoRoundErr', msg: res });
+              if (
+                res.data.account_id !=
+                this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
+              ) {
+                // 当前已经有人开始视频轮询了
+                const title = `${this.$getRoleName(res.data.role_name)}已开启了视频轮巡功能`;
+                if (this._isClientEmbed) {
+                  // 如果下一组报错了，报给客户端
+                  clientMsgApi.JsCallQtMsg({ type: 'videoRoundErr', msg: title });
+                  return;
+                }
+                this.setPollingAlert(title);
               }
+            })
+            .catch(() => {
+              // 当前已经有人开始视频轮询了
+              const msg = '网络异常导致互动房间连接失败';
+              if (this._isClientEmbed) {
+                // 如果下一组报错了，报给客户端
+                clientMsgApi.JsCallQtMsg({ type: 'videoRoundErr', msg });
+                return;
+              }
+              this.setPollingAlert(msg);
             });
         }
         this.nextTimer = setInterval(() => {
@@ -260,7 +281,7 @@
       // 退出视频轮询
       exitVideoPolling() {
         // 通知客户端关闭视频轮询页面
-        if (this.$route.query.embed === 'client') {
+        if (this._isClientEmbed) {
           clientMsgApi.JsCallQtMsg({ type: 'closeVideoRound' });
           return;
         }
@@ -287,6 +308,20 @@
       // 切换全屏
       enterFullScreen() {
         screenfull.toggle(this.$refs.videoPolling);
+      },
+      // 已经有其他人开启了轮巡
+      setPollingAlert(title) {
+        this.$alert(title, '', {
+          title: '提示',
+          confirmButtonText: '知道了',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel',
+          callback: () => {
+            this._isExitPolling = true;
+            localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
+            window.open(location, '_self').close();
+          }
+        });
       }
     }
   };
