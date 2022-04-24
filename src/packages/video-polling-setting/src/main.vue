@@ -32,9 +32,14 @@
               自动轮巡
               <span class="item_color">（展示时间结束后，自动切换到下一组视频画面）</span>
             </el-radio>
-            <div class="item_time" v-show="pollingForm.videoAutoPolling == 1">
+            <div class="item_time">
               展示时间
-              <el-select v-model="pollingForm.videoTime" placeholder="请选择" style="width: 120px">
+              <el-select
+                v-model="pollingForm.videoTime"
+                :disabled="pollingForm.videoAutoPolling == 0"
+                placeholder="请选择"
+                style="width: 120px"
+              >
                 <el-option
                   v-for="item in pollingTimeList"
                   :key="item.value"

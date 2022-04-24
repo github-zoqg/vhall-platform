@@ -134,7 +134,7 @@
         </i18n>
         <div class="polling-dialog_btn">
           <el-button type="primary" round @click="pollingVisible = false">
-            {{ $t('other.other_1019') }}
+            {{ $t('other.other_1015') }}
           </el-button>
         </div>
       </div>
