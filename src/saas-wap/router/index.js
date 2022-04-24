@@ -129,30 +129,12 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  // Vue history模式 微信分享IOS无效解决办法---最终章
-  const { system } = getBrowserType();
-  if (
-    system == 'ios' &&
-    `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
-  ) {
-    location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
-  }
   const res = await grayInit(to);
   if (res) {
     console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度、如果是中台用户, 跳转到中台
-      // const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
-      // const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
-      // let protocol = window.location.protocol;
-      // if (res.data.is_csd_user == 1) {
-      //   if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
-      //     window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
-      //   }
-      // }
       wxAuthCheck(to, next);
-      // next();
     } else {
       next({
         name: 'PageError',
@@ -164,7 +146,6 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     wxAuthCheck(to, next);
-    // next();
   }
 });
 
