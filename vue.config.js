@@ -9,8 +9,6 @@ const btool = require('./scripts/btool');
 const resolve = dir => path.join(__dirname, dir);
 const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const ReorganizePlugin = require('./scripts/plugins/reorganize-webpack-plugin');
-// const SentryCliPlugin = require('@sentry/webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 
@@ -37,25 +35,27 @@ function getPlugins() {
         ROUTER_BASE_URL: isDev ? JSON.stringify('/') : JSON.stringify('@routerBaseUrl'),
         VUE_APP_WAP_WATCH_MIDDLE: JSON.stringify(process.env.VUE_APP_WAP_WATCH_MIDDLE),
         VUE_APP_WEB_BASE_MIDDLE: JSON.stringify(process.env.VUE_APP_WEB_BASE_MIDDLE),
+        // 化蝶pc观看端项目名
         VUE_MIDDLE_SAAS_WATCH_PC_PROJECT: JSON.stringify(
           process.env.VUE_MIDDLE_SAAS_WATCH_PC_PROJECT
         ),
+        // 化蝶wap观看端项目名
         VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT: JSON.stringify(
           process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT
         ),
+        // 化蝶发起端项目名
         VUE_MIDDLE_SAAS_LIVE_PC_PROJECT: JSON.stringify(
           process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT
         ),
-        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS), //化蝶观看端域名
-        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS) //化蝶发起端域名
+        //化蝶观看端(pc、wap)域名
+        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS),
+        //化蝶发起端域名
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS)
       }
     })
   ];
 
   if (!isDev) {
-    // 项目资源路径
-    let projectResourceDir = path.join(pathConfig.ROOT, `dist/${argv.project}/static/js/`);
-
     // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
     if (argv.middle) {
       process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
@@ -113,28 +113,7 @@ function getPlugins() {
       }
     ];
 
-    // 如果非开发环境，修改 sourceMap 的地址
-    // if (!isDev) {
-    //   replaceInFileWebpackPluginData.push({
-    //     dir: `dist/${argv.project}`,
-    //     test: /\.js$/,
-    //     rules: [
-    //       {
-    //         search: /sourceMappingURL=/gi,
-    //         replace: `sourceMappingURL=https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/sourcemap/${argv.project}/`
-    //       }
-    //     ]
-    //   });
-    // }
-
     plugins.push(
-      // new SentryCliPlugin({
-      //   release: `${argv.version}`, // 版本号
-      //   include: projectResourceDir, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
-      //   // ignore: ['node_modules'], // 忽略文件目录,当然我们在inlcude中制定了文件路径,这个忽略目录可以不加
-      //   configFile: `sentry/${argv.project}/sentry.properties`,
-      //   urlPrefix: `~/${argv.project}/static/js/` //  线上对应的url资源的相对路径 比如我的域名是 http://XXX.com/,静态资源都在 static文件夹里面
-      // }),
       new FileManagerPlugin({
         events: {
           onEnd: {
@@ -231,31 +210,6 @@ const sharedConfig = {
           ];
         });
     }
-
-    if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
-      // 编译结束后重新组织编译结果
-      // config.plugin('reorganize').use(
-      //   new ReorganizePlugin({
-      //     resoucePrefix: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/`,
-      //     dist: path.resolve('dist'),
-      //     project: argv.project,
-      //     version: argv.version,
-      //     routerBase: `${process.env.VUE_APP_ROUTER_BASE_URL}`
-      //   })
-      // );
-    }
-    // config.module
-    //   .rule('images')
-    //   .test(/\.(jpg|png|gif)$/)
-    //   .use('url-loader')
-    //   .loader('url-loader')
-    //   .options({
-    //     limit: 10,
-    //     publicPath: `${process.env.VUE_APP_PUBLIC_PATH}/common-static/${argv.project}/static/img`,
-    //     outputPath: 'img',
-    //     name: '[name].[ext]'
-    //   })
-    //   .end();
   },
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader

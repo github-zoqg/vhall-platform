@@ -208,3 +208,6 @@ eslint 检查集成了 prettier 规则，通常只需要在 prettier.config.js �
 # 提交时转换为LF，检出时不转换
 git config --global core.autocrlf input
 ```
+
+问题 2：日志查询地址？
+sentry: https://sentry.vhall.com/
