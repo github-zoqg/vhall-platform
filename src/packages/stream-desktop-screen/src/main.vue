@@ -216,12 +216,17 @@
           }
           return false;
         }
+      },
+      // 当前文档或白板容器的Id
+      currentCid() {
+        return this.docServer.state.currentCid;
       }
     },
     components: {
       SaasAlert
     },
     beforeCreate() {
+      this.docServer = useDocServer();
       this.micServer = useMicServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaSettingServer = useMediaSettingServer();
@@ -324,7 +329,8 @@
           // 桌面共享开启消息
           if (msg.data.type === 'desktop_sharing_disable') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'player') {
+              console.log('this.currentCid-2', this.currentCid);
+              if (useRoomBaseServer().state.miniElement == 'player' || !this.currentCid) {
                 return;
               }
               window.$middleEventSdk?.event?.send(
@@ -337,7 +343,8 @@
           // 桌面共享关闭消息
           if (msg.data.type === 'desktop_sharing_open') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'doc') {
+              console.log('this.currentCid-1', this.currentCid);
+              if (useRoomBaseServer().state.miniElement == 'doc' || !this.currentCid) {
                 return;
               }
               window.$middleEventSdk?.event?.send(
