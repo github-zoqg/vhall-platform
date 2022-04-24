@@ -326,13 +326,13 @@
             }
           }
 
-          // 桌面共享开启消息
+          // 桌面共享关闭消息
           if (msg.data.type === 'desktop_sharing_disable') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              console.log('this.currentCid-2', this.currentCid);
-              if (useRoomBaseServer().state.miniElement == 'player' || !this.currentCid) {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'player' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -340,13 +340,13 @@
             useRoomBaseServer().setInavToolStatus('is_desktop', 0);
           }
 
-          // 桌面共享关闭消息
+          // 桌面共享开启消息
           if (msg.data.type === 'desktop_sharing_open') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              console.log('this.currentCid-1', this.currentCid);
-              if (useRoomBaseServer().state.miniElement == 'doc' || !this.currentCid) {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'doc' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -421,10 +421,8 @@
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
-        if (!this.isWatch && useDocServer().state.switchStatus) {
-          // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
-          this.interactiveServer.setDesktop({ status });
-        }
+        if (this.isWatch || !useDocServer().state.switchStatus) return;
+        this.interactiveServer.setDesktop({ status });
       },
       // 关闭弹窗
       closeConfirm() {
