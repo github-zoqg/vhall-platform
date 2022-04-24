@@ -250,11 +250,6 @@
       async publishLocalStream() {
         await this.interactiveServer.publishStream().catch(e => {
           console.log('paltForm publishLocalStream failed....', e);
-          if (e.code === '611007') {
-            this.handleSpeakOnError('noPermission');
-          } else {
-            this.handleSpeakOnError('publishStreamError');
-          }
         });
       },
       // 实时获取网路状况和麦克风能量
