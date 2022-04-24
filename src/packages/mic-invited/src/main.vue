@@ -108,7 +108,11 @@
           })
           .then(res => {
             if (res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513347) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+              } else {
+                this.$message.error(res.msg);
+              }
             }
             useMicServer().userSpeakOn();
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
