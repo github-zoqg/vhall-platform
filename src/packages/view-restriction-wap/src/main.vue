@@ -130,6 +130,7 @@
     word-wrap: break-word;
     padding-right: 56px;
     margin-bottom: 40px;
+    text-align: center;
   }
   .scroll-content {
     max-height: 540px;
