@@ -278,10 +278,7 @@
 
       // 检测是否支持连麦，不支持直接进行提示
       if (useMediaCheckServer().state.isBrowserNotSupport) {
-        await useMediaCheckServer().checkSystemRequirements();
-        if (useMediaCheckServer().state.isBrowserNotSupport) {
-          return Toast(this.$t('other.other_1010'));
-        }
+        return Toast(this.$t('other.other_1010'));
       }
       this.replayPlay = debounce(this.replayPlay, 500);
     },
