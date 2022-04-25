@@ -31,7 +31,7 @@
         <div
           class="vmp-split-screen__stream-container"
           v-for="speaker in remoteSpeakers"
-          :key="speaker.id"
+          :key="speaker.accountId"
         >
           <div class="vmp-split-screen__stream-container-box">
             <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
