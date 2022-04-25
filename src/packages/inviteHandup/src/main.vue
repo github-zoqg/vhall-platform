@@ -123,7 +123,7 @@
           .then(res => {
             this.btnDisabled = false;
             if (res.code !== 200) {
-              if (res.code == 513347) {
+              if (res.code == 513345) {
                 this.$message.warning(this.$t('interact.interact_1037'));
               } else {
                 this.$message.error(res.msg);
