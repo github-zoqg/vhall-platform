@@ -573,6 +573,11 @@
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
+            break;
           case 512002:
           case 512522:
             setTimeout(() => {
