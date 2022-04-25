@@ -604,9 +604,10 @@
             useRoomBaseServer().setChangeElement('player');
           }
 
+          // 如果是嘉宾开启了分屏，不需要初始化互动实例
           if (
             (this.isNoDelay === 1 && +this.joinInfo.role_name !== 1) ||
-            +this.joinInfo.role_name === 4
+            (+this.joinInfo.role_name === 4 && !this.splitScreenServer.state.isOpenSplitScreen)
           ) {
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
