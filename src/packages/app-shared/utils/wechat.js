@@ -80,7 +80,7 @@ function filterAddressParams(path) {
   }`;
   console.log('wechatjs 看看当前走入到了哪里_next不为空------->', nextUrl);
   // replaceState 添加或替换历史记录后，浏览器地址栏会变成你传的地址，而页面并不会重新载入或跳转
-  window.history.replaceState(null, null, nextUrl);
+  // window.history.replaceState(null, null, nextUrl);
   window.location.replace(nextUrl);
 }
 
