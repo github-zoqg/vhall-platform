@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-third-stream" v-if="isShowThirdStream">
+  <div class="vmp-third-stream" v-show="isShowThirdStream">
     <!-- 第三方推流 -->
     <div class="vmp-third-stream-box">
       <div class="vmp-third-stream-title">推流设置</div>
@@ -97,19 +97,20 @@
         return this.roomBaseServer.state.watchInitData.join_info.role_name;
       }
     },
-    mounted() {
-      if (
-        this.isThirdStream &&
-        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
-        this.roleName == 1
-      ) {
+    created() {
+      if (this.roleName != 1) return;
+      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
         this.isShowThirdStream = true;
+        this.getThirdPushStream();
         this.changePushImage(true);
       }
+    },
+    mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
         if (msg.data.type == 'live_over' && this.roleName == 1) {
           this.isShowThirdStream = false;
           this.changePushImage(false);
+          this.isShowThirdStream = false;
         }
       });
     },
