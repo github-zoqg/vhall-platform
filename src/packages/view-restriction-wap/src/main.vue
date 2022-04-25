@@ -119,25 +119,37 @@
     box-shadow: 0px -2px 10px 0px rgba(0, 0, 0, 0.1);
     border-radius: 32px;
     padding: 64px 0 48px;
+    ::-webkit-scrollbar-track-piece {
+      opacity: 0;
+    }
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 6px;
+    }
   }
 
   .restriction-title {
     font-size: 36px;
     font-weight: 500;
     color: #1a1a1a;
-    line-height: 50px;
-    word-break: break-all;
-    word-wrap: break-word;
-    padding-right: 56px;
+    // word-break: break-all;
+    // word-wrap: break-word;
+    // padding-right: 56px;
     margin-bottom: 40px;
     text-align: center;
+    padding: 0 56px;
   }
   .scroll-content {
     max-height: 540px;
     margin-bottom: 24px;
     overflow-y: auto;
-    word-break: break-all;
-    word-wrap: break-word;
+    // word-break: break-all;
+    // word-wrap: break-word;
     padding: 0 56px;
   }
   .restriction-content {
