@@ -119,9 +119,12 @@
     box-shadow: 0px -2px 10px 0px rgba(0, 0, 0, 0.1);
     border-radius: 32px;
     padding: 64px 0 48px;
-    ::-webkit-scrollbar-track-piece {
-      opacity: 0;
+
+    .van-popup__close-icon {
+      font-size: 32px;
+      color: #8c8c8c;
     }
+
     ::-webkit-scrollbar {
       width: 12px;
     }
