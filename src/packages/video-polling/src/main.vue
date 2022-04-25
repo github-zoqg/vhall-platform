@@ -317,8 +317,6 @@
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel',
           callback: () => {
-            this._isExitPolling = true;
-            localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
             window.open(location, '_self').close();
           }
         });

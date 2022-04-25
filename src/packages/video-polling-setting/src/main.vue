@@ -130,12 +130,16 @@
               this.pollingVisible = false;
               if (
                 localStorage.getItem(`isVideoPolling_${this.$route.params.id}`) == 1 &&
-                this.roleName == role_name
+                this.$domainStore.state.roomBaseServer.watchInitData.join_info
+                  .third_party_user_id == account_id
               ) {
                 this.goPollingPage();
                 return;
               } else {
-                if (this.roleName == role_name) {
+                if (
+                  this.$domainStore.state.roomBaseServer.watchInitData.join_info
+                    .third_party_user_id == account_id
+                ) {
                   title = '已开启了视频轮巡功能';
                 } else {
                   title = `${this.$getRoleName(role_name)}已开启了视频轮巡功能`;
