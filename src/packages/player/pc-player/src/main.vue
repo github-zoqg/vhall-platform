@@ -546,21 +546,17 @@
       feeAuth(params) {
         let data = {
           webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query,
           ...params
         };
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
-              const queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}`
-                : '';
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives/watch/${this.roomBaseServer.state.watchInitData.webinar.id}${queryString}`;
+                `/lives/watch/${this.roomBaseServer.state.watchInitData.webinar.id}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();

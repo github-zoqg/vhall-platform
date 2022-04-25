@@ -390,10 +390,16 @@
 
       // 恢复播放
       replayPlay() {
+        console.log('点击了恢复播放------', this.playAbort);
         this.playAbort.forEach(stream => {
-          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
-            this.showPlayIcon = false;
-          });
+          this.interactiveServer
+            .setPlay({ streamId: stream.streamId })
+            .then(() => {
+              this.showPlayIcon = false;
+            })
+            .catch(e => {
+              console.error('恢复播放失败----', e);
+            });
         });
         this.playAbort = [];
       },

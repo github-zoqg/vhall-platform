@@ -104,6 +104,7 @@
     mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
         if (msg.data.type == 'live_over') {
+          this.isShowThirdStream = false;
           this.changePushImage(false);
           this.isShowThirdStream = false;
         }
