@@ -118,6 +118,7 @@
           });
           if (result && result.code === 200) {
             this.count = '';
+            this.$emit('settingCancel', this.way);
             this.close();
           } else {
             this.$message.warning(result.msg || '分组失败');
@@ -131,7 +132,6 @@
         this.close();
       },
       close() {
-        this.$emit('settingCancel', this.way);
         this.dialogVisible = false;
         this.$emit('update:show', false);
       }
