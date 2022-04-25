@@ -5,7 +5,7 @@ const domainVersion = require('./package.json').testDomainVersion;
 const htmlConfig = {
   cdnJs: {
     vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js',
-    MiddleDomain: `//cnstatic01.e.vhall.com/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
+    MiddleDomain: `//t-alistatic01.e.vhall.com/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
   }
 };
 
