@@ -217,6 +217,13 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
+    ],
+    emitClickOpenSignUpForm: [
+      // 报名表单
+      {
+        cuid: 'comSignUpForm',
+        method: 'openModal'
+      }
     ]
   },
   // 结束页面

@@ -59,7 +59,7 @@
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer, useChatServer } from 'middle-domain';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {
@@ -195,15 +195,29 @@
             authWeixinAjax(this.$route, payUrl, () => {});
           }
         } else {
-          params = {
-            channel: 'ALIPAY',
-            reward_amount: money,
-            service_code: 'H5_PAY',
-            describe: this.note
-              ? this.note
-              : `${this.$t('interact_tools.interact_tools_1047')}～～`,
-            room_id: this.localRoomInfo.roomId
-          };
+          //如果是企业微信环境,需要启动微信h5支付相关参数
+          if (isWechatCom()) {
+            params = {
+              channel: 'WEIXIN',
+              reward_amount: money,
+              service_code: 'H5_PAY',
+              describe: this.note
+                ? this.note
+                : `${this.$t('interact_tools.interact_tools_1047')}～～`,
+              room_id: this.localRoomInfo.roomId
+            };
+          } else {
+            // 正常的h5支付, 支付宝
+            params = {
+              channel: 'ALIPAY',
+              reward_amount: money,
+              service_code: 'H5_PAY',
+              describe: this.note
+                ? this.note
+                : `${this.$t('interact_tools.interact_tools_1047')}～～`,
+              room_id: this.localRoomInfo.roomId
+            };
+          }
         }
 
         if (payAuthStatus == 0) {
