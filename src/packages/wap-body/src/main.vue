@@ -88,6 +88,7 @@
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
       if (
@@ -99,6 +100,10 @@
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
+      }
+      if (this.isInGroup) {
+        let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
+        this.gobackHome(1, this.groupServer.state.groupInitData.name, { sender_id: report_data });
       }
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
