@@ -192,6 +192,13 @@
           this.selectedMenu = 'document';
         }
       }
+      if (this.groupServer.state.groupInitData.isInGroup) {
+        this.grouAlert(
+          `${this.$getRoleName(1)}开启了分组讨论，您将进入${
+            this.groupServer.state.groupInitData.name
+          }组参与讨论`
+        );
+      }
     },
     methods: {
       initEvent() {
