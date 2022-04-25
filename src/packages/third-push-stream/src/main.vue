@@ -91,15 +91,23 @@
     computed: {
       isThirdStream() {
         return this.roomBaseServer.state.isThirdStream;
+      },
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
+      roleName() {
+        return this.roomBaseServer.state.watchInitData.join_info.role_name;
       }
     },
     mounted() {
-      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+      if (
+        this.isThirdStream &&
+        this.roomBaseServer.state.watchInitData.webinar.type == 1 &&
+        this.roleName == 1
+      ) {
         this.isShowThirdStream = true;
         this.changePushImage(true);
       }
       this.msgServer.$onMsg('ROOM_MSG', msg => {
-        if (msg.data.type == 'live_over') {
+        if (msg.data.type == 'live_over' && this.roleName == 1) {
           this.isShowThirdStream = false;
           this.changePushImage(false);
         }
