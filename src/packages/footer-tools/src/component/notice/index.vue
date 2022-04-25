@@ -22,6 +22,7 @@
           </li>
         </ul>
       </div>
+      <div class="container-data__shadow"></div>
       <div class="container-close">
         <i class="vh-iconfont vh-line-close" @click="closeNoticeList"></i>
       </div>
@@ -59,6 +60,9 @@
       this.groupServer = useGroupServer();
     },
     created() {
+      this.$on('notice_panel_close', result => {
+        this.isShowNotice = result;
+      });
       this.getNoticeInfo();
     },
     mounted() {
@@ -102,6 +106,7 @@
       },
       getNoticeHistoryList() {
         this.isShowNotice = true;
+        this.$emit('notice_panel_status', true);
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
@@ -128,6 +133,7 @@
           limit: 10,
           pageNum: 1
         };
+        this.$emit('notice_panel_status', false);
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -176,8 +182,8 @@
     }
     &_container {
       position: absolute;
-      right: -48px;
-      bottom: 50px;
+      right: -32px;
+      bottom: 64px;
       z-index: 12;
       width: 492px;
       height: 382px;
@@ -188,8 +194,8 @@
         position: absolute;
         top: 108px;
         left: 60px;
-        width: 352px;
-        max-height: 267px;
+        width: 355px;
+        max-height: 254px;
         padding-right: 20px;
         overflow: auto;
         color: @font-light-normal;
@@ -242,6 +248,24 @@
             border-radius: 2px;
           }
         }
+        &::-webkit-scrollbar {
+          /*滚动条*/
+          width: 6px;
+          background: transparent !important;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          height: 50px;
+          border-radius: 10px;
+          background: #cccccc !important;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent !important;
+        }
+      }
+      .container-data__shadow {
+        height: 8px;
+        box-shadow: 0 8px 0 rgb(51 51 51 / 24%), 0 2px 0 rgb(0 0 0 / 5%);
       }
       .container-close {
         position: absolute;
@@ -249,8 +273,9 @@
         right: 75px;
         cursor: pointer;
         .vh-iconfont {
-          font-size: 12px;
-          color: @font-error;
+          font-size: 16px;
+          color: #666666;
+          color: @font-light-second;
         }
       }
     }
