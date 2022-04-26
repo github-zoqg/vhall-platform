@@ -84,11 +84,18 @@
         popHeight: '60%',
         money: '',
         btnMoney: '', // 选中按钮上面的金额
-        note: '',
-        btnTxt: isWechat()
-          ? this.$t('interact_tools.interact_tools_1049')
-          : this.$t('interact_tools.interact_tools_1069')
+        note: ''
       };
+    },
+    computed: {
+      // 支付按钮文案
+      btnTxt() {
+        if (isWechat() || isWechatCom()) {
+          return this.$t('interact_tools.interact_tools_1049');
+        } else {
+          return this.$t('interact_tools.interact_tools_1069');
+        }
+      }
     },
     mounted() {
       this.chatServer = useChatServer();
@@ -319,8 +326,6 @@
     .title {
       text-align: center;
       font-size: 30px;
-      font-family: PingFangSC;
-      font-weight: 400;
       color: rgba(68, 68, 68, 1);
       margin: 30px 0px;
     }
@@ -333,10 +338,10 @@
         text-align: center;
         display: inline-block;
         height: 80px;
-        line-height: 84px;
+        line-height: 78px;
         color: #444444;
         border-radius: 8px;
-        border: 1px solid #979797;
+        border: 1px solid #d4d4d4;
         font-size: 36px;
         &.active {
           color: white;
@@ -346,65 +351,53 @@
         }
       }
     }
-    .otherMoney {
-      margin: 30px 0;
+
+    .otherMoney,
+    .notes {
+      margin: 30px;
       padding: 0 30px;
-      display: flex;
-      font-size: 30px;
-      font-family: PingFangSC;
-      font-weight: 400;
-      color: rgba(68, 68, 68, 1);
       height: 90px;
+      display: flex;
+      color: rgba(68, 68, 68, 1);
       justify-content: space-between;
+      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      font-size: 30px;
       > div {
-        height: 100%;
-        flex-grow: 1;
         input {
           width: 100%;
           height: 100%;
-          // padding: 20px 0 20px 20px;
-          border-radius: 8px;
-          border: 1px solid #979797;
           line-height: normal;
-          padding-left: 20px;
         }
-        input[type='number']::-webkit-input-placeholder {
+        input[type='number']::-webkit-input-placeholder,
+        input[type='text']::-webkit-input-placeholder {
           color: #a0a0a0;
-          font-family: PingFangSC;
-          font-weight: 400;
           font-size: 30px;
         }
       }
     }
+
+    .otherMoney {
+      > div {
+        height: 100%;
+        flex-grow: 1;
+      }
+    }
     .notes {
-      padding: 0 30px;
-      font-size: 30px;
-      font-family: PingFangSC;
-      font-weight: 400;
-      height: 90px;
-      color: rgba(68, 68, 68, 1);
       margin-bottom: 170px;
       > div {
         height: 100%;
+        width: 100%;
         position: relative;
         input {
-          width: 100%;
-          height: 100%;
-          border-radius: 8px;
-          border: 1px solid #979797;
-          line-height: normal;
-          padding-left: 20px;
-        }
-        input[type='text']::-webkit-input-placeholder {
-          color: #a0a0a0;
-          font-family: PingFangSC;
-          font-weight: 400;
-          font-size: 30px;
+          padding-right: 120px;
         }
         .text-limit {
           position: absolute;
-          top: 30px;
+          line-height: 88px;
+          top: 0px;
           right: 20px;
+          font-size: 30px;
         }
       }
       .van-cell__value::v-deep {
