@@ -256,7 +256,7 @@
       .vmp-polling-stream-remote__shadow-box {
         display: flex;
         height: 24px;
-        bottom: 24px;
+        bottom: 22px;
         flex-direction: row;
         top: auto;
         background: rgba(0, 0, 0, 0);
@@ -268,14 +268,13 @@
         }
       }
       .vmp-polling-stream__bottom {
-        background: none;
         padding: 0 25px;
-        bottom: 19px;
       }
     }
     .vmp-polling-stream-remote__container {
       width: 100%;
       height: 100%;
+      background-color: #1a1a1a;
     }
 
     // 网络异常占位图
@@ -305,10 +304,10 @@
 
     .vmp-polling-stream__bottom {
       width: 100%;
-      height: 24px;
-      font-size: 12px;
-      line-height: 24px;
-      color: #ffffff;
+      height: 70px;
+      font-size: 14px;
+      line-height: 70px;
+      color: #e6e6e6;
       box-sizing: border-box;
       padding: 0 6px;
       position: absolute;
@@ -324,12 +323,14 @@
       }
       &-signal {
         float: right;
-        font-size: 12px;
+        font-size: 14px;
         margin-left: 5px;
-        margin-top: 4px;
         background-size: contain;
-        height: 16px;
+        height: 70px;
+        line-height: 70px;
         width: 16px;
+        background-position: center;
+        background-repeat: no-repeat;
         background-image: url(./img/network0.png);
         &__0 {
           background-image: url(./img/network0.png);
