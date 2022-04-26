@@ -26,7 +26,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, replaceWithRules } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpViewRestrictionWap',
@@ -60,10 +60,15 @@
               let statement_content = '';
               if (data.statement_status && Array.isArray(data.statement_info)) {
                 statement_content = data.statement_content;
+                const rules = [];
                 data.statement_info.forEach(statement => {
                   const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
-                  statement_content = statement_content.replace(statement.title, txtHtml);
+                  rules.push({
+                    before: statement.title,
+                    after: txtHtml
+                  });
                 });
+                statement_content = replaceWithRules(statement_content, rules);
               }
               this.agreementInfo = {
                 statement_content,
@@ -140,19 +145,13 @@
     font-size: 36px;
     font-weight: 500;
     color: #1a1a1a;
-    // word-break: break-all;
-    // word-wrap: break-word;
-    // padding-right: 56px;
     margin-bottom: 40px;
     text-align: center;
-    padding: 0 56px;
   }
   .scroll-content {
     max-height: 540px;
     margin-bottom: 24px;
     overflow-y: auto;
-    // word-break: break-all;
-    // word-wrap: break-word;
     padding: 0 56px;
   }
   .restriction-content {

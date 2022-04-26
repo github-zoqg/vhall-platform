@@ -21,7 +21,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, replaceWithRules } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpViewRestriction',
@@ -75,10 +75,15 @@
               let statement_content = '';
               if (data.statement_status && Array.isArray(data.statement_info)) {
                 statement_content = data.statement_content;
+                const rules = [];
                 data.statement_info.forEach(statement => {
                   const txtHtml = `<a class="law-link" href="${statement.link}">${statement.title}</a>`;
-                  statement_content = statement_content.replace(statement.title, txtHtml);
+                  rules.push({
+                    before: statement.title,
+                    after: txtHtml
+                  });
                 });
+                statement_content = replaceWithRules(statement_content, rules);
               }
               this.agreementInfo = {
                 statement_content,
