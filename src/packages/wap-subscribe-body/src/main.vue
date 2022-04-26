@@ -98,7 +98,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import authBox from './components/confirm.vue';
   export default {
@@ -364,12 +364,13 @@
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
           return;
         }
+
         if (isWechat()) {
           // 微信正常授权过
           if (open_id) {
             params = {
               webinar_id: this.webinarId,
-              type: 2,
+              type: 2, // 1-支付宝，2-微信
               service_code: 'JSAPI',
               code: open_id
             };
@@ -380,17 +381,32 @@
             authWeixinAjax(this.$route, payUrl, () => {});
           }
         } else {
-          params = {
-            webinar_id: this.webinarId,
-            type: 1,
-            service_code: 'H5_PAY',
-            user_id: userId,
-            show_url:
-              window.location.origin +
-              process.env.VUE_APP_ROUTER_BASE_URL +
-              `/lives/watch/${this.webinarId}`
-          };
+          //如果是企业微信环境
+          if (isWechatCom()) {
+            params = {
+              webinar_id: this.webinarId,
+              type: 2, //1-支付宝，2-微信
+              service_code: 'H5_PAY', //支付方式 H5_PAY JSAPI
+              user_id: userId,
+              show_url:
+                window.location.origin +
+                process.env.VUE_APP_ROUTER_BASE_URL +
+                `/lives/watch/${this.webinarId}`
+            };
+          } else {
+            params = {
+              webinar_id: this.webinarId,
+              type: 1,
+              service_code: 'H5_PAY',
+              user_id: userId,
+              show_url:
+                window.location.origin +
+                process.env.VUE_APP_ROUTER_BASE_URL +
+                `/lives/watch/${this.webinarId}`
+            };
+          }
         }
+
         if (payAuthStatus == 0) {
           this.newHandlePay(params);
         }
