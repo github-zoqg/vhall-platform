@@ -85,6 +85,7 @@
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
           this.goWatchPage(clientType);
+          return;
         }
         await subscribeState();
         bindWeiXin();
