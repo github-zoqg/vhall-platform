@@ -34,6 +34,7 @@
           <div
             class="vmp-video-polling__stream-list"
             :class="`vmp-video-polling__stream-list__${layoutLevel}`"
+            v-if="pollingList.length"
           >
             <div
               class="vmp-video-polling__stream-container"
@@ -43,6 +44,12 @@
               <div class="vmp-video-polling__stream-container-box">
                 <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
               </div>
+            </div>
+          </div>
+          <div v-else class="vmp-video-polling__stream-null">
+            <div class="polling-null">
+              <span class="polling_img"><img src="./img/polling_null@2x.png" alt="" /></span>
+              <p class="polling_text">暂无人轮巡</p>
             </div>
           </div>
         </div>
@@ -225,7 +232,7 @@
         }
         this.nextTimer = setInterval(() => {
           this.nextTime--;
-          if (this.nextTime == 0) {
+          if (this.nextTime <= 0) {
             this.nextTime = 10;
             clearInterval(this.nextTimer);
             return false;
@@ -242,7 +249,11 @@
         if (this.isPausedPolling) {
           clearInterval(this.countTimer);
         } else {
-          this.counterTime(this.minute, this.second);
+          if (this.minute == 0 && this.second == 0) {
+            this.changeTime();
+          } else {
+            this.counterTime(this.minute, this.second);
+          }
         }
       },
       counterTime(minute, second) {
@@ -403,6 +414,32 @@
         flex: 1;
         height: 100%;
         overflow: auto;
+      }
+      .vmp-video-polling__stream-null {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .polling-null {
+          .polling_img {
+            display: inline-block;
+            width: 220px;
+            height: 100px;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: scale-down;
+            }
+          }
+          .polling_text {
+            text-align: center;
+            margin-top: 20px;
+            line-height: 22px;
+            font-size: 16px;
+            color: #999;
+          }
+        }
       }
       .vmp-video-polling__body-stream {
         flex: 1;
