@@ -1,4 +1,4 @@
-## 插播流组件
+## 插播列表组件
 
 用于 pc 发起端、pc 观看端，发起以及订阅插播流。
 
@@ -25,3 +25,15 @@
 - 描述: 打开插播文件列表 dialog
 - 参数: 无
 - 示例代码：`window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'openInsertFileDialog'))`
+
+### 后端接口
+
+1. 获取插播文件列表
+
+- 接口地址：/v3/webinars/waiting-file/get-list
+- yapi 地址：http://yapi.vhall.domain/project/99/interface/api/41722
+
+2. 删除插播文件
+
+- 接口地址：/v3/webinars/waiting-file/get-list
+- yapi 地址：http://yapi.vhall.domain/project/99/interface/api/41722

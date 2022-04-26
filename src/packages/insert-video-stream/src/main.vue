@@ -10,12 +10,13 @@
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__is-embed': isEmbed,
-      'vmp-insert-stream__has-stream-list': hasStreamList
+      'vmp-insert-stream__has-stream-list': hasStreamList,
+      'vmp-insert-stream__is-watch-full-screen': isWatch && isFullScreen
     }"
   >
     <div class="vmp-insert-stream-mask">
       <p>
-        <span>视图</span>
+        <span class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
           content="切换"
           placement="top"
@@ -946,6 +947,18 @@
     }
     &__has-stream-list {
       top: 80px;
+    }
+    &__is-watch-full-screen {
+      .vmp-insert-stream-mask {
+        height: 25px;
+        bottom: 16px;
+        top: auto;
+        opacity: 1;
+        background: none;
+      }
+      .vmp-insert-stream-mask__label {
+        display: none;
+      }
     }
     .vmp-insert-local-stream {
       position: absolute;

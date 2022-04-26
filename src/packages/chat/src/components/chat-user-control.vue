@@ -11,7 +11,7 @@
             ? 'vmp-chat-user-control__item disabled'
             : 'vmp-chat-user-control__item'
         "
-        @click="atUser(accountId)"
+        @click="atUser(count)"
       >
         <i></i>
         <span>@TA</span>

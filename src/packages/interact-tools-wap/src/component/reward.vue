@@ -106,7 +106,7 @@
         console.log('收到打赏成功消息', msg, this.webinarData.join_info.third_party_user_id);
         const data = {
           avatar: msg.data.rewarder_avatar,
-          nickname:
+          nickName:
             msg.data.rewarder_nickname.length > 8
               ? msg.data.rewarder_nickname.substr(0, 8) + '...'
               : msg.data.rewarder_nickname,
@@ -117,8 +117,8 @@
               : this.$t('chat.chat_1037'),
             num: msg.data.reward_amount
           },
-          sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
-          roleName: this.roleName,
+          sendId: this.webinarData.join_info.third_party_user_id,
+          // roleName: this.roleName,
           interactToolsStatus: true
         };
         this.chatServer.addChatToList(data);
@@ -312,6 +312,7 @@
     }
     ul {
       display: flex;
+      box-sizing: border-box;
       padding: 0 30px;
       justify-content: space-between;
       li {
@@ -322,6 +323,7 @@
         line-height: 84px;
         color: #444444;
         border-radius: 8px;
+        box-sizing: border-box;
         border: 1px solid #979797;
         font-size: 36px;
         &.active {
@@ -347,7 +349,7 @@
         flex-grow: 1;
         input {
           width: 100%;
-          height: 100%;
+          height: 99%;
           // padding: 20px 0 20px 20px;
           border-radius: 8px;
           border: 1px solid #979797;
@@ -367,7 +369,7 @@
       font-size: 30px;
       font-family: PingFangSC;
       font-weight: 400;
-      height: 90px;
+      height: 91px;
       color: rgba(68, 68, 68, 1);
       margin-bottom: 170px;
       > div {
@@ -380,6 +382,7 @@
           border: 1px solid #979797;
           line-height: normal;
           padding-left: 20px;
+          padding-right: 120px;
         }
         input[type='text']::-webkit-input-placeholder {
           color: #a0a0a0;

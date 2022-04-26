@@ -18,10 +18,14 @@
             !['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localSpeaker.accountId"
+        v-show="localSpeaker.accountId || isStreamYun"
       >
         <!-- 非云导播活动 -->
-        <vmp-air-container :oneself="true" :cuid="childrenCom[0]" v-if="false"></vmp-air-container>
+        <vmp-air-container
+          :oneself="true"
+          :cuid="childrenCom[0]"
+          v-if="!isStreamYun"
+        ></vmp-air-container>
         <!-- 云导播活动 -->
         <vmp-air-container :oneself="true" :cuid="childrenCom[1]" v-else></vmp-air-container>
       </div>
@@ -203,6 +207,9 @@
           !this.isInGroup &&
           !this.isShowMainScreen
         );
+      },
+      isStreamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
 
@@ -221,6 +228,7 @@
     },
 
     mounted() {
+      console.log(this.localSpeaker, 'localSpeaker');
       // 计算一行最多放几个
       this.remoteMaxLength = parseInt(this.$refs.streamList.offsetWidth / 142);
 
@@ -276,8 +284,12 @@
           });
         }
         // 接收设为主讲人消息
+        // 云导播不提示 is_director==1
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          if (this.joinInfo.role_name == 1) {
+          if (
+            this.joinInfo.role_name == 1 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director != 1
+          ) {
             const mainScreenSpeaker = this.speakerList.find(
               speaker => speaker.accountId == msg.data.room_join_id
             );

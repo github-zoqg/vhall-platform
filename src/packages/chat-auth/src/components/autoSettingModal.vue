@@ -103,26 +103,6 @@
 
 <style lang="less">
   .vmp-auto-setting-modal {
-    //.el-dialog__header {
-    //  position: relative;
-    //  height: 40px;
-    //  padding: 0 20px;
-    //  line-height: 40px;
-    //  border-radius: 4px 4px 0 0;
-    //  background-color: #fb3a32;
-    //}
-    //.el-dialog__title {
-    //  font-size: 16px;
-    //  color: #333;
-    //}
-    //.el-dialog__headerbtn {
-    //  top: 50%;
-    //  right: 15px;
-    //  transform: translateY(-50%);
-    //}
-    //.dialog__close {
-    //  font-size: 20px;
-    //}
     .el-dialog__body {
       padding-bottom: 0;
     }
@@ -133,8 +113,6 @@
       color: #1a1a1a;
     }
     .auto-chat-main {
-      //padding-top: 10px;
-      //margin: 0 10px;
       .el-textarea__inner {
         padding: 10px;
       }
@@ -149,9 +127,6 @@
         }
       }
       .auto-radio {
-        // border-top: solid 1px $color-bd;
-        //margin-top: 4px;
-        //padding: 10px 0 20px 0;
         .auto-radio-title {
           line-height: 30px;
         }

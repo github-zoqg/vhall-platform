@@ -1,5 +1,4 @@
 /**
-import vm from '../../../src/packages/chat/src/js/Events';
  * Created by yangxy on 2022/01/07.
  * 自定义webpack插件
  * 因为项目编译后的文件需要按照我们约定的方式通过jenkens发布，这会导致 路由及部分资源 路径指向不正确。

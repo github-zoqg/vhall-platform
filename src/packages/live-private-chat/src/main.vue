@@ -169,13 +169,7 @@
         //图片上传地址
         actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
         //私聊群组列表
-        chatGroupList: [
-          // {
-          //   id: 0,
-          //   type: 2,
-          //   chat_name: '主办方群聊'
-          // }
-        ],
+        chatGroupList: [],
         //当前选中的私聊群组的index
         activeGroupIndex: -1,
         //聊天输入框的值
@@ -241,7 +235,6 @@
       },
       //打开模态窗
       async openModal() {
-        console.log('收到打开窗口的信令');
         await this.getPrivateContactList();
         this.visible = true;
         this.activeGroupIndex = 0;
@@ -376,11 +369,9 @@
       //选中表情
       emojiInput(value) {
         const _this = this;
-        console.log(value, '选中了表情------------------');
         this.$nextTick(() => {
           _this.inputText += value;
         });
-        console.log(this.inputText);
       },
       //发送消息
       sendMessage() {
@@ -403,15 +394,15 @@
           return;
         }
 
-        const curmsg = useChatServer().createCurMsg();
+        const currentMsg = useChatServer().createCurMsg();
         const target = this.chatGroupList[this.activeGroupIndex].account_id;
-        curmsg.setTarget(target);
+        currentMsg.setTarget(target);
         //将文本消息加入消息体
-        curmsg.setText(this.inputText);
+        currentMsg.setText(this.inputText);
         //将图片消息加入消息体
-        curmsg.setImge(this.imgList);
+        currentMsg.setImage(this.imgList);
         //发送消息
-        useChatServer().sendMsg(curmsg);
+        useChatServer().sendMsg(currentMsg);
         //清除发送后的消息
         useChatServer().clearCurMsg();
         this.imgList.length = 0;
@@ -443,7 +434,6 @@
     }
     .el-dialog__title {
       font-size: 16px;
-      //color: #333;
       color: #fff;
     }
 
@@ -485,7 +475,6 @@
           }
         }
         &__group-avatar_img {
-          // display: inline-block;
           width: 30px;
           height: 30px;
           border-radius: 50%;

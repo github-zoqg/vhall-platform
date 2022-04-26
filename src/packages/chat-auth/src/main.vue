@@ -164,6 +164,7 @@
   import autoSettingModal from './components/autoSettingModal';
   import authTable from './components/authTable';
   import { useChatAuthServer, useMsgServer } from 'middle-domain';
+  import { setRequestBody, setRequestHeaders } from 'middle-domain';
   export default {
     name: 'VmpChatAuth',
     components: {
@@ -398,6 +399,27 @@
           params.live_token = params.liveT;
         }
 
+        if (!params.live_token && params.assistant_token) {
+          if (location.search.includes('token_type=')) {
+            // 1: livetoken   0:token
+            if (params.token_type == 1) {
+              setRequestBody({
+                live_token: params.assistant_token
+              });
+            } else {
+              setRequestHeaders({
+                token: params.assistant_token
+              });
+            }
+          }
+        }
+
+        if (params.live_token) {
+          setRequestBody({
+            live_token: params.live_token
+          });
+        }
+
         return this.chatAuthServer
           .initRoomInfo(params)
           .then(res => {
@@ -479,7 +501,6 @@
           ...this.$domainStore.state.chatAuthServer.baseChanelInfo,
           switch: this.enableChatAuth
         };
-        console.log(params);
         this.chatAuthServer
           .toggleChatAuthStatus(params)
           .then(res => {

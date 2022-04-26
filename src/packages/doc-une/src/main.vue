@@ -6,6 +6,7 @@
     :class="[
       { 'is-watch': isWatch },
       `vmp-doc-une--${displayMode}`,
+      { 'vmp-doc-une--embed': isEmbed },
       { 'has-stream-list': hasStreamList },
       { 'no-delay-layout': isUseNoDelayLayout }
     ]"
@@ -29,7 +30,7 @@
     <!-- 文档白板内容区 -->
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
-        <div>
+        <div style="border: none">
           <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
@@ -88,7 +89,7 @@
         ></li>
         <li
           data-value="move"
-          :title="$t('doc.doc_1007')"
+          :title="canMove ? $t('doc.doc_1028') : $t('doc.doc_1007')"
           class="doc-pagebar__opt vh-saas-iconfont vh-saas-line-drag doc-pagebar__opt--move"
           :class="{ selected: canMove }"
         ></li>
@@ -107,22 +108,24 @@
       </ul>
 
       <!-- 文档缩略图 -->
-      <ul
-        class="vmp-doc-thumbnailbar"
-        @click="handleThumbnail"
-        v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
-      >
-        <li
-          class="doc-thumbnailbar__opt"
-          v-for="(item, index) in docServer.state.thumbnailList"
-          :key="'thum' + index"
-          :data-value="index"
-          :class="{ selected: pageNum - 1 === index }"
+      <transition name="el-fade-in-linear">
+        <ul
+          class="vmp-doc-thumbnailbar"
+          @click="handleThumbnail"
+          v-show="currentType !== 'board' && webinarMode != 5 && thumbnailShow"
         >
-          <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
-          <img :src="item" />
-        </li>
-      </ul>
+          <li
+            class="doc-thumbnailbar__opt"
+            v-for="(item, index) in docServer.state.thumbnailList"
+            :key="'thum' + index"
+            :data-value="index"
+            :class="{ selected: pageNum - 1 === index }"
+          >
+            <span class="doc-thumbnailbar-seq">{{ index + 1 }}</span>
+            <img :src="item" />
+          </li>
+        </ul>
+      </transition>
     </div>
 
     <!-- 文档加载时的遮罩和进度,观看端才用 -->
@@ -171,13 +174,19 @@
         keepAspectRatio: true, //保持纵横比
         thumbnailShow: false, // 文档缩略是否显示
         hasStreamList: false, // 是否展示流列表
-        canMove: false //文档能否拖拽
+        canMove: false, //文档能否拖拽
+        rebroadcastStartTimer: null,
+        rebroadcastStopTimer: null
       };
     },
     computed: {
+      // 是不是单视频嵌入
       isEmbedVideo() {
-        // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
@@ -238,10 +247,11 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
-      // 角色
+      // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
+      // 是否在屏幕共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
@@ -264,18 +274,9 @@
           } else {
             return false;
           }
-          // return (
-          //   this.docServer.state.switchStatus ||
-          //   this.groupServer.state.isInGroup ||
-          //   this.hasDocPermission
-          // );
         } else {
           if (this.isShareScreen) {
             return this.roleName == 3;
-
-            // return (
-            //   (this.docServer.state.currentCid && !this.micServer.state.isSpeakOn)
-            // );
           } else {
             return true;
           }
@@ -364,6 +365,7 @@
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
       },
+      // 当前用户的上麦信息
       localSpeaker() {
         return (
           this.$domainStore.state.micServer.speakerList.find(
@@ -371,8 +373,8 @@
           ) || {}
         );
       },
+      // 1：无延迟直播
       isNoDelay() {
-        // 1：无延迟直播
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
       // 互动无延迟 未上麦观众是否使用类似旁路布局
@@ -401,8 +403,6 @@
             this.docServer.state.isChannelChanged = false;
             // 初始化事件
             this.initEvents();
-            // 清空
-            // this.docServer.resetContainer();
             // 恢复上一次的文档数据;
             this.recoverLastDocs();
           }
@@ -441,7 +441,7 @@
     },
     methods: {
       /**
-       * 全屏
+       * 全屏切换
        */
       fullscreen() {
         screenfull.toggle(this.$refs.docWrapper);
@@ -459,6 +459,11 @@
           }
         }
       },
+      /**
+       * 设置文档的展示模式
+       * @param {String} mode
+       * normal-常规模式, mini-小屏模式, fullscreen-全屏模式
+       */
       async setDisplayMode(mode) {
         console.log('[doc] setDisplayMode:', mode);
         if (!['normal', 'mini', 'fullscreen'].includes(mode)) {
@@ -485,7 +490,6 @@
         }
         await this.$nextTick();
         // PC端文档大小的改变，会自动触发 erd.listenTo 事件;
-        console.log('----resize-----');
         this.resize();
       },
       /**
@@ -584,49 +588,57 @@
             }
           });
         }
-
-        useMsgServer().$onMsg('ROOM_MSG', msg => {
-          // 直播开始
-          if (msg.data.type === 'live_start') {
-            // 3-助理，4-嘉宾
-            if ([3, 4].includes(this.roleName)) {
-              this.recoverLastDocs();
-            }
-          }
-        });
-
+        // 直播开始
+        this.docServer.$on('live_start', this.liveStart);
         // 直播结束
-        useMsgServer().$on('live_over', () => {
-          console.log('[doc]---直播结束 live_over---');
-          // 设置观众不可见
-          this.docServer.state.switchStatus = false;
-          if (this.isWatch) {
-            useRoomBaseServer().setChangeElement('doc');
-          } else {
-            this.setDisplayMode('normal');
-            // 通知默认菜单和工具栏默认为文档
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
-            );
-          }
-          this.hasStreamList = false;
-        });
+        this.docServer.$on('live_over', this.liveOver);
 
         const reBroadcastServer = useRebroadcastServer();
         // 转播开始事件
         reBroadcastServer.$on('live_broadcast_start', () => {
-          this.docServer.setRole(VHDocSDK.RoleType.HOST);
-          this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
-          this.recoverLastDocs();
+          // 文档角色设置成观众
+          this.docServer.setRole(VHDocSDK.RoleType.SPECTATOR);
+          // 设置转播中
+          this.docServer.setRelay(true);
+          // 清除存在的定时器
+          if (this.rebroadcastStartTimer) {
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }
+          this.rebroadcastStartTimer = setTimeout(() => {
+            // 设置播放流模式为FLV模式
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+            this.recoverLastDocs();
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }, 1000);
         });
+
         // 转播结束事件
         reBroadcastServer.$on('live_broadcast_stop', () => {
-          // 如果当前人拥有直播间文档操作权限，设为 host 角色
-          if (this.hasDocPermission) {
-            this.docServer.setRole(VHDocSDK.RoleType.GUEST);
-            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+          // 设置非转播
+          this.docServer.setRelay(false);
+          if (this.rebroadcastStopTimer) {
+            clearTimeout(this.rebroadcastStopTimer);
+            this.rebroadcastStopTimer = null;
           }
-          this.recoverLastDocs();
+          this.rebroadcastStopTimer = setTimeout(() => {
+            // 重置状态
+            this.docServer.resetState();
+            // 设置文档角色 （观众不需要设置，观众的文档角色没有变化）
+            if (this.hasDocPermission) {
+              // 如果当前人拥有直播间文档操作权限，设为 HOST 角色
+              this.docServer.setRole(VHDocSDK.RoleType.HOST);
+            } else if (this.roleName == 3) {
+              // 助理
+              this.docServer.setRole(VHDocSDK.RoleType.ASSISTANT);
+            } else if (this.roleName == 4) {
+              // 嘉宾
+              this.docServer.setRole(VHDocSDK.RoleType.GUEST);
+            }
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+            this.recoverLastDocs();
+          }, 1000);
         });
 
         // 监控文档区域大小改变事件
@@ -753,14 +765,7 @@
        * @param switchStatus 观众可见：true/false
        */
       async demonstrate(docId, docType, switchStatus) {
-        console.log(
-          '[doc] 演示文档:docId=',
-          docId,
-          ';docType=',
-          docType,
-          '; switchStatu:',
-          switchStatus
-        );
+        console.log(`[doc] 演示文档:docId=${docId};docType=${docType};switchStatu:${switchStatus}`);
         this.docServer.setDocLoadComplete(false);
         this.docServer.setSwitchStatus(switchStatus);
 
@@ -815,21 +820,36 @@
               this.docServer.nextStep();
             }
             break;
+          // 放大、缩小、还原操作会自动开启可移动功能（sdk逻辑）
           // 放大
           case 'zoomIn':
             this.docServer.zoomIn();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 缩小
           case 'zoomOut':
             this.docServer.zoomOut();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 还原
           case 'zoomReset':
             this.docServer.zoomReset();
+            this.$refs.docToolbar.setBrush('move');
+            this.canMove = true;
             break;
           // 移动
           case 'move':
-            this.$refs.docToolbar.changeTool('move');
+            if (this.canMove) {
+              if (this.hasDocPermission) {
+                this.$refs.docToolbar.changeTool(this.$refs.docToolbar.lastEditBrush);
+              } else {
+                this.$refs.docToolbar.changeTool('');
+              }
+            } else {
+              this.$refs.docToolbar.changeTool('move');
+            }
             break;
           // 全屏
           case 'fullscreen':
@@ -850,7 +870,6 @@
        * 重新设置当前画笔
        */
       resetCurrentBrush() {
-        console.log('---resetCurrentBrush---');
         this.$refs.docToolbar.resetCurrentBrush();
       },
 
@@ -957,6 +976,28 @@
       // 文档不存在或已删除
       dispatchDocNotExit() {
         this.$message({ type: 'error', message: '文档不存在或已删除' });
+      },
+
+      // 直播开始
+      liveStart() {
+        // 3-助理，4-嘉宾
+        if ([3, 4].includes(this.roleName)) {
+          this.recoverLastDocs();
+        }
+      },
+
+      // 直播结束
+      liveOver() {
+        if (this.isWatch) {
+          useRoomBaseServer().setChangeElement('doc');
+        } else {
+          this.setDisplayMode('normal');
+          // 通知默认菜单和工具栏默认为文档
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitSwitchTo', ['document'])
+          );
+        }
+        this.hasStreamList = false;
       }
     },
     mounted() {
@@ -984,6 +1025,8 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_page_change', this.dispatchDocPageChange);
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
+      this.docServer.$off('live_start', this.liveStart);
+      this.docServer.$off('live_over', this.liveOver);
       window.removeEventListener('keydown', this.listenKeydown);
     }
   };
@@ -1074,6 +1117,12 @@
         position: absolute;
         transform: translate(-50%, -50%);
         overflow: visible !important;
+
+        // 不显示图片还未加载时的白边（设置border无效）
+        img[src=''],
+        img:not([src]) {
+          opacity: 0;
+        }
       }
     }
     .vmp-doc-pagebar {
@@ -1102,10 +1151,12 @@
         padding: 7px 10px;
         &:hover {
           color: #fb3a32;
+          cursor: pointer;
         }
 
         &.selected {
           color: #fc5659;
+          cursor: pointer;
         }
       }
     }
@@ -1116,7 +1167,7 @@
       bottom: 0;
       right: 0;
       width: 144px;
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1126,7 +1177,7 @@
         width: 6px;
         height: 6px;
         border-radius: 0;
-        background-color: #000 !important;
+        background-color: transparent;
       }
       &::-webkit-scrollbar-track {
         background-color: transparent;
@@ -1135,8 +1186,8 @@
       &::-webkit-scrollbar-thumb {
         height: 60px;
         border-radius: 10px;
-        border: 1px solid #333;
-        background: #333 !important;
+        border: 1px solid #666;
+        background: #666 !important;
       }
 
       li.doc-thumbnailbar__opt {
@@ -1229,8 +1280,10 @@
       width: calc(100% - 380px);
       height: auto;
       min-height: auto;
+      &.vmp-doc-une--embed {
+        width: calc(100% - 360px);
+      }
     }
-
     // 观看端结束演示按钮
     .end-demonstrate {
       position: absolute;

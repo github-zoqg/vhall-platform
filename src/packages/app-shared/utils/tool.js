@@ -94,7 +94,11 @@ const ua = navigator.userAgent.toLowerCase();
 
 // 是否微信
 export function isWechat() {
-  return ua.indexOf('micromessenger') > -1;
+  // return ua.indexOf('micromessenger') > -1; // 返回以前对微信环境的ua识别(阻止企业微信)
+  // return ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  console.log('isWechat 是否为微信', isWechat);
+  return isWechat;
 }
 // 是否qq浏览器
 export function isQQ() {
@@ -102,7 +106,10 @@ export function isQQ() {
 }
 // 是否企业微信
 export function isWechatCom() {
-  return ua.indexOf('wxwork') > -1;
+  // return ua.indexOf('wxwork') > -1;
+  const isWechatCom = ua.indexOf('wxwork') > -1;
+  console.log('isWechatCom 是否为企业微信', isWechatCom);
+  return isWechatCom;
 }
 
 // 是否移动端
@@ -117,20 +124,6 @@ export function getQueryString(name) {
   const r = window.location.search.substr(1).match(reg);
   if (r != null) return unescape(r[2]);
   return null;
-}
-
-/**
- * @description 区分浏览器类型 是微信还是普通浏览器
- * @returns null
- */
-export function browserType() {
-  const ua = window.navigator.userAgent.toLowerCase();
-  if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-    /* 是微信浏览器 */
-    return true;
-  } else {
-    return false;
-  }
 }
 
 // 返回四位版本数

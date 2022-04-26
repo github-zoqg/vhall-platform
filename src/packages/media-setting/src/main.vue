@@ -82,6 +82,19 @@
     >
       <main slot="content">{{ popAlert.text }}</main>
     </saas-alert>
+    <!--主持人设备禁用弹窗 -->
+    <saas-alert
+      :visible="hostAlertVisible"
+      @onClose="hostAlertVisible = false"
+      @onSubmit="handleCheck"
+      retry="检查设备"
+    >
+      <main slot="content">
+        因设备问题导致直播中断，请检查设备。
+        <br />
+        注意：如果没有可用设备，建议使用图片推流
+      </main>
+    </saas-alert>
   </section>
 </template>
 
@@ -143,13 +156,14 @@
         mediaState: this.mediaSettingServer.state,
         isShow: false, // 整体media-setting是否可见
         isConfirmVisible: false, // 确定框可视性
+        isRepublishMode: false, // 设备异常重推流
         selectedMenuItem: 'basic-setting',
         alertText: this.$t('setting.setting_1031'),
         popAlert: {
           text: this.$t('interact.interact_1011'),
-          visible: false,
-          confirm: true
-        }
+          visible: false
+        },
+        hostAlertVisible: false
       };
     },
     computed: {
@@ -167,7 +181,7 @@
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
-
+      const role = watchInitData.join_info?.role_name;
       // 绑定confirm对应的视图操作
       mediaSettingConfirm.onShow(text => {
         this.alertText = text;
@@ -177,7 +191,11 @@
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
         if (+msg.data.streamType !== 3) {
           // 非桌面共享
-          this.popAlert.visible = true;
+          if (role == 1) {
+            this.hostAlertVisible = true;
+          } else {
+            this.popAlert.visible = true;
+          }
         }
       });
     },
@@ -197,10 +215,19 @@
         this.reset();
       },
       /**
+       * 设备被禁用，重新检查设备
+       */
+      handleCheck() {
+        this.hostAlertVisible = false;
+        this.isRepublishMode = true;
+        this.showMediaSetting();
+      },
+      /**
        * 关闭弹窗
        */
       closeMediaSetting() {
         this.isShow = false;
+        this.isRepublishMode = false;
         this?.$refs['videoSetting']?.destroyStream();
         this?.$refs['audioOutSetting']?.pauseAudio();
       },
@@ -323,6 +350,8 @@
         const source = this._originCaptureState;
         let current = { ...this.mediaState };
 
+        if (this.isRepublishMode) current.isRepublishMode = true;
+
         const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
 
         return getDiffObject(source, current, { ignoreKeys });
@@ -438,30 +467,45 @@
           audioOutputDevices = []
         } = this.devices;
 
+        const getCurSelect = (devices, id) => {
+          const isExsit = devices.find(item => item.deviceId === id);
+          console.log('devices:', id, devices);
+          if (id && !isExsit) return '';
+
+          return id;
+        };
+
         // 视频
         if (videoInputDevices.length > 0) {
           const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
-          this.mediaState.video =
-            this.mediaState.video || sessionVideoId || videoInputDevices[0].deviceId;
+          const lastSelect = this.mediaState.video || sessionVideoId;
+          const curSelect = getCurSelect(videoInputDevices, lastSelect);
+          this.mediaState.video = curSelect || videoInputDevices[0].deviceId;
         } else {
+          this.mediaState.video = '';
           sessionStorage.removeItem('selectedVideoDeviceId');
         }
 
         // 麦克风
         if (audioInputDevices.length > 0) {
           const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
-          this.mediaState.audioInput =
-            this.mediaState.audioInput || sessionAudioId || audioInputDevices[0].deviceId;
+          const lastSelect = this.mediaState.audioInput || sessionAudioId;
+          const curSelect = getCurSelect(audioInputDevices, lastSelect);
+          this.mediaState.audioInput = curSelect || audioInputDevices[0].deviceId;
         } else {
+          this.mediaState.audioInput = '';
           sessionStorage.removeItem('selectedAudioDeviceId');
         }
 
         // 扬声器
         if (audioOutputDevices.length > 0) {
           const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
-          this.mediaState.audioOutput =
-            this.mediaState.audioOutput || sessionAudioOutputId || audioOutputDevices[0].deviceId;
+          const lastSelect = this.mediaState.audioOutput || sessionAudioOutputId;
+          const curSelect = getCurSelect(audioOutputDevices, lastSelect);
+
+          this.mediaState.audioOutput = curSelect || audioOutputDevices[0].deviceId;
         } else {
+          this.mediaState.audioOutput = '';
           sessionStorage.removeItem('selectedAudioOutputDeviceId');
         }
       }

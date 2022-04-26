@@ -9,7 +9,8 @@
 ```js
 ------------------------------------
 方法名：switchTo
-描述：切换到文档或白板
-参数：fileType: 文件类型，字符串， document-文档;board-白板
+描述：切换某个菜单
+参数：kind 菜单类型，字符串，具体包括：document-文档，board-白板，desktopShare-桌面共享，insertMedia-插播文件，
+    interactTool-互动工具，group-分组讨论，share-分享，exitGroup-退出小组
 ------------------------------------
 ```

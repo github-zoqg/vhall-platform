@@ -94,6 +94,12 @@ const routes = [
     component: () => import('../views/bind'),
     meta: { grayType: '' }
   },
+  {
+    path: '/lives/bindB/:id',
+    name: 'bind',
+    component: () => import('../views/bind'),
+    meta: { grayType: '' }
+  },
   // 独立报名表单
   // {
   //   path: '/lives/entryform/:id',
@@ -122,6 +128,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // Vue history模式 微信分享IOS无效解决办法---最终章
+  // if (to.path !== location.pathname) {
+  //   console.log('to.fullPath------->', to);
+  //   location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+  // }
   const res = await grayInit(to);
   if (res) {
     console.log('---grayInit---', res);

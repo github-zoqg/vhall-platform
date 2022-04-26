@@ -295,9 +295,7 @@
     updated() {
       //hack处理BsScroll不能滚动的问题
       this.$nextTick(() => {
-        if (this.$refs && this.$refs.scroll) {
-          this.$refs.scroll.refresh();
-        }
+        this.refresh();
       });
     },
     watch: {
@@ -431,6 +429,12 @@
       },
       //初始化房间消息回调监听
       listenEvents() {
+        //监听自定义消息
+        this.msgServer.$onMsg('CUSTOM_MSG', msg => {
+          //人员上下线消息丢失时，会收到这个消息
+          msg.data.type === 'reload_online_user_list' && this.updateOnlineUserList();
+        });
+
         //加入房间
         this.memberServer.$on('JOIN', this.handleJoinRoom);
 
@@ -440,8 +444,11 @@
         //直播结束
         this.memberServer.$on('live_over', this.handleEndLive);
 
-        //用户申请上麦
+        //用户申请上麦(提示小红点)
         this.memberServer.$on('UPDATE_TAB_TIPS', this.handleUpdateTabTips);
+
+        //用户申请上麦
+        this.memberServer.$on('vrtc_connect_apply', this.handleConnectApply);
 
         //用户上麦成功
         this.memberServer.$on('vrtc_connect_success', this.handleConnectSuccess);
@@ -456,16 +463,13 @@
         this.memberServer.$on('endLive', this.handleEndLive);
 
         //取消踢出
-        this.memberServer.$on('room_kickout_cancel', this.handleCancelKickedOut);
-
-        //用户被邀请演示-同意演示
-        this.memberServer.$on('vrtc_connect_presentation_agree', this.handleUserAgreePresentation);
+        this.memberServer.$on('room_kickout_cancel', this.updateOnlineUserList);
 
         //开始讨论
-        this.memberServer.$on('group_switch_start', this.handleStartDiscussion);
+        this.memberServer.$on('group_switch_start', this.updateOnlineUserList);
 
         //组内人员变动
-        this.memberServer.$on('group_join_change', this.handleGroupJoinChange);
+        this.memberServer.$on('group_join_change', this.updateOnlineUserList);
 
         //切换频道
         this.memberServer.$on('GROUP_MSG_CREATED', this.updateOnlineUserList);
@@ -496,8 +500,10 @@
         this.memberServer.$off('LEFT', this.handleLeaveRoom);
         //直播结束
         this.memberServer.$off('live_over', this.handleEndLive);
-        //用户申请上麦
+        //用户申请上麦(提示小红点)
         this.memberServer.$off('UPDATE_TAB_TIPS', this.handleUpdateTabTips);
+        //用户申请上麦
+        this.memberServer.$off('vrtc_connect_apply', this.handleConnectApply);
         //移除用户上麦成功
         this.memberServer.$off('vrtc_connect_success', this.handleConnectSuccess);
         //用户拒绝上麦邀请
@@ -507,13 +513,11 @@
         //房间消息结束直播
         this.memberServer.$off('endLive', this.handleEndLive);
         //取消踢出
-        this.memberServer.$off('room_kickout_cancel', this.handleCancelKickedOut);
-        //用户被邀请演示-同意演示
-        this.memberServer.$off('vrtc_connect_presentation_agree', this.handleUserAgreePresentation);
+        this.memberServer.$off('room_kickout_cancel', this.updateOnlineUserList);
         //开始讨论
-        this.memberServer.$off('group_switch_start', this.handleStartDiscussion);
+        this.memberServer.$off('group_switch_start', this.updateOnlineUserList);
         //组内人员变动
-        this.memberServer.$off('group_join_change', this.handleGroupJoinChange);
+        this.memberServer.$off('group_join_change', this.updateOnlineUserList);
         //  结束讨论
         this.memberServer.$off('GROUP_SWITCH_END', this.updateOnlineUserList);
 
@@ -561,6 +565,14 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitTabTips', { visible: visible, type: 8 })
         );
+      },
+      //用户申请上麦
+      handleConnectApply(msg) {
+        if (this.roleName == 1 && msg.data.room_role == 4) {
+          this.$message.success(
+            `收到 ${this.$getRoleName(4)} [ ${msg.data.nick_name || msg.data.nickname} ] 的上麦申请`
+          );
+        }
       },
       //用户上麦成功
       handleConnectSuccess(msg) {
@@ -610,29 +622,11 @@
           })
         });
       },
-      //取消踢出
-      handleCancelKickedOut() {
-        this.updateOnlineUserList();
-      },
-      //用户接受演示邀请
-      handleUserAgreePresentation(msg) {
-        // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
-        // 已和产品确认，接受邀请不提示
-        // if (msg.data.extra_params == this.userId) {
-        //   this.$message.success('对方已接受邀请');
-        // }
-      },
-      //开始讨论
-      handleStartDiscussion() {
-        this.updateOnlineUserList();
-      },
-      //组内人员变动
-      handleGroupJoinChange() {
-        this.updateOnlineUserList();
-      },
       //组长变更
       handleLeaderChange(msg) {
         console.log(msg);
+        //还原一下tab
+        this.tabIndex = 1;
         this.updateOnlineUserList();
       },
       //主持人进入、退出小组
@@ -643,7 +637,7 @@
       updateOnlineUserList: throttle(function () {
         this.pageConfig.page = 0;
         this.getOnlineUserList();
-      }, 1500),
+      }, 2000),
       //获取在线人员列表
       getOnlineUserList(pos) {
         const params = {
@@ -662,13 +656,9 @@
           .then(res => {
             if (res.code === 200) {
               this.$refs.scroll.finishPullUp();
-              this.$refs.scroll.refresh();
-              // this.onlineUsers = this.memberServer.state.onlineUsers || [];
               if (!res?.data?.list?.length) {
                 this.pageConfig.page--;
               }
-              //在线总人数
-              // this.totalNum = this.memberServer.state.totalNum;
             }
             if (![200, '200'].includes(res.code)) {
               this.pageConfig.page--;
@@ -676,6 +666,9 @@
           })
           .catch(() => {
             this.pageConfig.page--;
+          })
+          .finally(() => {
+            this.refresh();
           });
       },
       //刷新在线人数
@@ -932,7 +925,6 @@
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
-              console.log(res, 'presentation');
             })
             .catch(err => {
               this.$message.warning(err.msg);
@@ -1102,21 +1094,7 @@
       },
       //删除用户
       _deleteUser(accountId, list = [], key = '') {
-        // const index = list.findIndex(
-        //   item => ![null, void 0, ''].includes(accountId) && item.account_id === accountId
-        // );
-        //
-        // if (index !== -1) {
-        //   list.splice(index, 1);
-        //   this.memberServer.updateState(key, list);
-        // }
         this.memberServer._deleteUser(accountId, list);
-      },
-      //查找用户在数组的索引号
-      _getUserIndex(accountId, list) {
-        return list.findIndex(
-          item => item.account_id === accountId || item.accountId === accountId
-        );
       },
       //加载更多
       loadMore() {

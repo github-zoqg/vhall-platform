@@ -2,12 +2,18 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
-      <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="deviceStatus == 2">
+      <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
+      <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
-        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+        <div
+          v-if="liveStep == 1"
+          class="vmp-header-right_btn"
+          :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+          @click="handleStartClick"
+        >
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
         <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
@@ -87,7 +93,8 @@
     useInteractiveServer,
     useSubscribeServer,
     useSplitScreenServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    useRebroadcastServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -111,8 +118,7 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        },
-        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
+        }
       };
     },
     computed: {
@@ -144,6 +150,21 @@
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
+      isStreamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+      },
+      // 是否为第三方发起
+      isThirdStream() {
+        return this.roomBaseServer.state.isThirdStream;
+      },
+      // 设备状态
+      deviceStatus() {
+        return useMediaCheckServer().state.deviceInfo?.device_status;
+      },
+      // 云导播台是否有流
+      director_stream() {
+        return this.$domainStore.state.roomBaseServer.director_stream == 1;
       }
     },
     components: {
@@ -155,22 +176,35 @@
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.rebroadcastServer = useRebroadcastServer();
       this.initConfig();
       this.listenEvents();
     },
     mounted() {
-      if (this.deviceStatus == 2) {
+      /*
+       * 补充：第三方发起时，不在进行设备状态的相关提示
+       *    若助理，则无需进行提示，助理是不存在上麦的
+       */
+      if (this.deviceStatus == 2 && (!this.isThirdStream || this.roleName != 3)) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        this.liveStep = 2;
-        // 如果开启了分屏
-        if (this.splitScreenServer.state.isOpenSplitScreen) {
+        // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
+        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
+          this.liveStep = 3;
+        } else {
+          this.liveStep = 2;
+        }
+        // 如果开启了分屏 或者是 云导播
+        if (this.splitScreenServer.state.isOpenSplitScreen || this.isStreamYun) {
           this.handlePublishComplate();
         }
+      }
+      if (this.isStreamYun) {
+        this.roomBaseServer.getStreamStatus();
       }
     },
     methods: {
@@ -237,7 +271,6 @@
       async handleRecheck() {
         await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
-          this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
           );
@@ -369,9 +402,16 @@
       },
       // 开始直播/录制事件
       handleStartClick() {
+        // 如果是云导播活动 并且没有流
+        if (this.isStreamYun && !this.director_stream) return false;
         this.liveStep = 2;
-        // 派发推流事件
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        if (this.isThirdStream || this.isStreamYun) {
+          // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
+          this.handlePublishComplate();
+        } else {
+          // 派发推流事件
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        }
       },
       // 结束直播/录制
       handleEndClick() {
@@ -389,23 +429,29 @@
         const { watchInitData, interactToolStatus } = this.roomBaseServer.state;
 
         this.liveStep = 4;
+
+        // 如果正在开启转播
+        if (watchInitData.rebroadcast.id) {
+          // 先结束转播
+          await this.rebroadcastServer.stop({
+            webinar_id: watchInitData.webinar.id,
+            source_id: this.rebroadcastServer.state.sourceWebinarId
+          });
+        }
+
         const res = await this.roomBaseServer.endLive({
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
-        if (res.code == 200 && interactToolStatus.start_type == 4) {
-          // 如果是第三方推流直接生成回放
+        // 如果是第三方推流直接生成回放 云导播逻辑相同
+        if (res.code == 200 && (interactToolStatus.start_type == 4 || this.isStreamYun)) {
           this.handleSaveVodInLive();
           this.liveStep = 1;
-        } else {
-          // 如果不是第三方推流,派发结束直播事件,停止推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       // 录制页 点击结束录制
@@ -565,6 +611,10 @@
       padding: 0 10px;
       cursor: pointer;
       background-color: @bg-error-light;
+    }
+    .right_btn_dis {
+      background: #fc5659;
+      opacity: 0.5;
     }
     .vmp-header-right_duration {
       &-end {

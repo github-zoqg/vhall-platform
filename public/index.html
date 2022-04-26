@@ -26,6 +26,14 @@
 
     <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico" /> -->
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta
+      name="keywords"
+      content="微吼,微吼直播,在线直播,视频会议,远程培训,直播软件,直播,现场直播,网络直播,视频直播,网络教学平台,视频会议软件,在线教育平台,教育在线互动平台,网络视频直播平台,活动策划直播,多屏互动浏览"
+    />
+    <meta
+      name="description"
+      content="微吼，全球在线商务活动平台专业服务提供商，最大的网络直播平台；提供网络直播、在线教育和视频会议等服务，支持多屏互动浏览；租用热线:400-888-9970。"
+    />
     <!-- CDN预解析 -->
     <% if( htmlWebpackPlugin.options.dnsPrefetch && htmlWebpackPlugin.options.dnsPrefetch.open){ %>
     <% for (const dns of Object.values(htmlWebpackPlugin.options.dnsPrefetch.dns)) { %> <%if(dns){%>
@@ -55,6 +63,5 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <script src="<%= js %>"></script>
     <% } }%>
-    <script></script>
   </body>
 </html>

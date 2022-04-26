@@ -1,5 +1,11 @@
 ## 上麦弹窗组件
 
+- [上麦流程](http://wiki.vhallops.com/pages/viewpage.action?pageId=219611642)
+
+## 主要功能
+
+监听上麦邀请消息“vrtc_connect_invite”，开始倒计时 30s，若用户未上麦，则默认调用“拒绝上麦”方法。
+
 ### 输入 api(向其他组件发送的指令)
 
 | 方法名          | 参数 1 | 描述                                                                              | 代码块                                                                               |
