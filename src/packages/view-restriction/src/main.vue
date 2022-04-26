@@ -155,6 +155,12 @@
     background: rgba(0, 0, 0, 0.6);
     z-index: 10000;
     font-family: PingFangSC-Medium, PingFang SC;
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 6px;
+    }
   }
   .vmp-view-restriction-wrap {
     width: 600px;
