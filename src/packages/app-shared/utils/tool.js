@@ -4,7 +4,7 @@ import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
  * Created by yangxy on 2022/01/13.
  * 通用工具类
  */
-export const hasOwnProperty = function (obj, key) {
+export const hasOwnProperty = function(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 
@@ -13,7 +13,7 @@ export const hasOwnProperty = function (obj, key) {
  * @param {*} ms 毫秒数
  * @returns {Promise}
  */
-export const sleep = function (ms) {
+export const sleep = function(ms) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
@@ -22,7 +22,7 @@ export const sleep = function (ms) {
 //防抖
 export function debounce(fn, t = 300) {
   let lastTime;
-  return function () {
+  return function() {
     window.clearTimeout(lastTime);
     const [that, args] = [this, arguments];
     lastTime = window.setTimeout(() => {
@@ -35,13 +35,13 @@ export function debounce(fn, t = 300) {
 export function throttle(fn, t = 300) {
   let last;
   let timer;
-  return function () {
+  return function() {
     let th = this;
     let args = arguments;
     let now = +new Date();
     if (last && now - last < t) {
       window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
+      timer = window.setTimeout(function() {
         last = now;
         fn.apply(th, args);
       }, t);
@@ -206,25 +206,18 @@ export const replaceXss = htmltext => {
 };
 
 /**
- * @description 多次替换对一个问题做替换
+ * @description 多次替换对一个问题做替换(使用uuid作为占位符)
  * @param longText String 替换前文本
  * @param rules Array 替换前后的数据封装体
  * @returns string
  */
 export const replaceWithRules = (longText, rules = []) => {
-  let restText = longText;
-  let replaceText = '';
-  for (let i = 0; i < rules.length; i++) {
-    const rule = rules[i];
-    const idx = restText.indexOf(rule.before);
-    if (idx === -1) {
-      continue; // 如果当前没有
-    } else {
-      const splitIdx = idx + rule.before.length; // 切割的位置应该
-      const currentReplaceText = restText.substring(0, idx).concat(rule.after);
-      restText = restText.substring(splitIdx, restText.length);
-      replaceText = replaceText.concat(currentReplaceText);
-    }
-  }
-  return replaceText.concat(restText);
+  rules.forEach(rule => {
+    rule.tempSign = uuid() // 先替换为占位符
+    longText = longText.replace(rule.before, rule.tempSign)
+  })
+  rules.forEach(rule => {
+    longText = longText.replace(rule.tempSign, rule.after)
+  })
+  return longText
 };
