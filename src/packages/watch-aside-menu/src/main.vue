@@ -192,6 +192,14 @@
           this.selectedMenu = 'document';
         }
       }
+      if (this.groupServer.state.groupInitData.isInGroup) {
+        let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
+        this.grouAlert(
+          `${
+            report_data == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName
+          }开启了分组讨论，您将进入${this.groupServer.state.groupInitData.name}组参与讨论`
+        );
+      }
     },
     methods: {
       initEvent() {

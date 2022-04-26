@@ -666,9 +666,9 @@
       },
       // 分配设置主动取消回调
       settingCancel(way) {
-        this.groupServer.state.panelShow = false;
+        this.groupServer.state.panelShow = true;
         this.presetWay = way == 3 ? true : false;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [true]));
       },
       // 结束讨论回调
       endDiscussion() {},
