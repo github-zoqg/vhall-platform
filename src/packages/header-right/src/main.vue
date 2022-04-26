@@ -152,7 +152,12 @@
       },
       // 设备状态
       deviceStatus() {
-        return useMediaCheckServer().state.deviceInfo?.device_status;
+        console.warn(
+          '--------------1',
+          this.$domainStore.state.mediaCheckServer.deviceInfo.device_status,
+          useMediaCheckServer().state.deviceInfo?.device_status
+        );
+        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
       }
     },
     components: {
