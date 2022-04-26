@@ -25,7 +25,7 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
-  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import { getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -41,6 +41,14 @@
     },
     async created() {
       try {
+        if (isWechatCom()) {
+          if (sessionStorage.getItem('reloadStatus')) {
+            sessionStorage.setItem('reloadStatus', 2);
+          } else {
+            sessionStorage.setItem('reloadStatus', 1);
+            window.location.reload();
+          }
+        }
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'embed';
