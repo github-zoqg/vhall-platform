@@ -74,10 +74,8 @@
           console.log('嵌入', e);
         }
         const domain = await this.initReceiveLive(this.clientType);
-        debugger;
         await roomState();
         // 是否跳转预约页
-        debugger;
         if (
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
           !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
@@ -132,7 +130,6 @@
         console.error('---初始化直播房间出现异常--');
         console.error(err);
         this.state = 2;
-        debugger;
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }
@@ -267,15 +264,6 @@
   };
 </script>
 <style lang="less">
-  .common-notice-light-mask {
-    width: 100%;
-    position: absolute;
-    height: 100%;
-    background: transparent;
-    top: 0;
-    left: 0;
-    z-index: 12;
-  }
   .vmp-basic-container-embed {
     .vmp-basic-bd {
       max-width: unset;

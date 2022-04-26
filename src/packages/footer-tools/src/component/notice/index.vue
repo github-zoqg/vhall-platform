@@ -6,6 +6,7 @@
         <img src="./img/notice-icon.png" alt="" />
       </div>
     </div>
+    <div class="common-notice-light-mask" v-if="isShowNotice" @click="closeNoticeList"></div>
     <div class="vmp-notice-list_container" v-if="isShowNotice">
       <div class="container-data">
         <ul v-if="noticeList.length" v-infinite-scroll="moreLoadData">
@@ -60,9 +61,6 @@
       this.groupServer = useGroupServer();
     },
     created() {
-      this.$on('notice_panel_close', result => {
-        this.isShowNotice = result;
-      });
       this.getNoticeInfo();
     },
     mounted() {
@@ -106,7 +104,6 @@
       },
       getNoticeHistoryList() {
         this.isShowNotice = true;
-        this.$emit('notice_panel_status', true);
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
@@ -133,7 +130,6 @@
           limit: 10,
           pageNum: 1
         };
-        this.$emit('notice_panel_status', false);
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -179,6 +175,15 @@
         z-index: 1;
         border: solid 1px @border-tools-color;
       }
+    }
+    .common-notice-light-mask {
+      width: 100%;
+      position: fixed;
+      height: 100%;
+      background: transparent;
+      top: 0;
+      left: 0;
+      z-index: 11;
     }
     &_container {
       position: absolute;
