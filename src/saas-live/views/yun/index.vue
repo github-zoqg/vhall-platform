@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import { Domain, useInteractiveServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import { Domain, useInteractiveServer } from 'middle-domain';
   export default {
     data() {
       return {
@@ -15,8 +15,7 @@
     async created() {
       const interactiveServer = useInteractiveServer();
       const domain = await this.init();
-      await useMicServer().init();
-      await interactiveServer.baseInit();
+      !/embed/.test(location.search) && (await interactiveServer.baseInit());
       domain.initVhallReport(
         {
           bu: 0,
@@ -43,7 +42,7 @@
         // 初始化直播房间
         const { il_id } = this.$route.params;
         console.log(this.$route.params, 'this.$route.params');
-        const { token, nickname = '', email = '', liveT = '' } = this.$route.query;
+        const { token, nickname = '', email = '', liveT = '', seat_id } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
@@ -57,7 +56,7 @@
           },
           initRoom: {
             webinar_id: il_id, //活动id
-            seat_id: this.$route.query.seat_id,
+            seat_id: seat_id,
             clientType: 'sendYun', //客户端类型
             nickname,
             email,

@@ -118,8 +118,7 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        },
-        director_stream: 0 // 云导播台是否有流
+        }
       };
     },
     computed: {
@@ -162,6 +161,10 @@
       // 设备状态
       deviceStatus() {
         return useMediaCheckServer().state.deviceInfo?.device_status;
+      },
+      // 云导播台是否有流
+      director_stream() {
+        return this.$domainStore.state.roomBaseServer.director_stream == 1;
       }
     },
     components: {
@@ -201,9 +204,7 @@
         }
       }
       if (this.isStreamYun) {
-        this.roomBaseServer.getStreamStatus().then(res => {
-          this.director_stream = res.data.director_stream;
-        });
+        this.roomBaseServer.getStreamStatus();
       }
     },
     methods: {
@@ -326,11 +327,6 @@
           // live_over 结束直播
           this.interactiveServer.$on('live_over', () => {
             this.liveStep = 1;
-          });
-
-          // 云导播台流变化消息
-          useRoomBaseServer().$on('director_stream', msg => {
-            this.director_stream = msg.status;
           });
         }
       },

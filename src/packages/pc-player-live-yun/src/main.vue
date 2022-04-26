@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
-    <div id="vmp-player-yun" class="player_box" v-if="roleName == 1 && !pushStream">
+    <div id="vmp-player-yun" class="player_box" v-if="!pushStream">
       <div class="top_tip" :class="director_stream ? 'success' : 'warning'">
         {{ tipText }}
       </div>
@@ -9,7 +9,7 @@
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
       <div class="stream_people_name" v-if="liveStart && director_stream">
-        {{ $domainStore.state.roomBaseServer.watchInitData.join_info.nickname }}
+        {{ joinInfo.nickname }}
       </div>
 
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
@@ -90,12 +90,7 @@
 
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import {
-    useRoomBaseServer,
-    usePlayerServer,
-    useInteractiveServer,
-    useSubscribeServer
-  } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer, useInteractiveServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   export default {
     name: 'VmpPcPlayerLiveYun',
@@ -104,13 +99,11 @@
         localSpeaker: {},
         audioLevel: 1,
         networkStatus: 2,
-        showFloatLayer: false,
         isFullScreen: false,
         isMiniDoc: false,
         tipText: '未检测到云导播推流',
-        liveStart: false,
-        director_stream: 0,
-        time: 3580,
+        time: 0,
+        timer: null,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
         audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
       };
@@ -122,13 +115,6 @@
         let S = (this.time % 3600) % 60;
         return (H > 9 ? H : '0' + H) + ':' + (M > 9 ? M : '0' + M) + ':' + (S > 9 ? S : '0' + S);
       },
-      // 直播类型 6分组
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
-      roleName() {
-        return this.$domainStore.state.roomBaseServer.watchInitData?.join_info?.role_name;
-      },
       // 是否为推流页面
       pushStream() {
         return (
@@ -139,13 +125,31 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      director_stream() {
+        return this.$domainStore.state.roomBaseServer.director_stream == 1;
+      },
+      liveStart() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       }
     },
     watch: {
-      liveStart(val) {
-        this.liveStart = val;
-        if (val) {
-          this.tipText = '正在使用云导播推流';
+      director_stream: {
+        immediate: true,
+        handler: function (val) {
+          if (val) {
+            this.tipText = '正在使用云导播推流';
+          } else {
+            this.tipText = '未检测到云导播推流';
+          }
+          if (!val && this.liveStart) {
+            clearInterval(this.timer);
+            this.timer = setInterval(() => {
+              this.time++;
+            }, 1000);
+          } else {
+            clearInterval(this.timer);
+          }
         }
       }
     },
@@ -157,26 +161,14 @@
     mounted() {
       console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
       this.init();
-      this.liveStart = this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
-      // 云导播台流变化消息
-      this.roomBaseServer.$on('director_stream', msg => {
-        this.director_stream = msg.status;
-      });
-
-      // 开始直播
-      useSubscribeServer().$on('live_start', () => {
-        this.liveStart = true;
-      });
     },
     methods: {
       async init() {
         // 主持人初始化播放器
-        if (this.roleName == 1 && !this.pushStream) {
+        if (!this.pushStream) {
           await this.initPlayer();
           // 获取云导播台是否有流
-          this.roomBaseServer.getStreamStatus().then(res => {
-            this.director_stream = res.data.director_stream;
-          });
+          this.roomBaseServer.getStreamStatus();
         } else {
           // 其他人创建本地流&推流
           await this.createLocalStream();
@@ -221,30 +213,21 @@
       // 创建本地流
       async createLocalStream() {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
-        if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
-          await this.interactiveServer
-            .createLocalVideoStream({
-              videoNode: `stream-yun-box`,
-              mute: { audio: this.audioMuted == 1, video: this.videoMuted == 1 }
-            })
-            .then(res => {
-              this.localSpeaker.streamId = res.streamId;
-            })
-            .catch(e => {
-              if (e && e?.name == 'NotAllowed') {
-                return Promise.reject('NotAllowed');
-              } else {
-                return Promise.reject('createLocalStreamError');
-              }
-            });
-        }
-      },
-      sleep(time = 1000) {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(true);
-          }, time);
-        });
+        await this.interactiveServer
+          .createLocalVideoStream({
+            videoNode: `stream-yun-box`,
+            mute: { audio: this.audioMuted == 1, video: this.videoMuted == 1 }
+          })
+          .then(res => {
+            this.localSpeaker.streamId = res.streamId;
+          })
+          .catch(e => {
+            if (e && e?.name == 'NotAllowed') {
+              return Promise.reject('NotAllowed');
+            } else {
+              return Promise.reject('createLocalStreamError');
+            }
+          });
       },
       // 推流
       async publishLocalStream() {
@@ -254,6 +237,25 @@
       },
       // 实时获取网路状况和麦克风能量
       getLevel() {
+        // 麦克风音量查询计时器
+        this._audioLeveInterval = setInterval(() => {
+          if (
+            !this.localSpeaker.streamId ||
+            !this.$domainStore.state.interactiveServer.isInstanceInit
+          )
+            return clearInterval(this._audioLeveInterval);
+          // 获取音量
+          this.interactiveServer
+            .getAudioLevel({ streamId: this.localSpeaker.streamId })
+            .then(level => {
+              this.audioLevel = calculateAudioLevel(level);
+            })
+            .catch(() => {
+              clearInterval(this._audioLeveInterval);
+              this.audioLevel = 0;
+            });
+        }, 1000);
+
         // 网络信号查询计时器
         this._netWorkStatusInterval = setInterval(() => {
           if (
