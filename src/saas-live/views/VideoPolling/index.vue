@@ -119,5 +119,9 @@
   .vmp-video-polling-wrap {
     width: 100%;
     height: 100%;
+    ::-webkit-scrollbar-thumb {
+      /*滚动条里面小方块*/
+      background: #666;
+    }
   }
 </style>
