@@ -93,18 +93,21 @@
             {{ $t('interact_tools.interact_tools_1024') }}
           </p>
           <!-- 正常聊天消息 -->
-          <p class="msg-content_name" v-else>
-            <span
-              v-if="source.roleName && source.roleName != '2'"
-              class="role"
-              :class="source.roleName | roleClassFilter"
-            >
-              {{ source.roleName | roleFilter }}
-            </span>
-            <span class="nickname">
-              {{ source.nickname }}
-            </span>
-          </p>
+          <div class="msg-content_name" v-else>
+            <p>
+              <span
+                v-if="source.roleName && source.roleName != '2'"
+                class="role"
+                :class="source.roleName | roleClassFilter"
+              >
+                {{ source.roleName | roleFilter }}
+              </span>
+              <span class="nickname">
+                {{ source.nickname | overHidden(8) }}
+              </span>
+            </p>
+            <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
+          </div>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
@@ -266,41 +269,23 @@
       handleAt() {
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList || !this.source.atList.length) {
-          this.msgContent = this.urlToLink(this.source.content.text_content);
-        } else {
-          let at = false;
-          this.source.atList.forEach(a => {
-            // TODO历史列表aList与直播中格式不一致作
-            const userName = `@${a.nick_name || a.nickName} `;
-            const match =
-              this.source.content &&
-              this.source.content.text_content &&
-              this.source.content.text_content.indexOf(userName) != -1;
-            if (match) {
-              if (at) {
-                this.msgContent = this.urlToLink(
-                  this.msgContent.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              } else {
-                this.msgContent = this.urlToLink(
-                  this.source.content.text_content.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              }
-              at = true;
-            } else {
-              this.msgContent = at
-                ? this.urlToLink(this.msgContent)
-                : this.urlToLink(this.source.content.text_content);
-            }
-          });
-        }
+        this.msgContent = this.urlToLink(this.source.content.text_content);
+        this.source.atList.forEach(a => {
+          // TODO历史列表aList与直播中格式不一致作
+          const userName = `@${a.nick_name || a.nickName} `;
+          const match =
+            this.source.content &&
+            this.source.content.text_content &&
+            this.source.content.text_content.indexOf(userName) != -1;
+          if (match) {
+            this.msgContent = this.urlToLink(
+              this.source.content.text_content.replace(
+                userName,
+                `<span style='color:#3562fa'>${userName}</span>`
+              )
+            );
+          }
+        });
         if (
           (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
@@ -394,6 +379,7 @@
         .msg-content_name {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           margin-bottom: 5px;
           height: 34px;
           .nickname {
@@ -405,6 +391,11 @@
             color: #666;
             max-width: 300px;
             line-height: 34px;
+          }
+          .send_time {
+            font-size: 24px;
+            font-weight: 400;
+            color: #8c8c8c;
           }
           .role {
             margin-right: 10px;
