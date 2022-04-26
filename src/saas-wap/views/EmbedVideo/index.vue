@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout vmp-basic-layout-embed">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -189,9 +189,10 @@
   };
 </script>
 <style lang="less">
-  .vmp-basic-layout {
-    .vmp-basic-bd {
-      margin-top: 55%;
+  .vmp-basic-layout-embed {
+    .vmp-basic-container {
+      display: flex;
+      align-items: center;
     }
   }
 </style>

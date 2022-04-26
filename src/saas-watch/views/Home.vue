@@ -74,7 +74,7 @@
           this.goSubscribePage(this.clientType);
           return false;
         }
-        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
+        await this.initCheckAuth('watch'); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
@@ -120,7 +120,9 @@
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }

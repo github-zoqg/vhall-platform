@@ -2,7 +2,7 @@ import { useUserServer } from 'middle-domain';
 
 export default {
   methods: {
-    async initCheckAuth() {
+    async initCheckAuth(watchPageType = 'watch') {
       const userAuthKey = this.$route.query.user_auth_key; // url上带的三方授权回调信息
       if (!userAuthKey) return false;
       const authTag = localStorage.getItem('vmp_auth_tag') || '';
@@ -59,7 +59,7 @@ export default {
             if (sceneId !== 2) {
               // 非提现功能时，绑定成功，界面初始化刷新(去掉user_auth_key参数)
               // TODO: url后续得改
-              const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
+              const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
               window.location.href = url;
             }
           } else {

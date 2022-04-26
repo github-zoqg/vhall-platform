@@ -111,7 +111,6 @@
       top: 80px;
       left: 0px;
       width: 100%;
-      z-index: 25;
     }
     .van-notice-bar {
       box-sizing: border-box;
