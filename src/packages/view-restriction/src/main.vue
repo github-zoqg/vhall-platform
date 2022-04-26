@@ -3,15 +3,17 @@
     <div class="vmp-view-restriction-wrap">
       <div class="restriction-close vh-iconfont vh-line-close" @click="popupVisible = false"></div>
       <div class="restriction-content">
-        <div class="restriction-content-title">
-          {{ agreementInfo.title }}
+        <div class="restriction-scroll-content">
+          <div class="restriction-content-title">
+            {{ agreementInfo.title }}
+          </div>
+          <div class="restriction-content-text" v-html="agreementInfo.content"></div>
+          <div
+            v-if="agreementInfo.statement_content"
+            class="restriction-content-law"
+            v-html="agreementInfo.statement_content"
+          ></div>
         </div>
-        <div class="restriction-content-text" v-html="agreementInfo.content"></div>
-        <div
-          v-if="agreementInfo.statement_content"
-          class="restriction-content-law"
-          v-html="agreementInfo.statement_content"
-        ></div>
       </div>
       <div class="restriction-control">
         <span @click.stop="agree">{{ $t('other.other_1017') }}</span>
@@ -189,12 +191,14 @@
       }
     }
     .restriction-content {
-      padding: 0px 32px;
-      box-sizing: border-box;
-      width: 100%;
-      width: 100%;
-      height: 242px;
-      overflow-y: scroll;
+      padding-right: 2px; // 为滚动条让出2px
+      .restriction-scroll-content {
+        box-sizing: border-box;
+        width: 100%;
+        height: 242px;
+        padding: 0 30px 0 32px;
+        overflow-y: auto;
+      }
       &-title {
         width: 100%;
         min-height: 28px;
