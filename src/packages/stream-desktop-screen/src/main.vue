@@ -39,7 +39,7 @@
     <div
       class="vmp-desktop-screen-exchange"
       @click="exchangeVideoDocs"
-      v-if="(!isSpeakOn && roleName == 2) || roleName == 3"
+      v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
     >
       <p>
         <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -398,6 +398,7 @@
                 this.interactiveServer.resetLayout();
 
                 this.setDesktop('1');
+                useDocServer().resetLayoutByMiniElement();
               })
               .catch(error => {
                 console.log(error, this.$t('interact.interact_1021'));
@@ -417,6 +418,7 @@
         this.desktopShareServer.stopShareScreen().then(() => {
           this.setDesktop('0');
           this.interactiveServer.resetLayout();
+          useDocServer().resetLayoutByMiniElement();
         });
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
