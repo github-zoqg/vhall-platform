@@ -157,7 +157,7 @@
           this.$domainStore.state.mediaCheckServer.deviceInfo.device_status,
           useMediaCheckServer().state.deviceInfo?.device_status
         );
-        return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
+        return useMediaCheckServer().state.deviceInfo?.device_status;
       }
     },
     components: {
