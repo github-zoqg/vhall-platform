@@ -72,7 +72,7 @@
           initRoom: {
             webinar_id: il_id, //活动id
             seat_id: seat_id,
-            clientType: 'sendYun', //客户端类型
+            clientType: /embed/.test(location.search) ? 'sendYun' : 'send', //客户端类型
             nickname,
             email,
             check_online: 0 // 不检查主持人是否在房间
