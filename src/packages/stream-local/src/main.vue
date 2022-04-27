@@ -1000,7 +1000,6 @@
             useMediaCheckServer().state.deviceInfo.device_status === 2
           ) {
             clearInterval(this._audioLeveInterval);
-
             // window.$middleEventSdk?.event?.send(
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );

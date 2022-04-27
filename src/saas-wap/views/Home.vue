@@ -32,6 +32,8 @@
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
   import { getQueryString, getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
+  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
+
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -65,7 +67,19 @@
         return this.$domainStore.state.roomBaseServer.webinarTag;
       }
     },
-    async created() {
+    beforeRouteEnter(to, from, next) {
+      // Vue history模式 微信分享IOS无效解决办法---最终章
+      const { system } = getBrowserType();
+      if (
+        system == 'ios' &&
+        `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
+      ) {
+        location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+      } else {
+        next();
+      }
+    },
+    async mounted() {
       try {
         if (isWechatCom()) {
           if (sessionStorage.getItem('reloadStatus')) {
@@ -104,6 +118,8 @@
           return;
         }
         await roomState();
+
+        //微信相关设置
         bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
@@ -141,8 +157,8 @@
         this.state = 2;
         this.handleErrorCode(err);
       }
-    },
-    mounted() {
+
+      //消息监听
       useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;
         this.liveErrorTip = this.$t('message.message_1003');

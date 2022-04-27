@@ -216,12 +216,17 @@
           }
           return false;
         }
+      },
+      // 当前文档或白板容器的Id
+      currentCid() {
+        return this.docServer.state.currentCid;
       }
     },
     components: {
       SaasAlert
     },
     beforeCreate() {
+      this.docServer = useDocServer();
       this.micServer = useMicServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaSettingServer = useMediaSettingServer();
@@ -321,12 +326,13 @@
             }
           }
 
-          // 桌面共享开启消息
+          // 桌面共享关闭消息
           if (msg.data.type === 'desktop_sharing_disable') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'player') {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'player' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -334,12 +340,13 @@
             useRoomBaseServer().setInavToolStatus('is_desktop', 0);
           }
 
-          // 桌面共享关闭消息
+          // 桌面共享开启消息
           if (msg.data.type === 'desktop_sharing_open') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'doc') {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'doc' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -414,10 +421,8 @@
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
-        if (!this.isWatch && useDocServer().state.switchStatus) {
-          // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
-          this.interactiveServer.setDesktop({ status });
-        }
+        if (this.isWatch || !useDocServer().state.switchStatus) return;
+        this.interactiveServer.setDesktop({ status });
       },
       // 关闭弹窗
       closeConfirm() {

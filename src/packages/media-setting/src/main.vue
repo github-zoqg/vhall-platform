@@ -177,6 +177,9 @@
     created() {
       this._originCaptureState = {}; // 原始选中的数据
       this._diffOptions = {}; // 差异数据（更改的数据）
+
+      window.mediaSettingServer = this.mediaSettingServer;
+      window.mediaComponent = this;
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
@@ -225,11 +228,14 @@
       /**
        * 关闭弹窗
        */
-      closeMediaSetting() {
+      async closeMediaSetting() {
         this.isShow = false;
-        this.isRepublishMode = false;
         this?.$refs['videoSetting']?.destroyStream();
         this?.$refs['audioOutSetting']?.pauseAudio();
+        this.isRepublishMode = false;
+        await this.$nextTick();
+
+        this.mediaState = Object.assign(this.mediaState, this._originCaptureState); // 如果取消，将选中项还原
       },
       /**
        * 点击对话框确认按钮（保存）的回调
