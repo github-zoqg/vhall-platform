@@ -14,7 +14,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!(groupedUserExists && verify == 2 && isOpenSwitch != 1 && presetWay)"
+              :disabled="!(verify == 2 && isOpenSwitch != 1 && presetWay)"
               @click="groupPresetImport"
             >
               重新导入
@@ -887,8 +887,6 @@
                   color: white;
                 }
               }
-            }
-            .user-name-tag--waiting {
             }
             .user-name {
               max-width: 106px;
