@@ -265,8 +265,9 @@
             }
           } else {
             if (newval) {
+              useDocServer().resetLayoutByMiniElement();
               // 开启共享
-              useRoomBaseServer().setChangeElement('stream-list');
+              // useRoomBaseServer().setChangeElement('stream-list');
             }
           }
         },
