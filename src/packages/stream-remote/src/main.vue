@@ -183,6 +183,14 @@
           ></span>
         </el-tooltip> -->
       </p>
+      <p v-else-if="guestHasInvitePer && stream.attributes.roleName != 1">
+        <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
+          <span
+            class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
+            @click="speakOff"
+          ></span>
+        </el-tooltip>
+      </p>
 
       <p
         v-if="joinInfo.role_name == 1 || groupRole == 20"
@@ -364,6 +372,15 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.stream.attributes.roleName) && this.isInGroup;
+      },
+      // 嘉宾为当前主讲人时是否有邀请上麦的权限
+      guestHasInvitePer() {
+        let room = this.$domainStore.state.roomBaseServer;
+        return (
+          room.configList?.speak_manage == 1 &&
+          room.interactToolStatus.doc_permission == this.joinInfo.third_party_user_id &&
+          this.joinInfo.role_name == 4
+        );
       }
     },
     beforeCreate() {

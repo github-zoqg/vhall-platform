@@ -46,6 +46,7 @@
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
                   :status="liveStatus"
+                  :guest-has-invite-per="guestHasInvitePer"
                 ></member-item>
               </template>
             </template>
@@ -81,6 +82,7 @@
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
                   :status="liveStatus"
+                  :guest-has-invite-per="guestHasInvitePer"
                 ></member-item>
               </template>
             </template>
@@ -138,8 +140,9 @@
         </span>
         <div
           class="info-panel__allow-raise-hand"
-          v-if="configList['ui.hide_handsUp'] && mode !== 6"
+          v-if="(configList['ui.hide_handsUp'] && mode !== 6) || guestHasInvitePer"
         >
+          >
           <label class="raise-hand-switch" for="raiseHandSwitch">
             允许举手
             <input
@@ -173,7 +176,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
-              v-if="isShowBtn(configList['is_interact_and_host'])"
+              v-if="isShowBtn(configList['is_interact_and_host']) || guestHasInvitePer"
             >
               举手
             </li>
@@ -389,6 +392,14 @@
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
         return this.micServer.state.speakerList;
+      },
+      // 嘉宾为当前主讲人时是否有邀请上麦的权限
+      guestHasInvitePer() {
+        return (
+          this.configList?.speak_manage == 1 &&
+          this.interactToolStatus.doc_permission == this.userId &&
+          this.roleName == 4
+        );
       }
     },
     methods: {
@@ -571,6 +582,18 @@
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
+            // 嘉宾为当前主讲人时，允许举手的状态同步
+            case 'vrtc_connect_open':
+              if (temp.sender_id != _this.userId) {
+                _this.allowRaiseHand = true;
+              }
+              break;
+            case 'vrtc_connect_close':
+              if (temp.sender_id != _this.userId) {
+                _this.allowRaiseHand = false;
+              }
+              break;
+
             default:
               break;
           }
@@ -1395,7 +1418,9 @@
             console.log('switch-mic-status', res);
             //数据埋点--开启/关闭允许举手
             window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
-            this.$message.success({ message: '设置成功' });
+            if (res.code == 200) {
+              this.$message.success({ message: '设置成功' });
+            }
           })
           .catch(err => {
             this.allowRaiseHand = false;
