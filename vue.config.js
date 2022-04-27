@@ -14,7 +14,7 @@ const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 
 // 是否开发环境
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-console.log(chalk.bold.bgBlue(`环境 NODE_ENV `), chalk.bold.blue(`${process.env.NODE_ENV}`));
+// console.log(chalk.bold.blue(`环境 NODE_ENV  ${process.env.NODE_ENV}`));
 
 // 解析参数成key-value形式：
 // {
@@ -300,8 +300,8 @@ if (['serve', 'build'].includes(cmd)) {
     );
   }
 
-  console.log(chalk.bold.bgBlue(` vueConfig `));
-  console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
+  // console.log(chalk.bold.bgBlue(` vueConfig `));
+  // console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
 
   // 导出
   module.exports = vueConfig;
