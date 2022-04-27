@@ -110,6 +110,8 @@
         }
         try {
           const { watchInitData = {} } = this.roomBaseServer.state;
+          const interactToken = watchInitData?.interact?.interact_token;
+          sessionStorage.setItem('interact_token', interactToken);
           const result = await this.groupServer.groupCreate({
             number: this.count,
             way: this.way,
