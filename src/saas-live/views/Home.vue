@@ -132,7 +132,7 @@
             nickname,
             email,
             check_online: 1, // 检查主持人是否在房间.
-            visitor_id: sessionStorage.getItem('visitorId_Home') || ''
+            visitor_id: sessionStorage.getItem('visitorId_home') || ''
           }
         });
       },
