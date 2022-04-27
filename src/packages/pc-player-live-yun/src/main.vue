@@ -8,7 +8,7 @@
       <div class="err_tip" v-if="liveStart && !director_stream">
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
-      <div class="stream_people_name" v-if="liveStart && director_stream">
+      <div class="stream_people_name" v-if="director_stream">
         {{ joinInfo.nickname }}
       </div>
 
@@ -103,6 +103,7 @@
         isMiniDoc: false,
         tipText: '未检测到云导播推流',
         time: 0,
+        into: 0,
         timer: null,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
         audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
@@ -161,6 +162,14 @@
     mounted() {
       console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
       this.init();
+      const dom = document.getElementById('vmp-player-yun');
+      dom.onmousemove = () => {
+        this.into++;
+        this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+      };
+      dom.onmouseleave = () => {
+        this.into = 0;
+      };
     },
     methods: {
       async init() {
@@ -199,14 +208,16 @@
         miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         roomBaseServer.setChangeElement(miniElement);
         window.vhallReportForProduct?.report(110135);
-        this.isMiniDoc = true;
+        this.isMiniDoc = !this.isMiniDoc;
       },
       // 播放器全屏
       fullScreenPlayer() {
         if (this.isFullScreen) {
           this.playerServer.exitFullScreen();
+          window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull"' })); // 客户端退出全屏方法
         } else {
           this.playerServer.enterFullScreen();
+          window.JsCallQtMsg(JSON.stringify({ type: 'EnterFull"' })); // 客户端全屏方法
         }
         this.isFullScreen = !this.isFullScreen;
       },
@@ -302,13 +313,11 @@
           receive_account_id: this.joinInfo.third_party_user_id
         });
         if (deviceType == 'audio') {
-          console.log(123);
           this.interactiveServer.muteAudio({
             streamId: this.localSpeaker.streamId,
             isMute: this[`${deviceType}Muted`] == 0
           });
         } else {
-          console.log(456);
           this.interactiveServer.muteVideo({
             streamId: this.localSpeaker.streamId,
             isMute: this[`${deviceType}Muted`] == 0
