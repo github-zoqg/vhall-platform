@@ -997,14 +997,12 @@
           // 当前角色为主持人&&设备被禁用
           if (
             +this.joinInfo.role_name === 1 &&
-            this.mode == 2 &&
-            (options?.source === 'live_over' ||
-              useMediaCheckServer().state.deviceInfo.device_status === 2)
+            useMediaCheckServer().state.deviceInfo.device_status === 2
           ) {
             clearInterval(this._audioLeveInterval);
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
-            );
+            // window.$middleEventSdk?.event?.send(
+            //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            // );
             resolve();
           }
 
