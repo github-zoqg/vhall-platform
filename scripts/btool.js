@@ -12,17 +12,21 @@ const pathConfig = require('./path-config');
 const CMDLIST = ['serve', 'build', 'inspect', 'lint', 'help'];
 const cLog = console.log;
 
-/**
- * 字符串平均分配两端补齐
- * @param {*} maxLength 补齐后的总长度
- * @param {*} fillString 填充的字符串，默认一个空格
- * @returns
- */
-String.prototype.padBoth = function (maxLength, fillString = ' ') {
-  const start = parseInt((maxLength - this.length) / 2);
-  if (start < 0) return this;
-  return this.padStart(this.length + start, fillString).padEnd(maxLength, fillString);
-};
+// 开启提示文字
+function bootstripTip(tips, t = 40, m = 14, n = 19) {
+  const chalkBorder = chalk.hex('#0FA86E'); //边框
+  const chalkLabel = chalk.hex('#00AED0').bold;
+  cLog(chalkBorder('╭'.padEnd(t - 1, '─') + '╮'));
+  for (const [key, value] of Object.entries(tips)) {
+    cLog(
+      chalkBorder('│  '),
+      chalkLabel(`▸ ${key}:`.padEnd(m)),
+      `${value}`.padEnd(n),
+      chalkBorder('│')
+    );
+  }
+  cLog(chalkBorder('╰'.padEnd(t - 1, '─') + '╯'));
+}
 
 /**
  * 解析命令后面的参数
@@ -166,6 +170,7 @@ async function checkDomainRes(project) {
 }
 
 module.exports = {
+  bootstripTip,
   parseArgv,
   checkValidArgs,
   createSpecialConfig,

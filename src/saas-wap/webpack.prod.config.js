@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const baseConfig = require('./webpack.base.config');
-const domainVersion = require('./package.json').domainVersion;
+const domainVersion = require('../../package.json').domainVersion;
 
 const htmlConfig = {
   cdnJs: {

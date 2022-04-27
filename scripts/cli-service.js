@@ -29,10 +29,10 @@ const cmdArgs = Array.prototype.slice.call(argv, 2);
 const args = btool.parseArgv(argv);
 // 获取项目名
 const { project, _, mode } = args;
-// 获取项目的package.json
-const projectPkg = require(path.join(pathConfig.SRC, project, 'package.json'));
+// 获取root package.json
+const pkg = require(path.join(pathConfig.ROOT, 'package.json'));
 // 补充版本号
-cmdArgs.push(`--version=${projectPkg.version}`);
+cmdArgs.push(`--version=${pkg.version}`);
 // 转成命令选项为字符串: 'serve --project=live-pc --mode=development --version=1.0.0'
 const cmdOption = cmdArgs.join(' ');
 const cmd = _[0];
@@ -41,17 +41,12 @@ const vueMode = btool.getVueMode(cmd, mode);
 const nodeEnv = btool.getNodeEnv(vueMode);
 process.env.NODE_ENV = nodeEnv;
 // 开启提示文字
-const text1 = `项目: ${project}`;
-const text2 = `版本号: ${projectPkg.version}`;
-const text3 = `vue环境: .env.${vueMode}`;
-const text4 = `NODE_ENV: ${nodeEnv}`;
-const info = chalk.hex('#4169E1'); //蓝色
-cLog(info('┌────────────────────────────────────┐'));
-cLog(info(`│${text1.padBoth(34)}│`));
-cLog(info(`│${text2.padBoth(33)}│`));
-cLog(info(`│${text3.padBoth(34)}│`));
-cLog(info(`│${text4.padBoth(36)}│`));
-cLog(info('└────────────────────────────────────┘'));
+btool.bootstripTip({
+  Project: project,
+  Version: pkg.version,
+  Environment: `.env.${vueMode}`,
+  NODE_ENV: nodeEnv
+});
 
 (async () => {
   if (cmd === 'build') {
@@ -66,8 +61,7 @@ cLog(info('└──────────────────────
       process.exit(1);
     }
   }
-
-  //组织编译命令
+  // 组织编译命令
   const cmdStr = `node_modules${path.sep}.bin${path.sep}vue-cli-service ${cmdOption}`;
   // cLog('cmdStr:', cmdStr);
   // 这里不使用 spinner提示进度，否则 ctrl+c 无法停止（暂时不知道原因）
