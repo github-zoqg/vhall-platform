@@ -142,7 +142,6 @@
           class="info-panel__allow-raise-hand"
           v-if="(configList['ui.hide_handsUp'] && mode !== 6) || guestHasInvitePer"
         >
-          >
           <label class="raise-hand-switch" for="raiseHandSwitch">
             允许举手
             <input
