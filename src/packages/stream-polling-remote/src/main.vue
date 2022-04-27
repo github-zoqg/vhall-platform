@@ -256,7 +256,7 @@
       .vmp-polling-stream-remote__shadow-box {
         display: flex;
         height: 24px;
-        bottom: 22px;
+        bottom: 10px;
         flex-direction: row;
         top: auto;
         background: rgba(0, 0, 0, 0);
@@ -304,9 +304,9 @@
 
     .vmp-polling-stream__bottom {
       width: 100%;
-      height: 70px;
+      height: 50px;
       font-size: 14px;
-      line-height: 70px;
+      line-height: 50px;
       color: #e6e6e6;
       box-sizing: border-box;
       padding: 0 6px;
@@ -317,6 +317,7 @@
       &-nickname {
         display: inline-block;
         width: 80px;
+        line-height: 70px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
