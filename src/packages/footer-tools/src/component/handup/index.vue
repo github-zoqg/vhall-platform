@@ -114,6 +114,13 @@
       useChatServer().$on('allBanned', res => {
         this.allBanned = res;
       });
+      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
+      useMicServer().$on('vrtc_connect_apply_cancel', msg => {
+        this.loading = false;
+        this.isApplyed = false;
+        this.waitInterval && clearInterval(this.waitInterval);
+        this.btnText = this.$t('interact.interact_1001');
+      });
     },
     methods: {
       // 下麦
