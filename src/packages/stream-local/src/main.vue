@@ -1000,7 +1000,6 @@
               boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             );
             resolve();
-            return;
           }
 
           // 当前角色为主持人&&设备被禁用
