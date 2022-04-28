@@ -6,8 +6,8 @@
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
-      @onReturn="closeMediaSetting"
-      @onClose="closeMediaSetting"
+      @onReturn="cancelMediaSetting"
+      @onClose="cancelMediaSetting"
     >
       <section v-loading="loading" v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
@@ -49,7 +49,7 @@
               <el-button size="small" round type="primary" @click="saveMediaSetting">
                 {{ $t('account.account_1062') }}
               </el-button>
-              <el-button @click="closeMediaSetting" round size="small">
+              <el-button @click="cancelMediaSetting" round size="small">
                 {{ $t('account.account_1063') }}
               </el-button>
             </section>
@@ -239,6 +239,10 @@
         this.isRepublishMode = true;
         this.showMediaSetting();
       },
+      cancelMediaSetting() {
+        this.closeMediaSetting();
+        this.mediaState = Object.assign(this.mediaState, this._originCaptureState); // 如果取消，将选中项还原
+      },
       /**
        * 关闭弹窗
        */
@@ -248,8 +252,6 @@
         this?.$refs['audioOutSetting']?.pauseAudio();
         this.isRepublishMode = false;
         await this.$nextTick();
-
-        this.mediaState = Object.assign(this.mediaState, this._originCaptureState); // 如果取消，将选中项还原
       },
       /**
        * 点击对话框确认按钮（保存）的回调
