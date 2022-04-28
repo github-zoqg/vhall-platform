@@ -61,7 +61,7 @@
       </main>
     </el-dialog>
 
-    <pre-dialog ref="pre-dialog" @show="showCheckDialog"></pre-dialog>
+    <pre-dialog ref="pre-dialog" v-if="!showCheckDom" @show="showCheckDialog"></pre-dialog>
   </div>
 </template>
 
@@ -117,6 +117,10 @@
     computed: {
       devices() {
         return this.mediaState.devices;
+      },
+      // 云导播客户端嵌入不需要检测
+      showCheckDom() {
+        return this.$route.name == 'yun' && /embed/.test(location.search);
       }
     },
     beforeCreate() {

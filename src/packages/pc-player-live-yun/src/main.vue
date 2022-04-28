@@ -15,7 +15,7 @@
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
         <p class="vmp-stream-local__shadow-second-line">
           <span class="vmp-stream-local__shadow-label">视图</span>
-          <el-tooltip content="切换" placement="bottom">
+          <el-tooltip content="切换" placement="bottom" v-if="!isFullScreen">
             <span
               class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
               @click="exchange"
@@ -165,11 +165,25 @@
       const dom = document.getElementById('vmp-player-yun');
       dom.onmousemove = () => {
         this.into++;
-        this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+        try {
+          this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+        } catch (err) {
+          console.log(err);
+        }
       };
       dom.onmouseleave = () => {
         this.into = 0;
       };
+      window.addEventListener('keydown', e => {
+        if (e.keyCode == 27) {
+          this.isFullScreen = false;
+          try {
+            window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull' })); // 客户端退出全屏方法
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      });
     },
     methods: {
       async init() {
@@ -209,15 +223,24 @@
         roomBaseServer.setChangeElement(miniElement);
         window.vhallReportForProduct?.report(110135);
         this.isMiniDoc = !this.isMiniDoc;
+        try {
+          window.JsCallQtMsg(JSON.stringify({ type: 'changeLayout' })); // 客户端切换布局
+        } catch (err) {
+          console.log(err);
+        }
       },
       // 播放器全屏
       fullScreenPlayer() {
-        if (this.isFullScreen) {
-          this.playerServer.exitFullScreen();
-          window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull"' })); // 客户端退出全屏方法
-        } else {
-          this.playerServer.enterFullScreen();
-          window.JsCallQtMsg(JSON.stringify({ type: 'EnterFull"' })); // 客户端全屏方法
+        try {
+          if (this.isFullScreen) {
+            this.playerServer.exitFullScreen();
+            !this.pushStream && window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull' })); // 客户端退出全屏方法
+          } else {
+            this.playerServer.enterFullScreen();
+            !this.pushStream && window.JsCallQtMsg(JSON.stringify({ type: 'EnterFull' })); // 客户端全屏方法
+          }
+        } catch (err) {
+          console.log(err);
         }
         this.isFullScreen = !this.isFullScreen;
       },
