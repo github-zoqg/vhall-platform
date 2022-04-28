@@ -113,7 +113,8 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        }
+        },
+        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
       };
     },
     computed: {
@@ -149,15 +150,6 @@
       // 是否为第三方发起
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
-      },
-      // 设备状态
-      deviceStatus() {
-        console.warn(
-          '--------------1',
-          this.$domainStore.state.mediaCheckServer.deviceInfo.device_status,
-          useMediaCheckServer().state.deviceInfo?.device_status
-        );
-        return useMediaCheckServer().state.deviceInfo?.device_status;
       }
     },
     components: {
@@ -267,6 +259,7 @@
       async handleRecheck() {
         await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+          this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
           );
