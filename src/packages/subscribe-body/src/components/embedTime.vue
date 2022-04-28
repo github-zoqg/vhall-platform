@@ -24,18 +24,25 @@
       <span class="des">{{ second }}</span>
       <span>{{ $t('appointment.appointment_1029') }}</span>
     </div>
-    <button
-      v-if="btnText"
-      class="sub-auth"
-      :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
-      :disabled="btnText == $t('webinar.webinar_1036')"
-      @click="authCheck"
-    >
-      {{ btnText }}
+    <button v-if="showAgreement" class="sub-auth add-auth" @click="agreement">
+      {{ $t('appointment.appointment_1025') }}
     </button>
+    <template v-else>
+      <button
+        v-if="btnText"
+        class="sub-auth"
+        :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
+        :disabled="btnText == $t('webinar.webinar_1036')"
+        @click="authCheck"
+      >
+        {{ btnText }}
+      </button>
+    </template>
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
+
   export default {
     name: 'EmbedTime',
     props: {
@@ -43,6 +50,26 @@
         type: Object,
         required: true,
         default: () => {}
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      showAgreement() {
+        const isAgreement = this.subOption.needAgreement;
+        const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
+        const isLive = this.webinarType != 2 && this.webinarType != 3;
+        if (isAgreement && isLive && !isEmbedVideo) {
+          return true;
+        } else {
+          return false;
+        }
+        // if (isAgreement && ((!btnText && type == 1) || btnText))
       }
     },
     data() {
@@ -102,6 +129,9 @@
       this.handleSubscribeProcess();
     },
     methods: {
+      agreement() {
+        this.$emit('agreement');
+      },
       handleSubscribeProcess() {
         this.clearTimer();
         this.handleTips();
