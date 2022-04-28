@@ -989,7 +989,7 @@
           }
 
           //发起端需要判断一下是不是非主持人&&非主讲人的嘉宾
-          if (_this.isLive && _this.roleName != 1 && _this.guestHasInvitePer) {
+          if (_this.isLive && _this.roleName != 1 && !_this.guestHasInvitePer) {
             return;
           }
 
@@ -1018,8 +1018,8 @@
           );
           //提示语
           if (msg.data.target_id == _this.userId) {
-            this.timer && clearTimeout(this.timer);
-            this.timer = setTimeout(() => {
+            _this.timer && clearTimeout(_this.timer);
+            _this.timer = setTimeout(() => {
               _this.$message.success({ message: _this.$t('interact.interact_1028') });
             }, 1000);
             return;
@@ -1574,7 +1574,7 @@
       downMic(accountId, needConfirm = true) {
         const data = {
           room_id: this.roomId,
-          receive_account_id: accountId
+          receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
