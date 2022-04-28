@@ -878,7 +878,7 @@
             nickname: msg.data.nick_name || msg.data.nickname,
             role_name: msg.data.room_role
           };
-          if (_this.roleName == 1 && user.role_name == 4) {
+          if ((_this.roleName == 1 || _this.guestHasInvitePer) && user.role_name == 4) {
             _this.$message.success(`收到 ${_this.$getRoleName(4)} [ ${user.nickname} ] 的上麦申请`);
           }
           const { member_info = { is_apply: 1 } } = msg.data;
@@ -988,8 +988,8 @@
             return;
           }
 
-          //发起端需要判断一下是不是非主持人
-          if (_this.isLive && _this.roleName != 1) {
+          //发起端需要判断一下是不是非主持人&&非主讲人的嘉宾
+          if (_this.isLive && _this.roleName != 1 && _this.guestHasInvitePer) {
             return;
           }
 
