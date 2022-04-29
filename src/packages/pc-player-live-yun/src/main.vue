@@ -218,6 +218,7 @@
             }
           })
           .then(() => {
+            document.getElementsByTagName('video')[0].play();
             console.log('%c云导播播放器初始化成功', 'color:blue');
           });
       },

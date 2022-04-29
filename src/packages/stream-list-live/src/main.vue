@@ -18,16 +18,20 @@
             !['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localSpeaker.accountId || isStreamYun"
+        v-show="localSpeaker.accountId || (isStreamYun && joinInfo.role_name == 1)"
       >
+        <!-- 云导播活动 -->
+        <vmp-air-container
+          :oneself="true"
+          v-if="isStreamYun && joinInfo.role_name == 1"
+          :cuid="childrenCom[1]"
+        ></vmp-air-container>
         <!-- 非云导播活动 -->
         <vmp-air-container
           :oneself="true"
           :cuid="childrenCom[0]"
           v-if="!isStreamYun"
         ></vmp-air-container>
-        <!-- 云导播活动 -->
-        <vmp-air-container :oneself="true" :cuid="childrenCom[1]" v-else></vmp-air-container>
       </div>
 
       <!-- 远端流列表 -->
@@ -46,7 +50,14 @@
               speaker.accountId == mainScreen
           }"
         >
-          <vmp-stream-remote :stream="streamInfo(speaker)"></vmp-stream-remote>
+          <!-- 云导播活动 -->
+          <vmp-air-container
+            :oneself="true"
+            :cuid="childrenCom[1]"
+            v-if="isStreamYun && joinInfo.role_name == 3"
+          ></vmp-air-container>
+          <!-- 非云导播活动 -->
+          <vmp-stream-remote :stream="streamInfo(speaker)" v-if="!isStreamYun"></vmp-stream-remote>
         </div>
       </template>
 
