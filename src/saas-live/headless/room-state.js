@@ -32,6 +32,12 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+
+  //预分组导入获取不到group_id，提前进行初始化
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    await groupServer.updateGroupInitData();
+  }
+
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
   const promiseList = [
     // 获取媒体许可，设置设备状态
