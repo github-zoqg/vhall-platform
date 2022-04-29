@@ -1,7 +1,7 @@
 {
   "name": "middle-platform",
-  "version": "1.3.13-beta",
-  "domainVersion": "1.3.16-beta",
+  "version": "1.3.13",
+  "domainVersion": "1.3.16",
   "private": true,
   "scripts": {
     "/---/": "-------------saas业务线相关命令----------------",
@@ -26,6 +26,7 @@
     "build:saas-wap": "node scripts/cli-service.js build --project=saas-wap",
     "build:saas-watch": "node scripts/cli-service.js build --project=saas-watch",
     "/***/": "-------------其它命令----------------",
+    "update:version": "node ./scripts/update-version.js serve",
     "help:lint": "node_modules/.bin/vue-cli-service help lint",
     "format": "prettier --write './src/**/*.(vue|js|css|less|jsx)' './scripts/**/*.js'",
     "lint": "node_modules/.bin/vue-cli-service lint --no-fix",
