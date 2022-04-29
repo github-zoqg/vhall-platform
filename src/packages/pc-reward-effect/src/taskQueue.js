@@ -59,8 +59,11 @@ export default class TaskQueue {
       // if (this.queue.length >= this.maxQueueLen) {
       this.queue.pop();
     }
+
     // 5.执行队列
-    this.execute();
+    if (this.queue.length == 1 && this.running < this.maxQueueLen) {
+      this.execute();
+    }
   }
 
   /* 执行(循环) */
@@ -68,15 +71,15 @@ export default class TaskQueue {
     if (this.queue.length == 0 || this.running >= this.maxQueueLen) {
       return;
     }
-    await this.sleep(this.minTaskTime * this.running);
-    this.running++;
     const queueTaskItem = this.queue.shift();
     console.log('this.queue.queueTaskItem-------->', queueTaskItem);
     if (queueTaskItem) {
+      // await this.sleep(this.minTaskTime * this.running);
+      this.running++;
       await queueTaskItem.playRewardEffect();
-      this.running--;
-      await this.sleep(this.minTaskTime * (this.running || 1));
+      await this.sleep(this.minTaskTime * this.running);
       await queueTaskItem.removeRewardEffect();
+      this.running--;
       this.execute();
     }
   }

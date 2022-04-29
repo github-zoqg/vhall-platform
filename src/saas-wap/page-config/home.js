@@ -13,7 +13,6 @@ const serverConfig = {
       'layerBody',
       'layerBodyCenter',
       'comAllDialog',
-      'comWapRewardEffect',
       'comGoodsDetail',
       'comUserAccountWap'
     ]
@@ -54,7 +53,8 @@ const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comCashWap',
-      'comInviteHandup'
+      'comInviteHandup',
+      'comViewRestrictionWap'
     ]
   },
   // 顶部
@@ -306,25 +306,12 @@ const serverConfig = {
   //wap端文档
   comDocWap: {
     component: 'VmpDocWap',
-    addTab: [
-      {
-        cuid: ['comTabMenuWap'],
-        method: 'addItem',
-        args: ['$0']
-      }
-    ],
     emitShowMenuTab: {
       cuid: ['comTabMenuWap'],
       method: 'changeDocStatus',
       args: ['$0']
     },
     children: ['comInteractToolsWap'],
-    options: {}
-  },
-  // wap礼物飘屏动画
-  comWapRewardEffect: {
-    component: 'VmpWapRewardEffect',
-    children: [],
     options: {}
   },
   // 开屏页
@@ -487,6 +474,16 @@ const serverConfig = {
   embedVideoLComWapBody: {
     component: 'VmpWapBody',
     children: ['comWapPlayer']
+  },
+  comViewRestrictionWap: {
+    component: 'VmpViewRestrictionWap',
+    emitAgreeWitthTerms: [
+      //登录弹窗
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
   // *******单视频嵌入页面****结束
 };

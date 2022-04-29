@@ -40,7 +40,7 @@
 </template>
 
 <script>
-  import { useChatServer, useUserServer } from 'middle-domain';
+  import { useChatServer } from 'middle-domain';
   // 抽奖中的展示样式(发起与观看,必须有多语言)
   export default {
     name: 'LotteryPending',
@@ -84,12 +84,38 @@
           this.lotteryInfo.submit_command !== 1 &&
           !this.joined
         );
+      },
+      // 口令抽奖是否需要登录状态
+      needLoginStatus() {
+        if (this.configList && this.configList['ui.show_chat_without_login'] == '0') {
+          //
+          if (this.joinUserId !== 0 || this.isEmbed) {
+            // 当前为嵌入页或已登录
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          // 配置了聊天免登录
+          return false;
+        }
+      },
+      // 是否是嵌入页
+      isEmbed() {
+        return this.$domainStore.state?.roomBaseServer?.embedObj?.embed;
+      },
+      // 房间配置
+      configList() {
+        return this.$domainStore.state?.roomBaseServer?.configList;
+      },
+      // 参会id(识别登录状态)
+      joinUserId() {
+        return this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
       }
     },
     data() {
       return {
         timer: null,
-
         loading: false,
         joined: false
       };
@@ -103,16 +129,7 @@
         this.$emit('end');
       },
       joinLottery() {
-        // 如果开启了聊天免登陆
-        // if (!this.noChatLogin) {
-        //   if (!this.isLogin && !this.isEmbed) {
-        //     this.$emit('handleLogin');
-        //     return;
-        //   }
-        // }
-        const state = useUserServer().state;
-        const { userInfo } = state;
-        if (!userInfo || !userInfo.user_id) {
+        if (this.needLoginStatus) {
           return this.$emit('needLogin');
         }
         if (this.loading || this.joined) return;

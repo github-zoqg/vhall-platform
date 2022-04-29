@@ -2,10 +2,11 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
-      <!-- 主持人显示开始结束直播按钮 -->
-      <template v-if="deviceStatus == 2">
+      <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
+      <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
         <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
           {{ isRecord ? '开始录制' : '开始直播' }}
@@ -24,7 +25,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving && !isInGroup">
+      <template v-if="roleName == 4 && isLiving && !isInGroup && deviceStatus != 2">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -87,7 +88,8 @@
     useInteractiveServer,
     useSubscribeServer,
     useSplitScreenServer,
-    useMediaCheckServer
+    useMediaCheckServer,
+    useRebroadcastServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -144,6 +146,10 @@
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
+      },
+      // 是否为第三方发起
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       }
     },
     components: {
@@ -155,18 +161,28 @@
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.rebroadcastServer = useRebroadcastServer();
       this.initConfig();
       this.listenEvents();
     },
     mounted() {
-      if (this.deviceStatus == 2) {
+      /*
+       * 补充：第三方发起时，不在进行设备状态的相关提示
+       *    若助理，则无需进行提示，助理是不存在上麦的
+       */
+      if (this.deviceStatus == 2 && this.roleName != 3 && !this.isThirdStream) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
-        this.liveStep = 2;
+        // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
+        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
+          this.liveStep = 3;
+        } else {
+          this.liveStep = 2;
+        }
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
           this.handlePublishComplate();
@@ -181,7 +197,13 @@
           .userApply()
           .then(res => {
             if (+res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513025) {
+                this.$message.error(
+                  this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
+                );
+              } else {
+                this.$message.error(res.msg);
+              }
               return;
             }
             this.isApplying = true;
@@ -370,8 +392,13 @@
       // 开始直播/录制事件
       handleStartClick() {
         this.liveStep = 2;
-        // 派发推流事件
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        if (this.isThirdStream) {
+          // 若是选择第三方发起，则直接进行调用接口更改liveStep状态
+          this.handlePublishComplate();
+        } else {
+          // 派发推流事件
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        }
       },
       // 结束直播/录制
       handleEndClick() {
@@ -389,13 +416,22 @@
         const { watchInitData, interactToolStatus } = this.roomBaseServer.state;
 
         this.liveStep = 4;
+
+        // 如果正在开启转播
+        if (watchInitData.rebroadcast.id) {
+          // 先结束转播
+          await this.rebroadcastServer.stop({
+            webinar_id: watchInitData.webinar.id,
+            source_id: this.rebroadcastServer.state.sourceWebinarId
+          });
+        }
+
         const res = await this.roomBaseServer.endLive({
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
-          this.splitScreenServer.state.isOpenSplitScreen = false;
           return;
         }
 
@@ -403,9 +439,6 @@
           // 如果是第三方推流直接生成回放
           this.handleSaveVodInLive();
           this.liveStep = 1;
-        } else {
-          // 如果不是第三方推流,派发结束直播事件,停止推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
         }
       },
       // 录制页 点击结束录制

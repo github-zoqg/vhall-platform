@@ -280,8 +280,6 @@
             );
             if (mainScreenSpeaker.streamId) {
               this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
-            } else {
-              this.$message.warning('当前用户正在推流，请稍等');
             }
           }
         });
@@ -360,9 +358,9 @@
               }
             }
           }
-          // .vmp-stream-local__bottom {
-          //   bottom: 17px;
-          // }
+          .vmp-stream-local__bottom {
+            bottom: 18px;
+          }
         }
         // 远端流大窗样式
       }

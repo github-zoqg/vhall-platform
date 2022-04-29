@@ -43,10 +43,10 @@
     </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
-        <div
-          class="vmp-subscribe-body-auth-two"
-          v-if="subOption.verify == 6 && !subOption.is_subscribe && webinarType != 3"
-        >
+        <div v-if="subOption.needAgreement" @click="showAgreement">
+          <span>{{ $t('appointment.appointment_1025') }}</span>
+        </div>
+        <div class="vmp-subscribe-body-auth-two" v-else-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
           ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
@@ -98,7 +98,8 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
-  import { boxEventOpitons, browserType } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import authBox from './components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
@@ -121,7 +122,8 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          hide_subscribe: 1
+          hide_subscribe: 1,
+          needAgreement: false
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
@@ -132,6 +134,28 @@
       authBox
     },
     computed: {
+      /**
+       * 观看协议展示条件
+       * 非单视频嵌入
+       * 直播 type == 1
+       */
+      showViewRestriction() {
+        const agreement = this.subOption.needAgreement;
+        const isEmbed = this.roomBaseServer.state.embedObj.embedVideo;
+        const isLive = this.webinarType == 1 || this.webinarType == 5;
+        if (agreement && !isEmbed && isLive) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      showSubscribeBtn() {
+        if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
@@ -150,7 +174,7 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
-      // 是否为嵌入页
+      // 是否为完全嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
@@ -203,7 +227,7 @@
         });
       },
       handlerInitInfo() {
-        const { webinar, join_info, warmup } = this.roomBaseServer.state.watchInitData;
+        const { webinar, join_info, warmup, agreement } = this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.verify = webinar.verify;
         this.subOption.fee = webinar.fee || 0;
@@ -213,6 +237,18 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (
+          agreement &&
+          agreement.is_open === 1 &&
+          agreement.is_agree !== 1 &&
+          webinar.type !== 2 &&
+          webinar.type !== 3 &&
+          !this.roomBaseServer.state?.embedObj?.embedVideo
+        ) {
+          // 预约和结束状态不显示,视频嵌入页不显示
+          // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
+          this.subOption.needAgreement = true;
+        }
         if (webinar.type == 2) {
           // 嵌入页没有预约页
           if (this.isEmbed) {
@@ -251,9 +287,8 @@
         let params = {
           type: type,
           webinar_id: this.webinarId,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
-          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query
         };
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
@@ -319,13 +354,14 @@
             this.isSubscribeShow = true;
             break;
           case 512523:
-            open_id = sessionStorage.getItem('open_id') || '';
+            this.webinarPayAuth();
+            /* open_id = sessionStorage.getItem('open_id') || '';
             userId = this.userInfo ? this.userInfo.user_id : '';
             if (!open_id && !userId) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
               return;
             }
-            if (browserType() && open_id) {
+            if (isWechat() && open_id) {
               // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
               // const open_id = sessionStorage.getItem('open_id');
               params = {
@@ -347,19 +383,110 @@
                   `/lives/watch/${this.webinarId}`
               };
               this.handlePay(params, 2);
-            }
+            } */
             break;
           default:
             this.$toast(this.$tec(code) || msg);
             break;
         }
       },
+      webinarPayAuth() {
+        const open_id = sessionStorage.getItem('open_id');
+        let params = {};
+        let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        const userId = this.userInfo ? this.userInfo.user_id : '';
+        if (!open_id && !userId) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+          return;
+        }
+
+        if (isWechat()) {
+          // 微信正常授权过
+          if (open_id) {
+            params = {
+              webinar_id: this.webinarId,
+              type: 2, // 1-支付宝，2-微信
+              service_code: 'JSAPI',
+              code: open_id
+            };
+          } else {
+            //重新授权
+            payAuthStatus = 1;
+            const payUrl = buildPayUrl(this.$route);
+            authWeixinAjax(this.$route, payUrl, () => {});
+          }
+        } else {
+          //如果是企业微信环境
+          if (isWechatCom()) {
+            params = {
+              webinar_id: this.webinarId,
+              type: 2, //1-支付宝，2-微信
+              service_code: 'H5_PAY', //支付方式 H5_PAY JSAPI
+              user_id: userId,
+              show_url:
+                window.location.origin +
+                process.env.VUE_APP_ROUTER_BASE_URL +
+                `/lives/watch/${this.webinarId}`
+            };
+          } else {
+            params = {
+              webinar_id: this.webinarId,
+              type: 1,
+              service_code: 'H5_PAY',
+              user_id: userId,
+              show_url:
+                window.location.origin +
+                process.env.VUE_APP_ROUTER_BASE_URL +
+                `/lives/watch/${this.webinarId}`
+            };
+          }
+        }
+
+        if (payAuthStatus == 0) {
+          this.newHandlePay(params);
+        }
+      },
+      newHandlePay(params) {
+        const that = this;
+        this.subscribeServer
+          .payWay({ ...params })
+          .then(res => {
+            if (res.code == 200) {
+              if (isWechat()) {
+                WeixinJSBridge.invoke(
+                  'getBrandWCPayRequest',
+                  {
+                    appId: res.data.appId,
+                    timeStamp: String(res.data.timeStamp), // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                    nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
+                    package: res.data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                    signType: res.data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                    paySign: res.data.paySign // 支付签名
+                  },
+                  function (res) {
+                    if (res.err_msg == 'get_brand_wcpay_request:ok') {
+                      window.location.reload();
+                    }
+                  }
+                );
+              } else {
+                window.location.href = res.data.link;
+              }
+            } else {
+              that.$toast(`${that.$tec(res.code) || res.msg}`);
+            }
+          })
+          .catch(e => {
+            console.log(e, '获取支付信息失败');
+            that.$toast(`${that.$tec(e.code) || e.msg}`);
+          });
+      },
       handlePay(params, flag) {
         this.subscribeServer
           .payWay({ ...params })
           .then(res => {
             if (res.data) {
-              if (browserType() && flag == 1) {
+              if (isWechat() && flag == 1) {
                 WeixinJSBridge.invoke(
                   'getBrandWCPayRequest',
                   {
@@ -392,9 +519,8 @@
           type: type,
           webinar_id: this.webinarId,
           verify_value: value,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
-          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id
+          visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query
         };
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
@@ -486,16 +612,13 @@
         }
       },
       initPage() {
-        if (this.webinarType != 3) {
+        if (this.webinarType == 3) {
+          this.showBottomBtn = false;
+          this.countDownTime = 0;
+        } else {
           // 不是 活动结束 - 就启动倒计时
           this.sureCountDown();
           this.handlerInitInfo();
-        } else if (this.webinarType == 3) {
-          if (this.roomBaseServer.state.embedObj.embedVideo) {
-            this.showBottomBtn = false;
-          }
-          this.subscribeText = this.$t('player.player_1017');
-          this.countDownTime = 0;
         }
       },
       livingStartConfirm() {
@@ -516,14 +639,9 @@
         const activeId = this.$route.params.id;
         const { join_info } = this.roomBaseServer.state.watchInitData;
         const joinId = join_info.join_id;
-        const lang = localStorage.getItem('lang');
-
-        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}&lang=${lang}`;
-
+        const inviteUrl = `/lives/invite/${activeId}?invite_id=${joinId}`;
         const location = window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL;
-
         const url = `${location}${inviteUrl}`;
-
         window.location.href = url;
       },
       /**
@@ -579,6 +697,15 @@
           clearInterval(this.countDowntimer);
           this.countDownTime = '';
         }
+      },
+      showAgreement() {
+        this.roomBaseServer.$emit('POPUP_AGREEMENT');
+      },
+      // 同意观看协议后回调
+      handleAgreeWitthTerms() {
+        this.subOption.needAgreement = false;
+        const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        this.authCheck(type);
       }
     }
   };

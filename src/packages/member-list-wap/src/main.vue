@@ -117,7 +117,6 @@
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { interact = {} } = watchInitData;
-        console.log(this.roomBaseServer.state);
         this.roomId = interact.room_id;
       },
       // 初始化事件监听
@@ -125,17 +124,14 @@
         const _this = this;
         // 加入房间消息
         this.msgServer.$onMsg('JOIN', msg => {
-          console.log(msg, '加入房间消息');
           this.handleGroupPerson(msg, 'JOIN');
         });
         // 离开房间消息
         this.msgServer.$onMsg('LEFT', msg => {
-          console.log(msg, '离开房间消息');
           this.handleGroupPerson(msg, 'LEFT');
         });
         //直播结束
         this.msgServer.$on('live_over', () => {
-          console.log('【成员列表消息】结束直播');
           this.updateOnlineUserList();
         });
         this.msgServer.$onMsg('ROOM_MSG', rawMsg => {
@@ -166,51 +162,34 @@
               break;
           }
         });
-        //开始讨论
-        // this.groupServer.$on('GROUP_SWITCH_START', msg => {
-        //   console.log('开始讨论', msg);
-        //   _this.initList();
-        // });
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
-          console.log('结束讨论', msg);
           this.updateOnlineUserList();
         });
         // 主持人进入退出小组 消息监听
         this.groupServer.$on('GROUP_MANAGER_ENTER', msg => {
-          console.log('[成员列表，主持人进出小组]');
           this.updateOnlineUserList();
         });
         //解散小组
         this.groupServer.$on('GROUP_DISBAND', () => {
-          console.log('解散小组');
           this.updateOnlineUserList();
         });
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          console.log('踢出小组事件');
           handleGroupKicked(msg);
         });
         //切换频道
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', msg => {
-          console.log('切换频道', msg);
           this.updateOnlineUserList();
         });
         // 切换组长(组长变更)
         this.groupServer.$on('GROUP_LEADER_CHANGE', msg => {
-          console.log('切换组长(组长变更)', msg);
           handleGroupLeaderChange(msg);
         });
         //为上线的分组成员添加身份
         this.groupServer.$on('GROUP_JOIN_INFO', msg => {
-          console.log('为上线成员添加身份', msg);
           handleGroupJoinInfoChange(msg);
         });
-        //切换分组
-        // this.groupServer.$on('GROUP_JOIN_CHANGE', msg => {
-        //   console.log('切换分组', msg);
-        //   _this.initList();
-        // });
         //踢出小组
         function handleGroupKicked(msg) {
           if (!_this.groupInitData.isInGroup) return;
@@ -229,6 +208,10 @@
         // 组长改变的消息
         function handleGroupLeaderChange(msg) {
           console.log(msg, '组长改变的消息');
+          if (!_this.groupInitData.isInGroup) {
+            return;
+          }
+          _this.updateOnlineUserList();
         }
         // 人员身份更改
         function handleGroupJoinInfoChange(msg) {
@@ -237,7 +220,6 @@
               item.role_name = msg.data.join_role;
             }
           });
-          console.log(msg, '人员身份更改');
         }
         // 主房间人员变动
         function handleMainRoomJoinChange(msg) {
@@ -285,7 +267,6 @@
         return this.memberServer
           .getOnlineUserList(params)
           .then(res => {
-            console.log(res, '请求在线人员');
             const { list = [], total = 0, code } = res && res.data ? res.data : {};
             if (this.pageConfig.page === 0) {
               this.list = list;
@@ -295,7 +276,6 @@
             const uniqList = uniqBy(this.list, 'account_id');
             this.list = this.memberServer._sortUsers(uniqList);
             this.memberServer.updateState('onlineUsers', this.list);
-            console.log(this.list);
             this.pageConfig.total = total;
             this.finished = this.list.length >= total;
             if (!['200', 200].includes(code) || !list.length) {
@@ -316,7 +296,6 @@
         if (this.loading || this.finished || this.refreshing) {
           return;
         }
-        console.log('222222');
         this.pageConfig.page++;
         this.getList();
       },
@@ -358,19 +337,16 @@
           temp.nickname = temp.nick_name;
         }
         const index = this.list.findIndex(item => item.account_id === temp.account_id);
-        console.log(this.list);
 
         if (type === 'JOIN' && index === -1) {
           this.list.push(temp);
           this.list = this.memberServer._sortUsers(this.list);
           this.pageConfig.total++;
-          console.log(temp, '上线人员信息');
           return;
         }
         if (type === 'LEFT' && index !== -1) {
           this.list.splice(index, 1);
           this.pageConfig.total--;
-          console.log(temp, '离线人员信息');
         }
       }
     }
@@ -427,7 +403,6 @@
       font-weight: 400;
       color: #8c8c8c;
       line-height: 30px;
-      vertical-align: middle;
     }
     .info-role {
       text-align: center;

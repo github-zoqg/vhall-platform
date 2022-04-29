@@ -632,13 +632,14 @@
         }
 
         .tips {
-          display: inline-block;
+          position: absolute;
           width: 4px;
           height: 4px;
           border-radius: 50%;
           background: #ff0005;
           border: 9px solid #ff0005;
-          transform: translate(30%, -100%);
+          right: 18px;
+          top: 10px;
         }
 
         .bottom-line {

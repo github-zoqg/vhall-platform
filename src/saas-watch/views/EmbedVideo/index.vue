@@ -100,7 +100,9 @@
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }
@@ -120,11 +122,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -212,24 +215,25 @@
           case 512514:
             this.errorData.errorPageTitle = 'un_auth'; // 您已被禁止访问当前活动，被踢出直播间
             break;
+          case 512588:
+            this.errorData.errorPageTitle = 'embed_verify';
+            this.errorData.errorPageText = this.$tec(err.code) || err.msg;
+            break;
           case 512539:
             this.errorData.errorPageTitle = 'embed_verify'; // 观看页为嵌入页，设置观看限制为付费、邀请码、白名单、付费or邀请码、设置了报名报单时，访问观看页时，页面提示
             break;
           case 611001:
-            this.errorData.errorPageTitle = '互动初始化失败，' + err.message;
+            this.errorData.errorPageTitle = '互动初始化失败，' + err.msg;
             break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
-            this.errorData.errorPageText = this.$tec(err.code) || err.message;
+            this.errorData.errorPageText = this.$tec(err.code) || err.msg;
         }
       }
     }
   };
 </script>
 <style lang="less">
-  body {
-    overflow: hidden;
-  }
   .vmp-embed-video-basic-container {
     width: 100%;
     height: 100%;

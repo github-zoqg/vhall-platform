@@ -5,7 +5,8 @@
     :class="[
       miniElement === 'screen' ? 'mini' : 'normal',
       { 'is-watch': isWatch },
-      { 'has-stream-list': hasStreamList }
+      { 'has-stream-list': hasStreamList },
+      { 'share-screen': isShareScreen }
     ]"
   >
     <!-- 结束演示按钮 -->
@@ -215,12 +216,17 @@
           }
           return false;
         }
+      },
+      // 当前文档或白板容器的Id
+      currentCid() {
+        return this.docServer.state.currentCid;
       }
     },
     components: {
       SaasAlert
     },
     beforeCreate() {
+      this.docServer = useDocServer();
       this.micServer = useMicServer();
       this.roomBaseServer = useRoomBaseServer();
       this.mediaSettingServer = useMediaSettingServer();
@@ -272,17 +278,17 @@
           this.interactiveServer.resetLayout();
         });
 
-        this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1013`),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeStream();
-          }
-        });
+        // this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
+        //   if (e.data.stream.getID() == this.desktopShareServer.state.localDesktopStreamId) {
+        //     this.$message({
+        //       message: this.$t(`interact.interact_1013`),
+        //       showClose: true,
+        //       type: 'warning',
+        //       customClass: 'zdy-info-box'
+        //     });
+        //     this.subscribeStream();
+        //   }
+        // });
 
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
@@ -320,12 +326,13 @@
             }
           }
 
-          // 桌面共享开启消息
+          // 桌面共享关闭消息
           if (msg.data.type === 'desktop_sharing_disable') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'player') {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'player' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -333,12 +340,13 @@
             useRoomBaseServer().setInavToolStatus('is_desktop', 0);
           }
 
-          // 桌面共享关闭消息
+          // 桌面共享开启消息
           if (msg.data.type === 'desktop_sharing_open') {
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
-              if (useRoomBaseServer().state.miniElement == 'doc') {
-                return;
-              }
+              const { miniElement } = useRoomBaseServer().state;
+              const { switchStatus } = useDocServer().state;
+              if (miniElement === 'doc' || !switchStatus) return;
+
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
               );
@@ -413,10 +421,8 @@
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
-        if (!this.isWatch && useDocServer().state.switchStatus) {
-          // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
-          this.interactiveServer.setDesktop({ status });
-        }
+        if (this.isWatch || !useDocServer().state.switchStatus) return;
+        this.interactiveServer.setDesktop({ status });
       },
       // 关闭弹窗
       closeConfirm() {
@@ -439,12 +445,17 @@
 
 <style lang="less">
   .vmp-desktop-screen {
-    width: 100%;
-    height: 100%;
     background: #2d2d2d;
     position: relative;
     display: flex;
-    z-index: 3;
+    #vmp-desktop-screen-subscribe {
+      width: 100%;
+      height: 100%;
+    }
+    &.share-screen {
+      width: 100%;
+      height: 100%;
+    }
     &__tip {
       text-align: center;
       position: absolute;

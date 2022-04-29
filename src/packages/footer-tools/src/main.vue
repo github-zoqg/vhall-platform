@@ -19,7 +19,10 @@
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </div>
-      <div class="vmp-footer-tools__left-language" v-if="isEmbed && languageList.length > 1">
+      <div
+        class="vmp-footer-tools__left-language"
+        v-if="isEmbed && languageList.length > 1 && !isInGroup"
+      >
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -65,7 +68,7 @@
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="isLiving">
+      <li v-if="isLiving || isEnding">
         <!-- 抽奖 -->
         <lottery-icon @clickIcon="checkLotteryIcon" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
@@ -184,6 +187,10 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否结束直播
+      isEnding() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3;
       },
       isTrySee() {
         const { watchInitData } = this.roomBaseState;
@@ -362,6 +369,9 @@
       > div {
         margin-left: 16px;
       }
+      li {
+        line-height: initial; // 防止继承外部属性值
+      }
       li > div > img {
         width: 32px;
         height: 32px;
@@ -388,7 +398,7 @@
       background: #fb3a32;
       border: 1px solid #2a2a2a;
       border-radius: 50%;
-      top: 10px;
+      // top: 10px;
       right: 0px;
       position: absolute;
     }

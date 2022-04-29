@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap">
-    <div class="vmp-chat-wap__content" ref="chatContent">
+    <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
         v-if="hideChatHistory && !chatList.length && !historyLoaded"
@@ -10,28 +10,31 @@
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <virtual-list
-        ref="chatlist"
-        :style="{ height: chatlistHeight, overflow: 'auto' }"
-        :keeps="30"
-        :data-key="'count'"
-        :data-sources="chatList"
-        :data-component="msgItem"
-        :extra-props="{
-          previewImg: previewImg.bind(this),
-          emitLotteryEvent,
-          emitQuestionnaireEvent,
-          joinInfo
-        }"
-        @tobottom="toBottom"
-      ></virtual-list>
-      <div
-        class="vmp-chat-wap__content__new-msg-tips"
-        v-show="isHasUnreadAtMeMsg"
-        @click="scrollToTarget"
-      >
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+      <div ref="chatContent" class="virtual-content">
+        <virtual-list
+          ref="chatlist"
+          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
+          :keeps="20"
+          :estimate-size="100"
+          :data-key="'count'"
+          :data-sources="chatList"
+          :data-component="msgItem"
+          :extra-props="{
+            previewImg: previewImg.bind(this),
+            emitLotteryEvent,
+            emitQuestionnaireEvent,
+            joinInfo
+          }"
+          @tobottom="toBottom"
+        ></virtual-list>
+        <div
+          class="vmp-chat-wap__content__new-msg-tips"
+          v-show="isHasUnreadAtMeMsg"
+          @click="scrollToTarget"
+        >
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
@@ -54,7 +57,13 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useGroupServer,
+    useMicServer,
+    useMenuServer
+  } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
@@ -107,8 +116,13 @@
         allBanned: useChatServer().state.allBanned,
         //是否加载完聊天历史
         historyLoaded: false,
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0
+        },
         //聊天内容高度
-        chatlistHeight: '100%',
+        chatlistHeight: 0,
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
@@ -208,7 +222,6 @@
     created() {
       this.initViewData();
       this.page = 0;
-      this.imgUrls = [];
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -242,13 +255,10 @@
           this.$nextTick(() => {
             if (e) {
               this.chatlistHeight =
-                this.$refs.chatContent.clientHeight -
-                this.$refs.sendBox.$el.clientHeight +
-                60 +
-                'px';
+                this.$refs.chatContentMain.clientHeight - this.$refs.sendBox.$el.clientHeight + 60;
               this.scrollBottom();
             } else {
-              this.chatlistHeight = '100%';
+              this.chatlistHeight = this.virtual.contentHeight;
             }
           });
         });
@@ -274,7 +284,12 @@
         this.scrollBottom();
       },
       showWelcomeTxt() {
-        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+        // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
+        this.welcomeText &&
+          this.$toast({
+            message: `${this.joinInfo.nickname}${this.welcomeText}`,
+            position: 'bottom'
+          });
       },
       //初始化视图数据
       initViewData() {
@@ -330,6 +345,15 @@
         chatServer.$on('roomKickout', () => {
           this.$toast(this.$t('chat.chat_1007'));
         });
+        //监听切换到当前tab
+        this.menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.showlist = data.cuid == this.cuid;
+            this.chatlistHeight = this.virtual.contentHeight;
+            this.scrollBottom();
+          });
+        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {
@@ -349,18 +373,17 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-
-        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
-        if (chatList.length > 0) {
-          this.imgUrls = imgUrls;
-        }
+        await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
         this.scrollBottom();
       },
-      previewImg(img) {
-        const index = this.imgUrls.findIndex(item => item === img);
+      //图片预览
+      previewImg(img, index = 0, list = []) {
+        if ((Array.isArray(list) && !list.length) || index < 0) {
+          return;
+        }
         ImagePreview({
-          images: this.imgUrls,
+          images: list,
           startPosition: index,
           lazyLoad: true
         });
@@ -388,10 +411,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.chatlist &&
           this.$refs.chatlist.$el.scrollHeight -
             this.$refs.chatlist.$el.scrollTop -
             this.$refs.chatlist.getClientSize() <
-          5
+            5
         );
       },
       showUserPopup() {
@@ -437,6 +461,15 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    .virtual-content {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      .virtual-list {
+        height: 100%;
+        overflow: auto;
+      }
+    }
     &__content {
       position: absolute;
       top: 0;

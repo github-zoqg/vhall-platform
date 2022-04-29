@@ -265,6 +265,7 @@
             }
           } else {
             if (newval) {
+              // useDocServer().resetLayoutByMiniElement();
               // 开启共享
               useRoomBaseServer().setChangeElement('stream-list');
             }
@@ -355,15 +356,17 @@
     directives: {
       drag(el, bindings) {
         el.onmousedown = function (e) {
-          const boxdom = document.getElementById('vmp-stream-list');
-          var disx = e.pageX - el.offsetLeft;
-          const boxdomScrollLeft = boxdom.scrollLeft;
-          document.onmousemove = function (e) {
-            const l = e.pageX - disx;
-            boxdom.scrollLeft = boxdomScrollLeft - l * (boxdom.offsetWidth / el.offsetWidth);
+          // const boxdom = document.getElementById('vmp-stream-list');
+          let startX = e.pageX;
+          // var disx = e.pageX - el.offsetLeft;
+          // const boxdomScrollLeft = boxdom.scrollLeft;
+          el.onmousemove = function (e) {
+            const l = e.pageX - startX;
+            // boxdom.scrollLeft = boxdomScrollLeft - l * (boxdom.offsetWidth / el.offsetWidth);
+            el.scrollLeft -= l;
           };
-          document.onmouseup = function (e) {
-            document.onmousemove = document.onmouseup = null;
+          el.onmouseup = function (e) {
+            el.onmousemove = null;
           };
         };
       }
@@ -393,6 +396,10 @@
       flex: 1;
       overflow: hidden;
       display: flex;
+      display: inherit;
+      cursor: pointer;
+
+      user-select: none;
       &-scroll {
         display: flex;
         justify-content: center;
@@ -565,6 +572,12 @@
         .vmp-stream-list__remote-container {
           width: 72px;
           height: 40px;
+
+          &:not(.vmp-stream-list__main-screen) {
+            .vmp-stream-local__bottom-nickname {
+              width: 60px;
+            }
+          }
         }
         .vmp-stream-local__bottom-role {
           display: none;

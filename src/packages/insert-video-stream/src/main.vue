@@ -10,12 +10,13 @@
       'vmp-insert-stream__mini': miniElement == 'insert-video',
       'vmp-insert-stream__is-watch': isWatch,
       'vmp-insert-stream__is-embed': isEmbed,
-      'vmp-insert-stream__has-stream-list': hasStreamList
+      'vmp-insert-stream__has-stream-list': hasStreamList,
+      'vmp-insert-stream__is-watch-full-screen': isWatch && isFullScreen
     }"
   >
     <div class="vmp-insert-stream-mask">
       <p>
-        <span>视图</span>
+        <span class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
           content="切换"
           placement="top"
@@ -63,7 +64,10 @@
     ></div>
 
     <!-- 音频插播封面图 -->
-    <div v-if="isAudio && (!isLiving || mode == 1)" class="vmp-insert-stream-audio-poster"></div>
+    <div
+      v-if="isAudio && ((isLiving && isFullScreen) || !isLiving || mode == 1)"
+      class="vmp-insert-stream-audio-poster"
+    ></div>
 
     <!-- 远端视频插播的播放器容器 -->
     <div id="vmp-insert-remote-stream" class="vmp-insert-remote-stream">
@@ -349,10 +353,8 @@
           .catch(err => {
             console.log('初始化本地插播播放器失败', err);
             this.$message.warning('视频分辨率过高，请打开分辨率为1280*720以下的视频');
-            // 关闭插播
-            this.closeInsertvideo({
-              isShowConfirmDialog: false
-            }); // 关闭插播
+            // 关闭插播，传 ture 不需要更改麦克风状态
+            this.closeInsertvideoHandler(true);
           });
       },
       // 本地插播，video成功创建之后的处理逻辑
@@ -476,7 +478,7 @@
       },
       // 打开插播列表dialog
       handleOpenInsertFileDialog() {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'openInsertFileDialog'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenInsertFileDialog'));
       },
       /**
        * 关闭插播
@@ -949,6 +951,18 @@
     &__has-stream-list {
       top: 80px;
     }
+    &__is-watch-full-screen {
+      .vmp-insert-stream-mask {
+        height: 25px;
+        bottom: 16px;
+        top: auto;
+        opacity: 1;
+        background: none;
+      }
+      .vmp-insert-stream-mask__label {
+        display: none;
+      }
+    }
     .vmp-insert-local-stream {
       position: absolute;
       height: 100px;
@@ -1033,7 +1047,7 @@
     &-controller {
       position: absolute;
       bottom: -31px;
-      z-index: 1;
+      z-index: 6;
       width: 100%;
       padding: 0px 0 0 23px;
       height: 38px;

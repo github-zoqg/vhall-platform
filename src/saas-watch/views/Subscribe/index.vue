@@ -17,6 +17,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
   export default {
     name: 'vmpSubscribe',
@@ -33,6 +34,7 @@
     components: {
       ErrorPage
     },
+    mixins: [authCheck],
     async created() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
@@ -57,6 +59,9 @@
         }
         await this.initReceiveLive(this.clientType);
         await subscribeState();
+        if (this.clientType != 'embed') {
+          await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
+        }
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
@@ -72,9 +77,18 @@
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
       }
+    },
+    mounted() {
+      const roomBaseServer = useRoomBaseServer();
+      roomBaseServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
+        this.state = 2;
+        this.errorData.errorPageTitle = 'view_restriction';
+      });
     },
     methods: {
       initReceiveLive(clientType) {
@@ -82,11 +96,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -98,7 +113,23 @@
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
+        let currentQuery = location.search;
         switch (err.code) {
+          case 512534:
+            window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
+            break;
+          case 512502: // 不支持的活动类型（flash）
+          case 512503: // 不支持的活动类型（旧H5）
+            currentQuery =
+              currentQuery.indexOf('nickname=') != -1
+                ? currentQuery.replace('nickname=', 'name=')
+                : currentQuery;
+            currentQuery =
+              currentQuery.indexOf('record_id=') > -1
+                ? currentQuery.replace('record_id=', 'rid=')
+                : currentQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
             break;
@@ -120,26 +151,29 @@
           case 512514:
             this.errorData.errorPageTitle = 'un_auth'; // 您已被禁止访问当前活动，被踢出直播间
             break;
+          case 512588:
+            this.errorData.errorPageTitle = 'embed_verify';
+            this.errorData.errorPageText = this.$tec(err.code) || err.msg;
+            break;
           case 512539:
             this.errorData.errorPageTitle = 'embed_verify'; // 观看页为嵌入页，设置观看限制为付费、邀请码、白名单、付费or邀请码、设置了报名报单时，访问观看页时，页面提示
             break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
-            this.errorData.errorPageText = this.$tec(err.code) || err.message;
+            this.errorData.errorPageText = this.$tec(err.code) || err.msg;
         }
       }
     }
   };
 </script>
 <style lang="less">
-  body {
-    overflow-y: auto;
-  }
   .vmp-subscribe-container {
+    height: 100vh;
     .vmp-basic-container {
       width: 100%;
       height: 100%;
       background: #1a1a1a;
+      overflow-y: auto;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {
@@ -157,8 +191,9 @@
     }
     .vmp-container-embed {
       width: 100%;
-      height: 100%;
+      height: 100vh;
       background: #1a1a1a;
+      overflow: hidden;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;
       .vmp-basic-bd {

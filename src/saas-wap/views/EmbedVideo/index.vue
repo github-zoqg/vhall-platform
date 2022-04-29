@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout vmp-basic-layout-embed">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -25,7 +25,7 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
-  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import { getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -41,6 +41,14 @@
     },
     async created() {
       try {
+        if (isWechatCom()) {
+          if (sessionStorage.getItem('reloadStatus')) {
+            sessionStorage.setItem('reloadStatus', 2);
+          } else {
+            sessionStorage.setItem('reloadStatus', 1);
+            window.location.reload();
+          }
+        }
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'embed';
@@ -115,11 +123,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -164,9 +173,9 @@
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
         } else if (err.code == 611001) {
-          this.liveErrorTip = '互动初始化失败，' + err.message;
+          this.liveErrorTip = '互动初始化失败，' + err.msg;
         } else {
-          this.liveErrorTip = this.$tec(err.code) || err.message;
+          this.liveErrorTip = this.$tec(err.code) || err.msg;
         }
       },
       goSubscribePage(clientType) {
@@ -180,9 +189,10 @@
   };
 </script>
 <style lang="less">
-  .vmp-basic-layout {
-    .vmp-basic-bd {
-      margin-top: 55%;
+  .vmp-basic-layout-embed {
+    .vmp-basic-container {
+      display: flex;
+      align-items: center;
     }
   }
 </style>

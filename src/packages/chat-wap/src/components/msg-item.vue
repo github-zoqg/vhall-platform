@@ -45,35 +45,33 @@
     </template>
     <!-- 打赏 -->
     <template v-else-if="source.type == 'reward_pay_ok'">
-      <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
+      <div class="msg-item new-gift">
         <div class="interact-gift-box">
           <p class="new-gift-name">
             {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
-            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | overHidden(6) }}
+            {{ $t('chat.chat_1029') }}
           </p>
+          <img class="new-award-img" src="../img/red-package.png" />
         </div>
-        <img class="new-award-img" src="../img/red-package.png" />
+        <p class="reward_txt">
+          {{ source.content.text_content | overHidden(10) }}
+        </p>
       </div>
     </template>
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
-      <div
-        v-if="source.content.gift_name"
-        class="msg-item interact new-gift"
-        :class="Math.random() * 10 > 3 ? 'purpose' : 'red'"
-      >
+      <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box">
-          <p class="new-gift-name">
+          <span class="new-gift-name">
             {{ source.nickname | overHidden(10) }}
-          </p>
-          <p class="new-gift-content">
+          </span>
+          <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
-          </p>
+          </span>
+          <img class="new-gift-img" :src="source.content.gift_url" />
         </div>
-        <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
     <!-- 聊天消息 -->
@@ -125,7 +123,7 @@
               </p>
               <div class="msg-content_body">
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="source.content.text_content"></span>
+                <span v-html="msgContent"></span>
                 <img
                   @click="$emit('preview', img)"
                   class="msg-content_chat-img"
@@ -165,9 +163,9 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="source.content.text_content" style="display: block"></span>
+                <span v-html="msgContent" style="display: block" class="aaa"></span>
                 <img
-                  @click="previewImg(img)"
+                  @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
                   width="50"
                   height="50"
@@ -267,32 +265,39 @@
       //处理@消息
       handleAt() {
         //@用户
-        if (this.source && Array.isArray(this.source.atList) && !this.source.atList.length) {
-          this.msgContent = this.source.content.text_content;
-        } else if (this.source.atList && this.source.atList.length) {
+        //todo 可以考虑domaint提供统一的处理 实现@用户
+        if (!this.source.atList || !this.source.atList.length) {
+          this.msgContent = this.urlToLink(this.source.content.text_content);
+        } else {
           let at = false;
-          (this.source.atList || []).forEach(a => {
-            const userName = `@${a.nick_name} `;
+          this.source.atList.forEach(a => {
+            // TODO历史列表aList与直播中格式不一致作
+            const userName = `@${a.nick_name || a.nickName} `;
             const match =
               this.source.content &&
               this.source.content.text_content &&
               this.source.content.text_content.indexOf(userName) != -1;
-            console.log(match);
             if (match) {
               if (at) {
-                this.msgContent = this.msgContent.replace(
-                  userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.msgContent.replace(
+                    userName,
+                    `<span style='color:#3562fa'>${userName}</span>`
+                  )
                 );
               } else {
-                this.msgContent = this.source.content.text_content.replace(
-                  userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                this.msgContent = this.urlToLink(
+                  this.source.content.text_content.replace(
+                    userName,
+                    `<span style='color:#3562fa'>${userName}</span>`
+                  )
                 );
               }
               at = true;
             } else {
-              this.msgContent = at ? this.msgContent : this.source.content.text_content;
+              this.msgContent = at
+                ? this.urlToLink(this.msgContent)
+                : this.urlToLink(this.source.content.text_content);
             }
           });
         }
@@ -317,6 +322,39 @@
             this.$emit('dispatchEvent', { type: 'closeTip' });
           }, 10000);
         }
+      },
+      // 将聊天消息中的链接用 a 标签包裹
+      urlToLink(str) {
+        if (!str) return '';
+
+        // 提取聊天内容中的 img 标签
+        const regImg = /<img.*?(?:>|\/>)/g;
+        const imgArr = str.match(regImg);
+
+        // 提取聊天内容中除去 img 标签以外的部分
+        const strArr = str.split(regImg);
+        // eslint-disable-next-line no-useless-escape
+        const regUrl =
+          /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+
+        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
+        strArr.forEach((item, index) => {
+          const tempStr = item.replace(regUrl, function (match) {
+            return `<a class='msg-item__content-body__content-link' href='${match}' target='_blank'>${match}</a>`;
+          });
+          strArr[index] = tempStr;
+        });
+
+        // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
+        if (imgArr) {
+          const imgArrLength = imgArr.length;
+          let imgIndex = 0;
+          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+            imgIndex++;
+          }
+        }
+        return strArr.join('');
       }
     }
   };
@@ -342,7 +380,7 @@
           border-radius: 50%;
           display: block;
           border: 2px solid #e3e3e3;
-          object-fit: contain;
+          object-fit: cover;
         }
         .chat-phone {
           position: absolute;
@@ -478,12 +516,9 @@
     }
     .new-gift {
       padding-left: 0;
-      width: 350px;
-      margin-top: 26px;
-      height: 72px;
-      border-top-left-radius: 36px;
-      border-bottom-left-radius: 36px;
+      padding-top: 26px;
       position: relative;
+      display: block;
       &.interact {
         justify-content: unset;
       }
@@ -493,12 +528,15 @@
       &.red {
         background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
       }
+
       .interact-gift-box {
         padding-left: 24px;
         margin-right: 10px;
         text-align: left;
         width: 100%;
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border: none;
         p {
           text-align: left;
@@ -506,31 +544,28 @@
           color: #fff;
         }
         .new-gift-name {
-          font-size: 24px;
-          width: 240px;
+          font-size: 28px;
+          max-width: 240px;
           line-height: 28px;
-          padding-left: 8px;
-          margin-bottom: 6px;
+          margin-right: 8px;
+          color: #8c8c8c;
         }
         .new-gift-content {
-          font-size: 18px;
+          font-size: 28px;
           transform: scale(0.9);
           line-height: 22px;
-          margin-left: -4px;
+          color: #262626;
         }
       }
       .new-gift-img,
       .new-award-img {
-        position: absolute;
-        right: -36px;
-        bottom: 0;
-        display: inline-block;
-        width: 74px;
-        height: 74px;
-        border-radius: 40px;
-        border: 1px solid #f7f7f7;
-        background: #f7f7f7;
-        object-fit: scale-down;
+        width: 32px;
+      }
+      .reward_txt {
+        color: #ffd11a;
+        font-size: 28px;
+        line-height: 40px;
+        text-align: center;
       }
     }
     .margin-top-bottom {
@@ -542,6 +577,10 @@
       display: inline-block;
       padding: 2px 30px;
       border-radius: 20px;
+    }
+    .msg-item__content-body__content-link {
+      color: #3562fa;
+      text-decoration: underline #3562fa !important;
     }
   }
 </style>

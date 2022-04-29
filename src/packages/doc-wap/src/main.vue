@@ -14,7 +14,6 @@
     <div ref="docContent" class="vmp-doc-une__content">
       <div ref="docInner" class="vmp-doc-inner">
         <div>
-          <!-- display:none|block 会影响父级元素和iframe的通信，会导致通信时长延长5s左右，故采用visible -->
           <div
             v-for="item of docServer.state.containerList"
             :id="item.cid"
@@ -53,12 +52,12 @@
     </div>
 
     <!-- 全屏切换 -->
-    <div @click="fullscreen" class="btn-doc-fullscreen">
+    <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
       <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
       <i v-else class="vh-iconfont vh-line-amplification"></i>
     </div>
     <!-- 文档拖动后还原 -->
-    <div @click="restore" class="btn-doc-restore">
+    <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
       <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
     </div>
   </div>
@@ -69,6 +68,7 @@
     useDocServer,
     useMsgServer,
     usePlayerServer,
+    useRebroadcastServer,
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -84,7 +84,9 @@
         docViewRect: {
           width: 0,
           height: 0
-        }
+        },
+        rebroadcastStartTimer: null,
+        rebroadcastStopTimer: null
       };
     },
     computed: {
@@ -118,6 +120,7 @@
       },
       // 是否有翻页按钮
       hasPager() {
+        // 直播中 && 开启了文档显示 && 当前展示的是文档
         return (
           this.webinarType === 1 &&
           !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
@@ -134,7 +137,6 @@
             // 初始化事件
             this.initEvents();
             // 恢复上一次的文档数据;
-            console.log('----- recoverLastDocs 频道变更');
             this.recoverLastDocs();
           }
         }
@@ -150,6 +152,9 @@
       console.log('[doc] wap mounted');
       // 初始化文档server的getDocViewRect方法
       this.docServer.getDocViewRect = this.getDocViewRect;
+
+      // 初始计算一次文档区域
+      this.getDocViewRect();
 
       this.initEvents();
 
@@ -195,6 +200,42 @@
             );
           }
         });
+
+        const reBroadcastServer = useRebroadcastServer();
+        // 转播开始事件
+        reBroadcastServer.$on('live_broadcast_start', () => {
+          // 文档角色设置成观众，实际上wap端只能是观众
+          this.docServer.setRole(VHDocSDK.RoleType.SPECTATOR);
+          // 设置转播中
+          this.docServer.setRelay(true);
+          // 清除存在的定时器
+          if (this.rebroadcastStartTimer) {
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }
+          this.rebroadcastStartTimer = setTimeout(() => {
+            // 设置播放流模式为FLV模式
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.FLV);
+            this.recoverLastDocs();
+            clearTimeout(this.rebroadcastStartTimer);
+            this.rebroadcastStartTimer = null;
+          }, 1000);
+        });
+        // 转播结束事件
+        reBroadcastServer.$on('live_broadcast_stop', () => {
+          // 设置非转播
+          this.docServer.setRelay(false);
+          if (this.rebroadcastStopTimer) {
+            clearTimeout(this.rebroadcastStopTimer);
+            this.rebroadcastStopTimer = null;
+          }
+          this.rebroadcastStopTimer = setTimeout(() => {
+            // 重置状态
+            this.docServer.resetState();
+            this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
+            this.recoverLastDocs();
+          }, 1000);
+        });
       },
 
       /**
@@ -227,6 +268,7 @@
         }
         h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
+        console.log('[doc] ', this.docViewRect);
         return { width: w, height: h };
       },
       /**
@@ -343,9 +385,8 @@
         height: 100%;
         display: flex;
         align-items: center;
-        // background: #2d2d2d;
         flex-direction: column;
-        padding-top: 2.13rem;
+        justify-content: center;
         i {
           color: #7c7c7c;
           font-size: 2rem;
@@ -393,7 +434,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background-color: #000;
+      background-color: rgba(0, 0, 0, 0.4);
       width: 64px;
       height: 64px;
       border-radius: 100px;
@@ -403,10 +444,10 @@
       z-index: 10;
 
       &--prev {
-        left: 0;
+        left: 32px;
       }
       &--next {
-        right: 0;
+        right: 32px;
       }
     }
 

@@ -25,7 +25,11 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-stream-list__main-screen-doubleRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 6,
+            'vmp-stream-list__main-screen-threeRow':
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -39,7 +43,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -50,23 +54,24 @@
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
         <img :src="coverImgUrl" alt />
-        <p @click.stop="replayPlay">
+        <p class="preventClick" @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
+        v-if="languageList.length > 1 && !isInGroup"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
-        <span @click.stop.prevent="openLanguage" v-if="languageList.length > 1">
+        <span @click.stop.prevent="openLanguage">
           {{ lang.key == 1 ? '中文' : 'EN' }}
         </span>
       </div>
       <!-- 进入全屏 -->
       <div
         class="vmp-wap-stream-wrap-mask-screen"
-        :class="[iconShow && isShowMainScreen ? 'opcity-true' : 'opcity-flase']"
+        :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
@@ -123,7 +128,7 @@
         showPlayIcon: false, // 是否展示播放按钮
         scroll: null, // BScroll 插件
         mainScreenDom: null, // 主屏Dom
-        iconShow: false, // 5 秒的展示
+        iconShow: false, // 5 秒的icon展示
         isOpenlang: false,
         lang: {},
         languageList: [],
@@ -219,13 +224,18 @@
       is_host_in_group() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus?.is_host_in_group == 1;
       },
-      // 是否存在主屏画面 配合主持人进入小组内时，页面内是否存在主画面
-      isShowMainScreen() {
-        let _flag = false;
-        _flag =
-          this.remoteSpeakers.findIndex(ele => ele.accountId == this.mainScreen) > -1 ||
-          this.joinInfo.third_party_user_id == this.mainScreen;
-        return _flag;
+      // 主屏流   和产品佳佳沟通：显示全屏按钮条件：存在视频流  条件：先判断远端流内是否存在主屏 || 本地流是否是主屏 || {}
+      mainScreenStream() {
+        let _stream =
+          this.remoteSpeakers.find(ele => {
+            ele.streamSource = 'remote';
+            return ele.accountId == this.mainScreen;
+          }) || {};
+        if (this.localSpeaker.accountId == this.mainScreen) {
+          _stream = this.localSpeaker;
+          _stream.streamSource = 'local';
+        }
+        return _stream;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -237,7 +247,7 @@
           !this.isInGroup &&
           this.is_host_in_group &&
           this.roomBaseServer.state.watchInitData.webinar.mode == 6 &&
-          !this.isShowMainScreen &&
+          !this.mainScreenStream.accountId &&
           !this.isShareScreen
         );
       },
@@ -256,12 +266,12 @@
     },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
-      useMediaCheckServer().checkSystemRequirements();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
     },
 
     async created() {
+      await useMediaCheckServer().checkSystemRequirements();
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
@@ -326,6 +336,27 @@
         this.micServer.$on('vrtc_speaker_switch', msg => {
           this.setBigScreen(msg);
         });
+
+        // 下麦成功 - 移除BScroll
+        this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.destroy();
+            this.scroll = null;
+          }
+        });
+
+        // 监听全屏变化
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              this.interactiveServer.state.fullScreenType = false;
+            }
+          },
+          true
+        );
       },
 
       // 创建betterScroll
@@ -337,15 +368,19 @@
             this.scroll = new BScroll(this.$refs['vmp-wap-stream-wrap'], {
               scrollX: true,
               click: true,
-              probeType: 3 // listening scroll event
+              probeType: 3, // listening scroll event
+              preventDefaultException: {
+                className: /(^|\s)preventClick(\s|$)/
+              }
             });
           }
-
+          // 在创建时，需获取主屏Dom并设置left值，防止出现布局混乱
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
           }
           this.scroll.on('scroll', ({ x }) => {
+            // 更改禁止方案
             if (this.mainScreenDom) {
               this.mainScreenDom.style.left = `${30 + -x}px`;
             }
@@ -355,10 +390,16 @@
 
       // 恢复播放
       replayPlay() {
+        console.log('点击了恢复播放------', this.playAbort);
         this.playAbort.forEach(stream => {
-          this.interactiveServer.setPlay({ streamId: stream.streamId }).then(() => {
-            this.showPlayIcon = false;
-          });
+          this.interactiveServer
+            .setPlay({ streamId: stream.streamId })
+            .then(() => {
+              this.showPlayIcon = false;
+            })
+            .catch(e => {
+              console.error('恢复播放失败----', e);
+            });
         });
         this.playAbort = [];
       },
@@ -366,32 +407,20 @@
       // 全屏
       setFullScreen() {
         /*
-         * 布局原因：wap进入全屏仅全屏主屏流
+         * 布局原因：wap进入全屏仅全屏主屏流， 本地流和远端流都存在被设置为主屏情况
          *    进入全屏在list内，退出全屏在remote/local内进行退出
          */
-        let allStream = this.interactiveServer.getRoomStreams();
-        let mainScreenStream = allStream.find(stream => stream.accountId == this.mainScreen);
-        if (mainScreenStream) {
-          if (mainScreenStream.streamSource == 'remote') {
-            this.interactiveServer
-              .setStreamFullscreen({
-                streamId: mainScreenStream.streamId,
-                vNode: `vmp-stream-remote__${mainScreenStream.streamId}`
-              })
-              .then(() => {
-                this.setFullScreenStatus();
-              });
-          } else {
-            this.interactiveServer
-              .setStreamFullscreen({
-                streamId: mainScreenStream.streamId,
-                vNode: `vmp-stream-local__${mainScreenStream.accountId}`
-              })
-              .then(() => {
-                this.setFullScreenStatus();
-              });
-          }
-        }
+        this.interactiveServer
+          .setStreamFullscreen({
+            streamId: this.mainScreenStream.streamId,
+            vNode:
+              this.mainScreenStream.streamSource == 'remote'
+                ? `vmp-stream-remote__${this.mainScreenStream.streamId}`
+                : `vmp-stream-local__${this.mainScreenStream.accountId}`
+          })
+          .then(() => {
+            this.setFullScreenStatus();
+          });
       },
       setFullScreenStatus() {
         // 参考player组件内的brower内的ios判断条件
@@ -703,6 +732,13 @@
         top: 0;
         width: 100%;
         height: calc(100% - 85px);
+      }
+      // 未上麦执行旁路布局模式，会根据上麦人数进行修改主屏的高度
+      .vmp-stream-list__main-screen-doubleRow {
+        height: calc(100% - 170px);
+      }
+      .vmp-stream-list__main-screen-threeRow {
+        height: calc(100% - 255px);
       }
     }
     // 铺满全屏

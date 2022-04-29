@@ -7,13 +7,15 @@
       <virtual-list
         ref="qalist"
         style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'id'"
+        :keeps="15"
+        :estimate-size="100"
+        :data-key="'msgId'"
         :data-sources="qaList"
         :data-component="MsgItem"
         :extra-props="{
           isOnlyMine,
-          joinId
+          joinId,
+          roleName
         }"
         @tobottom="tobottom"
       ></virtual-list>
@@ -49,7 +51,7 @@
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
   // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
-  import { useRoomBaseServer, useQaServer, useChatServer } from 'middle-domain';
+  import { useRoomBaseServer, useQaServer, useChatServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/packages/app-shared/mixins/emitter';
@@ -124,6 +126,9 @@
       },
       noLoginKey() {
         return this.configList['ui.show_chat_without_login'];
+      },
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
     watch: {
@@ -179,6 +184,11 @@
         chatServer.$on('allBanned', res => {
           this.allBanned = res;
           this.initInputStatus();
+        });
+        useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!this.isInGroup) {
+            this.getQaHistoryMsg();
+          }
         });
       },
       initInputStatus() {
@@ -257,10 +267,11 @@
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.qalist &&
           this.$refs.qalist.$el.scrollHeight -
             this.$refs.qalist.$el.scrollTop -
             this.$refs.qalist.getClientSize() <
-          5
+            5
         );
       },
       //处理唤起登录

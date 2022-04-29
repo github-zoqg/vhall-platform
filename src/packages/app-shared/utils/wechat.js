@@ -7,7 +7,7 @@ import { Toast } from 'vant';
  * @param {*} to
  * @returns
  */
-function buildLoginAddress(to) {
+export function buildLoginAddress(to) {
   //获取地址栏参数、设置请求路径
   let _search = '';
   if (location.search && location.search != '') {
@@ -80,7 +80,7 @@ function filterAddressParams(path) {
   }`;
   console.log('wechatjs 看看当前走入到了哪里_next不为空------->', nextUrl);
   // replaceState 添加或替换历史记录后，浏览器地址栏会变成你传的地址，而页面并不会重新载入或跳转
-  window.history.replaceState(null, null, nextUrl);
+  // window.history.replaceState(null, null, nextUrl);
   window.location.replace(nextUrl);
 }
 
@@ -206,13 +206,15 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
 export function initHideChatSdk(initData = {}, failedCb = () => {}) {
   let hideConfigSdk = {
     debug: false,
-    jsApiList: ['hideMenuItems'],
+    jsApiList: ['hideMenuItems', 'hideAllNonBaseMenuItem', 'showMenuItems'],
     appId: initData.appId,
     timestamp: initData.timestamp,
     nonceStr: initData.nonceStr,
     signature: initData.signature
   };
   wx.config(hideConfigSdk);
+
+  //微信初始化完成
   wx.ready(function () {
     wx.hideMenuItems({
       menuList: [
@@ -225,8 +227,18 @@ export function initHideChatSdk(initData = {}, failedCb = () => {}) {
         'menuItem:copyUrl'
       ]
     });
-    wx.error(function (res) {
-      failedCb(res);
+  });
+
+  //微信错误回调
+  wx.error(function (res) {
+    console.log('微信隐藏菜单配置错误------>', res);
+    wx.hideAllNonBaseMenuItem();
+    failedCb(res);
+    //上报日志
+    window.vhallLog({
+      tag: 'wx', // 日志所属功能模块
+      data: res,
+      type: 'log' // log 日志埋点，event 业务数据埋点
     });
   });
 }

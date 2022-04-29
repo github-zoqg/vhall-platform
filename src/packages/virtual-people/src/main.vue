@@ -10,7 +10,7 @@
         <div class="vmp-virtual-wrap-contaner">
           <div class="vmp-virtual-wrap-contaner-real">
             实际数据：{{ person.onlineNum }}人在线
-            <span>｜</span>
+            <span style="color: #1a1a1a">｜</span>
             {{ virtualText }} {{ person.pv }}&nbsp;&nbsp;
             <el-tooltip effect="dark" placement="right">
               <i class="iconfont iconicon_help_m"></i>

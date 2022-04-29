@@ -31,8 +31,9 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import { getQueryString, getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
+  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
+
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -66,8 +67,28 @@
         return this.$domainStore.state.roomBaseServer.webinarTag;
       }
     },
-    async created() {
+    beforeRouteEnter(to, from, next) {
+      // Vue history模式 微信分享IOS无效解决办法---最终章
+      const { system } = getBrowserType();
+      if (
+        system == 'ios' &&
+        `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
+      ) {
+        location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+      } else {
+        next();
+      }
+    },
+    async mounted() {
       try {
+        if (isWechatCom()) {
+          if (sessionStorage.getItem('reloadStatus')) {
+            sessionStorage.setItem('reloadStatus', 2);
+          } else {
+            sessionStorage.setItem('reloadStatus', 1);
+            window.location.reload();
+          }
+        }
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'standard';
@@ -97,6 +118,8 @@
           return;
         }
         await roomState();
+
+        //微信相关设置
         bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
@@ -134,8 +157,8 @@
         this.state = 2;
         this.handleErrorCode(err);
       }
-    },
-    mounted() {
+
+      //消息监听
       useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;
         this.liveErrorTip = this.$t('message.message_1003');
@@ -154,11 +177,12 @@
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },
@@ -198,14 +222,15 @@
         ) {
           this.liveErrorTip = this.$t('message.message_1004');
         } else if (err.code == 512503 || err.code == 512502) {
+          // 跳转到老saas
           window.location.href = `${window.location.origin}/${this.$route.params.id}`;
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
         } else if (err.code == 611001) {
-          this.liveErrorTip = '互动初始化失败，' + err.message;
+          this.liveErrorTip = '互动初始化失败，' + err.msg;
         } else {
-          this.liveErrorTip = this.$tec(err.code) || err.message;
+          this.liveErrorTip = this.$tec(err.code) || err.msg;
         }
       },
       goSubscribePage(clientType) {

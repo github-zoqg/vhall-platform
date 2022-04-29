@@ -55,11 +55,10 @@
 </template>
 
 <script>
-  // import EventBus from '@/utils/Events';
-  import { debounce } from 'lodash';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  // import { debounce } from 'lodash';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import { useGiftsServer, useMsgServer } from 'middle-domain';
+  import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',
     data() {
@@ -110,6 +109,7 @@
     beforeCreate() {
       this.giftsServer = useGiftsServer();
       this.msgServer = useMsgServer();
+      this.chatServer = useChatServer();
     },
     beforeDestroy() {
       this.timer = 3;
@@ -117,6 +117,22 @@
     },
     mounted() {
       // this.showgift();
+      this.giftsServer.$on('gift_send_success', msg => {
+        console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
+        const nickname = msg.data.gift_user_nickname || msg.data.nickname;
+        const data = {
+          nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+          avatar: msg.data.avatar,
+          content: {
+            gift_name: msg.data.gift_name,
+            gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
+            source_status: msg.data.source_status
+          },
+          type: 'gift_send_success',
+          interactToolsStatus: true
+        };
+        this.chatServer.addChatToList(data);
+      });
     },
     methods: {
       // 获取礼物列表
@@ -208,7 +224,8 @@
       /**
        * 赠送礼物
        */
-      giveGiftSubmit: debounce(function () {
+      giveGiftSubmit() {
+        this.close();
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
@@ -245,12 +262,23 @@
             }
           }
         } else {
-          params = {
-            gift_id: this.currentGift.id,
-            channel: 'ALIPAY',
-            service_code: 'H5_PAY',
-            room_id: this.localRoomInfo.roomId
-          };
+          //如果是企业微信环境,需要启动微信h5支付相关参数
+          if (isWechatCom()) {
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'WEIXIN',
+              service_code: 'H5_PAY',
+              room_id: this.localRoomInfo.roomId
+            };
+          } else {
+            // 正常的h5支付, 支付宝
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'ALIPAY',
+              service_code: 'H5_PAY',
+              room_id: this.localRoomInfo.roomId
+            };
+          }
         }
 
         // 如果不需要经过微信授权
@@ -263,7 +291,7 @@
             this.payProcess(params);
           }
         }
-      }, 300),
+      },
       /**
        * 关闭礼物弹框
        */
@@ -336,7 +364,7 @@
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',
-            avatar: this.joinInfoInGift.avatar,
+            gift_user_avatar: this.joinInfoInGift.avatar,
             barrageTxt: '',
             text_content: '',
             gift_user_nickname: this.joinInfoInGift.nickname,

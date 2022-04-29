@@ -26,33 +26,37 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
-      await this.getGrayConfig();
+      // await this.getGrayConfig();
       this.getFormOpenLinkStatus();
       //多语言接口
       await this.roomBaseServer.getLangList(this.webinar_id);
-      if (localStorage.getItem('lang')) {
-        this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
-      } else {
-        this.$i18n.locale = 'zh';
-      }
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
+      // if (localStorage.getItem('lang')) {
+      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      // } else {
+      //   this.$i18n.locale = 'zh';
+      // }
     },
     methods: {
-      getGrayConfig() {
-        return this.roomBaseServer
-          .webinarInitBefore({
-            webinar_id: this.webinar_id
-          })
-          .then(res => {
-            if (res.code == 200 && res.data) {
-              sessionStorage.setItem(`V3_WAP_US_${this.webinar_id}`, res.data.user_id);
-            } else {
-              console.log(`灰度ID-获取活动by用户信息失败~${res.msg}`);
-            }
-          })
-          .catch(e => {
-            console.log(`灰度ID-获取活动by用户信息失败~${e}`);
-          });
-      },
+      // getGrayConfig() {
+      //   return this.roomBaseServer
+      //     .webinarInitBefore({
+      //       webinar_id: this.webinar_id
+      //     })
+      //     .then(res => {
+      //       if (res.code == 200 && res.data) {
+      //         sessionStorage.setItem(`V3_WAP_US_${this.webinar_id}`, res.data.user_id);
+      //       } else {
+      //         console.log(`灰度ID-获取活动by用户信息失败~${res.msg}`);
+      //       }
+      //     })
+      //     .catch(e => {
+      //       console.log(`灰度ID-获取活动by用户信息失败~${e}`);
+      //     });
+      // },
       // 报名表单独立链接是否有效
       getFormOpenLinkStatus() {
         this.entryformServer
