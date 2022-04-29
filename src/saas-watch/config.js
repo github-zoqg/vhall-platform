@@ -71,7 +71,8 @@ export const serverConfig = {
       'comMediaSetting',
       'comWatchPayFee',
       'comMicInvited',
-      'comCameraCheck'
+      'comCameraCheck',
+      'comViewRestriction'
     ]
   },
 
@@ -217,6 +218,13 @@ export const serverConfig = {
       {
         cuid: 'compRegLogin',
         method: 'open'
+      }
+    ],
+    emitClickOpenSignUpForm: [
+      // 报名表单
+      {
+        cuid: 'comSignUpForm',
+        method: 'openModal'
       }
     ]
   },
@@ -653,6 +661,20 @@ export const serverConfig = {
   embedVideoLayerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
     children: ['comPcPlayer', 'comLivingEnd']
+  },
+  comViewRestriction: {
+    component: 'VmpViewRestriction',
+    emitAgreeWitthTerms: [
+      {
+        cuid: 'comVmpSubscribeBody',
+        method: 'handleAgreeWitthTerms'
+      },
+      {
+        cuid: 'comPcPlayer',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
+
   // *******单视频嵌入页面****结束
 };

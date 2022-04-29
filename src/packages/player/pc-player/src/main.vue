@@ -338,6 +338,7 @@
         languageList: [],
         marquee: {}, // 跑马灯
         water: {}, //水印
+        agreement: false,
         playerOtherOptions: {
           barrage_button: 0,
           progress_bar: 0,
@@ -427,6 +428,8 @@
     },
     created() {
       if (this.isShowContainer) return;
+      const { agreement } = this.roomBaseServer.state.watchInitData;
+      this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
       this.getWebinerStatus();
       if (this.isEmbedVideo) {
         this.languageList = this.roomBaseServer.state.languages.langList;
@@ -541,7 +544,11 @@
         let params = {
           type: this.authText == 6 ? type : this.roomBaseServer.state.watchInitData.webinar.verify
         };
-        this.feeAuth(params);
+        if (this.agreement) {
+          this.roomBaseServer.$emit('POPUP_AGREEMENT');
+        } else {
+          this.feeAuth(params);
+        }
       },
       feeAuth(params) {
         let data = {
@@ -572,6 +579,11 @@
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+            break;
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
             break;
           case 512002:
           case 512522:
@@ -619,6 +631,17 @@
             break;
         }
       },
+      handleAgreeWitthTerms() {
+        this.agreement = false;
+        this.getShiPreview();
+        const verify = this.roomBaseServer.state.watchInitData.webinar.verify;
+        const type = verify === 6 ? 4 : verify;
+        this.authTryWatch(type);
+      },
+      // handleAuthCheck() {
+      //   let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+      //   this.feeAuth({ type: type });
+      // },
       closePayFee() {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickPay', { flag: false })

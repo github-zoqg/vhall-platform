@@ -120,7 +120,9 @@
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }
