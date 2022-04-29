@@ -53,7 +53,8 @@ const serverConfig = {
       'comScreenPostWap',
       'comUserCenterWap',
       'comCashWap',
-      'comInviteHandup'
+      'comInviteHandup',
+      'comViewRestrictionWap'
     ]
   },
   // 顶部
@@ -473,6 +474,16 @@ const serverConfig = {
   embedVideoLComWapBody: {
     component: 'VmpWapBody',
     children: ['comWapPlayer']
+  },
+  comViewRestrictionWap: {
+    component: 'VmpViewRestrictionWap',
+    emitAgreeWitthTerms: [
+      //登录弹窗
+      {
+        cuid: 'comSubcribeWapBody',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
   // *******单视频嵌入页面****结束
 };

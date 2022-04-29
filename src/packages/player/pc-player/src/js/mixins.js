@@ -11,7 +11,9 @@ const playerMixins = {
     getShiPreview() {
       const { webinar } = this.roomBaseServer.state.watchInitData;
       const authType = webinar.verify;
-      if (authType == 1) {
+      if (this.agreement) {
+        this.authText = this.$t('appointment.appointment_1025');
+      } else if (authType == 1) {
         this.authText = webinar.verify_tip || this.$t('other.other_1002');
       } else if (authType == 2) {
         this.authText = webinar.verify_tip || this.$t('appointment.appointment_1002');

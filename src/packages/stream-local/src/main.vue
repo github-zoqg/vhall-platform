@@ -604,9 +604,10 @@
             useRoomBaseServer().setChangeElement('player');
           }
 
+          // 如果是嘉宾开启了分屏，不需要初始化互动实例
           if (
             (this.isNoDelay === 1 && +this.joinInfo.role_name !== 1) ||
-            +this.joinInfo.role_name === 4
+            (+this.joinInfo.role_name === 4 && !this.splitScreenServer.state.isOpenSplitScreen)
           ) {
             if (this.mode === 6) {
               await this.groupServer.updateGroupInitData();
@@ -992,6 +993,14 @@
             resolve();
             return;
           }
+          // 视频直播时结束直播
+          if (this.mode == 2 && options?.source === 'live_over') {
+            clearInterval(this._audioLeveInterval);
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          }
 
           // 当前角色为主持人&&设备被禁用
           if (
@@ -999,7 +1008,6 @@
             useMediaCheckServer().state.deviceInfo.device_status === 2
           ) {
             clearInterval(this._audioLeveInterval);
-
             // window.$middleEventSdk?.event?.send(
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );

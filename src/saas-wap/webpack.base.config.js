@@ -14,8 +14,8 @@ const htmlConfig = {
     VueRouter:
       '//cnstatic01.e.vhall.com/common-static/middle/vue-router/3.5.3/dist/vue-router.min.js',
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
+    jsCookie: '//cnstatic01.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
-
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
 
@@ -68,7 +68,8 @@ module.exports = {
             //如果个别地方不想转化px。可以简单的使用大写的 PX 或 Px 。
             // selectorBlackList: ['ig'],
             propList: ['*'],
-            exclude: /node_modules/
+            exclude: /node_modules/,
+            minPixelValue: 2 //设置要替换的最小像素值(2px会被转rem)。 默认 0
           })
         ]
       }

@@ -20,25 +20,32 @@
           <span class="num" place="n">{{ num }}</span>
         </i18n>
       </div>
-      <button
-        v-if="type != 3 && (verify != 0 || (verify == 0 && subOption.hide_subscribe != 0))"
-        class="sub-auth"
-        :class="{ disableClick: disabled }"
-        :disabled="disabled"
-        @click="authCheck"
-      >
-        {{ btnText }}
+      <!-- 观看协议 -->
+      <button v-if="showAgreement" class="sub-auth add-auth" @click="agreement">
+        {{ $t('appointment.appointment_1025') }}
       </button>
-      <button v-if="addText && type != 3" class="sub-auth add-auth" @click="payMore">
-        {{ addText }}
-      </button>
-      <div v-if="type == 3" class="end-tip">
-        {{ $t('player.player_1017') }}
-      </div>
+      <template v-else>
+        <button
+          v-if="type != 3 && (verify != 0 || (verify == 0 && subOption.hide_subscribe != 0))"
+          class="sub-auth"
+          :class="{ disableClick: disabled }"
+          :disabled="disabled"
+          @click="authCheck"
+        >
+          {{ btnText }}
+        </button>
+        <button v-if="addText && type != 3" class="sub-auth add-auth" @click="payMore">
+          {{ addText }}
+        </button>
+        <div v-if="type == 3" class="end-tip">
+          {{ $t('player.player_1017') }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'BottomTab',
     props: {
@@ -74,6 +81,25 @@
         is_subscribe: 0,
         disabled: false
       };
+    },
+    computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      showAgreement() {
+        const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
+        const agreement = this.subOption.needAgreement;
+        const isLive = this.webinarType != 2 && this.webinarType != 3;
+        if (agreement && isLive && !isEmbedVideo) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
     },
     watch: {
       subOption: {
@@ -261,6 +287,9 @@
       },
       payMore() {
         this.$emit('payMore', { type: 3 });
+      },
+      agreement() {
+        this.$emit('agreement');
       }
     }
   };
