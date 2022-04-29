@@ -162,18 +162,6 @@
     mounted() {
       console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
       this.init();
-      const dom = document.getElementById('vmp-player-yun');
-      dom.onmousemove = () => {
-        this.into++;
-        try {
-          this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      dom.onmouseleave = () => {
-        this.into = 0;
-      };
       window.addEventListener('keydown', e => {
         if (e.keyCode == 27) {
           this.isFullScreen = false;
@@ -189,10 +177,28 @@
       async init() {
         // 主持人初始化播放器
         if (!this.pushStream) {
+          const dom = document.getElementById('vmp-player-yun');
+          dom.onmousemove = () => {
+            this.into++;
+            try {
+              this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+            } catch (err) {
+              console.log(err);
+            }
+          };
+          dom.onmouseleave = () => {
+            this.into = 0;
+          };
           await this.initPlayer();
           // 获取云导播台是否有流
           this.roomBaseServer.getStreamStatus();
         } else {
+          let flag = await this.roomBaseServer.selectSeat({
+            webinar_id: this.$route.params.il_id,
+            seat_id: this.$route.query.seat_id,
+            uuid: this.$route.query.uuid
+          });
+          if (!flag) return false;
           // 其他人创建本地流&推流
           await this.createLocalStream();
           await this.publishLocalStream();
