@@ -183,11 +183,7 @@
           ></span>
         </el-tooltip> -->
       </p>
-      <p
-        v-else-if="
-          guestHasInvitePer && (stream.attributes.roleName != 1 || stream.attributes.role != 1)
-        "
-      >
+      <p v-else-if="guestHasInvitePer && +stream.attributes.role != 1">
         <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
