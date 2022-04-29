@@ -2,9 +2,9 @@
   <div class="chat-input-modal" v-show="visible">
     <div class="input-info">
       <div class="send-box" @click="operateEmoji">
-        <i class="vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
+        <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
-          class="vh-iconfont vh-saas-iconfont vh-saas-jianpan_icon"
+          class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
           v-show="showEmoji"
           title="键盘"
         ></i>
@@ -30,7 +30,7 @@
       ></el-input>
       <div class="send-box">
         <div class="send-menu" @click="send">
-          <span class="vh-iconfont vh-line-send"></span>
+          <span class="iconfonts vh-iconfont vh-line-send"></span>
         </div>
       </div>
     </div>
@@ -45,7 +45,7 @@
       </div>
       <div class="tools">
         <div class="btn" @click="delInput">
-          <span class="vh-iconfont vh-saas-iconfont vh-saas-delete"></span>
+          <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
         <div class="btn send" @click="send">发送</div>
       </div>
@@ -223,7 +223,7 @@
         align-items: center;
         justify-content: center;
 
-        > .vh-iconfont {
+        > .iconfonts {
           font-size: 50px;
         }
 
@@ -263,16 +263,16 @@
     .send-box__bottom--emoji {
       position: relative;
       width: 100%;
-      height: 456px;
+      height: 356px;
       box-sizing: border-box;
       overflow-y: scroll;
       background-color: #f0f0f0;
-      padding: 30px 30px 80px;
+      padding: 30px 30px 110px;
       .imgs {
         display: grid;
         justify-content: space-between;
-        grid-template-columns: repeat(auto-fill, 60px);
-        grid-gap: 30px;
+        grid-template-columns: repeat(auto-fill, 52px);
+        grid-gap: 26px;
         img {
           width: 60px;
           height: 60px;
@@ -291,7 +291,7 @@
         align-items: flex-end;
         .btn {
           width: 104px;
-          height: 84px;
+          height: 74px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -302,7 +302,7 @@
           align-items: center;
           justify-content: center;
           color: #666;
-          .vh-iconfont {
+          .iconfonts {
             font-size: 44px;
           }
           &.send {
