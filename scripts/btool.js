@@ -12,20 +12,29 @@ const pathConfig = require('./path-config');
 const CMDLIST = ['serve', 'build', 'inspect', 'lint', 'help'];
 const cLog = console.log;
 
-// 开启提示文字
-function bootstripTip(tips, t = 40, m = 14, n = 19) {
+/**
+ * 开启提示文字
+ * @param {*} tips 提示内容，key-value形式
+ * @param {*} param
+ *  tLen 总长度
+ *  lLen 左边key的长度
+ *  rLen 右边value的长度
+ */
+function bootstripTip(tips, { tLen = 40, lLen = 14, rLen = 19 } = {}) {
   const chalkBorder = chalk.hex('#0FA86E'); //边框
   const chalkLabel = chalk.hex('#00AED0').bold;
-  cLog(chalkBorder('╭'.padEnd(t - 1, '─') + '╮'));
+  cLog(chalkBorder('╭'.padEnd(tLen - 1, '─') + '╮'));
+  cLog(chalkBorder('│'.padEnd(tLen - 1, ' ') + '│'));
   for (const [key, value] of Object.entries(tips)) {
     cLog(
       chalkBorder('│  '),
-      chalkLabel(`▸ ${key}:`.padEnd(m)),
-      `${value}`.padEnd(n),
+      chalkLabel(`▸ ${key}:`.padEnd(lLen)),
+      `${value}`.padEnd(rLen),
       chalkBorder('│')
     );
   }
-  cLog(chalkBorder('╰'.padEnd(t - 1, '─') + '╯'));
+  cLog(chalkBorder('│'.padEnd(tLen - 1, ' ') + '│'));
+  cLog(chalkBorder('╰'.padEnd(tLen - 1, '─') + '╯'));
 }
 
 /**
