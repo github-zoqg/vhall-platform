@@ -213,7 +213,6 @@
       font-size: 12px;
       color: @font-error-low;
       border: solid 1px @border-tools-color;
-      // z-index: 1;
       white-space: nowrap;
     }
     &-bubble {
@@ -222,7 +221,7 @@
       position: absolute;
       top: -287px;
       left: -184px;
-      z-index: 13;
+      z-index: 15;
       &-img {
         position: absolute;
         width: 80px;

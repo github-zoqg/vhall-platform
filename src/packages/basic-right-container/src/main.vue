@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-right-container" v-if="!isEmbedVideo">
+  <div class="vmp-basic-right-container">
     <template v-if="isTryWatch">
       <div class="vmp-try-watch">
         <img src="./img/try@2x.png" alt="" />
@@ -43,10 +43,6 @@
           this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
           this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
         );
-      },
-      isEmbedVideo() {
-        // 是不是音视频嵌入
-        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     beforeCreate() {

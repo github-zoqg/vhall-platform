@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-reward-effect">
+  <div class="vmp-wap-reward-effect" v-if="showEffectStatus">
     <transition-group name="right-left">
       <div
         v-for="rewardEffectInfo in rewardEffectList"
@@ -30,7 +30,8 @@
             rewardEffectInfo.data.event_type == 'free_gift_send'
           "
         >
-          {{ rewardEffectInfo.data.gift_name }}
+          <!-- 礼物标题 -->
+          送出{{ rewardEffectInfo.data.gift_name }}
           <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}
@@ -68,7 +69,8 @@
     useRoomBaseServer,
     useGiftsServer,
     useChatServer,
-    useWatchRewardServer
+    useWatchRewardServer,
+    useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
@@ -89,7 +91,7 @@
         //是否屏蔽特效
         hideEffect: false,
         rewardEffectList: [],
-        // rewardEffectInfo: null,
+        showEffectStatus: false,
         taskQueue: null // 飘窗列队
       };
     },
@@ -107,6 +109,7 @@
       this.watchRewardServer = useWatchRewardServer();
       this.giftsServer = useGiftsServer();
       this.chatServer = useChatServer();
+      this.menuServer = useMenuServer();
       console.log('wap this.roomBaseServer------->', this.roomBaseServer);
       this.listenServer();
     },
@@ -116,7 +119,8 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 2
       });
 
       //测试数据
@@ -209,6 +213,19 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
+          }
+        });
+        // 自定义菜单服务事件监听
+        this.menuServer.$on('tab-switched', data => {
+          console.log('wap tab-switched------>', this.cuid, data);
+          /**
+           * { cuid, menuId }
+           * 如果当前tab 激活的是聊天
+           */
+          if (this.cuid == 'comWapRewardEffect' && data.type == 3) {
+            this.showEffectStatus = true;
+          } else {
+            this.showEffectStatus = false;
           }
         });
       },

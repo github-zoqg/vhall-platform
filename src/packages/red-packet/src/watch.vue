@@ -41,6 +41,11 @@
         componentsView: 'RedPacketAccept'
       };
     },
+    computed: {
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    },
     beforeCreate() {
       this.redPacketServer = useRedPacketServer({
         mode: 'watch'
@@ -77,6 +82,10 @@
       },
       initEvent() {
         this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
+          if (this.isEmbed) {
+            console.log('嵌入页不支持红包');
+            return;
+          }
           useChatServer().addChatToList({
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {

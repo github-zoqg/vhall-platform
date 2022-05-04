@@ -138,6 +138,7 @@
 
         pushStreamSeperately: false,
         isPushLocalStream: false,
+        isPreviewInit: false,
         isPreviewVisible: false,
         videoParam: {},
         overlayScrollBarsOptions: {
@@ -161,6 +162,20 @@
         return `暂无可转播直播`;
       }
     },
+    created() {
+      this.rebroadcastServer.$on('live_broadcast_stop', async () => {
+        this.$message.success('停止转播成功!');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'stopRebroadcast'));
+
+        if (this.isPushLocalStream) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startPush'));
+        }
+
+        this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        await this.$nextTick(0);
+        this.close();
+      });
+    },
     methods: {
       open() {
         this.isShow = true;
@@ -170,8 +185,9 @@
         this.isShow = false;
         this.reset();
       },
-      reset() {
+      async reset() {
         this.$refs.videoPreview && this.$refs.videoPreview.destroy();
+        await this.$nextTick(0);
         this.currentRoomId = '';
         this.rebroadcastingRoomId = '';
         this.pushStreamSeperately = false;
@@ -231,7 +247,6 @@
               roomId
             }
           };
-
           this.isPreviewVisible = true;
           await sleep(600);
           this.previewLoading = false;
@@ -277,16 +292,7 @@
             source_id: this.domainState.sourceWebinarId
           });
 
-          if (res.code === 200) {
-            this.$message.success('停止转播成功!');
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'stopRebroadcast'));
-
-            if (this.isPushLocalStream) {
-              this.interactiveServer.publishStream();
-            }
-
-            this.close();
-          } else {
+          if (res.code !== 200) {
             this.$message.error('停止转播失败!');
           }
         } catch (error) {

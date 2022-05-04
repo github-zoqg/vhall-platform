@@ -179,7 +179,8 @@
     data() {
       return {
         showAudienceTip: true,
-        // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser
+        lastEditBrush: '', // 上一次的非move笔刷
+        // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser, move
         currentBrush: '',
         // 画笔状态
         pen: {
@@ -278,7 +279,18 @@
     },
     methods: {
       /**
-       *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser
+       * 设置笔刷
+       * @param {String} brush
+       */
+      setBrush(brush) {
+        if (this.currentBrush !== 'move') {
+          // 设置最近一次的非move笔刷
+          this.lastEditBrush = this.currentBrush;
+        }
+        this.currentBrush = brush;
+      },
+      /**
+       *  brush：笔刷,可选 select, pen, highlighter, shape, text, eraser、move
        */
       changeTool(brush, key, value) {
         if (
@@ -290,9 +302,8 @@
         }
 
         console.log('changeTool brush:', brush, '; key:', key, '; value:', value);
-        this.currentBrush = brush;
-        if (!brush) return;
-        if (key) {
+        this.setBrush(brush);
+        if (brush && key) {
           this[brush][key] = value;
         }
         if (brush !== 'move') {
@@ -344,7 +355,6 @@
       },
       // 重设当前画笔
       resetCurrentBrush() {
-        console.log('---resetCurrentBrush---this.currentBrush:', this.currentBrush);
         this.changeTool(this.currentBrush);
       },
       /**

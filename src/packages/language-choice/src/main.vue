@@ -1,6 +1,6 @@
 <!-- 主题选择组件 -->
 <template>
-  <div class="vmp-language-choice" v-if="mode != 6 && languageList.length > 1">
+  <div class="vmp-language-choice" v-if="!isInGroup && languageList.length > 1">
     <el-dropdown @command="handleChangeLang" placement="bottom">
       <div :class="'vmp-language-choice-lang ' + themeClass.iconClass">
         <span class="vmp-language-choice-lang-icon">
@@ -25,7 +25,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpLanguageChoice',
     data() {
@@ -35,19 +35,25 @@
           pageBg: '#cccccc',
           iconClass: 'icon-default' // icon默认色
         },
-        mode: 1,
         lang: {},
         languageList: []
       };
     },
+    beforeCreate() {
+      this.groupServer = useGroupServer();
+    },
     created() {
       const roomBaseServer = useRoomBaseServer();
       this.setSkinInfo(roomBaseServer.state.skinInfo);
-      this.mode = roomBaseServer.state.watchInitData.webinar.mode;
       // 语言列表
       this.languageList = roomBaseServer.state.languages.langList;
       // 当前语言
       this.lang = roomBaseServer.state.languages.lang;
+    },
+    computed: {
+      isInGroup() {
+        return this.groupServer.state.groupInitData.isInGroup;
+      }
     },
     watch: {},
     methods: {
@@ -55,6 +61,7 @@
       handleChangeLang(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =

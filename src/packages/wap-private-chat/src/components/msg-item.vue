@@ -94,7 +94,7 @@
     .private-chat-msg__showtime {
       padding: 15px 0 5px;
       font-size: 24px;
-      color: #888888;
+      color: #888;
       text-align: center;
     }
     .private-chat-msg__item-main {
@@ -125,7 +125,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: #666666;
+            color: #666;
             max-width: 300px;
             height: 26px;
             line-height: 26px;
@@ -154,7 +154,7 @@
           display: inline-block;
           margin-top: 5px;
           padding: 18px 20px;
-          color: #444444;
+          color: #444;
           line-height: 36px;
           background-color: #f7f7f7;
           width: fit-content;

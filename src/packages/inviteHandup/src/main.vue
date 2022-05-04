@@ -11,11 +11,13 @@
       <div class="invite-box">
         <p class="invite-desc">{{ $t('interact.interact_1031', { n: roleName }) }}</p>
         <div class="invite-btn-box">
-          <button class="btn btn-agree" @click="customAgreeConnect">
+          <button class="btn btn-agree" :disabled="btnDisabled" @click="customAgreeConnect">
             {{ $t('interact.interact_1009') }}
           </button>
           <!-- 拒绝上麦 -->
-          <button class="btn" @click="refuseInviteConnect">{{ refusedText }}</button>
+          <button class="btn" :disabled="btnDisabled" @click="refuseInviteConnect">
+            {{ refusedText }}
+          </button>
         </div>
       </div>
     </van-popup>
@@ -34,7 +36,8 @@
         roleName: this.$getRoleName(1),
         isWaitting: false,
         inviteTime: 30,
-        senderId: ''
+        senderId: '',
+        btnDisabled: false
       };
     },
     computed: {
@@ -110,6 +113,7 @@
       },
       // 同意邀请上麦
       customAgreeConnect() {
+        this.btnDisabled = true;
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -117,6 +121,7 @@
             extra_params: this.senderId
           })
           .then(res => {
+            this.btnDisabled = false;
             if (res.code !== 200) {
               this.$message.error(res.msg);
             }
@@ -126,10 +131,14 @@
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');
             this.closeInviteConnectPop();
+          })
+          .catch(err => {
+            this.btnDisabled = false;
           });
       },
       // 拒绝上麦
       refuseInviteConnect() {
+        this.btnDisabled = true;
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -137,6 +146,7 @@
             extra_params: this.senderId
           })
           .then(res => {
+            this.btnDisabled = false;
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');
@@ -146,6 +156,7 @@
           .catch(err => {
             // 拒绝失败
             console.log(err);
+            this.btnDisabled = false;
           });
       }
     }

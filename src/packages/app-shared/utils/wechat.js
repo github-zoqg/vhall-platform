@@ -7,7 +7,7 @@ import { Toast } from 'vant';
  * @param {*} to
  * @returns
  */
-function buildLoginAddress(to) {
+export function buildLoginAddress(to) {
   //获取地址栏参数、设置请求路径
   let _search = '';
   if (location.search && location.search != '') {
@@ -18,6 +18,25 @@ function buildLoginAddress(to) {
     process.env.VUE_APP_WAP_WATCH +
     process.env.VUE_APP_WEB_KEY +
     `${to.path}?purpose=login${_search ? '&' + _search : ''}`;
+  return address;
+}
+
+/**
+ *  统一构建支付当前的授权地址
+ * @param {*} to
+ * @returns
+ */
+export function buildPayUrl(to) {
+  //获取地址栏参数、设置请求路径
+  let _search = '';
+  if (location.search && location.search != '') {
+    _search = location.search.split('?')[1];
+  }
+  const address =
+    window.location.protocol +
+    process.env.VUE_APP_WAP_WATCH +
+    process.env.VUE_APP_WEB_KEY +
+    `${to.path}?purpose=payAuth${_search ? '&' + _search : ''}`;
   return address;
 }
 
@@ -61,7 +80,7 @@ function filterAddressParams(path) {
   }`;
   console.log('wechatjs 看看当前走入到了哪里_next不为空------->', nextUrl);
   // replaceState 添加或替换历史记录后，浏览器地址栏会变成你传的地址，而页面并不会重新载入或跳转
-  window.history.replaceState(null, null, nextUrl);
+  // window.history.replaceState(null, null, nextUrl);
   window.location.replace(nextUrl);
 }
 
@@ -69,7 +88,7 @@ function filterAddressParams(path) {
  * 授权三方登录
  * @param {*} _next 路由函数
  */
-export function handleThirdLogin(_next) {
+export function handleThirdLoginOrPay(_next) {
   const path = window.location.pathname; // 举例： '/v3/lives/watch/671680195'
   const user_auth_key = getQueryString('user_auth_key');
   const purpose = getQueryString('purpose');
@@ -120,8 +139,8 @@ export function handleAuth(params, path, _next) {
           duration: 0
         });
 
-        //直接进入主页面
-        // _next();
+        //直接进入后续流程路由
+        _next();
       }
     })
     .catch(res => {
@@ -130,9 +149,16 @@ export function handleAuth(params, path, _next) {
         position: 'center',
         duration: 0
       });
+      _next();
     });
 }
 
+/**
+ * 初始化微信sdk, 包括分享设置
+ * @param {*} initData
+ * @param {*} shareData
+ * @returns
+ */
 export function initWeChatSdk(initData = {}, shareData = {}) {
   const configParams = {
     debug: false,
@@ -172,16 +198,23 @@ export function initWeChatSdk(initData = {}, shareData = {}) {
   });
 }
 
+/**
+ * 隐藏微信菜单选项
+ * @param {*} initData
+ * @param {*} failedCb
+ */
 export function initHideChatSdk(initData = {}, failedCb = () => {}) {
   let hideConfigSdk = {
     debug: false,
-    jsApiList: ['hideMenuItems'],
+    jsApiList: ['hideMenuItems', 'hideAllNonBaseMenuItem', 'showMenuItems'],
     appId: initData.appId,
     timestamp: initData.timestamp,
     nonceStr: initData.nonceStr,
     signature: initData.signature
   };
   wx.config(hideConfigSdk);
+
+  //微信初始化完成
   wx.ready(function () {
     wx.hideMenuItems({
       menuList: [
@@ -194,78 +227,59 @@ export function initHideChatSdk(initData = {}, failedCb = () => {}) {
         'menuItem:copyUrl'
       ]
     });
-    wx.error(function (res) {
-      failedCb(res);
+  });
+
+  //微信错误回调
+  wx.error(function (res) {
+    console.log('微信隐藏菜单配置错误------>', res);
+    wx.hideAllNonBaseMenuItem();
+    failedCb(res);
+    //上报日志
+    window.vhallLog({
+      tag: 'wx', // 日志所属功能模块
+      data: res,
+      type: 'log' // log 日志埋点，event 业务数据埋点
     });
   });
 }
 
-//微信授权相关
-export async function authWeixinAjax(to, address, _next) {
+//微信授权相关需要判断
+export function authWeixinAjax(to, address, _next) {
   const isEmbed = !!/embed/.test(to.path);
   //如果是微信
   if (isWechat() && !isEmbed) {
-    let roomBaseServer = useRoomBaseServer();
-
-    console.log('authWeixinAjax roomBaseServer-------->', roomBaseServer);
-    //获取房间权限配置列表
-    await roomBaseServer.getConfigList({
-      webinar_id: to.params.id,
-      webinar_user_id: window.sessionStorage.getItem('initGrayId'),
-      scene_id: 2 //观看端传2
-    });
-    await roomBaseServer.getDegradationConfig({
-      staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-      environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
-      systemKey: 2
-    });
-    if (
-      roomBaseServer.state.configList &&
-      roomBaseServer.state.configList['ui.hide_wechat'] == '0'
-    ) {
-      const open_id = sessionStorage.getItem('open_id');
-      if (!open_id) {
-        // 请求授权接口
-        useUserServer()
-          .authWeixinAjax({
-            source: 'wab',
-            jump_url: address
-          })
-          .then(res => {
-            if (res && res.code == 200) {
-              console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
-              window.location.replace(res.data.url);
-            } else {
-              Toast({
-                message: res.msg || '微信回调失败，请重新扫码',
-                position: 'center',
-                duration: 0
-              });
-
-              // 如果是路由执行
-              if (_next) {
-                _next();
-              }
-            }
-          })
-          .catch(res => {
+    const open_id = sessionStorage.getItem('open_id');
+    if (!open_id) {
+      // 请求授权接口
+      useUserServer()
+        .authWeixinAjax({
+          source: 'wab',
+          jump_url: address
+        })
+        .then(res => {
+          if (res && res.code == 200) {
+            console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
+            window.location.replace(res.data.url);
+          } else {
             Toast({
               message: res.msg || '微信回调失败，请重新扫码',
               position: 'center',
               duration: 0
             });
+
+            // 如果是路由执行
+            if (_next) {
+              _next();
+            }
+          }
+        })
+        .catch(res => {
+          Toast({
+            message: res.msg || '微信回调失败，请重新扫码',
+            position: 'center',
+            duration: 0
           });
-      }
-    } else {
-      // 走免登录，默认设置值为''
-      // localStorage.setItem('token', '');
-      // localStorage.setItem('userInfo', '');
-
-      sessionStorage.setItem('isLogin', '');
-
-      if (_next) {
-        _next();
-      }
+        });
     }
   } else {
     if (_next) {
@@ -275,8 +289,7 @@ export async function authWeixinAjax(to, address, _next) {
 }
 
 // init微信授权跳转逻辑
-export function authCheck(to, next) {
-  // const isEmbed = !!/embed/.test(to.path);
+export async function wxAuthCheck(to, next) {
   let _next = next;
 
   // 若当前用户已登录过，直接进入界面。
@@ -287,16 +300,43 @@ export function authCheck(to, next) {
 
   // 若当前地址栏包含user_auth_key 以及 purposer入参，表示当前需要执行第三方信息回调
   if (getQueryString('user_auth_key') && getQueryString('purpose')) {
-    handleThirdLogin(_next);
+    handleThirdLoginOrPay(_next);
   } else {
     // 观看页和嵌入页需要微信授权
-    if (!/watch|subscribe/.test(to.path)) {
+    if (!/watch|subscribe/.test(to.path) || /embed/.test(to.path)) {
       // 不是 预约/观看 或者 嵌入情况， 直接进入
       next();
     } else {
       // 微信登录鉴权
-      let address = buildLoginAddress(to);
-      authWeixinAjax(to, address, _next);
+      let roomBaseServer = useRoomBaseServer();
+      //获取房间权限配置列表
+      await roomBaseServer.getConfigList({
+        webinar_id: to.params.id,
+        webinar_user_id: window.sessionStorage.getItem('initGrayId'),
+        scene_id: 2 //观看端传2
+      });
+      await roomBaseServer.getDegradationConfig({
+        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+        environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+        systemKey: 2
+      });
+
+      // 判断是否admin开启了微信授权开关
+      if (
+        roomBaseServer.state.configList &&
+        roomBaseServer.state.configList['ui.hide_wechat'] == 0
+      ) {
+        let address = buildLoginAddress(to);
+        authWeixinAjax(to, address, _next);
+      } else {
+        // 走免登录，默认设置值为''
+        // localStorage.setItem('token', '');
+        // localStorage.setItem('userInfo', '');
+        // sessionStorage.setItem('isLogin', '');
+        if (_next) {
+          _next();
+        }
+      }
     }
   }
 }

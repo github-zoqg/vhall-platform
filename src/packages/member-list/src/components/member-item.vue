@@ -5,14 +5,14 @@
         width="28"
         height="28"
         class="vmp-member-item__avatar-wrapper__avatar"
-        :src="userInfo.avatar && userInfo.avatar !== '0' ? userInfo.avatar : defaultAvatar"
+        :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
       />
       <img
         v-show="[1, '1', 3, '3'].includes(userInfo.device_type)"
         class="vmp-member-item__avatar-wrapper__phone"
         width="9"
         height="12"
-        src="../img/phone.png"
+        :src="phoneImg"
         alt
       />
     </div>
@@ -276,6 +276,7 @@
 
 <script>
   import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
   export default {
     name: 'VmpMemberItem',
     filters: {
@@ -296,7 +297,9 @@
     props: {
       //当前的tabIndex
       tabIndex: {
-        required: true
+        type: Number,
+        required: true,
+        default: 1
       },
       //成员组件配置
       memberOptions: {
@@ -331,7 +334,8 @@
       },
       //当前主讲人id
       currentSpeakerId: {
-        type: [Number, String]
+        type: [Number, String],
+        default: () => ''
       },
       //当前演示主屏幕（主讲人）
       mainScreen: {
@@ -350,16 +354,13 @@
       },
       //当前登录用户的id
       userId: {
-        type: [Number, String]
+        type: [Number, String],
+        default: () => ''
       },
       //是否是互动直播(1是 0否)
       isInteract: {
         type: Number,
         default: 0
-      },
-      isEnjoy: {
-        required: false,
-        default: false
       },
       //申请互动的人员
       applyUsers: {
@@ -379,6 +380,8 @@
       return {
         //默认头像
         defaultAvatar: defaultAvatar,
+        //手机图片标识
+        phoneImg: phoneImg,
         //操作项
         operateList: [
           //设为主讲
@@ -634,8 +637,7 @@
         const options = [
           [1, '1'].includes(this.roleName),
           ![1, '1'].includes(this.userInfo.role_name),
-          (this.isEnjoy && [3, '3'].includes(this.userInfo.role_name)) ||
-            ![3, '3'].includes(this.userInfo.role_name),
+          ![3, '3'].includes(this.userInfo.role_name),
           ![20, '20'].includes(this.userInfo.role_name),
           ![2, '2'].includes(this.userInfo.device_status)
         ];
@@ -820,7 +822,7 @@
 <style lang="less">
   .vmp-member-item {
     position: relative;
-    color: #999999;
+    color: #999;
     line-height: 48px;
     padding: 0 10px 0 14px;
     font-size: 12px;
@@ -906,7 +908,7 @@
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
         margin-right: 6px;
-        color: #dddddd;
+        color: #ddd;
         text-align: center;
         vertical-align: middle;
         line-height: 16px;
@@ -926,7 +928,7 @@
         vertical-align: middle;
         margin-left: 3px;
         padding: 2px 4px;
-        color: #cccccc;
+        color: #ccc;
         font-size: 12px;
         opacity: 0;
         background: url('../img/more.png') no-repeat center;
@@ -935,7 +937,7 @@
         &:hover {
           cursor: pointer;
           background-color: #434343;
-          color: #cccccc;
+          color: #ccc;
         }
       }
       &__more-place-holder {
@@ -967,7 +969,7 @@
           padding: 0;
           margin: 3px 0;
           &:hover {
-            background-color: #444444;
+            background-color: #444;
             color: #fff;
           }
         }

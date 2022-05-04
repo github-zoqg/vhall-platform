@@ -2,7 +2,7 @@
   <div class="vmp-chat-input">
     <div
       :class="['vmp-chat-input__textarea-box', { 'is-watch': isWatch }]"
-      v-show="(!inputStatus.disable && !chatLoginStatus) || isEmbed"
+      v-show="!inputStatus.disable && (!chatLoginStatus || isEmbed)"
     >
       <textarea
         id="chat-textarea"
@@ -29,10 +29,10 @@
     </div>
 
     <div
-      v-show="(inputStatus.disable || chatLoginStatus) && !isEmbed"
+      v-show="inputStatus.disable || chatLoginStatus"
       :class="['vmp-chat-input__textarea-placeholder', { 'is-watch': isWatch }]"
     >
-      <span v-show="chatLoginStatus" class="textarea-placeholder_no-login">
+      <span v-show="chatLoginStatus && !isEmbed" class="textarea-placeholder_no-login">
         <i18n path="chat.chat_1001">
           <span class="chat-login-btn" place="n" @click="callLogin">{{ $t('nav.nav_1005') }}</span>
         </i18n>
@@ -274,7 +274,7 @@
         //将文本消息加入消息体
         curmsg.setText(inputValue);
         //将图片消息加入消息体
-        curmsg.setImge(this.imgUrls);
+        curmsg.setImage(this.imgUrls);
         //将回复消息加入消息体
         curmsg.setReply(this.replyMsg);
         //将@消息加入消息体
@@ -382,11 +382,11 @@
         this.$refs.chatTextarea.focus();
       },
       //处理@某人
-      atUser(accountId) {
+      atUser(count) {
         this.replyMsg = {};
         const msgToAt =
           this.chatList.find(chatMsg => {
-            return chatMsg.sendId == accountId;
+            return chatMsg.count == count;
           }) || {};
         if (!this.atList.find(u => u.accountId == msgToAt.sendId)) {
           this.inputValue = this.trimPlaceHolder() + `@${msgToAt.nickname} `;

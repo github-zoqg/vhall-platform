@@ -152,7 +152,7 @@
           !this.localSpeaker.accountId
         );
       },
-      // 退出全屏
+      // 退出全屏   原因同wap-stream-remote
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
@@ -240,10 +240,16 @@
 
         // 推流失败
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-          if (e.data.stream.getID() == this.localSpeaker.streamId) {
-            Toast(this.$t('因网络问题推流失败，正在重新推流'));
-            await this.stopPush();
-            this.startPush();
+          if (e.data.accountId == this.joinInfo.third_party_user_id) {
+            Dialog.alert({
+              title: this.$t('account.account_1061'),
+              message: this.$t('interact.interact_1036')
+            }).then(() => {
+              window.location.reload();
+            });
+            // Toast(this.$t('因网络问题推流失败，正在重新推流'));
+            // await this.stopPush();
+            // this.startPush();
           }
         });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
@@ -348,7 +354,6 @@
           this.$message.error(this.$t('interact.interact_1016'));
           // 下麦接口
           this.speakOff();
-          // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'NotAllowed') {
           // 本地流创建失败
           this.$message.error(this.$t('interact.interact_1016'));
@@ -357,7 +362,6 @@
           this.$message.error(this.$t('interact.interact_1021'));
           // 下麦接口
           this.speakOff();
-          // TODO: 派发上麦失败事件，可能需要执行销毁互动实例重新创建播放器实例的逻辑
         } else if (err == 'noPermission') {
           await this.interactiveServer.destroy();
           await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
@@ -443,8 +447,8 @@
       },
       // 结束推流
       stopPush() {
-        return new Promise(resolve => {
-          // 增加判断当前是否在推流中    助理默认是不推流，但是能监听到结束直播成功的消息
+        return new Promise((resolve, reject) => {
+          // 增加判断当前是否在推流中
           if (!this.localStreamId) {
             resolve();
             return;
@@ -457,7 +461,9 @@
               clearInterval(this._netWorkStatusInterval);
               resolve();
             })
-            .catch(e => {});
+            .catch(e => {
+              reject(e);
+            });
         });
       },
       // 实时获取网路状况和麦克风能量
@@ -510,8 +516,7 @@
             streamId: this.localSpeaker.streamId,
             vNode: `vmp-stream-local__${this.localSpeaker.accountId}`
           })
-          .then(res => {
-            console.warn('res----', res);
+          .then(() => {
             this.interactiveServer.state.fullScreenType = false;
           });
       }

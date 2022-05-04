@@ -18,12 +18,12 @@
 </template>
 
 <script>
-  import { browserType } from '@/packages/app-shared/utils/tool.js';
+  import { isWechat } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapQrCode',
     data() {
       return {
-        isWechat: browserType(),
+        isWechat: isWechat(),
         showStatus: false
       };
     },
@@ -43,6 +43,7 @@
       }
     },
     created() {
+      if (this.embedObj.embedVideo) return;
       this.getOfficialInfo();
     },
     mounted() {

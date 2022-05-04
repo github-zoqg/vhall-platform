@@ -12,20 +12,22 @@
       </span>
 
       <!-- item -->
-      <ul class="vmp-tab-menu-scroll-container" ref="menu">
-        <li
-          v-for="item of visibleMenu"
-          :ref="item.id"
-          :key="item.id"
-          class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
-          @click="select({ type: item.type, id: item.id })"
-        >
-          <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i v-show="item.tipsVisible" class="tips"></i>
-          <hr class="bottom-line" :style="themeBgColor" />
-        </li>
-      </ul>
+      <div class="vmp-tab-menu-scroll-container" ref="menu">
+        <ul class="vmp-tab-menu-scroll-container__content" ref="menuContent">
+          <li
+            v-for="item of visibleMenu"
+            :ref="item.id"
+            :key="item.id"
+            class="vmp-tab-menu-item"
+            :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span class="item-text">{{ $tdefault(item.name) }}</span>
+            <i v-show="item.tipsVisible" class="tips"></i>
+            <hr class="bottom-line" :style="themeBgColor" />
+          </li>
+        </ul>
+      </div>
 
       <!-- next btn -->
       <span
@@ -45,6 +47,7 @@
 </template>
 
 <script>
+  import { clamp } from '@/packages/app-shared/utils/math';
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
   import {
@@ -127,6 +130,9 @@
       //活动信息
       webinarInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       }
     },
     watch: {
@@ -209,7 +215,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.isEmbed && this.webinarInfo.type == 1) {
+          if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
@@ -231,7 +237,9 @@
 
           if (msg.data.type === 'live_over') {
             this.setVisible({ visible: false, type: 'private' }); // private-chat
-            // this.setVisible({ visible: false, type: 'v5' }); // qa
+            if (this.roleName != 2) {
+              this.setVisible({ visible: false, type: 'v5' });
+            } // qa
             clientType === 'send' && this.selectDefault();
           }
         });
@@ -243,12 +251,14 @@
             this.setVisible({ visible: false, type: 'private' });
             this.setVisible({ visible: false, type: 'notice' });
           } else {
+            this.initMenu();
             if (interactToolStatus.question_status == 1) {
               this.setVisible({ visible: true, type: 'v5' });
             } else {
               this.setVisible({ visible: false, type: 'v5' });
             }
             this.setVisible({ visible: true, type: 'notice' });
+            this.selectDefault();
           }
         });
       },
@@ -258,7 +268,7 @@
       initMenu() {
         const roomState = this.$domainStore.state.roomBaseServer;
         let list = [];
-
+        this.menu = [];
         // 从接口拉取的配置
         if (roomState.clientType === 'send') {
           list = [...this.menuServer.state.list];
@@ -270,7 +280,6 @@
         for (const item of list) {
           this.addItem(item);
         }
-
         this.addSpecialItem();
       },
       /**
@@ -388,7 +397,6 @@
           }
         });
       },
-
       /**
        * 平滑滚动到指定元素
        * @param {String} cuid
@@ -396,20 +404,18 @@
        */
       async smoothScrollToItem({ id }) {
         await this.$nextTick();
-        const itemsWithPosition = this.visibleMenu.map(item => {
-          const id = item.id;
-          const ref = this.$refs[id][0];
-          const paddingLeft = parseFloat(window.getComputedStyle(ref).paddingLeft);
-          const left = ref.offsetLeft - paddingLeft;
-          return { id, ref, left };
-        });
 
-        const positionItem = itemsWithPosition.find(item => item.id === id);
+        // initRect
+        const viewRect = this.$refs['menu'].getBoundingClientRect();
+        const contentRect = this.$refs['menuContent'].getBoundingClientRect();
 
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left,
-          behavior: 'smooth'
-        });
+        // getItemLeft
+        const itemRect = this.$refs[id][0].getBoundingClientRect();
+        const itemLeft = itemRect.left - contentRect.left;
+
+        const contentMaxOffsetX = contentRect.width - viewRect.width; // 容器最大偏移量
+        const contentOffsetX = clamp(itemLeft, 0, contentMaxOffsetX); // 以itemLeft为偏移量，但实际偏移范围0~contentMaxOffsetX
+        this.$refs['menuContent'].style.transform = `translate3D(-${contentOffsetX}px,0px,0px)`;
       },
 
       /**
@@ -501,10 +507,12 @@
       border-bottom: 1px solid #1a1a1a;
       display: flex;
       height: 45px;
+      user-select: none;
 
       .vmp-tab-menu-page-btn {
         position: relative;
         display: inline-flex;
+        flex: 0 0 auto;
         justify-content: center;
         align-items: center;
         width: 24px;
@@ -535,10 +543,17 @@
       .vmp-tab-menu-scroll-container {
         height: 45px;
         flex: 1 1 auto;
-        overflow-y: scroll;
         display: flex;
         flex-wrap: nowrap;
         overflow: hidden;
+        user-select: none;
+
+        &__content {
+          transition: transform 0.2s;
+          white-space: nowrap;
+          user-select: none;
+        }
+
         .vmp-tab-menu-item {
           flex: 0 0 auto;
           position: relative;

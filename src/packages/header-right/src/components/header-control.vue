@@ -28,7 +28,8 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{
-              'header-right_control_wrap-container-disabled': !isLiving || isInsertFilePushing
+              'header-right_control_wrap-container-disabled':
+                !isLiving || isInsertFilePushing || isCurrentShareScreen
             }"
             v-if="configList['is_interact'] && isSupportSplitScreen"
             @click="handleSplitScreenChange"
@@ -46,7 +47,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="isShowThirdPushStream"
+            v-if="isShowThirdPushStream && !thirtPushStreamimg"
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -55,7 +56,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             @click="thirdPartyClose"
-            v-if="webinarInfo.mode == 2 && thirtPushStreamimg"
+            v-if="isShowThirdPushStream && thirtPushStreamimg"
           >
             <i class="vh-saas-iconfont vh-saas-a-color-webpageinitiate1"></i>
             <p>网页发起</p>
@@ -101,19 +102,22 @@
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
       },
+      // 是否开启桌面共享
+      isCurrentShareScreen() {
+        return (
+          this.$domainStore.state.desktopShareServer.localDesktopStreamId &&
+          this.$domainStore.state.desktopShareServer.desktopShareInfo.accountId ==
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
+      },
       // 是否正在第三方推流
       thirtPushStreamimg() {
-        return this.roomBaseServer.state.isThirdStream;
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
       //是否显示第三方推流组件
       isShowThirdPushStream() {
         // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
-        return (
-          this.configList['btn_thirdway'] &&
-          this.webinarInfo.no_delay_webinar == 0 &&
-          this.webinarInfo.mode == 2 &&
-          !this.thirtPushStreamimg
-        );
+        return this.configList['btn_thirdway'] && this.webinarInfo.no_delay_webinar == 0;
       }
     },
     data() {

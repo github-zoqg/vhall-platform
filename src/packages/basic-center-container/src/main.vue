@@ -3,8 +3,7 @@
     :class="[
       'vmp-basic-center',
       {
-        'vmp-basic-center-embed': isEmbed && !isEmbedVideo,
-        'vmp-basic-center-embedFull': isEmbedVideo
+        'vmp-basic-center-embed': isEmbed
       }
     ]"
   >
@@ -15,8 +14,7 @@
       :class="[
         'vmp-basic-center__cover',
         {
-          cover_embed: isEmbed && !isEmbedVideo,
-          cover_embedFull: isEmbedVideo
+          cover_embed: isEmbed
         }
       ]"
       v-show="showcoverImg"
@@ -42,10 +40,6 @@
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
-      },
-      isEmbedVideo() {
-        // 是不是单视频嵌入
-        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       // 文档区域是否展示 在上麦或者分组时，右上角为主屏画面，一般在主屏画面处设置播放按钮
       // switchStatusDoc() {
@@ -90,14 +84,15 @@
     flex-direction: column;
     background-color: #2d2d2d;
     width: calc(100% - 380px);
+    height: calc(100%- 56px);
     border-radius: 4px;
     &-embed {
       height: 100%;
       width: calc(100% - 360px) !important;
-    }
-    &-embedFull {
-      height: 100%;
-      width: 100% !important;
+      .vmp-basic-center__mainscreen-pos {
+        width: 100%;
+        padding-top: 0;
+      }
     }
     &__mainscreen-pos {
       height: 100%;
@@ -110,14 +105,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 6;
+      z-index: 12;
       &.cover_embed {
-        height: 100%;
         width: calc(100% - 360px) !important;
-      }
-      &.cover_embedFull {
-        height: 100%;
-        width: 100% !important;
       }
       img {
         position: absolute;

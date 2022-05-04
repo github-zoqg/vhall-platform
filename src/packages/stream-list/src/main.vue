@@ -1,6 +1,7 @@
 <template>
   <div
     class="vmp-stream-list"
+    id="vmp-stream-list"
     :class="{
       'vmp-stream-list-h0': isStreamListH0 && !isUseNoDelayLayout,
       'no-delay-layout': isUseNoDelayLayout,
@@ -18,7 +19,7 @@
     </span>
 
     <!-- <template v-if="showScrollDom && (isShowInteract || mode == 6)"></template> -->
-    <div ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
+    <div v-drag ref="streamWrapper" class="vmp-stream-list__stream-wrapper">
       <div class="vmp-stream-list__stream-wrapper-scroll">
         <!-- 本地流容器 -->
         <div
@@ -46,7 +47,8 @@
             :class="{
               'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
               'vmp-dom__max': miniElement != 'stream-list' && speaker.accountId == mainScreen,
-              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen
+              'vmp-dom__mini': miniElement == 'stream-list' && speaker.accountId == mainScreen,
+              embed: isEmbed
             }"
           >
             <div class="vmp-stream-list__remote-container-h">
@@ -104,6 +106,12 @@
     },
 
     computed: {
+      isEmbed() {
+        return (
+          this.$domainStore.state.roomBaseServer.embedObj.embed &&
+          !this.$domainStore.state.roomBaseServer.embedObj.embedVideo
+        );
+      },
       // 主持人是否在小组内
       isHostInGroup() {
         return !!this.$domainStore.state.roomBaseServer.interactToolStatus.is_host_in_group;
@@ -257,6 +265,7 @@
             }
           } else {
             if (newval) {
+              // useDocServer().resetLayoutByMiniElement();
               // 开启共享
               useRoomBaseServer().setChangeElement('stream-list');
             }
@@ -343,6 +352,24 @@
             this.remoteSpeakers.length * 142 > this.$refs.streamWrapper.clientWidth;
         }
       }
+    },
+    directives: {
+      drag(el, bindings) {
+        el.onmousedown = function (e) {
+          // const boxdom = document.getElementById('vmp-stream-list');
+          let startX = e.pageX;
+          // var disx = e.pageX - el.offsetLeft;
+          // const boxdomScrollLeft = boxdom.scrollLeft;
+          el.onmousemove = function (e) {
+            const l = e.pageX - startX;
+            // boxdom.scrollLeft = boxdomScrollLeft - l * (boxdom.offsetWidth / el.offsetWidth);
+            el.scrollLeft -= l;
+          };
+          el.onmouseup = function (e) {
+            el.onmousemove = null;
+          };
+        };
+      }
     }
   };
 </script>
@@ -369,6 +396,10 @@
       flex: 1;
       overflow: hidden;
       display: flex;
+      display: inherit;
+      cursor: pointer;
+
+      user-select: none;
       &-scroll {
         display: flex;
         justify-content: center;
@@ -403,6 +434,9 @@
             width: calc(100% - 380px);
             height: auto;
             min-height: auto;
+            &.embed {
+              width: calc(100% - 360px);
+            }
           }
 
           // 主屏在小窗的样式
@@ -538,6 +572,12 @@
         .vmp-stream-list__remote-container {
           width: 72px;
           height: 40px;
+
+          &:not(.vmp-stream-list__main-screen) {
+            .vmp-stream-local__bottom-nickname {
+              width: 60px;
+            }
+          }
         }
         .vmp-stream-local__bottom-role {
           display: none;

@@ -188,12 +188,13 @@
     },
     watch: {
       'ruleForm.password'(val) {
-        console.log(val);
         this.ruleForm.password = `${val}`.replace(/[\u4E00-\u9FA5]/g, '');
-        console.log(val);
       },
       'ruleForm.phone': function () {
         this.codeBtnDisabledCheck();
+      },
+      'ruleForm.captchas'(val) {
+        this.ruleForm.captchas = `${val}`.replace(/[^0-9]/g, '');
       },
       captchaReady() {
         this.codeBtnDisabledCheck();

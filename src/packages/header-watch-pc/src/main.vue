@@ -287,14 +287,15 @@
           this.$nextTick(() => {
             const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_pc) || '';
             this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
-            this.themeClass.pageBg = pageStyle;
+            this.themeClass.pageBg = pageStyle; // 观看端风格/颜色
             this.themeClass.bgColor =
               bgColor == '#1a1a1a' ? 'dark' : bgColor == '#F2F2F2' ? 'gray' : 'white';
             const bottomContent = document.querySelector('.vmp-basic-container');
             if (!bottomContent) return;
+            // 观看端背景颜色
             if (bottomContent && background) {
               bottomContent.style.background = `url(${background}) no-repeat`;
-              bottomContent.style.backgroundSize = '100% 100%';
+              bottomContent.style.backgroundSize = 'cover';
               bottomContent.style.backgroundPosition = 'center';
             } else if (bottomContent && bgColor) {
               bottomContent.style.background = `${bgColor}`;

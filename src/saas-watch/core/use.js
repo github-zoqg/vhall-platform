@@ -11,7 +11,7 @@ import VmpIconText from '@/packages/icon-text';
 import VmpLanguageChoice from '@/packages/language-choice';
 import VmpHeaderLeft from '@/packages/header-left';
 import VmpHeaderWatch from '@/packages/header-watch-pc';
-import VmpPcPlayer from '@/packages/pc-player';
+import VmpPcPlayer from '@/packages/player/pc-player';
 import VmpChat from '@/packages/chat';
 import VmpDocUne from '@/packages/doc-une';
 import VmpDocDlglist from '@/packages/doc-dlglist';
@@ -72,6 +72,8 @@ import VmpSubscribeBody from '@/packages/subscribe-body/index';
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
 
+import VmpViewRestriction from '@/packages/view-restriction/index';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -131,4 +133,5 @@ export function initUse() {
   Vue.use(VmpStreamDesktopScreen);
   Vue.use(VmpInsertStream);
   Vue.use(VmpMicInvited);
+  Vue.use(VmpViewRestriction);
 }

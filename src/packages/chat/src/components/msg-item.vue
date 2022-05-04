@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName != 1)">
+  <div class="vmp-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName == 2)">
     <!--消息发送时间-->
     <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
@@ -40,7 +40,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../img/phone.png"
+                :src="phoneImg"
                 alt
               />
             </div>
@@ -53,7 +53,7 @@
                 class="chat-phone"
                 width="9"
                 height="12"
-                src="../img/phone.png"
+                :src="phoneImg"
                 alt
               />
             </div>
@@ -62,7 +62,6 @@
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
               <template>
-                <!-- TODO: 自己不能@自己 -->
                 <span
                   class="info-wrap__nick-name cur-pointer"
                   @click="setPersonStatus($event, source)"
@@ -82,7 +81,7 @@
 
               <span
                 v-if="
-                  (source.type === 'text' || source.type === 'image' || source.isHistoryMsg) &&
+                  (['text', 'image'].includes(source.type) || source.isHistoryMsg) &&
                   source.roleName &&
                   source.roleName != '2'
                 "
@@ -273,7 +272,8 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import defaultAvatar from '../img/my-dark@2x.png';
+  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
@@ -332,10 +332,14 @@
     },
     data() {
       return {
+        //消息内容
         msgContent: '',
         //是否是嵌入端
         isEmbed: false,
-        defaultAvatar: defaultAvatar
+        //默认兜底头像
+        defaultAvatar: defaultAvatar,
+        //手机端icon标识
+        phoneImg: phoneImg
       };
     },
     computed: {
@@ -388,23 +392,6 @@
         if (!msg.sendId) {
           return;
         }
-        // 嘉宾和助理只能操作观众
-        // if ((this.roleName == 3 || this.roleName == 4) && msg.roleName != 2) {
-        //   EventBus.$emit(
-        //     'set_person_status_in_chat',
-        //     event.target,
-        //     msg.sendId,
-        //     msg.count,
-        //     msg.nickname,
-        //     false,
-        //     msg.roleName
-        //   );
-        //   return;
-        // }
-        // // 观众不能操作
-        // if (this.roleName == 2) {
-        //   return;
-        // }
         EventBus.$emit(
           'set_person_status_in_chat',
           event.target,
@@ -418,10 +405,9 @@
       isSelfMsg(id) {
         return this.joinInfo.third_party_user_id == id;
       },
-      //todo 信令唤起其他模块 点击查看消息
+      //信令唤起其他模块 点击查看消息
       clickToView(type, content) {
         // TODO: type 目前消息体不统一
-        console.log('clickToView', type, content);
         // 抽奖点击查看
         if (content?.msg?.data?.type === 'lottery_result_notice') {
           this.lotteryCheck(content?.msg?.data);
@@ -431,13 +417,12 @@
           this.questionnaireCheck(content.questionnaire_id);
         }
       },
-      //todo 点击查看抽奖信息
+      //点击查看抽奖信息
       lotteryCheck(msg) {
         this.emitLotteryEvent(msg);
       },
-      //todo 点击查看问卷信息
+      //点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
-        console.log('questionnaireCheck', questionnaire_id);
         this.emitQuestionnaireEvent(questionnaire_id);
       },
       //处理@消息
@@ -709,6 +694,7 @@
             font-size: 14px;
             color: @font-dark-normal;
             line-height: 20px;
+            word-break: break-word;
             .normal-msg__content-wrapper__label {
               color: #fa9a32;
             }
@@ -757,7 +743,7 @@
           // margin: 20px 46px 0;
           line-height: 20px;
           padding: 5px 16px;
-          background-color: #222222;
+          background-color: #222;
           border-radius: 15px;
           color: @font-dark-normal;
           font-size: 14px;
@@ -817,7 +803,7 @@
           /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
           line-height: 20px;
           padding: 5px 16px;
-          background-color: #222222;
+          background-color: #222;
           border-radius: 15px;
           color: @font-dark-normal;
           font-size: 14px;

@@ -58,7 +58,7 @@
     </div>
 
     <!-- 滚动操作 -->
-    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0">
+    <div class="vmp-stream-list__folder" v-show="remoteSpeakers.length > 0 && !isStreamListH0">
       <span
         class="vmp-stream-list__folder--up"
         :class="{
@@ -260,10 +260,14 @@
 
           // 接收设为主讲人消息
           this.micServer.$on('vrtc_speaker_switch', msg => {
+            const m =
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 6
+                ? '主画面'
+                : this.$t('interact.interact_1034');
             this.$message.success(
               this.$t('interact.interact_1012', {
                 n: msg.data.nick_name,
-                m: this.$t('interact.interact_1034')
+                m: m
               })
             );
           });
@@ -276,14 +280,15 @@
             );
             if (mainScreenSpeaker.streamId) {
               this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
-            } else {
-              this.$message.warning('当前用户正在推流，请稍等');
             }
           }
         });
       },
 
       toggleShrink(flag) {
+        if (this.remoteSpeakers.length <= this.remoteMaxLength) {
+          return;
+        }
         this.isShrink = flag;
       },
       /**
@@ -354,7 +359,7 @@
             }
           }
           .vmp-stream-local__bottom {
-            bottom: 17px;
+            bottom: 18px;
           }
         }
         // 远端流大窗样式

@@ -56,9 +56,8 @@
     name: 'VmpWapStreamRemote',
     data() {
       return {
-        audioLevel: 1,
-        networkStatus: 0,
-        isFullScreen: false,
+        audioLevel: 1, // 音量范围 默认值
+        networkStatus: 0, // 网络范围 默认值
         isShowNetError: false
       };
     },
@@ -134,6 +133,7 @@
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       },
+      // 是否展示退出全屏值     放置domain层原因：由于全屏按钮放置streamlist层，全屏的不知是本地流还是远端流
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
       }
@@ -170,9 +170,10 @@
 
         // 订阅失败
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.stream.streamId) {
-            Toast(this.$t(`interact.interact_1014`, { n: this.stream.nickname }));
-            this.subscribeRemoteStream();
+          if (e.data.accountId == this.stream.accountId) {
+            this.isShowNetError = true;
+            // Toast(this.$t(`interact.interact_1014`, { n: this.stream.nickname }));
+            // this.subscribeRemoteStream();
           }
         });
       },
@@ -216,12 +217,6 @@
           .catch(e => {
             console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
-      },
-      // 用户下麦接口
-      speakOff() {
-        this.micServer.speakOff({
-          receive_account_id: this.stream.accountId
-        });
       },
       getLevel() {
         // 麦克风音量查询计时器
@@ -285,11 +280,6 @@
     height: 100%;
     background-color: #000;
     position: relative;
-    &:hover {
-      .vmp-stream-remote__shadow-box {
-        display: flex;
-      }
-    }
 
     .vmp-stream-local__top {
       pointer-events: none;

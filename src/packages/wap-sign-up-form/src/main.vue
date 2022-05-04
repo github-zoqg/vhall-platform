@@ -69,7 +69,7 @@
                 v-model="form[question.id]"
                 :placeholder="placeholderMap[question.default_type] || $t('form.form_1014')"
                 type="text"
-                maxlength="60"
+                :maxlength="getInputLimit(question)"
               />
               <p v-show="!!errMsgMap[question.id]" class="err-msg">
                 {{ errMsgMap[question.id] }}
@@ -259,9 +259,9 @@
             <p v-show="!!errMsgMap.code" class="err-msg">{{ errMsgMap.code }}</p>
           </li>
           <li v-if="privacy" class="tab-content-li">
-            <div class="provicyBox clearfix" @click="handleClickPrivacy(privacy)">
+            <div class="privacy-box clearfix" @click="handleClickPrivacy(privacy)">
               <i
-                class="privicyitem vh-iconfont vh-line-check"
+                class="privacy-item vh-iconfont vh-line-check"
                 :class="{ active: form[privacy.id] }"
               ></i>
               <span v-html="privacyText"></span>
@@ -346,7 +346,7 @@
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
-  import { useSignUpFormServer } from 'middle-domain';
+  import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
@@ -378,29 +378,6 @@
         isSubscribe: 0,
         //简介文字是否超长
         overflowStatus: false,
-        //tab栏的配置
-        tabConfig: {
-          1: [
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            },
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            }
-          ],
-          2: [
-            {
-              code: 2,
-              text: this.$t('form.form_1024')
-            },
-            {
-              code: 1,
-              text: this.$t('form.form_1025')
-            }
-          ]
-        },
         //当前激活的tab
         activeTab: 1,
         // 手机短信验证是都开启
@@ -441,18 +418,6 @@
           'form.form_1070',
           'form.form_1071'
         ],
-        //输入文字提示的map
-        placeholderMap: {
-          1: this.$t('interact_tools.interact_tools_1005'),
-          2: this.$t('account.account_1025'),
-          3: this.$t('form.form_1023'),
-          5: {
-            province: this.$t('form.form_1004'),
-            city: this.$t('form.form_1005'),
-            county: this.$t('form.form_1006')
-          },
-          6: this.$t('form.form_1020')
-        },
         //错误信息的map
         errMsgMap: {},
         //省份
@@ -497,11 +462,11 @@
         privacyText: '',
         //答案
         answer: {},
-        //
+        //是否显示云盾验证码
         codeEnable: false,
         verifyCodeEnable: false,
         showCaptcha: false, // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用
-        captchakey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
+        captchaKey: 'b7982ef659d64141b7120a6af27e19a0', // 云盾key
         mobileKey: '', // 云盾值
         captcha1: null, // 云盾实例
         captcha2: null, // 云盾实例
@@ -540,21 +505,63 @@
             });
             return list;
           }
+          return list;
+        };
+      },
+      //tab栏的配置
+      tabConfig() {
+        return {
+          1: [
+            {
+              code: 1,
+              text: this.$t(this.formInfo.tab_form_title)
+            },
+            {
+              code: 2,
+              text: this.$t(this.formInfo.tab_verify_title)
+            }
+          ],
+          2: [
+            {
+              code: 2,
+              text: this.$t(this.formInfo.tab_verify_title)
+            },
+            {
+              code: 1,
+              text: this.$t(this.formInfo.tab_form_title)
+            }
+          ]
+        };
+      },
+      //输入文字提示的map
+      placeholderMap() {
+        return {
+          1: this.$t('interact_tools.interact_tools_1005'),
+          2: this.$t('account.account_1025'),
+          3: this.$t('form.form_1023'),
+          5: {
+            province: this.$t('form.form_1003'),
+            city: this.$t('form.form_1004'),
+            county: this.$t('form.form_1005')
+          },
+          6: this.$t('form.form_1020')
+        };
+      },
+      //计算输入框限制的字数
+      getInputLimit() {
+        return function (question = {}) {
+          let maxLength = '';
+          if (question.default_type == 1) {
+            maxLength = 50;
+          } else {
+            maxLength = question.type == 0 ? '' : 60;
+          }
+          return maxLength;
         };
       }
     },
     watch: {
-      // province(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.city = '';
-      //     this.county = '';
-      //   }
-      // },
-      // city(newVal, oldVal) {
-      //   if (newVal != oldVal) {
-      //     this.county = '';
-      //   }
-      // },
+      //是否开启了手机验证码验证
       isPhoneValidate: {
         immediate: true,
         handler(newVal) {
@@ -567,6 +574,7 @@
           }
         }
       },
+      //问题列表
       list: {
         deep: true,
         handler(newList) {
@@ -606,9 +614,23 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     async mounted() {
       await this.getFormLinkStatus();
+      await this.roomBaseServer.getLangList(this.$route.params.id);
+      const roomBaseState = this.roomBaseServer.state;
+      document.title = roomBaseState.languages.curLang.subject;
+      let lang = roomBaseState.languages.lang;
+      this.$i18n.locale = lang.type;
+      setRequestHeaders({
+        token: localStorage.getItem('token') || ''
+      });
+      // if (localStorage.getItem('lang')) {
+      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+      // } else {
+      //   this.$i18n.locale = 'zh';
+      // }
       this.getWebinarType();
       this.getBaseInfo();
       this.getQuestionList();
@@ -758,13 +780,11 @@
         const that = this;
         // eslint-disable-next-line
         initNECaptcha({
-          captchaId: that.captchakey,
+          captchaId: that.captchaKey,
           element: id,
           mode: 'float',
           lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
-          onReady(instance) {
-            console.log(instance);
-          },
+          onReady() {},
           onVerify(err, data) {
             if (data) {
               that.mobileKey = data.validate;
@@ -854,7 +874,6 @@
           if (this.errMsgMap[item] != '') {
             this.refArr.forEach((refItem, index) => {
               if (refItem == item) {
-                console.log(item, refItem);
                 firstErrIndex == 'first'
                   ? (firstErrIndex = index)
                   : firstErrIndex > index && (firstErrIndex = index);
@@ -867,8 +886,6 @@
         firstErrIndex == 'first' && this.errMsgMap.code && (firstErrIndex = 'code');
 
         if (isValidate) {
-          console.log(this.form);
-          // const refer = this.getQueryVariable('refer')
           this.formHandler();
           this.submitSignUpForm();
         } else {
@@ -938,7 +955,6 @@
                 process.env.VUE_APP_WAP_WATCH +
                 process.env.VUE_APP_WEB_KEY +
                 `/lives/watch/${this.webinar_id}${queryString}`;
-              // this.$router.push(`/lives/watch/${this.webinar_id}`)
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
@@ -969,10 +985,8 @@
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
                     `/lives/watch/${this.webinar_id}${queryString}`;
-                  // this.$router.push(`/lives/watch/${this.webinar_id}`)
                 });
             } else {
-              // this.$router.push(`/lives/watch/${this.webinar_id}`)
               window.location.href =
                 window.location.protocol +
                 process.env.VUE_APP_WAP_WATCH +
@@ -1061,7 +1075,7 @@
           } else if (item.type === 4) {
             // 下拉
             !answer.select && (answer.select = []);
-            const element = item.items.find(elem => elem.subject === this.form[item.id]);
+            const element = item.items.find(elem => elem.id === this.form[item.id]);
             element &&
               answer.select.push({
                 id: item.id,
@@ -1074,7 +1088,7 @@
           } else if (item.type === 5) {
             // 地域
             !answer.address && (answer.address = []);
-            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+            const province = this.provinces.find(ele => ele.value == this.province) || {
               label: '',
               value: ''
             };
@@ -1088,11 +1102,11 @@
                 : { label: '', value: '' };
             answer.address.push({
               id: item.id,
-              content: `${provinec.label}${city.label}${county.label}`,
+              content: `${province.label}${city.label}${county.label}`,
               contentDe: [
                 {
-                  id: provinec.value,
-                  content: provinec.label
+                  id: province.value,
+                  content: province.label
                 },
                 {
                   id: city.value,
@@ -1132,8 +1146,6 @@
           `/lives/entryform/${this.webinar_id}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
-            console.log('获取微信分享数据', res.data);
-            // const hideShare = this.configList ? this.configList['ui.watch_hide_share'] : 0
             const params = {
               appId: res.data.appId,
               timestamp: res.data.timestamp,
@@ -1378,8 +1390,6 @@
             params.visit_id = sessionStorage.getItem('visitorId');
           }
 
-          console.log(this.signUpFormServer);
-
           this.signUpFormServer
             .checkIsRegistered(params)
             .then(res => {
@@ -1485,7 +1495,6 @@
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             overflow: hidden;
-            text-overflow: -o-ellipsis-lastline;
             text-overflow: ellipsis;
           }
           .text-tail {
@@ -1496,7 +1505,7 @@
             background-color: #fff;
             color: #3562fa;
             .is-ellipsis {
-              color: #666666;
+              color: #666;
             }
           }
           .text-tail-2 {
@@ -1561,16 +1570,7 @@
             margin-top: 90px;
           }
         }
-        //li {
-        //  margin-top: 0.52rem;
-        //  position: relative;
-        //  margin-bottom: 0.02rem;
-        //  &:last-child {
-        //    margin-top: 90px;
-        //  }
-        //}
         input {
-          // line-height: 1.04rem !important;
           height: 1.04rem;
           line-height: 0.84rem;
           width: 9.07rem;
@@ -1642,7 +1642,6 @@
     }
     .err-msg {
       position: absolute;
-      /* display: none; */
       bottom: -0.4rem;
       left: 0;
       font-size: 0.32rem;
@@ -1650,9 +1649,7 @@
     }
     .radio-item {
       position: relative;
-      // min-height: 1.067rem;
-      padding: 0.267rem 0.2rem 0 0.2rem;
-      // border: 0.02rem solid #d2d2d2;
+      padding: 0 0.2rem 0 0.2rem;
       border-radius: 0.11rem;
       margin-top: 0.267rem;
       max-width: 9.07rem;
@@ -1675,7 +1672,7 @@
       .radio-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        line-height: 1.5;
         color: #1a1a1a;
         word-break: break-all;
         font-size: 0.37rem;
@@ -1684,7 +1681,8 @@
           display: block;
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1701,14 +1699,15 @@
       .checkbox-value {
         display: block;
         padding: 0.07rem 0 0 0.7rem;
-        line-height: 0.4rem;
+        line-height: 1.5;
         font-size: 0.37rem;
         color: #1a1a1a;
         word-break: break-all;
         .vh-line-check {
           position: absolute;
           left: 0.267rem;
-          top: 0.32rem;
+          top: 50%;
+          transform: translateY(-50%);
           /* prettier-ignore */
           width: 15Px; /*no*/
           /* prettier-ignore */
@@ -1742,8 +1741,6 @@
       }
       .select-item {
         appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
         display: inline-block;
         width: 9.07rem;
         height: 1.07rem;
@@ -1768,7 +1765,7 @@
         background-size: 100%;
       }
     }
-    .provicyBox {
+    .privacy-box {
       min-height: 0.5rem;
       span {
         float: left;
@@ -1777,7 +1774,7 @@
         width: calc(100% - 0.52rem);
       }
     }
-    .privicyitem {
+    .privacy-item {
       &.vh-line-check {
         float: left;
         width: 0.38rem;
@@ -1850,9 +1847,6 @@
       ::v-deep .yidun_tips {
         color: #999999 !important;
         line-height: 1.05rem !important;
-        // .yidun_tips__text {
-        // vertical-align: initial!important;
-        // }
       }
       ::v-deep .yidun_slide_indicator {
         line-height: 1.07rem !important;
@@ -1886,7 +1880,6 @@
       }
       ::v-deep .yidun.yidun--light.yidun--success {
         .yidun_control {
-          // border-color: #3562FA!important;
           .yidun_slider__icon {
             background-image: url(./img/icon-succeed.png) !important;
           }

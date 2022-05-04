@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comMicInvited'
+      'comMicInvited',
+      'comViewRestriction'
     ]
   },
 
@@ -216,6 +217,13 @@ export const serverConfig = {
       {
         cuid: 'compRegLogin',
         method: 'open'
+      }
+    ],
+    emitClickOpenSignUpForm: [
+      // 报名表单
+      {
+        cuid: 'comSignUpForm',
+        method: 'openModal'
       }
     ]
   },
@@ -616,5 +624,40 @@ export const serverConfig = {
         method: 'updateAutoSpeak'
       }
     ]
+  },
+  // *******单视频嵌入页面****开始
+  // 单视频嵌入页面配置
+  embedVideoLayerRoot: {
+    component: 'VmpAirContainer',
+    children: ['embedVideoLayerBody']
+  },
+  // 中间主区域容器
+  embedVideoLayerBody: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-bd',
+    children: ['embedVideoLayerBodyCenter']
+  },
+  embedVideoLayerBodyCenter: {
+    component: 'VmpBasicCenterContainer',
+    children: ['embedVideoLayerBodyCenterMain']
+  },
+  embedVideoLayerBodyCenterMain: {
+    component: 'VmpBasicCenterMain',
+    children: ['comPcPlayer', 'comLivingEnd']
+  },
+  comViewRestriction: {
+    component: 'VmpViewRestriction',
+    emitAgreeWitthTerms: [
+      {
+        cuid: 'comVmpSubscribeBody',
+        method: 'handleAgreeWitthTerms'
+      },
+      {
+        cuid: 'comPcPlayer',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
+
+  // *******单视频嵌入页面****结束
 };

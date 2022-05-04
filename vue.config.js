@@ -10,7 +10,7 @@ const resolve = dir => path.join(__dirname, dir);
 const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ReorganizePlugin = require('./scripts/plugins/reorganize-webpack-plugin');
-const SentryCliPlugin = require('@sentry/webpack-plugin');
+// const SentryCliPlugin = require('@sentry/webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 
@@ -113,28 +113,28 @@ function getPlugins() {
       }
     ];
 
-    // 如果非测试环境  非开发环境，修改 sourceMap 的地址
-    if (process.env.NODE_ENV != 'test') {
-      replaceInFileWebpackPluginData.push({
-        dir: `dist/${argv.project}`,
-        test: /\.js$/,
-        rules: [
-          {
-            search: /sourceMappingURL=/gi,
-            replace: `sourceMappingURL=https://t-alistatic01.e.vhall.com/common-static/sourcemap/${argv.project}/`
-          }
-        ]
-      });
-    }
+    // 如果非开发环境，修改 sourceMap 的地址
+    // if (!isDev) {
+    //   replaceInFileWebpackPluginData.push({
+    //     dir: `dist/${argv.project}`,
+    //     test: /\.js$/,
+    //     rules: [
+    //       {
+    //         search: /sourceMappingURL=/gi,
+    //         replace: `sourceMappingURL=https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/sourcemap/${argv.project}/`
+    //       }
+    //     ]
+    //   });
+    // }
 
     plugins.push(
-      new SentryCliPlugin({
-        release: `${argv.version}`, // 版本号
-        include: projectResourceDir, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
-        // ignore: ['node_modules'], // 忽略文件目录,当然我们在inlcude中制定了文件路径,这个忽略目录可以不加
-        configFile: `sentry/${argv.project}/sentry.properties`,
-        urlPrefix: `~/${argv.project}/static/js/` //  线上对应的url资源的相对路径 比如我的域名是 http://XXX.com/,静态资源都在 static文件夹里面
-      }),
+      // new SentryCliPlugin({
+      //   release: `${argv.version}`, // 版本号
+      //   include: projectResourceDir, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
+      //   // ignore: ['node_modules'], // 忽略文件目录,当然我们在inlcude中制定了文件路径,这个忽略目录可以不加
+      //   configFile: `sentry/${argv.project}/sentry.properties`,
+      //   urlPrefix: `~/${argv.project}/static/js/` //  线上对应的url资源的相对路径 比如我的域名是 http://XXX.com/,静态资源都在 static文件夹里面
+      // }),
       new FileManagerPlugin({
         events: {
           onEnd: {
@@ -161,8 +161,12 @@ function getPlugins() {
                 destination: `dist/${argv.project}/cloud/${argv.version}/static`
               },
               {
-                source: `dist/${argv.project}/static/**/*.map`,
-                destination: `dist/${argv.project}/sourcemap`
+                source: `dist/${argv.project}/static/**/*.js.map`,
+                destination: `dist/${argv.project}/sourcemap/static/js`
+              },
+              {
+                source: `dist/${argv.project}/static/**/*.css.map`,
+                destination: `dist/${argv.project}/sourcemap/static/css`
               }
             ],
             delete: [`dist/${argv.project}/static/**/*.map`, `dist/${argv.project}/cloud/**/*.map`]
@@ -184,8 +188,7 @@ const sharedConfig = {
   assetsDir: 'static', // 配置js、css静态资源二级目录的位置
   // 会通过webpack-merge 合并到最终的配置中
   configureWebpack: {
-    devtool:
-      isDev || process.env.NODE_ENV == 'test' ? '#eval-source-map' : '#cheap-module-source-map',
+    devtool: isDev ? '#eval-source-map' : 'none',
     // 该选项可以控制 webpack 如何通知「资源(asset)和入口起点超过指定文件限制」
     performance: {
       hints: isDev ? false : 'warning',
@@ -214,7 +217,21 @@ const sharedConfig = {
 
     if (!isDev) {
       config.optimization.minimize(true);
+      config.devtool(false); // 这个是把本地的productionSourceMap给关掉了，用下面的，不关的话，会造成，编译好的js有两个sourceMap的指向（需要注意的地方）
+      config
+        .plugin('SourceMapDevToolPlugin')
+        .use(webpack.SourceMapDevToolPlugin)
+        .tap(args => {
+          return [
+            {
+              filename: '[file].map',
+              publicPath: `https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/sourcemap/${argv.project}/`,
+              moduleFilenameTemplate: 'source-map'
+            }
+          ];
+        });
     }
+
     if (cmd === 'build' && ['test', 'production'].includes(process.env.NODE_ENV)) {
       // 编译结束后重新组织编译结果
       // config.plugin('reorganize').use(

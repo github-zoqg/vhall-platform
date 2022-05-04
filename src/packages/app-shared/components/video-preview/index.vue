@@ -23,7 +23,7 @@
           :class="hoveVideo ? 'vmp-video-preview-wrap-controller__active' : ''"
           v-show="isShowController"
         >
-          <div class="vmp-video-preview-wrap-controller-slider">
+          <div class="vmp-video-preview-wrap-controller-slider" v-show="isVod">
             <!-- 进度条 -->
             <el-slider
               v-model="sliderVal"
@@ -32,6 +32,7 @@
               @change="setVideo"
             ></el-slider>
             <div
+              v-show="isVod"
               :style="{ left: hoverLeft + 'px' }"
               class="vmp-video-preview-wrap-controller-times"
             >
@@ -47,7 +48,7 @@
               ></i>
               <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
               <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i> -->
-              <div class="vmp-center-box">
+              <div class="vmp-center-box" :class="isVod ? '' : 'vmp-center-box__hidden'">
                 <span>
                   {{ currentTime | secondToDate }}
                 </span>
@@ -77,10 +78,10 @@
               <template v-if="!isInsertVideoPreview">
                 <i
                   v-if="isFullscreen"
-                  class="vh-iconfont vh-a-line-fullscreen"
+                  class="vh-iconfont vh-a-line-exitfullscreen"
                   @click="exitFullscreen"
                 ></i>
-                <i v-else class="vh-iconfont vh-a-line-exitfullscreen" @click="enterFullscreen"></i>
+                <i v-else class="vh-iconfont vh-a-line-fullscreen" @click="enterFullscreen"></i>
               </template>
               <!-- 插播视频播放器显示的按钮 -->
               <template v-if="isInsertVideoPreview">
@@ -150,6 +151,9 @@
         const videoType = this.videoParam.msg_url || this.videoParam.file_type;
         if (!videoType) return false;
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
+      },
+      isVod() {
+        return this.videoParam.type == 'vod' || !this.videoParam.type;
       }
     },
     beforeCreate() {
@@ -165,7 +169,7 @@
     },
     methods: {
       initPlayer() {
-        this.initSDK().then(() => {
+        this.initSDK().then(async () => {
           if (this.isInsertVideoPreview) {
             this._firstInit = true;
           }
@@ -175,6 +179,12 @@
           }); // 获取视频总时长
           this.initSlider(); // 初始化播放进度条
           this.listen();
+          await this.$nextTick(0);
+          try {
+            this.videoParam.autoplay && this.playerServer.play(); // TODO: player sdk 2.3.9+ 如果首次拉流404，后续不会自动播放，先hack解决
+          } catch (err) {
+            console.error('自动播放失败');
+          }
         });
       },
       async initSDK() {
@@ -457,7 +467,7 @@
       }
       &-controller {
         position: absolute;
-        z-index: 20;
+        z-index: 6;
         width: 100%;
         height: 40px;
         bottom: -31px;
@@ -531,6 +541,9 @@
             .vmp-center-box {
               display: inline-block;
               line-height: 48px;
+              &__hidden {
+                visibility: hidden;
+              }
             }
           }
           &-right {

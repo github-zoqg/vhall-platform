@@ -174,7 +174,7 @@
       //选中的tab
       selectMenuType: {
         type: String,
-        default: () => ''
+        default: ''
       },
       //聊天审核组件的配置
       options: {
@@ -201,6 +201,7 @@
     },
     data() {
       return {
+        //是否正在加载
         loading: false,
         //分页配置
         pageConfig: {
@@ -221,14 +222,14 @@
       };
     },
     computed: {
-      //判断未审核的禁言何踢出按钮是否展示
+      //判断未审核的禁言和踢出按钮是否展示
       showMutedAndKickedBtn() {
         return function (item) {
           const { third_party_user_id = '' } = item;
           const { baseChanelInfo = {}, hostUserId = '' } = this.$domainStore.state.chatAuthServer;
           return (
-            third_party_user_id !== hostUserId &&
-            baseChanelInfo.third_party_user_id !== third_party_user_id
+            third_party_user_id != hostUserId &&
+            baseChanelInfo.third_party_user_id != third_party_user_id
           );
         };
       }
@@ -333,7 +334,6 @@
         width: 120px;
         height: 120px;
         margin: 10px auto;
-        //background: url('../images/no-data.png') no-repeat;
         background-size: cover;
       }
     }
@@ -354,7 +354,6 @@
           }
           .chat-info__time {
             color: #888;
-            // margin-left: 10px;
             position: absolute;
             right: 0;
           }

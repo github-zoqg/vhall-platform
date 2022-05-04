@@ -15,6 +15,8 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
+  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   export default {
@@ -57,24 +59,51 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.hide_subscribe;
       }
     },
-    async created() {
+    beforeRouteEnter(to, from, next) {
+      // Vue history模式 微信分享IOS无效解决办法---最终章
+      const { system } = getBrowserType();
+      if (
+        system == 'ios' &&
+        `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
+      ) {
+        location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+      } else {
+        next();
+      }
+    },
+    async mounted() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'standard';
-        if (location.pathname.indexOf('embedclient') != -1) {
-          clientType = 'embed';
+        const roomBaseServer = useRoomBaseServer();
+        // 判断是否是嵌入/单视频嵌入
+        try {
+          const _param = {
+            isEmbed: false,
+            isEmbedVideo: false
+          };
+          if (location.pathname.indexOf('embedclient') != -1) {
+            _param.isEmbed = true;
+            clientType = 'embed';
+          }
+          if (getQueryString('embed') == 'video') {
+            _param.isEmbedVideo = true;
+          }
+          roomBaseServer.setEmbedObj(_param);
+        } catch (e) {
+          console.log('嵌入', e);
         }
         await this.initReceiveLive(clientType);
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
           this.goWatchPage(clientType);
+          return;
         }
         await subscribeState();
         bindWeiXin();
         console.log('%c---初始化直播房间 完成', 'color:blue');
 
-        const roomBaseServer = useRoomBaseServer();
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
@@ -100,11 +129,12 @@
         return new Domain({
           plugins: ['chat', 'player'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: clientType //客户端类型
+            clientType: clientType, //客户端类型
+            ...this.$route.query // 第三方地址栏传参
           }
         });
       },

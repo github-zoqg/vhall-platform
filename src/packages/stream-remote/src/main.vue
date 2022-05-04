@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-stream-remote" :id="`vmp-stream-remote__${stream.streamId}`">
+  <div
+    class="vmp-stream-remote"
+    :class="{ fullscreen: isFullScreen }"
+    :id="`vmp-stream-remote__${stream.streamId}`"
+  >
     <!-- 流容器 -->
     <div class="vmp-stream-remote__container" :id="`stream-${stream.streamId}`"></div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
@@ -16,28 +20,19 @@
     <!-- 音频直播的的时候显示流占位图 -->
     <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
 
-    <!-- 网络异常时占位图，根据是否有streamId判断 -->
-    <section
-      v-if="isShowNetError && !stream.streamId && isInstanceInit"
-      class="vmp-stream-remote__container__net-error"
-    >
-      <div class="net-error-img"></div>
-      <p>{{ $t('interact.interact_1035') }}</p>
-    </section>
-
     <!-- 顶部流消息 -->
     <section class="vmp-stream-local__top">
       <div v-show="isShowPresentationScreen" class="vmp-stream-local__top-presentation">演示中</div>
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bottom">
+    <section class="vmp-stream-local__bottom" v-show="stream.streamId">
       <span
         v-show="showRole"
         class="vmp-stream-local__bottom-role"
         :class="`vmp-stream-local__bottom-role__${stream.attributes.roleName}`"
       >
-        {{ stream.attributes.roleName | roleFilter(true) }}
+        {{ stream.attributes.roleName | roleFilter }}
       </span>
       <span
         class="vmp-stream-local__bottom-nickname"
@@ -56,6 +51,15 @@
         :class="stream.audioMuted ? 'vh-line-turn-off-microphone' : `vh-microphone${audioLevel}`"
       ></span>
     </section>
+
+    <!-- 网络异常时占位图，根据是否有streamId判断 -->
+    <section
+      v-if="isShowNetError && !stream.streamId && isInstanceInit"
+      class="vmp-stream-remote__container__net-error"
+    >
+      <div class="net-error-img"></div>
+      <p>{{ $t('interact.interact_1035') }}</p>
+    </section>
     <!-- {{ joinInfo.role_name }} -- {{ groupRole }} -->
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
@@ -67,7 +71,7 @@
           v-if="[1, 3, 4].includes(stream.attributes.roleName)"
           class="vmp-stream-local__shadow-label"
         >
-          {{ stream.attributes.roleName | roleFilter(true) }}
+          {{ stream.attributes.roleName | roleFilter }}
         </span>
 
         <el-tooltip
@@ -100,10 +104,7 @@
       </p>
 
       <p class="vmp-stream-remote__shadow-second-line" v-if="liveMode != 1">
-        <span
-          v-if="[1, 3, 4].includes(stream.attributes.roleName)"
-          class="vmp-stream-local__shadow-label"
-        >
+        <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           视图
         </span>
 
@@ -115,13 +116,17 @@
           ></span>
         </el-tooltip>
 
-        <el-tooltip :content="isFullScreen ? '关闭全屏' : '全屏'" placement="bottom">
+        <el-tooltip
+          :content="isFullScreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="bottom"
+        >
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont"
             :class="{
               'vh-line-amplification': !isFullScreen,
               'vh-line-narrow': isFullScreen
             }"
+            v-show="stream.streamId"
             @click="fullScreen"
           ></span>
         </el-tooltip>
@@ -187,7 +192,10 @@
           <span
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
             v-show="
-              !isInGroup && (stream.attributes.roleName == 4 || stream.attributes.roleName == 1)
+              !isInGroup &&
+              (stream.attributes.roleName == 4 ||
+                stream.attributes.roleName == 1 ||
+                stream.attributes.role == 4)
             "
             @click="setOwner(stream.accountId)"
           ></span>
@@ -250,6 +258,7 @@
       'stream.streamId': {
         handler(newval) {
           console.log('----speaker--- 有流Id了------', newval);
+          console.log('[mic server] speakerlist', JSON.stringify(useMicServer().state.speakerList));
           if (newval) {
             this.$nextTick(() => {
               this.subscribeRemoteStream();
@@ -401,14 +410,15 @@
         );
 
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', e => {
-          if (e.data.stream.getID() == this.stream.streamId) {
-            this.$message({
-              message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-            this.subscribeRemoteStream();
+          if (e.data.accountId == this.stream.accountId) {
+            this.isShowNetError = true;
+            // this.$message({
+            //   message: this.$t(`interact.interact_1014`, { n: this.stream.nickname }),
+            //   showClose: true,
+            //   type: 'warning',
+            //   customClass: 'zdy-info-box'
+            // });
+            // this.subscribeRemoteStream();
           }
         });
 
@@ -437,7 +447,8 @@
           });
         this.interactiveServer.state.showPlayIcon = false;
       },
-      subscribeRemoteStream() {
+      async subscribeRemoteStream() {
+        await this.checkVRTCInstance();
         let videoNode = `stream-${this.stream.streamId}`;
         document.getElementById(videoNode).innerHTML = '';
         // TODO:主屏订阅大流，小窗订阅小流
@@ -447,11 +458,14 @@
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
 
-        console.log('订阅参数', opt);
+        console.log('订阅参数', opt, this.stream);
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            if (this.joinInfo.role_name === 1) {
+              this.interactiveServer.resetLayout();
+            }
             setTimeout(() => {
               this.replayPlay();
 
@@ -514,7 +528,10 @@
         const roomBaseServer = useRoomBaseServer();
         let miniElement = '';
         if (this.isShareScreen) {
-          if (this.presentationScreen != this.joinInfo.third_party_user_id) {
+          if (
+            this.presentationScreen != this.joinInfo.third_party_user_id ||
+            this.joinInfo.role_name != 2
+          ) {
             miniElement = roomBaseServer.state.miniElement == 'screen' ? 'stream-list' : 'screen';
           } else {
             miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
@@ -599,6 +616,28 @@
           .catch(err => {
             console.error('setmainscreen failed ::', err);
           });
+      },
+      /**
+       * 开始讨论/结束讨论时，会重新初始化互动，此时可能会有其他流加入订阅，而互动实例不存在的情况
+       */
+      checkVRTCInstance() {
+        return new Promise((resolve, reject) => {
+          let count = 0;
+          const timer = setInterval(() => {
+            if (this.interactiveServer.interactiveInstance) {
+              resolve();
+              clearInterval(timer);
+            } else {
+              count++;
+              console.log('checkVRTCInstance count', count);
+              if (count > 20) {
+                clearInterval(timer);
+                console.error('互动实例不存在');
+                reject();
+              }
+            }
+          }, 100);
+        });
       }
     }
   };
@@ -613,6 +652,22 @@
     &:hover {
       .vmp-stream-remote__shadow-box {
         display: flex;
+      }
+    }
+    &.fullscreen {
+      .vmp-stream-remote__shadow-box {
+        display: flex;
+        height: 24px;
+        bottom: 0;
+        flex-direction: row;
+        top: auto;
+        background: rgba(0, 0, 0, 0);
+        .vmp-stream-remote__shadow-icon {
+          background: none;
+          &:hover {
+            background-color: #fb3a32;
+          }
+        }
       }
     }
     .vmp-stream-remote__container {
@@ -663,6 +718,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      background-color: #000;
       .net-error-img {
         width: 25px;
         height: 19px;

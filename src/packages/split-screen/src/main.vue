@@ -22,7 +22,7 @@
         :class="`vmp-split-screen__stream-list__${layoutLevel}`"
       >
         <!-- 本地流 -->
-        <div class="vmp-split-screen__stream-container">
+        <div class="vmp-split-screen__stream-container" v-show="localSpeaker.accountId">
           <div class="vmp-split-screen__stream-container-box">
             <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
@@ -31,7 +31,7 @@
         <div
           class="vmp-split-screen__stream-container"
           v-for="speaker in remoteSpeakers"
-          :key="speaker.id"
+          :key="speaker.accountId"
         >
           <div class="vmp-split-screen__stream-container-box">
             <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import { useSplitScreenServer } from 'middle-domain';
+  import { useSplitScreenServer, useInteractiveServer } from 'middle-domain';
   import screenfull from 'screenfull';
   export default {
     name: 'VmpSplitScreen',
@@ -58,6 +58,15 @@
       // 远端流列表showPlayIcon
       speakerList() {
         return this.$domainStore.state.micServer.speakerList;
+      },
+      localSpeaker() {
+        return (
+          this.$domainStore.state.micServer.speakerList.find(
+            item =>
+              item.accountId ==
+              this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+          ) || {}
+        );
       },
       remoteSpeakers() {
         return (
@@ -88,6 +97,7 @@
     },
     beforeCreate() {
       this.splitScreenServer = useSplitScreenServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
@@ -96,6 +106,22 @@
       // TODO: 限定特定的组件的全屏更改
       screenfull.on('change', () => {
         this.isFullscreen = screenfull.isFullscreen;
+      });
+      // 订阅流播放失败    监听到播放失败, 然后展示按钮
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+        this.playboartCount ? ++this.playboartCount : (this.playboartCount = 1);
+        if (this.playboartCount > 1) {
+          return;
+        }
+        this.$alert('您已进入直播房间，马上开始互动吧', '', {
+          title: '提示',
+          confirmButtonText: '立即开始',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel',
+          callback: () => {
+            this.interactiveServer.playAbortStreams();
+          }
+        });
       });
     },
     methods: {

@@ -9,9 +9,12 @@
       </div>
       <div class="content-input">
         <template v-if="chatShow">
+          <div class="content-input__placeholder" v-if="currentTab != 'qa' && liveStatus == 3">
+            <span>{{ $t('chat.chat_1092') }}</span>
+          </div>
           <div
             class="content-input__placeholder"
-            v-if="!isLogin && !noChatLogin && !isEmbed"
+            v-else-if="!isLogin && !noChatLogin && !isEmbed"
             @click="login"
           >
             <span class="login-btn">{{ $t('nav.nav_1005') }}</span>
@@ -22,17 +25,19 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned">
-              {{ $t('chat.chat_1006') }}
-            </span>
-            <span v-else-if="isAllBanned">{{ $t('chat.chat_1044') }}</span>
-            <span v-else-if="isvod">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>{{ $t('chat.chat_1042') }}</span>
+            <span v-else>
+              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
+            </span>
           </div>
         </template>
       </div>
-      <span @click="showMyQA" :class="{ 'only-my': isShowMyQA }" v-if="currentTab == 'qa'">
+      <span
+        @click="showMyQA"
+        :class="[{ 'only-my': isShowMyQA }, 'only-my-default']"
+        v-if="currentTab == 'qa'"
+      >
         {{ $t('chat.chat_1018') }}
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
@@ -40,7 +45,7 @@
         <div class="icon-wrapper" v-show="isShowMicBtn">
           <!-- 上麦 -->
           <div
-            v-if="isAllowhandup || isSpeakOn"
+            v-if="isAllowHandUp || isSpeakOn"
             style="position: relative"
             auth="{ 'ui.hide_reward': 0 }"
           >
@@ -92,14 +97,16 @@
     useMicServer
   } from 'middle-domain';
   import Handup from './handup.vue';
-  import { browserType } from '@/packages/app-shared/utils/tool';
+  import { isWechat } from '@/packages/app-shared/utils/tool';
 
   export default {
     props: {
+      //当前菜单选中的tab
       currentTab: {
         type: [String, Number],
         default: ''
       },
+      //自定义样式名
       className: {
         required: false,
         type: Object,
@@ -107,22 +114,27 @@
           return {};
         }
       },
+      //是否显示聊天输入框
       chatShow: {
         type: Boolean,
         default: true
       },
+      //是否全体禁言
       isAllBanned: {
         type: Boolean,
         default: false
       },
+      //是否被禁言
       isBanned: {
         type: Boolean,
         default: false
       },
+      //是否允许举手
       isHandsUp: {
         type: Boolean,
         default: false
       },
+      //设备类型
       deviceType: {
         require: true,
         default: () => {
@@ -154,17 +166,18 @@
         roomBaseState,
         //定时器
         timer: {},
-        //是否可以发送消息，发送限频
-        canSend: true,
         //限频时间
         time: 0,
         //是否发送频繁，等待中
         waitTimeFlag: true,
         waitTime: 1,
-        connectMicShow: false, // 连麦入口按钮
-        disabledAll: false, // 全员禁言
+        // 连麦入口按钮
+        connectMicShow: false,
+        // 全员禁言状态
+        disabledAll: false,
         //活动信息
         webinar: {},
+        //举手状态
         handUpStatus: false,
         //只看我的问答
         isShowMyQA: false
@@ -176,7 +189,7 @@
         return this.$domainStore.state.mediaCheckServer.deviceInfo.device_status;
       },
       // 是否开启举手
-      isAllowhandup() {
+      isAllowHandUp() {
         let status = this.$domainStore.state.roomBaseServer.interactToolStatus.is_handsup;
         return status;
       },
@@ -192,7 +205,7 @@
       //是否不需要登录
       noChatLogin() {
         let noChatLogin = false;
-        if (browserType()) {
+        if (isWechat()) {
           /**
            * ui.hide_wechat: 0使用微信授权 1不适用微信授权
            */
@@ -210,8 +223,8 @@
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
       },
+      // 是不是音视频嵌入
       isEmbed() {
-        // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       //当前登录人信息
@@ -222,8 +235,7 @@
       },
       //是否展示互动上麦按钮
       isShowMicBtn() {
-        console.warn('--------', this.device_status);
-        //todo 注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
+        //注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
           this.device_status != 2 &&
@@ -238,7 +250,7 @@
         );
       },
       //是否回放禁言
-      isvod() {
+      isMuted() {
         return (
           (this.webinar.type == 5 || this.webinar.type == 4) &&
           this.configList['ui.watch_record_no_chatting'] == 1
@@ -251,6 +263,10 @@
       isLogin() {
         const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
         return user_id != 0;
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     watch: {
@@ -329,7 +345,7 @@
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
           (this.groupInitData.isBanned && this.groupInitData.isInGroup) ||
-          this.isvod
+          this.isMuted
         ) {
           return;
         }
@@ -437,7 +453,7 @@
     &__content {
       width: 100%;
       height: 120px;
-      background-color: #ffffff;
+      background-color: #fff;
       padding: 0 30px;
       box-sizing: border-box;
       display: flex;
@@ -448,7 +464,7 @@
         align-items: center;
         .content-input__placeholder {
           background-color: #f5f5f5;
-          color: #444444;
+          color: #444;
           border-radius: 40px;
           width: 100%;
           height: 80px;
@@ -483,7 +499,7 @@
         height: 40px;
         padding-right: 10px;
         .icon-wrapper {
-          color: #666666;
+          color: #666;
           display: inline-block;
           margin-right: 36px;
           text-align: center;
@@ -513,6 +529,9 @@
       }
       .only-my {
         color: #fb3a32;
+      }
+      .only-my-default {
+        margin-left: 16px;
       }
     }
   }
@@ -560,7 +579,7 @@
       left: 0;
       bottom: 0;
       overflow-y: scroll;
-      background-color: #ffffff;
+      background-color: #fff;
       img {
         width: 48px;
         height: 48px;

@@ -72,7 +72,7 @@
     useWatchRewardServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffect',
@@ -116,15 +116,18 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000
+        minTaskTime: 2000,
+        maxQueueLen: 3
       });
+
+      let i = 0;
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
       //     app_id: 'fd8d3653',
       //     bu: '1',
       //     channel: 'ch_qT76A13e',
       //     date_time: '2022-03-10 10:15:37',
-      //     msg_id: 'msg_8f1218c9470f4aa6bc188d53dc22732c',
+      //     msg_id: 'msg_8f1218c9470f4aa6bc188d53dc22732c' + i++,
       //     msg_source: 'prefix01',
       //     pv: 3,
       //     sender_id: '18200089',
@@ -145,40 +148,39 @@
       //     uv: 3
       //   });
       // }, 500);
+
       //测试数据
-      /*
-        setInterval(() => {
-          this.addRewardEffect({
-            uv: 2,
-            data: {
-              type: 'gift_send_success',
-              room_id: 'lss_726c98ec',
-              gift_user_id: '1044042222',
-              gift_user_nickname: 'v邵永凯11111',
-              gift_user_avatar: null,
-              gift_user_name: null,
-              gift_name: '666',
-              gift_price: 0,
-              gift_image_url:
-                'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
-              gift_id: 134518,
-              gift_receiver_id: '100890',
-              gift_creator_id: '0',
-              source_status: '0'
-            },
-            msg_source: 'prefix01',
-            pv: 2,
-            channel: 'ch_527661Qi',
-            sender_id: '104404666',
-            service_type: 'service_room',
-            bu: '1',
-            date_time: '2022-02-19 17:22:19',
-            context: { nick_name: '', avatar: '' },
-            msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
-            app_id: 'fd8d3653'
-          });
-        }, 100);
-        */
+      // setInterval(() => {
+      //   this.addRewardEffect({
+      //     uv: 2,
+      //     data: {
+      //       type: 'gift_send_success',
+      //       room_id: 'lss_726c98ec',
+      //       gift_user_id: '1044042222',
+      //       gift_user_nickname: 'v邵永凯11111' + uuid(),
+      //       gift_user_avatar: null,
+      //       gift_user_name: null,
+      //       gift_name: '666',
+      //       gift_price: 0,
+      //       gift_image_url:
+      //         'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
+      //       gift_id: 134518,
+      //       gift_receiver_id: '100890',
+      //       gift_creator_id: '0',
+      //       source_status: '0'
+      //     },
+      //     msg_source: 'prefix01',
+      //     pv: 2,
+      //     channel: 'ch_527661Qi',
+      //     sender_id: '104404666333',
+      //     service_type: 'service_room',
+      //     bu: '1',
+      //     date_time: '2022-02-19 17:22:19',
+      //     context: { nick_name: '', avatar: '' },
+      //     msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
+      //     app_id: 'fd8d3653'
+      //   });
+      // }, 100);
     },
     methods: {
       // 监听domain层服务消息
@@ -246,7 +248,9 @@
           rewardEffectInfo.data.event_type == 'free_gift_send'
         ) {
           // 来源于接口消息字段
-          if (rewardEffectInfo.data.gift_user_avatar) {
+          if (rewardEffectInfo.data.avatar) {
+            return rewardEffectInfo.data.avatar;
+          } else if (rewardEffectInfo.data.gift_user_avatar) {
             return rewardEffectInfo.data.gift_user_avatar;
           } else if (rewardEffectInfo.data.rewarder_avatar) {
             return rewardEffectInfo.data.rewarder_avatar;

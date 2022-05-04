@@ -1,7 +1,7 @@
 <template>
   <div class="lottery-list">
     <div class="award-info">
-      <img :src="prizeInfo.image_url || noLotteryImg" alt="" />
+      <img :src="prizeInfo.image_url || defaultLotteryImg" alt="" />
     </div>
     <span>{{ prizeInfo.award_name }}</span>
     <div class="table-title">{{ $t('interact_tools.interact_tools_1020') }}</div>

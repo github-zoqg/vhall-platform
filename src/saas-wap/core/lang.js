@@ -11,7 +11,11 @@ Vue.prototype.$tec = function (path) {
 };
 
 Vue.prototype.$tdefault = function (key) {
-  return defaultLanguageConf[key] ? this.$t(defaultLanguageConf[key]) : key;
+  if (this.$t) {
+    return defaultLanguageConf[key] ? this.$t(defaultLanguageConf[key]) : key;
+  } else {
+    return defaultLanguageConf[key] ? this.t(defaultLanguageConf[key]) : key;
+  }
 };
 
 /**
@@ -22,8 +26,8 @@ export function initI18n() {
   window.i18n = new VueI18n({
     locale: window.$globalConfig.currentLang || 'zh',
     messages: {
-      en: languages.en,
-      zh: languages.zh
+      zh: languages.zh,
+      en: languages.en
     }
   });
   return window.i18n;

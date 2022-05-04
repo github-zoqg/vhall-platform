@@ -344,14 +344,16 @@
       initEvent() {
         // 发起端收到同意邀约演示
         this.groupServer.$on('VRTC_CONNECT_PRESENTATION_AGREE', msg => {
-          if (msg.data.extra_params == this.userId) {
-            this.$message({
-              message: '对方已接受邀请',
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-          }
+          // https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005425
+          // 已和产品确认，接受邀请不提示
+          // if (msg.data.extra_params == this.userId) {
+          //   this.$message({
+          //     message: '对方已接受邀请',
+          //     showClose: true,
+          //     type: 'success',
+          //     customClass: 'zdy-info-box'
+          //   });
+          // }
         });
 
         // 发起端收到拒绝邀请演示
@@ -622,7 +624,7 @@
             // 设置开始为未讨论状态
             useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
             console.warn('结束讨论成功');
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });
       },
@@ -634,7 +636,7 @@
       // 分配设置主动取消回调
       settingCancel() {
         this.groupServer.state.panelShow = false;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCancelGroup'));
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
       },
       // 结束讨论回调
       endDiscussion() {},

@@ -189,31 +189,29 @@
         });
       },
       // 点击登录 - 验证码登录
-      handleCodeLogin() {
-        this.$refs.ruleForm.validate(valid => {
-          if (valid) {
-            const params = {
-              way: 2, // 手机号验证码登录
-              phone: this.ruleForm.phone,
-              dynamic_code: this.ruleForm.captchas, // 动态密码【快捷登录（短信验证码登录）必传】
-              remember: this.autoLoginStatus ? 1 : ''
-            };
-            if (this.visitorId) {
-              params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
-            }
-            this.userServer.userLogin(params).then(res => {
-              if (res.code === 200) {
-                this.$emit('handleClose', 'code');
-                // 刷新页面
-                window.location.reload();
-              } else {
-                this.$message({
-                  message: this.$tec(res.code) || this.$t('login.login_1021'),
-                  showClose: true,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
-              }
+      async handleCodeLogin() {
+        const valid = await this.$refs.ruleForm.validate();
+        if (!valid) return false;
+        const params = {
+          way: 2, // 手机号验证码登录
+          phone: this.ruleForm.phone,
+          dynamic_code: this.ruleForm.captchas, // 动态密码【快捷登录（短信验证码登录）必传】
+          remember: this.autoLoginStatus ? 1 : ''
+        };
+        if (this.visitorId) {
+          params.visitor_id = this.visitorId; // 游客id 登录方式为账号密码或者手机号验证码方式，如果传入游客ID会将访客和登录账户进行绑定
+        }
+        this.userServer.userLogin(params).then(res => {
+          if (res.code === 200) {
+            this.$emit('handleClose', 'code');
+            // 刷新页面
+            window.location.reload();
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || this.$t('login.login_1021'),
+              showClose: true,
+              type: 'error',
+              customClass: 'zdy-info-box'
             });
           }
         });

@@ -3,35 +3,41 @@
     <div class="vmp-chat-wap__content">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
-        v-if="hideChatHistory && !chatList.length && !historyloaded"
+        v-if="hideChatHistory && !chatList.length && !historyLoaded"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
-      <virtual-list
-        ref="chatlist"
-        style="height: 100%; overflow: auto"
-        :keeps="30"
-        :data-key="'count'"
-        :data-sources="chatList"
-        :data-component="msgItem"
-        :extra-props="{
-          previewImg: previewImg.bind(this),
-          emitLotteryEvent,
-          emitQuestionnaireEvent,
-          joinInfo
-        }"
-        @tobottom="tobottom"
-      ></virtual-list>
-      <div
-        class="vmp-chat-wap__content__new-msg-tips"
-        v-show="isHasUnreadAtMeMsg"
-        @click="scrollToTarget"
-      >
-        <span>{{ tipMsg }}</span>
-        <i class="vh-iconfont vh-line-arrow-down"></i>
+      <div ref="chatContent" class="virtual-content">
+        <virtual-list
+          v-if="virtual.showlist"
+          :style="{ height: virtual.contentHeight + 'px' }"
+          ref="chatlist"
+          class="virtual-list"
+          :keeps="20"
+          :estimate-size="100"
+          :data-key="'count'"
+          :data-sources="chatList"
+          :data-component="msgItem"
+          :extra-props="{
+            previewImg: previewImg.bind(this),
+            emitLotteryEvent,
+            emitQuestionnaireEvent,
+            joinInfo
+          }"
+          @tobottom="toBottom"
+        ></virtual-list>
+
+        <div
+          class="vmp-chat-wap__content__new-msg-tips"
+          v-show="isHasUnreadAtMeMsg"
+          @click="scrollToTarget"
+        >
+          <span>{{ tipMsg }}</span>
+          <i class="vh-iconfont vh-line-arrow-down"></i>
+        </div>
       </div>
     </div>
     <send-box
@@ -52,10 +58,16 @@
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
-  import { useChatServer, useRoomBaseServer, useGroupServer, useMicServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useGroupServer,
+    useMicServer,
+    useMenuServer
+  } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { browserType, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatWap',
@@ -90,16 +102,23 @@
         page: 1,
         //是否已经下拉刷新
         isPullingDown: false,
-        //关键词列表 todo 需要获取设置的关键词
+        //关键词列表
         keywordList: [],
         //房间号
         roomId: '',
         //是否是嵌入端
         isEmbed: false,
-        isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        //true禁言，false未禁言
+        isBanned: useChatServer().state.banned,
+        //true全体禁言，false未禁言
+        allBanned: useChatServer().state.allBanned,
         //是否加载完聊天历史
-        historyloaded: false
+        historyLoaded: false,
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0
+        }
       };
     },
     watch: {
@@ -191,11 +210,11 @@
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
+      this.menuServer = useMenuServer();
     },
     created() {
       this.initViewData();
       this.page = 0;
-      this.imgUrls = [];
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -208,7 +227,12 @@
     },
     methods: {
       showWelcomeTxt() {
-        this.welcomeText && this.$toast(`${this.joinInfo.nickname}${this.welcomeText}`);
+        // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
+        this.welcomeText &&
+          this.$toast({
+            message: `${this.joinInfo.nickname}${this.welcomeText}`,
+            position: 'bottom'
+          });
       },
       //初始化视图数据
       initViewData() {
@@ -264,6 +288,14 @@
         chatServer.$on('roomKickout', () => {
           this.$toast(this.$t('chat.chat_1007'));
         });
+        //监听切换到当前tab
+        this.menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.showlist = data.cuid == this.cuid;
+            this.scrollBottom();
+          });
+        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {
@@ -283,18 +315,17 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-
-        const { chatList = [], imgUrls = [] } = await this.chatServer.getHistoryMsg(data, 'h5');
-        if (chatList.length > 0) {
-          this.imgUrls = imgUrls;
-        }
-        this.historyloaded = true;
+        await this.chatServer.getHistoryMsg(data, 'h5');
+        this.historyLoaded = true;
         this.scrollBottom();
       },
-      previewImg(img) {
-        const index = this.imgUrls.findIndex(item => item === img);
+      //图片预览
+      previewImg(img, index = 0, list = []) {
+        if ((Array.isArray(list) && !list.length) || index < 0) {
+          return;
+        }
         ImagePreview({
-          images: this.imgUrls,
+          images: list,
           startPosition: index,
           lazyLoad: true
         });
@@ -315,17 +346,18 @@
         });
       },
       //监听滚动条滚动到底部
-      tobottom() {
+      toBottom() {
         this.unReadMessageCount = 0;
         this.isHasUnreadAtMeMsg = false;
       },
       //滚动条是否在最底部
       isBottom() {
         return (
+          this.$refs.chatlist &&
           this.$refs.chatlist.$el.scrollHeight -
             this.$refs.chatlist.$el.scrollTop -
             this.$refs.chatlist.getClientSize() <
-          5
+            5
         );
       },
       showUserPopup() {
@@ -339,16 +371,14 @@
       sendMsgEnd() {
         this.scrollBottom();
       },
-      //todo domain负责 抽奖情况检查
+      //抽奖情况检查
       emitLotteryEvent(msg) {
-        console.log('emitLotteryEvent', msg);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickLotteryChatItem', [msg])
         );
       },
-      //todo domain负责 问卷情况检查
+      //问卷情况检查
       emitQuestionnaireEvent(questionnaireId) {
-        console.log('emitQuestionnaireEvent', questionnaireId);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
@@ -362,19 +392,22 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    .virtual-content {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      .virtual-list {
+        height: 100%;
+        overflow: auto;
+      }
+    }
     &__content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 120px;
-      //overflow: hidden;
-      overflow-x: hidden;
-      overflow-y: auto;
+      height: calc(100% - 120px);
+      overflow: hidden;
       &__get-list-btn-container {
         width: 100%;
         text-align: center;
-        color: #666666;
+        color: #666;
         font-size: 28px;
         padding-top: 20px;
       }
@@ -388,7 +421,7 @@
         height: 60px;
         background-color: rgba(255, 233, 233, 0.9);
         border: 1px solid rgba(254, 129, 148, 1);
-        color: #333333;
+        color: #333;
         font-size: 26px;
         display: flex;
         justify-content: center;

@@ -3,7 +3,8 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import grayInit from '@/packages/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
-import { authCheck } from '../../packages/app-shared/utils/wechat';
+import { wxAuthCheck } from '../../packages/app-shared/utils/wechat';
+import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 Vue.use(VueRouter);
 
@@ -18,6 +19,35 @@ const routes = [
     path: '/lives/embedclient/watch/:id',
     component: Home,
     name: 'LiveEmbedclientRoom',
+    meta: { title: '直播间嵌入', grayType: 'webinar' },
+    redirect: to => {
+      if (to.query.embed === 'video') {
+        // 单视频嵌入
+        return {
+          name: 'LiveEmbedVideoRoom',
+          query: to.query,
+          params: to.params
+        };
+      } else {
+        // 完全嵌入
+        return {
+          name: 'LiveEmbedFullRoom',
+          query: to.query,
+          params: to.params
+        };
+      }
+    }
+  },
+  {
+    path: '/lives/embedclientfull/watch/:id', //完全嵌入观看页
+    component: Home,
+    name: 'LiveEmbedFullRoom',
+    meta: { title: '直播间嵌入', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/embedclientvideo/watch/:id', //单视频嵌入观看页
+    component: () => import('../views/EmbedVideo/index.vue'),
+    name: 'LiveEmbedVideoRoom',
     meta: { title: '直播间嵌入', grayType: 'webinar' }
   },
   {
@@ -65,13 +95,19 @@ const routes = [
     component: () => import('../views/bind'),
     meta: { grayType: '' }
   },
-  // 独立报名表单
   {
-    path: '/lives/entryform/:id',
-    name: 'entryform',
-    component: () => import('../views/entryform/index.vue'),
-    meta: { grayType: 'webinar' }
+    path: '/lives/bindB/:id',
+    name: 'bind',
+    component: () => import('../views/bind'),
+    meta: { grayType: '' }
   },
+  // 独立报名表单
+  // {
+  //   path: '/lives/entryform/:id',
+  //   name: 'entryform',
+  //   component: () => import('../views/entryform/index.vue'),
+  //   meta: { grayType: 'webinar' }
+  // },
   {
     path: '/user/home/:id', // 个人主页
     name: 'userHome',
@@ -98,17 +134,7 @@ router.beforeEach(async (to, from, next) => {
     console.log('---grayInit---', res);
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度、如果是中台用户, 跳转到中台
-      const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
-      const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
-      let protocol = window.location.protocol;
-      if (res.data.is_csd_user == 1) {
-        if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
-          window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
-        }
-      }
-      authCheck(to, next);
-      next();
+      wxAuthCheck(to, next);
     } else {
       next({
         name: 'PageError',
@@ -119,8 +145,7 @@ router.beforeEach(async (to, from, next) => {
       });
     }
   } else {
-    authCheck(to, next);
-    next();
+    wxAuthCheck(to, next);
   }
 });
 

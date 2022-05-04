@@ -4,7 +4,7 @@ import Vue from 'vue';
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
-import VmpWapPlayer from '@/packages/wap-player';
+import VmpWapPlayer from '@/packages/player/wap-player';
 import VmpDocWap from '@/packages/doc-wap';
 import VmpWapStreamList from '@/packages/wap-stream-list';
 import VmpWapStreamLocal from '@/packages/wap-stream-local';
@@ -57,7 +57,7 @@ import VmpCashWap from '@/packages/cash-wap';
 import VmpLotteryWap from '@/packages/lottery-wap';
 
 // 送礼物飘屏动画
-import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+// import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 
 // 章节
 import VmpChapterWap from '@/packages/watch-chapter-wap';
@@ -79,6 +79,8 @@ import VmpWapInsertFIle from '@/packages/stream-insert-file-wap';
 
 // 被邀请上麦的弹窗
 import VmpInviteHandup from '@/packages/inviteHandup';
+// 观看协议
+import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 
 // 全局注册组件
 export function initUse() {
@@ -109,7 +111,7 @@ export function initUse() {
   Vue.use(VmpSignWap);
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapBody);
-  Vue.use(VmpWapRewardEffect);
+  // Vue.use(VmpWapRewardEffect);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
   Vue.use(VmpUserAccountWap);
@@ -125,4 +127,5 @@ export function initUse() {
   Vue.use(VmpWapDesktopScreen);
   Vue.use(VmpWapInsertFIle);
   Vue.use(VmpInviteHandup);
+  Vue.use(VmpViewRestrictionWap);
 }

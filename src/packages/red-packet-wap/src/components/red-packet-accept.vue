@@ -45,7 +45,8 @@
     data() {
       return {
         accepted: false, // 是否已领取
-        opened: false
+        opened: false, // 完成红包打开
+        opening: false // 点击抢红包请求中
       };
     },
     computed: {
@@ -55,21 +56,13 @@
     },
     methods: {
       openRedPacket() {
-        // if (this.accepted) return;
-        // this.accepted = true;
+        if (this.opening || this.opened) return; // 红包打开中或已打开则拦截
+        console.log('clickopenRedPacket');
         if (this.userId == 0) {
           return this.$emit('needLogin');
         }
         const available = this.redPacketServer.state.available;
-        if (available) {
-          this.redPacketServer.openRedPacket().finally(() => {
-            this.opened = true;
-            const st = setTimeout(() => {
-              clearTimeout(st);
-              this.$emit('navTo', 'RedPacketSuccess');
-            }, 1000);
-          });
-        } else {
+        const getStatus = () => {
           this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
             const st = setTimeout(() => {
@@ -77,6 +70,30 @@
               this.$emit('navTo', 'RedPacketSuccess');
             }, 1000);
           });
+        };
+        if (available) {
+          this.opening = true; // 打开中
+          this.redPacketServer
+            .openRedPacket()
+            .then(res => {
+              if (res.code === 200) {
+                this.opened = true;
+                const st = setTimeout(() => {
+                  clearTimeout(st);
+                  this.$emit('navTo', 'RedPacketSuccess');
+                }, 1000);
+              } else {
+                getStatus();
+              }
+            })
+            .catch(() => {
+              getStatus();
+            })
+            .finally(() => {
+              this.opening = false;
+            });
+        } else {
+          getStatus();
         }
         // 更新领取后的状态
         this.redPacketServer.setAvailable(false);

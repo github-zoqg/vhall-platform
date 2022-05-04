@@ -25,19 +25,7 @@ if (process.env.NODE_ENV !== 'development') {
     release: `${process.env.VUE_APP_BUILD_VERSION}`,
     // environment 上报的环境 建议 按照 测试、生产区分
     environment: process.env.NODE_ENV,
-    integrations: [
-      new Integrations.BrowserTracing({
-        routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-        tracingOrigins: [
-          'test4-saas.vhall.com',
-          'dev-csd-saas-web.vhall.com',
-          'test-csd-saas-web.vhall.com',
-          'csd-saas-web.vhall.com',
-          // 'e.vhall.com',
-          /^\//
-        ]
-      })
-    ],
+    integrations: [],
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production

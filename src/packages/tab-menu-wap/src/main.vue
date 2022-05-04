@@ -143,6 +143,9 @@
       //活动信息
       webinarInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       }
     },
     watch: {
@@ -229,7 +232,7 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
-          if (!this.embedObj.embed && this.webinarInfo.type == 1) {
+          if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
           }
         });
@@ -250,8 +253,10 @@
           }
 
           if (msg.data.type === 'live_over') {
-            this.setVisible({ visible: false, type: 'private' }); // private-chat
-            // this.setVisible({ visible: false, type: 'v5' }); // qa
+            this.setVisible({ visible: false, type: 'private' });
+            if (this.roleName != 2) {
+              this.setVisible({ visible: false, type: 'v5' });
+            } // qa
             clientType === 'send' && this.selectDefault();
           }
         });
@@ -627,13 +632,14 @@
         }
 
         .tips {
-          display: inline-block;
+          position: absolute;
           width: 4px;
           height: 4px;
           border-radius: 50%;
           background: #ff0005;
           border: 9px solid #ff0005;
-          transform: translate(30%, -100%);
+          right: 18px;
+          top: 10px;
         }
 
         .bottom-line {

@@ -33,6 +33,9 @@ const defaultLanguageConf = {
   凌晨: 'webinar.webinar_1027',
   早上: 'webinar.webinar_1028',
   下午: 'webinar.webinar_1029',
-  晚上: 'webinar.webinar_1030'
+  晚上: 'webinar.webinar_1030',
+  主持人: 'chat.chat_1022',
+  嘉宾: 'chat.chat_1023',
+  助理: 'chat.chat_1024'
 };
 export default defaultLanguageConf;

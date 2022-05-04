@@ -30,7 +30,12 @@
         </el-dropdown>
       </div>
       <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
-        <EmbedTime ref="embedTime" :sub-option="subOption" @authFetch="handleAuthCheck"></EmbedTime>
+        <EmbedTime
+          ref="embedTime"
+          :sub-option="subOption"
+          @authFetch="handleAuthCheck"
+          @agreement="popupAgreement"
+        ></EmbedTime>
       </div>
       <!--活动时间信息-->
       <div class="subscribe-img-bottom" v-if="!isEmbed">
@@ -40,6 +45,7 @@
           :sub-option="subOption"
           @payMore="feeAuth"
           @authFetch="handleAuthCheck"
+          @agreement="popupAgreement"
         ></bottom-tab>
       </div>
     </div>
@@ -80,7 +86,8 @@
           is_subscribe: 0,
           actual_start_time: '',
           show: 1,
-          num: 0
+          num: 0,
+          needAgreement: false
         }
       };
     },
@@ -159,7 +166,8 @@
         });
       },
       handlerInitInfo() {
-        const { webinar, subscribe, join_info, warmup } = this.roomBaseServer.state.watchInitData;
+        const { webinar, subscribe, join_info, warmup, agreement } =
+          this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.startTime = webinar.start_time;
         this.subOption.verify = webinar.verify;
@@ -172,6 +180,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
+          // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
+          this.subOption.needAgreement = true;
+        }
         if (this.isEmbed) {
           // 嵌入的暖场视频只有免费的时候显示
           if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
@@ -189,6 +201,7 @@
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
+          ...this.$route.query,
           ...params
         };
         this.subscribeServer.watchAuth(data).then(res => {
@@ -272,9 +285,11 @@
         this.feeAuth({ type: type });
       },
       handlePlay() {},
+      // 切换多语言
       changeLang(key) {
         localStorage.setItem('lang', key);
         const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
         if (params.lang) {
           params.lang = key;
           let sourceUrl =
@@ -291,6 +306,13 @@
         }
       },
       livingLink() {
+        this.handleAuthCheck();
+      },
+      popupAgreement() {
+        this.roomBaseServer.$emit('POPUP_AGREEMENT');
+      },
+      handleAgreeWitthTerms() {
+        this.subOption.needAgreement = false;
         this.handleAuthCheck();
       }
     }
@@ -425,6 +447,14 @@
     &-tab {
       background: #2a2a2a;
       margin: 0px auto;
+    }
+    .subscribe-img-box-embed {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: rgba(0, 0, 0, 0.6);
     }
   }
   @media screen and (max-width: 1366px) {

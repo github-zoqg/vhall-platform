@@ -38,7 +38,12 @@
             <div class="btn-text">{{ $t('interact.interact_1007') }}</div>
           </button>
         </div>
-        <button class="btn btn-handsup" v-if="!isSpeakOn" @click="handsUpToConnect">
+        <button
+          class="btn btn-handsup"
+          v-if="!isSpeakOn"
+          :disabled="btnDisabled"
+          @click="handsUpToConnect"
+        >
           <i
             v-if="handText.search(`${$t('interact.interact_1004')}...`) != -1"
             class="vh-iconfont iconfont-bottom vh-a-line-handsup"
@@ -60,7 +65,8 @@
         lowerWheat: false, // 用户自己主动上麦等待时间展示
         lowerWheatFun: null,
         showConnectMic: false, // 连麦弹框
-        isWaitting: false
+        isWaitting: false,
+        btnDisabled: false
       };
     },
     computed: {
@@ -136,12 +142,18 @@
       },
       // 主动上麦方法
       applyMic() {
+        this.btnDisabled = true;
         useMicServer()
           .userApply()
           .then(res => {
+            this.btnDisabled = false;
             if (res.code != 200) {
               // TODO 根据code码提示 this.$tec(res.code) || res.msg
-              this.$toast(res.msg);
+              if (res.code == 513025) {
+                this.$message.error(
+                  this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
+                );
+              }
               return;
             }
             /*
@@ -172,6 +184,9 @@
                 useMicServer().userCancelApply();
               }
             }, 1000);
+          })
+          .catch(err => {
+            this.btnDisabled = false;
           });
       },
       async handleClickMuteDevice(deviceType) {

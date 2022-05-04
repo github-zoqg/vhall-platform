@@ -196,7 +196,7 @@
         left: 0;
         bottom: 0;
         overflow-y: scroll;
-        background-color: #ffffff;
+        background-color: #fff;
         img {
           width: 48px;
           height: 48px;

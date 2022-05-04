@@ -304,7 +304,8 @@ export default {
     chat_1078: 'There is a new message',
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
-    chat_1081: 'Q&A locked'
+    chat_1081: 'Q&A locked',
+    chat_1092: 'You have been muted'
   },
   form: {
     form_1001: 'Name',
@@ -519,7 +520,8 @@ export default {
     setting_1027: 'Please increase the speaker volume of the device',
     setting_1028: 'Choose external speakers or replace the computer',
     setting_1029: 'Help and support',
-    setting_1030: 'Setting'
+    setting_1030: 'Setting',
+    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',
@@ -729,7 +731,9 @@ export default {
     interact_1031: '{n} invites you to open the microphone',
     interact_1033: '主画面',
     interact_1034: 'presenter',
-    interact_1035: 'Opposite party network exception'
+    interact_1035: 'Opposite party network exception',
+    interact_1036:
+      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -741,7 +745,8 @@ export default {
     doc_1007: 'Move',
     doc_1008: 'Restore',
     doc_1009: 'Exit full screen mode',
-    doc_1010: 'Full screen mode'
+    doc_1010: 'Full screen mode',
+    doc_1028: 'Cancel Move'
   },
   webinar: {
     webinar_1001: 'Close',
@@ -788,7 +793,8 @@ export default {
     webinar_1038: 'Share success',
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
-    webinar_1041: 'Pay{n}'
+    webinar_1041: 'Pay{n}',
+    webinar_1042: 'The content you want has not been searched yet'
   },
   color: {},
   other: {
@@ -810,7 +816,7 @@ export default {
     other_1016: 'K value verification failed',
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
-    other_1019: 'I got it',
+    other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
   }
 };

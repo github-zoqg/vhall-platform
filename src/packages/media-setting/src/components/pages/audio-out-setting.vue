@@ -104,6 +104,10 @@
         this.$refs.outputAudioPlayer.removeEventListener('pause', this.setIsPaused);
         this.$refs.outputAudioPlayer.removeEventListener('play', this.setAudioPlay);
       },
+      pauseAudio() {
+        if (this.isPaused === true) return;
+        this.$refs.outputAudioPlayer.pause();
+      },
       /**
        * 试播音频
        */

@@ -9,7 +9,12 @@
         <i class="vh-iconfont vh-line-copy-document"></i>
       </el-tooltip>
     </span>
-    <video-preview ref="videoPreview" v-if="isShow" :videoParam="videoParam" />
+    <video-preview
+      ref="videoPreview"
+      v-if="isShow"
+      :isShowController="true"
+      :videoParam="videoParam"
+    />
   </section>
 </template>
 
@@ -21,7 +26,6 @@
     useRebroadcastServer,
     useMsgServer
   } from 'middle-domain';
-  import { sleep } from '@/packages/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpRebroadcastStream',
@@ -42,7 +46,7 @@
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
       roleName() {
-        return this.$domainStore.state.roomBaseServer.join_info.role_name;
+        return this.$domainStore.state.roomBaseServer?.join_info?.role_name;
       }
     },
     beforeCreate() {
@@ -57,21 +61,28 @@
       const { watchInitData, isThirdStream } = this.roomBaseServer.state;
       const hasRebroadCast = watchInitData.rebroadcast.id;
 
-      if (hasRebroadCast || (isThirdStream && this.roleName == 3)) {
+      if (
+        watchInitData.webinar.type == 1 &&
+        (hasRebroadCast ||
+          (watchInitData.switch.start_type != 1 &&
+            watchInitData.join_info.role_name == 3 &&
+            watchInitData.webinar.no_delay_webinar != 1))
+      ) {
         this.open();
       }
     },
     methods: {
       listenEvents() {
         const msgServer = useMsgServer();
-        // 只有第三方推流时才会触发这个事件
-        this.roomBaseServer.$on('LIVE_START', () => {
-          if (this.roleName != 3) return;
+        this.roomBaseServer.$on('LIVE_BROADCAST_START', () => {
           this.open();
         });
 
-        this.roomBaseServer.$on('LIVE_OVER', () => {
-          if (this.roleName != 3) return;
+        this.rebroadcastServer.$on('live_broadcast_start', () => {
+          this.open();
+        });
+
+        this.rebroadcastServer.$on('live_broadcast_stop', () => {
           this.close();
         });
 
@@ -86,9 +97,10 @@
        * 调起转播
        */
       async open() {
-        await sleep(1000);
+        if (this.isShow) {
+          return;
+        }
         const { watchInitData } = this.roomBaseServer.state;
-
         const token = watchInitData.interact.paas_access_token;
         const appId = watchInitData.interact.paas_app_id;
         const accountId = watchInitData.join_info.user_id;
@@ -106,20 +118,18 @@
             roomId
           }
         };
-        console.log('videoParam:', this.videoParam);
         this.isShow = true;
 
         if (this.interactiveServer.state.localStream.streamId) {
-          await this.interactiveServer.unpublishStream();
+          this.interactiveServer.unpublishStream();
         }
-        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: true });
+
         this.roomBaseServer.setChangeElement('rebroadcast-stream'); // 默认放小窗
       },
       async close() {
         this.isShow = false;
         this.$refs.videoPreview?.destroy();
-        this.miniElement !== 'rebroadcast-stream' && this.exchangeScreen();
-        this.roomBaseServer.setRebroadcastInfo({ isRebroadcasting: false });
+        await this.$nextTick(0);
       },
       exchangeScreen() {
         const miniElement =
