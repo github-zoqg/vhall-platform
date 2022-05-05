@@ -135,7 +135,13 @@
         <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="isShowDownMicBtn || guestHasInvitePer"
+            v-if="
+              guestHasInvitePer
+                ? stream.attributes.hasOwnProperty('role') && stream.attributes.role !== ''
+                  ? +stream.attributes.role != 1
+                  : +stream.attributes.roleName != 1
+                : isShowDownMicBtn
+            "
             @click="speakOff"
           ></span>
         </el-tooltip>
