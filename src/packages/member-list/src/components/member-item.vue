@@ -87,7 +87,7 @@
         </template>
         <!--同意上麦-->
         <i
-          v-if="tabIndex === 2 && [1, '1'].includes(roleName)"
+          v-if="tabIndex === 2 && ([1, '1'].includes(roleName) || guestHasInvitePer)"
           class="vmp-member-item__control__up-mic"
           @click="handleConsent(userInfo.account_id)"
         >
@@ -373,6 +373,11 @@
         default: () => {
           return 0;
         }
+      },
+      // 嘉宾为当前主讲人时是否有邀请上麦的权限
+      guestHasInvitePer: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {},
@@ -662,7 +667,10 @@
           return isShow;
         }
         //如果不是主持人
-        if (this.isNotHost) {
+        if (
+          this.isNotHost ||
+          (this.guestHasInvitePer && this.userInfo.role_name != 1 && this.userInfo.role_name != 3)
+        ) {
           isShow =
             [1, '1'].includes(this.isInteract) &&
             !this.userInfo.is_banned &&
@@ -682,7 +690,7 @@
             this.currentSpeakerId !== this.userId
           );
         }
-        if (this.isNotHost) {
+        if (this.isNotHost || (this.guestHasInvitePer && this.userInfo.role_name != 1)) {
           isShow = [1, '1'].includes(this.isInteract) && this.userInfo.is_speak;
         }
         return isShow;
