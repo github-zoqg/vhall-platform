@@ -1,7 +1,12 @@
 <template>
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
-    <div id="vmp-player-yun" class="player_box" v-if="!pushStream">
+    <div
+      id="vmp-player-yun"
+      class="player_box"
+      :class="playStatus ? 'player_box_hover' : ''"
+      v-if="!pushStream"
+    >
       <div class="top_tip" :class="director_stream ? 'success' : 'warning'">
         {{ tipText }}
       </div>
@@ -33,6 +38,10 @@
           </el-tooltip>
         </p>
       </section>
+      <!-- 开始按钮 -->
+      <div class="play_bg_radius" v-if="!playStatus">
+        <i class="vh-iconfont vh-line-video-play" @click="playerStart"></i>
+      </div>
     </div>
 
     <!-- 本地推流区域 -->
@@ -105,6 +114,7 @@
         time: 0,
         into: 0,
         timer: null,
+        playStatus: false,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
         audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
       };
@@ -218,9 +228,14 @@
             }
           })
           .then(() => {
+            this.playerServer.play();
             document.getElementsByTagName('video')[0].play();
             console.log('%c云导播播放器初始化成功', 'color:blue');
           });
+      },
+      playerStart() {
+        this.playerServer.play();
+        this.playStatus = true;
       },
       // 切换大小窗
       exchange() {
@@ -377,13 +392,13 @@
       width: 100%;
       height: 100%;
     }
+    .player_box_hover:hover {
+      .vmp-stream-local__shadow-box {
+        display: flex;
+      }
+    }
     .player_box {
       position: relative;
-      &:hover {
-        .vmp-stream-local__shadow-box {
-          display: flex;
-        }
-      }
       .top_tip {
         position: absolute;
         padding: 6px 16px;
@@ -472,6 +487,24 @@
         height: 40px;
         bottom: 10px;
         background-color: initial;
+      }
+      .play_bg_radius {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 6;
+        text-align: center;
+        cursor: pointer;
+        .vh-line-video-play {
+          color: white;
+          position: relative;
+          top: 12px;
+        }
       }
     }
     .stream_box_header {
