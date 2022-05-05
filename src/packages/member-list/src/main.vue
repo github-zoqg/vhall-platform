@@ -999,7 +999,7 @@
           } else if (msg.data.room_role == 4) {
             role = _this.$t('chat.chat_1023');
           }
-          if (msg.data.extra_params == _this.userId) {
+          if (msg.data.inviter_count_id == _this.userId) {
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
