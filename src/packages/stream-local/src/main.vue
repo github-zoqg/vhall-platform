@@ -438,6 +438,10 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       }
     },
     beforeCreate() {
@@ -1019,11 +1023,7 @@
             .then(() => {
               clearInterval(this._audioLeveInterval);
               // 如果是主持人，并且是结束直播导致的停止推流，需要派发事件改变开始直播按钮状态
-              if (
-                this.joinInfo.role_name == 1 &&
-                options?.source === 'live_over' &&
-                this.mode != 2
-              ) {
+              if (this.joinInfo.role_name == 1 && options?.source === 'live_over') {
                 window.$middleEventSdk?.event?.send(
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );

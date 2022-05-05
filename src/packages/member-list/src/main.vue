@@ -1415,9 +1415,9 @@
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
-            //数据埋点--开启/关闭允许举手
-            window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
             if (res.code == 200) {
+              //数据埋点--开启/关闭允许举手
+              window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
               this.$message.success({ message: '设置成功' });
             }
           })
