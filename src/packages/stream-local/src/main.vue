@@ -993,6 +993,14 @@
             resolve();
             return;
           }
+          // 视频直播时结束直播
+          if (this.mode == 2 && options?.source === 'live_over') {
+            clearInterval(this._audioLeveInterval);
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
+          }
 
           // 当前角色为主持人&&设备被禁用
           if (
@@ -1000,7 +1008,6 @@
             useMediaCheckServer().state.deviceInfo.device_status === 2
           ) {
             clearInterval(this._audioLeveInterval);
-
             // window.$middleEventSdk?.event?.send(
             //   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             // );

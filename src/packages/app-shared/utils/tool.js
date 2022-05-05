@@ -192,3 +192,31 @@ export const replaceHtml = str => {
   desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
   return desc;
 };
+
+/**
+ * 转换html文本中的xss(仅替换script与style标签)
+ * @param {*} string
+ * @returns string
+ */
+export const replaceXss = htmltext => {
+  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
+  const styleReg = /<style(([\s\S])*?)<\/style>/g;
+  return `${htmltext}`.replace(scriptReg, '').replace(styleReg, '');
+};
+
+/**
+ * @description 多次替换对一个问题做替换(使用uuid作为占位符)
+ * @param longText String 替换前文本
+ * @param rules Array 替换前后的数据封装体
+ * @returns string
+ */
+export const replaceWithRules = (longText, rules = []) => {
+  rules.forEach(rule => {
+    rule.tempSign = uuid(); // 先替换为占位符
+    longText = longText.replace(rule.before, rule.tempSign);
+  });
+  rules.forEach(rule => {
+    longText = longText.replace(rule.tempSign, rule.after);
+  });
+  return longText;
+};
