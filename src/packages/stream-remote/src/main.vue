@@ -186,7 +186,7 @@
       <p
         v-else-if="
           guestHasInvitePer &&
-          (stream.attributes?.role && stream.attributes.role !== ''
+          (stream.attributes.hasOwnProperty('role') && stream.attributes.role !== ''
             ? +stream.attributes.role != 1
             : +stream.attributes.roleName != 1)
         "
