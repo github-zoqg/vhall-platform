@@ -131,11 +131,11 @@
           ></span>
         </el-tooltip>
 
-        <!-- 主持人和组长不能互相下麦 -->
+        <!-- 主持人和组长不能互相下麦 或者 嘉宾为主讲人且不是主画面时 -->
         <el-tooltip :content="$t('interact.interact_1007')" placement="bottom">
           <span
             class="vmp-stream-remote__shadow-icon vh-iconfont vh-a-line-handsdown"
-            v-if="isShowDownMicBtn"
+            v-if="isShowDownMicBtn || guestHasInvitePer"
             @click="speakOff"
           ></span>
         </el-tooltip>
