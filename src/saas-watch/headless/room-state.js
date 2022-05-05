@@ -36,6 +36,8 @@ export default async function () {
   const promiseList = [
     // configList 和 黄金链路串行执行
     roomBaseServer.getConfigList().then(async () => {
+      // 获取视频论巡配置项 TODO:后面观看端权限统一处理之后，这个就不需要调了
+      await roomBaseServer.getVideoPollingConfig();
       //黄金链路
       await roomBaseServer.startGetDegradationInterval({
         staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
