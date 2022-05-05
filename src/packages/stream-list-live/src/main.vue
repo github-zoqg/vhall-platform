@@ -280,8 +280,6 @@
             );
             if (mainScreenSpeaker.streamId) {
               this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
-            } else {
-              this.$message.warning('当前用户正在推流，请稍等');
             }
           }
         });

@@ -16,6 +16,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   export default {
@@ -58,7 +59,19 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.hide_subscribe;
       }
     },
-    async created() {
+    beforeRouteEnter(to, from, next) {
+      // Vue history模式 微信分享IOS无效解决办法---最终章
+      const { system } = getBrowserType();
+      if (
+        system == 'ios' &&
+        `${process.env.VUE_APP_ROUTER_BASE_URL}${to.path}` != `${location.pathname}`
+      ) {
+        location.assign(`${process.env.VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+      } else {
+        next();
+      }
+    },
+    async mounted() {
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
@@ -85,6 +98,7 @@
         // 是否跳转预约页
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
           this.goWatchPage(clientType);
+          return;
         }
         await subscribeState();
         bindWeiXin();
