@@ -33,7 +33,7 @@ export default async function () {
   }
   //预分组导入获取不到group_id，提前进行初始化
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
-    await groupServer.updateGroupInitData();
+    await groupServer.initPresetGroup();
   }
   const promiseList = [
     // configList 和 黄金链路串行执行
