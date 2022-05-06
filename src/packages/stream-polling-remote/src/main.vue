@@ -145,6 +145,7 @@
           }
         });
 
+        // 客户端嵌入页面，需要将 esc 事件通知给客户端，客户端自己监听不到这个按键
         if (this.$route.query.embed === 'client') {
           window.addEventListener('keydown', e => {
             if (e.keyCode == 27 && this.isFullScreen) {

@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-video-polling-member-list">
-    <div class="vmp-video-polling-member-list__title">成员</div>
+    <h3 class="vmp-video-polling-member-list__title">成员</h3>
     <!--成员区域-->
     <div class="vmp-video-polling-member-list__container">
       <scroll
@@ -210,7 +210,7 @@
           }
         };
       },
-      //查找用户在数组的索引号
+      //查找用户在数组的索引号 消息字段兼容问题,这里兼容的是上下线消息和上下麦消息
       getUserIndex(accountId, list) {
         return list.findIndex(
           item => item.account_id === accountId || item.accountId === accountId

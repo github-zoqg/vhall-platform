@@ -74,14 +74,14 @@
     },
     data() {
       return {
-        childrenCom: [],
+        childrenCom: [], // 编排子组件
         isFullscreen: false, // 是否进入全屏
-        layoutLevel: 1,
-        nextTime: 10,
-        isPausedPolling: false,
-        countTimer: null,
-        minute: '10',
-        second: '00'
+        layoutLevel: 1, // 布局级别
+        nextTime: 10, // 手动下一组倒计时的时间
+        isPausedPolling: false, // 是否暂停轮巡
+        countTimer: null, // 自动下一组的计时器
+        minute: '10', // 自动下一组的计时时间
+        second: '00' // 自动下一组的计时时间q
       };
     },
     computed: {
@@ -165,6 +165,8 @@
             this.enterFullScreen();
           }
         });
+
+        // 客户端嵌入页面，需要将 esc 事件通知给客户端，客户端自己监听不到这个按键
         if (this._isClientEmbed) {
           window.addEventListener('keydown', e => {
             if (e.keyCode == 27 && this.isFullscreen) {
@@ -191,6 +193,7 @@
         // 直播结束
         this.videoPollingServer.$on('VIDEO_POLLING_OVER', () => {
           localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
+          // 在其他页面通过js脚本打开的标签页，直接 close 是关不掉的
           window.open(location, '_self').close();
         });
       },
