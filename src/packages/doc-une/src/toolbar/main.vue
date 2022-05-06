@@ -19,7 +19,7 @@
             inactive-color="#cecece"
           ></el-switch>
           <!-- 提示 -->
-          <div class="audience-tip" v-show="showAudienceTip">
+          <div class="audience-tip" v-show="showAudienceTip && !showWhiteboardTp">
             <div class="audience-tip__arrow"></div>
             <span
               @click="showAudienceTip = false"
@@ -30,16 +30,25 @@
         </div>
       </div>
       <!-- 观看端没有观众可见的按钮 -->
-      <div class="whiteboard-visible" v-if="!isWatch && !isInGroup">
-        <span style="margin-right: 5px">手写板</span>
+      <div
+        class="whiteboard-visible"
+        v-if="!isWatch && !isInGroup"
+        @mouseover="showWhiteboardTp = true"
+        @mouseout="showWhiteboardTp = false"
+      >
         <i class="vh-saas-iconfont vh-saas-tablets"></i>
-        <!-- 提示 -->
-        <div class="audience-tip">
-          <div class="audience-tip__arrow"></div>
-          <a href="https://saas-doc.vhall.com/docs/show/1490" target="_blank">
-            点我查看手写板兼容性测试报告
-          </a>
+        <span>手写板</span>
+        <div class="q-tip">
+          <i class="vh-iconfont vh-line-question"></i>
+          <div class="whiteboard-tip" v-show="showWhiteboardTp">
+            <div class="whiteboard-tip__arrow"></div>
+            点我查看
+            <a href="https://saas-doc.vhall.com/docs/show/1490" target="_blank">
+              手写板兼容性测试报告
+            </a>
+          </div>
         </div>
+        <!-- 提示 -->
       </div>
     </div>
     <!-- 中：画笔相关工具 -->
@@ -191,6 +200,7 @@
     data() {
       return {
         showAudienceTip: true,
+        showWhiteboardTp: false,
         lastEditBrush: '', // 上一次的非move笔刷
         // 当前笔刷,可选 select, pen, highlighter, shape, text, eraser, move
         currentBrush: '',
@@ -420,6 +430,7 @@
       // max-width: 250px;
       display: flex;
       flex-direction: row;
+      align-items: center;
       .choose-document {
         height: 27px;
         width: 76px;
@@ -453,16 +464,25 @@
         margin-left: 20px;
         position: relative;
         pointer-events: initial;
+        padding-right: 20px;
       }
       .whiteboard-visible {
         height: 40px;
         line-height: 40px;
-        cursor: auto;
+        cursor: default;
+        .q-tip {
+          margin-left: 5px;
+          position: relative;
+        }
+        .vh-saas-tablets {
+          font-size: 20px;
+          margin-right: 5px;
+        }
         i {
-          font-size: 22px;
+          font-size: 14px;
         }
         .audience-tip {
-          display: none;
+          // display: none;
           z-index: 2;
           a {
             color: #fff;
@@ -544,6 +564,37 @@
 
     .audience-visible__swith {
       z-index: 2;
+    }
+    .whiteboard-tip {
+      position: absolute;
+      top: 40px;
+      left: -10px;
+      width: auto;
+      word-break: break-all;
+      background: rgba(26, 26, 26, 0.95);
+      border-radius: 4px;
+      line-height: 28px;
+      padding: 0px 8px;
+      color: #fff;
+      font-size: 12px;
+      box-sizing: content-box;
+      user-select: none;
+      white-space: nowrap;
+      a {
+        color: #0a7ff5;
+      }
+      .whiteboard-tip__arrow {
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-width: 0 8px 8px;
+        border-style: solid;
+        border-color: transparent transparent #1a1a1a;
+        opacity: 0.95;
+        top: -8px;
+        left: 10px;
+      }
     }
     .audience-tip {
       position: absolute;
