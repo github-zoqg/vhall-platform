@@ -438,6 +438,10 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       }
     },
     beforeCreate() {
