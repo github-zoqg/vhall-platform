@@ -29,6 +29,18 @@
           </div>
         </div>
       </div>
+      <!-- 观看端没有观众可见的按钮 -->
+      <div class="whiteboard-visible" v-if="!isWatch && !isInGroup">
+        <span style="margin-right: 5px">手写板</span>
+        <i class="vh-saas-iconfont vh-saas-tablets"></i>
+        <!-- 提示 -->
+        <div class="audience-tip">
+          <div class="audience-tip__arrow"></div>
+          <a href="https://saas-doc.vhall.com/docs/show/1490" target="_blank">
+            点我查看手写板兼容性测试报告
+          </a>
+        </div>
+      </div>
     </div>
     <!-- 中：画笔相关工具 -->
     <div class="vmp-doc-toolbar__bd">
@@ -405,7 +417,7 @@
     pointer-events: none;
 
     .vmp-doc-toolbar__hd {
-      max-width: 250px;
+      // max-width: 250px;
       display: flex;
       flex-direction: row;
       .choose-document {
@@ -427,7 +439,8 @@
           color: #fff;
         }
       }
-      .audience-visible {
+      .audience-visible,
+      .whiteboard-visible {
         font-size: 12px;
         color: #dadada;
         line-height: 17px;
@@ -440,6 +453,26 @@
         margin-left: 20px;
         position: relative;
         pointer-events: initial;
+      }
+      .whiteboard-visible {
+        height: 40px;
+        line-height: 40px;
+        cursor: auto;
+        i {
+          font-size: 22px;
+        }
+        .audience-tip {
+          display: none;
+          z-index: 2;
+          a {
+            color: #fff;
+          }
+        }
+        &:hover {
+          .audience-tip {
+            display: block;
+          }
+        }
       }
     }
     .vmp-doc-toolbar__bd {

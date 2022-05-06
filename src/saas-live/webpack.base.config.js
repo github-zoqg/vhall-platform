@@ -29,7 +29,7 @@ const htmlConfig = {
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.2/iconfont.css',
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.3/iconfont.css',
     iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.2/iconfont.css'
   },
   // dns-prefetch
