@@ -438,6 +438,10 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       }
     },
     beforeCreate() {
@@ -992,6 +996,14 @@
             }
             resolve();
             return;
+          }
+          // 视频直播时结束直播
+          if (this.mode == 2 && options?.source === 'live_over') {
+            clearInterval(this._audioLeveInterval);
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
+            );
+            resolve();
           }
 
           // 当前角色为主持人&&设备被禁用

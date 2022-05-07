@@ -136,6 +136,10 @@
       };
     },
     computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -276,8 +280,12 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
-      // 检测是否支持连麦，不支持直接进行提示
-      if (useMediaCheckServer().state.isBrowserNotSupport) {
+      // 检测是否支持连麦&&非视频直播&&非回放，不支持直接进行提示
+      if (
+        useMediaCheckServer().state.isBrowserNotSupport &&
+        this.roomBaseServer.state.watchInitData.webinar.mode != 2 &&
+        this.webinarType != 5
+      ) {
         return Toast(this.$t('other.other_1010'));
       }
       this.replayPlay = debounce(this.replayPlay, 500);

@@ -163,7 +163,8 @@
           text: this.$t('interact.interact_1011'),
           visible: false
         },
-        hostAlertVisible: false
+        hostAlertVisible: false,
+        alertStatus: false
       };
     },
     computed: {
@@ -195,9 +196,22 @@
         if (+msg.data.streamType !== 3) {
           // 非桌面共享
           if (role == 1) {
-            this.hostAlertVisible = true;
+            this.hostAlertVisible ? null : (this.hostAlertVisible = true);
           } else {
-            this.popAlert.visible = true;
+            this.popAlert.visible ? null : (this.popAlert.visible = true);
+          }
+        }
+      });
+      useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
+        if (+msg.data.streamType !== 3) {
+          // 非桌面共享
+          if (!this.alertStatus) {
+            if (role == 1) {
+              this.hostAlertVisible ? null : (this.hostAlertVisible = true);
+            } else {
+              this.popAlert.visible ? null : (this.popAlert.visible = true);
+            }
+            this.alertStatus = true;
           }
         }
       });

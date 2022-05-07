@@ -70,7 +70,8 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comMicInvited'
+      'comMicInvited',
+      'comViewRestriction'
     ]
   },
 
@@ -643,6 +644,20 @@ export const serverConfig = {
   embedVideoLayerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
     children: ['comPcPlayer', 'comLivingEnd']
+  },
+  comViewRestriction: {
+    component: 'VmpViewRestriction',
+    emitAgreeWitthTerms: [
+      {
+        cuid: 'comVmpSubscribeBody',
+        method: 'handleAgreeWitthTerms'
+      },
+      {
+        cuid: 'comPcPlayer',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
+
   // *******单视频嵌入页面****结束
 };

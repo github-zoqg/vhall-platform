@@ -72,6 +72,8 @@ import VmpSubscribeBody from '@/packages/subscribe-body/index';
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
 
+import VmpViewRestriction from '@/packages/view-restriction/index';
+
 // 全局注册组件
 export function initUse() {
   Vue.use(ElementUI);
@@ -131,4 +133,5 @@ export function initUse() {
   Vue.use(VmpStreamDesktopScreen);
   Vue.use(VmpInsertStream);
   Vue.use(VmpMicInvited);
+  Vue.use(VmpViewRestriction);
 }
