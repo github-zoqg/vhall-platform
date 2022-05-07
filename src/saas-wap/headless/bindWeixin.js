@@ -59,8 +59,20 @@ export default function () {
 
   function wxShareInfo(shareInfo) {
     const configList = roomBaseServer.state.configList;
-    const address = location.href.split('#')[0];
-    return roomBaseServer.wechatShare({ wx_url: address }).then(res => {
+    let wx_sign_url = location.href.split('#')[0]; // 验证签名所需URL
+
+    // const { system } = getBrowserType();
+
+    // if (system == 'ios') {
+    //   // 微信浏览器&&苹果设备, 取出记录的第一次访问的URL
+    //   wx_sign_url = sessionStorage.getItem('ios_wx_sign_url');
+    // } else {
+    //   wx_sign_url = location.href.split('#')[0]; // 当前页面URL
+    // }
+
+    const share_address = location.href.split('#')[0];
+
+    return roomBaseServer.wechatShare({ wx_url: wx_sign_url }).then(res => {
       if (res.code == 200 && res.data) {
         const hideShare = configList ? configList['ui.watch_hide_share'] : 0;
         const params = {
@@ -79,7 +91,7 @@ export default function () {
             {
               title: shareInfo.title,
               desc: shareInfo.introduction,
-              link: address,
+              link: share_address,
               imgUrl: shareInfo.img_url || defaultImg
             }
           );

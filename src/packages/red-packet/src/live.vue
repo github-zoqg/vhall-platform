@@ -242,7 +242,7 @@
         this.paySuccess = false;
         this.amount = '0.00';
         this.describe = '多谢大家支持';
-        this.redPacketServer.getOnline();
+        this.redPacketServer.getRedpacketTotal();
       },
       backPay() {
         this.qrCodeDialogVisible = false;

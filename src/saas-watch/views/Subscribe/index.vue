@@ -77,9 +77,18 @@
         }
       } catch (err) {
         console.error('---初始化直播房间出现异常--', err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
       }
+    },
+    mounted() {
+      const roomBaseServer = useRoomBaseServer();
+      roomBaseServer.$on('VIEW_RESTRICTION_ERROR_PAGE', () => {
+        this.state = 2;
+        this.errorData.errorPageTitle = 'view_restriction';
+      });
     },
     methods: {
       initReceiveLive(clientType) {
@@ -104,7 +113,23 @@
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
+        let currentQuery = location.search;
         switch (err.code) {
+          case 512534:
+            window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
+            break;
+          case 512502: // 不支持的活动类型（flash）
+          case 512503: // 不支持的活动类型（旧H5）
+            currentQuery =
+              currentQuery.indexOf('nickname=') != -1
+                ? currentQuery.replace('nickname=', 'name=')
+                : currentQuery;
+            currentQuery =
+              currentQuery.indexOf('record_id=') > -1
+                ? currentQuery.replace('record_id=', 'rid=')
+                : currentQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
             break;

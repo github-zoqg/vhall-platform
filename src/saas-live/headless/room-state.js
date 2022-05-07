@@ -93,6 +93,7 @@ export default async function () {
   window.insertFileServer = insertFileServer;
   window.memberServer = useMemberServer();
   window.splitScreenServer = splitScreenServer;
+  window.mediaCheckServer = mediaCheckServer;
 }
 
 // 获取分屏页面url
