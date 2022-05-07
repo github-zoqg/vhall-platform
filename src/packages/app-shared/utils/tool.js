@@ -96,11 +96,10 @@ const ua = navigator.userAgent.toLowerCase();
 
 // 是否微信
 export function isWechat() {
-  return ua.indexOf('micromessenger') > -1; // 返回以前对微信环境的ua识别(阻止企业微信)
   // return ua.indexOf('micromessenger') > -1 && !isWechatCom();
-  // const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
-  // console.log('isWechat 是否为微信', isWechat);
-  // return isWechat;
+  const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  console.log('isWechat 是否为微信', isWechat);
+  return isWechat;
 }
 
 // 是否qq浏览器
@@ -192,4 +191,32 @@ export const replaceHtml = str => {
   desc = desc.replace(/<[^>]+>/g, ''); // 截取html标签
   desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
   return desc;
+};
+
+/**
+ * 转换html文本中的xss(仅替换script与style标签)
+ * @param {*} string
+ * @returns string
+ */
+export const replaceXss = htmltext => {
+  const scriptReg = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
+  const styleReg = /<style(([\s\S])*?)<\/style>/g;
+  return `${htmltext}`.replace(scriptReg, '').replace(styleReg, '');
+};
+
+/**
+ * @description 多次替换对一个问题做替换(使用uuid作为占位符)
+ * @param longText String 替换前文本
+ * @param rules Array 替换前后的数据封装体
+ * @returns string
+ */
+export const replaceWithRules = (longText, rules = []) => {
+  rules.forEach(rule => {
+    rule.tempSign = uuid(); // 先替换为占位符
+    longText = longText.replace(rule.before, rule.tempSign);
+  });
+  rules.forEach(rule => {
+    longText = longText.replace(rule.tempSign, rule.after);
+  });
+  return longText;
 };

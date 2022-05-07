@@ -65,11 +65,10 @@
         console.log(webinar, '???13214');
         let data = {
           webinar_id: webinar.id,
-          refer: this.$route.query.refer,
-          record_id: this.$route.query.record_id,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           type: webinar.verify == 6 ? 4 : webinar.verify,
-          verify_value: this.authTitle
+          verify_value: this.authTitle,
+          ...this.$route.query
         };
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
