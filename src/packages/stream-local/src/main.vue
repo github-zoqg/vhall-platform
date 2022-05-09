@@ -761,58 +761,68 @@
           });
         }
       },
-      // 媒体切换后进行无缝切换
+      /**
+       * 媒体设备更换后重新推流
+       * @param {*} param
+       */
       async switchStreamType(param) {
         // 音视频/图片推流 方式变更
-        if (param.videoType || param.canvasImgUrl) {
-          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-            await this.$refs.imgPushStream.updateCanvasImg();
-          }
-
-          if (param.isRepublishMode) {
-            await this.startPush();
-          } else if (this.localSpeaker.streamId) {
-            await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
-            await this.startPush();
-          }
+        const isTypeChange = param.videoType || param.canvasImgUrl;
+        if (isTypeChange || param.isRepublishMode) {
+          this.republishStream(param);
         } else {
-          // 不在麦上直接return
-          if (!this.micServer.getSpeakerStatus()) {
-            return;
-          }
-          // 无缝切换音视频
-          if (param.audioInput) {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'audio'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
-            return;
-          } else if (
-            param.video &&
-            this.$domainStore.state.mediaSettingServer.videoType == 'camera'
-          ) {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'video'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
-          }
+          this.silentSwitchStream(param);
         }
       },
-      sleep(time = 1000) {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(true);
-          }, time);
-        });
+      /**
+       * 重新推流
+       * @param {*} param
+       */
+      async republishStream(param) {
+        const mediaState = this.$domainStore.state.mediaSettingServer;
+
+        if (mediaState.videoType == 'picture') {
+          await this.$refs.imgPushStream.updateCanvasImg();
+        }
+
+        if (param.isRepublishMode) {
+          await this.startPush();
+        } else if (this.localSpeaker.streamId) {
+          await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
+          await this.startPush();
+        }
       },
+      /**
+       * 无缝切换流
+       * @param {*} param
+       */
+      async silentSwitchStream(param) {
+        const mediaState = this.$domainStore.state.mediaSettingServer;
+        if (!this.micServer.getSpeakerStatus()) return; // 不在麦上
+
+        try {
+          // 无缝切换音视频
+          // const isCanSwitchAudio = param.audioInput;
+          // if (isCanSwitchAudio) {
+          //   this.interactiveServer.switchStream({
+          //     type: 'audio',
+          //     streamId: this.localSpeaker.streamId
+          //   });
+          // }
+
+          //  无缝切换视频
+          const isCanSwitchVideo = param.video && mediaState.videoType === 'camera';
+          if (isCanSwitchVideo) {
+            this.interactiveServer.switchStream({
+              type: 'video',
+              streamId: this.localSpeaker.streamId
+            });
+          }
+        } catch (err) {
+          console.error('无缝切换失败', err);
+        }
+      },
+
       // 上麦接口
       async userSpeakOn() {
         const res = await this.micServer.userSpeakOn();
@@ -938,7 +948,7 @@
             });
         } else {
           // 若是图片推流，刷新则需等待canvas进行绘制
-          await this.sleep();
+          await sleep(1000);
           const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
           if (!videoTracks) {
             throw 'getCanvasStreamError';
