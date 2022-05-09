@@ -208,6 +208,10 @@
               is_next: 1
             })
             .then(res => {
+              if (res.code == 513343) {
+                this.setPollingAlert('视频论巡未开启！');
+                return;
+              }
               if (
                 res.data.account_id !=
                 this.roomBaseServer.state.watchInitData.join_info.third_party_user_id
