@@ -277,7 +277,7 @@
                 is_next: 1
               })
               .then(res => {
-                if (res.code === 200) {
+                if (res.code === 200 && !this.isPausedPolling) {
                   this.changeTime();
                 } else {
                   clearInterval(this.countTimer);
