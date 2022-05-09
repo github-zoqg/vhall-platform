@@ -1,5 +1,5 @@
 <template>
-  <div class="win-lottery-wrapper">
+  <div :class="['win-lottery-wrapper', isEmbed ? 'win-lottery-embed-wrapper' : '']">
     <lottery-header :prizeInfo="prizeInfo"></lottery-header>
     <p class="win-lottery-title">{{ $t('interact_tools.interact_tools_1015') }}</p>
     <p class="win-lottery-desc">
@@ -26,6 +26,13 @@
         default() {
           return {};
         }
+      }
+    },
+    computed: {
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     methods: {
@@ -81,6 +88,11 @@
       bottom: 72px;
       left: 50%;
       transform: translateX(-80px);
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .win-lottery-embed-wrapper {
+      margin-top: 0px;
     }
   }
 </style>
