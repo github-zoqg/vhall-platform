@@ -297,7 +297,7 @@
   }
   @media screen and (max-height: 580px) {
     .sign_embed_container {
-      margin-top: 0px;
+      margin-top: 0px !important;
     }
   }
 </style>

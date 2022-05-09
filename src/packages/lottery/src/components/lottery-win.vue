@@ -16,6 +16,7 @@
 
 <script>
   import LotteryHeader from './lottery-header';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     components: {
       LotteryHeader
@@ -27,6 +28,9 @@
           return {};
         }
       }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
     },
     computed: {
       isEmbed() {
