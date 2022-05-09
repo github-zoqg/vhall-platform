@@ -69,8 +69,8 @@
       content() {
         const defaultText = this.$t('appointment.appointment_1019');
         const defaultContent = `
-        <section style="text-align:center">
-          <img class="empty" style="display: block;width: 160px;height: 120px;margin: 80px auto 10px auto;" src="${IntroEmptyImg}" alt="">
+        <section style="text-align:center;padding-bottom:20px">
+          <img class="empty" style="display: block;width: 160px;height: 120px;margin: 50px auto 10px auto;" src="${IntroEmptyImg}" alt="">
           <div class="info" style="color:#999">${defaultText}</div>
         </section>
         `;
