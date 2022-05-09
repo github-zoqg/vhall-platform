@@ -73,11 +73,13 @@
         </div>
         <!-- 倍速、清晰度切换 -->
         <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
-          {{ $t('player.player_1009') }}
-          <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
+          <span v-if="isSetQuality">
+            {{ $t('player.player_1009') }}
+            <span class="red">{{ formatQualityText(currentQualitys.def) }}</span>
+          </span>
           <span v-if="isSetSpeed">
             <i18n path="player.player_1015" style="color: #fff">
-              <span place="n">
+              <span place="n" class="red">
                 {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
               </span>
             </i18n>
@@ -92,14 +94,15 @@
           <!-- 倍速和画质合并 -->
           <div class="vmp-wap-player-speed">
             <span @click="openLanguage" v-if="languageList.length > 1">
-              {{ lang.key == 1 ? '中文' : 'EN' }}
+              {{ lang.key == 1 ? 'CN' : 'EN' }}
+              <i class="vh-iconfont vh-line-arrow-down"></i>
             </span>
-            <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
+            <!-- <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
               {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
             </span>
             <span @click="openQuality" v-if="!isWarnPreview">
               {{ formatQualityText(currentQualitys.def) }}
-            </span>
+            </span> -->
           </div>
           <div class="vmp-wap-player-control">
             <!-- 试看逻辑不加 按照线上 -->
@@ -171,6 +174,16 @@
                 </span>
                 <!-- 右侧icon集合 -->
                 <p class="vmp-wap-player-control-icons-right">
+                  <span @click="openQuality" v-if="!isWarnPreview" class="icons-quality">
+                    {{ formatQualityText(currentQualitys.def) }}
+                  </span>
+                  <span
+                    class="icons-quality"
+                    @click="openSpeed"
+                    v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview"
+                  >
+                    {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+                  </span>
                   <span
                     @click="openBarrage"
                     v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
@@ -193,13 +206,7 @@
             </div>
           </div>
         </div>
-        <van-popup
-          v-model="isOpenSpeed"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenSpeed" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="item in UsableSpeed"
@@ -211,13 +218,7 @@
             </li>
           </ul>
         </van-popup>
-        <van-popup
-          v-model="isOpenQuality"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenQuality" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="item in qualitysList"
@@ -229,13 +230,7 @@
             </li>
           </ul>
         </van-popup>
-        <van-popup
-          v-model="isOpenlang"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenlang" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="(item, index) in languageList"
@@ -948,8 +943,11 @@
       z-index: 2;
       transform: translateX(-50%);
       span {
-        color: #fb2626;
+        color: #fff;
         padding-left: 5px;
+      }
+      .red {
+        color: #fb2626;
       }
     }
     &-audie {
@@ -969,24 +967,27 @@
     &-speed {
       position: absolute;
       right: 32px;
-      top: 50%;
-      width: 88px;
-      transform: translateY(-60%);
+      top: 24px;
+      width: 80px;
       z-index: 6;
       span {
         width: 100%;
         display: block;
-        height: 48px;
+        height: 36px;
+        padding: 0 5px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 0.5);
         text-align: center;
-        line-height: 48px;
+        line-height: 36px;
         font-size: 24px;
         font-family: PingFangSC-Medium, PingFang SC;
         color: #fff;
-        &:nth-child(2) {
-          margin: 40px 0;
+        i {
+          font-size: 10px;
         }
+        // &:nth-child(2) {
+        //   margin: 40px 0;
+        // }
       }
     }
     &-control {
@@ -1054,12 +1055,23 @@
           }
         }
         &-right {
-          i {
-            padding-left: 15px;
+          span {
+            margin-left: 16px;
+            vertical-align: middle;
+          }
+          .icons-quality {
+            border: 1px solid #fff;
+            border-radius: 20px;
+            display: inline-block;
+            width: 65px;
+            height: 32px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 8px;
           }
         }
         .vh-iconfont {
-          font-size: 30px;
+          font-size: 32px;
         }
         // .icon-zanting_icon{
         //   font-size: 34px;
@@ -1068,12 +1080,12 @@
       }
     }
     &-popup {
-      width: 200px;
-      position: absolute;
+      // width: 200px;
+      // position: absolute;
       // transform: none;
-      height: 100%;
+      // height: 100%;
       // top: 0;
-      background: rgba(0, 0, 0, 0.7);
+      // background: rgba(0, 0, 0, 0.7);
       ul {
         display: flex;
         width: 100%;
@@ -1081,15 +1093,15 @@
         flex-direction: column;
         justify-content: center;
         flex-wrap: wrap;
-        padding: 30px 0;
+        // padding: 30px 0;
         li {
           width: 100%;
-          height: 60px;
-          line-height: 60px;
+          height: 100px;
+          line-height: 100px;
           font-size: 28px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: rgba(255, 255, 255, 1);
+          color: #262626;
           text-align: center;
           &.popup-active {
             color: #fb2626;

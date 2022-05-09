@@ -18,9 +18,9 @@
         cx="50%"
         cy="50%"
         r="47"
-        fill="transparent"
-        stroke="url(#greenGradient)"
-        stroke-dasharray="1"
+        fill="#FED8D6"
+        stroke="#FED8D6"
+        stroke-dasharray="0"
         stroke-dashoffset="1"
       ></circle>
       <circle
@@ -28,10 +28,11 @@
         cx="50%"
         cy="50%"
         r="47"
-        fill="transparent"
-        stroke="#F5F5F5"
+        fill="#FED8D6"
+        stroke="#FB3A32"
         :stroke-dasharray="perimeter"
         :stroke-dashoffset="progress"
+        stroke-linecap="square"
       ></circle>
     </svg>
 
@@ -86,13 +87,13 @@
 <style lang="less" scoped>
   .countdown {
     position: relative;
-    width: 238px;
-    height: 238px;
+    width: 240px;
+    height: 240px;
     &-core {
-      width: 180px;
-      height: 180px;
+      width: 210px;
+      height: 210px;
       border-radius: 50%;
-      background-color: #fff2f0;
+      // background-color: #fff2f0;
       position: absolute;
       left: 50%;
       top: 50%;
@@ -100,14 +101,15 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 48px;
-      color: #fb3a32;
+      font-size: 50px;
+      color: @font-light-normal;
       font-weight: bold;
+      background-color: #fff;
     }
-    &-ani {
-      width: 238px;
-      height: 238px;
-    }
+    // &-ani {
+    //   width: 238px;
+    //   height: 238px;
+    // }
     > svg {
       transform: rotate(-90deg);
     }
@@ -116,9 +118,9 @@
     stroke-width: 12px;
   }
   .progress-bar {
-    transform: rotate(-90deg);
-    transform: rotateX(180deg);
+    // transform: rotate(-90deg);
+    // transform: rotateX(180deg);
     transform-origin: 50%;
-    stroke-width: 14px;
+    stroke-width: 12px;
   }
 </style>
