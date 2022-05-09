@@ -1066,13 +1066,14 @@
             resolve();
             return;
           }
-          // 视频直播时结束直播
-          if (this.mode == 2 && options?.source === 'live_over') {
+          // 第三方推流(无streamId) && 直播时结束直播
+          if (this.isThirdStream && options?.source === 'live_over') {
             clearInterval(this._audioLeveInterval);
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             );
             resolve();
+            return;
           }
 
           // 当前角色为主持人&&设备被禁用
