@@ -118,9 +118,13 @@
       devices() {
         return this.mediaState.devices;
       },
-      // 云导播客户端嵌入不需要检测
+      // 云导播客户端嵌入不需要检测 发起端不检测
       showCheckDom() {
-        return this.$route.name == 'yun' && /embed/.test(location.search);
+        return (
+          (this.$route.name == 'yun' && /embed/.test(location.search)) ||
+          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+            this.$route.name == 'LiveRoom')
+        );
       }
     },
     beforeCreate() {

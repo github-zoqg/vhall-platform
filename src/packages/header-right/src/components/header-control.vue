@@ -19,7 +19,7 @@
           <div
             class="header-right_control_wrap-container-setting"
             :class="{ 'header-right_control_wrap-container-disabled': thirtPushStreamimg }"
-            v-if="userInfo.role_name == 1 || userInfo.role_name == 4"
+            v-if="showSetting"
             @click="openMediaSettings"
           >
             <i class="vh-iconfont vh-line-setting"></i>
@@ -118,6 +118,14 @@
       isShowThirdPushStream() {
         // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
         return this.configList['btn_thirdway'] && this.webinarInfo.no_delay_webinar == 0;
+      },
+      // 媒体设置icon展示
+      showSetting() {
+        return (
+          (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
+          // 不是云导播
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director != 1
+        );
       }
     },
     data() {
