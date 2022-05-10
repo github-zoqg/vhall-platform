@@ -436,9 +436,8 @@
         display: inline-block;
         img {
           width: 100%;
-          height: 100%;
           max-width: 120px;
-          max-height: 90px;
+          height: 90px;
           margin-top: 20px;
           object-fit: scale-down;
         }
