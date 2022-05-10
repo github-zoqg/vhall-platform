@@ -1,24 +1,22 @@
 <template>
-  <div class="vhall-dialog-wrap">
+  <div>
     <van-popup
       v-model="signInVisible"
       position="bottom"
-      :overlay="false"
-      :style="{ height: popHeight }"
+      round
+      closeable="true"
+      class="vhall-dialog-wrap"
     >
-      <div class="header">
-        <!-- 签到 -->
+      <!-- <div class="header">
         {{ $t('interact_tools.interact_tools_1024') }}
         <i class="vh-iconfont vh-line-close" @click="closeSignIn"></i>
-      </div>
+      </div> -->
 
       <div class="wrap">
-        <div class="center">
-          <CountDown :duration="duration" :consume="seconds" class="countdown"></CountDown>
-          <!-- TODO -->
+        <div class="wrap_center">
           <div class="title">{{ title }}</div>
+          <CountDown :duration="duration" :consume="seconds" class="countdown"></CountDown>
           <van-Button type="danger" class="red-btn" @click="signin">
-            <!-- 立即签到 -->
             {{ $t('interact_tools.interact_tools_1026') }}
           </van-Button>
         </div>
@@ -243,113 +241,31 @@
 </script>
 <style lang="less" scoped>
   .vhall-dialog-wrap {
-    .icon-wrap {
-      margin-bottom: 10px;
-      width: 84px;
-      height: 84px;
-      position: relative;
-      background-color: transparent;
-      &:before {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #ff0005;
-        content: '';
-      }
-      img {
-        width: 84px;
-        height: 84px;
-      }
-    }
-    .header {
-      height: 90px;
-      border-bottom: 1px solid #d4d4d4;
-      // @include border(bottom);
-      text-align: center;
-      line-height: 90px;
-      position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: rgba(68, 68, 68, 1);
-      .vh-line-close {
-        position: absolute;
-        right: 33px;
-      }
-    }
+    height: 596px;
+    width: 100%;
+    background: linear-gradient(55.94deg, #fdf1ed 9.51%, #f3f2ff 102.75%);
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     .wrap {
-      height: calc(100% - 1000px);
       text-align: center;
       display: flex;
       align-items: center;
       flex-direction: column;
-      // justify-content: center;
-      .title {
-        height: 42px;
-        font-size: 30px;
-        font-weight: bold;
-        color: rgba(68, 68, 68, 1);
-        line-height: 42px;
-        margin-top: 30px;
-        margin-bottom: 95px;
-      }
-      .secend {
-        margin: 40px;
-        font-size: 30px;
-        font-weight: 400;
-        color: rgba(68, 68, 68, 1);
-        line-height: 42px;
-      }
-      .sigin {
-        display: inline-block;
-        width: 240px;
-        height: 240px;
-        border: 1px solid rgba(252, 84, 89, 1); /* no*/
-        border-radius: 50%;
-        box-sizing: border-box;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        span {
-          width: 220px;
-          height: 220px;
-
-          border-radius: 50%;
-          background: rgba(252, 84, 89, 1);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-size: 40px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 1);
+      &_center {
+        margin-top: 90px;
+        .title {
+          font-size: 30px;
+          font-weight: bold;
+          color: rgba(68, 68, 68, 1);
         }
-      }
-      // .sigin-anima {
-      // animation: rotate 3s linear infinite;
-      // }
-      @keyframes rotate {
-        from {
-          transform: rotate(0deg);
+        .countdown {
+          margin: 50px auto;
         }
-        to {
-          transform: rotate(359deg);
+        .red-btn {
+          width: 360px;
+          background-color: #fb3a32;
+          border-radius: 50px;
         }
       }
     }
-  }
-  .vanpop {
-    height: 100%;
-    .wrap {
-      height: 100%;
-    }
-  }
-  .countdown {
-    margin: 64px auto 0;
-  }
-  .red-btn {
-    width: 364px;
-    background-color: #fb3a32;
   }
 </style>
