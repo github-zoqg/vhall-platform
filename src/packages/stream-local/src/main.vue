@@ -766,7 +766,7 @@
        * @param {*} param
        */
       async switchStreamType(param) {
-        // 音视频/图片推流 方式变更
+        // 需要重新推流或 检测到音视频/图片推流 方式变更时
         const isTypeChange = param.videoType || param.canvasImgUrl;
         if (isTypeChange || param.isRepublishMode) {
           this.republishStream(param);
@@ -802,13 +802,13 @@
 
         try {
           // 无缝切换音视频
-          // const isCanSwitchAudio = param.audioInput;
-          // if (isCanSwitchAudio) {
-          //   this.interactiveServer.switchStream({
-          //     type: 'audio',
-          //     streamId: this.localSpeaker.streamId
-          //   });
-          // }
+          const isCanSwitchAudio = param.audioInput;
+          if (isCanSwitchAudio) {
+            this.interactiveServer.switchStream({
+              type: 'audio',
+              streamId: this.localSpeaker.streamId
+            });
+          }
 
           //  无缝切换视频
           const isCanSwitchVideo = param.video && mediaState.videoType === 'camera';
