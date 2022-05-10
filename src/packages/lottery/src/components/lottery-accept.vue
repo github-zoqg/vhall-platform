@@ -1,11 +1,5 @@
 <template>
-  <div
-    :class="[
-      'lottery-winner-info',
-      isEmbed ? 'lottery-winner-embed-info' : '',
-      { big: stepHtmlList.length !== 3 }
-    ]"
-  >
+  <div :class="['lottery-winner-info', isEmbed ? 'lottery-winner-embed-info' : '']">
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
