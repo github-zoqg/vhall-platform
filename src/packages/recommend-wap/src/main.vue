@@ -136,11 +136,13 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: auto;
     .vmp-recommend-list {
       display: block;
       width: 100%;
-      overflow-y: hidden;
+      height: 100%;
+      margin-bottom: 100px;
+      overflow: hidden;
     }
     .recommend-item {
       width: 330px;

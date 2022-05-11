@@ -2,7 +2,7 @@
   <div class="vmp-subscribe-body">
     <div class="vmp-subscribe-body-container">
       <template v-if="isTryVideo">
-        <vmp-air-container :cuid="cuid"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
       </template>
       <template v-else>
         <template v-if="!showVideo">
@@ -11,13 +11,13 @@
           </div>
         </template>
         <template v-if="showVideo">
-          <vmp-air-container :cuid="cuid"></vmp-air-container>
+          <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
         </template>
         <template v-if="!showVideo">
-          <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
+          <!-- <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
             {{ countDownTime }}
-          </div>
-          <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
+          </div> -->
+          <!-- <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
           <div
             class="subscribe-status"
             :class="`subscribe-status-${webinarType}`"
@@ -34,25 +34,88 @@
                 ? $t('common.common_1024')
                 : $t('common.common_1021')
             }}
-          </div>
+          </div> -->
           <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
             <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
           </div>
         </template>
       </template>
     </div>
+    <div class="vmp-subscribe-body-info">
+      <div class="subscribe_into">
+        <div class="subscribe_into_down" v-if="webinarType != 3">
+          <span>{{ tip }}</span>
+          <span class="des">{{ day }}</span>
+          <span>{{ $t('appointment.appointment_1026') }}</span>
+          <span class="des">{{ hour }}</span>
+          <span>{{ $t('appointment.appointment_1027') }}</span>
+          <span class="des">{{ minute }}</span>
+          <span>{{ $t('appointment.appointment_1028') }}</span>
+          <span class="des">{{ second }}</span>
+          <span>{{ $t('appointment.appointment_1029') }}</span>
+        </div>
+        <div class="subscribe_into_container" v-if="subOption.hide_subscribe == 1">
+          <div class="subscribe_into_other" v-if="showSubscribeBtn">
+            <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
+            <span @click="authCheck(3)">
+              {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
+            </span>
+          </div>
+          <div
+            class="subscribe_into_person"
+            v-else-if="subOption.needAgreement"
+            @click="showAgreement"
+          >
+            <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+          </div>
+          <div
+            v-else
+            :class="[
+              'subscribe_into_person',
+              {
+                isSubscribe: subOption.is_subscribe == 1
+              }
+            ]"
+            @click="authCheck(subOption.verify)"
+          >
+            <span class="subscribe_btn">
+              {{ subscribeText }}
+            </span>
+            <span class="subscribe_num">预约人数：1123243</span>
+          </div>
+        </div>
+      </div>
+      <div class="subscribe_tabs">
+        <vmp-air-container :cuid="childrenCom[1]"></vmp-air-container>
+      </div>
+    </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
-        <div v-if="subOption.needAgreement" @click="showAgreement">
-          <span>{{ $t('appointment.appointment_1025') }}</span>
-        </div>
-        <div class="vmp-subscribe-body-auth-two" v-else-if="showSubscribeBtn">
+        <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
-          ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
         </div>
-        <div v-else @click="authCheck(subOption.verify)">
-          <span>{{ subscribeText }}</span>
+        <div
+          class="subscribe_into_person"
+          v-else-if="subOption.needAgreement"
+          @click="showAgreement"
+        >
+          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+        </div>
+        <div
+          v-else
+          :class="[
+            'subscribe_into_person',
+            {
+              isSubscribe: subOption.is_subscribe == 1
+            }
+          ]"
+          @click="authCheck(subOption.verify)"
+        >
+          <span class="subscribe_btn">
+            {{ subscribeText }}
+          </span>
+          <span class="subscribe_num">预约人数：1123243</span>
         </div>
       </div>
     </template>
@@ -106,11 +169,16 @@
     data() {
       return {
         showVideo: false, // 显示暖场视频
+        tip: this.$t('appointment.appointment_1015'),
         isSubscribeShow: false,
         popupLivingStart: false, // 开播提醒
-        countDownTime: '',
+        // countDownTime: '',
+        hour: '',
+        minute: '',
+        second: '',
+        day: '',
         subscribeText: '',
-        showBottomBtn: true,
+        showBottomBtn: false,
         authInfo: {},
         subOption: {
           startTime: '',
@@ -197,14 +265,23 @@
       this.playerServer = usePlayerServer();
     },
     created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
       this.initPage();
       this.listenEvents();
+      this.handleScroll();
     },
     methods: {
+      handleScroll() {
+        let dom = document.querySelector('.vmp-subscribe-body-info');
+        dom.addEventListener('scroll', e => {
+          let scrollTop = e.target.scrollTop;
+          this.showBottomBtn = scrollTop >= 100 ? true : false;
+        });
+      },
       listenEvents() {
         this.subscribeServer.$on('live_start', () => {
           this.subOption.type = 1;
@@ -616,9 +693,18 @@
           this.showBottomBtn = false;
           this.countDownTime = 0;
         } else {
+          this.handleTips();
           // 不是 活动结束 - 就启动倒计时
           this.sureCountDown();
           this.handlerInitInfo();
+        }
+      },
+      // 时间提示
+      handleTips() {
+        if (this.webinarType == 1) {
+          this.tip = this.$t('appointment.appointment_1016');
+        } else if (this.webinarType == 2) {
+          this.tip = this.$t('appointment.appointment_1015');
         }
       },
       livingStartConfirm() {
@@ -682,20 +768,27 @@
               Math.floor(times) - day * 24 * 60 * 60 - hour * 60 * 60 - minute * 60
             ).padStart(2, '0');
           }
-          this.countDownTime =
-            day +
-            this.$t('appointment.appointment_1026') +
-            hour +
-            this.$t('appointment.appointment_1027') +
-            minute +
-            this.$t('appointment.appointment_1028') +
-            second +
-            this.$t('appointment.appointment_1029');
+          this.day = day;
+          this.hour = hour;
+          this.minute = minute;
+          this.second = second;
+          // this.countDownTime =
+          //   day +
+          //   this.$t('appointment.appointment_1026') +
+          //   hour +
+          //   this.$t('appointment.appointment_1027') +
+          //   minute +
+          //   this.$t('appointment.appointment_1028') +
+          //   second +
+          //   this.$t('appointment.appointment_1029');
           times--;
         }, 1000);
         if (times <= 0) {
           clearInterval(this.countDowntimer);
-          this.countDownTime = '';
+          this.day = 0;
+          this.hour = 0;
+          this.minute = 0;
+          this.second = 0;
         }
       },
       showAgreement() {
@@ -712,13 +805,14 @@
 </script>
 <style lang="less">
   .vmp-subscribe-body {
-    height: 422px;
+    height: 100%;
     width: 100%;
     position: relative;
     z-index: 2;
     &-container {
-      height: 100%;
+      height: 422px;
       width: 100%;
+      position: relative;
       .subscribe-bg {
         width: 100%;
         height: 100%;
@@ -777,26 +871,88 @@
         cursor: pointer;
       }
     }
+    &-info {
+      height: calc(100% - 422px);
+      overflow-y: auto;
+      width: 100%;
+      background: #f2f2f2;
+      .subscribe_into {
+        background: #fff;
+        padding: 40px 0;
+        margin-bottom: 16px;
+        &_down {
+          width: 100%;
+          text-align: center;
+          span {
+            font-size: 20px;
+            color: #595959;
+            line-height: 28px;
+          }
+          .des {
+            font-size: 56px;
+            color: #262626;
+            line-height: 65px;
+            display: inline-block;
+            min-width: 70px;
+            text-align: right;
+          }
+        }
+      }
+      .subscribe_tabs {
+        height: 100%;
+      }
+    }
+    .subscribe_into_person {
+      width: 520px;
+      margin: 32px auto 0;
+      height: 90px;
+      background: #fb3a32;
+      border-radius: 50px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .subscribe_btn {
+        line-height: 45px;
+        font-size: 32px;
+      }
+      .subscribe_num {
+        font-size: 22px;
+      }
+      &.isSubscribe {
+        background: #fff;
+        border: 1px solid #fb3a32;
+        color: #fb3a32;
+      }
+    }
+    .subscribe_into_other {
+      border-radius: 50px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 85px;
+      span {
+        display: inline-block;
+        width: 280px;
+        height: 90px;
+        line-height: 90px;
+        text-align: center;
+        border-radius: 50px;
+        background: #fb3a32;
+      }
+    }
     &-auth {
       position: fixed;
-      bottom: 0;
+      bottom: 32px;
       width: 100%;
-      height: 100px;
-      font-size: 36px;
-      font-weight: 500;
-      color: #fff;
-      line-height: 100px;
-      background: #fb3a32;
-      text-align: center;
+      height: 90px;
+      z-index: 20;
       margin-bottom: env(safe-area-inset-bottom);
-      div {
-        padding: 0 32px;
-      }
-      &-two {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
+      .subscribe_into_person {
+        margin: 0 auto;
       }
     }
     &-dialog {
