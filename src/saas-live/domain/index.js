@@ -16,6 +16,7 @@ import {
   useInsertFileServer,
   useDesktopShareServer,
   useSplitScreenServer,
+  useVideoPollingServer,
   useMediaCheckServer
 } from 'middle-domain';
 
@@ -51,6 +52,7 @@ export default new DomainStore.Store({
     userServer: useUserServer().state,
     insertFileServer: useInsertFileServer().state,
     desktopShareServer: useDesktopShareServer().state,
-    splitScreenServer: useSplitScreenServer().state
+    splitScreenServer: useSplitScreenServer().state,
+    videoPollingServer: useVideoPollingServer().state
   }
 });

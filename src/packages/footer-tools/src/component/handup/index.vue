@@ -152,7 +152,9 @@
           .then(res => {
             this.loading = false;
             if (res.code != 200) {
-              if (res.code == 513025) {
+              if (res.code == 513345) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+              } else if (res.code == 513025) {
                 this.$message.error(
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );

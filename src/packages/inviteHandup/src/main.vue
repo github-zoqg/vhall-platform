@@ -126,10 +126,15 @@
           .then(res => {
             this.btnDisabled = false;
             if (res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513345) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+              } else {
+                this.$message.error(res.msg);
+              }
+            } else {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
+              useMicServer().userSpeakOn();
             }
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
-            useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');

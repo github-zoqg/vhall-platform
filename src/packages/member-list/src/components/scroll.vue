@@ -17,6 +17,12 @@
   BScroll.use(Pullup);
 
   export default {
+    props: {
+      pullUpLoad: {
+        type: Boolean,
+        default: true
+      }
+    },
     mounted() {
       this.$nextTick(() => {
         this.scroll = new BScroll(this.$refs.scrollBox, {
@@ -33,7 +39,7 @@
           preventDefaultException: {
             tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT|AUDIO|DIV|SPAN|P)$/
           },
-          pullUpLoad: true,
+          pullUpLoad: this.pullUpLoad,
           scrollbar: true,
           observeDom: true
         });
