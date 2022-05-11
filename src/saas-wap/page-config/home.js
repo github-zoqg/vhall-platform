@@ -174,16 +174,57 @@ const serverConfig = {
        * 此配置主要涉及到type对应哪个cuid
        */
       menuConfig: [
-        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
-        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, // 文档
-        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
-        { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
-        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
-        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
-        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
-        { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
-        { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员
-        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } //问答
+        {
+          type: 1,
+          cuid: 'comCustomMenuWap',
+          text: ''
+        }, //自定义菜单
+        {
+          type: 2,
+          cuid: 'comDocWap',
+          text: 'menu.menu_1001',
+          visible: false
+        }, // 文档
+        {
+          type: 3,
+          cuid: 'comChatWap',
+          text: 'menu.menu_1002'
+        }, // 聊天
+        {
+          type: 'private',
+          cuid: 'comPrivateChatWap',
+          text: 'common.common_1008'
+        }, // 私聊
+        {
+          type: 4,
+          cuid: 'comIntroWap',
+          text: 'menu.menu_1003'
+        }, // 简介
+        {
+          type: 5,
+          cuid: 'comGoodSaasWap',
+          text: 'menu.menu_1004'
+        }, // 商品
+        {
+          type: 6,
+          cuid: 'comRecommendWap',
+          text: 'menu.menu_1005'
+        }, // 广告、推荐
+        {
+          type: 7,
+          cuid: 'comChapterWap',
+          text: 'menu.menu_1013'
+        }, // 章节
+        {
+          type: 8,
+          cuid: 'comMemberListWap',
+          text: ''
+        }, // 成员
+        {
+          type: 'v5',
+          cuid: 'comQa',
+          text: 'common.common_1004'
+        } //问答
       ]
     }
   },
@@ -261,7 +302,7 @@ const serverConfig = {
       method: 'open',
       args: ['$0']
     },
-    children: ['comInteractToolsWap'],
+    children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
     options: {}
   },
   //wap端私聊
@@ -429,10 +470,26 @@ const serverConfig = {
        * 此配置主要涉及到type对应哪个cuid
        */
       menuConfig: [
-        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
-        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
-        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
-        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' } // 广告、推荐
+        {
+          type: 1,
+          cuid: 'comCustomMenuWap',
+          text: ''
+        }, //自定义菜单
+        {
+          type: 4,
+          cuid: 'comIntroWap',
+          text: 'menu.menu_1003'
+        }, // 简介
+        {
+          type: 5,
+          cuid: 'comGoodSaasWap',
+          text: 'menu.menu_1004'
+        }, // 商品
+        {
+          type: 6,
+          cuid: 'comRecommendWap',
+          text: 'menu.menu_1005'
+        } // 广告、推荐
       ]
     }
   },
@@ -484,8 +541,16 @@ const serverConfig = {
         method: 'handleAgreeWitthTerms'
       }
     ]
-  }
+  },
   // *******单视频嵌入页面****结束
+  // 礼物动画组件
+  comWapRewardEffect: {
+    component: 'VmpWapRewardEffect'
+  },
+  // 礼物动画组件-SVGAA
+  comWapRewardEffectSVGA: {
+    component: 'VmpWapRewardEffectSVGA'
+  }
 };
 
 export default {

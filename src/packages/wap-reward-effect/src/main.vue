@@ -13,52 +13,56 @@
             rewardEffectInfo.data.type == 'gift_send_success'
         }"
       >
-        <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
-        <img class="gift-user-avatar" :src="gift_user_avatar(rewardEffectInfo)" />
-        <span class="nick-name">
-          {{ gift_user_nickname(rewardEffectInfo) | overHidden(7) }}
-        </span>
-        <!-- <span v-if="rewardEffectInfo.type == 'reward'">
+        <div class="content">
+          <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
+          <span class="nick-name">
+            {{ gift_user_nickname(rewardEffectInfo) | overHidden(8) }}
+          </span>
+          <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
             <span class="money">{{ rewardEffectInfo.gift_price }}</span>
             元
           </span> -->
-        <span
-          class="gift-name"
-          v-if="
-            rewardEffectInfo.data.type == 'gift_send_success' ||
-            rewardEffectInfo.data.event_type == 'free_gift_send'
-          "
-        >
-          <!-- 礼物标题 -->
-          送出{{ rewardEffectInfo.data.gift_name }}
-          <!-- <span class="count">
+          <span
+            class="gift-name"
+            v-if="
+              rewardEffectInfo.data.type == 'gift_send_success' ||
+              rewardEffectInfo.data.event_type == 'free_gift_send'
+            "
+          >
+            <!-- 礼物标题 -->
+            送出{{ rewardEffectInfo.data.gift_name | overHidden(8) }}
+            <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}
             </span> -->
-        </span>
-        <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
-          {{ rewardEffectInfo.data.reward_describe | overHidden(8) }}
-        </span>
-        <span
-          v-if="
-            rewardEffectInfo.data.type == 'gift_send_success' ||
-            rewardEffectInfo.data.event_type == 'free_gift_send'
-          "
-          class="gift-img"
-          :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
-          :style="{
-            backgroundImage: `url(${
-              rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url
-            }?x-oss-process=image/resize,m_lfit,w_100)`
-          }"
-        ></span>
-        <img
-          src="./images/red-package-1.png"
-          alt=""
-          class="gift-img red-package"
-          v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
-        />
+          </span>
+          <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
+            {{ rewardEffectInfo.data.reward_describe | overHidden(8) }}
+          </span>
+          <div
+            v-if="
+              rewardEffectInfo.data.type == 'gift_send_success' ||
+              rewardEffectInfo.data.event_type == 'free_gift_send'
+            "
+            class="gift-img"
+          >
+            <img
+              :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
+              :src="
+                (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
+                '?x-oss-process=image/resize,m_lfit,w_100'
+              "
+              alt=""
+            />
+          </div>
+          <img
+            src="./images/red-package-1.png"
+            alt=""
+            class="gift-img red-package"
+            v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
+          />
+        </div>
       </div>
     </transition-group>
   </div>
@@ -68,13 +72,12 @@
   import {
     useRoomBaseServer,
     useGiftsServer,
-    useChatServer,
     useWatchRewardServer,
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -108,7 +111,6 @@
       this.roomBaseServer = useRoomBaseServer();
       this.watchRewardServer = useWatchRewardServer();
       this.giftsServer = useGiftsServer();
-      this.chatServer = useChatServer();
       this.menuServer = useMenuServer();
       console.log('wap this.roomBaseServer------->', this.roomBaseServer);
       this.listenServer();
@@ -119,13 +121,13 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000,
+        minTaskTime: 222000,
         maxQueueLen: 2
       });
 
       //测试数据
-      /*
-      setInterval(() => {
+
+      /*  setInterval(() => {
         this.addRewardEffect({
           uv: 2,
           data: {
@@ -150,70 +152,22 @@
           sender_id: '104404666',
           service_type: 'service_room',
           bu: '1',
-          date_time: '2022-02-19 17:22:19',
+          date_time: '2022-06-19 17:22:19',
           context: { nick_name: '', avatar: '' },
           msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
           app_id: 'fd8d3653'
         });
-      }, 100);
-      */
+      }, 3000); */
     },
     methods: {
       // 监听domain层服务消息
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
-          console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
-          const nickname = msg.data.gift_user_nickname || msg.data.nickname;
-          const data = {
-            nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
-            avatar: msg.data.avatar,
-            content: {
-              gift_name: msg.data.gift_name,
-              gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
-              source_status: msg.data.source_status
-            },
-            type: 'gift_send_success',
-            interactToolsStatus: true
-          };
-          this.chatServer.addChatToList(data);
           !this.hideEffect && this.addRewardEffect(msg);
         });
         // 打赏消息
         this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
-          // 添加聊天消息
-          const data = {
-            avatar: rawMsg.data.rewarder_avatar,
-            nickname:
-              rawMsg.data.rewarder_nickname.length > 8
-                ? rawMsg.data.rewarder_nickname.substr(0, 8) + '...'
-                : rawMsg.data.rewarder_nickname,
-            type: 'reward_pay_ok',
-            content: {
-              text_content: rawMsg.data.reward_describe
-                ? rawMsg.data.reward_describe
-                : this.$t('chat.chat_1037'),
-              num: rawMsg.data.reward_amount
-            },
-            sendId: this.roomBaseServer.state.watchInitData.join_info.third_party_user_id,
-            roleName: this.roleName,
-            interactToolsStatus: true
-          };
-          this.chatServer.addChatToList(data);
           !this.hideEffect && this.addRewardEffect(rawMsg);
-
-          if (
-            this.roomBaseServer.state.watchInitData.join_info.third_party_user_id ==
-            rawMsg.data.rewarder_id
-          ) {
-            this.closeDialog();
-            this.$message({
-              message: this.$t('common.common_1005'),
-              showClose: true,
-              // duration: 0,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
-          }
         });
         // 自定义菜单服务事件监听
         this.menuServer.$on('tab-switched', data => {
@@ -228,26 +182,6 @@
             this.showEffectStatus = false;
           }
         });
-      },
-      // 礼物用户头像
-      gift_user_avatar(rewardEffectInfo) {
-        console.log('gift_user_avatar------>', rewardEffectInfo);
-        if (
-          rewardEffectInfo.data.type == 'gift_send_success' ||
-          rewardEffectInfo.data.type == 'reward_pay_ok' ||
-          rewardEffectInfo.data.event_type == 'free_gift_send'
-        ) {
-          // 来源于接口消息字段
-          if (rewardEffectInfo.data.gift_user_avatar) {
-            return rewardEffectInfo.data.gift_user_avatar;
-          } else if (rewardEffectInfo.data.rewarder_avatar) {
-            return rewardEffectInfo.data.rewarder_avatar;
-          } else {
-            return this.default_user_avatar;
-          }
-        } else {
-          return this.default_user_avatar;
-        }
       },
       // 用户昵称
       gift_user_nickname(rewardEffectInfo) {
@@ -326,17 +260,22 @@
   .vmp-wap-reward-effect {
     // .flex();
     position: absolute;
-    left: 16px;
-    top: 620px;
+    left: 0;
+    top: 40px;
     z-index: 100;
     .reward-effect-box {
-      width: 480px;
-      height: 110px;
+      height: 56px;
       position: relative;
-      background-size: 100%;
+      background-size: contain;
       background-repeat: no-repeat;
+      background-position: center;
       &.default {
-        background-image: url(images/red-package-bg.png);
+        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 44px;
+        .gift-img {
+          background-image: url(images/flower-bg.png);
+        }
       }
       &.bg-applause {
         background-image: url(images/applause-bg.png);
@@ -345,27 +284,39 @@
         background-image: url(images/coffee-bg.png);
       }
       &.bg-custom {
-        background-image: url(images/custom-bg.png);
+        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 44px;
+        .gift-img {
+          background-image: url(images/flower-bg.png);
+        }
       }
       &.bg-flower {
-        background-image: url(images/flower-bg.png);
+        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 44px;
+        .gift-img {
+          background-image: url(images/flower-bg.png);
+        }
       }
       &.bg-praise {
         background-image: url(images/praise-bg.png);
       }
       &.bg-666 {
-        background-image: url(images/666-bg.png);
+        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 44px;
+        .gift-img {
+          background-image: url(images/flower-bg.png);
+        }
       }
-      .gift-user-avatar {
-        width: 80px;
-        height: 80px;
-        position: absolute;
-        left: 4px;
-        bottom: 4px;
-        background: white;
-        border-radius: 50%;
-        overflow: hidden;
-      }
+    }
+    .content {
+      position: relative;
+      top: -14px;
+      left: 24px;
+      display: flex;
+      align-items: center;
     }
     .money-img {
       display: inline-block;
@@ -375,15 +326,20 @@
     }
 
     .gift-img {
-      width: 140px;
-      height: 140px;
-      position: absolute;
-      right: 0;
-      bottom: 0;
+      width: 124px;
+      height: 83px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
       z-index: 10;
+      position: relative;
+      top: 0;
+      right: -6px;
+      img {
+        width: 98px;
+        height: 98px;
+        margin-top: -30px;
+      }
     }
 
     .zdy-gigt-img {
@@ -391,29 +347,19 @@
       height: 80px;
       background-color: white;
       border-radius: 50%;
-      top: -10px;
-      right: 20px;
     }
     .nick-name {
-      width: 252px;
-      height: 28px;
+      max-width: 216px;
       font-size: 28px;
       font-weight: 500;
       color: #ffffff;
-      line-height: 28px;
-      position: absolute;
-      top: 30px;
-      left: 100px;
+      margin-right: 8px;
+      .ellipsis();
     }
     .gift-name {
-      width: 216px;
-      height: 24px;
+      max-width: 240px;
       font-size: 24px;
       color: #ffffff;
-      line-height: 24px;
-      position: absolute;
-      top: 70px;
-      left: 100px;
       opacity: 0.8;
       .ellipsis();
     }
@@ -427,8 +373,6 @@
     .red-package {
       width: 64px;
       height: auto;
-      top: -2px;
-      right: 32px;
     }
   }
 </style>
