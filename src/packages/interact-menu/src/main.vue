@@ -76,18 +76,25 @@
       </div>
     </div>
     <!-- 问答 -->
-    <saas-alert
-      title="问答"
-      :retry="isQAEnabled ? '关闭问答' : '开启问答'"
-      :visible="qaVisible"
-      @onClose="qaVisible = false"
-      @onSubmit="handleQASubmit"
-    >
-      <div slot="content">
+    <el-dialog title="问答" :visible.sync="qaVisible" :close-on-click-modal="false" width="440px">
+      <div>
         <template v-if="!assistantType">
-          <p v-if="!isQAEnabled">
-            开启后，右侧互动区会增加“问答”模块，可进入右下角“问答管理”对观众提问进行处理。
-          </p>
+          <div v-if="!isQAEnabled">
+            <p>1、开启后，右侧互动区会增加“问答”模块，可进入右下角“问答管理”对观众提问进行处理。</p>
+            <p>
+              2、支持修改「问答」的显示名称，如改成「提问」「投票」等，修改后的名称在用户观看时生效。
+            </p>
+            <el-form inline>
+              <el-form-item label="签到提示">
+                <el-input
+                  class="form-input"
+                  maxlength="8"
+                  show-word-limit
+                  v-model="QAName"
+                ></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
           <p v-if="isQAEnabled">该功能已开启，是否关闭？ 当前已收集问题：{{ qaCount }} 个</p>
         </template>
         <template v-else>
@@ -98,19 +105,15 @@
           </p>
         </template>
       </div>
-    </saas-alert>
+    </el-dialog>
   </div>
 </template>
 <script>
-  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { debounce } from 'lodash';
   import { useQaServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   export default {
     name: 'VmpInteractMenu',
-    components: {
-      SaasAlert
-    },
     data() {
       return {
         living: false,
@@ -122,7 +125,8 @@
         disable: false, // 是否禁用
         hidden: false, // 是否隐藏
         disTimer: false,
-        assistantType: false // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
+        assistantType: false, // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
+        QAName: '问答'
       };
     },
     computed: {
