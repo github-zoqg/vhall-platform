@@ -39,7 +39,7 @@
     <div
       class="vmp-desktop-screen-exchange"
       @click="exchangeVideoDocs"
-      v-if="(!isSpeakOn && roleName == 2) || roleName == 3"
+      v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
     >
       <p>
         <el-tooltip :content="$t('player.player_1008')" placement="top">
