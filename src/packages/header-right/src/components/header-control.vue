@@ -47,7 +47,7 @@
           </div>
           <div
             class="header-right_control_wrap-container-setting"
-            v-if="isShowThirdPushStream && !thirtPushStreamimg"
+            v-if="isShowThirdPushStream && !thirtPushStreamimg && !isDirector"
             @click="thirdPartyShow"
           >
             <i class="vh-saas-iconfont vh-saas-a-line-thirdpartyinitiate"></i>
@@ -126,6 +126,10 @@
           // 不是云导播
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director != 1
         );
+      },
+      // 是否为云导播活动
+      isDirector() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     data() {
