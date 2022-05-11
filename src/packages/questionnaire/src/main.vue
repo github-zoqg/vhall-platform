@@ -17,6 +17,12 @@
           @click="initPage"
         />
         问卷
+        <span class="headBtnGroup" v-if="showTip">
+          <el-button type="text" @click="openSet" class="name_set_button">
+            修改问卷显示名称
+          </el-button>
+          <i class="vh-iconfont vh-line-question" @click="showPreview"></i>
+        </span>
       </header>
       <section class="question__content">
         <div class="vhall-question__content" v-show="showQuestionnaireTable">
@@ -135,6 +141,7 @@
         </section>
       </section>
     </el-dialog>
+
     <el-dialog
       :visible.sync="saveDialogVisible"
       custom-class="save-dialog"
@@ -156,6 +163,38 @@
         </el-button>
         <el-button @click="saveQuestionnaire(false)" round>取 消</el-button>
       </div>
+    </el-dialog>
+
+    <!-- 别名设置弹框 -->
+    <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
+      <div>
+        <div class="async__ctx">
+          <el-input
+            v-model="newName"
+            :placeholder="'请输入标记文字'"
+            maxlength="8"
+            show-word-limit
+          ></el-input>
+          <p class="setname_tip">
+            可将名称修改为「投票」「报名」等，修改后用户观看直播时看到的是修改后的名称
+          </p>
+        </div>
+        <div class="setname_button">
+          <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
+            保存
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 图列展示弹框 -->
+    <el-dialog
+      :visible.sync="dialogPreview"
+      custom-class="save-dialog"
+      width="400px"
+      :show-close="false"
+    >
+      <img src="" alt="" />
     </el-dialog>
   </div>
 </template>
@@ -190,7 +229,11 @@
         shareQuestionnaire: true, // 同步到管理
         prevQuestionnaireId: false, // 显示预览状态的相关UI
         saving: false, //保存中的状态
-        totalPages: 0 // 总页数
+        totalPages: 0, // 总页数
+        dialogNameSet: false,
+        dialogPreview: false,
+        newName: '',
+        showTip: false
       };
     },
     computed: {
@@ -232,6 +275,7 @@
       },
       initPage() {
         this.firstLoad = false;
+        this.showTip = false;
         this.showQuestionnaireTable = true;
         this.prevQuestionnaireId = null;
         this.queryQuestionnaireList(true);
@@ -317,6 +361,7 @@
         this.showQuestionnaireTable = false;
         this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector);
+        this.showTip = true;
       },
       /**
        * @description 编辑问卷
@@ -551,6 +596,7 @@
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
             console.log('saveQuestionnaire', res);
+            this.showTip = false;
             if (confirm) {
               // 确认同步才需要弹窗提示
               this.$message({
@@ -681,6 +727,14 @@
         this.queryParams.pageNum++;
         this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
         this.queryQuestionnaireList();
+      },
+      // 问卷别名设置
+      openSet() {
+        this.dialogNameSet = true;
+      },
+      // 问卷别名设置样式预览
+      showPreview() {
+        this.dialogPreview = true;
       }
     }
   };
@@ -732,6 +786,16 @@
         border-top-color: #fff;
       }
     }
+  }
+  .setname_tip {
+    margin-top: 10px;
+  }
+  .setname_button {
+    text-align: right;
+    margin-top: 10px;
+  }
+  .name_set_button {
+    margin-right: 8px;
   }
 </style>
 <style lang="less">
