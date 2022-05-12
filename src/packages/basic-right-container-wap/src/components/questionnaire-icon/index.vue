@@ -14,7 +14,7 @@
       <div class="vmp-questionnaire-list_container">
         <img class="q_header" src=".\images\header.png" alt="" />
         <div class="container-data">
-          <ul v-if="QuestionList.length">
+          <ul v-if="QuestionList && QuestionList.length">
             <li v-for="(item, index) in QuestionList" :key="index">
               <div class="data-time">
                 {{ item.created_at | chatTime }}
