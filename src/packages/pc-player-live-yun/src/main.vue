@@ -7,14 +7,18 @@
       :class="playStatus ? 'player_box_hover' : ''"
       v-if="!pushStream"
     >
-      <div class="top_tip" :class="director_stream ? 'success' : 'warning'">
+      <div
+        class="top_tip"
+        :class="director_stream ? 'success' : 'warning'"
+        v-if="joinInfo.role_name == 1"
+      >
         {{ tipText }}
       </div>
-      <div class="err_tip" v-if="liveStart && !director_stream">
+      <div class="err_tip" v-if="liveStart && !director_stream && joinInfo.role_name == 1">
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
       <div class="stream_people_name" v-if="director_stream">
-        {{ joinInfo.nickname }}
+        {{ $domainStore.state.roomBaseServer.watchInitData.userinfo.nickname }}
       </div>
 
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">

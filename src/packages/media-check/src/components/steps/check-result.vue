@@ -32,7 +32,7 @@
           重新检测
         </el-button>
         <el-button class="fr" round type="primary" v-if="isDirector" @click="finish">
-          okey
+          去推流
         </el-button>
         <el-button
           class="fr"
