@@ -101,6 +101,7 @@
                   :label="item.name"
                   v-model="item.status"
                   :disabled="item.isDisable || !allBanned"
+                  @change="setAllBanned(allBanned)"
                 ></el-checkbox>
               </div>
               <div
@@ -116,7 +117,6 @@
       </div>
     </div>
     <div class="operate-container__input-bar">
-      {{ allBannedModuleList }}
       <chat-input
         ref="chatInput"
         :chat-login-status="chatLoginStatus"
@@ -281,13 +281,13 @@
           this.$message.error('直播未开始禁止调用');
           return;
         }
-        this.setAllBanned();
+        this.setAllBanned(val);
         window.vhallReportForProduct?.report(val ? 110116 : 110117);
       },
-      setAllBanned() {
+      setAllBanned(status) {
         const { chat, qa, privateChat } = this.bannedMoudleList;
         this.$emit('changeAllBanned', {
-          status: this.allBanned,
+          status,
           chat_status: chat.status,
           qa_status: qa.status,
           private_chat_status: privateChat.status

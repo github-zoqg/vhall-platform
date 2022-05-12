@@ -563,7 +563,6 @@
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {
-        alert(JSON.stringify(data));
         let params = {
           room_id: this.roomId,
           status: data.status ? 1 : 0,

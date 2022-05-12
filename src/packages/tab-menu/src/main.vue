@@ -465,7 +465,7 @@
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
-        tab.name = name;
+        name && (tab.name = name);
         if (tab.id == this.selectedId) {
           visible === false && this.jumpToNearestItemById(tab.id);
         }
