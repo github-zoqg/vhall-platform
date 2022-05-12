@@ -34,8 +34,8 @@ const htmlConfig = {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.3/iconfont.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.3/iconfont.css'
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.4/iconfont.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.4/iconfont.css'
   }
 };
 
