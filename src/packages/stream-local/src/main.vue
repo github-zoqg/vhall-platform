@@ -550,6 +550,7 @@
         } else {
           if (!this.isSpeakOn) {
             await this.stopPush();
+            await this.interactiveServer.destroy();
           }
         }
       },
