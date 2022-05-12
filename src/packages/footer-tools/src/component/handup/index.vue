@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useChatServer } from 'middle-domain';
+  import { useMicServer, useChatServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -115,7 +115,23 @@
         this.allBanned = res;
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
-      useMicServer().$on('vrtc_connect_apply_cancel', msg => {
+      useMsgServer().$onMsg('ROOM_MSG', msg => {
+        let temp = Object.assign({}, msg);
+        if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+          temp.data = JSON.parse(temp.data);
+        }
+        const { type = '' } = temp.data || {};
+        console.log('aaa--1', this.joinInfo.third_party_user_id, temp);
+        if (type === 'vrtc_connect_refused') {
+          if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
+          this.loading = false;
+          this.isApplyed = false;
+          this.waitInterval && clearInterval(this.waitInterval);
+          this.btnText = this.$t('interact.interact_1001');
+        }
+      });
+      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
+      useMicServer().$on('vrtc_connect_refused', msg => {
         this.loading = false;
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);

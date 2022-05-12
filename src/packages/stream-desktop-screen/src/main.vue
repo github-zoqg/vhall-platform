@@ -39,7 +39,7 @@
     <div
       class="vmp-desktop-screen-exchange"
       @click="exchangeVideoDocs"
-      v-if="(!isSpeakOn && roleName == 2) || roleName == 3"
+      v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
     >
       <p>
         <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -396,6 +396,7 @@
                 // 重新布局旁路
                 console.log('[screen] 桌面共享推流成功');
                 this.interactiveServer.resetLayout();
+                this.docServer.resetLayoutByMiniElement();
 
                 this.setDesktop('1');
               })
@@ -413,11 +414,11 @@
           });
       },
       // 停止共享
-      stopShare() {
-        this.desktopShareServer.stopShareScreen().then(() => {
-          this.setDesktop('0');
-          this.interactiveServer.resetLayout();
-        });
+      async stopShare() {
+        await this.desktopShareServer.stopShareScreen();
+        this.setDesktop('0');
+        this.interactiveServer.resetLayout();
+        this.docServer.resetLayoutByMiniElement();
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
