@@ -19,7 +19,7 @@
         问卷
         <span class="headBtnGroup" v-if="showTip">
           <el-button type="text" @click="openSet" class="name_set_button">
-            修改问卷显示名称
+            修改「问卷」显示名称
           </el-button>
           <i class="vh-iconfont vh-line-question" @click="showPreview"></i>
         </span>
@@ -170,7 +170,7 @@
       <div>
         <div class="async__ctx">
           <el-input
-            v-model="newName"
+            v-model="alias"
             :placeholder="'请输入标记文字'"
             maxlength="8"
             show-word-limit
@@ -181,8 +181,9 @@
         </div>
         <div class="setname_button">
           <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
-            保存
+            确定
           </el-button>
+          <el-button plain size="medium" @click="dialogNameSet = false" round>取消</el-button>
         </div>
       </div>
     </el-dialog>
@@ -232,7 +233,7 @@
         totalPages: 0, // 总页数
         dialogNameSet: false,
         dialogPreview: false,
-        newName: '',
+        alias: '',
         showTip: false
       };
     },
@@ -592,6 +593,9 @@
         this.saveDialogVisible = false;
         this.showQuestionnaireTable = true;
         this.saving = true;
+        if (this.alias) {
+          this.questionnaireCreateInfo.alias = this.alias;
+        }
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
@@ -796,6 +800,7 @@
   }
   .name_set_button {
     margin-right: 8px;
+    color: #3562fa !important;
   }
 </style>
 <style lang="less">

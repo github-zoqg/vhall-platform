@@ -67,7 +67,7 @@
             nickname: msg.nick_name,
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: this.$t('chat.chat_1030'),
+              text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
