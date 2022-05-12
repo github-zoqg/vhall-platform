@@ -7,10 +7,10 @@
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="0">
-          <stop offset="0%" stop-color="#fb3a32" />
-          <stop offset="50%" stop-color="#fb3a32" />
-          <stop offset="100%" stop-color="#FFA32B" />
+        <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FC4E2A" />
+          <stop offset="100%" stop-color="#FC9A32" />
+          <!-- <stop offset="100%" stop-color="#FFA32B" /> -->
         </linearGradient>
       </defs>
       <circle
@@ -18,7 +18,7 @@
         cx="50%"
         cy="50%"
         r="47"
-        fill="#FED8D6"
+        fill="transparent"
         stroke="#FED8D6"
         stroke-dasharray="0"
         stroke-dashoffset="1"
@@ -28,11 +28,11 @@
         cx="50%"
         cy="50%"
         r="47"
-        fill="#FED8D6"
-        stroke="#FB3A32"
+        fill="transparent"
+        stroke="url(#greenGradient)"
         :stroke-dasharray="perimeter"
         :stroke-dashoffset="progress"
-        stroke-linecap="square"
+        stroke-linecap="round"
       ></circle>
     </svg>
 
@@ -104,7 +104,7 @@
       font-size: 50px;
       color: @font-light-normal;
       font-weight: bold;
-      background-color: #fff;
+      // background-color: #fff;
     }
     // &-ani {
     //   width: 238px;
@@ -121,6 +121,6 @@
     // transform: rotate(-90deg);
     // transform: rotateX(180deg);
     transform-origin: 50%;
-    stroke-width: 12px;
+    stroke-width: 15px;
   }
 </style>
