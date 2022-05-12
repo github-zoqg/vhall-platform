@@ -116,6 +116,7 @@
       </div>
     </div>
     <div class="operate-container__input-bar">
+      {{ allBannedModuleList }}
       <chat-input
         ref="chatInput"
         :chat-login-status="chatLoginStatus"
@@ -133,7 +134,7 @@
 </template>
 
 <script>
-  import { useGroupServer } from 'middle-domain';
+  import { useGroupServer, useChatServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
@@ -195,6 +196,12 @@
         type: Boolean,
         default: () => false
       },
+      allBannedModuleList: {
+        type: Object,
+        default: () => {
+          return {};
+        }
+      },
       //活动id
       webinarId: {
         type: [Number, String],
@@ -236,17 +243,17 @@
         //禁言模块列表
         bannedMoudleList: {
           chat: {
-            status: true,
+            status: true, //this.allBannedModuleList.chat_status,
             name: '聊天',
             isDisable: true
           },
           qa: {
-            status: false,
+            status: this.allBannedModuleList.qa_status,
             name: '问答',
             isDisable: false
           },
-          privateChatz: {
-            status: false,
+          privateChat: {
+            status: this.allBannedModuleList.private_chat_status,
             name: '私聊',
             isDisable: false
           }
@@ -256,8 +263,14 @@
     beforeCreate() {
       this.groupServer = useGroupServer();
     },
-    mounted() {},
+    mounted() {
+      this.listenEvents();
+    },
     methods: {
+      listenEvents() {
+        //监听全体禁言通知
+        useChatServer().$on('allBanned', res => {});
+      },
       //隐藏设置弹窗
       hidechatOptions() {
         this.isFilterShow = false;
@@ -268,16 +281,16 @@
           this.$message.error('直播未开始禁止调用');
           return;
         }
-        this.$emit('changeAllBanned', val);
+        this.setAllBanned();
         window.vhallReportForProduct?.report(val ? 110116 : 110117);
       },
       setAllBanned() {
         const { chat, qa, privateChat } = this.bannedMoudleList;
         this.$emit('changeAllBanned', {
-          status: this.allBanned ? 1 : 0,
-          chat_status: chat ? 1 : 0,
-          qa_status: qa.status ? 1 : 0,
-          private_chat_status: privateChat.status ? 1 : 0
+          status: this.allBanned,
+          chat_status: chat.status,
+          qa_status: qa.status,
+          private_chat_status: privateChat.status
         });
       },
       //进入聊天审核
