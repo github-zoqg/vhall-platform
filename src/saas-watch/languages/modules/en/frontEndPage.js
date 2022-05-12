@@ -259,7 +259,7 @@ export default {
     chat_1023: 'Guest',
     chat_1024: 'Assistant',
     chat_1025: 'Submitted too frequently',
-    chat_1026: 'Q&A unlocked',
+    chat_1026: '{n} unlocked',
     chat_1027: 'Sign-in initiated',
     chat_1028: 'Sign-in ended',
     chat_1029: 'Give a bonus',
@@ -733,7 +733,11 @@ export default {
     interact_1034: 'presenter',
     interact_1035: 'Opposite party network exception',
     interact_1036:
-      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect'
+      'The live broadcast is interrupted due to network problems. Please refresh the page and reconnect',
+    interact_1037:
+      'Currently on display, cannot apply for video connection at the moment, please try again later',
+    interact_1038:
+      'The organizer has turned on the video tour function, and you will see your video screen on the host\'s side. Please ensure that the video equipment is all normal, and click "{n}" to set the media.'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -794,12 +798,7 @@ export default {
     webinar_1039: 'Make an appointment',
     webinar_1040: 'Pay{n}',
     webinar_1041: 'Pay{n}',
-    webinar_1042: 'The content you want has not been searched yet',
-    webinar_1043:
-      'Unfortunately, we can not continue to serve you. You can close the page manually',
-    webinar_1044: 'Agree and continue',
-    webinar_1045: 'Refuse',
-    webinar_1046: 'I got it'
+    webinar_1042: 'The content you want has not been searched yet'
   },
   color: {},
   other: {

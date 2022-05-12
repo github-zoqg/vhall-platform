@@ -101,7 +101,8 @@
         //true禁言，false未禁言
         isBanned: useChatServer().state.banned,
         //true全体禁言，false未禁
-        allBanned: useChatServer().state.allBanned
+        allBanned: useChatServer().state.allBanned,
+        private_allBanned_status: useChatServer().state.allBannedModuleList.private_chat_status //全体禁言对问答是否生效
       };
     },
     watch: {
@@ -181,10 +182,11 @@
       },
       //初始化输入框状态
       initInputStatus() {
-        this.inputStatus.disable = this.isBanned || this.allBanned;
+        this.inputStatus.disable =
+          this.isBanned || (this.allBanned && this.private_allBanned_status);
         if (this.isBanned) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
-        } else if (this.allBanned) {
+        } else if (this.allBanned && this.private_allBanned_status) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1021');
@@ -217,8 +219,11 @@
           this.initInputStatus();
         });
         //监听全体禁言通知
-        this.chatServer.$on('allBanned', res => {
-          this.allBanned = res;
+        this.chatServer.$on('allBanned', (status, msg) => {
+          this.allBanned = status;
+          if (msg) {
+            this.private_allBanned_status = msg.private_chat_status == 1 ? true : false;
+          }
           this.initInputStatus();
         });
       },
