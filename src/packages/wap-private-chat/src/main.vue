@@ -211,8 +211,8 @@
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
-          console.log(this.$refs.chatlist.scrollToBottom);
-          this.$refs.chatlist.scrollToBottom();
+          // console.log(this.$refs.chatlist.scrollToBottom);
+          this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
           this.isHasUnreadAtMeMsg = false;
         });
