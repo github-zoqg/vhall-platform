@@ -858,6 +858,9 @@
     overflow: hidden;
     background: #1a1a1a;
     z-index: 2;
+    #vmp-player {
+      background: #1a1a1a;
+    }
     &-watch {
       height: 100%;
       width: 100%;

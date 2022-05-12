@@ -1,5 +1,5 @@
 <template>
-  <div class="lottery-submit-ret">
+  <div :class="['lottery-submit-ret', isEmbed ? 'lottery-submit-embed-ret' : '']">
     <lottery-header :prizeInfo="prizeInfo"></lottery-header>
     <p class="lottery-title-icon" :class="prizeInfo.publish_winner != 1 ? 'nobtn' : ''">
       <span
@@ -23,6 +23,8 @@
 
 <script>
   import LotteryHeader from './lottery-header';
+  import { useRoomBaseServer } from 'middle-domain';
+
   export default {
     components: {
       LotteryHeader
@@ -42,6 +44,16 @@
       },
       prizeInfo: {
         type: Object
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    computed: {
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     methods: {
@@ -103,6 +115,11 @@
       background: rgba(255, 255, 255, 0.9);
       position: absolute;
       bottom: 60px;
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .lottery-submit-embed-ret {
+      margin-top: 0px;
     }
   }
 </style>
