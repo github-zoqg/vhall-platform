@@ -2,13 +2,35 @@
   <section class="subscribe-wap-auth" @click.self="close">
     <div>
       <div class="title-box">
-        <p class="title">{{ optionInfo.title || '' }}</p>
-        <p class="sub-title">{{ optionInfo.placeHolder || '' }}</p>
+        <p class="title" v-if="!isStartLiving">
+          {{ optionInfo.title || '' }}
+        </p>
+        <p v-else></p>
+        <i class="vh-iconfont vh-line-close" @click="close"></i>
       </div>
-      <div class="content">
-        <input type="text" v-model="textAuth" />
-      </div>
-      <div class="footer" @click.stop="sure">{{ $t('account.account_1062') }}</div>
+      <template v-if="isStartLiving">
+        <div class="living-start">
+          <span class="living-img">
+            <img src="../img/live_start.png" alt="" />
+          </span>
+          <p class="living-text">{{ $t('player.player_1018') }}</p>
+          <p class="footer" @click="startWatch">{{ $t('player.player_1013') }}</p>
+        </div>
+      </template>
+      <template v-else>
+        <div class="content">
+          <input
+            :type="`${isHidden ? 'password' : 'text'}`"
+            v-model="textAuth"
+            :placeHolder="optionInfo.placeHolder"
+          />
+          <i
+            :class="`vh-iconfont ${isHidden ? 'vh-line-hidden' : 'vh-line-view'}`"
+            @click="isHidden = !isHidden"
+          ></i>
+        </div>
+        <div class="footer" @click.stop="sure">{{ $t('account.account_1062') }}</div>
+      </template>
     </div>
   </section>
 </template>
@@ -19,16 +41,24 @@
       optionInfo: {
         type: Object,
         default: () => {}
+      },
+      isStartLiving: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
       return {
+        isHidden: true,
         textAuth: ''
       };
     },
     methods: {
       sure() {
         this.$emit('authSubmit', this.textAuth);
+      },
+      startWatch() {
+        this.$emit('startWatch');
       },
       close() {
         this.textAuth = '';
@@ -54,46 +84,88 @@
     > div {
       width: 100%;
       background-color: #fff;
-      border-radius: 14px;
-      padding-top: 36px;
+      border-radius: 32px;
+      padding: 50px 60px;
       .title-box {
-        text-align: center;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         .title {
-          font-size: 36px;
-          font-weight: 400;
-          color: rgba(0, 0, 0, 1);
-          line-height: 30px;
-        }
-        .sub-title {
-          margin-top: 18px;
-          font-size: 30px;
-          font-weight: 400;
-          color: rgba(136, 136, 136, 1);
+          font-size: 32px;
+          font-weight: 500;
+          color: #262626;
           line-height: 45px;
+        }
+        .vh-iconfont {
+          font-size: 20px;
+          color: #8c8c8c;
         }
       }
       .content {
-        padding: 18px 40px;
-        border-bottom: 1px solid rgba(221, 221, 221, 1);
+        width: 100%;
+        margin: 32px 0;
+        background: #ffffff;
+        border: 2px solid #d9d9d9;
+        border-radius: 8px;
+        height: 80px;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         input {
-          width: 100%;
-          height: 72px;
-          background: rgba(255, 255, 255, 1);
-          border-radius: 16px;
-          border: 2px solid rgba(221, 221, 221, 1);
-          text-align: center;
-          font-size: 30px;
+          width: 92%;
+          padding: 0 12px;
+          font-size: 28px;
+          &::-webkit-input-placeholder {
+            color: #bfbfbf;
+          }
+        }
+        .vh-iconfont {
+          display: inline-block;
+          width: 8%;
+          font-size: 28px;
+          color: #8c8c8c;
         }
       }
       .footer {
-        height: 100px;
-        font-size: 36px;
+        height: 80px;
+        font-size: 28px;
         font-family: PingFangSC;
         font-weight: 400;
-        color: rgba(252, 86, 89, 1);
+        color: #fff;
+        line-height: 80px;
+        background: #fb2626;
+        border-radius: 40px;
+        text-align: center;
+      }
+      .living-start {
+        width: 100%;
+        margin-top: 32px;
+        background: #ffffff;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
+        justify-content: space-between;
+        .living-img {
+          display: inline-block;
+          width: 160px;
+          height: 160px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
+        }
+        .living-text {
+          padding: 20px 0 40px;
+          color: #262626;
+          font-size: 28px;
+          line-height: 40px;
+        }
+        .footer {
+          width: 340px;
+        }
       }
     }
   }
