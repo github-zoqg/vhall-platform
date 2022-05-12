@@ -848,7 +848,7 @@
     }
     &-invite {
       position: fixed;
-      z-index: 10;
+      z-index: 13;
       display: block;
       right: 0;
       top: 140px;

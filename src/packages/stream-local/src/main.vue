@@ -256,7 +256,8 @@
     useMediaCheckServer,
     useChatServer,
     useDocServer,
-    useMsgServer
+    useMsgServer,
+    useVideoPollingServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
   import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
@@ -320,7 +321,9 @@
         return (
           this.$domainStore.state.micServer.speakerList.find(
             item => item.accountId == this.joinInfo.third_party_user_id
-          ) || {}
+          ) ||
+          this.$domainStore.state.videoPollingServer.localPollinger ||
+          {}
         );
       },
       remoteSpeakers() {
@@ -438,6 +441,18 @@
       },
       showRole() {
         return [1, 3, 4].includes(this.joinInfo.role_name) && this.isInGroup;
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      // 是否开启视频轮巡
+      isVideoPolling() {
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     beforeCreate() {
@@ -448,12 +463,31 @@
       this.chatServer = useChatServer();
       this.roomBaseServer = useRoomBaseServer();
       this.splitScreenServer = useSplitScreenServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this.listenEvents();
     },
     async mounted() {
-      this.checkStartPush();
+      await this.checkStartPush();
+      // 轮训列表更新消息
+      this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
+        console.log('轮训列表更新消息', msg);
+        this.videoStartPush();
+      });
+      // 停止视频轮巡
+      this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
+          await this.stopPush();
+          await this.interactiveServer.destroy();
+          if (this.isNoDelay == 1) {
+            await this.interactiveServer.init();
+          }
+        }
+      });
+      if (!this.isSpeakOn) {
+        this.videoStartPush();
+      }
     },
     beforeDestroy() {
       // 清空计时器
@@ -490,6 +524,41 @@
       startPushOnce() {
         this.startPushStreamOnce = true;
         this.startPush();
+      },
+      /**
+       *
+       * @description: 视频轮巡推流
+       * @param arr {Array} 当前参与轮巡的观众流列表
+       */
+      async videoStartPush() {
+        if (this.videoPollingServer.state.isPolling) {
+          if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
+          if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
+          if (this.localStreamId) return; // 判断当前是否在推流中
+          try {
+            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+              // 如果存在互动实例需要销毁，重新初始化
+              await this.interactiveServer.destroy();
+            }
+            await this.interactiveServer.init({ videoPolling: true });
+            // 轮询判断是否有互动实例
+            await this.checkVRTCInstance();
+          } catch (error) {
+            console.log('视频轮巡初始化互动实例error', error);
+          }
+          this.startPollingPush();
+        } else {
+          if (!this.isSpeakOn) {
+            await this.stopPush();
+          }
+        }
+      },
+      // 视频轮巡开始推流
+      async startPollingPush() {
+        const res = await this.interactiveServer.createVideoPollingStream({
+          videoNode: `stream-${this.joinInfo.third_party_user_id}`
+        });
+        this.interactiveServer.publishStream(res);
       },
       // 检查推流
       async checkStartPush() {
@@ -768,12 +837,16 @@
           if (param.isRepublishMode) {
             await this.startPush();
           } else if (this.localSpeaker.streamId) {
-            await this.interactiveServer.unpublishStream(this.localSpeaker.streamId);
-            await this.startPush();
+            await this.interactiveServer.unpublishStream(this.localSpeaker);
+            if (this.videoPollingServer.state.isPolling) {
+              await this.videoStartPush();
+            } else {
+              await this.startPush();
+            }
           }
         } else {
-          // 不在麦上直接return
-          if (!this.micServer.getSpeakerStatus()) {
+          // (不在麦上 || 非视频轮巡状态中)  直接return
+          if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
             return;
           }
           // 无缝切换音视频
@@ -993,13 +1066,14 @@
             resolve();
             return;
           }
-          // 视频直播时结束直播
-          if (this.mode == 2 && options?.source === 'live_over') {
+          // 第三方推流(无streamId) && 直播时结束直播
+          if (this.isThirdStream && options?.source === 'live_over') {
             clearInterval(this._audioLeveInterval);
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
             );
             resolve();
+            return;
           }
 
           // 当前角色为主持人&&设备被禁用

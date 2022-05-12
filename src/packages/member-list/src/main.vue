@@ -46,6 +46,7 @@
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
                   :status="liveStatus"
+                  :guest-has-invite-per="guestHasInvitePer"
                 ></member-item>
               </template>
             </template>
@@ -81,6 +82,7 @@
                   :tab-index="tabIndex"
                   :apply-users="applyUsers"
                   :status="liveStatus"
+                  :guest-has-invite-per="guestHasInvitePer"
                 ></member-item>
               </template>
             </template>
@@ -138,7 +140,7 @@
         </span>
         <div
           class="info-panel__allow-raise-hand"
-          v-if="configList['ui.hide_handsUp'] && mode !== 6"
+          v-if="(configList['ui.hide_handsUp'] && mode !== 6) || guestHasInvitePer"
         >
           <label class="raise-hand-switch" for="raiseHandSwitch">
             允许举手
@@ -173,7 +175,7 @@
                 raiseHandTip ? 'raise-hand' : '',
                 tabIndex === 2 ? 'active' : ''
               ]"
-              v-if="isShowBtn(configList['is_interact_and_host'])"
+              v-if="isShowBtn(configList['is_interact_and_host']) || guestHasInvitePer"
             >
               举手
             </li>
@@ -389,6 +391,14 @@
       //获取当前的上麦的人员列表
       getCurrentSpeakerList() {
         return this.micServer.state.speakerList;
+      },
+      // 嘉宾为当前主讲人时是否有邀请上麦的权限
+      guestHasInvitePer() {
+        return (
+          this.configList?.speak_manage == 1 &&
+          this.interactToolStatus.doc_permission == this.userId &&
+          this.roleName == 4
+        );
       }
     },
     methods: {
@@ -571,6 +581,18 @@
             case 'room_kickout_cancel':
               handleRoomCancelKickOut(temp);
               break;
+            // 嘉宾为当前主讲人时，允许举手的状态同步
+            case 'vrtc_connect_open':
+              if (temp.sender_id != _this.userId) {
+                _this.allowRaiseHand = true;
+              }
+              break;
+            case 'vrtc_connect_close':
+              if (temp.sender_id != _this.userId) {
+                _this.allowRaiseHand = false;
+              }
+              break;
+
             default:
               break;
           }
@@ -856,7 +878,7 @@
             nickname: msg.data.nick_name || msg.data.nickname,
             role_name: msg.data.room_role
           };
-          if (_this.roleName == 1 && user.role_name == 4) {
+          if ((_this.roleName == 1 || _this.guestHasInvitePer) && user.role_name == 4) {
             _this.$message.success(`收到 ${_this.$getRoleName(4)} [ ${user.nickname} ] 的上麦申请`);
           }
           const { member_info = { is_apply: 1 } } = msg.data;
@@ -966,8 +988,8 @@
             return;
           }
 
-          //发起端需要判断一下是不是非主持人
-          if (_this.isLive && _this.roleName != 1) {
+          //发起端需要判断一下是不是非主持人&&非主讲人的嘉宾
+          if (_this.isLive && _this.roleName != 1 && !_this.guestHasInvitePer) {
             return;
           }
 
@@ -977,7 +999,7 @@
           } else if (msg.data.room_role == 4) {
             role = _this.$t('chat.chat_1023');
           }
-          if (msg.data.extra_params == _this.userId) {
+          if (msg.data.inviter_account_id == _this.userId) {
             _this.$message.warning({
               message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
             });
@@ -996,8 +1018,8 @@
           );
           //提示语
           if (msg.data.target_id == _this.userId) {
-            this.timer && clearTimeout(this.timer);
-            this.timer = setTimeout(() => {
+            _this.timer && clearTimeout(_this.timer);
+            _this.timer = setTimeout(() => {
               _this.$message.success({ message: _this.$t('interact.interact_1028') });
             }, 1000);
             return;
@@ -1393,9 +1415,11 @@
           .setHandsUp(params)
           .then(res => {
             console.log('switch-mic-status', res);
-            //数据埋点--开启/关闭允许举手
-            window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
-            this.$message.success({ message: '设置成功' });
+            if (res.code == 200) {
+              //数据埋点--开启/关闭允许举手
+              window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
+              this.$message.success({ message: '设置成功' });
+            }
           })
           .catch(err => {
             this.allowRaiseHand = false;
@@ -1550,7 +1574,7 @@
       downMic(accountId, needConfirm = true) {
         const data = {
           room_id: this.roomId,
-          receive_account_id: accountId
+          receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
