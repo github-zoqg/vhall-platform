@@ -1,17 +1,16 @@
 <template>
   <div class="qa">
-    <div class="qa-content-wrapper">
+    <div class="qa-content-wrapper" ref="chatContentMain">
       <div class="qa-content" ref="qaContent">
         <virtual-list
           v-if="virtual.showlist"
-          class="qalist"
           ref="qalist"
-          :style="{ height: virtual.contentHeight + 'px' }"
+          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
           :keeps="15"
           :estimate-size="100"
           :data-key="'msgId'"
           :data-sources="qaList"
-          :data-component="MsgItem"
+          :data-component="msgItem"
           @tobottom="tobottom"
           :extra-props="{
             isOnlyMine,
@@ -25,7 +24,9 @@
         </div>
       </div>
     </div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
+      ref="sendBox"
       currentTab="qa"
       @showMyQA="showMyQA"
       @sendQa="sendQa"
@@ -37,7 +38,8 @@
   </div>
 </template>
 <script>
-  import MsgItem from './components/msg-item.vue';
+  import VirtualList from 'vue-virtual-scroll-list';
+  import msgItem from './components/msg-item';
   import SendBox from '@/packages/chat-wap/src/components/send-box';
   import {
     useRoomBaseServer,
@@ -48,12 +50,14 @@
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
+  import EventBus from '@/packages/chat-wap/src/js/Events.js';
+  import { isMse } from './js/utils.js';
   export default {
     name: 'VmpQaWap',
     mixins: [emitter],
     data() {
       return {
-        MsgItem,
+        msgItem,
         qaList: useQaServer().state.qaList,
         listCopy: [],
         tipMsg: '',
@@ -66,7 +70,13 @@
         virtual: {
           showlist: false,
           contentHeight: 0
-        }
+        },
+        //聊天内容高度
+        chatlistHeight: 0,
+        //android的内初始部高度
+        innerHeight: 0,
+        //显示输入组件
+        showSendBox: false
       };
     },
     computed: {
@@ -92,7 +102,10 @@
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
     },
-    components: { SendBox },
+    components: {
+      VirtualList,
+      SendBox
+    },
     // watch: {
     //   qaList: function () {
     //     this.scrollBottom();
@@ -102,8 +115,23 @@
       this.menuServer = useMenuServer();
       this.getQAHistroy();
     },
-    beforeDestroy() {},
+    beforeDestroy() {
+      //移除事件
+      window.removeEventListener('resize', this.resizeAndroid);
+      window.removeEventListener('focusin', this.focusinIOS);
+      window.removeEventListener('focusout', this.focusoutIOS);
+    },
     mounted() {
+      const IsMse = isMse();
+      if (IsMse.os === 'android') {
+        this.innerHeight = window.innerHeight;
+        window.addEventListener('resize', this.resizeAndroid);
+      } else if (IsMse.os === 'ios') {
+        window.addEventListener('focusin', this.focusinIOS);
+        window.addEventListener('focusout', this.focusoutIOS);
+      }
+      this.initEvent();
+      this.eventListener();
       this.listenEvents();
       window.aaaa = this.scrollBottom;
     },
@@ -113,6 +141,40 @@
       }
     },
     methods: {
+      //初始化eventbus
+      initEvent() {
+        EventBus.$on('showEmoji', e => {
+          this.$nextTick(() => {
+            if (e) {
+              this.chatlistHeight =
+                this.$refs.chatContentMain.clientHeight - this.$refs.sendBox.$el.clientHeight + 60;
+              this.scrollBottom();
+            } else {
+              this.chatlistHeight = this.virtual.contentHeight;
+            }
+          });
+        });
+      },
+      resizeAndroid() {
+        const newInnerHeight = window.innerHeight;
+        if (this.innerHeight > newInnerHeight) {
+          // 键盘弹出事件处理
+          // alert('android 键盘弹窗事件');
+          this.scrollBottom();
+        } else {
+          // 键盘收起事件处理
+          // alert('android 键盘收起事件处理');
+        }
+      },
+      focusoutIOS() {
+        // 键盘收起事件处理
+        // alert('iphone 键盘收起事件处理');
+      },
+      focusinIOS() {
+        // 键盘弹出事件处理
+        // alert('iphone 键盘弹出事件处理');
+        this.scrollBottom();
+      },
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
@@ -148,6 +210,7 @@
           this.$nextTick(() => {
             this.virtual.contentHeight = this.$refs.qaContent.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
+            this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();
           });
         });
@@ -211,6 +274,17 @@
       },
       showMyQA(status) {
         this.isOnlyMine = status;
+      },
+      // eventBus监听
+      eventListener() {
+        //监听聊天组件是否打开
+        EventBus.$on('showSendBox', e => {
+          this.showSendBox = e;
+        });
+      },
+      //关闭遮罩层
+      closeOverlay() {
+        EventBus.$emit('showSendBox', false);
       }
     }
   };
@@ -218,20 +292,20 @@
 <style lang="less">
   .qa {
     height: 100%;
+    overflow: hidden;
     position: relative;
-    display: flex;
-    flex-direction: column;
     .qa-content-wrapper {
-      height: calc(100% - 120px);
-      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 94px;
+      overflow-x: hidden;
+      overflow-y: auto;
       .qa-content {
         height: 100%;
         overflow: hidden;
         position: relative;
-        .qalist {
-          height: 100%;
-          overflow: auto;
-        }
         .qa-item-wrapper {
           padding: 0 30px;
           &.qa-last-ios-progress {
@@ -352,6 +426,15 @@
       .only-my {
         color: #fb3a32;
       }
+    }
+    > .overlay {
+      width: 100vw;
+      height: 100vh;
+      z-index: 21;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: transparent;
     }
   }
 </style>

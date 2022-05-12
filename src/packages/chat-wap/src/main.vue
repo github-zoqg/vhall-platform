@@ -12,6 +12,7 @@
       </p>
       <div ref="chatContent" class="virtual-content">
         <virtual-list
+          v-if="virtual.showlist"
           ref="chatlist"
           :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
           :keeps="20"
