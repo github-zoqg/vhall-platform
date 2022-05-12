@@ -89,7 +89,8 @@
     useRoomBaseServer,
     useMicServer,
     useGroupServer,
-    useDocServer
+    useDocServer,
+    useVideoPollingServer
   } from 'middle-domain';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
 
@@ -229,9 +230,15 @@
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
+      // 当前人是否在视频轮巡
+      isPolling() {
+        return this.videoPollingServer.state.isPolling;
+      },
       // 是否展示流列表
       isShowRemoteList() {
-        return this.remoteSpeakers.length && this.liveStatus == 1;
+        return this.isPolling
+          ? !!this.isNoDelay
+          : this.remoteSpeakers.length && this.liveStatus == 1;
       }
     },
     watch: {
@@ -279,6 +286,7 @@
       this.interactiveServer = useInteractiveServer();
       this.roomBaseServer = useRoomBaseServer();
       this.micServer = useMicServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
 
     created() {
