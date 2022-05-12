@@ -308,6 +308,13 @@
             }
           });
 
+          // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
+          useMicServer().$on('vrtc_connect_refused', msg => {
+            this.isApplying = false;
+            this.applyTime = 30;
+            clearInterval(this._applyInterval);
+          });
+
           // 开始直播显示申请上麦
           useSubscribeServer().$on('live_start', () => {
             this.liveStep = 2;
