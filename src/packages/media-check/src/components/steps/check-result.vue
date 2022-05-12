@@ -31,7 +31,16 @@
         <el-button round v-if="!isCheckSuccess" @click="restart" class="confirm">
           重新检测
         </el-button>
-        <el-button class="fr" round type="primary" v-if="isCheckSuccess" @click="finish">
+        <el-button class="fr" round type="primary" v-if="isDirector" @click="finish">
+          okey
+        </el-button>
+        <el-button
+          class="fr"
+          round
+          type="primary"
+          v-if="!isDirector && isCheckSuccess"
+          @click="finish"
+        >
           {{ roleName == 1 ? '去直播' : '马上互动' }}
         </el-button>
       </section>
@@ -76,6 +85,10 @@
     computed: {
       isCheckSuccess() {
         return this.checkList.every(item => item.status === 'success');
+      },
+      // 云导播活动
+      isDirector() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     created() {
