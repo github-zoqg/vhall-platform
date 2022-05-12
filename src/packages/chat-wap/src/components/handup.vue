@@ -56,7 +56,7 @@
   </section>
 </template>
 <script>
-  import { useMicServer, useInteractiveServer } from 'middle-domain';
+  import { useMicServer, useInteractiveServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'Handup',
     data() {
@@ -116,6 +116,25 @@
       });
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
+      });
+      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
+      useMsgServer().$onMsg('ROOM_MSG', msg => {
+        let temp = Object.assign({}, msg);
+        if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+          temp.data = JSON.parse(temp.data);
+        }
+        const { type = '' } = temp.data || {};
+        console.log('11110-0-0-0-0-0-2222', temp, this.joinInfo.third_party_user_id);
+        if (type === 'vrtc_connect_refused') {
+          if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
+          this.lowerWheatFun && clearInterval(this.lowerWheatFun);
+          this.lowerWheatFun = null;
+          this.isWaitting = false;
+          this.handText = this.$t('interact.interact_1001');
+          this.showConnectMic = false;
+          this.$emit('handupLoading', false);
+          this.closeConnectPop();
+        }
       });
     },
     methods: {

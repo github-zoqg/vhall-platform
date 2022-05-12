@@ -89,7 +89,8 @@
     useSubscribeServer,
     useSplitScreenServer,
     useMediaCheckServer,
-    useRebroadcastServer
+    useRebroadcastServer,
+    useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -308,11 +309,29 @@
             }
           });
 
-          // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
-          useMicServer().$on('vrtc_connect_refused', msg => {
-            this.isApplying = false;
-            this.applyTime = 30;
-            clearInterval(this._applyInterval);
+          // 嘉宾申请被拒绝（客户端有拒绝用户上麦的操作）
+          useMsgServer().$onMsg('ROOM_MSG', msg => {
+            let temp = Object.assign({}, msg);
+            if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+              temp.data = JSON.parse(temp.data);
+            }
+            const { type = '' } = temp.data || {};
+            console.log(
+              '1111-a-a-a-a-a-',
+              temp,
+              this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id
+            );
+            if (type === 'vrtc_connect_refused') {
+              if (
+                this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id !=
+                temp.data.room_join_id
+              ) {
+                return;
+              }
+              this.isApplying = false;
+              this.applyTime = 30;
+              this._applyInterval && clearInterval(this._applyInterval);
+            }
           });
 
           // 开始直播显示申请上麦

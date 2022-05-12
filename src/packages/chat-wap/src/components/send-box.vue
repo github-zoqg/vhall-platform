@@ -310,24 +310,6 @@
         }
         this.connectMicShow = false;
       });
-      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
-      useMicServer().$on('vrtc_connect_apply_cancel', msg => {
-        this.lowerWheatFun && clearInterval(this.lowerWheatFun);
-        this.lowerWheatFun = null;
-        this.isWaitting = false;
-        this.handText = this.$t('interact.interact_1001');
-        this.showConnectMic = false;
-        this.$emit('handupLoading', false);
-      });
-      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
-      useMicServer().$on('vrtc_connect_refused', msg => {
-        this.lowerWheatFun && clearInterval(this.lowerWheatFun);
-        this.lowerWheatFun = null;
-        this.isWaitting = false;
-        this.handText = this.$t('interact.interact_1001');
-        this.showConnectMic = false;
-        this.$emit('handupLoading', false);
-      });
       window.chat = this;
     },
     methods: {
