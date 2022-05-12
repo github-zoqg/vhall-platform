@@ -40,7 +40,6 @@
               v-model="privacyReply">私密</el-checkbox> -->
           </li>
         </ul>
-        {{ questionIds }}
         <!-- 查询条件过滤部分  -->
         <div class="exact-search">
           <!-- 选择本页 -->
@@ -50,7 +49,7 @@
             v-if="activeIndex === 0 || activeIndex === 1"
             @change="changeAllChecked"
           >
-            {{ checkAll }} 选择本页 {{ isAllChecked }}
+            选择本页
           </el-checkbox>
           <!-- 标记为不处理 -->
           <el-button
@@ -227,12 +226,16 @@
                   </p>
                 </div>
                 <div class="fr">
+                  <span class="answer-control-btn" @click="replyAnswerStatus('no', item, index)">
+                    标为未回复
+                  </span>
+                  <span class="answer-control-btn" @click="replyAnswerStatus('yes', item, index)">
+                    标为已回复
+                  </span>
                   <span class="answer-control-btn" @click="reply({ type: 'private' }, item, index)">
                     {{ $t('common.common_1008') }}
                   </span>
-                  <span class="answer-control-btn" @click="reply('text', item, index)">
-                    {{ $t('chat.chat_1082') }}
-                  </span>
+                  <span class="answer-control-btn" @click="reply('text', item, index)">回复</span>
                 </div>
                 <ul class="answer">
                   <li class="await-name">
@@ -417,7 +420,7 @@
             v-show="activeIndex == 2"
           >
             <template v-if="noDealList.length > 0">
-              <li v-for="item in noDealList" :key="item.id" class="clearFix">
+              <li v-for="(item, index) in noDealList" :key="item.id" class="clearFix">
                 <div class="fl">
                   <p class="await-name">
                     <span class="await-id" v-if="item.sequence">
@@ -439,30 +442,42 @@
                     <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
-                </div>
-                <div class="no-deal-fr">
-                  <div class="no-deal-fr-top">
-                    <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="item.operator.nick_name"
-                      placement="top-start"
-                    >
-                      <span class="ellsips">{{ item.operator.nick_name | overHidden(8) }}</span>
-                    </el-tooltip>
-                    <span
-                      class="role-name"
-                      :class="{
-                        rolehost: item.operator.role_name == 'host',
-                        roleassistant:
-                          item.operator.role_name == 'guest' ||
-                          item.operator.role_name == 'assistant'
-                      }"
-                    >
-                      {{ item.operator.role_name | roleFilter }}
-                    </span>
+                  <div class="no-deal-fr">
+                    <div class="no-deal-fr-top">
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="item.operator.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="ellsips">{{ item.operator.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        class="role-name"
+                        :class="{
+                          rolehost: item.operator.role_name == 'host',
+                          roleassistant:
+                            item.operator.role_name == 'guest' ||
+                            item.operator.role_name == 'assistant'
+                        }"
+                      >
+                        {{ item.operator.role_name | roleFilter }}
+                      </span>
+                    </div>
+                    <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
                   </div>
-                  <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
+                </div>
+                <div class="fr">
+                  <span class="answer-control-btn" @click="replyAnswerStatus('no', item, index)">
+                    标为未回复
+                  </span>
+                  <span class="answer-control-btn" @click="replyAnswerStatus('yes', item, index)">
+                    标为已回复
+                  </span>
+                  <span class="answer-control-btn" @click="reply({ type: 'private' }, item, index)">
+                    {{ $t('common.common_1008') }}
+                  </span>
+                  <span class="answer-control-btn" @click="reply('text', item, index)">回复</span>
                 </div>
               </li>
             </template>
@@ -786,6 +801,9 @@
         if (searchContent) {
           this.qaServer.setState('isSearch', true);
         }
+        // 按条件搜索的时候，重置选中状态与数据
+        this.qaServer.clearQuestionIds();
+        this.checkAll = false;
         // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
         // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
         if (this.activeIndex == 1) {
@@ -1055,14 +1073,35 @@
         );
       },
       // 单条记录-切换选中状态
-      changeItemCheckStatus({ isCheckBox, id }) {
-        const result = this.qaServer.changeItemQuestionIds(isCheckBox, id, this.activeIndex);
+      changeItemCheckStatus(item) {
+        const len = this.questionIds.length + 1;
+        if (item.isCheckBox && len > 25) {
+          this.$message.error('批量操作最多仅支持500条数据，更多勾选则不生效');
+          item.isCheckBox = false;
+          this.checkAll = false;
+          return;
+        }
+        const result = this.qaServer.changeItemQuestionIds(
+          item.isCheckBox,
+          item.id,
+          this.activeIndex
+        );
         if (result !== null) {
           this.checkAll = result;
         }
       },
       // 全选-切换选中状态
       changeAllChecked(checked) {
+        if (this.activeIndex === 0) {
+          const len = this.awaitList.length + this.questionIds.length;
+          if (checked && len > 25) {
+            this.$message.error(
+              `批量操作最多仅支持500条数据，当前剩余可勾选${500 - this.questionIds.length}条`
+            );
+            this.checkAll = false;
+            return;
+          }
+        }
         this.qaServer.changeAllQuestionIds(checked, this.activeIndex);
       },
       // 全选-清空选中状态
@@ -1099,7 +1138,7 @@
       // 弹出框 - 确认
       unExactOrDelSubmit() {
         if (this.unExactOrDelPopAlert.type == 'unExact') {
-          this.sendUpdateBatch();
+          this.sendUpdateBatch(1, this.questionIds); // 批量设置为不处理
         } else {
           this.sendDelQaAndAnswerMulti();
         }
@@ -1109,27 +1148,31 @@
         this.unExactOrDelPopAlert.visible = false;
         this.unExactOrDelPopAlert.text = '';
       },
-      // 调用批量不处理接口
-      sendUpdateBatch() {
+      // 调用批量修改问题状态接口，支持单个
+      sendUpdateBatch: debounce(async function (statusVal, ids = []) {
         this.qaServer
           .updateBatchStatus({
             room_id: this.baseObj.interact.room_id,
-            question_ids: this.questionIds.join(','),
-            status: 1
+            question_ids: ids.join(','),
+            status: statusVal
           })
           .then(res => {
             if (res.code != 200) {
-              this.$message.error(res.msg || '批量修改失败');
+              this.$message.error(res.msg || '修改失败');
             } else {
-              this.closeConfirm();
+              this.qaServer.updateStatusToUNHANDLE(ids);
+              // 若是批量设为不处理，弹出框打开的，需要关闭弹出框。
+              if (this.unExactOrDelPopAlert && this.unExactOrDelPopAlert.visible) {
+                this.closeConfirm();
+              }
             }
           })
           .catch(err => {
             this.$message.error(err.msg);
           });
-      },
+      }, 500),
       // 调用批量删除接口
-      sendDelQaAndAnswerMulti() {
+      sendDelQaAndAnswerMulti: debounce(async function () {
         let questionIdsStr = null;
         if (this.unExactOrDelPopAlert.row) {
           questionIdsStr = `${this.unExactOrDelPopAlert.row.id}`;
@@ -1157,7 +1200,32 @@
           .catch(err => {
             // this.$message.error(err.msg);
           });
-      }
+      }, 500),
+      // 设为 - 未回复状态 or 已回复状态
+      replyAnswerStatus: debounce(async function (saveType, item, index) {
+        console.log('设置为未回复状态-当前数据变化', saveType, item, index);
+        this.qaServer
+          .updateBatchStatus({
+            room_id: this.baseObj.interact.room_id,
+            question_ids: [item.id].join(','),
+            status: saveType == 'no' ? 0 : 3
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.$message.success('设置成功');
+              saveType === 'no'
+                ? this.qaServer.updateStatusToUNANSWER(item)
+                : this.qaServer.updateStatusToTEXTANSWER(item);
+              // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
+              // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
+            } else {
+              this.$message.error(res.msg || '设置失败');
+            }
+          })
+          .catch(err => {
+            // this.$message.error(err.msg);
+          });
+      }, 500)
     }
   };
 </script>
@@ -1387,6 +1455,7 @@
                 margin-top: -10px !important;
                 &.tag__no__check {
                   padding-left: 76px;
+                  width: 388px;
                 }
                 .tiwen {
                   margin-right: 8px;
@@ -1394,6 +1463,7 @@
                 }
                 .content-text {
                   word-break: break-all;
+                  line-height: 20px;
                 }
               }
             }
@@ -1501,18 +1571,15 @@
               font-size: 14px;
               color: #1a1a1a;
               display: flex;
-              flex-direction: column;
-              align-items: flex-end;
-              justify-content: flex-end;
-
+              align-items: flex-start;
+              justify-content: flex-start;
+              margin-left: 74px;
+              margin-top: 16px;
               span {
                 float: right;
                 height: 14px;
                 font-size: 14px;
                 line-height: 14px;
-              }
-              span:nth-child(1) {
-                margin-bottom: 8px;
               }
               &-top {
                 min-width: 60px;
@@ -1522,7 +1589,6 @@
                 justify-content: space-around;
                 color: #666666;
                 .role-name {
-                  margin-bottom: 8px;
                   margin-left: 8px;
                 }
                 .rolehost,
@@ -1537,8 +1603,17 @@
                   text-align: center;
                 }
                 .rolehost {
+                  margin-left: 12px;
+                  margin-right: 12px;
+                  font-style: normal;
+                  font-weight: 400;
+                  font-size: 12px;
+                  line-height: 16px;
                   color: #fb3a32;
                   background: rgba(251, 58, 50, 0.2);
+                  border-radius: 9px;
+                  text-align: center;
+                  padding: 0 4px;
                 }
                 .roleassistant {
                   color: #0a7ff5;
@@ -1619,8 +1694,17 @@
               margin-right: 16px;
             }
             .role-host {
+              margin-left: 12px;
+              margin-right: 12px;
+              font-style: normal;
+              font-weight: 400;
+              font-size: 12px;
+              line-height: 16px;
               color: #fb3a32;
               background: rgba(251, 58, 50, 0.2);
+              border-radius: 9px;
+              text-align: center;
+              padding: 0 4px;
             }
             .role-assis {
               background: #ade1ff;
