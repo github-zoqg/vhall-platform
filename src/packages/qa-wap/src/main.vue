@@ -122,6 +122,7 @@
       window.removeEventListener('focusout', this.focusoutIOS);
     },
     mounted() {
+      this.listenEvents();
       const IsMse = isMse();
       if (IsMse.os === 'android') {
         this.innerHeight = window.innerHeight;
@@ -132,7 +133,6 @@
       }
       this.initEvent();
       this.eventListener();
-      this.listenEvents();
       window.aaaa = this.scrollBottom;
     },
     filters: {
