@@ -165,20 +165,25 @@
       isStreamListH0() {
         /**
          * 计算方式:
-         * 1. 远端流列表长度为 0
+         * 1.无互动实例
+         * 2.不是无延迟直播 && 在视频轮训中
+         * 3. 远端流列表长度为 0
          *    1) 如果存在本地流并且不是主屏,高度不为 0,返回 false
          *    2) 如果存在本地流并且是主屏,高度为 0,返回 true
-         * 2. 远端流列表长度为 1
+         * 4. 远端流列表长度为 1
          *    1) 如果不存在本地流并且远端流是主屏,高度为 0,返回 true
          *    2) 如果不存在本地流并且远端流不是主屏,高度不为 0,返回 false
          *    3) 如果存在本地流,高度不为 0,返回 false
-         * 3. 远端流列表长度大于 1
+         * 5. 远端流列表长度大于 1
          *    高度不为 0,但是为无延迟旁路布局，返回true,否则返回 false
-         * 4. 没有互动实例的时候高度为0
+         * 6. 没有互动实例的时候高度为0
          */
         if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
           return true;
+        } else if (this.isNoDelay != 1 && this.isPolling) {
+          return true;
         }
+
         if (!this.remoteSpeakers.length) {
           if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;
