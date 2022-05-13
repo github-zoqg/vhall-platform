@@ -4,7 +4,7 @@ import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
-import grayInit from '@/packages/app-shared/gray-init';
+import grayInit from '@/app-shared/gray-init';
 // import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
