@@ -115,20 +115,40 @@
         </div>
       </div>
     </template>
-    <authBox
+    <alertBox
       v-if="isSubscribeShow"
-      :optionInfo="authInfo"
-      :isStartLiving="false"
+      :title="$t('appointment.appointment_1020')"
+      :width="'100%'"
       @authSubmit="authSubmit"
       @authClose="authClose"
-    ></authBox>
+    >
+      <div slot="content" class="vmp-subscribe-body_input">
+        <input
+          :type="`${isHidden ? 'password' : 'text'}`"
+          v-model="textAuth"
+          :placeHolder="authInfo.placeHolder"
+        />
+        <i
+          :class="`vh-iconfont ${isHidden ? 'vh-line-hidden' : 'vh-line-view'}`"
+          @click="isHidden = !isHidden"
+        ></i>
+      </div>
+    </alertBox>
     <!-- 弹出直播提醒 -->
-    <authBox
+    <alertBox
       v-if="popupLivingStart"
-      :isStartLiving="true"
+      :title="''"
+      :titleBtn="$t('player.player_1013')"
       @authClose="livingCloseConfirm"
-      @startWatch="livingStartConfirm"
-    ></authBox>
+      @authSubmit="livingStartConfirm"
+    >
+      <div slot="content" class="vmp-subscribe-body_living">
+        <span class="living-img">
+          <img src="./img/live_start.png" alt="" />
+        </span>
+        <p class="living-text">{{ $t('player.player_1018') }}</p>
+      </div>
+    </alertBox>
     <!-- 弹出语言弹窗 -->
     <van-popup v-model="isOpenlang" round position="bottom" class="vmp-subscribe-body-popup">
       <ul>
@@ -155,8 +175,8 @@
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import authBox from './components/confirm.vue';
   import TimeDown from './components/timeDown.vue';
+  import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -166,9 +186,9 @@
         popupLivingStart: false, // 开播提醒
         subscribeText: '',
         showBottomBtn: false,
-        authInfo: {
-          title: '观看验证'
-        },
+        authInfo: {},
+        textAuth: '',
+        isHidden: true,
         isLiveEnd: false,
         subOption: {
           startTime: '',
@@ -189,8 +209,8 @@
       };
     },
     components: {
-      authBox,
-      TimeDown
+      TimeDown,
+      alertBox
     },
     computed: {
       /**
@@ -259,6 +279,14 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
+      // this.$dialog
+      //   .alert({
+      //     title: '提示',
+      //     showCloseIcon: true,
+      //     theme: 'round-button',
+      //     message: this.$t('form.form_1032', { n: 123 })
+      //   })
+      //   .then(() => {});
     },
     mounted() {
       this.initPage();
@@ -871,6 +899,54 @@
       height: 90px;
       z-index: 20;
       margin-bottom: env(safe-area-inset-bottom);
+    }
+    &_input {
+      width: 100%;
+      border: 2px solid #d9d9d9;
+      border-radius: 8px;
+      height: 80px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      input {
+        width: 92%;
+        padding: 0 12px;
+        font-size: 28px;
+        &::-webkit-input-placeholder {
+          color: #bfbfbf;
+        }
+      }
+      .vh-iconfont {
+        display: inline-block;
+        width: 8%;
+        font-size: 28px;
+        color: #8c8c8c;
+      }
+    }
+    &_living {
+      width: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .living-img {
+        display: inline-block;
+        width: 160px;
+        height: 160px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+        }
+      }
+      .living-text {
+        padding-top: 20px;
+        color: #262626;
+        font-size: 28px;
+        line-height: 40px;
+      }
     }
     &-popup {
       ul {

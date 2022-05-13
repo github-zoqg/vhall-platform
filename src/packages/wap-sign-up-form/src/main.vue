@@ -340,6 +340,13 @@
       <br />
       &nbsp;
     </p>
+    <alertBox v-if="isSubmitSuccess" @authClose="signCloseConfirm" @authSubmit="signStartConfirm">
+      <div slot="content">
+        <i18n path="form.form_1032">
+          <span place="n">{{ startTime }}</span>
+        </i18n>
+      </div>
+    </alertBox>
   </div>
 </template>
 
@@ -350,11 +357,13 @@
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
+  import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
       customSelectPicker,
-      customCascade
+      customCascade,
+      alertBox
     },
     data() {
       return {
@@ -471,7 +480,10 @@
         captcha1: null, // 云盾实例
         captcha2: null, // 云盾实例
         //是第一次验证
-        isFirstChange: true
+        isFirstChange: true,
+        startTime: '',
+        queryString: '',
+        isSubmitSuccess: false
       };
     },
     computed: {
@@ -897,6 +909,17 @@
           }
         }
       },
+      signStartConfirm() {
+        this.isSubmitSuccess = false;
+        window.location.href =
+          window.location.protocol +
+          process.env.VUE_APP_WAP_WATCH +
+          process.env.VUE_APP_WEB_KEY +
+          `/lives/watch/${this.webinar_id}${this.queryString}`;
+      },
+      signCloseConfirm() {
+        this.isSubmitSuccess = false;
+      },
       //提交表单到服务器
       submitSignUpForm() {
         const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
@@ -975,17 +998,22 @@
               queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
             }
             if (res.data.webinar.type == 2) {
-              this.$dialog
-                .alert({
-                  message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
-                })
-                .then(() => {
-                  window.location.href =
-                    window.location.protocol +
-                    process.env.VUE_APP_WAP_WATCH +
-                    process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinar_id}${queryString}`;
-                });
+              this.startTime = res.data.webinar.start_time;
+              this.queryString = queryString;
+              this.isSubmitSuccess = true;
+              // this.$dialog
+              //   .alert({
+              //     title: '提示',
+              //     theme: 'round-button',
+              //     message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
+              //   })
+              //   .then(() => {
+              //     window.location.href =
+              //       window.location.protocol +
+              //       process.env.VUE_APP_WAP_WATCH +
+              //       process.env.VUE_APP_WEB_KEY +
+              //       `/lives/watch/${this.webinar_id}${queryString}`;
+              //   });
             } else {
               window.location.href =
                 window.location.protocol +
@@ -1806,8 +1834,8 @@
       color: #fff;
       outline: none;
       width: 9.07rem;
-      height: 1.25rem;
-      border-radius: 0.12rem;
+      height: 80px;
+      border-radius: 50px;
       &.red {
         border-color: #fb3a32;
         background-color: #fb3a32;
