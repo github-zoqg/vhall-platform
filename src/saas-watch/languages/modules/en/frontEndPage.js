@@ -596,7 +596,7 @@ export default {
     cash_1025: 'Please enter the withdrawal amount (maximum ¥800  for a single transaction)',
     cash_1026: 'WeChat',
     cash_1027: 'Withdraw now',
-    cash_1028: 'Submission means consent',
+    cash_1028: 'I consent',
     cash_1029: 'User Exchange Agreement',
     cash_1030: 'Please enter a numeric value',
     cash_1031: 'The withdrawal amount is at least  ¥1',
