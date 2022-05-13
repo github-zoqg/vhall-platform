@@ -164,11 +164,13 @@
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
+          this.closeOverlay();
         }
       },
       focusoutIOS() {
         // 键盘收起事件处理
         // alert('iphone 键盘收起事件处理');
+        this.closeOverlay();
       },
       focusinIOS() {
         // 键盘弹出事件处理
