@@ -56,8 +56,18 @@
               />
             </template>
             <template v-else>
+              <div
+                v-if="rewardEffectInfo.data.source_status == 1"
+                class="zdy-gigt-img"
+                :style="{
+                  backgroundImage:
+                    'url(' +
+                    (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
+                    '?x-oss-process=image/resize,m_lfit,w_100)'
+                }"
+              ></div>
               <img
-                :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
+                v-else
                 :src="
                   (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
                   '?x-oss-process=image/resize,m_lfit,w_100'
@@ -74,12 +84,9 @@
               alt=""
             /> -->
           </div>
-          <img
-            src="./images/red-package-1.png"
-            alt=""
-            class="gift-img red-package"
-            v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
-          />
+          <div v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'" class="gift-img">
+            <img src="./images/red-package-1.png" alt="" class="red-package" />
+          </div>
         </div>
       </div>
     </transition-group>
@@ -293,6 +300,13 @@
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
           background-image: url(images/red-package-bg.png);
+          right: 6px;
+          width: 109px;
+          margin-left: 6px;
+          img {
+            height: 48px;
+            margin-left: 36px;
+          }
         }
       }
       &.bg-applause {
@@ -300,29 +314,53 @@
         .gift-img {
           background-image: url(images/applause-bg.png);
           right: -2px;
+          width: 124px;
+          margin-right: 2px;
+          img {
+            height: 69px;
+            margin-left: 10px;
+            margin-top: -12px;
+          }
         }
       }
       &.bg-coffee {
         background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
         .gift-img {
           background-image: url(images/coffee-bg.png);
-          right: -2px;
+          right: 12px;
+          width: 98px;
+          margin-left: 12px;
+          img {
+            height: 62px;
+            margin-left: 20px;
+            margin-top: -8px;
+          }
         }
       }
       &.bg-custom {
         background: linear-gradient(90.01deg, #fb3a32 1.37%, rgba(255, 172, 44, 0.8) 97.58%);
         .gift-img {
           background-image: url(images/custom-bg.png);
-          right: -8px;
+          right: 2px;
+          width: 108px;
+          margin-right: 2px;
+          img {
+            height: 54px;
+            margin-left: 13px;
+          }
         }
       }
       &.bg-flower {
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
           background-image: url(images/flower-bg.png);
-          right: 4px;
+          right: 2px;
+          width: 124px;
+          margin-left: 2px;
           img {
             height: 64px;
+            margin-left: 14px;
+            margin-top: -6px;
           }
         }
       }
@@ -330,7 +368,14 @@
         background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
         .gift-img {
           background-image: url(images/praise-bg.png);
-          right: 0;
+          right: 18px;
+          width: 91px;
+          margin-left: 18px;
+          img {
+            height: 73px;
+            margin-left: 14px;
+            margin-top: -10px;
+          }
         }
       }
       &.bg-666 {
@@ -338,6 +383,13 @@
         .gift-img {
           background-image: url(images/666-bg.png);
           right: 8px;
+          width: 124px;
+          margin-left: 8px;
+          img {
+            height: 52px;
+            margin-left: 14px;
+            margin-top: 8px;
+          }
         }
       }
     }
@@ -356,8 +408,7 @@
     }
 
     .gift-img {
-      width: 124px;
-      height: 83px;
+      height: 82px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
@@ -365,18 +416,17 @@
       position: relative;
       top: 0;
       right: -6px;
-      img {
-        width: 98px;
-        height: 98px;
-        margin-top: -30px;
-      }
     }
 
     .zdy-gigt-img {
-      width: 80px;
-      height: 80px;
+      width: 54px;
+      height: 54px;
       background-color: white;
       border-radius: 50%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin-left: 13px;
     }
     .nick-name {
       font-size: 28px;
@@ -395,10 +445,6 @@
     }
     .multiple {
       font-size: 12px;
-    }
-    .red-package {
-      width: 64px;
-      height: auto;
     }
   }
 </style>

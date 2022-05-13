@@ -566,14 +566,12 @@
         .new-gift-name {
           font-size: 28px;
           max-width: 240px;
-          line-height: 28px;
           margin-right: 8px;
           color: #595959;
         }
         .new-gift-content {
           font-size: 28px;
           transform: scale(0.9);
-          line-height: 22px;
           color: #262626;
         }
       }
