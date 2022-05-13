@@ -1,6 +1,8 @@
 import Vue from 'vue';
+// 控制台日志打印处理
+import '@/app-shared/extension/vh-console.js';
 // js内置对象扩展
-import '@/app-shared/extension/native-ext';
+import '@/app-shared/extension/native-ext.js';
 // 全局属性的定义
 import './init-global/prototype.js';
 // 导入根组件
