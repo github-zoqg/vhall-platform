@@ -72,6 +72,9 @@
         if (this.isShowQuestionList) return false;
         await this.questionnaireServer.getSurveyList();
         let arr = this.QuestionList.filter(item => item.isAnswered == 0);
+        if (arr.length == 0) {
+          this.$message.success('提交成功，感谢您的参与。');
+        }
         // 如果只有一份未填写,则直接打开问卷
         if (arr.length == 1) {
           this.writeQ(arr[0]);
