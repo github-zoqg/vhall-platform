@@ -24,10 +24,10 @@
                 <span class="data-text_circle">
                   <i class="num"></i>
                 </span>
-                <p class="data-text_title" :class="item.isAnswered ? '' : 'write_over'">
+                <p class="data-text_title" :class="item.is_answered ? '' : 'write_over'">
                   {{ item.title }}
                 </p>
-                <span class="write" v-if="item.isAnswered == 0" @click="writeQ(item)">填写</span>
+                <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
                 <span v-else class="write write_over">已填</span>
               </div>
             </li>
@@ -67,7 +67,7 @@
       async clickQuestionnaireIcon() {
         if (this.showQuestionList) return false;
         await this.questionnaireServer.getSurveyList();
-        let arr = this.QuestionList.filter(item => item.isAnswered == 0);
+        let arr = this.QuestionList.filter(item => item.is_answered == 0);
         if (arr.length == 0) {
           this.$toast('提交成功，感谢您的参与。');
           return false;
@@ -82,7 +82,7 @@
       // 问卷填写
       writeQ(data) {
         // console.log(data);
-        this.$emit('clickIcon', data.questionId);
+        this.$emit('clickIcon', data.question_id);
       },
       // 关闭问卷面板
       closeQuestionList() {
