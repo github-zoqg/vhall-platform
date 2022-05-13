@@ -552,6 +552,8 @@
             await this.stopPush();
             await this.interactiveServer.destroy();
             if (this.isNoDelay == 1) {
+              await sleep(200);
+              console.log('无延迟---销毁--互动实例');
               await this.interactiveServer.init();
             }
           }
