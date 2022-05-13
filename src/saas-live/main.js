@@ -30,9 +30,11 @@ import './assets/styles/skins/index.less';
 import './init-global/sentry';
 
 Vue.config.productionTip = false;
-Vue.config.devtools = true; // 生产环境需要开启吗？
+if (process.env.NODE_ENV !== 'production') {
+  Vue.config.devtools = true;
+}
 
-window.root = new Vue({
+new Vue({
   router,
   i18n,
   domainStore,
