@@ -161,7 +161,7 @@
           {{ item.label }}
         </li>
       </ul>
-      <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p>
+      <!-- <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p> -->
     </van-popup>
 
     <!-- 邀请卡浮动按钮 -->
