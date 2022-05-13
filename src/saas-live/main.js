@@ -1,37 +1,32 @@
 import Vue from 'vue';
+// js内置对象扩展
+import '@/app-shared/extension/native-ext';
+// 全局属性的定义
+import './init-global/prototype.js';
+// 导入根组件
 import App from './App.vue';
+// 导入路由
 import router from './router';
-import { initGlobalAPI, i18n } from './core';
-import domainStore from './domain';
-import '@/packages/app-shared/filters/index';
+// 引入国际化组件
+import i18n from '@/app-shared/i18n/index';
+// domain store
+import domainStore from './init-global/store';
+// 组件use
+import './init-global/use';
+// 全局混入
+import '@/app-shared/mixins/index';
+// 全局指令
+import '@/app-shared/directives/index';
+// 全局过滤器
+import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
-
-import * as Sentry from '@sentry/vue';
-import { Integrations } from '@sentry/tracing';
-
-// 初始化
-initGlobalAPI();
+// 引入sentry
+import './init-global/sentry';
 
 Vue.config.productionTip = false;
-Vue.config.devtools = true;
-
-if (process.env.NODE_ENV !== 'development') {
-  // Sentry监控探针
-  Sentry.init({
-    Vue,
-    dsn: 'https://a8d7c8deb63541239a0e9fcb538187bb@sentry.vhall.com/17',
-    release: `${process.env.VUE_APP_BUILD_VERSION}`,
-    // environment 上报的环境 建议 按照 测试、生产区分
-    environment: process.env.NODE_ENV,
-    integrations: [],
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0
-  });
-}
+Vue.config.devtools = true; // 生产环境需要开启吗？
 
 window.root = new Vue({
   router,
