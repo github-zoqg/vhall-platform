@@ -81,7 +81,7 @@
                     <span class="vhall-question__content-list__colmun-action">
                       <span class="item" @click="publish(item)">推送</span>
                       <span class="item" @click="prevQuestion(item.question_id)">预览</span>
-                      <span class="item" @click="editQuestion(item.question_id)">编辑</span>
+                      <span class="item" @click="editQuestion(item)">编辑</span>
                       <span @click.prevent.stop class="item">
                         <el-dropdown
                           @command="handleCommand"
@@ -169,12 +169,19 @@
     <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
       <div>
         <div class="async__ctx">
-          <el-input
-            v-model="alias"
-            :placeholder="'请输入标记文字'"
-            maxlength="8"
-            show-word-limit
-          ></el-input>
+          <el-input v-model="alias" :placeholder="'请输入标记文字'" maxlength="8">
+            <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
+              <span
+                :style="{
+                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : ''
+                }"
+              >
+                {{ alias.length }}
+              </span>
+              <span>/</span>
+              <span>8</span>
+            </div>
+          </el-input>
           <p class="setname_tip">
             可将名称修改为「投票」「报名」等，修改后用户观看直播时看到的是修改后的名称
           </p>
@@ -183,7 +190,15 @@
           <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
             确定
           </el-button>
-          <el-button plain size="medium" @click="dialogNameSet = false" round>取消</el-button>
+          <el-button
+            plain
+            size="medium"
+            @click="dialogNameSet = false"
+            round
+            class="hover_button_cancel"
+          >
+            取消
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -191,11 +206,11 @@
     <!-- 图列展示弹框 -->
     <el-dialog
       :visible.sync="dialogPreview"
-      custom-class="save-dialog"
-      width="400px"
-      :show-close="false"
+      custom-class="preview_dialog"
+      width="732px"
+      :show-close="true"
     >
-      <img src="" alt="" />
+      <img src="./images/Q_preview.png" alt="" />
     </el-dialog>
   </div>
 </template>
@@ -367,11 +382,14 @@
       /**
        * @description 编辑问卷
        */
-      editQuestion(id) {
+      editQuestion(row) {
+        console.log(row, '131231');
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
+        this.showTip = true;
         this.prevQuestionnaireId = null;
-        this.questionnaireServer.renderCreatQuestionnaire(selector, id);
+        this.alias = row.alias;
+        this.questionnaireServer.renderCreatQuestionnaire(selector, row.id);
       },
       setReportData(data) {
         const { id, title, description, detail, imgUrl } = data;
@@ -749,6 +767,22 @@
       height: 100vh;
       overflow: hidden;
     }
+    .preview_dialog {
+      .el-dialog__header {
+        padding: 0;
+      }
+      .el-dialog__body {
+        height: 0px;
+        padding: 0;
+      }
+      .el-dialog__headerbtn {
+        right: 0px;
+        top: -30px;
+        .el-dialog__close {
+          color: white;
+        }
+      }
+    }
   }
   .questionnaire-dialog {
     margin-top: calc((100vh - 572px) / 2) !important; // 让弹窗保持居中
@@ -797,6 +831,10 @@
   .setname_button {
     text-align: right;
     margin-top: 10px;
+    .hover_button_cancel:hover {
+      color: #fb3a32;
+      border-color: #fb3a32;
+    }
   }
   .name_set_button {
     margin-right: 8px;
