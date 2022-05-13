@@ -300,7 +300,7 @@
   /* 设置密码 or 修改密码 */
   .vmp-user-account-pwd {
     .el-input__inner {
-      padding-right: 60px !important; // 覆盖输入框样式
+      padding-right: 65px !important; // 覆盖输入框样式
     }
     .vmp-user-account-pwd-wrap {
       .el-dialog {
