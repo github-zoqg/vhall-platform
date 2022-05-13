@@ -9,7 +9,7 @@
       class="vmp-sign-watch_sign"
       :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
-      <div class="sign_container">
+      <div :class="['sign_container', isEmbed ? 'sign_embed_container' : '']">
         <div class="sign_content">
           <p class="sign_title">{{ title }}</p>
           <CountDown :duration="duration" :consume="sign_time" class="sign_counter"></CountDown>
@@ -130,6 +130,11 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     methods: {
@@ -288,6 +293,11 @@
           color: #fff;
         }
       }
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .sign_embed_container {
+      margin-top: 0px !important;
     }
   }
 </style>

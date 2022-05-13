@@ -428,10 +428,8 @@
       //处理@消息
       handleAt() {
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList || !this.source.atList.length) {
-          this.msgContent = this.urlToLink(this.source.content.text_content);
-        } else {
-          let at = false;
+        this.msgContent = this.urlToLink(this.source.content.text_content);
+        this.source.atList &&
           this.source.atList.forEach(a => {
             // TODO历史列表aList与直播中格式不一致作
             const userName = `@${a.nick_name || a.nickName} `;
@@ -440,29 +438,14 @@
               this.source.content.text_content &&
               this.source.content.text_content.indexOf(userName) != -1;
             if (match) {
-              if (at) {
-                this.msgContent = this.urlToLink(
-                  this.msgContent.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              } else {
-                this.msgContent = this.urlToLink(
-                  this.source.content.text_content.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              }
-              at = true;
-            } else {
-              this.msgContent = at
-                ? this.urlToLink(this.msgContent)
-                : this.urlToLink(this.source.content.text_content);
+              this.msgContent = this.urlToLink(
+                this.source.content.text_content.replace(
+                  userName,
+                  `<span style='color:#3562fa'>${userName}</span>`
+                )
+              );
             }
           });
-        }
         if (
           this.source.atList &&
           this.source.atList.find(u => this.joinInfo.third_party_user_id == u.accountId) &&

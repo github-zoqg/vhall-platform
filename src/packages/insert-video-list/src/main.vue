@@ -205,7 +205,13 @@
         console.log('---点击插播文件按钮----', insertStreamInfo);
 
         // 如果是直播状态需要判断当前主持人是否是用网页发起直播
-        if (watchInitData.switch.start_type != 1 && watchInitData.webinar.type == 1) {
+        // 嘉宾：设为主讲人的时候 可以插播
+        // 助理： 如果是网页发起，一直都有插播。如果是客户端发起，不支持插播文件，存在提示
+        if (
+          watchInitData.switch.start_type != 1 &&
+          watchInitData.webinar.type == 1 &&
+          watchInitData.join_info.role_name == 3
+        ) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
             confirmButtonText: '知道了',
