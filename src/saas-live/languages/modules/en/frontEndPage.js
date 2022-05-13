@@ -593,7 +593,7 @@ export default {
     cash_1022: 'Done and continue to withdraw',
     cash_1023: 'Scan QR-code with WeChat to blnd your account',
     cash_1024: 'Then the withdrawal will continue',
-    cash_1025: 'Please enter the withdrawal amount (maximum ¥800  for a single transaction)',
+    cash_1025: 'Please enter the withdrawal amount',
     cash_1026: 'WeChat',
     cash_1027: 'Withdraw now',
     cash_1028: 'I consent',
