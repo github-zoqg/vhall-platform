@@ -32,15 +32,14 @@
                   : $t('common.common_1021')
               }}
             </span>
+            <span class="subscribe-language" @click="openLanguage" v-if="languageList.length > 1">
+              {{ lang.key == 1 ? 'CN' : 'EN' }}
+              <i class="vh-iconfont vh-line-arrow-down"></i>
+            </span>
           </div>
         </template>
         <template v-if="showVideo">
           <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
-        </template>
-        <template v-if="!showVideo">
-          <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
-            <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
-          </div>
         </template>
       </template>
     </div>
@@ -162,7 +161,7 @@
           {{ item.label }}
         </li>
       </ul>
-      <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p>
+      <!-- <p class="language-item" @click="isOpenlang = false">{{ $t('account.account_1063') }}</p> -->
     </van-popup>
 
     <!-- 邀请卡浮动按钮 -->
@@ -789,6 +788,26 @@
           border-radius: 30px;
           font-size: 24px;
         }
+        .subscribe-language {
+          position: absolute;
+          right: 32px;
+          top: 28px;
+          width: 80px;
+          cursor: pointer;
+          display: block;
+          height: 36px;
+          padding: 0 5px;
+          border-radius: 24px;
+          background: rgba(0, 0, 0, 0.5);
+          text-align: center;
+          line-height: 36px;
+          font-size: 24px;
+          font-family: PingFangSC-Medium, PingFang SC;
+          color: #fff;
+          i {
+            font-size: 10px;
+          }
+        }
         .living_end {
           display: flex;
           flex-direction: column;
@@ -823,15 +842,6 @@
             line-height: 28px;
           }
         }
-      }
-      .subscribe-language {
-        position: absolute;
-        bottom: 25px;
-        right: 20px;
-        z-index: 10;
-        color: #fff;
-        font-size: 28px;
-        cursor: pointer;
       }
     }
     &-info {
@@ -972,16 +982,16 @@
       z-index: 10;
       display: block;
       right: 0;
-      top: 140px;
-      width: 152px;
-      height: 62px;
-      background: linear-gradient(121deg, rgba(246, 208, 63, 1) 0%, rgba(209, 110, 53, 1) 100%);
+      top: 180px;
+      width: 115px;
+      height: 56px;
+      background: linear-gradient(139.05deg, #8f66ff 8.09%, rgba(249, 51, 249, 0.8) 95.91%);
       box-shadow: 0px 5px 3px 0px rgba(0, 0, 0, 0.5);
       border-radius: 35px 0px 0px 35px;
       font-size: 28px;
       font-weight: 400;
       color: rgba(255, 255, 255, 1);
-      line-height: 62px;
+      line-height: 56px;
       text-align: center;
       animation-fill-mode: forwards;
     }
