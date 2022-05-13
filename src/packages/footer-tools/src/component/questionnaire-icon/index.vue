@@ -4,7 +4,7 @@
     <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
     <div class="vmp-questionnaire-list_container" v-if="isShowQuestionList">
-      <img class="q_header" src=".\images\header.png" alt="" />
+      <img class="q_header" src="./images/header.png" alt="" />
       <div class="container-data">
         <ul v-if="QuestionList && QuestionList.length" v-infinite-scroll="moreLoadData">
           <li v-for="(item, index) in QuestionList" :key="index">
