@@ -16,8 +16,9 @@ const htmlConfig = {
     Moment: '//cnstatic01.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     jsCookie: '//cnstatic01.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
     VueI18n: '//cnstatic01.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
+
     MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js',
+    MiddleDomain: '',
     ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
@@ -32,17 +33,9 @@ const htmlConfig = {
   cdnCss: {
     ElementUi:
       '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    // 开发时暂时使用阿里链接，后面改成自己的cdn
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.3/iconfont.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.3/iconfont.css'
-  },
-  // dns-prefetch
-  dnsPrefetch: {
-    open: false, //是否开启dns预解析
-    dns: {
-      't-alistatic01': '//t-alistatic01.e.vhall.com'
-    }
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.4/iconfont.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.4/iconfont.css'
   }
 };
 

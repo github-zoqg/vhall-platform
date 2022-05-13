@@ -40,10 +40,15 @@
       <i class="continue-btn">继续抽奖</i>
     </span>
     <!-- 关闭按钮 -->
-    <i class="winner-list__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
+    <i
+      class="winner-list__close-btn vh-iconfont vh-line-circle-close"
+      :class="{ 'winner-list-embed-close': isEmbed }"
+      @click="close"
+    ></i>
   </div>
 </template>
 <script>
+  import { useRoomBaseServer } from 'middle-domain';
   /**
    * @description 中奖列表(发起端)
    */
@@ -67,6 +72,16 @@
         default() {
           return {};
         }
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    computed: {
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     data() {
@@ -271,6 +286,11 @@
       font-size: 30px;
       color: #ffffff;
       cursor: pointer;
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .winner-list-embed-close {
+      bottom: -20px;
     }
   }
 </style>
