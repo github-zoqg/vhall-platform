@@ -3,8 +3,10 @@ import Vue from 'vue';
 import '@/app-shared/extension/vh-console';
 // js内置对象扩展
 import '@/app-shared/extension/native-ext';
+// 重置 elementUI 的 message
+import '@/app-shared/extension/message';
 // 全局属性的定义
-import './init-global/prototype.js';
+import './init-global/prototype';
 // 导入根组件
 import App from './App.vue';
 // 导入路由

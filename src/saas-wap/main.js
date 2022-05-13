@@ -4,9 +4,9 @@ import '@/app-shared/extension/vh-console';
 // js内置对象扩展
 import '@/app-shared/extension/native-ext';
 // 移动端字体大小自适应处理
-import './init-global/resize-font-size.js';
+import './init-global/resize-font-size';
 // 全局属性的定义
-import './init-global/prototype.js';
+import './init-global/prototype';
 // 导入根组件
 import App from './App.vue';
 // 导入路由
