@@ -829,13 +829,17 @@
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 音视频/图片推流 方式变更
-        if (param.videoType || param.canvasImgUrl) {
+        if (param.videoType || param.canvasImgUrl || param.isRepublishMode) {
           if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
             await this.$refs.imgPushStream.updateCanvasImg();
           }
 
           if (param.isRepublishMode) {
-            await this.startPush();
+            if (this.videoPollingServer.state.isPolling) {
+              await this.videoStartPush();
+            } else {
+              await this.startPush();
+            }
           } else if (this.localSpeaker.streamId) {
             await this.interactiveServer.unpublishStream(this.localSpeaker);
             if (this.videoPollingServer.state.isPolling) {
@@ -860,10 +864,9 @@
                 console.error('切换失败', err);
               });
             return;
-          } else if (
-            param.video &&
-            this.$domainStore.state.mediaSettingServer.videoType == 'camera'
-          ) {
+          }
+
+          if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
             this.interactiveServer
               .switchStream({
                 streamId: this.localSpeaker.streamId,
