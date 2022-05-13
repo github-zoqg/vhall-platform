@@ -95,9 +95,9 @@
       webinarId() {
         return this.watchInitData.webinar.id;
       },
-      isEmbed() {
-        return this.embedObj.embed || this.embedObj.embedVideo;
-      },
+      // isEmbed() {
+      //   return this.embedObj.embed || this.embedObj.embedVideo;
+      // },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
       }
@@ -240,7 +240,9 @@
         };
         useQaServer()
           .sendQaMsg(data)
-          .then(() => {});
+          .then(() => {
+            this.scrollBottom();
+          });
       },
       //唤起登录弹窗
       handleLogin() {
