@@ -4,7 +4,7 @@
       v-model="signInVisible"
       position="bottom"
       round
-      closeable="true"
+      :closeable="true"
       class="vhall-dialog-wrap"
     >
       <!-- <div class="header">

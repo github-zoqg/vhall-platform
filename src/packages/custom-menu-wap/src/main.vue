@@ -88,7 +88,7 @@
     &-wrapper {
       height: 100%;
       width: 100%;
-      padding: 30px;
+      padding: 16px 30px;
       overflow-y: scroll;
       // margin: 0 20px;
     }

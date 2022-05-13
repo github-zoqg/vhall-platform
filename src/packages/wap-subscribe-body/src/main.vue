@@ -2,78 +2,153 @@
   <div class="vmp-subscribe-body">
     <div class="vmp-subscribe-body-container">
       <template v-if="isTryVideo">
-        <vmp-air-container :cuid="cuid"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
       </template>
       <template v-else>
         <template v-if="!showVideo">
           <div class="subscribe-bg">
             <img :src="webinarsBgImg" alt="" />
+            <div class="living_end" v-if="isLiveEnd">
+              <div class="living_end_img">
+                <img src="./img/livingEnd@2x.png" alt="" />
+              </div>
+              <h1 class="living_end_text">{{ $t('player.player_1017') }}</h1>
+              <div class="living_end_people" v-if="webinarType != 3">
+                <i18n path="appointment.appointment_1018">
+                  <span place="n">{{ subOption.num }}</span>
+                </i18n>
+              </div>
+            </div>
+            <span class="subscribe-type">
+              {{
+                webinarType == 1
+                  ? $t('webinar.webinar_1018')
+                  : webinarType == 2
+                  ? $t('common.common_1019')
+                  : webinarType == 3
+                  ? $t('common.common_1020')
+                  : webinarType == 4
+                  ? $t('common.common_1024')
+                  : $t('common.common_1021')
+              }}
+            </span>
           </div>
         </template>
         <template v-if="showVideo">
-          <vmp-air-container :cuid="cuid"></vmp-air-container>
+          <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
         </template>
         <template v-if="!showVideo">
-          <div class="subscribe-time" v-if="countDownTime && webinarType == 2">
-            {{ countDownTime }}
-          </div>
-          <div class="subscribe-time" v-if="webinarType == 1">{{ $t('webinar.webinar_1017') }}</div>
-          <div
-            class="subscribe-status"
-            :class="`subscribe-status-${webinarType}`"
-            v-if="!roomBaseServer.state.embedObj.embedVideo"
-          >
-            {{
-              webinarType == 1
-                ? $t('webinar.webinar_1018')
-                : webinarType == 2
-                ? $t('common.common_1019')
-                : webinarType == 3
-                ? $t('common.common_1020')
-                : webinarType == 4
-                ? $t('common.common_1024')
-                : $t('common.common_1021')
-            }}
-          </div>
           <div class="subscribe-language" v-if="languageList.length > 1" @click="openLanguage">
             <span>{{ lang.key == 1 ? '中文' : 'EN' }}</span>
           </div>
         </template>
       </template>
     </div>
+    <div class="vmp-subscribe-body-info">
+      <div class="subscribe_into" v-if="!isLiveEnd">
+        <template v-if="webinarType == 1 || webinarType == 2">
+          <time-down ref="timeDowner"></time-down>
+        </template>
+        <template v-else>
+          <p class="vod_title">直播回放中</p>
+        </template>
+        <div class="subscribe_into_container" v-if="subOption.hide_subscribe == 1">
+          <div class="subscribe_into_other" v-if="showSubscribeBtn">
+            <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
+            <span @click="authCheck(3)">
+              {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
+            </span>
+          </div>
+          <div
+            class="subscribe_into_person"
+            v-else-if="subOption.needAgreement"
+            @click="showAgreement"
+          >
+            <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+          </div>
+          <div
+            v-else
+            :class="[
+              'subscribe_into_person',
+              {
+                isSubscribe: subOption.is_subscribe == 1
+              }
+            ]"
+            @click="authCheck(subOption.verify)"
+          >
+            <span class="subscribe_btn">
+              {{ subscribeText }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="subscribe_tabs">
+        <vmp-air-container :cuid="childrenCom[1]"></vmp-air-container>
+      </div>
+    </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
       <div class="vmp-subscribe-body-auth">
-        <div v-if="subOption.needAgreement" @click="showAgreement">
-          <span>{{ $t('appointment.appointment_1025') }}</span>
-        </div>
-        <div class="vmp-subscribe-body-auth-two" v-else-if="showSubscribeBtn">
+        <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
-          ｜
           <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
         </div>
-        <div v-else @click="authCheck(subOption.verify)">
-          <span>{{ subscribeText }}</span>
+        <div
+          class="subscribe_into_person"
+          v-else-if="subOption.needAgreement"
+          @click="showAgreement"
+        >
+          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+        </div>
+        <div
+          v-else
+          :class="[
+            'subscribe_into_person',
+            {
+              isSubscribe: subOption.is_subscribe == 1
+            }
+          ]"
+          @click="authCheck(subOption.verify)"
+        >
+          <span class="subscribe_btn">
+            {{ subscribeText }}
+          </span>
         </div>
       </div>
     </template>
-    <authBox
+    <alertBox
       v-if="isSubscribeShow"
-      :optionInfo="authInfo"
+      :title="$t('appointment.appointment_1020')"
+      :width="'100%'"
       @authSubmit="authSubmit"
       @authClose="authClose"
-    ></authBox>
-    <!-- 弹出直播提醒 -->
-    <van-dialog
-      use-slot
-      v-model="popupLivingStart"
-      :title="$t('webinar.webinar_1019')"
-      :confirmButtonText="$t('common.common_1010')"
-      class="vmp-subscribe-body-dialog"
-      @confirm="livingStartConfirm"
-      @close="livingCloseConfirm"
     >
-      <p>{{ $t('player.player_1018') }}</p>
-    </van-dialog>
+      <div slot="content" class="vmp-subscribe-body_input">
+        <input
+          :type="`${isHidden ? 'password' : 'text'}`"
+          v-model="textAuth"
+          :placeHolder="authInfo.placeHolder"
+        />
+        <i
+          :class="`vh-iconfont ${isHidden ? 'vh-line-hidden' : 'vh-line-view'}`"
+          @click="isHidden = !isHidden"
+        ></i>
+      </div>
+    </alertBox>
+    <!-- 弹出直播提醒 -->
+    <alertBox
+      v-if="popupLivingStart"
+      :title="''"
+      :titleBtn="$t('player.player_1013')"
+      @authClose="livingCloseConfirm"
+      @authSubmit="livingStartConfirm"
+    >
+      <div slot="content" class="vmp-subscribe-body_living">
+        <span class="living-img">
+          <img src="./img/live_start.png" alt="" />
+        </span>
+        <p class="living-text">{{ $t('player.player_1018') }}</p>
+      </div>
+    </alertBox>
     <!-- 弹出语言弹窗 -->
     <van-popup v-model="isOpenlang" round position="bottom" class="vmp-subscribe-body-popup">
       <ul>
@@ -100,7 +175,8 @@
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
   import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import authBox from './components/confirm.vue';
+  import TimeDown from './components/timeDown.vue';
+  import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -108,10 +184,12 @@
         showVideo: false, // 显示暖场视频
         isSubscribeShow: false,
         popupLivingStart: false, // 开播提醒
-        countDownTime: '',
         subscribeText: '',
-        showBottomBtn: true,
+        showBottomBtn: false,
         authInfo: {},
+        textAuth: '',
+        isHidden: true,
+        isLiveEnd: false,
         subOption: {
           startTime: '',
           type: 0,
@@ -131,7 +209,8 @@
       };
     },
     components: {
-      authBox
+      TimeDown,
+      alertBox
     },
     computed: {
       /**
@@ -197,20 +276,36 @@
       this.playerServer = usePlayerServer();
     },
     created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
+      // this.$dialog
+      //   .alert({
+      //     title: '提示',
+      //     showCloseIcon: true,
+      //     theme: 'round-button',
+      //     message: this.$t('form.form_1032', { n: 123 })
+      //   })
+      //   .then(() => {});
     },
     mounted() {
       this.initPage();
       this.listenEvents();
+      this.handleScroll();
     },
     methods: {
+      handleScroll() {
+        let dom = document.querySelector('.vmp-subscribe-body-info');
+        dom.addEventListener('scroll', e => {
+          let scrollTop = e.target.scrollTop;
+          this.showBottomBtn = scrollTop >= 100 ? true : false;
+        });
+      },
       listenEvents() {
         this.subscribeServer.$on('live_start', () => {
           this.subOption.type = 1;
-          if (this.countDowntimer) clearInterval(this.countDowntimer);
-          this.countDownTime = '';
           this.popupLivingStart = true;
+          this.$refs.timeDowner.changeTime();
           this.subscribeText = this.$t('player.player_1013');
         });
 
@@ -223,11 +318,14 @@
 
         this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
+          this.showBottomBtn = false;
+          this.$refs.timeDowner.clearTimer();
           this.subscribeText = this.$t('player.player_1017');
         });
       },
       handlerInitInfo() {
-        const { webinar, join_info, warmup, agreement } = this.roomBaseServer.state.watchInitData;
+        const { webinar, join_info, warmup, agreement, subscribe } =
+          this.roomBaseServer.state.watchInitData;
         this.subOption.type = webinar.type;
         this.subOption.verify = webinar.verify;
         this.subOption.fee = webinar.fee || 0;
@@ -237,6 +335,9 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (webinar.type == 2 && subscribe.show == 1) {
+          this.subOption.num = subscribe.num;
+        }
         if (
           agreement &&
           agreement.is_open === 1 &&
@@ -281,7 +382,10 @@
         this.authCheck(info.type);
       },
       authCheck(type) {
-        if (this.webinarType == 2 && this.subOption.is_subscribe == 1) {
+        if (
+          (this.webinarType == 2 && this.subOption.is_subscribe == 1) ||
+          this.subOption.type == 3
+        ) {
           return false;
         }
         let params = {
@@ -335,21 +439,21 @@
             break;
           case 512531:
             // 邀请码
-            this.authInfo.title = this.$t('appointment.appointment_1011');
+            // this.authInfo.title = this.$t('appointment.appointment_1011');
             this.authInfo.placeHolder =
               this.subOption.verify_tip || this.$t('appointment.appointment_1024');
             this.isSubscribeShow = true;
             break;
           case 512528:
             // 密码
-            this.authInfo.title = this.$t('form.form_1079');
+            // this.authInfo.title = this.$t('form.form_1079');
             this.authInfo.placeHolder =
               this.subOption.verify_tip || this.$t('appointment.appointment_1022');
             this.isSubscribeShow = true;
             break;
           case 512532:
             //白名单
-            this.authInfo.title = this.$t('appointment.appointment_1032');
+            // this.authInfo.title = this.$t('appointment.appointment_1032');
             this.authInfo.placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
             this.isSubscribeShow = true;
             break;
@@ -614,10 +718,9 @@
       initPage() {
         if (this.webinarType == 3) {
           this.showBottomBtn = false;
-          this.countDownTime = 0;
+          this.isLiveEnd = true;
         } else {
-          // 不是 活动结束 - 就启动倒计时
-          this.sureCountDown();
+          //  活动信息
           this.handlerInitInfo();
         }
       },
@@ -644,60 +747,6 @@
         const url = `${location}${inviteUrl}`;
         window.location.href = url;
       },
-      /**
-       * 倒计时是否开启
-       */
-      sureCountDown() {
-        const { webinar } = this.roomBaseServer.state.watchInitData;
-        this.countDowntimer && clearInterval(this.countDowntimer);
-        this.countDownTime = '';
-        let countDownTime = '';
-        if (new Date(webinar.start_time.replace(/-/g, '/')).getTime() - new Date().getTime() > 0) {
-          countDownTime = Math.floor(
-            (new Date(webinar.start_time.replace(/-/g, '/')).getTime() - new Date().getTime()) /
-              1000
-          );
-        } else {
-          countDownTime = 0;
-        }
-        if (countDownTime) {
-          this.countDown(countDownTime);
-        }
-      },
-      /**
-       * 倒计时函数
-       */
-      countDown(times) {
-        this.countDowntimer = setInterval(() => {
-          let day = 0;
-          let hour = 0;
-          let minute = 0;
-          let second = 0;
-          // 时间默认值
-          if (times > 0) {
-            day = String(Math.floor(times / (60 * 60 * 24))).padStart(2, '0');
-            hour = String(Math.floor(times / (60 * 60)) - day * 24).padStart(2, '0');
-            minute = String(Math.floor(times / 60) - day * 24 * 60 - hour * 60).padStart(2, '0');
-            second = String(
-              Math.floor(times) - day * 24 * 60 * 60 - hour * 60 * 60 - minute * 60
-            ).padStart(2, '0');
-          }
-          this.countDownTime =
-            day +
-            this.$t('appointment.appointment_1026') +
-            hour +
-            this.$t('appointment.appointment_1027') +
-            minute +
-            this.$t('appointment.appointment_1028') +
-            second +
-            this.$t('appointment.appointment_1029');
-          times--;
-        }, 1000);
-        if (times <= 0) {
-          clearInterval(this.countDowntimer);
-          this.countDownTime = '';
-        }
-      },
       showAgreement() {
         this.roomBaseServer.$emit('POPUP_AGREEMENT');
       },
@@ -712,13 +761,14 @@
 </script>
 <style lang="less">
   .vmp-subscribe-body {
-    height: 422px;
+    height: 100%;
     width: 100%;
     position: relative;
     z-index: 2;
     &-container {
-      height: 100%;
+      height: 422px;
       width: 100%;
+      position: relative;
       .subscribe-bg {
         width: 100%;
         height: 100%;
@@ -727,44 +777,51 @@
           height: 100%;
           object-fit: fill;
         }
-      }
-      .subscribe-time {
-        position: absolute;
-        bottom: 0;
-        height: 80px;
-        background: rgba(0, 0, 0, 0.7);
-        font-size: 28px;
-        color: #fff;
-        text-align: center;
-        line-height: 80px;
-        width: 100%;
-      }
-      .subscribe-status {
-        position: absolute;
-        bottom: -0.293333rem;
-        left: 0.4rem;
-        padding: 0 0.2rem;
-        height: 0.56rem;
-        background: #5ea6ec;
-        border-radius: 0.053333rem;
-        text-align: center;
-        font-size: 0.373333rem;
-        font-weight: 400;
-        color: #fff;
-        line-height: 0.56rem;
-        font-style: normal;
-        &-1 {
-          background: #ff3333;
+        .subscribe-type {
+          position: absolute;
+          top: 28px;
+          left: 32px;
+          display: inline-block;
+          padding: 8px 15px;
+          text-align: center;
+          color: #fff;
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 30px;
+          font-size: 24px;
         }
-        &-2 {
-          background: #1087dc;
-        }
-        &-3 {
-          background: #757575;
-        }
-        &-4,
-        &-5 {
-          background: #2ab804;
+        .living_end {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          &_img {
+            width: 141px;
+            height: 104px;
+            margin-bottom: 15px;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: scale-down;
+            }
+          }
+          &_text,
+          &_people {
+            font-size: 28px;
+            line-height: 50px;
+            height: 50px;
+            color: #fff;
+            padding-left: 25px;
+            font-weight: 400;
+          }
+          &_people {
+            font-size: 22px;
+            line-height: 28px;
+          }
         }
       }
       .subscribe-language {
@@ -777,54 +834,118 @@
         cursor: pointer;
       }
     }
-    &-auth {
-      position: fixed;
-      bottom: 0;
+    &-info {
+      height: calc(100% - 422px);
+      overflow-y: auto;
       width: 100%;
-      height: 100px;
-      font-size: 36px;
-      font-weight: 500;
-      color: #fff;
-      line-height: 100px;
-      background: #fb3a32;
-      text-align: center;
-      margin-bottom: env(safe-area-inset-bottom);
-      div {
-        padding: 0 32px;
-      }
-      &-two {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-      }
-    }
-    &-dialog {
-      min-height: 360px;
-      border-radius: 14px;
-      .van-dialog__header {
-        font-size: 36px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
-        color: rgba(0, 0, 0, 1);
-        line-height: 40px;
-        padding-top: 40px;
-        font-weight: bolder;
-      }
-      .van-dialog__content {
-        height: 184px;
-        font-size: 32px;
-        font-family: PingFangSC-Regular, PingFang SC;
-        font-weight: 400;
-        padding: 68px 0 70px;
-        color: #333;
-        p {
+      background: #f2f2f2;
+      .subscribe_into {
+        background: #fff;
+        padding: 40px 0;
+        margin-bottom: 16px;
+        .vod_title {
+          width: 100%;
           text-align: center;
+          margin-bottom: 32px;
+          font-weight: 500;
+          color: #262626;
+          font-size: 36px;
         }
       }
-      .van-dialog__confirm {
-        font-size: 36px;
+      .subscribe_tabs {
+        height: 100%;
+      }
+    }
+    .subscribe_into_person {
+      width: 520px;
+      margin: 0 auto;
+      height: 90px;
+      background: #fb3a32;
+      border-radius: 50px;
+      color: #fff;
+      text-align: center;
+      .subscribe_btn {
+        line-height: 90px;
+        font-size: 32px;
+      }
+      &.isSubscribe {
+        background: #fff;
+        border: 1px solid #fb3a32;
         color: #fb3a32;
+      }
+    }
+    .subscribe_into_other {
+      border-radius: 50px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 85px;
+      span {
+        display: inline-block;
+        width: 280px;
+        height: 90px;
+        line-height: 90px;
+        text-align: center;
+        border-radius: 50px;
+        background: #fb3a32;
+      }
+    }
+    &-auth {
+      position: fixed;
+      bottom: 32px;
+      width: 100%;
+      height: 90px;
+      z-index: 20;
+      margin-bottom: env(safe-area-inset-bottom);
+    }
+    &_input {
+      width: 100%;
+      border: 2px solid #d9d9d9;
+      border-radius: 8px;
+      height: 80px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      input {
+        width: 92%;
+        padding: 0 12px;
+        font-size: 28px;
+        &::-webkit-input-placeholder {
+          color: #bfbfbf;
+        }
+      }
+      .vh-iconfont {
+        display: inline-block;
+        width: 8%;
+        font-size: 28px;
+        color: #8c8c8c;
+      }
+    }
+    &_living {
+      width: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .living-img {
+        display: inline-block;
+        width: 160px;
+        height: 160px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+        }
+      }
+      .living-text {
+        padding-top: 20px;
+        color: #262626;
+        font-size: 28px;
+        line-height: 40px;
       }
     }
     &-popup {

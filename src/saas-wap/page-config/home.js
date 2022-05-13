@@ -389,7 +389,7 @@ const serverConfig = {
 
   subcribeRoot: {
     component: 'VmpAirContainer',
-    children: ['subcribeHeader', 'subcribeBody', 'subcribeCenter', 'comAllDialog', 'comGoodsDetail']
+    children: ['subcribeHeader', 'subcribeBody', 'comAllDialog', 'comGoodsDetail']
   },
   // 顶部header容器
   subcribeHeader: {
@@ -410,7 +410,7 @@ const serverConfig = {
   },
   comSubcribeWapBody: {
     component: 'VmpSubscribeBody',
-    children: ['comWapPlayer'],
+    children: ['comWapPlayer', 'subcribeCenter'],
     emitClickLogin: [
       //登录弹窗
       {
