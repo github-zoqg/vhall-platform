@@ -74,6 +74,7 @@
         let arr = this.QuestionList.filter(item => item.isAnswered == 0);
         if (arr.length == 0) {
           this.$message.success('提交成功，感谢您的参与。');
+          return false;
         }
         // 如果只有一份未填写,则直接打开问卷
         if (arr.length == 1) {
