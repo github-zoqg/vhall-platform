@@ -47,14 +47,32 @@
             "
             class="gift-img"
           >
-            <img
+            <template v-if="!!effectsMap[rewardEffectInfo.data.gift_name]">
+              <img
+                :src="
+                  require('./images/' + effectsMap[rewardEffectInfo.data.gift_name] + '-icon.png')
+                "
+                alt=""
+              />
+            </template>
+            <template v-else>
+              <img
+                :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
+                :src="
+                  (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
+                  '?x-oss-process=image/resize,m_lfit,w_100'
+                "
+                alt=""
+              />
+            </template>
+            <!-- <img
               :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
               :src="
                 (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
                 '?x-oss-process=image/resize,m_lfit,w_100'
               "
               alt=""
-            />
+            /> -->
           </div>
           <img
             src="./images/red-package-1.png"
@@ -270,44 +288,56 @@
       background-repeat: no-repeat;
       background-position: center;
       &.default {
-        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 44px;
+        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/flower-bg.png);
+          background-image: url(images/red-package-bg.png);
         }
       }
       &.bg-applause {
-        background-image: url(images/applause-bg.png);
+        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
+        .gift-img {
+          background-image: url(images/applause-bg.png);
+          right: -2px;
+        }
       }
       &.bg-coffee {
-        background-image: url(images/coffee-bg.png);
+        background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
+        .gift-img {
+          background-image: url(images/coffee-bg.png);
+          right: -2px;
+        }
       }
       &.bg-custom {
-        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 44px;
+        background: linear-gradient(90.01deg, #fb3a32 1.37%, rgba(255, 172, 44, 0.8) 97.58%);
         .gift-img {
-          background-image: url(images/flower-bg.png);
+          background-image: url(images/custom-bg.png);
+          right: -8px;
         }
       }
       &.bg-flower {
-        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 44px;
+        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
           background-image: url(images/flower-bg.png);
+          right: 4px;
+          img {
+            height: 64px;
+          }
         }
       }
       &.bg-praise {
-        background-image: url(images/praise-bg.png);
+        background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
+        .gift-img {
+          background-image: url(images/praise-bg.png);
+          right: 0;
+        }
       }
       &.bg-666 {
-        background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 44px;
+        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/flower-bg.png);
+          background-image: url(images/666-bg.png);
+          right: 8px;
         }
       }
     }
