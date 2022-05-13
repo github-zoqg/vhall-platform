@@ -13,7 +13,6 @@
       <div ref="chatContent" class="virtual-content">
         <virtual-list
           v-if="virtual.showlist"
-          :style="{ height: virtual.contentHeight + 'px' }"
           ref="chatlist"
           class="virtual-list"
           :keeps="20"

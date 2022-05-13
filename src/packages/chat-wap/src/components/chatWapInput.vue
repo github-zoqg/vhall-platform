@@ -93,9 +93,9 @@
         }
         this.visible = true;
         this.showEmoji = false;
-        setTimeout(() => {
-          document.querySelector('textarea#textareaChat').focus();
-        }, 0);
+        this.$nextTick(() => {
+          this.$refs.textareaChat.focus();
+        });
       },
       //点击发送按钮
       send() {
@@ -229,6 +229,7 @@
 
         .send-menu {
           width: 66px;
+          min-width: 66px;
           height: 66px;
           border-radius: 50%;
           display: flex;
