@@ -628,6 +628,40 @@
           });
         });
       },
+      // TODO:暂停讨论
+      handlePauseDiscussion() {
+        this.$confirm('暂停讨论，全部组员将返回到主直播间，确定暂停讨论？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          // 暂停讨论
+          this.groupServer.pauseDiscussion().then(() => {
+            // TODO:设置groupServer中的暂停状态,也有可能是通过消息更改
+            // useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            console.warn('暂停讨论成功');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+          });
+        });
+      },
+      // TODO:继续讨论
+      handleContinueDiscussion() {
+        this.$confirm('确定是否继续讨论？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          // 继续讨论
+          this.groupServer.continueDiscussion().then(() => {
+            // TODO:设置groupServer中的暂停状态,也有可能是通过消息更改
+            // useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            console.warn('继续讨论成功');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+          });
+        });
+      },
       // 是否含有主持人||助理
       isHave(arr) {
         const obj = arr.find(item => [1, 3, '1', '3'].includes(item.join_role));
