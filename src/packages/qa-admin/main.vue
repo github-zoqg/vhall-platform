@@ -1253,7 +1253,7 @@
       // 单条记录-切换选中状态
       changeItemCheckStatus(item) {
         const len = this.questionIds.length + 1;
-        if (item.isCheckBox && len > 25) {
+        if (item.isCheckBox && len > 500) {
           this.$message.error('批量操作最多仅支持500条数据，更多勾选则不生效');
           item.isCheckBox = false;
           this.checkAll = false;
@@ -1272,7 +1272,7 @@
       changeAllChecked(checked) {
         if (this.activeIndex === 0) {
           const len = this.awaitList.length + this.questionIds.length;
-          if (checked && len > 25) {
+          if (checked && len > 500) {
             this.$message.error(
               `批量操作最多仅支持500条数据，当前剩余可勾选${500 - this.questionIds.length}条`
             );
