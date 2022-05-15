@@ -177,6 +177,72 @@
                     </el-dropdown-menu>
                   </el-dropdown> -->
                 </div>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
+                  </li>
+                </ul>
               </li>
             </template>
             <template v-else>
@@ -273,6 +339,72 @@
                       </span>
                     </p>
                     <p class="livein-processed">{{ $t('chat.chat_1086') }}</p>
+                  </li>
+                </ul>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
                   </li>
                 </ul>
               </li>
@@ -490,6 +622,72 @@
                   </span>
                   <span class="answer-control-btn" @click="reply('text', item, index)">回复</span>
                 </div>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
+                  </li>
+                </ul>
               </li>
             </template>
             <template v-else>
@@ -805,6 +1003,7 @@
             this.$message.error(err.msg);
           });
       },
+      // 悄悄回答
       handlerAnswer(status) {
         this.qaServer.handlerAnswer(status);
         this.textReply();
