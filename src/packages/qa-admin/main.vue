@@ -33,12 +33,6 @@
             {{ item.text }}
             <span class="count">({{ item.count | filterChatCount }})</span>
           </li>
-          <li v-if="activeIndex == 1" class="reply-text">
-            <!-- <el-checkbox @change='setReply'
-              v-model="openReply">公开</el-checkbox>
-            <el-checkbox @change='setReply'
-              v-model="privacyReply">私密</el-checkbox> -->
-          </li>
         </ul>
         <!-- 查询条件过滤部分  -->
         <div class="exact-search">
@@ -183,6 +177,72 @@
                     </el-dropdown-menu>
                   </el-dropdown> -->
                 </div>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
+                  </li>
+                </ul>
               </li>
             </template>
             <template v-else>
@@ -240,13 +300,18 @@
                 <ul class="answer">
                   <li class="await-name">
                     <p class="answer-title">
-                      <img v-if="item.operator.avatar" class="avatar" :src="item.operator.avatar" />
+                      <img
+                        v-if="item.operator && item.operator.avatar"
+                        class="avatar"
+                        :src="item.operator.avatar || ''"
+                      />
                       <img v-else class="avatar" src="./images/answer_default.png" />
                       <el-tooltip
                         class="item"
                         effect="dark"
-                        :content="item.operator.nick_name"
+                        :content="item.operator.nick_name || ''"
                         placement="top-start"
+                        v-if="item.operator && item.operator.nick_name"
                       >
                         <span class="answer-time" style="color: #666">
                           {{ item.operator.nick_name | overHidden(8) }}
@@ -254,22 +319,92 @@
                       </el-tooltip>
                       <span
                         v-if="
-                          item.operator.role_name == 'host' ||
-                          item.operator.role_name == 'assistant' ||
-                          item.operator.role_name == 'guest'
+                          item.operator &&
+                          (item.operator.role_name == 'host' ||
+                            item.operator.role_name == 'assistant' ||
+                            item.operator.role_name == 'guest')
                         "
                         :class="{
-                          'role-host': item.operator.role_name == 'host',
+                          'role-host': item.operator && item.operator.role_name == 'host',
                           'role-assis':
-                            item.operator.role_name == 'assistant' ||
-                            item.operator.role_name == 'guest'
+                            item.operator &&
+                            (item.operator.role_name == 'assistant' ||
+                              item.operator.role_name == 'guest')
                         }"
                       >
-                        {{ item.operator.role_name | roleFilter }}
+                        {{ (item.operator ? item.operator.role_name : '') | roleFilter }}
                       </span>
-                      <span class="answer-time">{{ item.operator.operate_time }}</span>
+                      <span class="answer-time">
+                        {{ item.operator ? item.operator.operate_time : '' }}
+                      </span>
                     </p>
                     <p class="livein-processed">{{ $t('chat.chat_1086') }}</p>
+                  </li>
+                </ul>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
                   </li>
                 </ul>
               </li>
@@ -449,22 +584,30 @@
                         effect="dark"
                         :content="item.operator.nick_name"
                         placement="top-start"
+                        v-if="item.operator && item.operator.nick_name"
                       >
-                        <span class="ellsips">{{ item.operator.nick_name | overHidden(8) }}</span>
+                        >
+                        <span class="ellsips">
+                          {{ (item.operator ? item.operator.nick_name : '') | overHidden(8) }}
+                        </span>
                       </el-tooltip>
                       <span
                         class="role-name"
                         :class="{
-                          rolehost: item.operator.role_name == 'host',
+                          rolehost: item.operator && item.operator.role_name == 'host',
                           roleassistant:
-                            item.operator.role_name == 'guest' ||
-                            item.operator.role_name == 'assistant'
+                            item.operator &&
+                            (item.operator.role_name == 'guest' ||
+                              item.operator.role_name == 'assistant')
                         }"
                       >
-                        {{ item.operator.role_name | roleFilter }}
+                        {{ (item.operator ? item.operator.role_name : '') | roleFilter }}
                       </span>
                     </div>
-                    <span>{{ $t('chat.chat_1091') }}: {{ item.operator.operate_time }}</span>
+                    <span>
+                      {{ $t('chat.chat_1091') }}:
+                      {{ item.operator ? item.operator.operate_time : '' }}
+                    </span>
                   </div>
                 </div>
                 <div class="fr">
@@ -479,6 +622,72 @@
                   </span>
                   <span class="answer-control-btn" @click="reply('text', item, index)">回复</span>
                 </div>
+                <ul class="answer">
+                  <li
+                    class="await-name"
+                    v-for="(ite, ind) in item.answer"
+                    style="padding-bottom: 0px"
+                    :key="ite.id"
+                  >
+                    <p class="answer-title">
+                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
+                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="ite.nick_name"
+                        placement="top-start"
+                      >
+                        <span class="answer-time">{{ ite.nick_name | overHidden(8) }}</span>
+                      </el-tooltip>
+                      <span
+                        v-if="
+                          ite.role_name == 'host' ||
+                          ite.role_name == 'assistant' ||
+                          ite.role_name == 'guest'
+                        "
+                        :class="{
+                          'role-host': ite.role_name == 'host',
+                          'role-assis': ite.role_name == 'assistant' || ite.role_name == 'guest'
+                        }"
+                      >
+                        {{ ite.role_name | roleFilter }}
+                      </span>
+                      <span class="answer-time">{{ ite.created_at }}</span>
+                      <template v-if="ite.is_open == 1">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                      <template v-if="ite.is_open == 0">
+                        <span v-if="ite.is_backout == 1" style="margin-left: 10px">
+                          {{ $t('chat.chat_1087') }}
+                        </span>
+                        <span
+                          v-if="ite.is_backout == 0"
+                          @click="revoke(ite, ind, index)"
+                          class="answer-time answer-revoke"
+                        >
+                          {{ $t('chat.chat_1088') }}
+                        </span>
+                      </template>
+                    </p>
+                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
+                    <p class="answer-text">
+                      <span class="answer-tip">
+                        {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
+                      </span>
+                      <span v-html="ite.content"></span>
+                    </p>
+                  </li>
+                </ul>
               </li>
             </template>
             <template v-else>
@@ -762,16 +971,19 @@
       await useMsgServer().initMaintMsg({ ...watchInitData, hide: 1 });
       await Promise.all([this.roomBaseServer.getCustomRoleName(), this.chatPrivateGetRankList()]);
 
-      this.getChat(0); // 待处理
-      this.getChat(1); // 不处理
-      this.getChat(2); // 直播中回答
-      this.setReply(); // 文字回复
-
+      // this.getChat(0); // 待处理
+      // this.getChat(1); // 不处理
+      // this.getChat(2); // 直播中回答
+      // this.setReply(); // 文字回复
+      this.getQuestionAnswerByTab(0); // 未回复 &待处理 列表
+      this.getQuestionAnswerByTab(3); // 已回复 列表
+      this.getQuestionAnswerByTab(1); // 不处理 列表
+      this.getQuestionAnswerByTab(2); // 直播中回答 列表
       this.qaServer.initQaAdmin();
       this.getQaShowName();
       this.ready = true;
       this.qaServer.setState('pageSize', this.page_size);
-      this.select(0);
+      // this.select(0);
     },
     methods: {
       /**
@@ -791,6 +1003,7 @@
             this.$message.error(err.msg);
           });
       },
+      // 悄悄回答
       handlerAnswer(status) {
         this.qaServer.handlerAnswer(status);
         this.textReply();
@@ -806,18 +1019,15 @@
         this.checkAll = false;
         // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
         // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
-        if (this.activeIndex == 1) {
-          this.setReply(0, searchContent);
-        } else {
-          const activeIndex = this.activeIndex == 3 ? 1 : this.activeIndex == 2 ? 3 : 0;
-          this.getChat(activeIndex, 0, searchContent);
-        }
+        const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
+        this.getQuestionAnswerByTab(queryStatusList[this.activeIndex], 0, searchContent);
       },
       clearSearchQaList() {
         this.exactSearch[`exactSearch${this.activeIndex}`] = '';
         // 重新查询下数据
         this.handleSearchQaList();
       },
+      // 点击tab切换时接口调用，此时传入的为数组下标
       select(index, tab = null) {
         this.List[index].page = 1;
         this.qaServer.setState('activeIndex', index);
@@ -831,22 +1041,9 @@
         if (searchContent) {
           this.qaServer.setState('isSearch', true);
         }
-        // 0 未处理 1 不处理 2 直播中回答 3 文字回复
-        switch (index) {
-          case 0:
-            this.getChat(0, 0, searchContent);
-            break;
-          case 1:
-            this.getChat(1, 0, searchContent);
-            break;
-          case 2:
-            // 获取文字回复
-            this.setReply(0, searchContent);
-            break;
-          case 3:
-            this.getChat(3, 0, searchContent);
-            break;
-        }
+        // 问题类型： 0 未回复，1：不处理，2：直播间回复，3: 已回复
+        const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
+        this.getQuestionAnswerByTab(queryStatusList[index], 0, searchContent);
       },
       async currentChangeHandler(val) {
         console.warn('页码的点击效果----', val);
@@ -856,23 +1053,12 @@
         }
         // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
         // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
-        if (this.activeIndex == 1) {
-          await this.setReply((val - 1) * this.page_size, searchContent);
-        } else {
-          let type;
-          switch (this.activeIndex) {
-            case 0:
-              type = 0;
-              break;
-            case 3:
-              type = 1;
-              break;
-            case 2:
-              type = 3;
-              break;
-          }
-          await this.getChat(type, (val - 1) * this.page_size, searchContent);
-        }
+        const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
+        await this.getQuestionAnswerByTab(
+          queryStatusList[this.activeIndex],
+          (val - 1) * this.page_size,
+          searchContent
+        );
         // 分页切换，设定全选状态
         this.checkAll = this.qaServer.pageChangeAllCheck(this.activeIndex);
       },
@@ -913,6 +1099,7 @@
             // this.$message.error(err.msg);
           });
       },
+      // Todo 废弃方法: 获取tab列表数据
       getChat(type, pagePos, str) {
         return this.qaServer
           .getQuestionByStatus({
@@ -927,6 +1114,7 @@
             // this.$message.error(err.msg);
           });
       },
+      // Todo 废弃方法: 获取回复信息
       setReply(pagePos, keyword) {
         // 文本回复  --- 设置回复 / 获取回复
         const openType = this.testAnswer;
@@ -939,6 +1127,24 @@
           sort_sequence: 1
         };
         return this.qaServer.getTextReply(data);
+      },
+      // 点击tab获取问题及回复
+      getQuestionAnswerByTab(type, pagePos, keyword) {
+        // type问题类型： 0 未回复，1：不处理，2：直播间回复，3: 已回复
+        let openType = 2; // 默认全部
+        if (type == 3) {
+          openType = this.testAnswer; // 若当前是已回复状态，按条件过滤
+        }
+        const params = {
+          room_id: this.baseObj.interact.room_id,
+          is_open: openType, // 0 私密 1 公开 2 全部
+          pos: typeof pagePos == 'number' || typeof pagePos == 'string' ? pagePos : 0,
+          limit: 20,
+          keyword: keyword || '',
+          sort_sequence: 1,
+          status: type
+        };
+        return this.qaServer.getQuestionAnswer(params);
       },
       // 更多（私聊 & 在直播中回答）: 修复42302-标记为直播中回答时数组移除错误问题后引入的 不处理错误问题。
       replyBut(val) {
@@ -1053,7 +1259,11 @@
                 // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
                 if (this.activeIndex == 1) {
                   //发送回复后延时调用拉取列表接口，防止后端入库未完成，列表未更新
-                  this.setReply((this.activeObj.page - 1) * this.page_size);
+                  const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
+                  this.getQuestionAnswerByTab(
+                    queryStatusList[this.activeIndex],
+                    (this.activeObj.page - 1) * this.page_size
+                  );
                 } else {
                   this.resetCurList();
                 }
@@ -1065,9 +1275,9 @@
       resetCurList() {
         // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
         // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
-        const type = this.activeIndex == 3 ? 1 : this.activeIndex == 2 ? 3 : 0;
-        this.getChat(
-          type,
+        const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
+        this.getQuestionAnswerByTab(
+          queryStatusList[this.activeIndex],
           (this.activeObj.page - 1) * this.page_size,
           this.exactSearch[`exactSearch${this.activeIndex}`]
         );
