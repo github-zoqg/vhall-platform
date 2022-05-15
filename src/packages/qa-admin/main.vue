@@ -209,7 +209,7 @@
                         {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
-                      <template v-if="ite.is_open == 1">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 1">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -221,7 +221,7 @@
                           {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
-                      <template v-if="ite.is_open == 0">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 0">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -234,13 +234,16 @@
                         </span>
                       </template>
                     </p>
-                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
-                    <p class="answer-text">
+                    <p class="answer-text" v-if="ite.op_type === 3">
                       <span class="answer-tip">
                         {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
                       </span>
                       <span v-html="ite.content"></span>
                     </p>
+                    <p class="livein-processed" v-if="ite.op_type === 2">
+                      {{ $t('chat.chat_1086') }}
+                    </p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
                   </li>
                 </ul>
               </li>
@@ -298,50 +301,6 @@
                   <span class="answer-control-btn" @click="reply('text', item, index)">回复</span>
                 </div>
                 <ul class="answer">
-                  <li class="await-name">
-                    <p class="answer-title">
-                      <img
-                        v-if="item.operator && item.operator.avatar"
-                        class="avatar"
-                        :src="item.operator.avatar || ''"
-                      />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
-                      <el-tooltip
-                        class="item"
-                        effect="dark"
-                        :content="item.operator.nick_name || ''"
-                        placement="top-start"
-                        v-if="item.operator && item.operator.nick_name"
-                      >
-                        <span class="answer-time" style="color: #666">
-                          {{ item.operator.nick_name | overHidden(8) }}
-                        </span>
-                      </el-tooltip>
-                      <span
-                        v-if="
-                          item.operator &&
-                          (item.operator.role_name == 'host' ||
-                            item.operator.role_name == 'assistant' ||
-                            item.operator.role_name == 'guest')
-                        "
-                        :class="{
-                          'role-host': item.operator && item.operator.role_name == 'host',
-                          'role-assis':
-                            item.operator &&
-                            (item.operator.role_name == 'assistant' ||
-                              item.operator.role_name == 'guest')
-                        }"
-                      >
-                        {{ (item.operator ? item.operator.role_name : '') | roleFilter }}
-                      </span>
-                      <span class="answer-time">
-                        {{ item.operator ? item.operator.operate_time : '' }}
-                      </span>
-                    </p>
-                    <p class="livein-processed">{{ $t('chat.chat_1086') }}</p>
-                  </li>
-                </ul>
-                <ul class="answer">
                   <li
                     class="await-name"
                     v-for="(ite, ind) in item.answer"
@@ -373,7 +332,7 @@
                         {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
-                      <template v-if="ite.is_open == 1">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 1">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -385,7 +344,7 @@
                           {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
-                      <template v-if="ite.is_open == 0">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 0">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -398,13 +357,16 @@
                         </span>
                       </template>
                     </p>
-                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
-                    <p class="answer-text">
+                    <p class="answer-text" v-if="ite.op_type === 3">
                       <span class="answer-tip">
                         {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
                       </span>
                       <span v-html="ite.content"></span>
                     </p>
+                    <p class="livein-processed" v-if="ite.op_type === 2">
+                      {{ $t('chat.chat_1086') }}
+                    </p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
                   </li>
                 </ul>
               </li>
@@ -502,7 +464,7 @@
                         {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
-                      <template v-if="ite.is_open == 1">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 1">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -514,7 +476,7 @@
                           {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
-                      <template v-if="ite.is_open == 0">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 0">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -527,13 +489,16 @@
                         </span>
                       </template>
                     </p>
-                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
-                    <p class="answer-text">
+                    <p class="answer-text" v-if="ite.op_type === 3">
                       <span class="answer-tip">
                         {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
                       </span>
                       <span v-html="ite.content"></span>
                     </p>
+                    <p class="livein-processed" v-if="ite.op_type === 2">
+                      {{ $t('chat.chat_1086') }}
+                    </p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
                   </li>
                 </ul>
               </li>
@@ -577,7 +542,7 @@
                     <span class="tiwen">{{ $t('chat.chat_1040') }}</span>
                     <span class="content-text" v-html="item.content"></span>
                   </p>
-                  <div class="no-deal-fr">
+                  <!-- <div class="no-deal-fr">
                     <div class="no-deal-fr-top">
                       <el-tooltip
                         class="item"
@@ -608,7 +573,7 @@
                       {{ $t('chat.chat_1091') }}:
                       {{ item.operator ? item.operator.operate_time : '' }}
                     </span>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="fr">
                   <span class="answer-control-btn" @click="replyAnswerStatus('no', item, index)">
@@ -654,7 +619,7 @@
                         {{ ite.role_name | roleFilter }}
                       </span>
                       <span class="answer-time">{{ ite.created_at }}</span>
-                      <template v-if="ite.is_open == 1">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 1">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -666,7 +631,7 @@
                           {{ $t('chat.chat_1088') }}
                         </span>
                       </template>
-                      <template v-if="ite.is_open == 0">
+                      <template v-if="ite.op_type === 3 && ite.is_open == 0">
                         <span v-if="ite.is_backout == 1" style="margin-left: 10px">
                           {{ $t('chat.chat_1087') }}
                         </span>
@@ -679,13 +644,16 @@
                         </span>
                       </template>
                     </p>
-                    <!-- <p class="livein-processed">{{ $t('chat.chat_1086') }}</p> -->
-                    <p class="answer-text">
+                    <p class="answer-text" v-if="ite.op_type === 3">
                       <span class="answer-tip">
                         {{ ite.is_open == 1 ? $t('chat.chat_1089') : $t('chat.chat_1090') }}
                       </span>
                       <span v-html="ite.content"></span>
                     </p>
+                    <p class="livein-processed" v-if="ite.op_type === 2">
+                      {{ $t('chat.chat_1086') }}
+                    </p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
                   </li>
                 </ul>
               </li>
