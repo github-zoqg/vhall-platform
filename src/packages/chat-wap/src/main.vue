@@ -127,7 +127,9 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false
+        showSendBox: false,
+        //显示表情
+        openEmoji: false
       };
     },
     watch: {
@@ -264,6 +266,9 @@
             }
           });
         });
+        EventBus.$on('openEmoji', e => {
+          this.openEmoji = e;
+        });
       },
       resizeAndroid() {
         const newInnerHeight = window.innerHeight;
@@ -280,7 +285,11 @@
       focusoutIOS() {
         // 键盘收起事件处理
         // alert('iphone 键盘收起事件处理');
-        this.closeOverlay();
+        setTimeout(() => {
+          if (!this.openEmoji) {
+            this.closeOverlay();
+          }
+        }, 500);
       },
       focusinIOS() {
         // 键盘弹出事件处理
