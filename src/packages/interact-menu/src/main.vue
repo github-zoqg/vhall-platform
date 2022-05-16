@@ -178,6 +178,9 @@
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.isQAEnabled = false;
         });
+        qaServer.$on(qaServer.Events.QA_SET, msg => {
+          this.QAName = msg.name;
+        });
       },
       handleQAPopup() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110061);

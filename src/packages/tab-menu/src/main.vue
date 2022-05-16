@@ -194,7 +194,7 @@
             visible: true,
             type: 'v5',
             name:
-              this.roleName == 1 || !msg.data.name || msg.data.name == '问答'
+              this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
                 ? this.$t('common.common_1004')
                 : msg.data.name
           });
@@ -202,7 +202,7 @@
             content: {
               //观看端显示编辑后的问答名称，发起端不变，消息体默认返回“问答”
               text_content:
-                this.roleName == 1 || !msg.data.name || msg.data.name == '问答'
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
                   ? this.$t('chat.chat_1026', { n: this.$t('common.common_1004') })
                   : this.$t('chat.chat_1026', { n: msg.data.name })
             },
@@ -218,7 +218,7 @@
           chatServer.addChatToList({
             content: {
               text_content:
-                this.roleName == 1 || !msg.data.name || msg.data.name == '问答'
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
                   ? this.$t('chat.chat_1081', { n: this.$t('common.common_1004') })
                   : this.$t('chat.chat_1081', { n: msg.data.name })
             },
@@ -226,6 +226,18 @@
             type: msg.data.type,
             interactStatus: true
           });
+        });
+        //收到问答修改消息
+        qaServer.$on(qaServer.Events.QA_SET, msg => {
+          if (this.roleName == 2) {
+            this.setTabName({
+              type: 'v5',
+              name:
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                  ? this.$t('common.common_1004')
+                  : msg.data.name
+            });
+          }
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
@@ -470,7 +482,11 @@
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
-
+      setTabName({ type, id, name }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+        name && (tab.name = name);
+      },
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
