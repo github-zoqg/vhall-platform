@@ -278,14 +278,6 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
-      // this.$dialog
-      //   .alert({
-      //     title: '提示',
-      //     showCloseIcon: true,
-      //     theme: 'round-button',
-      //     message: this.$t('form.form_1032', { n: 123 })
-      //   })
-      //   .then(() => {});
     },
     mounted() {
       this.initPage();
@@ -458,35 +450,6 @@
             break;
           case 512523:
             this.webinarPayAuth();
-            /* open_id = sessionStorage.getItem('open_id') || '';
-            userId = this.userInfo ? this.userInfo.user_id : '';
-            if (!open_id && !userId) {
-              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
-              return;
-            }
-            if (isWechat() && open_id) {
-              // 如果没有open_id 参考wap礼物组件 authWeixinAjax方法 重新获取
-              // const open_id = sessionStorage.getItem('open_id');
-              params = {
-                webinar_id: this.webinarId,
-                type: 2,
-                service_code: 'JSAPI',
-                code: open_id
-              };
-              this.handlePay(params, 1);
-            } else {
-              params = {
-                webinar_id: this.webinarId,
-                type: 1,
-                service_code: 'H5_PAY',
-                user_id: userId,
-                show_url:
-                  window.location.origin +
-                  process.env.VUE_APP_ROUTER_BASE_URL +
-                  `/lives/watch/${this.webinarId}`
-              };
-              this.handlePay(params, 2);
-            } */
             break;
           default:
             this.$toast(this.$tec(code) || msg);
@@ -582,37 +545,6 @@
           .catch(e => {
             console.log(e, '获取支付信息失败');
             that.$toast(`${that.$tec(e.code) || e.msg}`);
-          });
-      },
-      handlePay(params, flag) {
-        this.subscribeServer
-          .payWay({ ...params })
-          .then(res => {
-            if (res.data) {
-              if (isWechat() && flag == 1) {
-                WeixinJSBridge.invoke(
-                  'getBrandWCPayRequest',
-                  {
-                    appId: res.data.appId,
-                    timeStamp: String(res.data.timeStamp), // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                    nonceStr: res.data.nonceStr, // 支付签名随机串，不长于 32 位
-                    package: res.data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                    signType: res.data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                    paySign: res.data.paySign // 支付签名
-                  },
-                  function (res) {
-                    if (res.err_msg == 'get_brand_wcpay_request:ok') {
-                      window.location.reload();
-                    }
-                  }
-                );
-              } else {
-                window.location.href = res.data.link;
-              }
-            }
-          })
-          .catch(e => {
-            console.log(e, '获取支付信息失败');
           });
       },
       authSubmit(value) {
