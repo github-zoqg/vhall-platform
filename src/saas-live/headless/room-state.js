@@ -32,6 +32,7 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
+
   console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
   const promiseList = [
     // 获取媒体许可，设置设备状态

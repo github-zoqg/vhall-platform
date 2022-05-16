@@ -8,6 +8,17 @@
         <div class="vmp-group-split__hd">
           <span class="split-title">分组设置</span>
           <div class="split-op">
+            <!-- 有观众&&白名单&&没有开启讨论&&白名单预分组模式 -->
+            <el-button
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
+              :disabled="!(verify == 2 && isOpenSwitch != 1 && presetWay)"
+              @click="groupPresetImport"
+            >
+              重新导入
+            </el-button>
             <el-button
               type="default"
               size="small"
@@ -303,6 +314,7 @@
         changeGroupFlag: 1, //1-待分配的换组，2-某个组的换组
         needChangeList: [], // 某个组选择要换组人员
         showItem: null,
+        presetWay: 1, //是否是白名单预分组
         isInvitedId: '' // 演示人id(受邀请人Id)
       };
     },
@@ -314,6 +326,10 @@
       this.docServer = useDocServer();
     },
     computed: {
+      //观看限制白名单，白名单预设分组可设置，其他则不可选
+      verify() {
+        return this.roomBaseServer.state.watchInitData.webinar.verify;
+      },
       userId() {
         return this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id;
       },
@@ -450,6 +466,22 @@
       async initData() {
         await this.groupServer.getWaitingUserList();
         await this.groupServer.getGroupedUserList();
+        this.presetWay = this.groupServer.state.presetWay;
+      },
+      //预分组重新导入
+      async groupPresetImport() {
+        try {
+          const result = await this.groupServer.groupPresetImport();
+          if (result && result.code === 200) {
+            // 重新导入成功
+            this.$message.success('重新导入成功');
+            this.initData();
+          } else {
+            this.$message.error(result.msg || '重新导入失败');
+          }
+        } catch (ex) {
+          this.$message.error(ex.messge || '重新导入出现异常');
+        }
       },
       handleNotice() {
         this.noticeDialogVisible = true;
@@ -694,9 +726,10 @@
         return !!obj;
       },
       // 分配设置主动取消回调
-      settingCancel() {
-        this.groupServer.state.panelShow = false;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+      settingCancel(way) {
+        this.groupServer.state.panelShow = true;
+        this.presetWay = way == 3 ? true : false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [true]));
       },
       // 结束讨论回调
       endDiscussion() {},
@@ -914,8 +947,6 @@
                   color: white;
                 }
               }
-            }
-            .user-name-tag--waiting {
             }
             .user-name {
               max-width: 106px;

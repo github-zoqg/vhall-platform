@@ -329,7 +329,7 @@
             if ([200, '200'].includes(code)) {
               sessionStorage.setItem('interact_token', res.data.live_token);
               sessionStorage.setItem('visitorId', res.data.visitor_id);
-              this.handleJump(params.type, res.data.live_token);
+              this.handleJump(params.type, res.data.live_token, res.data.visitor_id);
             } else {
               this.$message.error(msg);
             }
@@ -362,7 +362,7 @@
         return params;
       },
       //处理登录成功跳转
-      handleJump(role = '', token = '') {
+      handleJump(role = '', token = '', visitorId = '') {
         const _this = this;
         setTimeout(() => {
           if ([3, '3'].includes(role)) {
@@ -382,6 +382,13 @@
             });
             return;
           }
+          console.log(
+            'window.location.href',
+            window.location.protocol +
+              `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
+                _this.$route.params.id
+              }/${role}?type=code&liveT=${token}&visitorId=${visitorId}`
+          );
 
           window.location.href =
             window.location.protocol +
