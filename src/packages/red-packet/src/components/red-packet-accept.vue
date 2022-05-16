@@ -10,7 +10,7 @@
         @click="openRedPacket"
       />
       <!-- 文案 -->
-      <h1 ref="desc">
+      <h1>
         {{ $tdefault(redPacketInfo.describe) }}
       </h1>
       <img
@@ -30,7 +30,6 @@
   </div>
 </template>
 <script>
-  import clamp from '@/app-shared/utils/clamp';
   export default {
     name: 'RedPacketAccept',
     inject: ['redPacketServer'],
@@ -53,10 +52,6 @@
       userId() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.user_id;
       }
-    },
-    mounted() {
-      const dom = this.$refs.desc;
-      clamp(dom, { clamp: 2 });
     },
     methods: {
       openRedPacket() {
