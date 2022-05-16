@@ -243,7 +243,7 @@
                     <p class="livein-processed" v-if="ite.op_type === 2">
                       {{ $t('chat.chat_1086') }}
                     </p>
-                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">不处理此问题</p>
                   </li>
                 </ul>
               </li>
@@ -366,7 +366,7 @@
                     <p class="livein-processed" v-if="ite.op_type === 2">
                       {{ $t('chat.chat_1086') }}
                     </p>
-                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">不处理此问题</p>
                   </li>
                 </ul>
               </li>
@@ -498,7 +498,7 @@
                     <p class="livein-processed" v-if="ite.op_type === 2">
                       {{ $t('chat.chat_1086') }}
                     </p>
-                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">不处理此问题</p>
                   </li>
                 </ul>
               </li>
@@ -653,7 +653,7 @@
                     <p class="livein-processed" v-if="ite.op_type === 2">
                       {{ $t('chat.chat_1086') }}
                     </p>
-                    <p class="livein-processed" v-if="ite.op_type === 1">设为不处理</p>
+                    <p class="livein-processed" v-if="ite.op_type === 1">不处理此问题</p>
                   </li>
                 </ul>
               </li>
@@ -821,7 +821,8 @@
           // 设为批量不处理 或者 批量删除 的弹窗
           text: '',
           visible: false,
-          confirm: true
+          confirm: true,
+          type: null
         }
       };
     },
@@ -1299,15 +1300,15 @@
           this.unExactOrDelPopAlert.type = type;
           this.unExactOrDelPopAlert.row = row;
         } else {
-          // 批量删除
+          // 批量删除 or 批量不处理
           this.unExactOrDelPopAlert.row = null;
+          this.unExactOrDelPopAlert.type = type;
           if (this.questionIds && this.questionIds.length) {
             this.unExactOrDelPopAlert.visible = true;
             this.unExactOrDelPopAlert.text =
               type === 'unExact'
                 ? '确定对勾选数据进行批量标记为不处理吗？'
                 : '删除后将无法找回，确定删除？';
-            this.unExactOrDelPopAlert.type = type;
           } else {
             this.$message.error('请至少选择一条记录');
           }
@@ -1327,7 +1328,7 @@
         this.unExactOrDelPopAlert.text = '';
       },
       // 调用批量修改问题状态接口，支持单个
-      sendUpdateBatch: debounce(async function (statusVal, ids = []) {
+      sendUpdateBatch: debounce(function (statusVal, ids = []) {
         this.qaServer
           .updateBatchStatus({
             room_id: this.baseObj.interact.room_id,
@@ -1338,19 +1339,18 @@
             if (res.code != 200) {
               this.$message.error(res.msg || '修改失败');
             } else {
-              this.qaServer.updateStatusToUNHANDLE(ids);
+              // 修改数据状态
+              this.qaServer.updateStatusToUNHANDLE(ids.join(','));
               // 若是批量设为不处理，弹出框打开的，需要关闭弹出框。
-              if (this.unExactOrDelPopAlert && this.unExactOrDelPopAlert.visible) {
-                this.closeConfirm();
-              }
+              this.closeConfirm();
             }
           })
           .catch(err => {
-            this.$message.error(err.msg);
+            this.$message.error(err.msg || '修改失败');
           });
       }, 500),
       // 调用批量删除接口
-      sendDelQaAndAnswerMulti: debounce(async function () {
+      sendDelQaAndAnswerMulti: debounce(function () {
         let questionIdsStr = null;
         if (this.unExactOrDelPopAlert.row) {
           questionIdsStr = `${this.unExactOrDelPopAlert.row.id}`;
