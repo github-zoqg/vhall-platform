@@ -17,7 +17,7 @@
         class="progress"
         cx="50%"
         cy="50%"
-        r="45"
+        r="42"
         fill="transparent"
         stroke="#FED8D6"
         stroke-dasharray="0"
@@ -28,7 +28,7 @@
         class="progress progress-bar"
         cx="50%"
         cy="50%"
-        r="45"
+        r="42"
         fill="transparent"
         stroke="url(#greenGradient)"
         :stroke-dasharray="perimeter"
@@ -37,7 +37,7 @@
         stroke-width="7"
       ></circle>
       <!-- 小白点 -->
-      <circle cx="95" cy="50%" r="2" fill="white"></circle>
+      <circle cx="92" cy="50%" r="2" fill="white"></circle>
     </svg>
 
     <div class="countdown-core">
@@ -119,10 +119,10 @@
     }
   }
   .progress {
-    stroke-width: 7px;
+    stroke-width: 8px;
   }
   .progress-bar {
     transform-origin: 50%;
-    stroke-width: 12px;
+    stroke-width: 14px;
   }
 </style>
