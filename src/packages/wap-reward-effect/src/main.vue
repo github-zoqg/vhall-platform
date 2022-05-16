@@ -146,13 +146,13 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 222000,
+        minTaskTime: 2000,
         maxQueueLen: 2
       });
 
       //测试数据
 
-      this.addRewardEffect({
+      /* this.addRewardEffect({
         uv: 2,
         data: {
           type: 'reward_pay_ok',
@@ -181,7 +181,7 @@
         context: { nick_name: '', avatar: '' },
         msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
         app_id: 'fd8d3653'
-      });
+      }); */
     },
     methods: {
       // 监听domain层服务消息
