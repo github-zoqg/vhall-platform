@@ -3,7 +3,7 @@
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
-      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3 && !isStreamYun">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
       <!-- 主持人显示开始结束直播按钮 -->
@@ -185,7 +185,11 @@
        * 补充：第三方发起时，不在进行设备状态的相关提示
        *    若助理，则无需进行提示，助理是不存在上麦的
        */
-      if (this.deviceStatus == 2 && (!this.isThirdStream || this.roleName != 3)) {
+      if (
+        this.deviceStatus == 2 &&
+        (!this.isThirdStream || this.roleName != 3) &&
+        !this.isStreamYun
+      ) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
