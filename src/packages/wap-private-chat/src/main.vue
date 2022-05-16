@@ -158,7 +158,11 @@
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
-          this.closeOverlay();
+          setTimeout(() => {
+            if (!this.openEmoji) {
+              this.closeOverlay();
+            }
+          }, 500);
         }
       },
       focusoutIOS() {
