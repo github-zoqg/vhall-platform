@@ -98,6 +98,19 @@
         ></span>
       </div>
     </div>
+
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>{{ PopAlertOffline.text }}</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -105,8 +118,10 @@
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useRoomBaseServer, usePlayerServer, useInteractiveServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpPcPlayerLiveYun',
+    components: { SaasAlert },
     data() {
       return {
         localSpeaker: {},
@@ -120,7 +135,13 @@
         timer: null,
         playStatus: false,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
-        audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
+        audioMuted: localStorage.getItem('audioMuted') || 0, // 1为禁用
+
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false,
+          text: ''
+        }
       };
     },
     computed: {
@@ -208,12 +229,9 @@
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
         console.log('网络异常断开', msg);
-        Dialog.alert({
-          title: this.$t('account.account_1061'),
-          message: '网络异常导致互动房间连接失败'
-        }).then(() => {
-          window.location.reload();
-        });
+
+        this.PopAlertOffline.text = '网络异常导致互动房间连接失败';
+        this.PopAlertOffline.visible = true;
       });
     },
     methods: {
@@ -256,7 +274,7 @@
             videoNode: 'vmp-player-yun',
             type: 'live',
             liveOption: {
-              type: 'auto',
+              type: 'hls',
               roomId: this.roomBaseServer.state.watchInitData.interact.room_id // 互动应用ID，必填
             }
           })
@@ -410,6 +428,12 @@
           // 110138 关闭    110139 开启
           window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
         }
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
