@@ -18,7 +18,7 @@
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
       <div class="stream_people_name" v-if="director_stream">
-        {{ $domainStore.state.roomBaseServer.watchInitData.userinfo.nickname }}
+        {{ $domainStore.state.roomBaseServer.watchInitData.webinar.userinfo.nickname }}
       </div>
 
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
@@ -166,6 +166,14 @@
             clearInterval(this.timer);
           }
         }
+      },
+      liveStart: {
+        handler: function (val) {
+          if (!val && this.joinInfo.role_name == 3) {
+            // 注销播放器
+            this.playerServer.destroy();
+          }
+        }
       }
     },
     beforeCreate() {
@@ -232,8 +240,8 @@
             }
           })
           .then(() => {
-            this.playerServer.play();
-            document.getElementsByTagName('video')[0].play();
+            // this.playerServer.play();
+            // document.getElementsByTagName('video')[0].play();
             console.log('%c云导播播放器初始化成功', 'color:blue');
           });
       },
