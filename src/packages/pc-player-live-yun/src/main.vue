@@ -194,6 +194,12 @@
           }
         }
       });
+
+      this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
+        if (e.data.accountId == this.joinInfo.third_party_user_id) {
+          this.$message.warning(this.$t('interact.interact_1036'));
+        }
+      });
     },
     methods: {
       async init() {
