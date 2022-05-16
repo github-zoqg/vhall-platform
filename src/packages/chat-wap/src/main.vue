@@ -516,7 +516,6 @@
     > .overlay {
       width: 100vw;
       height: 100vh;
-      z-index: 21;
       position: fixed;
       left: 0;
       top: 0;
