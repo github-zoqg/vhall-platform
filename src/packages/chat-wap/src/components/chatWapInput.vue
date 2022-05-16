@@ -117,9 +117,9 @@
       //处理失去焦点
       handleOnBlur() {
         // this.showEmoji = false;
-        window.document.body.scrollTop = '0px';
-        window.document.activeElement.scrollIntoViewIfNeeded(true);
-        window.scroll(0, 0);
+        // window.document.body.scrollTop = '0px';
+        // window.document.activeElement.scrollIntoViewIfNeeded(true);
+        // window.scroll(0, 0);
       },
       //处理获得焦点
       handleOnFocus() {
@@ -167,7 +167,6 @@
       },
       operateEmoji() {
         this.showEmoji = !this.showEmoji;
-        EventBus.$emit('openEmoji', this.showEmoji);
         //设置只读属性可以暂时禁止键盘
         // this.$refs.textareaChat.$el.setAttribute('readonly', 'readonly');
         // this.$refs.textareaChat.focus();
