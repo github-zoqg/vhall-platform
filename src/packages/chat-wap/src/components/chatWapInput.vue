@@ -167,6 +167,7 @@
       },
       operateEmoji() {
         this.showEmoji = !this.showEmoji;
+        EventBus.$emit('openEmoji', this.showEmoji);
         //设置只读属性可以暂时禁止键盘
         // this.$refs.textareaChat.$el.setAttribute('readonly', 'readonly');
         // this.$refs.textareaChat.focus();
