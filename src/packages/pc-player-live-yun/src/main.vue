@@ -1,21 +1,30 @@
 <template>
   <div class="vmp-pc-player-live-yun">
     <!-- 播放器区域 -->
-    <div id="vmp-player-yun" class="player_box" v-if="!pushStream">
-      <div class="top_tip" :class="director_stream ? 'success' : 'warning'">
+    <div
+      id="vmp-player-yun"
+      class="player_box"
+      :class="playStatus ? 'player_box_hover' : ''"
+      v-if="!pushStream"
+    >
+      <div
+        class="top_tip"
+        :class="director_stream ? 'success' : 'warning'"
+        v-if="joinInfo.role_name == 1"
+      >
         {{ tipText }}
       </div>
-      <div class="err_tip" v-if="liveStart && !director_stream">
+      <div class="err_tip" v-if="liveStart && !director_stream && joinInfo.role_name == 1">
         <div class="err_text">云导播推流异常 {{ errarTime }}</div>
       </div>
-      <div class="stream_people_name" v-if="liveStart && director_stream">
-        {{ joinInfo.nickname }}
+      <div class="stream_people_name" v-if="director_stream">
+        {{ $domainStore.state.roomBaseServer.watchInitData.webinar.userinfo.nickname }}
       </div>
 
       <section class="vmp-stream-local__shadow-box" :class="isMiniDoc ? 'bigScreen' : ''">
         <p class="vmp-stream-local__shadow-second-line">
           <span class="vmp-stream-local__shadow-label">视图</span>
-          <el-tooltip content="切换" placement="bottom">
+          <el-tooltip content="切换" placement="bottom" v-if="!isFullScreen">
             <span
               class="vmp-stream-local__shadow-icon vh-iconfont vh-line-copy-document"
               @click="exchange"
@@ -33,6 +42,10 @@
           </el-tooltip>
         </p>
       </section>
+      <!-- 开始按钮 -->
+      <div class="play_bg_radius" v-if="!playStatus && director_stream">
+        <i class="vh-iconfont vh-line-video-play" @click="playerStart"></i>
+      </div>
     </div>
 
     <!-- 本地推流区域 -->
@@ -103,7 +116,9 @@
         isMiniDoc: false,
         tipText: '未检测到云导播推流',
         time: 0,
+        into: 0,
         timer: null,
+        playStatus: false,
         videoMuted: localStorage.getItem('videoMuted') || 0, // 1为禁用
         audioMuted: localStorage.getItem('audioMuted') || 0 // 1为禁用
       };
@@ -151,6 +166,19 @@
             clearInterval(this.timer);
           }
         }
+      },
+      liveStart: {
+        handler: function (val) {
+          if (this.joinInfo.role_name == 3) {
+            if (val) {
+              this.playStatus = false;
+              this.init();
+            } else {
+              // 注销播放器
+              this.playerServer.destroy();
+            }
+          }
+        }
       }
     },
     beforeCreate() {
@@ -159,17 +187,61 @@
       this.interactiveServer = useInteractiveServer();
     },
     mounted() {
-      console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
+      console.log(
+        this.roomBaseServer,
+        this.interactiveServer,
+        this.pushStream,
+        'this.interactiveServer'
+      );
       this.init();
+      window.addEventListener('keydown', e => {
+        if (e.keyCode == 27) {
+          this.isFullScreen = false;
+          try {
+            window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull' })); // 客户端退出全屏方法
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      });
+
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: '网络异常导致互动房间连接失败'
+        }).then(() => {
+          window.location.reload();
+        });
+      });
     },
     methods: {
       async init() {
         // 主持人初始化播放器
         if (!this.pushStream) {
+          const dom = document.getElementById('vmp-player-yun');
+          dom.onmousemove = () => {
+            this.into++;
+            try {
+              this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+            } catch (err) {
+              console.log(err);
+            }
+          };
+          dom.onmouseleave = () => {
+            this.into = 0;
+          };
           await this.initPlayer();
           // 获取云导播台是否有流
           this.roomBaseServer.getStreamStatus();
         } else {
+          let flag = await this.roomBaseServer.selectSeat({
+            webinar_id: this.$route.params.il_id,
+            seat_id: this.$route.query.seat_id,
+            uuid: this.$route.query.uuid
+          });
+          if (!flag) return false;
           // 其他人创建本地流&推流
           await this.createLocalStream();
           await this.publishLocalStream();
@@ -189,8 +261,14 @@
             }
           })
           .then(() => {
+            // this.playerServer.play();
+            // document.getElementsByTagName('video')[0].play();
             console.log('%c云导播播放器初始化成功', 'color:blue');
           });
+      },
+      playerStart() {
+        this.playerServer.play();
+        this.playStatus = true;
       },
       // 切换大小窗
       exchange() {
@@ -199,14 +277,25 @@
         miniElement = roomBaseServer.state.miniElement == 'doc' ? 'stream-list' : 'doc';
         roomBaseServer.setChangeElement(miniElement);
         window.vhallReportForProduct?.report(110135);
-        this.isMiniDoc = true;
+        this.isMiniDoc = !this.isMiniDoc;
+        try {
+          window.JsCallQtMsg(JSON.stringify({ type: 'changeLayout' })); // 客户端切换布局
+        } catch (err) {
+          console.log(err);
+        }
       },
       // 播放器全屏
       fullScreenPlayer() {
-        if (this.isFullScreen) {
-          this.playerServer.exitFullScreen();
-        } else {
-          this.playerServer.enterFullScreen();
+        try {
+          if (this.isFullScreen) {
+            this.playerServer.exitFullScreen();
+            !this.pushStream && window.JsCallQtMsg(JSON.stringify({ type: 'ExitFull' })); // 客户端退出全屏方法
+          } else {
+            this.playerServer.enterFullScreen();
+            !this.pushStream && window.JsCallQtMsg(JSON.stringify({ type: 'EnterFull' })); // 客户端全屏方法
+          }
+        } catch (err) {
+          console.log(err);
         }
         this.isFullScreen = !this.isFullScreen;
       },
@@ -302,13 +391,11 @@
           receive_account_id: this.joinInfo.third_party_user_id
         });
         if (deviceType == 'audio') {
-          console.log(123);
           this.interactiveServer.muteAudio({
             streamId: this.localSpeaker.streamId,
             isMute: this[`${deviceType}Muted`] == 0
           });
         } else {
-          console.log(456);
           this.interactiveServer.muteVideo({
             streamId: this.localSpeaker.streamId,
             isMute: this[`${deviceType}Muted`] == 0
@@ -338,13 +425,13 @@
       width: 100%;
       height: 100%;
     }
+    .player_box_hover:hover {
+      .vmp-stream-local__shadow-box {
+        display: flex;
+      }
+    }
     .player_box {
       position: relative;
-      &:hover {
-        .vmp-stream-local__shadow-box {
-          display: flex;
-        }
-      }
       .top_tip {
         position: absolute;
         padding: 6px 16px;
@@ -433,6 +520,24 @@
         height: 40px;
         bottom: 10px;
         background-color: initial;
+      }
+      .play_bg_radius {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 6;
+        text-align: center;
+        cursor: pointer;
+        .vh-line-video-play {
+          color: white;
+          position: relative;
+          top: 12px;
+        }
       }
     }
     .stream_box_header {

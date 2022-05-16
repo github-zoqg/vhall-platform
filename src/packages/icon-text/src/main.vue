@@ -36,6 +36,17 @@
         return this.$domainStore.state.roomBaseServer.configList;
       }
     },
+    watch: {
+      // 云导播隐藏桌面共享icon
+      '$domainStore.state.roomBaseServer.watchInitData.webinar.is_director': {
+        immediate: true,
+        handler: function (val) {
+          if (val == 1 && this.cuid == 'comShareDesktopMenu') {
+            this.setHiddenState(true);
+          }
+        }
+      }
+    },
 
     methods: {
       // 设置选中转态

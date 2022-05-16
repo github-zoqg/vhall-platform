@@ -42,22 +42,37 @@
         // 初始化直播房间
         const { il_id } = this.$route.params;
         console.log(this.$route.params, 'this.$route.params');
-        const { token, nickname = '', email = '', liveT = '', seat_id } = this.$route.query;
+        const {
+          token,
+          nickname = '',
+          email = '',
+          liveT = '',
+          seat_id,
+          assistant_token,
+          token_type
+        } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
+        }
+        if (location.search.includes('assistant_token=')) {
+          sessionStorage.setItem('vhall_client_token', assistant_token);
         }
         return new Domain({
           plugins: [/embed/.test(location.search) ? 'player' : 'interaction'],
           requestHeaders: {
-            token: localStorage.getItem('token') || ''
+            token:
+              // 嵌入页主持人
+              /embed/.test(location.search) && token_type == 0
+                ? assistant_token
+                : localStorage.getItem('token')
           },
           requestBody: {
-            live_token: liveT
+            live_token: /embed/.test(location.search) && token_type != 0 ? assistant_token : liveT
           },
           initRoom: {
             webinar_id: il_id, //活动id
             seat_id: seat_id,
-            clientType: 'sendYun', //客户端类型
+            clientType: /embed/.test(location.search) ? 'send' : 'sendYun', //客户端类型
             nickname,
             email,
             check_online: 0 // 不检查主持人是否在房间
