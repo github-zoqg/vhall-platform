@@ -43,7 +43,7 @@
         </p>
       </section>
       <!-- 开始按钮 -->
-      <div class="play_bg_radius" v-if="!playStatus">
+      <div class="play_bg_radius" v-if="!playStatus && director_stream">
         <i class="vh-iconfont vh-line-video-play" @click="playerStart"></i>
       </div>
     </div>
