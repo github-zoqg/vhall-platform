@@ -2,9 +2,9 @@
  * 重写console日志输出，可以通过开关控制
  * 支持在PC端和wap端使用, 其中wap端网页调试工具使用eruda
  * 以下情况（满足一条就行）会开启日志打印：
- * 1、非生产环境
- * 2、sessionStorage中存在key=__openDebug__，且值不为空
- * 3、地址链接中有debug=true
+ * 1、sessionStorage中存在key=__openDebug__，且值=1
+ * 2、地址链接中有debug=true
+ * 3、非生产环境默认开启日志
  */
 const isProd = process.env.NODE_ENV === 'production';
 const cacheKey = '__openDebug__';
@@ -59,7 +59,7 @@ console.error = (function (oriLogFunc) {
       oriLogFunc.call(console, ...arguments);
     }
   };
-})(console.warn);
+})(console.error);
 
 // 重写console.table
 console.table = (function (oriLogFunc) {
