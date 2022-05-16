@@ -48,6 +48,12 @@
         isNoticeMaskShow: false
       };
     },
+    computed: {
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      }
+    },
     async created() {
       this.$on('notice_panel_status', result => {
         this.isNoticeMaskShow = result;
@@ -206,22 +212,26 @@
         }
       },
       handleErrorCode(err) {
-        let currentQuery = location.search;
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
             break;
           case 512502: // 不支持的活动类型（flash）
           case 512503: // 不支持的活动类型（旧H5）
-            currentQuery =
-              currentQuery.indexOf('nickname=') != -1
-                ? currentQuery.replace('nickname=', 'name=')
-                : currentQuery;
-            currentQuery =
-              currentQuery.indexOf('record_id=') > -1
-                ? currentQuery.replace('record_id=', 'rid=')
-                : currentQuery;
-            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            if (this.embedObj?.embed || this.embedObj?.embedVideo) {
+              let _embedQuery = location.search;
+              _embedQuery =
+                _embedQuery.indexOf('nickname=') != -1
+                  ? _embedQuery.replace('nickname=', 'name=')
+                  : _embedQuery;
+              _embedQuery =
+                _embedQuery.indexOf('record_id=') > -1
+                  ? _embedQuery.replace('record_id=', 'rid=')
+                  : _embedQuery;
+              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.il_id}${_embedQuery}`;
+            } else {
+              window.location.href = `${window.location.origin}/${this.$route.params.il_id}`;
+            }
             break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了
