@@ -263,7 +263,7 @@
             if (e) {
               this.chatlistHeight =
                 this.$refs.chatContentMain.clientHeight - this.$refs.sendBox.$el.clientHeight + 60;
-              this.scrollBottom();
+              // this.scrollBottom();
             } else {
               this.chatlistHeight = this.virtual.contentHeight;
             }
@@ -275,7 +275,7 @@
         if (this.innerHeight > newInnerHeight) {
           // 键盘弹出事件处理
           // alert('android 键盘弹窗事件');
-          this.scrollBottom();
+          //this.scrollBottom();
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
@@ -288,7 +288,7 @@
       focusinIOS() {
         // 键盘弹出事件处理
         // alert('iphone 键盘弹出事件处理');
-        this.scrollBottom();
+        // this.scrollBottom();
       },
       showWelcomeTxt() {
         // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理

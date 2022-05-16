@@ -149,7 +149,7 @@
         if (this.innerHeight > newInnerHeight) {
           // 键盘弹出事件处理
           // alert('android 键盘弹窗事件');
-          this.scrollBottom();
+          // this.scrollBottom();
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
@@ -158,12 +158,11 @@
       focusoutIOS() {
         // 键盘收起事件处理
         // alert('iphone 键盘收起事件处理');
-        //this.closeOverlay();
       },
       focusinIOS() {
         // 键盘弹出事件处理
         // alert('iphone 键盘弹出事件处理');
-        this.scrollBottom();
+        // this.scrollBottom();
       },
       //初始化视图信息
       initViewData() {
