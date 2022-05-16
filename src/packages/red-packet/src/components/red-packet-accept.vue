@@ -11,7 +11,7 @@
       />
       <!-- 文案 -->
       <h1>
-        {{ $tdefault(redPacketInfo.describe) | overHidden(8) }}
+        {{ $tdefault(redPacketInfo.describe) }}
       </h1>
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"
@@ -188,7 +188,8 @@
       font-weight: 500;
       color: #fee4b3;
       line-height: 30px;
-      margin-top: 52px;
+      width: 220px;
+      margin: 52px auto 0;
     }
     p {
       font-size: 14px;
