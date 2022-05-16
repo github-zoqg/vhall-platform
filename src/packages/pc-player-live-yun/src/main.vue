@@ -169,9 +169,14 @@
       },
       liveStart: {
         handler: function (val) {
-          if (!val && this.joinInfo.role_name == 3) {
-            // 注销播放器
-            this.playerServer.destroy();
+          if (this.joinInfo.role_name == 3) {
+            if (val) {
+              this.playStatus = false;
+              this.init();
+            } else {
+              // 注销播放器
+              this.playerServer.destroy();
+            }
           }
         }
       }
@@ -182,7 +187,12 @@
       this.interactiveServer = useInteractiveServer();
     },
     mounted() {
-      console.log(this.roomBaseServer, this.pushStream, 'this.interactiveServer');
+      console.log(
+        this.roomBaseServer,
+        this.interactiveServer,
+        this.pushStream,
+        'this.interactiveServer'
+      );
       this.init();
       window.addEventListener('keydown', e => {
         if (e.keyCode == 27) {
@@ -195,10 +205,15 @@
         }
       });
 
-      this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
-        if (e.data.accountId == this.joinInfo.third_party_user_id) {
-          this.$message.warning(this.$t('interact.interact_1036'));
-        }
+      // 房间信令异常断开事件
+      this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+        console.log('网络异常断开', msg);
+        Dialog.alert({
+          title: this.$t('account.account_1061'),
+          message: '网络异常导致互动房间连接失败'
+        }).then(() => {
+          window.location.reload();
+        });
       });
     },
     methods: {
