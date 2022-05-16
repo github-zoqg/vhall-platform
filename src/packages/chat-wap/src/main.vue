@@ -38,7 +38,12 @@
         </div>
       </div>
     </div>
-    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @touchstart="closeOverlay"
+      @click="closeOverlay"
+    ></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -127,9 +132,7 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false,
-        //显示表情
-        openEmoji: false
+        showSendBox: false
       };
     },
     watch: {
@@ -266,9 +269,6 @@
             }
           });
         });
-        EventBus.$on('openEmoji', e => {
-          this.openEmoji = e;
-        });
       },
       resizeAndroid() {
         const newInnerHeight = window.innerHeight;
@@ -279,21 +279,11 @@
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
-          setTimeout(() => {
-            if (!this.openEmoji) {
-              this.closeOverlay();
-            }
-          }, 500);
         }
       },
       focusoutIOS() {
         // 键盘收起事件处理
         // alert('iphone 键盘收起事件处理');
-        setTimeout(() => {
-          if (!this.openEmoji) {
-            this.closeOverlay();
-          }
-        }, 500);
       },
       focusinIOS() {
         // 键盘弹出事件处理
