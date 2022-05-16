@@ -37,8 +37,12 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
-          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
+          <span :class="source.roleName == 1 ? 'host' : ''">
+            {{ source.roleName | roleFilter }}
+          </span>
+          {{ source.roleName != 1 ? source.nickname : '' }}{{ source.content.text_content }}，{{
+            $t('common.common_1030')
+          }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
@@ -373,6 +377,7 @@
       padding: 10px 0;
       display: flex;
       align-items: flex-start;
+
       .avatar-wrap {
         position: relative;
         margin-right: 10px;
@@ -478,6 +483,22 @@
       &.interact {
         justify-content: center;
       }
+      &.new-gift,
+      &.interact {
+        margin: 0 auto;
+        width: fit-content;
+        > div {
+          background: rgba(255, 209, 201, 0.2);
+          border-radius: 40px;
+          padding: 10px 24px;
+        }
+        .host {
+          background: rgba(251, 38, 38, 0.1);
+          color: #fb2626;
+          border-radius: 16px;
+          padding: 0 6px;
+        }
+      }
       .interact-msg {
         padding: 20px 60px;
         position: relative;
@@ -494,7 +515,6 @@
           position: absolute;
           top: 0;
           left: 0;
-          border: 1px solid #d2d2d2;
           transform: scale(0.5);
           transform-origin: 0 0;
           box-sizing: border-box;
@@ -546,14 +566,12 @@
         .new-gift-name {
           font-size: 28px;
           max-width: 240px;
-          line-height: 28px;
           margin-right: 8px;
-          color: #8c8c8c;
+          color: #595959;
         }
         .new-gift-content {
           font-size: 28px;
           transform: scale(0.9);
-          line-height: 22px;
           color: #262626;
         }
       }

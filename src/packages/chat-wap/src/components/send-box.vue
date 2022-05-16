@@ -72,7 +72,7 @@
         </div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
           <!-- 底部互动工具组件 comChatWap-->
-          <vmp-air-container cuid="comChatWap"></vmp-air-container>
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
     </div>
@@ -180,7 +180,8 @@
         //举手状态
         handUpStatus: false,
         //只看我的问答
-        isShowMyQA: false
+        isShowMyQA: false,
+        childrenCom: []
       };
     },
     computed: {
@@ -284,6 +285,7 @@
       this.userServer = useUserServer();
     },
     created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
