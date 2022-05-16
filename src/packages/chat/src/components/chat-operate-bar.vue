@@ -375,6 +375,15 @@
       openPrivateChatModal() {
         this.$emit('openPrivateChatModal');
       }
+    },
+    watch: {
+      allBannedModuleList: {
+        handler: function (data) {
+          this.bannedMoudleList.qa.status = data.qa_status;
+          this.bannedMoudleList.privateChat.status = data.private_chat_status;
+        },
+        deep: true
+      }
     }
   };
 </script>
