@@ -7,33 +7,37 @@
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="100%">
+        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#FC4E2A" />
           <stop offset="100%" stop-color="#FC9A32" />
-          <!-- <stop offset="100%" stop-color="#FFA32B" /> -->
         </linearGradient>
       </defs>
+      <!-- 内环 -->
       <circle
         class="progress"
         cx="50%"
         cy="50%"
-        r="47"
+        r="45"
         fill="transparent"
         stroke="#FED8D6"
         stroke-dasharray="0"
         stroke-dashoffset="1"
       ></circle>
+      <!-- 外环 -->
       <circle
         class="progress progress-bar"
         cx="50%"
         cy="50%"
-        r="47"
+        r="45"
         fill="transparent"
         stroke="url(#greenGradient)"
         :stroke-dasharray="perimeter"
         :stroke-dashoffset="progress"
         stroke-linecap="round"
+        stroke-width="7"
       ></circle>
+      <!-- 小白点 -->
+      <circle cx="95" cy="50%" r="2" fill="white"></circle>
     </svg>
 
     <div class="countdown-core">
@@ -115,12 +119,10 @@
     }
   }
   .progress {
-    stroke-width: 12px;
+    stroke-width: 7px;
   }
   .progress-bar {
-    // transform: rotate(-90deg);
-    // transform: rotateX(180deg);
     transform-origin: 50%;
-    stroke-width: 15px;
+    stroke-width: 12px;
   }
 </style>
