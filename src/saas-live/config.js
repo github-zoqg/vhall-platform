@@ -612,6 +612,13 @@ export const serverConfig = {
         method: 'switchStreamType',
         args: ['$0']
       }
+    ],
+    changeMediaOption: [
+      {
+        cuid: 'comPcPlayerLiveYun',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
     ]
   },
   comPcMediaCheck: {
@@ -928,6 +935,6 @@ export const serverConfig = {
   // 【云导播页面】本地流&播放器
   liveStreamYunRoot: {
     component: 'VmpAirContainer',
-    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck', 'comStreamLocal']
+    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
   }
 };
