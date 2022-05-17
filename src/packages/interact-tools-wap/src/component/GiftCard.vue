@@ -2,25 +2,20 @@
   <section>
     <van-popup v-model="showgiftCard" round position="bottom" closeable>
       <div class="gift-wrap">
-        <van-swipe
-          class="swiper-box"
-          indicator-color="#888"
-          :loop="filterGift.length != 1"
-          @change="swiperChange"
-        >
-          <van-swipe-item v-for="(item, index) in filterGift" :key="index" class="swiper-box-item">
+        <div class="swiper-box">
+          <div class="van-swipe-item">
             <div
-              v-for="(secItem, secIndex) in item"
+              v-for="(secItem, secIndex) in filterGift"
               :key="secIndex"
               class="gift-box"
               :class="{ active: secItem.active }"
             >
               <div class="info">
-                <div class="border-1px gift-img" @click="chooseGift(index, secItem, item)">
+                <div class="border-1px gift-img" @click="chooseGift(secIndex, secItem)">
                   <img :src="`${secItem.image_url}`" alt />
                 </div>
                 <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
-                <p class="money">
+                <p class="money" :class="{ free: secItem.price == 0 }">
                   {{
                     secItem.price == 0
                       ? $t('interact_tools.interact_tools_1058')
@@ -38,8 +33,9 @@
                 <span v-if="btnDisabled">{{ `${timer}s` }}</span>
               </div>
             </div>
-          </van-swipe-item>
-        </van-swipe>
+            <div class="block"></div>
+          </div>
+        </div>
       </div>
     </van-popup>
   </section>
@@ -85,16 +81,7 @@
         if (this.isEmbed) {
           source = source.filter(item => item.price === '0');
         }
-        const arr = [];
-        const rate = Math.ceil(source.length / 8);
-        for (let i = 0; i < rate; i++) {
-          if (source.length >= 8) {
-            arr.push(source.splice(0, 8));
-          } else {
-            arr.push(source);
-          }
-        }
-        return arr;
+        return source;
       }
     },
     beforeCreate() {
@@ -150,9 +137,9 @@
         });
       },
       // 选择礼物
-      chooseGift(index, currentItem, item) {
+      chooseGift(index, currentItem) {
         this.currentGift = currentItem;
-        for (const iterator of item) {
+        for (const iterator of this.filterGift) {
           iterator.active = false;
         }
         currentItem.active = true;
@@ -415,13 +402,19 @@
     height: 100%;
     background: linear-gradient(55.94deg, #fdf1ed 9.51%, #f3f2ff 102.75%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    padding-top: 106px;
     .swiper-box {
-      padding: 80px 0;
+      height: 610px;
+      padding: 0 32px;
+      overflow-y: auto;
       .van-swipe-item {
         display: grid;
-        justify-content: center;
-        grid-template-columns: repeat(4, 21%);
+        justify-content: flex-start;
+        grid-template-columns: repeat(4, 146px);
         grid-gap: 30px;
+      }
+      .block {
+        height: 270px;
       }
     }
     .gift-box {
@@ -434,34 +427,42 @@
       .info {
         margin: 0 auto;
         display: inline-block;
-        img {
-          width: 100%;
-          max-width: 120px;
-          height: 90px;
-          margin-top: 20px;
-          object-fit: scale-down;
+        .gift-img {
+          width: 130px;
+          height: 130px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
+
         > p {
-          margin-top: 16px;
           text-align: center;
         }
         .title {
           font-size: 24px;
           font-family: PingFangSC;
           font-weight: 400;
-          line-height: 32px;
-          color: #222;
+          line-height: 24px;
+          color: #262626;
           width: 144px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          margin-top: 5px;
         }
         .money {
-          font-size: 20px;
+          font-size: 12px;
+          line-height: 18px;
           font-family: PingFangSC;
           font-weight: 400;
-          line-height: 20px;
-          color: #444;
+          color: #8c8c8c;
+          margin-top: 12px;
+          &.free {
+            font-size: 18px;
+            color: #fb2626;
+          }
         }
       }
 
