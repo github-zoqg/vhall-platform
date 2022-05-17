@@ -281,10 +281,10 @@
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          const { watchInitData } = useRoomBaseServer().state;
           // 如果已经开启了讨论，而且被踢出的人是自己
           if (
-            interactToolStatus.is_open_switch == 1 &&
+            this.groupServer.state.groupInitData.switch_status == 1 &&
             msg.data.target_id === watchInitData.join_info.third_party_user_id
           ) {
             // 关闭邀请演示对话框

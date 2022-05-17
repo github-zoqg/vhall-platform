@@ -14,7 +14,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!(verify == 2 && isOpenSwitch != 1 && presetWay)"
+              :disabled="!(verify == 2 && [0, 2].includes(Number(groupSwitchStatus)) && presetWay)"
               @click="groupPresetImport"
             >
               重新导入
@@ -24,7 +24,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="isOpenSwitch != 1"
+              :disabled="groupSwitchStatus != 1"
               @click="handleNotice"
             >
               小组公告
@@ -38,30 +38,28 @@
             >
               新增分组
             </el-button>
-            <template v-if="isOpenSwitch == 1">
-              <el-button
-                v-if="isPauseSwitch"
-                type="default"
-                size="small"
-                :round="true"
-                class="btn-group-op"
-                @click="handlePauseDiscussion"
-              >
-                暂停讨论
-              </el-button>
-              <el-button
-                v-if="!isPauseSwitch"
-                type="default"
-                size="small"
-                :round="true"
-                class="btn-group-op"
-                @click="handleProceedDiscussion"
-              >
-                继续讨论
-              </el-button>
-            </template>
             <el-button
-              v-if="isOpenSwitch == 1"
+              v-if="groupSwitchStatus == 1"
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
+              @click="handlePauseDiscussion"
+            >
+              暂停讨论
+            </el-button>
+            <el-button
+              v-if="groupSwitchStatus == 3"
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
+              @click="handleProceedDiscussion"
+            >
+              继续讨论
+            </el-button>
+            <el-button
+              v-if="groupSwitchStatus == 1"
               type="default"
               size="small"
               :round="true"
@@ -173,7 +171,7 @@
                 <div class="split-card__menus">
                   <template v-if="!item.isChange">
                     <el-button
-                      v-if="isOpenSwitch == 1"
+                      v-if="groupSwitchStatus == 1"
                       class="btn-menu"
                       type="text"
                       @click="handleEnterGroup(item.id)"
@@ -336,13 +334,9 @@
       panelShow() {
         return this.groupServer.state.panelShow;
       },
-      // 0 未分组 1开始讨论 2已存在分组
-      isOpenSwitch() {
-        return this.roomBaseServer.state.interactToolStatus.is_open_switch;
-      },
-      isPauseSwitch() {
-        // TODO: domain 中的状态是否是这个还需确认
-        return this.roomBaseServer.state.interactToolStatus.is_pause_switch;
+      // 0 未分组 1开始讨论 2已存在分组 3暂停讨论
+      groupSwitchStatus() {
+        return this.groupServer.state.groupInitData.switch_status;
       },
       isInGroup() {
         // 在小组中
@@ -453,7 +447,7 @@
         this.addDialogVisible = false;
         this.noticeDialogVisible = false;
         this.chooseDialogVisible = false;
-        if (this.isOpenSwitch === 0) {
+        if (this.groupSwitchStatus === 0) {
           // 显示设置对话框
           this.groupServer.state.panelShow = false;
           this.settingDialogVisible = true;
@@ -680,13 +674,13 @@
           // 结束讨论
           this.groupServer.endDiscussion().then(() => {
             // 设置开始为未讨论状态
-            useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            this.groupServer.setGroupInitData('switch_status', 0);
             console.warn('结束讨论成功');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });
       },
-      // TODO:暂停讨论
+      // 暂停讨论
       handlePauseDiscussion() {
         this.$confirm('暂停讨论，全部组员将返回到主直播间，确定暂停讨论？', '提示', {
           confirmButtonText: '确定',
@@ -696,14 +690,14 @@
         }).then(() => {
           // 暂停讨论
           this.groupServer.pauseDiscussion().then(() => {
-            // TODO:设置groupServer中的暂停状态,也有可能是通过消息更改
-            // useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            // 设置groupServer中的分组状态
+            this.groupServer.setGroupInitData('switch_status', 3);
             console.warn('暂停讨论成功');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });
       },
-      // TODO:继续讨论
+      // 继续讨论
       handleProceedDiscussion() {
         this.$confirm('确定是否继续讨论？', '提示', {
           confirmButtonText: '确定',
@@ -713,8 +707,8 @@
         }).then(() => {
           // 继续讨论
           this.groupServer.proceedDiscussion().then(() => {
-            // TODO:设置groupServer中的暂停状态,也有可能是通过消息更改
-            // useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            // 设置groupServer中的分组状态
+            this.groupServer.setGroupInitData('switch_status', 1);
             console.warn('继续讨论成功');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
