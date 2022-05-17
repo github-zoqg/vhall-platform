@@ -66,7 +66,6 @@
       const hasRebroadCast = watchInitData.rebroadcast.id;
 
       if (
-        !this.streamYun &&
         watchInitData.webinar.type == 1 &&
         (hasRebroadCast ||
           (watchInitData.switch.start_type != 1 &&
@@ -102,7 +101,7 @@
        * 调起转播
        */
       async open() {
-        if (this.isShow) {
+        if (this.isShow || this.streamYun) {
           return;
         }
         const { watchInitData } = this.roomBaseServer.state;
