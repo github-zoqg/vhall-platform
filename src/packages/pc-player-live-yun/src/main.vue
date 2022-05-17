@@ -189,6 +189,7 @@
         }
       },
       liveStart: {
+        immediate: true,
         handler: function (val) {
           if (this.joinInfo.role_name == 3) {
             if (val) {
@@ -211,10 +212,10 @@
       console.log(
         this.roomBaseServer,
         this.interactiveServer,
-        this.pushStream,
+        this.joinInfo.role_name,
         'this.interactiveServer'
       );
-      this.init();
+      this.joinInfo.role_name == 1 && this.init();
       window.addEventListener('keydown', e => {
         if (e.keyCode == 27) {
           this.isFullScreen = false;
@@ -225,6 +226,22 @@
           }
         }
       });
+      try {
+        const dom = document.getElementById('vmp-player-yun');
+        dom.onmousemove = () => {
+          this.into++;
+          try {
+            this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+          } catch (err) {
+            console.log(err);
+          }
+        };
+        dom.onmouseleave = () => {
+          this.into = 0;
+        };
+      } catch (err) {
+        console.log(err);
+      }
 
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
@@ -238,18 +255,6 @@
       async init() {
         // 主持人初始化播放器
         if (!this.pushStream) {
-          const dom = document.getElementById('vmp-player-yun');
-          dom.onmousemove = () => {
-            this.into++;
-            try {
-              this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
-            } catch (err) {
-              console.log(err);
-            }
-          };
-          dom.onmouseleave = () => {
-            this.into = 0;
-          };
           await this.initPlayer();
           // 获取云导播台是否有流
           this.roomBaseServer.getStreamStatus();
