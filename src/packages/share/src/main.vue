@@ -142,7 +142,6 @@
       },
       // 打开微博 - 1
       openWeiboDialog() {
-        // 微博是 3
         const shareId = `${this.roomBaseState.watchInitData.share_id}-1`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
         const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
