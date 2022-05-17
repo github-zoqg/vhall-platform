@@ -45,17 +45,19 @@
     </template>
     <!-- 打赏 -->
     <template v-else-if="source.type == 'reward_pay_ok'">
-      <div class="msg-item interact new-gift" :class="Math.random() * 10 > 3 ? 'purpose' : 'red'">
+      <div class="msg-item new-gift">
         <div class="interact-gift-box">
           <p class="new-gift-name">
             {{ source.nickName | overHidden(10) }}
           </p>
           <p class="new-gift-content">
-            {{ $t('interact_tools.interact_tools_1044') }}{{ source.content.num
-            }}{{ $t('cash.cash_1003') }},{{ source.content.text_content | overHidden(6) }}
+            {{ $t('chat.chat_1029') }}
           </p>
+          <img class="new-award-img" src="../img/red-package.png" />
         </div>
-        <img class="new-award-img" src="../img/red-package.png" />
+        <p class="reward_txt">
+          {{ source.content.text_content | overHidden(10) }}
+        </p>
       </div>
     </template>
     <!-- 送礼物 -->
@@ -68,8 +70,8 @@
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
+          <img class="new-gift-img" :src="source.content.gift_url" />
         </div>
-        <img class="new-gift-img" :src="source.content.gift_url" />
       </div>
     </template>
     <!-- 聊天消息 -->
@@ -91,18 +93,21 @@
             {{ $t('interact_tools.interact_tools_1024') }}
           </p>
           <!-- 正常聊天消息 -->
-          <p class="msg-content_name" v-else>
-            <span
-              v-if="source.roleName && source.roleName != '2'"
-              class="role"
-              :class="source.roleName | roleClassFilter"
-            >
-              {{ source.roleName | roleFilter }}
-            </span>
-            <span class="nickname">
-              {{ source.nickname }}
-            </span>
-          </p>
+          <div class="msg-content_name" v-else>
+            <p>
+              <span
+                v-if="source.roleName && source.roleName != '2'"
+                class="role"
+                :class="source.roleName | roleClassFilter"
+              >
+                {{ source.roleName | roleFilter }}
+              </span>
+              <span class="nickname">
+                {{ source.nickname | overHidden(8) }}
+              </span>
+            </p>
+            <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
+          </div>
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
@@ -264,41 +269,23 @@
       handleAt() {
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList || !this.source.atList.length) {
-          this.msgContent = this.urlToLink(this.source.content.text_content);
-        } else {
-          let at = false;
-          this.source.atList.forEach(a => {
-            // TODO历史列表aList与直播中格式不一致作
-            const userName = `@${a.nick_name || a.nickName} `;
-            const match =
-              this.source.content &&
-              this.source.content.text_content &&
-              this.source.content.text_content.indexOf(userName) != -1;
-            if (match) {
-              if (at) {
-                this.msgContent = this.urlToLink(
-                  this.msgContent.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              } else {
-                this.msgContent = this.urlToLink(
-                  this.source.content.text_content.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              }
-              at = true;
-            } else {
-              this.msgContent = at
-                ? this.urlToLink(this.msgContent)
-                : this.urlToLink(this.source.content.text_content);
-            }
-          });
-        }
+        this.msgContent = this.urlToLink(this.source.content.text_content);
+        this.source.atList.forEach(a => {
+          // TODO历史列表aList与直播中格式不一致作
+          const userName = `@${a.nick_name || a.nickName} `;
+          const match =
+            this.source.content &&
+            this.source.content.text_content &&
+            this.source.content.text_content.indexOf(userName) != -1;
+          if (match) {
+            this.msgContent = this.urlToLink(
+              this.source.content.text_content.replace(
+                userName,
+                `<span style='color:#3562fa'>${userName}</span>`
+              )
+            );
+          }
+        });
         if (
           (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
@@ -392,6 +379,7 @@
         .msg-content_name {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           margin-bottom: 5px;
           height: 34px;
           .nickname {
@@ -403,6 +391,11 @@
             color: #666;
             max-width: 300px;
             line-height: 34px;
+          }
+          .send_time {
+            font-size: 24px;
+            font-weight: 400;
+            color: #8c8c8c;
           }
           .role {
             margin-right: 10px;
@@ -515,11 +508,8 @@
     .new-gift {
       padding-left: 0;
       padding-top: 26px;
-      height: 72px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       position: relative;
+      display: block;
       &.interact {
         justify-content: unset;
       }
@@ -529,12 +519,15 @@
       &.red {
         background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
       }
+
       .interact-gift-box {
         padding-left: 24px;
         margin-right: 10px;
         text-align: left;
-        // width: 100%;
-        display: inline-block;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border: none;
         p {
           text-align: left;
@@ -542,24 +535,28 @@
           color: #fff;
         }
         .new-gift-name {
-          font-size: 24px;
-          width: 240px;
+          font-size: 28px;
+          max-width: 240px;
           line-height: 28px;
-          padding-left: 8px;
-          margin-bottom: 6px;
+          margin-right: 8px;
           color: #8c8c8c;
         }
         .new-gift-content {
-          font-size: 18px;
+          font-size: 28px;
           transform: scale(0.9);
           line-height: 22px;
-          margin-left: -4px;
           color: #262626;
         }
       }
       .new-gift-img,
       .new-award-img {
-        width: 38px;
+        width: 32px;
+      }
+      .reward_txt {
+        color: #ffd11a;
+        font-size: 28px;
+        line-height: 40px;
+        text-align: center;
       }
     }
     .margin-top-bottom {

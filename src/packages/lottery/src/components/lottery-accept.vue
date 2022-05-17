@@ -1,5 +1,5 @@
 <template>
-  <div class="lottery-winner-info" :class="{ big: stepHtmlList.length !== 3 }">
+  <div :class="['lottery-winner-info', isEmbed ? 'lottery-winner-embed-info' : '']">
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
@@ -38,6 +38,7 @@
    */
   import OverlayScrollbars from 'overlayscrollbars';
   import LotteryHeader from './lottery-header';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'LotteryAccept',
     components: {
@@ -54,6 +55,16 @@
         default() {
           return {};
         }
+      }
+    },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
+    computed: {
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     data() {
@@ -219,7 +230,7 @@
       margin-bottom: 5px;
     }
     .winner-info-form {
-      max-height: 194px;
+      max-height: 156px;
       overflow-y: auto;
       overflow-x: hidden;
       .el-form-item__content {
@@ -339,6 +350,11 @@
     &.big {
       background: url(../img/bg-winner-info-big.png);
       height: 507px;
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .lottery-winner-embed-info {
+      margin-top: 0px;
     }
   }
 </style>

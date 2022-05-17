@@ -84,6 +84,10 @@
             window.vhallReportForProduct?.report(110026);
             break;
           }
+          case 'videoPolling': {
+            window.vhallReportForProduct?.report(110148);
+            break;
+          }
           case 'share': {
             window.vhallReportForProduct?.report(110115);
           }

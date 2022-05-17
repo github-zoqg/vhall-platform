@@ -30,7 +30,7 @@
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
-      <template v-if="roleName == 4 && isLiving && !isInGroup">
+      <template v-if="roleName == 4 && isLiving && !isInGroup && deviceStatus != 2">
         <!-- 申请上麦按钮 -->
         <div
           v-if="!isApplying && !isSpeakOn"
@@ -94,7 +94,8 @@
     useSubscribeServer,
     useSplitScreenServer,
     useMediaCheckServer,
-    useRebroadcastServer
+    useRebroadcastServer,
+    useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
@@ -118,7 +119,8 @@
           // 非默认回放暂存时间提示
           text: '',
           visible: false
-        }
+        },
+        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
       };
     },
     computed: {
@@ -156,7 +158,7 @@
       },
       // 是否为第三方发起
       isThirdStream() {
-        return this.roomBaseServer.state.isThirdStream;
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
       // 设备状态
       deviceStatus() {
@@ -187,7 +189,8 @@
        */
       if (
         this.deviceStatus == 2 &&
-        (!this.isThirdStream || this.roleName != 3) &&
+        this.roleName != 3 &&
+        !this.isThirdStream &&
         !this.isStreamYun
       ) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
@@ -219,7 +222,13 @@
           .userApply()
           .then(res => {
             if (+res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513025) {
+                this.$message.error(
+                  this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
+                );
+              } else {
+                this.$message.error(res.msg);
+              }
               return;
             }
             this.isApplying = true;
@@ -275,6 +284,7 @@
       async handleRecheck() {
         await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+          this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
           );
@@ -320,6 +330,31 @@
             ) {
               this.isApplying = false;
               clearInterval(this._applyInterval);
+            }
+          });
+
+          // 嘉宾申请被拒绝（客户端有拒绝用户上麦的操作）
+          useMsgServer().$onMsg('ROOM_MSG', msg => {
+            let temp = Object.assign({}, msg);
+            if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+              temp.data = JSON.parse(temp.data);
+            }
+            const { type = '' } = temp.data || {};
+            console.log(
+              '1111-a-a-a-a-a-',
+              temp,
+              this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id
+            );
+            if (type === 'vrtc_connect_refused') {
+              if (
+                this.roomBaseServer.state.watchInitData?.join_info?.third_party_user_id !=
+                temp.data.room_join_id
+              ) {
+                return;
+              }
+              this.isApplying = false;
+              this.applyTime = 30;
+              this._applyInterval && clearInterval(this._applyInterval);
             }
           });
 

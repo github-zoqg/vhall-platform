@@ -338,6 +338,7 @@
   .vmp-reward-effect {
     position: absolute;
     overflow: hidden;
+    padding-top: 8px;
     left: 16px;
     top: 60px;
     z-index: 100;

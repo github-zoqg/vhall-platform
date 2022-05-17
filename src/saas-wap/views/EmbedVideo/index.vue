@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout vmp-basic-layout-embed">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -25,7 +25,7 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
-  import { getVhallReportOs } from '@/packages/app-shared/utils/tool';
+  import { getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -41,6 +41,14 @@
     },
     async created() {
       try {
+        if (isWechatCom()) {
+          if (sessionStorage.getItem('reloadStatus')) {
+            sessionStorage.setItem('reloadStatus', 2);
+          } else {
+            sessionStorage.setItem('reloadStatus', 1);
+            window.location.reload();
+          }
+        }
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
         let clientType = 'embed';
@@ -146,6 +154,7 @@
         });
       },
       handleErrorCode(err) {
+        let currentQuery = location.search;
         if (err.code == 512522) {
           this.liveErrorTip = this.$t('message.message_1009');
         } else if (err.code == 512541) {
@@ -160,7 +169,15 @@
         ) {
           this.liveErrorTip = this.$t('message.message_1004');
         } else if (err.code == 512503 || err.code == 512502) {
-          window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+          currentQuery =
+            currentQuery.indexOf('nickname=') != -1
+              ? currentQuery.replace('nickname=', 'name=')
+              : currentQuery;
+          currentQuery =
+            currentQuery.indexOf('record_id=') > -1
+              ? currentQuery.replace('record_id=', 'rid=')
+              : currentQuery;
+          window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
@@ -181,9 +198,10 @@
   };
 </script>
 <style lang="less">
-  .vmp-basic-layout {
-    .vmp-basic-bd {
-      margin-top: 55%;
+  .vmp-basic-layout-embed {
+    .vmp-basic-container {
+      display: flex;
+      align-items: center;
     }
   }
 </style>

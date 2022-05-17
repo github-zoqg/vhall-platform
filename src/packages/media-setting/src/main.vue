@@ -6,8 +6,8 @@
       width="480px"
       style="min-width: 480px"
       :showDefault="false"
-      @onReturn="closeMediaSetting"
-      @onClose="closeMediaSetting"
+      @onReturn="cancelMediaSetting"
+      @onClose="cancelMediaSetting"
     >
       <section v-loading="loading" v-show="isShow" class="vmp-media-setting-dialog-body">
         <!-- 左侧菜单 -->
@@ -49,7 +49,7 @@
               <el-button size="small" round type="primary" @click="saveMediaSetting">
                 {{ $t('account.account_1062') }}
               </el-button>
-              <el-button @click="closeMediaSetting" round size="small">
+              <el-button @click="cancelMediaSetting" round size="small">
                 {{ $t('account.account_1063') }}
               </el-button>
             </section>
@@ -163,7 +163,8 @@
           text: this.$t('interact.interact_1011'),
           visible: false
         },
-        hostAlertVisible: false
+        hostAlertVisible: false,
+        alertStatus: false
       };
     },
     computed: {
@@ -192,9 +193,22 @@
         if (+msg.data.streamType !== 3) {
           // 非桌面共享
           if (role == 1) {
-            this.hostAlertVisible = true;
+            this.hostAlertVisible ? null : (this.hostAlertVisible = true);
           } else {
-            this.popAlert.visible = true;
+            this.popAlert.visible ? null : (this.popAlert.visible = true);
+          }
+        }
+      });
+      useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
+        if (+msg.data.streamType !== 3) {
+          // 非桌面共享
+          if (!this.alertStatus) {
+            if (role == 1) {
+              this.hostAlertVisible ? null : (this.hostAlertVisible = true);
+            } else {
+              this.popAlert.visible ? null : (this.popAlert.visible = true);
+            }
+            this.alertStatus = true;
           }
         }
       });
@@ -222,14 +236,19 @@
         this.isRepublishMode = true;
         this.showMediaSetting();
       },
+      cancelMediaSetting() {
+        this.closeMediaSetting();
+        this.mediaState = Object.assign(this.mediaState, this._originCaptureState); // 如果取消，将选中项还原
+      },
       /**
        * 关闭弹窗
        */
-      closeMediaSetting() {
+      async closeMediaSetting() {
         this.isShow = false;
-        this.isRepublishMode = false;
         this?.$refs['videoSetting']?.destroyStream();
         this?.$refs['audioOutSetting']?.pauseAudio();
+        this.isRepublishMode = false;
+        await this.$nextTick();
       },
       /**
        * 点击对话框确认按钮（保存）的回调
@@ -348,13 +367,17 @@
        */
       getDiffOptions() {
         const source = this._originCaptureState;
-        let current = { ...this.mediaState };
-
-        if (this.isRepublishMode) current.isRepublishMode = true;
 
         const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
+        let diff = getDiffObject(source, { ...this.mediaState }, { ignoreKeys });
 
-        return getDiffObject(source, current, { ignoreKeys });
+        if (this.isRepublishMode) {
+          diff = Object.assign(diff, {
+            isRepublishMode: true
+          });
+        }
+
+        return diff;
       },
       /**
        * 发送变化事件

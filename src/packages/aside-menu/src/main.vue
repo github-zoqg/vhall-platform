@@ -202,6 +202,10 @@
               }
             }
           } else if (vn.kind === 'desktopShare') {
+            if (this.isThirdStream && this.webinarType === 1) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 转播中
             if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
               vn.setDisableState(true);
@@ -268,6 +272,11 @@
               continue;
             }
           } else if (vn.kind === 'insertMedia') {
+            // 第三方推流开播
+            if (this.isThirdStream && this.webinarType === 1) {
+              vn.setDisableState(true);
+              continue;
+            }
             // 转播中
             if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
               vn.setDisableState(true);
@@ -395,6 +404,15 @@
               vn.setDisableState(false);
             } else {
               vn.setHiddenState(true);
+            }
+          } else if (vn.kind === 'videoPolling') {
+            if (this.webinarType == 1) {
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            }
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
             }
           }
         }

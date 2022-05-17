@@ -6,6 +6,11 @@
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
     <div
+      class="common-notice-light-mask"
+      v-if="isNoticeMaskShow"
+      @click.stop.prevent="handleChangeNoticeState"
+    ></div>
+    <div
       class="vmp-basic-container"
       :class="clientType == 'embed' ? 'vmp-basic-container-embed' : 'vmp-basic-container-normarl'"
       v-if="state === 1"
@@ -39,10 +44,14 @@
         errorData: {
           errorPageTitle: '',
           errorPageText: ''
-        }
+        },
+        isNoticeMaskShow: false
       };
     },
     async created() {
+      this.$on('notice_panel_status', result => {
+        this.isNoticeMaskShow = result;
+      });
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 初始化直播房间
@@ -74,7 +83,7 @@
           this.goSubscribePage(this.clientType);
           return false;
         }
-        await this.initCheckAuth(); // 必须先setToken (绑定qq,wechat)
+        await this.initCheckAuth('watch'); // 必须先setToken (绑定qq,wechat)
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
@@ -120,7 +129,9 @@
       } catch (err) {
         console.error('---初始化直播房间出现异常--');
         console.error(err);
-        this.state = 2;
+        if (![512534, 512502, 512503].includes(Number(err.code))) {
+          this.state = 2;
+        }
         this.handleErrorCode(err);
         // this.errMsg = err.msg;
       }
@@ -247,6 +258,9 @@
             this.errorData.errorPageTitle = 'embed_verify';
             this.errorData.errorPageText = this.$tec(err.code) || err.msg;
         }
+      },
+      handleChangeNoticeState() {
+        this.$emit('notice_panel_close', false);
       }
     }
   };
