@@ -14,7 +14,8 @@ import {
   useDesktopShareServer,
   useSplitScreenServer,
   useInsertFileServer,
-  useMediaCheckServer
+  useMediaCheckServer,
+  useVideoPollingServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -44,6 +45,7 @@ export default new DomainStore.Store({
     desktopShareServer: useDesktopShareServer().state,
     splitScreenServer: useSplitScreenServer().state,
     insertFileServer: useInsertFileServer().state,
-    mediaCheckServer: useMediaCheckServer().state
+    mediaCheckServer: useMediaCheckServer().state,
+    videoPollingServer: useVideoPollingServer().state
   }
 });

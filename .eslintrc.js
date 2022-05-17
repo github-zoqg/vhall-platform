@@ -19,7 +19,9 @@ module.exports = {
     $: true,
     wx: true,
     WeixinJSBridge: true,
-    Vlog: true
+    Vlog: true,
+    moment: true,
+    Cookies: true
   },
   extends: [
     'plugin:vue/essential', // vue2核心的lint的规则
@@ -31,7 +33,7 @@ module.exports = {
     parser: 'babel-eslint'
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-console': 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'prettier/prettier': 'error',
     'no-unused-vars': 'off'

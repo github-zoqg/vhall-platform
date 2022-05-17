@@ -70,7 +70,9 @@ export const serverConfig = {
       'comScreenPost',
       'comMediaSetting',
       'comWatchPayFee',
-      'comMicInvited'
+      'comMicInvited',
+      'comCameraCheck',
+      'comViewRestriction'
     ]
   },
 
@@ -217,6 +219,13 @@ export const serverConfig = {
         cuid: 'compRegLogin',
         method: 'open'
       }
+    ],
+    emitClickOpenSignUpForm: [
+      // 报名表单
+      {
+        cuid: 'comSignUpForm',
+        method: 'openModal'
+      }
     ]
   },
   // 结束页面
@@ -309,6 +318,11 @@ export const serverConfig = {
     emitClickMediaSetting: {
       cuid: 'comMediaSetting',
       method: 'showMediaSetting'
+    },
+    // 打开摄像头检测
+    emitClickCameraCheck: {
+      cuid: 'comCameraCheck',
+      method: 'showCameraCheck'
     },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
@@ -504,6 +518,17 @@ export const serverConfig = {
       }
     ]
   },
+  // 摄像头检测及设置
+  comCameraCheck: {
+    component: 'VmpCameraCheck',
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
+  },
 
   // 预约页面配置
   layerSubscribeRoot: {
@@ -636,6 +661,20 @@ export const serverConfig = {
   embedVideoLayerBodyCenterMain: {
     component: 'VmpBasicCenterMain',
     children: ['comPcPlayer', 'comLivingEnd']
+  },
+  comViewRestriction: {
+    component: 'VmpViewRestriction',
+    emitAgreeWitthTerms: [
+      {
+        cuid: 'comVmpSubscribeBody',
+        method: 'handleAgreeWitthTerms'
+      },
+      {
+        cuid: 'comPcPlayer',
+        method: 'handleAgreeWitthTerms'
+      }
+    ]
   }
+
   // *******单视频嵌入页面****结束
 };

@@ -690,7 +690,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: scale-down;
       }
       .liveTag {
         position: absolute;
@@ -713,7 +713,7 @@
         transform-origin: left;
         text-overflow: ellipsis;
         overflow: hidden;
-        width: 100%;
+        // width: 100%;
       }
       .live-status {
         padding: 5px;
@@ -785,7 +785,7 @@
         vertical-align: bottom;
       }
       i {
-        font-size: 14px;
+        font-size: 16px;
         padding-right: 3px;
       }
       span {

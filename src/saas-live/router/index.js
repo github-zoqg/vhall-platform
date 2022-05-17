@@ -53,6 +53,20 @@ const routes = [
     meta: { title: '分屏', grayType: 'webinar' }
   },
   {
+    path: '/lives/video-polling/:id',
+    name: 'VideoPolling',
+    component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
+    meta: { title: '视频轮询', grayType: 'webinar' }
+  },
+  {
+    // 其它没有匹配到的路由都会跳至此模块(404）
+    // 该路由为必须路由，不需要权限，必须放在最后
+    path: '*',
+    name: 'notfound',
+    component: NotFound,
+    meta: { keepAlive: false, grayType: '' }
+  },
+  {
     path: '/lives/client/:il_id', // 客户端嵌入
     name: 'Client',
     component: () => import('@/saas-live/views/clientEmbed/index')

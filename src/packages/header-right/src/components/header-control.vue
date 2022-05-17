@@ -112,7 +112,7 @@
       },
       // 是否正在第三方推流
       thirtPushStreamimg() {
-        return this.roomBaseServer.state.isThirdStream;
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
       //是否显示第三方推流组件
       isShowThirdPushStream() {

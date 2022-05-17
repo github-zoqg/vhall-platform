@@ -56,7 +56,7 @@
 
 <script>
   // import { debounce } from 'lodash';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
@@ -262,12 +262,23 @@
             }
           }
         } else {
-          params = {
-            gift_id: this.currentGift.id,
-            channel: 'ALIPAY',
-            service_code: 'H5_PAY',
-            room_id: this.localRoomInfo.roomId
-          };
+          //如果是企业微信环境,需要启动微信h5支付相关参数
+          if (isWechatCom()) {
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'WEIXIN',
+              service_code: 'H5_PAY',
+              room_id: this.localRoomInfo.roomId
+            };
+          } else {
+            // 正常的h5支付, 支付宝
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'ALIPAY',
+              service_code: 'H5_PAY',
+              room_id: this.localRoomInfo.roomId
+            };
+          }
         }
 
         // 如果不需要经过微信授权
