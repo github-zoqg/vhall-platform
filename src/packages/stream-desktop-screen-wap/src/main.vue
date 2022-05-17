@@ -12,7 +12,6 @@
     useGroupServer,
     useDesktopShareServer
   } from 'middle-domain';
-  import { Toast } from 'vant';
 
   export default {
     name: 'VmpWapDesktopScreen',

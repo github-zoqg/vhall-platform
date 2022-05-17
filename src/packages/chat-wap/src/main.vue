@@ -69,7 +69,7 @@
     useMicServer,
     useMenuServer
   } from 'middle-domain';
-  import { ImagePreview } from 'vant';
+  // import { ImagePreview } from 'vh5-ui';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
@@ -390,7 +390,7 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
-        ImagePreview({
+        this.$imagePreview({
           images: list,
           startPosition: index,
           lazyLoad: true
