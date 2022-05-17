@@ -47,6 +47,10 @@
       },
       roleName() {
         return this.$domainStore.state.roomBaseServer?.join_info?.role_name;
+      },
+      // 是否为云导播
+      streamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     beforeCreate() {
@@ -62,6 +66,7 @@
       const hasRebroadCast = watchInitData.rebroadcast.id;
 
       if (
+        !this.streamYun &&
         watchInitData.webinar.type == 1 &&
         (hasRebroadCast ||
           (watchInitData.switch.start_type != 1 &&
