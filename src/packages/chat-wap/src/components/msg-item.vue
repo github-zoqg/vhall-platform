@@ -37,12 +37,11 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          <span :class="source.roleName == 1 ? 'host' : ''">
+          {{ source.roleName != 1 ? source.nickname : '' }}
+          <span class="role" :class="source.roleName | roleClassFilter">
             &nbsp;{{ source.roleName | roleFilter }}
           </span>
-          {{ source.roleName != 1 ? source.nickname : '' }}{{ source.content.text_content }}，{{
-            $t('common.common_1030')
-          }}
+          {{ source.content.text_content }}，{{ $t('common.common_1030') }}
           <span class="highlight">{{ $t('chat.chat_1060') }}</span>
         </div>
       </div>
@@ -127,34 +126,34 @@
               </p>
               <div class="msg-content_body">
                 <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="msgContent"></span>
-                <img
+                <span v-html="msgContent" class="chat-text"></span>
+                <div
                   @click="$emit('preview', img)"
                   class="msg-content_chat-img"
-                  width="50"
-                  height="50"
                   v-for="(img, index) in source.content.image_urls"
                   :key="index"
-                  :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
+                  :style="`backgroundImage: url('${
+                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                  }')`"
                   :alt="$t('chat.chat_1065')"
-                />
+                ></div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
             <!-- @消息 -->
             <template v-if="source.atList && source.atList.length !== 0">
               <div class="msg-content_body">
-                <span v-html="msgContent"></span>
-                <img
+                <span v-html="msgContent" class="chat-text"></span>
+                <div
                   @click="previewImg(img)"
                   class="msg-content_chat-img"
-                  width="50"
-                  height="50"
                   v-for="(img, index) in source.content.image_urls"
                   :key="index"
-                  :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
+                  :style="`backgroundImage: url('${
+                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                  }')`"
                   :alt="$t('chat.chat_1065')"
-                />
+                ></div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
@@ -165,7 +164,7 @@
                 (!source.atList || !source.atList.length)
               "
             >
-              <div class="msg-content_body" :class="multi ? 'multi' : ''">
+              <div class="msg-content_body">
                 <span class="reply-color"></span>
                 <span v-html="msgContent" class="chat-text"></span>
                 <div
@@ -513,14 +512,24 @@
           border-radius: 40px;
           padding: 10px 24px;
         }
-        .host {
-          background: rgba(251, 38, 38, 0.1);
-          color: #fb2626;
+        .role {
           border-radius: 16px;
           padding: 0 6px;
           margin-right: 8px;
           font-size: 22px;
           line-height: 22px;
+          &.host {
+            background: rgba(251, 38, 38, 0.1);
+            color: #fb2626;
+          }
+          &.assistant {
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
+          }
+          &.guest {
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
+          }
         }
       }
       .interact-msg {
