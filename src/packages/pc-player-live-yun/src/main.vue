@@ -51,7 +51,7 @@
     <!-- 本地推流区域 -->
     <div v-else class="stream_box">
       <div class="stream_box_header">
-        <span class="header_left">视频推流到云导播台 — {{ $route.query.seat_name }}</span>
+        <span class="header_left">推流到云导播台 — {{ $route.query.seat_name }}</span>
         <span class="header_right">
           <span class="vh-iconfont vh-line-setting" @click="setInteractive"></span>
           <span class="vh-iconfont vh-a-line-fullscreen" @click="fullScreen"></span>
