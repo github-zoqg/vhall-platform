@@ -84,6 +84,7 @@
           return false;
         }
         await this.initCheckAuth('watch'); // 必须先setToken (绑定qq,wechat)
+        // 使用活动的标题作为浏览器title显示
         document.title = roomBaseServer.state.languages.curLang.subject;
         let lang = roomBaseServer.state.languages.lang;
         this.$i18n.locale = lang.type;
