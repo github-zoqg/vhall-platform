@@ -439,6 +439,32 @@
       },
       PopAlertOfflineConfirm() {
         window.location.reload();
+      },
+      // 媒体切换后进行无缝切换
+      async switchStreamType(param) {
+        // 无缝切换音视频
+        if (param.audioInput) {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'audio'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
+        }
+
+        if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'video'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+        }
       }
     }
   };
@@ -578,6 +604,7 @@
       align-items: center;
       .header_left {
         margin-left: 36px;
+        font-size: 16px;
       }
       .header_right {
         flex: 1 0 auto;
