@@ -51,7 +51,7 @@
     <!-- 本地推流区域 -->
     <div v-else class="stream_box">
       <div class="stream_box_header">
-        <span class="header_left">视频推流到云导播台 — {{ $route.query.seat_name }}</span>
+        <span class="header_left">推流到云导播台 — {{ $route.query.seat_name }}</span>
         <span class="header_right">
           <span class="vh-iconfont vh-line-setting" @click="setInteractive"></span>
           <span class="vh-iconfont vh-a-line-fullscreen" @click="fullScreen"></span>
@@ -189,6 +189,7 @@
         }
       },
       liveStart: {
+        immediate: true,
         handler: function (val) {
           if (this.joinInfo.role_name == 3) {
             if (val) {
@@ -211,10 +212,10 @@
       console.log(
         this.roomBaseServer,
         this.interactiveServer,
-        this.pushStream,
+        this.joinInfo.role_name,
         'this.interactiveServer'
       );
-      this.init();
+      this.joinInfo.role_name == 1 && this.init();
       window.addEventListener('keydown', e => {
         if (e.keyCode == 27) {
           this.isFullScreen = false;
@@ -225,6 +226,22 @@
           }
         }
       });
+      try {
+        const dom = document.getElementById('vmp-player-yun');
+        dom.onmousemove = () => {
+          this.into++;
+          try {
+            this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
+          } catch (err) {
+            console.log(err);
+          }
+        };
+        dom.onmouseleave = () => {
+          this.into = 0;
+        };
+      } catch (err) {
+        console.log(err);
+      }
 
       // 房间信令异常断开事件
       this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
@@ -238,18 +255,6 @@
       async init() {
         // 主持人初始化播放器
         if (!this.pushStream) {
-          const dom = document.getElementById('vmp-player-yun');
-          dom.onmousemove = () => {
-            this.into++;
-            try {
-              this.into < 2 && window.JsCallQtMsg(JSON.stringify({ type: 'EnterWnd"' }));
-            } catch (err) {
-              console.log(err);
-            }
-          };
-          dom.onmouseleave = () => {
-            this.into = 0;
-          };
           await this.initPlayer();
           // 获取云导播台是否有流
           this.roomBaseServer.getStreamStatus();
@@ -434,6 +439,32 @@
       },
       PopAlertOfflineConfirm() {
         window.location.reload();
+      },
+      // 媒体切换后进行无缝切换
+      async switchStreamType(param) {
+        // 无缝切换音视频
+        if (param.audioInput) {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'audio'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
+        }
+
+        if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'video'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+        }
       }
     }
   };
@@ -573,6 +604,7 @@
       align-items: center;
       .header_left {
         margin-left: 36px;
+        font-size: 16px;
       }
       .header_right {
         flex: 1 0 auto;

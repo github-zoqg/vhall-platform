@@ -928,6 +928,6 @@ export const serverConfig = {
   // 【云导播页面】本地流&播放器
   liveStreamYunRoot: {
     component: 'VmpAirContainer',
-    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
+    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck', 'comStreamLocal']
   }
 };
