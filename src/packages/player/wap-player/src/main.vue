@@ -178,7 +178,7 @@
                     {{ formatQualityText(currentQualitys.def) }}
                   </span>
                   <span
-                    class="icons-quality"
+                    class="icons-quality icons-speed"
                     @click="openSpeed"
                     v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview"
                   >
@@ -1047,11 +1047,17 @@
         justify-content: space-between;
         align-items: center;
         padding-top: 15px;
+        .vh-iconfont {
+          font-size: 32px;
+        }
         &-left {
           .vh-line-refresh-left,
           &-time {
             padding-left: 15px;
-            vertical-align: middle;
+            // vertical-align: middle;
+          }
+          .vh-line-refresh-left {
+            font-size: 28px;
           }
         }
         &-right {
@@ -1063,15 +1069,17 @@
             border: 1px solid #fff;
             border-radius: 20px;
             display: inline-block;
-            width: 65px;
-            height: 32px;
+            width: 90px;
+            height: 40px;
             text-align: center;
-            line-height: 30px;
-            font-size: 8px;
+            line-height: 40px;
+            font-size: 28px;
+            margin-left: 0;
+            transform: scale(0.8);
           }
-        }
-        .vh-iconfont {
-          font-size: 32px;
+          .icons-speed {
+            margin-right: -8px;
+          }
         }
         // .icon-zanting_icon{
         //   font-size: 34px;
