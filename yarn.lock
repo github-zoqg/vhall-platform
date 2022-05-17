@@ -9612,6 +9612,11 @@ svg-tags@^1.0.0:
   resolved "https://registry.npmjs.org/svg-tags/-/svg-tags-1.0.0.tgz"
   integrity sha1-WPcc7jvVGbWdSyqEO2x95krAR2Q=
 
+svgaplayerweb@^2.3.2:
+  version "2.3.2"
+  resolved "http://192.168.66.26:4873/svgaplayerweb/-/svgaplayerweb-2.3.2.tgz#15595b8dcc20cf4de4adc3103970b7cf5ae19a84"
+  integrity sha512-QuTvNIgy3W6Mi4h74SczEHUtAwb8m3ax7Ai7xRLUuN6hjJh49RGtWOWq1IuF2I7ECcl0HAYn8FcTn99UDz9UiQ==
+
 svgo@^1.0.0:
   version "1.3.2"
   resolved "https://registry.npmjs.org/svgo/-/svgo-1.3.2.tgz"
