@@ -38,7 +38,7 @@
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
           <span :class="source.roleName == 1 ? 'host' : ''">
-            {{ source.roleName | roleFilter }}
+            &nbsp;{{ source.roleName | roleFilter }}
           </span>
           {{ source.roleName != 1 ? source.nickname : '' }}{{ source.content.text_content }}，{{
             $t('common.common_1030')
@@ -98,6 +98,9 @@
           </p>
           <!-- 正常聊天消息 -->
           <p class="msg-content_name" v-else>
+            <span class="nickname">
+              {{ source.nickname }}
+            </span>
             <span
               v-if="source.roleName && source.roleName != '2'"
               class="role"
@@ -105,12 +108,9 @@
             >
               {{ source.roleName | roleFilter }}
             </span>
-            <span class="nickname">
-              {{ source.nickname }}
-            </span>
           </p>
           <!-- 图文消息 -->
-          <div class="msg-content_body_pre">
+          <div class="msg-content_body_pre" :class="multi ? 'multi' : ''">
             <!-- 回复消息 -->
             <template
               v-if="
@@ -165,19 +165,19 @@
                 (!source.atList || !source.atList.length)
               "
             >
-              <div class="msg-content_body">
+              <div class="msg-content_body" :class="multi ? 'multi' : ''">
                 <span class="reply-color"></span>
-                <span v-html="msgContent" style="display: block" class="aaa"></span>
-                <img
+                <span v-html="msgContent" class="chat-text"></span>
+                <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
-                  width="50"
-                  height="50"
                   v-for="(img, index) in source.content.image_urls"
                   :key="index"
-                  :src="img + '?x-oss-process=image/resize,m_lfit,h_150,w_150'"
+                  :style="`backgroundImage: url('${
+                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                  }')`"
                   :alt="$t('chat.chat_1065')"
-                />
+                ></div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
@@ -252,6 +252,15 @@
           return 'guest';
         }
         return '';
+      }
+    },
+    computed: {
+      multi() {
+        if (this.msgContent.indexOf('<br/>') == -1) {
+          return false;
+        } else {
+          return true;
+        }
       }
     },
     mounted() {
@@ -373,8 +382,8 @@
       text-align: center;
     }
     .msg-item {
-      margin: 0 30px;
-      padding: 10px 0;
+      margin: 0 24px;
+      padding: 8px 0 24px;
       display: flex;
       align-items: flex-start;
 
@@ -399,7 +408,7 @@
         .msg-content_name {
           display: flex;
           align-items: center;
-          margin-bottom: 5px;
+          margin-bottom: 12px;
           height: 34px;
           .nickname {
             font-size: 22px;
@@ -410,6 +419,7 @@
             color: #666;
             max-width: 300px;
             line-height: 34px;
+            margin-right: 8px;
           }
           .role {
             margin-right: 10px;
@@ -440,6 +450,14 @@
             left: -11px;
             top: 14px;
           }
+          &.multi {
+            .msg-content_body {
+              padding: 12px;
+              .chat-text {
+                line-height: 39px;
+              }
+            }
+          }
         }
         .reply-color {
           color: #4da1ff;
@@ -454,8 +472,7 @@
         .msg-content_body {
           position: relative;
           display: inline-block;
-          margin-top: 5px;
-          padding: 18px 20px;
+          padding: 16px;
           word-break: break-all;
           color: #444;
           line-height: 36px;
@@ -464,15 +481,19 @@
           span {
             word-break: break-word;
           }
-        }
-        .msg-content_chat-img-wrapper {
+          .chat-text {
+            display: block;
+            line-height: 28px;
+          }
           .msg-content_chat-img {
-            float: left;
+            display: inline-block;
+            margin-top: 12px;
             margin-right: 8px;
-            margin-top: 8px;
-            &:first-child {
-              margin-left: 8px;
-            }
+            width: 84px;
+            height: 86px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
           }
         }
         .emoji-img {
@@ -497,6 +518,9 @@
           color: #fb2626;
           border-radius: 16px;
           padding: 0 6px;
+          margin-right: 8px;
+          font-size: 22px;
+          line-height: 22px;
         }
       }
       .interact-msg {

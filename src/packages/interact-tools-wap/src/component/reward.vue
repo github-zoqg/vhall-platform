@@ -41,7 +41,10 @@
             @blur="textBlur"
           >
             <div slot="extra">
-              <span class="text-limit">{{ note.length }}/15</span>
+              <span class="text-limit">
+                <span>{{ note.length }}</span>
+                /15
+              </span>
             </div>
           </van-field>
         </div>
@@ -323,6 +326,9 @@
       color: #8c8c8c;
       border-radius: 8px;
       font-size: 28px;
+      input {
+        color: #262626;
+      }
     }
 
     .notes {
@@ -336,6 +342,9 @@
         right: 20px;
         font-size: 28px;
         color: rgba(89, 89, 89, 0.8);
+        > span {
+          color: rgba(10, 127, 245, 0.8);
+        }
       }
     }
     .btn {

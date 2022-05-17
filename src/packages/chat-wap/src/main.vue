@@ -499,18 +499,21 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 0;
-        height: 60px;
-        background-color: rgba(255, 233, 233, 0.9);
-        border: 1px solid rgba(254, 129, 148, 1);
-        color: #333;
-        font-size: 26px;
+        bottom: 20px;
+        width: 337px;
+        height: 56px;
+        background: #ffffff;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 28px;
+        color: #0a7ff5;
+        font-size: 28px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 0 auto;
         .vh-iconfont {
           font-size: 16px;
-          margin-left: 19px;
+          margin-left: 7px;
         }
       }
     }
