@@ -231,14 +231,15 @@
 
         // 结束分组讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          const isSwitchEnd = msg.data.type == 'group_switch_end';
           // 关闭邀请演示对话框
           this.dialogVisibleInvite && this.$refs.groupInvitaion.close();
           this.isCollapse = true;
           if (!msg.data.groupToast) {
             this.grouAlert(
-              `${
-                msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)
-              }结束了分组讨论，您将返回主直播间`
+              `${msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3)}${
+                isSwitchEnd ? '结束' : '暂停'
+              }了分组讨论，您将返回主直播间`
             );
           }
         });

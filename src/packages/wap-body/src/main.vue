@@ -181,6 +181,7 @@
       async gobackHome(index, name, msg) {
         // 1 主持人    3 助理
         const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
+        const isSwitchEnd = msg.data.type == 'group_switch_end';
         let title = '';
         switch (index) {
           case 1:
@@ -190,7 +191,7 @@
             title = who + '已将您分配至' + name + '组';
             break;
           case 3:
-            title = who + '结束了分组讨论，您将返回主直播间';
+            title = `${who}${isSwitchEnd ? '结束' : '暂停'}了分组讨论，您将返回主直播间`;
             break;
           case 4:
             title = who + '解散了分组，您将返回主直播间';
