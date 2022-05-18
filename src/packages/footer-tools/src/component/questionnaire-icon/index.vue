@@ -92,6 +92,7 @@
       // 问卷填写
       writeQ(data) {
         // console.log(data);
+        this.closeQuestionList();
         this.$emit('clickIcon', data.question_id);
       }
     }
