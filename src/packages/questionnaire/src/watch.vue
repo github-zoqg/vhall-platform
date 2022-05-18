@@ -48,7 +48,7 @@
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$message({
-              message: this.$t('form.form_1037'),
+              message: this.$t('form.form_1087'),
               showClose: true,
               // duration: 0,
               type: 'success',

@@ -49,7 +49,7 @@
       open(questionnaireId) {
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
-            this.$toast(this.$t('form.form_1037'));
+            this.$toast(this.$t('form.form_1087'));
           } else {
             this.popupVisible = true;
             this.$nextTick(() => {
@@ -92,7 +92,7 @@
             this.$toast(this.$t('interact_tools.interact_tools_1068'));
             this.popupVisible = false;
           } else {
-            this.$toast(this.$t('form.form_1037'));
+            this.$toast(this.$t('form.form_1087'));
             this.popupVisible = false;
           }
         });
