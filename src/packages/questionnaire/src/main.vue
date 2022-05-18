@@ -169,7 +169,7 @@
     <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
       <div>
         <div class="async__ctx">
-          <el-input v-model="alias" :placeholder="'请输入标记文字'" maxlength="8">
+          <el-input v-model="alias" :placeholder="'问卷'" maxlength="8">
             <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
               <span
                 :style="{
@@ -378,6 +378,8 @@
         this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector);
         this.showTip = true;
+        // 若当前是创建出发，alias别名设置为 ‘’
+        this.alias = '';
       },
       /**
        * @description 编辑问卷
@@ -679,7 +681,13 @@
       },
       // 复制
       copy(id) {
-        this.questionnaireServer.copyQuestionnaire(id).then(res => {
+        const params = {
+          surveyId: id
+        };
+        if (this.alias) {
+          params.alias = this.alias;
+        }
+        this.questionnaireServer.copyQuestionnaire(params).then(res => {
           this.$message({
             type: res.code == 200 ? 'success' : 'error',
             message: res.msg
