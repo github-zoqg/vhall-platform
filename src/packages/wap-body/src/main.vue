@@ -145,10 +145,10 @@
 
         // 本人被踢出来
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
-          const { interactToolStatus, watchInitData } = useRoomBaseServer().state;
+          const { watchInitData } = useRoomBaseServer().state;
           // 如果已经开启了讨论，而且被踢出的人是自己
           if (
-            interactToolStatus.is_open_switch == 1 &&
+            this.groupServer.state.groupInitData.switch_status == 1 &&
             msg.data.target_id === watchInitData.join_info.third_party_user_id
           ) {
             this.gobackHome(5, this.groupServer.state.groupInitData.name, msg);
@@ -181,6 +181,7 @@
       async gobackHome(index, name, msg) {
         // 1 主持人    3 助理
         const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
+        const isSwitchEnd = msg.data.type == 'group_switch_end';
         let title = '';
         switch (index) {
           case 1:
@@ -190,7 +191,7 @@
             title = who + '已将您分配至' + name + '组';
             break;
           case 3:
-            title = who + '结束了分组讨论，您将返回主直播间';
+            title = `${who}${isSwitchEnd ? '结束' : '暂停'}了分组讨论，您将返回主直播间`;
             break;
           case 4:
             title = who + '解散了分组，您将返回主直播间';
