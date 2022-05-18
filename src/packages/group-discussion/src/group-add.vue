@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-  import { useGroupServer } from 'middle-domain';
+  import { useGroupServer, useRoomBaseServer } from 'middle-domain';
   import _ from 'lodash';
 
   export default {
@@ -49,6 +49,7 @@
     },
     beforeCreate() {
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
     },
     computed: {
       placeholder() {
@@ -71,10 +72,13 @@
           this.$message.warning('参数错误');
           return false;
         }
+        const { watchInitData = {} } = this.roomBaseServer.state;
         try {
           const result = await this.groupServer.groupCreate({
             number: c,
-            way: 2
+            way: 2,
+            switch_id: watchInitData.switch.switch_id,
+            webinar_id: watchInitData.webinar.id
           });
           if (result && result.code === 200) {
             this.count = 1;

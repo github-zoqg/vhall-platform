@@ -82,6 +82,7 @@
           nickname = '',
           email = '',
           liveT = '',
+          live_token = '',
           token_type = '',
           assistant_token = ''
         } = this.$route.query;
@@ -100,7 +101,7 @@
             token: localStorage.getItem('token') || ''
           },
           requestBody: {
-            live_token: liveT
+            live_token: liveT || live_token
           },
           initRoom: {
             webinar_id: id, //活动id

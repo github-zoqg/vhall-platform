@@ -59,6 +59,29 @@
         <vmp-video-polling-member-list></vmp-video-polling-member-list>
       </div>
     </div>
+    <!-- confirm 弹窗 -->
+    <saas-alert
+      :visible="confirmInfo.visible"
+      :confirm="true"
+      :confirmText="$t('common.common_1010')"
+      :cancelText="$t('account.account_1063')"
+      @onSubmit="confirmSave"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+      style="pointer-events: initial"
+    >
+      <main slot="content">{{ confirmInfo.text }}</main>
+    </saas-alert>
+
+    <!-- alert 弹窗 -->
+    <saas-alert
+      :visible="alertInfo.visible"
+      :knowText="'知道了'"
+      @onClose="closeAlert"
+      @onCancel="closeAlert"
+    >
+      <main slot="content">{{ alertInfo.text }}</main>
+    </saas-alert>
   </div>
 </template>
 
@@ -67,10 +90,12 @@
   import screenfull from 'screenfull';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
   import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpVideoPolling',
     components: {
-      VmpVideoPollingMemberList
+      VmpVideoPollingMemberList,
+      SaasAlert
     },
     data() {
       return {
@@ -81,7 +106,15 @@
         isPausedPolling: false, // 是否暂停轮巡
         countTimer: null, // 自动下一组的计时器
         minute: '10', // 自动下一组的计时时间
-        second: '00' // 自动下一组的计时时间q
+        second: '00', // 自动下一组的计时时间q
+        alertInfo: {
+          visible: false, // 是否显示
+          text: '' // 显示的内容
+        },
+        confirmInfo: {
+          visible: false, // 是否显示
+          text: '' // 确认的内容
+        }
       };
     },
     computed: {
@@ -304,13 +337,7 @@
           return;
         }
 
-        this.$confirm('关闭后将结束视频轮巡功能', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          lockScroll: false,
-          cancelButtonClass: 'zdy-confirm-cancel'
-        }).then(() => {
+        this.setPollingConfirm('关闭后将结束视频轮巡功能', () => {
           this.videoPollingServer.videoRoundEnd().then(res => {
             if (res.code === 200) {
               this._isExitPolling = true;
@@ -327,17 +354,29 @@
       enterFullScreen() {
         screenfull.toggle(this.$refs.videoPolling);
       },
-      // 已经有其他人开启了轮巡
+      // 开启alert弹窗
       setPollingAlert(title) {
-        this.$alert(title, '', {
-          title: '提示',
-          confirmButtonText: '知道了',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel',
-          callback: () => {
-            window.open(location, '_self').close();
-          }
-        });
+        this.alertInfo.text = title;
+        this.alertInfo.visible = true;
+      },
+      // 关闭alert
+      closeAlert() {
+        window.open(location, '_self').close();
+      },
+      // 开启确认弹窗
+      setPollingConfirm(text, cb) {
+        this.confirmInfo.text = text;
+        this.confirmInfo.visible = true;
+        this._confirmCb = cb;
+      },
+      // confirm取消
+      closeConfirm() {
+        this.confirmInfo.visible = false;
+      },
+      // confirm确认
+      confirmSave() {
+        this._confirmCb && typeof this._confirmCb === 'function' && this._confirmCb();
+        this.confirmInfo.visible = false;
       }
     }
   };
