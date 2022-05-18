@@ -244,6 +244,18 @@
           // 默认显示菜单中的第一个
           this.selectDefault();
         });
+        //收到问答修改消息
+        qaServer.$on(qaServer.Events.QA_SET, msg => {
+          if (this.roleName == 2) {
+            this.setTabName({
+              type: 'v5',
+              name:
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                  ? this.$t('common.common_1004')
+                  : msg.data.name
+            });
+          }
+        });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
           if (this.webinarInfo.type == 1) {
@@ -445,7 +457,11 @@
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
-
+      setTabName({ type, id, name }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+        name && (tab.name = name);
+      },
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
