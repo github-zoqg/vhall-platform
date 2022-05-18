@@ -210,7 +210,7 @@
       width="732px"
       :show-close="true"
     >
-      <img src="./images/Q_preview.png" alt="" />
+      <img src="./images/Q_preview.png" alt="" class="img_size" />
     </el-dialog>
   </div>
 </template>
@@ -389,7 +389,7 @@
         this.showTip = true;
         this.prevQuestionnaireId = null;
         this.alias = row.alias;
-        this.questionnaireServer.renderCreatQuestionnaire(selector, row.id);
+        this.questionnaireServer.renderCreatQuestionnaire(selector, row.question_id);
       },
       setReportData(data) {
         const { id, title, description, detail, imgUrl } = data;
@@ -784,6 +784,9 @@
         .el-dialog__close {
           color: white;
         }
+      }
+      .img_size {
+        width: 100%;
       }
     }
   }
