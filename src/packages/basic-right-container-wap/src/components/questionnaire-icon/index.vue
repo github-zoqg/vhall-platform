@@ -3,6 +3,7 @@
     <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" />
     <i class="dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
+    <div class="popup_base" v-if="showQuestionList"></div>
     <van-popup
       get-container="#otherPopupContainer"
       class="questionnaire_base"
@@ -25,7 +26,7 @@
                   <i class="num"></i>
                 </span>
                 <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
-                  {{ item.title }}
+                  <span class="ellipsis_title">{{ item.title }}</span>
                 </p>
                 <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
                 <span v-else class="write write_over">已填</span>
@@ -53,6 +54,9 @@
     computed: {
       QuestionList() {
         return this.questionnaireServer.state.QuestionList;
+      },
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {
@@ -62,8 +66,19 @@
     },
     created() {
       this.questionnaireServer.checkIconStatus();
+      this.setSetingHeight();
     },
     methods: {
+      setSetingHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 80px为顶部图片一般高度
+        let baseHeight = 522 - 80;
+        if (this.isEmbed) {
+          baseHeight = 422 - 80;
+        }
+        this.popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+      },
       async clickQuestionnaireIcon() {
         if (this.showQuestionList) return false;
         await this.questionnaireServer.getSurveyList();
@@ -114,8 +129,18 @@
       background-color: #ff0005;
       content: '';
     }
+    .popup_base {
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 30;
+    }
     .questionnaire_base {
       height: 100%;
+      background: transparent;
     }
     .vmp-questionnaire-list_container {
       height: calc(100% - 80px);
@@ -199,12 +224,19 @@
             word-break: break-word;
             border-left: 1px dashed #3562fa;
             border-radius: 2px;
+            .ellipsis_title {
+              display: -webkit-box;
+              /**autoprefixer: ignore next */
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
           }
         }
       }
       .vh-line-close {
         position: absolute;
-        color: #666;
+        color: #8c8c8c;
         top: 110px;
         right: 30px;
         cursor: pointer;

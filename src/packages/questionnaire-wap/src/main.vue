@@ -89,7 +89,7 @@
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
           if (res.code === 200) {
-            this.$toast(this.$t('interact_tools.interact_tools_1068'));
+            this.$toast(this.$t('form.form_1088'));
             this.popupVisible = false;
           } else {
             this.$toast(this.$t('form.form_1087'));

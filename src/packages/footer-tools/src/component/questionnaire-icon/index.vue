@@ -17,7 +17,9 @@
                 <i class="num"></i>
               </span>
               <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
-                {{ item.title }}
+                <span class="ellipsis">
+                  {{ item.title }}
+                </span>
               </p>
               <span class="write write_hover" v-if="item.is_answered == 0" @click="writeQ(item)">
                 填写
@@ -73,7 +75,7 @@
       async checkQuestionnaireIcon() {
         if (this.isShowQuestionList) return false;
         await this.questionnaireServer.getSurveyList();
-        let arr = this.QuestionList.filter(item => item.is_answered == 0);
+        let arr = this.QuestionList && this.QuestionList.filter(item => item.is_answered == 0);
         if (arr.length == 0) {
           this.$message.success(this.$t('form.form_1087'));
           return false;
@@ -212,15 +214,13 @@
             color: #1a1a1a;
             border-left: 1px dashed #3562fa;
             border-radius: 2px;
-            display: -webkit-box;
-
-            -webkit-box-orient: vertical;
-
-            -webkit-line-clamp: 2;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
+            .ellipsis {
+              display: -webkit-box;
+              /**autoprefixer: ignore next */
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
           }
         }
       }
