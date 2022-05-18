@@ -49,16 +49,18 @@
             style="position: relative"
             auth="{ 'ui.hide_reward': 0 }"
           >
-            <i
+            <img
               v-if="!handUpStatus"
-              class="vh-saas-iconfont vh-saas-line-shangmai"
+              class="tool shangmai-img"
+              src="../img/default_avatar.png"
               @click="$refs.handup.openConnectPop()"
-            ></i>
-            <i
+            />
+            <img
               v-else
-              class="vh-saas-iconfont vh-saas-line-shangmaizhong"
+              class="tool shangmaizhong-img"
+              src="../img/default_avatar.png"
               @click="$refs.handup.openConnectPop()"
-            ></i>
+            />
             <span class="red-dot" v-if="handUpStatus"></span>
             <Handup
               ref="handup"
@@ -519,7 +521,6 @@
       .interact-wrapper {
         margin-left: 40px;
         text-align: right;
-        height: 40px;
         padding-right: 10px;
 
         .icon-wrapper {
@@ -541,6 +542,11 @@
           .vh-iconfont {
             font-size: 47px;
             color: #666666;
+          }
+
+          .tool {
+            width: 48px;
+            height: 48px;
           }
 
           .red-dot {

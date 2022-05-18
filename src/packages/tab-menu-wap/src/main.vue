@@ -553,7 +553,7 @@
       position: relative;
       padding: 0 24px;
       width: 100%;
-      height: 90px;
+      height: 80px;
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
@@ -577,14 +577,13 @@
         height: 100%;
         text-align: center;
         font-size: 14px;
-        color: #444;
+        color: #999;
         height: 100%;
         cursor: pointer;
 
-        &.disabledClick:hover {
-          cursor: auto;
+        &.disabledClick {
           i {
-            color: @font-light-low;
+            color: rgba(153, 153, 153, 0.4);
           }
         }
 
@@ -620,7 +619,7 @@
         height: 100%;
         justify-content: center;
         align-items: center;
-        padding: 0 34px;
+        padding: 0 32px;
         color: #595959;
         cursor: pointer;
         user-select: none;

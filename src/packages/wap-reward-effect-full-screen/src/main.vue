@@ -1,6 +1,7 @@
 <template>
-  <div class="vmp-wap-reward-effect-svga" v-show="showEffectStatus">
-    <SvgaPlayer ref="svgaPlayer" class="player-zone" @finish="finishedPlay" />
+  <div class="vmp-wap-reward-effect-full-screen" v-show="showEffectStatus">
+    <SvgaPlayer v-show="isSvga" ref="svgaPlayer" class="player-zone" @finish="finishedPlay" />
+    <ImgPlayer v-show="!isSvga" ref="gifPlayer" class="player-zone" @finish="finishedPlay" />
   </div>
 </template>
 
@@ -12,21 +13,24 @@
     useMenuServer
   } from 'middle-domain';
   import SvgaPlayer from './svga-player';
+  import ImgPlayer from './img-player';
   import TaskQueue from './taskQueue';
   // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
-    name: 'VmpWapRewardEffectSVGA',
+    name: 'VmpWapRewardEffectFullScreen',
     data() {
       return {
         //是否屏蔽特效
         hideEffect: false,
         showEffectStatus: false,
-        taskQueue: null // 飘窗列队
+        taskQueue: null, // 飘窗列队
+        isSvga: true
       };
     },
     components: {
-      SvgaPlayer
+      SvgaPlayer,
+      ImgPlayer
     },
     computed: {
       watchInitData() {
@@ -128,7 +132,17 @@
        */
       async startPlay(reload) {
         this.showEffectStatus = true;
-        let compontent = this.$refs.svgaPlayer;
+        this.visible = true;
+        let compontent;
+        // 自定义礼物
+        if (reload.data.source_status == 1) {
+          compontent = this.$refs.gifPlayer;
+          this.isSvga = false;
+        } else {
+          compontent = this.$refs.svgaPlayer;
+          this.isSvga = true;
+        }
+
         console.time('startPlay');
         await compontent.startPlay(reload);
         console.timeEnd('startPlay');
@@ -151,14 +165,14 @@
       }
     },
     destroy() {
-      console.log('VmpWapRewardEffectSVGA 组件销毁');
+      console.log('VmpWapRewardEffectFullScreen 组件销毁');
     }
   };
 </script>
 
 <style lang="less">
   // 飘屏
-  .vmp-wap-reward-effect-svga {
+  .vmp-wap-reward-effect-full-screen {
     position: absolute;
     left: 0;
     bottom: 100px;

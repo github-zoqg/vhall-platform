@@ -2,7 +2,7 @@
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
-        <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
+        <img class="tool gift-img" src="./img/like-3.1.4.png" @click="opneGifts" />
         <GiftCard
           ref="gifts"
           :isEmbed="localRoomInfo.isEmbed"
@@ -14,7 +14,7 @@
       </div>
       <!-- 打赏 -->
       <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
-        <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
+        <img class="tool redpacket-img" src="./img/like-3.1.4.png" @click="openReward" />
         <RewardCard
           ref="reward"
           :webinarData="webinarData"
@@ -28,7 +28,7 @@
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
-          <i class="vh-iconfont vh-line-share"></i>
+          <img class="tool share-img" src="./img/like-3.1.4.png" />
         </a>
       </div>
 
@@ -117,9 +117,15 @@
       & > div {
         font-size: 43px;
         margin-right: 36px;
+        display: flex;
+        align-items: center;
         &:last-child {
           margin-right: 0px;
         }
+      }
+      .tool {
+        width: 48px;
+        height: 48px;
       }
     }
     .vh-saas-iconfont,
