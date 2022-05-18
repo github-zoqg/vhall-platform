@@ -169,11 +169,11 @@
     <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
       <div>
         <div class="async__ctx">
-          <el-input v-model="alias" :placeholder="'请输入标记文字'" maxlength="8">
+          <el-input v-model="alias" :placeholder="'请输入名称'" maxlength="8">
             <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
               <span
                 :style="{
-                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : ''
+                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : '#999'
                 }"
               >
                 {{ alias.length }}
@@ -188,7 +188,7 @@
         </div>
         <div class="setname_button">
           <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
-            确定
+            保存
           </el-button>
           <el-button
             plain
@@ -248,7 +248,7 @@
         totalPages: 0, // 总页数
         dialogNameSet: false,
         dialogPreview: false,
-        alias: '',
+        alias: '问卷',
         showTip: false
       };
     },
@@ -763,6 +763,9 @@
 </script>
 <style lang="less">
   .questionnaire-lve {
+    .vh-line-question {
+      color: #999;
+    }
     .el-dialog__wrapper {
       height: 100vh;
       overflow: hidden;
@@ -827,6 +830,7 @@
   }
   .setname_tip {
     margin-top: 10px;
+    color: #666;
   }
   .setname_button {
     text-align: right;
