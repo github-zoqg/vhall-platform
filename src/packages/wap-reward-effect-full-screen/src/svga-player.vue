@@ -3,6 +3,7 @@
 </template>
 <script>
   import SVGA from 'svgaplayerweb';
+  import SVGAs from './source/svgas.js';
   const sourceMap = new Map();
   let parser, player;
   export default {
@@ -33,7 +34,8 @@
       },
       startPlay(reload) {
         // const path = `${this.$imgHost}/${reload.full_screen_image_url}`;
-        const path = `https://static.vhallyun.com/mp-prod/af/4e/af4edf96a16a48d1229ea5c00d9d47d8.svga`;
+        // const path = `https://static.vhallyun.com/mp-prod/af/4e/af4edf96a16a48d1229ea5c00d9d47d8.svga`;
+        const path = SVGAs[reload.data.gift_name];
         console.time(`get:${path}`);
         let videoItem = sourceMap.get(path);
         console.timeEnd(`get:${path}`);
@@ -55,4 +57,4 @@
     }
   };
 </script>
-<style lang="scss" scoped></style>
+<style lang="less" scoped></style>

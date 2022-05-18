@@ -79,7 +79,7 @@
     </template>
     <!-- 聊天消息 -->
     <template v-else>
-      <div v-if="source.showTime" class="msg-showtime">{{ source.showTime }}</div>
+      <div v-if="showTime" class="msg-showtime">{{ showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
           <img
@@ -188,6 +188,7 @@
 </template>
 <script>
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
+  import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     props: {
       source: {
@@ -260,6 +261,15 @@
         } else {
           return true;
         }
+      },
+      showTime() {
+        if (!this.source.sendTime) {
+          return '';
+        }
+        if (!this.source.prevTime) {
+          return handleChatShowTime('', this.source.sendTime);
+        }
+        return handleChatShowTime(this.source.prevTime, this.source.sendTime);
       }
     },
     mounted() {
