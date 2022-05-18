@@ -169,7 +169,7 @@
     <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
       <div>
         <div class="async__ctx">
-          <el-input v-model="alias" :placeholder="'问卷'" maxlength="8">
+          <el-input v-model="alias" :placeholder="'请输入名称'" maxlength="8">
             <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
               <span
                 :style="{
@@ -187,13 +187,11 @@
           </p>
         </div>
         <div class="setname_button">
-          <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
-            确定
-          </el-button>
+          <el-button type="primary" size="medium" @click="closeDialogNameSet" round>确定</el-button>
           <el-button
             plain
             size="medium"
-            @click="dialogNameSet = false"
+            @click="closeDialogNameSet"
             round
             class="hover_button_cancel"
           >
@@ -248,7 +246,7 @@
         totalPages: 0, // 总页数
         dialogNameSet: false,
         dialogPreview: false,
-        alias: '',
+        alias: '问卷',
         showTip: false
       };
     },
@@ -379,7 +377,7 @@
         this.questionnaireServer.renderCreatQuestionnaire(selector);
         this.showTip = true;
         // 若当前是创建出发，alias别名设置为 ‘’
-        this.alias = '';
+        this.alias = '问卷';
       },
       /**
        * @description 编辑问卷
@@ -761,6 +759,11 @@
       // 问卷别名设置
       openSet() {
         this.dialogNameSet = true;
+      },
+      // 确定 or 取消的时候，数据还原。若为‘’，默认为问卷
+      closeDialogNameSet() {
+        this.dialogNameSet = false;
+        this.alias = this.alias || '问卷';
       },
       // 问卷别名设置样式预览
       showPreview() {
