@@ -100,6 +100,17 @@
           <p class="qa_content_txt" v-if="isQAEnabled">
             该功能已开启，是否关闭？ 当前已收集问题：{{ qaCount }} 个
           </p>
+          <el-form inline v-if="isQAEnabled">
+            <el-form-item label="显示名称" class="qa_name_item">
+              <el-input
+                class="form-input qa_name"
+                maxlength="8"
+                show-word-limit
+                v-model="QAName"
+                :disabled="isQAEnabled"
+              ></el-input>
+            </el-form-item>
+          </el-form>
         </template>
         <template v-else>
           <p class="qa_content_txt" v-if="!isQAEnabled">
