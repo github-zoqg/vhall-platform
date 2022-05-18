@@ -24,7 +24,7 @@
                 <span class="data-text_circle">
                   <i class="num"></i>
                 </span>
-                <p class="data-text_title" :class="item.is_answered ? '' : 'write_over'">
+                <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
                   {{ item.title }}
                 </p>
                 <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
@@ -69,7 +69,7 @@
         await this.questionnaireServer.getSurveyList();
         let arr = this.QuestionList.filter(item => item.is_answered == 0);
         if (arr.length == 0) {
-          this.$toast('提交成功，感谢您的参与。');
+          this.$toast(this.$t('form.form_1087'));
           return false;
         }
         // 如果只有一份未填写,则直接打开问卷
@@ -177,7 +177,7 @@
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #3562fa;
-            top: 4px;
+            top: 0;
             left: -11px;
             position: absolute;
             .num {
@@ -194,6 +194,7 @@
           }
           &_title {
             padding: 0 60px 60px 32px;
+            color: #1a1a1a;
             line-height: 1.6;
             word-break: break-word;
             border-left: 1px dashed #3562fa;

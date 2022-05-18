@@ -146,7 +146,7 @@
       right: 10px;
       width: 24px;
       height: 24px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.25);
       border-radius: 28px;
       color: #fff;
       font-size: 12px;
