@@ -1,6 +1,5 @@
 export default {
   600: 'Error de parámetros',
-  510002: 'Error de datos de resultado',
   510007: 'No tiene permisos',
   510008: 'No ha iniciado sesión',
   510009: 'El usuario no existe',

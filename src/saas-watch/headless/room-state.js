@@ -36,18 +36,20 @@ export default async function () {
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     await groupServer.initPresetGroup();
   }
+
+  // configList 和 黄金链路串行执行 由于轮巡时，依赖roombase的config字段，故不能将此接口获取与mediaCheck同事使用
+  await roomBaseServer.getConfigList().then(async () => {
+    // 获取视频论巡配置项 TODO:后面观看端权限统一处理之后，这个就不需要调了
+    await roomBaseServer.getVideoPollingConfig();
+    //黄金链路
+    await roomBaseServer.startGetDegradationInterval({
+      staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
+      environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+      systemKey: 2
+    });
+  });
+
   const promiseList = [
-    // configList 和 黄金链路串行执行
-    roomBaseServer.getConfigList().then(async () => {
-      // 获取视频论巡配置项 TODO:后面观看端权限统一处理之后，这个就不需要调了
-      await roomBaseServer.getVideoPollingConfig();
-      //黄金链路
-      await roomBaseServer.startGetDegradationInterval({
-        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
-        systemKey: 2
-      });
-    }),
     //多语言接口
     roomBaseServer.getLangList(),
     // 调用聚合接口
@@ -82,13 +84,16 @@ export default async function () {
     roomBaseServer.getCustomRoleName()
   ];
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
+  // 1-音频 2-视频 3-互动 6-分组
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
-  // 互动、分组直播进行设备检测 或者是视频直播并且开启了视频轮巡权限
-  if (
-    liveType == 1 &&
-    ([3, 6].includes(liveMode) ||
-      (liveMode == 2 && roomBaseServer.state.configList['video_polling'] == 1))
-  ) {
+  console.log(
+    '%c video_polling',
+    'color:blue',
+    roomBaseServer.state.configList['video_polling'],
+    liveMode
+  );
+  // 视频直播并且开启了视频轮巡权限
+  if (liveType == 1 && liveMode != 6 && roomBaseServer.state.configList['video_polling'] == 1) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
@@ -146,6 +151,7 @@ export default async function () {
   window.groupServer = groupServer;
   window.micServer = micServer;
   window.insertFileServer = insertFileServer;
+  window.mediaCheckServer = mediaCheckServer;
 }
 export function isMSECanUse() {
   let mse = false;

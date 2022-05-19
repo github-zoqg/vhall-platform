@@ -136,6 +136,17 @@
         // this.errMsg = err.msg;
       }
     },
+    watch: {
+      ['$domainStore.state.interactiveServer.mediaPermissionDenied']: {
+        deep: true,
+        immediate: true,
+        handler(newVlaue) {
+          if (newVlaue) {
+            this.$message.warning(this.$t('interact.interact_1039'));
+          }
+        }
+      }
+    },
     mounted() {
       useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;

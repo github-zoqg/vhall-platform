@@ -47,7 +47,14 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer,
+    useMediaCheckServer,
+    useMicServer,
+    useInteractiveServer
+  } from 'middle-domain';
   import move from './js/move';
   import { Dialog, Toast } from 'vant';
   import masksliding from './components/mask.vue';
@@ -89,10 +96,11 @@
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.interactiveServer = useInteractiveServer();
     },
     async created() {
       if (
-        [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
+        this.$domainStore.state.interactiveServer.mobileOnWheat &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
       ) {
         await Dialog.alert({
@@ -100,6 +108,17 @@
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
+        let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        if (_flag) {
+          let res = await useMicServer().userSpeakOn({ source: 1 });
+          if (res.code == 200) {
+            await this.interactiveServer.destroy();
+            await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          }
+        } else {
+          //  this.$t('interact.interact_1039')
+          Toast(this.$t('interact.interact_1039'));
+        }
       }
       if (this.isInGroup) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;

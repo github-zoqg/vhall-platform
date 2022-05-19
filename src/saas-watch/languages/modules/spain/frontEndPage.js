@@ -354,7 +354,7 @@ export default {
     form_1047: 'Seleccionar la fecha + la hora',
     form_1048: 'Seleccionar la hora',
     form_1049: 'Añadir opciones de columna',
-    form_1050: 'Elementos obligatorios:',
+    form_1050: 'Elementos obligatorios',
     form_1051: 'Añadir opciones de fila',
     form_1052: 'Añadir opciones',
     form_1053: 'Por favor, ingrese el título',
@@ -387,7 +387,9 @@ export default {
     form_1079: 'Contraseña',
     form_1080: 'El contenido no puede ser mayor de 60 caracteres',
     form_1081: 'El contenido no puede ser mayor de 60 caracteres',
-    form_1082: 'Verificación'
+    form_1082: 'Verificación',
+    form_1087: 'Enviar con éxito, gracias por su participación',
+    form_1088: 'Enviar con éxito'
   },
   menu: {
     menu_1001: 'Documentación',
@@ -515,7 +517,7 @@ export default {
   },
   message: {
     message_1001:
-      'El patrocinador ha configurado una función de encriptación de video,\nSe recomienda utilizar la última versión del navegador Chrome para ver',
+      'El patrocinador ha configurado una función de encriptación de video,\r\nSe recomienda utilizar la última versión del navegador Chrome para ver',
     message_1002: 'No se admite la indicación de encriptación de video',
     message_1003: 'La cuenta ha visto esta actividad en otros dispositivos',
     message_1004: '¡Este video está fuera de línea!',
@@ -525,12 +527,12 @@ export default {
     message_1008:
       '¡El sitio de la actividad está demasiado animado y el número de personas ha excedido el límite superior!',
     message_1009:
-      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\nSe recomienda borrar las cookies del navegador antes de visitar ~',
+      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\r\nSe recomienda borrar las cookies del navegador antes de visitar ~',
     message_1010: 'La red se está agotando',
     message_1011:
-      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\nversión, se recomienda utilizar el navegador Chrome para ver ~',
+      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\r\nversión, se recomienda utilizar el navegador Chrome para ver ~',
     message_1012:
-      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
+      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\r\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
     message_1013: 'Falta la página, el ingeniero está en camino ...',
     message_1014: 'Transcodificación de video',
     message_1015: 'Falló la validación del valor K, a punto de saltar',

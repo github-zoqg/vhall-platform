@@ -284,17 +284,6 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
-      // 监听自动上麦的异常code
-      /**
-       * useInteractiveServer().$on('SPEAKON_FAILED', e => {
-        if (
-          +e.code === 513025 ||
-          +this.roomBaseServer.state?.watchInitData?.joinInfo?.role_name === 2
-        ) {
-          return;
-        }
-        e.msg && this.$message.warning(e.msg);
-      });*/
       // 订阅流播放失败
       this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
         let videos = document.querySelectorAll('video');

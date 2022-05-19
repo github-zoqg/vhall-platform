@@ -1,6 +1,5 @@
 export default {
   600: 'Parameter error',
-  510002: 'Result data error',
   510007: 'No permission',
   510008: 'Not logged in',
   510009: 'User does not exist',
@@ -56,6 +55,7 @@ export default {
   511076: 'The data is being migrated, the page is temporarily unavailable',
   511078: 'E-mail can not be left empty',
   511079: 'Login prohibited, please contact customer service',
+  511087: 'User is not registered',
   512002: 'This video is currently unavailable.',
   512017: 'Whitelisted audience does not exist',
   512029: 'This topic is not found.',
@@ -82,7 +82,7 @@ export default {
   512529: 'Wrong invitation code',
   512530: 'The invitation code has been used',
   512531: 'Please enter the invitation code',
-  512532: 'Please enter the whitelist mobile phone number|email|employee number|others',
+  512532: 'Please enter the phone/email/employee ID',
   512535: 'The organizer has set up a verification mechanism for the event',
   512536: 'Playback content does not exist',
   512538:
@@ -102,6 +102,7 @@ export default {
   512573: 'E-mail has been used by others',
   512579: 'Activity blocked by administrator',
   513025: 'The wheat seat is full. Your account supports {n} people to wheat',
+  513345: 'Currently on display,video connection is temporarily unavailable,please try again late',
   513533: 'Invalid participant token information',
   513534: 'The current activity type does not match, the operation is prohibited',
   513535: 'The host information is not obtained',

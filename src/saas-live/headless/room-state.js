@@ -33,14 +33,22 @@ export default async function () {
     throw Error('get roomBaseServer exception');
   }
 
-  console.log('%c------服务初始化 roomBaseServer 初始化完成', 'color:blue', roomBaseServer);
+  console.log(
+    '%c------服务初始化 roomBaseServer 初始化完成',
+    'color:blue',
+    roomBaseServer,
+    roomBaseServer.state.watchInitData.join_info.role_name
+  );
   const promiseList = [
-    // 获取媒体许可，设置设备状态
-    mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }),
     // 获取房间互动工具状态
     roomBaseServer.getInavToolStatus(),
     roomBaseServer.getCustomRoleName()
   ];
+
+  // 获取媒体许可，设置设备状态
+  if (roomBaseServer.state.watchInitData.join_info.role_name == 1) {
+    promiseList.unshift(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
+  }
 
   // 如果存在rebroadcast
   if (roomBaseServer.state.watchInitData?.rebroadcast?.id) {

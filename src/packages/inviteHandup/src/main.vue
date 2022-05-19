@@ -11,7 +11,7 @@
       <div class="invite-box">
         <p class="invite-desc">{{ $t('interact.interact_1031', { n: roleName }) }}</p>
         <div class="invite-btn-box">
-          <button class="btn btn-agree" :disabled="btnDisabled" @click="customAgreeConnect">
+          <button class="btn btn-agree" :disabled="btnDisabled" @click="mediaCheckClick">
             {{ $t('interact.interact_1009') }}
           </button>
           <!-- 拒绝上麦 -->
@@ -24,7 +24,13 @@
   </section>
 </template>
 <script>
-  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useChatServer,
+    useRoomBaseServer,
+    useMicServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
@@ -113,6 +119,27 @@
       // 关闭邀请连麦弹框
       closeInviteConnectPop() {
         this.showInviteConnectMic = false;
+      },
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.customAgreeConnect();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.customAgreeConnect();
+              } else {
+                this.$toast(this.$t('interact.interact_1039'));
+                this.refuseInviteConnect();
+              }
+            });
+        } else {
+          this.$toast(this.$t('interact.interact_1039'));
+          this.refuseInviteConnect();
+        }
       },
       // 同意邀请上麦
       customAgreeConnect() {
