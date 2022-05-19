@@ -96,7 +96,12 @@
 
         <!-- 设备有问题不能上麦  仅限视频轮巡活动展示-->
         <template
-          v-if="tabIndex === 1 && this.isVideoPolling && [2, '2'].includes(userInfo.device_status)"
+          v-if="
+            tabIndex === 1 &&
+            this.isVideoPolling &&
+            this.mode != 6 &&
+            [2, '2'].includes(userInfo.device_status)
+          "
         >
           <i class="vh-iconfont vh-full-warning vmp-member-item__control__device-abnormal"></i>
         </template>
@@ -163,7 +168,12 @@
         ></i>
         <!--设备有问题  仅限视频轮巡活动展示-->
         <i
-          v-if="tabIndex === 1 && this.isVideoPolling && [2, '2'].includes(userInfo.device_status)"
+          v-if="
+            tabIndex === 1 &&
+            this.isVideoPolling &&
+            this.mode != 6 &&
+            [2, '2'].includes(userInfo.device_status)
+          "
           style="color: #fb3a32; font-size: 15px; vertical-align: middle"
           class="vh-iconfont vh-full-warning vmp-member-item__control__user-icon"
         ></i>
