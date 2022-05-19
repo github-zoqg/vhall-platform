@@ -1571,7 +1571,6 @@
               width: auto;
               height: 14px;
               font-size: 16px;
-              font-family: Arial-ItalicMT, Arial;
               font-weight: normal;
               color: #1a1a1a;
               line-height: 14px;
@@ -1584,9 +1583,6 @@
               &:hover {
                 background: #f7f7f7;
               }
-              &.item-active {
-                background: #f7f7f7;
-              }
             }
             .fl {
               width: calc(100% - 288px);
@@ -1597,8 +1593,8 @@
                 line-height: 14px;
                 color: #666666;
                 .el-checkbox__inner {
-                  width: 16px;
-                  height: 16px;
+                  width: 14px;
+                  height: 14px;
                 }
                 .lf-content {
                   display: inline-block;
@@ -2006,6 +2002,18 @@
       .el-checkbox {
         margin-right: 14px;
         margin-left: 24px;
+        color: #666666;
+        font-weight: normal;
+      }
+      .el-checkbox__input.is-checked + .el-checkbox__label {
+        color: #fb3a32;
+      }
+      .el-checkbox__input.is-checked .el-checkbox__inner {
+        border-color: #fb3a32;
+      }
+      .el-checkbox__input.is-checked .el-checkbox__inner,
+      .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+        background-color: #fb3a32;
       }
       .el-select {
         margin-left: 14px;
@@ -2020,6 +2028,8 @@
       .el-input--prefix {
         .el-input__inner {
           padding-left: 35px;
+          line-height: 36px;
+          height: 36px;
         }
       }
       .el-input__inner {
@@ -2034,12 +2044,13 @@
         margin-left: auto;
         .el-input__prefix {
           left: 10px;
-          top: 2px;
+          top: -2px;
+          color: #666666;
         }
       }
       i.el-tooltip.vh-iconfont.vh-line-question.help-icon {
         font-size: 14px;
-        color: #dadada;
+        color: #999999;
         margin-left: 8px;
         cursor: pointer;
       }
@@ -2137,5 +2148,25 @@
         text-align: center;
       }
     }
+  }
+  .el-tooltip__popper.is-dark {
+    background: #1a1a1a;
+    opacity: 0.85;
+    color: #fff;
+  }
+  .el-button.is-round {
+    padding: 7px 24px;
+  }
+  .el-button.is-disabled {
+    background: transparent;
+    border: 1px solid #e6e6e6;
+    cursor: not-allowed;
+    padding: 7px 24px;
+    font-family: 'PingFang SC';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #b3b3b3;
   }
 </style>
