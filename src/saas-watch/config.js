@@ -115,10 +115,6 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    options: {
-      keepAspectRatio: false,
-      hasPager: false
-    },
     // 打开对话框
     emitOpenDocList: {
       cuid: 'dlgDocList',
