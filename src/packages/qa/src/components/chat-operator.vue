@@ -62,7 +62,12 @@
         </span>
       </div>
       <div class="vhsaas-chat-operator__send-btn-box">
-        <div class="vhsaas-chat-operator__send-btn" @click="sendMessage">
+        <div
+          class="vhsaas-chat-operator__send-btn"
+          :class="{ disable: inputStatus.disable }"
+          :disabled="inputStatus.disable"
+          @click="sendMessage"
+        >
           <i class="icon iconfont iconfasong_icon"></i>
         </div>
       </div>
@@ -259,6 +264,9 @@
       },
       //发送消息
       async sendMessage() {
+        if (this.inputStatus.disable) {
+          return;
+        }
         if (this.inputValue.trim() === '') {
           return this.$message({
             message: this.$t('chat.chat_1009'),
@@ -362,7 +370,7 @@
     position: relative;
     .vh-line-expression {
       cursor: pointer;
-      font-size: 19px;
+      font-size: 18px;
       color: #999999;
       vertical-align: top;
       &:hover {
@@ -374,7 +382,7 @@
       display: inline-flex;
       align-items: center;
       vertical-align: top;
-      line-height: 21px;
+      line-height: 18px;
       .only-me-item__checkbox {
         display: inline-block;
         margin-right: 8px;
@@ -407,7 +415,7 @@
       .only-me-item__label {
         // margin-left: 5px;
         font-size: 14px;
-        line-height: 21px;
+        line-height: 18px;
         color: #999999;
       }
     }
@@ -513,6 +521,12 @@
         .iconfasong_icon {
           font-size: 18px;
           color: @font-dark-normal;
+        }
+        &.disable {
+          cursor: default;
+          .iconfasong_icon {
+            color: #666666;
+          }
         }
       }
     }
