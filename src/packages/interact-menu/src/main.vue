@@ -207,6 +207,15 @@
             });
         }
         this.qaVisible = !this.qaVisible;
+        // 点开问答的时候，获取qaName数据
+        useQaServer()
+          .getQaName()
+          .then(res => {
+            this.QAName = res.code == 200 ? res.data.name || '问答' : '问答';
+          })
+          .catch(res => {
+            this.QAName = '问答';
+          });
       },
       handleQASubmit() {
         if (this.isQAEnabled) {
