@@ -163,7 +163,7 @@
   .vmp-question-wap {
     width: 100%;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.25);
     position: fixed;
     top: 0;
     left: 0;

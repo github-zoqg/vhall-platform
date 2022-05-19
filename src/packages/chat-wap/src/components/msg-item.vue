@@ -491,7 +491,7 @@
           background-color: rgba(53, 98, 250, 0.2);
           border-radius: 9px;
           padding: 0 4px;
-          font-size: 12px;
+          font-size: 28px;
           line-height: 16px;
           margin: 2px 4px 0;
           border-radius: 500px;

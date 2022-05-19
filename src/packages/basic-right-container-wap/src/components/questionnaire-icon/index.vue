@@ -114,6 +114,7 @@
     width: 84px;
     height: 84px;
     position: relative;
+    font-size: 28px;
     background-color: transparent;
     img {
       width: 84px;
@@ -169,12 +170,13 @@
           li {
             display: flex;
             color: @font-light-normal;
-            font-size: 14px;
+            font-size: 28px;
             line-height: 1.2;
           }
         }
         .data-time {
           line-height: 1.2;
+          font-size: 28px;
           display: inline-block;
           width: 100px;
           text-align: left;
@@ -182,13 +184,14 @@
         .data-text {
           display: flex;
           position: relative;
-          padding-right: 16px;
+          padding-right: 28px;
           width: calc(100% - 100px);
           .write {
             line-height: 1.2;
+            font-size: 28px;
             position: absolute;
             color: #3562fa;
-            right: 16px;
+            right: 28px;
             cursor: pointer;
           }
           .write_over {
@@ -224,6 +227,7 @@
             word-break: break-word;
             border-left: 1px dashed #3562fa;
             border-radius: 2px;
+            font-size: 28px;
             .ellipsis_title {
               display: -webkit-box;
               /**autoprefixer: ignore next */
