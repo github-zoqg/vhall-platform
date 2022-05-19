@@ -81,7 +81,7 @@
         <template v-if="!assistantType">
           <div v-if="!isQAEnabled">
             <p class="qa_content_txt">
-              1、开启后，右侧互动区会增加“问答”模块，可进入右下角[问答管理]处理提问。
+              1、开启后，右侧互动区会增加“问答”模块，可进入右下角「问答管理」处理提问。
             </p>
             <p class="qa_content_txt">
               2、支持修改「问答」的显示名称，如改成「提问」「投票」等，修改后的名称在用户观看时生效。
@@ -408,7 +408,7 @@
         color: #666666;
       }
       .qa_content_form {
-        padding-top: 2px;
+        padding-top: 6px;
         .el-form-item__label {
           color: #1a1a1a;
         }
