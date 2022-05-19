@@ -469,7 +469,6 @@
       this.listenEvents();
     },
     async mounted() {
-      await this.checkStartPush();
       // 轮训列表更新消息
       this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
         console.log('轮训列表更新消息', msg);
@@ -486,8 +485,9 @@
         }
       });
       if (!this.isSpeakOn) {
-        this.videoStartPush();
+        await this.videoStartPush();
       }
+      this.checkStartPush();
     },
     beforeDestroy() {
       // 清空计时器
@@ -548,8 +548,14 @@
           }
           this.startPollingPush();
         } else {
-          if (!this.isSpeakOn) {
+          if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
             await this.stopPush();
+            await this.interactiveServer.destroy();
+            if (this.isNoDelay == 1) {
+              await sleep(200);
+              console.log('无延迟---销毁--互动实例');
+              await this.interactiveServer.init();
+            }
           }
         }
       },
