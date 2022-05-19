@@ -436,7 +436,7 @@
       .qa_name_item {
         margin: 0;
         .qa_name {
-          width: 250px;
+          width: 266px;
         }
       }
     }
