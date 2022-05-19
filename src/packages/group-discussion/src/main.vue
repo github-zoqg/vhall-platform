@@ -59,7 +59,7 @@
               继续讨论
             </el-button>
             <el-button
-              v-if="groupSwitchStatus == 1"
+              v-if="groupSwitchStatus == 1 || groupSwitchStatus == 3"
               type="default"
               size="small"
               :round="true"
@@ -642,7 +642,13 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(async () => {
-            await this.groupServer.groupDisband(id);
+            const res = await this.groupServer.groupDisband(id);
+            // 回放生成成功
+            if (res.data.record_id > 0) {
+              this.$message.success('小组回放视频生成成功');
+            } else {
+              this.$message.error('小组讨论视频时长过短，不支持生成回放');
+            }
             await this.roomBaseServer.getInavToolStatus();
           })
           .catch(() => {});
