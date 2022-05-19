@@ -86,11 +86,12 @@
             <p class="qa_content_txt">
               2、支持修改「问答」的显示名称，如改成「提问」「投票」等，修改后的名称在用户观看时生效。
             </p>
-            <el-form inline>
+            <el-form class="qa_content_form" inline>
               <el-form-item label="显示名称" class="qa_name_item">
                 <el-input
                   class="form-input qa_name"
                   maxlength="8"
+                  placeholder="请输入名称"
                   show-word-limit
                   v-model="QAName"
                 ></el-input>
@@ -405,6 +406,12 @@
         line-height: 20px;
         text-align: justify;
         color: #666666;
+      }
+      .qa_content_form {
+        padding-top: 2px;
+        .el-form-item__label {
+          color: #1a1a1a;
+        }
       }
       .qa_name_item {
         margin: 0;
