@@ -298,8 +298,7 @@
       }
     }
   }
-</style>
-<style lang="less" scoped>
+
   .lottery-winner-info {
     width: 424px;
     height: 463px;

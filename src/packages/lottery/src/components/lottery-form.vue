@@ -119,6 +119,14 @@
           {{ repeatWinning ? '已开启，已中奖者可再次参与抽奖' : '开启后，已中奖者可再次参与抽奖' }}
         </span>
       </el-form-item>
+      <el-form-item label="领奖信息" class="repeat-winning">
+        <el-switch v-model="showWinner" active-color="#FB3A32" inactive-color="#CECECE"></el-switch>
+        <span>
+          {{
+            showWinner ? '关闭后，中奖用户不需要填写领奖信息' : '开启后，中奖用户需要填写领奖信息'
+          }}
+        </span>
+      </el-form-item>
       <el-form-item label="中奖名单" class="repeat-winning">
         <el-switch v-model="showWinner" active-color="#FB3A32" inactive-color="#CECECE"></el-switch>
         <span>

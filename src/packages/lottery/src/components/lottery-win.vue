@@ -50,7 +50,7 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .win-lottery-wrapper {
     width: 424px;
     height: 436px;
