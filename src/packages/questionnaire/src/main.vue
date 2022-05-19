@@ -205,10 +205,12 @@
     <el-dialog
       :visible.sync="dialogPreview"
       custom-class="preview_dialog"
-      width="732px"
+      width="740px"
       :show-close="true"
     >
-      <img src="./images/Q_preview.png" alt="" class="img_size" />
+      <div class="img_base">
+        <img src="./images/Q_preview.png" alt="" class="img_size" />
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -787,6 +789,14 @@
       overflow: hidden;
     }
     .preview_dialog {
+      .img_base {
+        padding: 4px;
+        border-radius: 4px;
+        background: #000;
+        img {
+          width: 100%;
+        }
+      }
       .el-dialog__header {
         padding: 0;
       }
