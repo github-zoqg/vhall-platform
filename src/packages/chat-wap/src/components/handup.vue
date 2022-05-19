@@ -177,10 +177,12 @@
                 this.applyMic();
               } else {
                 this.$toast(this.$t('interact.interact_1039'));
+                this.closeConnectPop();
               }
             });
         } else {
           this.$toast(this.$t('interact.interact_1039'));
+          this.closeConnectPop();
         }
       },
       // 主动上麦方法

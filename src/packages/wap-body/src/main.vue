@@ -110,7 +110,7 @@
         });
         let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (_flag) {
-          let res = await useMicServer().userSpeakOn({ source: 1 });
+          let res = await useMicServer().userSpeakOn();
           if (res.code == 200) {
             await this.interactiveServer.destroy();
             await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
