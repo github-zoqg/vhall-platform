@@ -187,9 +187,7 @@
           </p>
         </div>
         <div class="setname_button">
-          <el-button type="primary" size="medium" @click="dialogNameSet = false" round>
-            保存
-          </el-button>
+          <el-button type="primary" size="medium" @click="saveAlias" round>保存</el-button>
           <el-button
             plain
             size="medium"
@@ -388,7 +386,7 @@
         this.showQuestionnaireTable = false;
         this.showTip = true;
         this.prevQuestionnaireId = null;
-        this.alias = row.alias;
+        this.alias = row.alias || '问卷';
         this.questionnaireServer.renderCreatQuestionnaire(selector, row.question_id);
       },
       setReportData(data) {
@@ -757,6 +755,11 @@
       // 问卷别名设置样式预览
       showPreview() {
         this.dialogPreview = true;
+      },
+      // 问卷别名修改
+      saveAlias() {
+        this.questionnaireServer.setAlias(this.alias);
+        this.dialogNameSet = false;
       }
     }
   };
