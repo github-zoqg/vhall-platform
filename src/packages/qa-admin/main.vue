@@ -1598,6 +1598,10 @@
                 .el-checkbox__inner {
                   width: 14px;
                   height: 14px;
+                  border-color: #666666;
+                  &:hover {
+                    border-color: #fb3a32;
+                  }
                 }
                 .lf-content {
                   display: inline-block;
@@ -2008,6 +2012,12 @@
         color: #666666;
         font-weight: normal;
       }
+      .el-checkbox__inner {
+        border-color: #666666;
+        &:hover {
+          border-color: #fb3a32;
+        }
+      }
       .el-checkbox__input.is-checked + .el-checkbox__label {
         color: #fb3a32;
       }
@@ -2157,14 +2167,14 @@
     opacity: 0.85;
     color: #fff;
   }
-  .el-button.is-round {
-    padding: 7px 24px;
+  .el-button.unexact.is-round {
+    padding: 7px 20px;
   }
-  .el-button.is-disabled {
+  .el-button.unexact.is-disabled {
     background: transparent;
     border: 1px solid #e6e6e6;
     cursor: not-allowed;
-    padding: 7px 24px;
+    padding: 7px 20px;
     font-family: 'PingFang SC';
     font-style: normal;
     font-weight: 400;
