@@ -1237,6 +1237,9 @@
                   this.resetCurList();
                 }
               }, 1000);
+            } else if (res.code === 513123) {
+              // 异常情况下，关闭弹出框
+              this.qaServer.closeTextDialogStatus();
             }
           });
       },
