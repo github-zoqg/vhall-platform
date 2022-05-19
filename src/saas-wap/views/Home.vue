@@ -144,14 +144,26 @@
           },
           {
             namespace: 'saas', //业务线
-            env: 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
             method: 'post' // 上报方式
           }
         );
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
         this.addEventListener();
+        //上报日志
+        window.vhallLog({
+          tag: 'live_room_init', // 日志所属功能模块
+          data: 'live_room_init_success',
+          type: 'log' // log 日志埋点，event 业务数据埋点
+        });
       } catch (err) {
+        //上报日志
+        window.vhallLog({
+          tag: 'live_room_init', // 日志所属功能模块
+          data: err,
+          type: 'log' // log 日志埋点，event 业务数据埋点
+        });
         console.error('---初始化直播房间出现异常--', err);
         console.error(err);
         this.state = 2;
