@@ -1,4 +1,4 @@
-const svgas = {
+const sources = {
   666: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/666.svga',
   玫瑰: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/flower.svga',
   咖啡: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/coffee.svga',
@@ -9,4 +9,4 @@ const svgas = {
   礼炮: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/fireworks.svga',
   打赏: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/reward.svga'
 };
-export default svgas;
+export default sources;

@@ -50,17 +50,24 @@
     <template v-else-if="source.type == 'reward_pay_ok'">
       <div class="msg-item new-gift">
         <div class="interact-gift-box">
-          <p class="new-gift-name">
-            {{ source.nickName | overHidden(10) }}
-          </p>
-          <p class="new-gift-content">
-            {{ $t('chat.chat_1029') }}
-          </p>
-          <img class="new-award-img" src="../img/red-package.png" />
+          <div>
+            <div class="flex-box">
+              <p class="new-gift-name">
+                {{ source.nickName | overHidden(10) }}
+              </p>
+              <p class="new-gift-content">
+                {{ $t('chat.chat_1029') }}
+              </p>
+              <img
+                class="new-award-img"
+                :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
+              />
+            </div>
+            <div class="reward_txt">
+              {{ source.content.text_content | overHidden(10) }}
+            </div>
+          </div>
         </div>
-        <p class="reward_txt">
-          {{ source.content.text_content | overHidden(10) }}
-        </p>
       </div>
     </template>
     <!-- 送礼物 -->
@@ -73,7 +80,14 @@
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
-          <img class="new-gift-img" :src="source.content.gift_url" />
+          <img
+            class="new-gift-img"
+            :src="
+              require('@/packages/app-shared/assets/img/wap/chat/' +
+                source.content.gift_name +
+                '.png')
+            "
+          />
         </div>
       </div>
     </template>
@@ -617,13 +631,18 @@
           transform: scale(0.9);
           color: #262626;
         }
+        .flex-box {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
       .new-gift-img,
       .new-award-img {
-        width: 32px;
+        width: 40px;
       }
       .reward_txt {
-        color: #ffd11a;
+        color: #d67900;
         font-size: 28px;
         line-height: 40px;
         text-align: center;

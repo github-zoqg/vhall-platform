@@ -9,7 +9,7 @@
           // 打赏动效背景class
           'bg-red-package': rewardEffectInfo.data.type != 'gift_send_success',
           // 默认礼物的背景class
-          [effectsMap[rewardEffectInfo.data.gift_name] || 'bg-custom']:
+          [Sources[rewardEffectInfo.data.gift_name] || 'bg-custom']:
             rewardEffectInfo.data.type == 'gift_send_success'
         }"
       >
@@ -47,10 +47,12 @@
             "
             class="gift-img"
           >
-            <template v-if="!!effectsMap[rewardEffectInfo.data.gift_name]">
+            <template v-if="!!Sources[rewardEffectInfo.data.gift_name]">
               <img
                 :src="
-                  require('./images/' + effectsMap[rewardEffectInfo.data.gift_name] + '-icon.png')
+                  require('@/packages/app-shared/assets/img/wap/gift/' +
+                    rewardEffectInfo.data.gift_name +
+                    '.png')
                 "
                 alt=""
               />
@@ -85,7 +87,11 @@
             /> -->
           </div>
           <div v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'" class="gift-img">
-            <img src="./images/red-package-1.png" alt="" class="red-package" />
+            <img
+              :src="require('@/packages/app-shared/assets/img/wap/gift/reward.png')"
+              alt=""
+              class="red-package"
+            />
           </div>
         </div>
       </div>
@@ -102,20 +108,14 @@
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  import Sources from './source/index.js';
+  import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
     data() {
       return {
-        effectsMap: {
-          鲜花: 'bg-flower',
-          咖啡: 'bg-coffee',
-          赞: 'bg-praise',
-          鼓掌: 'bg-applause',
-          666: 'bg-666'
-          // 'bg-custom': 'bg-custom' //用户自定义礼物
-        },
+        Sources,
         //是否屏蔽特效
         hideEffect: false,
         rewardEffectList: [],
@@ -146,13 +146,13 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000,
+        minTaskTime: 200220,
         maxQueueLen: 2
       });
 
       //测试数据
 
-      /*   setTimeout(() => {
+      setTimeout(() => {
         this.addRewardEffect({
           uv: 2,
           data: {
@@ -183,7 +183,7 @@
           msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
           app_id: 'fd8d3653'
         });
-      }, 3000); */
+      }, 3000);
     },
     methods: {
       // 监听domain层服务消息
@@ -289,6 +289,7 @@
     left: 0;
     top: 40px;
     z-index: 100;
+
     .reward-effect-box {
       height: 56px;
       width: fit-content;
@@ -296,7 +297,12 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
+      margin-bottom: 32px;
       &.default {
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 44px;
+      }
+      &.bg-red-package {
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 44px;
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
@@ -305,10 +311,6 @@
           right: 6px;
           width: 109px;
           margin-left: 6px;
-          img {
-            height: 48px;
-            margin-left: 36px;
-          }
         }
       }
       &.bg-applause {
@@ -387,11 +389,6 @@
           right: 8px;
           width: 124px;
           margin-left: 8px;
-          img {
-            height: 52px;
-            margin-left: 14px;
-            margin-top: 8px;
-          }
         }
       }
     }
@@ -418,6 +415,11 @@
       position: relative;
       top: 0;
       right: -6px;
+      img {
+        height: 88px;
+        margin-left: 0;
+        margin-top: -18px;
+      }
     }
 
     .zdy-gigt-img {

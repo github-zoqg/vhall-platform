@@ -12,7 +12,15 @@
             >
               <div class="info">
                 <div class="border-1px gift-img" @click="chooseGift(secIndex, secItem)">
-                  <img :src="`${secItem.image_url}`" alt />
+                  <img v-if="secItem.source_status == 1" :src="`${secItem.image_url}`" alt />
+                  <img
+                    v-else-if="secItem.name == '666'"
+                    :src="
+                      require('@/packages/app-shared/assets/img/wap/gift/' + secItem.name + '.png')
+                    "
+                    alt
+                  />
+                  <img v-else :src="`${secItem.image_url}`" alt />
                 </div>
                 <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
