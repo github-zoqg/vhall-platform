@@ -102,7 +102,7 @@
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -152,36 +152,38 @@
 
       //测试数据
 
-      /* this.addRewardEffect({
-        uv: 2,
-        data: {
-          type: 'reward_pay_ok',
-          room_id: 'lss_726c98ec',
-          gift_user_id: '1044042222',
-          gift_user_nickname: '邵永凯邵永凯邵永凯邵永凯',
-          reward_describe: '一二三四五一二三四五一二三四五',
-          gift_user_avatar: null,
-          gift_user_name: null,
-          gift_name: '666',
-          gift_price: 0,
-          gift_image_url:
-            'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
-          gift_id: 134518,
-          gift_receiver_id: '100890',
-          gift_creator_id: '0',
-          source_status: '0'
-        },
-        msg_source: 'prefix01',
-        pv: 2,
-        channel: 'ch_527661Qi',
-        sender_id: '104404666',
-        service_type: 'service_room',
-        bu: '1',
-        date_time: '2022-06-19 17:22:19',
-        context: { nick_name: '', avatar: '' },
-        msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
-        app_id: 'fd8d3653'
-      }); */
+      /*   setTimeout(() => {
+        this.addRewardEffect({
+          uv: 2,
+          data: {
+            type: 'reward_pay_ok',
+            room_id: 'lss_726c98ec',
+            gift_user_id: '1044042222',
+            gift_user_nickname: '邵永凯邵永凯邵永凯邵永凯',
+            reward_describe: '一二三四五一二三四五一二三四五',
+            gift_user_avatar: null,
+            gift_user_name: null,
+            gift_name: '666',
+            gift_price: 0,
+            gift_image_url:
+              'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
+            gift_id: 134518,
+            gift_receiver_id: '100890',
+            gift_creator_id: '0',
+            source_status: '0'
+          },
+          msg_source: 'prefix01',
+          pv: 2,
+          channel: 'ch_527661Qi',
+          sender_id: '104404666',
+          service_type: 'service_room',
+          bu: '1',
+          date_time: '2022-06-19 17:22:19',
+          context: { nick_name: '', avatar: '' },
+          msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
+          app_id: 'fd8d3653'
+        });
+      }, 3000); */
     },
     methods: {
       // 监听domain层服务消息
