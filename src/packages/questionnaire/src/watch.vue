@@ -48,7 +48,7 @@
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$message({
-              message: this.$t('form.form_1037'),
+              message: this.$t('form.form_1087'),
               showClose: true,
               // duration: 0,
               type: 'success',
@@ -146,7 +146,7 @@
       right: 10px;
       width: 24px;
       height: 24px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.25);
       border-radius: 28px;
       color: #fff;
       font-size: 12px;

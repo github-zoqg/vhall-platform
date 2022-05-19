@@ -173,7 +173,7 @@
             <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
               <span
                 :style="{
-                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : ''
+                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : '#999'
                 }"
               >
                 {{ alias.length }}
@@ -187,7 +187,7 @@
           </p>
         </div>
         <div class="setname_button">
-          <el-button type="primary" size="medium" @click="closeDialogNameSet" round>确定</el-button>
+          <el-button type="primary" size="medium" @click="saveAlias" round>保存</el-button>
           <el-button
             plain
             size="medium"
@@ -208,7 +208,7 @@
       width="732px"
       :show-close="true"
     >
-      <img src="./images/Q_preview.png" alt="" />
+      <img src="./images/Q_preview.png" alt="" class="img_size" />
     </el-dialog>
   </div>
 </template>
@@ -388,8 +388,8 @@
         this.showQuestionnaireTable = false;
         this.showTip = true;
         this.prevQuestionnaireId = null;
-        this.alias = row.alias;
-        this.questionnaireServer.renderCreatQuestionnaire(selector, row.id);
+        this.alias = row.alias || '问卷';
+        this.questionnaireServer.renderCreatQuestionnaire(selector, row.question_id);
       },
       setReportData(data) {
         const { id, title, description, detail, imgUrl } = data;
@@ -768,12 +768,20 @@
       // 问卷别名设置样式预览
       showPreview() {
         this.dialogPreview = true;
+      },
+      // 问卷别名修改
+      saveAlias() {
+        this.questionnaireServer.setAlias(this.alias);
+        this.dialogNameSet = false;
       }
     }
   };
 </script>
 <style lang="less">
   .questionnaire-lve {
+    .vh-line-question {
+      color: #999;
+    }
     .el-dialog__wrapper {
       height: 100vh;
       overflow: hidden;
@@ -792,6 +800,9 @@
         .el-dialog__close {
           color: white;
         }
+      }
+      .img_size {
+        width: 100%;
       }
     }
   }
@@ -838,6 +849,7 @@
   }
   .setname_tip {
     margin-top: 10px;
+    color: #666;
   }
   .setname_button {
     text-align: right;

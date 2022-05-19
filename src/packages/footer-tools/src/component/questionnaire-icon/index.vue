@@ -16,10 +16,14 @@
               <span class="data-text_circle">
                 <i class="num"></i>
               </span>
-              <p class="data-text_title" :class="item.is_answered ? '' : 'write_over'">
-                {{ item.title }}
+              <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
+                <span class="ellipsis">
+                  {{ item.title }}
+                </span>
               </p>
-              <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
+              <span class="write write_hover" v-if="item.is_answered == 0" @click="writeQ(item)">
+                填写
+              </span>
               <span v-else class="write write_over">已填</span>
             </div>
           </li>
@@ -71,9 +75,9 @@
       async checkQuestionnaireIcon() {
         if (this.isShowQuestionList) return false;
         await this.questionnaireServer.getSurveyList();
-        let arr = this.QuestionList.filter(item => item.is_answered == 0);
+        let arr = this.QuestionList && this.QuestionList.filter(item => item.is_answered == 0);
         if (arr.length == 0) {
-          this.$message.success('提交成功，感谢您的参与。');
+          this.$message.success(this.$t('form.form_1087'));
           return false;
         }
         // 如果只有一份未填写,则直接打开问卷
@@ -120,14 +124,15 @@
     }
     .vmp-questionnaire-list_container {
       position: absolute;
-      right: -163px;
-      bottom: 45px;
+      right: -107px;
+      bottom: 60px;
       z-index: 12;
       width: 356px;
       max-height: 350px;
       background: transparent;
       border-radius: 8px;
       padding: 60px 5px 10px 30px;
+      box-shadow: 0px 8px 16px 0px rgba(51, 51, 51, 0.24), 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
       background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
       ::-webkit-scrollbar-thumb {
         background-color: #cccccc;
@@ -170,6 +175,11 @@
             color: #3562fa;
             right: 16px;
             cursor: pointer;
+            padding: 0 4px;
+          }
+          .write_hover:hover {
+            border-radius: 4px;
+            background: #ebefff;
           }
           .write_over {
             color: #666;
@@ -182,7 +192,7 @@
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #3562fa;
-            top: 4px;
+            top: 0;
             left: -6px;
             position: absolute;
             .num {
@@ -201,8 +211,16 @@
             padding: 0 29px 0 16px;
             word-break: break-word;
             padding-bottom: 16px;
+            color: #1a1a1a;
             border-left: 1px dashed #3562fa;
             border-radius: 2px;
+            .ellipsis {
+              display: -webkit-box;
+              /**autoprefixer: ignore next */
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+            }
           }
         }
       }
