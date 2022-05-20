@@ -2,10 +2,11 @@ import Vue from 'vue';
 import App from './App.vue';
 import '@/packages/app-shared/utils/vlog';
 import router from './router';
+import Vh5Ui from 'vh5-ui';
 import { initGlobalAPI, i18n } from './core';
 import domainStore from './domain';
 import '@/packages/app-shared/filters/index';
-
+import 'vh5-ui/lib/index.css';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 // 导入样式及皮肤
 import './assets/styles/common.less';
@@ -21,6 +22,7 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 initGlobalAPI();
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
+Vue.use(Vh5Ui);
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
