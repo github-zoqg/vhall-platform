@@ -7,6 +7,6 @@ const sources = {
   火箭: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/rocket.svga',
   汽车: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/car.svga',
   礼炮: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/fireworks.svga',
-  打赏: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/reward.svga'
+  打赏: 'https://t-alistatic01.e.vhall.com/common-static/svga/1.0.0/wallet.svga'
 };
 export default sources;

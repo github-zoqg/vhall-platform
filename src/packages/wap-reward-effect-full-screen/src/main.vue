@@ -54,7 +54,7 @@
         minTaskTime: 5000
       });
 
-      /*    //测试数据
+      /*  //测试数据
       setTimeout(() => {
         this.addRewardEffect({
           uv: 2,
@@ -139,7 +139,7 @@
         this.visible = true;
         let compontent;
         // 自定义礼物
-        if (reload.data.source_status == 1) {
+        if (reload.data.source_status == 1 && reload.data.type !== 'reward_pay_ok') {
           compontent = this.$refs.gifPlayer;
           this.isSvga = false;
         } else {

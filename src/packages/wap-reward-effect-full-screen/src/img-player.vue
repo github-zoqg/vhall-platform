@@ -59,8 +59,8 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    width: 50% !important;
-    height: 50% !important;
+    width: 321px !important;
+    height: 321px !important;
     display: inline-block;
     margin: 50% 50%;
     transform: translate(-50%, -50%);

@@ -109,7 +109,7 @@
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import Sources from './source/index.js';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
@@ -146,13 +146,13 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 200220,
+        minTaskTime: 2000,
         maxQueueLen: 2
       });
 
       //测试数据
 
-      setTimeout(() => {
+      /* setTimeout(() => {
         this.addRewardEffect({
           uv: 2,
           data: {
@@ -183,7 +183,7 @@
           msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
           app_id: 'fd8d3653'
         });
-      }, 3000);
+      }, 3000); */
     },
     methods: {
       // 监听domain层服务消息
@@ -302,90 +302,51 @@
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 44px;
       }
-      &.bg-red-package {
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 44px;
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/red-package-bg.png);
-          right: 6px;
-          width: 109px;
-          margin-left: 6px;
-        }
-      }
-      &.bg-applause {
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/applause-bg.png);
-          right: -2px;
-          width: 124px;
-          margin-right: 2px;
-          img {
-            height: 69px;
-            margin-left: 10px;
-            margin-top: -12px;
-          }
-        }
-      }
-      &.bg-coffee {
+      &.bg-coffee,
+      &.bg-rocket {
         background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
         .gift-img {
-          background-image: url(images/coffee-bg.png);
+          background-image: url(images/bg3.png);
           right: 12px;
           width: 98px;
           margin-left: 12px;
-          img {
-            height: 62px;
-            margin-left: 20px;
-            margin-top: -8px;
-          }
         }
       }
-      &.bg-custom {
+      &.bg-custom,
+      &.bg-red-package {
         background: linear-gradient(90.01deg, #fb3a32 1.37%, rgba(255, 172, 44, 0.8) 97.58%);
         .gift-img {
-          background-image: url(images/custom-bg.png);
+          background-image: url(images/bg5.png);
           right: 2px;
           width: 108px;
           margin-right: 2px;
-          img {
-            height: 54px;
-            margin-left: 13px;
-          }
         }
       }
       &.bg-flower {
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/flower-bg.png);
-          right: 2px;
+          background-image: url(images/bg4.png);
+          right: -2px;
           width: 124px;
-          margin-left: 2px;
-          img {
-            height: 64px;
-            margin-left: 14px;
-            margin-top: -6px;
-          }
+          margin-left: -2px;
         }
       }
-      &.bg-praise {
+      &.bg-love {
         background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
         .gift-img {
-          background-image: url(images/praise-bg.png);
-          right: 18px;
-          width: 91px;
-          margin-left: 18px;
-          img {
-            height: 73px;
-            margin-left: 14px;
-            margin-top: -10px;
-          }
+          background-image: url(images/bg2.png);
+          right: 24px;
+          width: 86px;
+          margin-left: 24px;
         }
       }
-      &.bg-666 {
+      &.bg-666,
+      &.bg-car,
+      &.bg-plane,
+      &.bg-fireworks {
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/666-bg.png);
+          background-image: url(images/bg1.png);
           right: 8px;
           width: 124px;
           margin-left: 8px;
