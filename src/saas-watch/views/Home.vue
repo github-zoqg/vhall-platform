@@ -228,9 +228,9 @@
                 _embedQuery.indexOf('record_id=') > -1
                   ? _embedQuery.replace('record_id=', 'rid=')
                   : _embedQuery;
-              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.il_id}${_embedQuery}`;
+              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
             } else {
-              window.location.href = `${window.location.origin}/${this.$route.params.il_id}`;
+              window.location.href = `${window.location.origin}/${this.$route.params.id}`;
             }
             break;
           case 512002:
