@@ -1,9 +1,11 @@
 import Vue from 'vue';
-import { globalConfig, serverConfig } from '../config';
+import { globalConfig } from '../page-config/global';
+import { serverConfig } from '../config.js';
 import moment from 'moment';
 
 // 初始化全局变量挂载到 window 上
 window.$globalConfig = globalConfig;
+// TODO 暂时保留
 window.$serverConfig = serverConfig;
 
 // 初始化全局变量挂载的 vue 实例上
