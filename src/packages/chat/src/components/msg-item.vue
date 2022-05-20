@@ -251,7 +251,15 @@
                   : `${$t('chat.chat_1032')}${source.content.gift_name}`
               }}
             </span>
+            <div
+              v-if="source.content.source_status == 1"
+              class="gift-zdy"
+              :style="{
+                backgroundImage: 'url(' + source.content.gift_url + ')'
+              }"
+            ></div>
             <img
+              v-else
               class="interact-tools-content__img"
               :class="{
                 'interact-tools-content__img-scale': source.content.source_status === '0',
@@ -831,6 +839,17 @@
             &-reward {
               transform: scale(0.8);
             }
+          }
+          .gift-zdy {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            background-color: white;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-left: 7px;
+            vertical-align: middle;
           }
         }
       }

@@ -551,6 +551,9 @@
       onSwitchShowSpecialEffects(status) {
         this.showSpecialEffects = !status;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHideEffect', [status]));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitHideEffectFullScreen', [status])
+        );
       },
       //处理只看主办方
       onSwitchShowSponsor(status) {

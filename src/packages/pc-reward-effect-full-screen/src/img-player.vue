@@ -34,7 +34,7 @@
           let timer = setTimeout(() => {
             clearTimeout(timer);
             resolve();
-          }, 4002220);
+          }, 4000);
         }).then(() => {
           this.$emit('finish');
         });
