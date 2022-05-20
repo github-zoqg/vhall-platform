@@ -260,6 +260,11 @@
             this.interactiveServer.destroy();
           }
         });
+        // 分组继续讨论，初始化互动实例完成后，开始推流
+        this.interactiveServer.$on('PROCEED_DISCUSSION', msg => {
+          console.log('分组继续讨论');
+          this.startPush();
+        });
 
         // 主持人同意上麦申请
         this.micServer.$on('vrtc_connect_agree', async () => {

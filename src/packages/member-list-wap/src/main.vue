@@ -162,6 +162,12 @@
               break;
           }
         });
+        // 暂停讨论
+        this.groupServer.$on('GROUP_SWITCH_END', msg => {
+          console.log('GROUP_暂停讨论', msg);
+          this.updateOnlineUserList();
+        });
+
         //结束讨论
         this.groupServer.$on('GROUP_SWITCH_END', msg => {
           this.updateOnlineUserList();

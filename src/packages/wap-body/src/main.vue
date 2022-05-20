@@ -181,7 +181,7 @@
       async gobackHome(index, name, msg) {
         // 1 主持人    3 助理
         const who = msg.sender_id == this.userinfoId ? this.$getRoleName(1) : this.$getRoleName(3);
-        const isSwitchEnd = msg.data.type == 'group_switch_end';
+        const isSwitchEnd = msg.data?.type == 'group_switch_end';
         let title = '';
         switch (index) {
           case 1:
