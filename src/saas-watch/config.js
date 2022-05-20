@@ -109,7 +109,20 @@ export const serverConfig = {
       cuid: 'comShare',
       method: 'shareOtherDialog',
       args: ['$0']
-    }
+    },
+    // 删除自定义菜单tab
+    emitDeleteMenu: [
+      {
+        cuid: 'comTabMenu',
+        method: 'setVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comSubscribeTabMenu',
+        method: 'setVisible',
+        args: ['$0']
+      }
+    ]
   },
 
   // 文档白板组件

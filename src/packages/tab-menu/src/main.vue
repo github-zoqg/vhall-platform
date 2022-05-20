@@ -449,7 +449,6 @@
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
-
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
