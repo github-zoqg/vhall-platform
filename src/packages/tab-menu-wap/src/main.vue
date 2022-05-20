@@ -86,7 +86,7 @@
         },
         themeClass: {
           bgColor: '',
-          pageBg: '#fb3a32'
+          pageBg: '#fb2626'
         }
       };
     },
@@ -557,7 +557,7 @@
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
-      border-bottom: 1px solid #d4d4d4;
+      border-bottom: 1px solid #f0f0f0;
 
       /*  &::before {
         content: '';

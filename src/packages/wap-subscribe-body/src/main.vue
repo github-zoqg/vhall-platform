@@ -2,7 +2,9 @@
   <div class="vmp-subscribe-body">
     <div class="vmp-subscribe-body-container">
       <template v-if="isTryVideo">
-        <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
+        <div class="subscribe-bg">
+          <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+        </div>
       </template>
       <template v-else>
         <template v-if="!showVideo">
@@ -39,7 +41,7 @@
           </div>
         </template>
         <template v-if="showVideo">
-          <vmp-air-container :cuid="childrenCom[0]"></vmp-air-container>
+          <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
         </template>
       </template>
     </div>
@@ -82,7 +84,7 @@
         </div>
       </div>
       <div class="subscribe_tabs">
-        <vmp-air-container :cuid="childrenCom[1]"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
     <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
@@ -547,13 +549,13 @@
             that.$toast(`${that.$tec(e.code) || e.msg}`);
           });
       },
-      authSubmit(value) {
+      authSubmit() {
         let queryString = '';
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         let params = {
           type: type,
           webinar_id: this.webinarId,
-          verify_value: value,
+          verify_value: this.textAuth,
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           ...this.$route.query
         };
@@ -587,6 +589,7 @@
       },
       authClose() {
         this.isSubscribeShow = false;
+        this.textAuth = '';
       },
       openLanguage() {
         this.isOpenlang = true;

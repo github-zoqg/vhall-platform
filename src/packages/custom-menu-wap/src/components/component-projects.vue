@@ -45,8 +45,8 @@
   };
 </script>
 <style lang="less">
-  .lives-wrap {
+  .lives-wrapbox {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 80px;
   }
 </style>
