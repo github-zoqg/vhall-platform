@@ -54,26 +54,26 @@
         minTaskTime: 5000
       });
 
-      //测试数据
-
-      /*  setInterval(() => {
+      /*  //测试数据
+      setTimeout(() => {
         this.addRewardEffect({
           uv: 2,
           data: {
-            type: 'gift_send_success',
+            type: 'reward_pay_ok',
             room_id: 'lss_726c98ec',
             gift_user_id: '1044042222',
-            gift_user_nickname: 'v邵永凯11111',
+            gift_user_nickname: '邵永凯邵永凯邵永凯邵永凯',
+            reward_describe: '一二三四五一二三四五一二三四五',
             gift_user_avatar: null,
             gift_user_name: null,
-            gift_name: '666',
+            gift_name: '打赏',
             gift_price: 0,
             gift_image_url:
               'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
             gift_id: 134518,
             gift_receiver_id: '100890',
             gift_creator_id: '0',
-            source_status: '0'
+            source_status: '1'
           },
           msg_source: 'prefix01',
           pv: 2,
@@ -92,11 +92,15 @@
       // 监听domain层服务消息
       listenServer() {
         this.giftsServer.$on('gift_send_success', msg => {
-          console.log('VmpWapRewardEffect-------->', JSON.stringify(msg));
+          console.log('VmpWapRewardEffect--gift_send_success------>', JSON.stringify(msg));
           !this.hideEffect && this.addRewardEffect(msg);
         });
         // 打赏消息
         this.watchRewardServer.$on('reward_pay_ok', rawMsg => {
+          /*
+          {"msg_id":"msg_89049cca2048c18b749bb681d0f0cea5","app_id":"fd8d3653","channel":"ch_b7c460c6","service_type":"service_room","data":{"type":"reward_pay_ok","room_id":"lss_d6821522","reward_receiver_id":"131458","reward_describe":"恶趣味企鹅","reward_amount":0.01,"reward_count":7,"rewarder_id":"131458","rewarder_nickname":"xs","rewarder_avatar":"https://t-alistatic01.e.vhall.com/upload/users/face-imgs/51/51/515180e3754987ed2cbfb65b1ec292d2.jpeg"},"date_time":"2022-05-19 11:32:07","sender_id":"","context":{"nick_name":"","avatar":""},"bu":"1","tag":"high","msg_source":"prefix01","pv":4,"uv":3}
+          */
+          console.log('VmpWapRewardEffect--reward_pay_ok------>', JSON.stringify(rawMsg));
           !this.hideEffect && this.addRewardEffect(rawMsg);
         });
         // 自定义菜单服务事件监听
@@ -135,7 +139,7 @@
         this.visible = true;
         let compontent;
         // 自定义礼物
-        if (reload.data.source_status == 1) {
+        if (reload.data.source_status == 1 && reload.data.type !== 'reward_pay_ok') {
           compontent = this.$refs.gifPlayer;
           this.isSvga = false;
         } else {

@@ -3,7 +3,7 @@
 </template>
 <script>
   import SVGA from 'svgaplayerweb';
-  import SVGAs from './source/svgas.js';
+  import Sources from './source/index.js';
   const sourceMap = new Map();
   let parser, player;
   export default {
@@ -35,16 +35,22 @@
       startPlay(reload) {
         // const path = `${this.$imgHost}/${reload.full_screen_image_url}`;
         // const path = `https://static.vhallyun.com/mp-prod/af/4e/af4edf96a16a48d1229ea5c00d9d47d8.svga`;
-        const path = SVGAs[reload.data.gift_name];
+        let source = '';
+        if (reload.data.type == 'reward_pay_ok') {
+          source = '打赏';
+        } else {
+          source = reload.data.gift_name;
+        }
+        const path = Sources[source];
         console.time(`get:${path}`);
         let videoItem = sourceMap.get(path);
         console.timeEnd(`get:${path}`);
         if (videoItem) {
           this.startAnimation(videoItem);
         } else {
-          console.time(`load:${reload.data.gift_name}`);
+          console.time(`load:${source}`);
           parser.load(path, videoItem => {
-            console.timeEnd(`load:${reload.data.gift_namename}`);
+            console.timeEnd(`load:${source}`);
             sourceMap.set(path, videoItem);
             this.startAnimation(videoItem);
           });

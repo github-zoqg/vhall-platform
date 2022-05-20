@@ -9,7 +9,7 @@
           // 打赏动效背景class
           'bg-red-package': rewardEffectInfo.data.type != 'gift_send_success',
           // 默认礼物的背景class
-          [effectsMap[rewardEffectInfo.data.gift_name] || 'bg-custom']:
+          [Sources[rewardEffectInfo.data.gift_name] || 'bg-custom']:
             rewardEffectInfo.data.type == 'gift_send_success'
         }"
       >
@@ -47,10 +47,12 @@
             "
             class="gift-img"
           >
-            <template v-if="!!effectsMap[rewardEffectInfo.data.gift_name]">
+            <template v-if="!!Sources[rewardEffectInfo.data.gift_name]">
               <img
                 :src="
-                  require('./images/' + effectsMap[rewardEffectInfo.data.gift_name] + '-icon.png')
+                  require('@/packages/app-shared/assets/img/wap/gift/' +
+                    rewardEffectInfo.data.gift_name +
+                    '.png')
                 "
                 alt=""
               />
@@ -85,7 +87,11 @@
             /> -->
           </div>
           <div v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'" class="gift-img">
-            <img src="./images/red-package-1.png" alt="" class="red-package" />
+            <img
+              :src="require('@/packages/app-shared/assets/img/wap/gift/reward.png')"
+              alt=""
+              class="red-package"
+            />
           </div>
         </div>
       </div>
@@ -102,20 +108,14 @@
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  import Sources from './source/index.js';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',
     data() {
       return {
-        effectsMap: {
-          鲜花: 'bg-flower',
-          咖啡: 'bg-coffee',
-          赞: 'bg-praise',
-          鼓掌: 'bg-applause',
-          666: 'bg-666'
-          // 'bg-custom': 'bg-custom' //用户自定义礼物
-        },
+        Sources,
         //是否屏蔽特效
         hideEffect: false,
         rewardEffectList: [],
@@ -152,36 +152,38 @@
 
       //测试数据
 
-      /* this.addRewardEffect({
-        uv: 2,
-        data: {
-          type: 'reward_pay_ok',
-          room_id: 'lss_726c98ec',
-          gift_user_id: '1044042222',
-          gift_user_nickname: '邵永凯邵永凯邵永凯邵永凯',
-          reward_describe: '一二三四五一二三四五一二三四五',
-          gift_user_avatar: null,
-          gift_user_name: null,
-          gift_name: '666',
-          gift_price: 0,
-          gift_image_url:
-            'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
-          gift_id: 134518,
-          gift_receiver_id: '100890',
-          gift_creator_id: '0',
-          source_status: '0'
-        },
-        msg_source: 'prefix01',
-        pv: 2,
-        channel: 'ch_527661Qi',
-        sender_id: '104404666',
-        service_type: 'service_room',
-        bu: '1',
-        date_time: '2022-06-19 17:22:19',
-        context: { nick_name: '', avatar: '' },
-        msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
-        app_id: 'fd8d3653'
-      }); */
+      /* setTimeout(() => {
+        this.addRewardEffect({
+          uv: 2,
+          data: {
+            type: 'reward_pay_ok',
+            room_id: 'lss_726c98ec',
+            gift_user_id: '1044042222',
+            gift_user_nickname: '邵永凯邵永凯邵永凯邵永凯',
+            reward_describe: '一二三四五一二三四五一二三四五',
+            gift_user_avatar: null,
+            gift_user_name: null,
+            gift_name: '666',
+            gift_price: 0,
+            gift_image_url:
+              'https://t-alistatic01.e.vhall.com/upload/interacts/gift-imgs/5e/4b/5e4b58727b6525b8fd7a9500ff8b1b5a.png',
+            gift_id: 134518,
+            gift_receiver_id: '100890',
+            gift_creator_id: '0',
+            source_status: '0'
+          },
+          msg_source: 'prefix01',
+          pv: 2,
+          channel: 'ch_527661Qi',
+          sender_id: '104404666',
+          service_type: 'service_room',
+          bu: '1',
+          date_time: '2022-06-19 17:22:19',
+          context: { nick_name: '', avatar: '' },
+          msg_id: 'msg_9df5c8e83a5846ceb79d011a81acacc3' + uuid(),
+          app_id: 'fd8d3653'
+        });
+      }, 3000); */
     },
     methods: {
       // 监听domain层服务消息
@@ -287,6 +289,7 @@
     left: 0;
     top: 40px;
     z-index: 100;
+
     .reward-effect-box {
       height: 56px;
       width: fit-content;
@@ -294,102 +297,59 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
+      margin-bottom: 32px;
       &.default {
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 44px;
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/red-package-bg.png);
-          right: 6px;
-          width: 109px;
-          margin-left: 6px;
-          img {
-            height: 48px;
-            margin-left: 36px;
-          }
-        }
       }
-      &.bg-applause {
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/applause-bg.png);
-          right: -2px;
-          width: 124px;
-          margin-right: 2px;
-          img {
-            height: 69px;
-            margin-left: 10px;
-            margin-top: -12px;
-          }
-        }
-      }
-      &.bg-coffee {
+      &.bg-coffee,
+      &.bg-rocket {
         background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
         .gift-img {
-          background-image: url(images/coffee-bg.png);
+          background-image: url(images/bg3.png);
           right: 12px;
           width: 98px;
           margin-left: 12px;
-          img {
-            height: 62px;
-            margin-left: 20px;
-            margin-top: -8px;
-          }
         }
       }
-      &.bg-custom {
+      &.bg-custom,
+      &.bg-red-package {
         background: linear-gradient(90.01deg, #fb3a32 1.37%, rgba(255, 172, 44, 0.8) 97.58%);
         .gift-img {
-          background-image: url(images/custom-bg.png);
+          background-image: url(images/bg5.png);
           right: 2px;
           width: 108px;
           margin-right: 2px;
-          img {
-            height: 54px;
-            margin-left: 13px;
-          }
         }
       }
       &.bg-flower {
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/flower-bg.png);
-          right: 2px;
+          background-image: url(images/bg4.png);
+          right: -2px;
           width: 124px;
-          margin-left: 2px;
-          img {
-            height: 64px;
-            margin-left: 14px;
-            margin-top: -6px;
-          }
+          margin-left: -2px;
         }
       }
-      &.bg-praise {
+      &.bg-love {
         background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
         .gift-img {
-          background-image: url(images/praise-bg.png);
-          right: 18px;
-          width: 91px;
-          margin-left: 18px;
-          img {
-            height: 73px;
-            margin-left: 14px;
-            margin-top: -10px;
-          }
+          background-image: url(images/bg2.png);
+          right: 24px;
+          width: 86px;
+          margin-left: 24px;
         }
       }
-      &.bg-666 {
+      &.bg-666,
+      &.bg-car,
+      &.bg-plane,
+      &.bg-fireworks {
         background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
         .gift-img {
-          background-image: url(images/666-bg.png);
+          background-image: url(images/bg1.png);
           right: 8px;
           width: 124px;
           margin-left: 8px;
-          img {
-            height: 52px;
-            margin-left: 14px;
-            margin-top: 8px;
-          }
         }
       }
     }
@@ -416,6 +376,11 @@
       position: relative;
       top: 0;
       right: -6px;
+      img {
+        height: 88px;
+        margin-left: 0;
+        margin-top: -18px;
+      }
     }
 
     .zdy-gigt-img {
