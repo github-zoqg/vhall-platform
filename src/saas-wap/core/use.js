@@ -59,7 +59,7 @@ import VmpLotteryWap from '@/packages/lottery-wap';
 // 送礼物飘屏动画
 import VmpWapRewardEffect from '@/packages/wap-reward-effect';
 // 送礼物飘屏动画svga
-import VmpWapRewardEffectSVGA from '@/packages/wap-reward-effect-svga';
+import VmpWapRewardEffectFullScreen from '@/packages/wap-reward-effect-full-screen';
 
 // 章节
 import VmpChapterWap from '@/packages/watch-chapter-wap';
@@ -114,7 +114,7 @@ export function initUse() {
   Vue.use(VmpMemberListWap);
   Vue.use(VmpWapBody);
   Vue.use(VmpWapRewardEffect);
-  Vue.use(VmpWapRewardEffectSVGA);
+  Vue.use(VmpWapRewardEffectFullScreen);
   Vue.use(VmpScreenPostWap);
   Vue.use(VmpUserCenterWap);
   Vue.use(VmpUserAccountWap);

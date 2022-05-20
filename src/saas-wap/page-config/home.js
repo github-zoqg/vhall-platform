@@ -549,7 +549,7 @@ const serverConfig = {
   },
   // 礼物动画组件-SVGAA
   comWapRewardEffectSVGA: {
-    component: 'VmpWapRewardEffectSVGA'
+    component: 'VmpWapRewardEffectFullScreen'
   }
 };
 
