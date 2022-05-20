@@ -550,7 +550,9 @@
         } else {
           if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
             await this.stopPush();
-            await this.interactiveServer.destroy();
+            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+              await this.interactiveServer.destroy();
+            }
             if (this.isNoDelay == 1) {
               await sleep(200);
               console.log('无延迟---销毁--互动实例');
@@ -729,7 +731,10 @@
 
           this.micServer.setSpeakerList([]);
         });
-        // 结束直播
+        // 分组继续讨论，初始化互动实例完成后，开始推流
+        this.interactiveServer.$on('PROCEED_DISCUSSION', msg => {
+          this.startPush();
+        });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           if (msg.data.type === 'vrtc_definition_set') {
             // 设备断开重连，重新检查device_status状态（主持人）
@@ -737,7 +742,11 @@
               await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: true });
             }
           }
-          if (msg.data.event_type === 'group_switch_end') {
+          // 分组结束讨论 || 分组暂停讨论
+          if (
+            msg.data.event_type === 'group_switch_end' ||
+            msg.data.event_type === 'group_switch_stop'
+          ) {
             // 如果开启分屏并且是主页面，不需要停止推流
             if (
               this.splitScreenServer.state.isOpenSplitScreen &&

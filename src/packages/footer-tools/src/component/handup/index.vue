@@ -121,7 +121,6 @@
           temp.data = JSON.parse(temp.data);
         }
         const { type = '' } = temp.data || {};
-        console.log('aaa--1', this.joinInfo.third_party_user_id, temp);
         if (type === 'vrtc_connect_refused') {
           if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
           this.loading = false;
