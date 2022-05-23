@@ -7,11 +7,11 @@
       </div>
       <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
         <!-- 播放器背景图片 -->
-        <div class="vmp-wap-player-prompt" v-if="isShowPoster">
+        <div class="vmp-wap-player-prompt" v-if="isShowPoster && !isSmallPlayer">
           <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
         </div>
         <!-- 播放 按钮 -->
-        <div v-show="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
+        <div v-show="!isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
           <p @click="startPlay">
             <i class="vh-iconfont vh-line-video-play"></i>
           </p>
@@ -63,9 +63,15 @@
         <!-- 观看次数  -->
         <div
           class="vmp-wap-player-header"
-          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
+          v-show="
+            roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
+          "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
+          <!-- 播放器缩小按钮 -->
+          <span @click="changePlayerSize(true)">
+            <i class="vh-iconfont vh-line-arrow-left"></i>
+          </span>
           <p>
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
             &nbsp;{{ hotNum | formatHotNum }}
@@ -86,7 +92,7 @@
         <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
         <div
           class="vmp-wap-player-footer"
-          v-show="isPlayering"
+          v-show="isPlayering && !isSmallPlayer"
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
           <!-- 倍速和画质合并 -->
@@ -193,6 +199,40 @@
             </div>
           </div>
         </div>
+
+        <!-- 小屏控制按钮 -->
+        <div v-show="isSmallPlayer" class="foot_control">
+          <div class="control_left">
+            <span class="pos" @click="startPlay">
+              <van-circle
+                v-model="currentRate"
+                :rate="rate"
+                size="34px"
+                layer-color="rgba(255, 255, 255, 0.2)"
+              ></van-circle>
+              <i
+                class="vh-iconfont"
+                :class="isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'"
+              ></i>
+            </span>
+            <span class="control_center">
+              <div class="status_tip">语音播放中</div>
+
+              <div class="player_time">
+                {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+              </div>
+            </span>
+          </div>
+          <div class="control_right">
+            <span class="set_center" @click.stop="refresh">
+              <i class="vh-iconfont vh-line-refresh-left"></i>
+            </span>
+            <span @click="changePlayerSize(false)">
+              <i class="vh-iconfont vh-line-arrow-right"></i>
+            </span>
+          </div>
+        </div>
+
         <van-popup
           v-model="isOpenSpeed"
           :overlay="false"
@@ -356,8 +396,23 @@
         encrypt: true,
         isOrientation: false,
         lang: {},
-        languageList: []
+        languageList: [],
+        isSmallPlayer: false,
+        currentRate: 0,
+        rate: 0
       };
+    },
+    watch: {
+      // 监听播放器大小
+      isSmallPlayer: {
+        handler: function (val) {
+          if (val) {
+            document.querySelector('.vmp-basic-bd').classList.add('small_player');
+          } else {
+            document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+          }
+        }
+      }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
@@ -375,6 +430,10 @@
       this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
+      if (this.isAudio) {
+        this.changePlayerSize(true);
+        // document.querySelector('.vmp-basic-bd').classList.add('small_player');
+      }
       let isMES = false;
       VhallPlayer.probe({}, data => {
         isMES = data.MediaSourceExtensions;
@@ -704,6 +763,15 @@
       replay() {
         this.isVodEnd = false;
         this.startPlay();
+      },
+      // 改变播放器大小
+      changePlayerSize(data) {
+        console.log(data, 'data');
+        this.isSmallPlayer = data;
+        this.playerServer.setPlayerSize(data);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeChatHeight', [data])
+        );
       }
     }
   };
@@ -715,6 +783,50 @@
     &-video {
       height: 100%;
       width: 100%;
+      position: relative;
+      .foot_control {
+        position: absolute;
+        width: 100%;
+        bottom: 0%;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        z-index: 30;
+        padding-left: 24px;
+        top: 50%;
+        transform: translate(0, -50%);
+        .control_left {
+          display: flex;
+          .pos {
+            position: relative;
+            .vh-iconfont {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            }
+          }
+          .control_center {
+            padding-left: 16px;
+            .status_tip {
+              position: relative;
+              font-size: 24px;
+            }
+            .player_time {
+              position: absolute;
+              bottom: 0;
+            }
+          }
+        }
+        .control_right {
+          position: relative;
+          padding-right: 24px;
+          top: 25%;
+          .set_center {
+            padding-right: 20px;
+          }
+        }
+      }
     }
     .player-encrypt {
       width: 100%;
@@ -933,6 +1045,9 @@
         z-index: 6;
         -webkit-transition: all 1s;
       }
+      .vh-line-arrow-left {
+        font-size: 20px;
+      }
     }
     &-tips {
       padding: 24px;
@@ -1096,6 +1211,13 @@
           }
         }
       }
+    }
+  }
+
+  // js动态添加播放器收起样式
+  .vmp-basic-container {
+    .small_player {
+      height: 130px !important;
     }
   }
 </style>

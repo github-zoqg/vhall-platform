@@ -382,6 +382,19 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      //
+      changeChatHeight(data) {
+        console.log(data, 'data1313');
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = data == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight;
+        }
+        this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
       }
     }
   };
