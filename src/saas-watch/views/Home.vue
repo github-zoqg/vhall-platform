@@ -52,89 +52,7 @@
       this.$on('notice_panel_status', result => {
         this.isNoticeMaskShow = result;
       });
-      try {
-        console.log('%c---初始化直播房间 开始', 'color:blue');
-        // 初始化直播房间
-        const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            this.clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
-        const domain = await this.initReceiveLive(this.clientType);
-        await roomState();
-        // 是否跳转预约页
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-          !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
-        ) {
-          this.goSubscribePage(this.clientType);
-          return false;
-        }
-        await this.initCheckAuth('watch'); // 必须先setToken (绑定qq,wechat)
-        document.title = roomBaseServer.state.languages.curLang.subject;
-        let lang = roomBaseServer.state.languages.lang;
-        this.$i18n.locale = lang.type;
-        domain.initVhallReport(
-          {
-            bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-            webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            os: 10,
-            type: 4,
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            pf: 7,
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-          },
-          {
-            namespace: 'saas', //业务线
-            env: 'test', // 环境
-            method: 'post' // 上报方式
-          }
-        );
-        window.vhallReport.report('ENTER_WATCH');
-        console.log('%c---初始化直播房间 完成', 'color:blue');
-        // 如果加密状态为 1 或者 2
-        // 并且是点播或者回放
-        // 需要判断当前浏览器是否支持 MSE
-        if (
-          roomBaseServer.state.watchInitData.webinar &&
-          (roomBaseServer.state.watchInitData.webinar.type == 4 ||
-            roomBaseServer.state.watchInitData.webinar.type == 5) &&
-          roomBaseServer.state.watchInitData.record.encrypt_status == 2
-        ) {
-          if (!isMSECanUse()) {
-            this.state = 2;
-            this.errorData.errorPageTitle = 'encrypt_error';
-            this.errorData.errorPageText =
-              '主办方设置了视频加密功能，建议使用最新版Chrome浏览器观看';
-            return false;
-          }
-        }
-        this.state = 1;
-        this.addEventListener();
-      } catch (err) {
-        console.error('---初始化直播房间出现异常--');
-        console.error(err);
-        if (![512534, 512502, 512503].includes(Number(err.code))) {
-          this.state = 2;
-        }
-        this.handleErrorCode(err);
-        // this.errMsg = err.msg;
-      }
+      await this.initRoom();
     },
     mounted() {
       useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
@@ -146,6 +64,91 @@
       window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
     },
     methods: {
+      async initRoom() {
+        try {
+          console.log('%c---初始化直播房间 开始', 'color:blue');
+          // 初始化直播房间
+          const roomBaseServer = useRoomBaseServer();
+          // 判断是否是嵌入/单视频嵌入
+          try {
+            const _param = {
+              isEmbed: false,
+              isEmbedVideo: false
+            };
+            if (location.pathname.indexOf('embedclient') != -1) {
+              _param.isEmbed = true;
+              this.clientType = 'embed';
+            }
+            if (getQueryString('embed') == 'video') {
+              _param.isEmbedVideo = true;
+            }
+            roomBaseServer.setEmbedObj(_param);
+          } catch (e) {
+            console.log('嵌入', e);
+          }
+          const domain = await this.initReceiveLive(this.clientType);
+          await roomState();
+          // 是否跳转预约页
+          if (
+            this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+            !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          ) {
+            this.goSubscribePage(this.clientType);
+            return false;
+          }
+          await this.initCheckAuth('watch'); // 必须先setToken (绑定qq,wechat)
+          document.title = roomBaseServer.state.languages.curLang.subject;
+          let lang = roomBaseServer.state.languages.lang;
+          this.$i18n.locale = lang.type;
+          domain.initVhallReport(
+            {
+              bu: 0,
+              user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+              webinar_id: this.$route.params.id,
+              t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+              os: 10,
+              type: 4,
+              entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+              pf: 7,
+              env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+            },
+            {
+              namespace: 'saas', //业务线
+              env: 'test', // 环境
+              method: 'post' // 上报方式
+            }
+          );
+          window.vhallReport.report('ENTER_WATCH');
+          console.log('%c---初始化直播房间 完成', 'color:blue');
+          // 如果加密状态为 1 或者 2
+          // 并且是点播或者回放
+          // 需要判断当前浏览器是否支持 MSE
+          if (
+            roomBaseServer.state.watchInitData.webinar &&
+            (roomBaseServer.state.watchInitData.webinar.type == 4 ||
+              roomBaseServer.state.watchInitData.webinar.type == 5) &&
+            roomBaseServer.state.watchInitData.record.encrypt_status == 2
+          ) {
+            if (!isMSECanUse()) {
+              this.state = 2;
+              this.errorData.errorPageTitle = 'encrypt_error';
+              this.errorData.errorPageText =
+                '主办方设置了视频加密功能，建议使用最新版Chrome浏览器观看';
+              return false;
+            }
+          }
+          this.state = 1;
+          this.addEventListener();
+        } catch (err) {
+          console.error('---初始化直播房间出现异常--');
+          console.error(err);
+          if (![512534, 512502, 512503, 511007, 511006].includes(Number(err.code))) {
+            this.state = 2;
+          }
+          this.handleErrorCode(err);
+          // this.errMsg = err.msg;
+        }
+      },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
@@ -262,7 +265,7 @@
             } else {
               localStorage.removeItem('token');
               localStorage.removeItem('userInfo');
-              location.reload();
+              this.initRoom();
             }
             break;
           default:

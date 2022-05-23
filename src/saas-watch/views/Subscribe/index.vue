@@ -36,52 +36,7 @@
     },
     mixins: [authCheck],
     async created() {
-      try {
-        console.log('%c---初始化直播房间 开始', 'color:blue');
-        // 初始化直播房间
-        const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            this.clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
-        await this.initReceiveLive(this.clientType);
-        await subscribeState();
-        if (this.clientType != 'embed') {
-          await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
-        }
-        document.title = roomBaseServer.state.languages.curLang.subject;
-        let lang = roomBaseServer.state.languages.lang;
-        this.$i18n.locale = lang.type;
-        console.log('%c---初始化直播房间 完成', 'color:blue');
-        this.state = 1;
-        // 是否跳转观看页
-        if (
-          this.$domainStore.state.roomBaseServer.watchInitData.status == 'live' ||
-          (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
-            this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id)
-        ) {
-          this.goWatchPage(this.clientType);
-        }
-      } catch (err) {
-        console.error('---初始化直播房间出现异常--', err);
-        if (![512534, 512502, 512503].includes(Number(err.code))) {
-          this.state = 2;
-        }
-        this.handleErrorCode(err);
-      }
+      await this.initRoom();
     },
     mounted() {
       const roomBaseServer = useRoomBaseServer();
@@ -91,6 +46,54 @@
       });
     },
     methods: {
+      async initRoom() {
+        try {
+          console.log('%c---初始化直播房间 开始', 'color:blue');
+          // 初始化直播房间
+          const roomBaseServer = useRoomBaseServer();
+          // 判断是否是嵌入/单视频嵌入
+          try {
+            const _param = {
+              isEmbed: false,
+              isEmbedVideo: false
+            };
+            if (location.pathname.indexOf('embedclient') != -1) {
+              _param.isEmbed = true;
+              this.clientType = 'embed';
+            }
+            if (getQueryString('embed') == 'video') {
+              _param.isEmbedVideo = true;
+            }
+            roomBaseServer.setEmbedObj(_param);
+          } catch (e) {
+            console.log('嵌入', e);
+          }
+          await this.initReceiveLive(this.clientType);
+          await subscribeState();
+          if (this.clientType != 'embed') {
+            await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
+          }
+          document.title = roomBaseServer.state.languages.curLang.subject;
+          let lang = roomBaseServer.state.languages.lang;
+          this.$i18n.locale = lang.type;
+          console.log('%c---初始化直播房间 完成', 'color:blue');
+          this.state = 1;
+          // 是否跳转观看页
+          if (
+            this.$domainStore.state.roomBaseServer.watchInitData.status == 'live' ||
+            (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+              this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id)
+          ) {
+            this.goWatchPage(this.clientType);
+          }
+        } catch (err) {
+          console.error('---初始化直播房间出现异常--', err);
+          if (![512534, 512502, 512503, 511007, 511006].includes(Number(err.code))) {
+            this.state = 2;
+          }
+          this.handleErrorCode(err);
+        }
+      },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         return new Domain({
@@ -166,7 +169,7 @@
             } else {
               localStorage.removeItem('token');
               localStorage.removeItem('userInfo');
-              location.reload();
+              this.initRoom();
             }
             break;
           default:

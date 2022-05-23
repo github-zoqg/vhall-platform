@@ -79,85 +79,8 @@
         next();
       }
     },
-    async mounted() {
-      try {
-        if (isWechatCom()) {
-          if (sessionStorage.getItem('reloadStatus')) {
-            sessionStorage.setItem('reloadStatus', 2);
-          } else {
-            sessionStorage.setItem('reloadStatus', 1);
-            window.location.reload();
-          }
-        }
-        console.log('%c---初始化直播房间 开始', 'color:blue');
-        // 初始化直播房间
-        let clientType = 'standard';
-        // 初始化直播房间
-        const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
-        const domain = await this.initReceiveLive(clientType);
-        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
-          // 是否跳转预约页
-          this.goSubscribePage(clientType);
-          return;
-        }
-        await roomState();
-
-        //微信相关设置
-        bindWeiXin();
-        console.log('%c---初始化直播房间 完成', 'color:blue');
-
-        const roomBaseState = roomBaseServer.state;
-        document.title = roomBaseState.languages.curLang.subject;
-        let lang = roomBaseServer.state.languages.lang;
-        this.$i18n.locale = lang.type;
-        // 初始化数据上报
-        console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
-        // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
-        domain.initVhallReport(
-          {
-            bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-            webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            os: getVhallReportOs(),
-            type: 2, //播放平台 2: wap
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            pf: 3, // wap
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-          },
-          {
-            namespace: 'saas', //业务线
-            env: 'test', // 环境
-            method: 'post' // 上报方式
-          }
-        );
-        window.vhallReport.report('ENTER_WATCH');
-        this.state = 1;
-        this.addEventListener();
-      } catch (err) {
-        console.error('---初始化直播房间出现异常--', err);
-        console.error(err);
-        this.state = 2;
-        this.handleErrorCode(err);
-      }
-
+    mounted() {
+      this.initRoom();
       //消息监听
       useRoomBaseServer().$on('ROOM_SIGNLE_LOGIN', () => {
         this.state = 2;
@@ -168,6 +91,85 @@
       window.vhallReport && window.vhallReport.report('LEAVE_WATCH', {}, false);
     },
     methods: {
+      async initRoom() {
+        try {
+          if (isWechatCom()) {
+            if (sessionStorage.getItem('reloadStatus')) {
+              sessionStorage.setItem('reloadStatus', 2);
+            } else {
+              sessionStorage.setItem('reloadStatus', 1);
+              window.location.reload();
+            }
+          }
+          console.log('%c---初始化直播房间 开始', 'color:blue');
+          // 初始化直播房间
+          let clientType = 'standard';
+          // 初始化直播房间
+          const roomBaseServer = useRoomBaseServer();
+          // 判断是否是嵌入/单视频嵌入
+          try {
+            const _param = {
+              isEmbed: false,
+              isEmbedVideo: false
+            };
+            if (location.pathname.indexOf('embedclient') != -1) {
+              _param.isEmbed = true;
+              clientType = 'embed';
+            }
+            if (getQueryString('embed') == 'video') {
+              _param.isEmbedVideo = true;
+            }
+            roomBaseServer.setEmbedObj(_param);
+          } catch (e) {
+            console.log('嵌入', e);
+          }
+          const domain = await this.initReceiveLive(clientType);
+          if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+            // 是否跳转预约页
+            this.goSubscribePage(clientType);
+            return;
+          }
+          await roomState();
+
+          //微信相关设置
+          bindWeiXin();
+          console.log('%c---初始化直播房间 完成', 'color:blue');
+
+          const roomBaseState = roomBaseServer.state;
+          document.title = roomBaseState.languages.curLang.subject;
+          let lang = roomBaseServer.state.languages.lang;
+          this.$i18n.locale = lang.type;
+          // 初始化数据上报
+          console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
+          // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
+          domain.initVhallReport(
+            {
+              bu: 0,
+              user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+              webinar_id: this.$route.params.id,
+              t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+              os: getVhallReportOs(),
+              type: 2, //播放平台 2: wap
+              entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+              pf: 3, // wap
+              env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+            },
+            {
+              namespace: 'saas', //业务线
+              env: 'test', // 环境
+              method: 'post' // 上报方式
+            }
+          );
+          window.vhallReport.report('ENTER_WATCH');
+          this.state = 1;
+          this.addEventListener();
+        } catch (err) {
+          console.error('---初始化直播房间出现异常--', err);
+          console.error(err);
+          this.state = 2;
+          this.handleErrorCode(err);
+        }
+      },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
@@ -242,7 +244,7 @@
           } else {
             localStorage.removeItem('token');
             localStorage.removeItem('userInfo');
-            location.reload();
+            this.initRoom();
           }
         } else {
           this.liveErrorTip = this.$tec(err.code) || err.msg;
