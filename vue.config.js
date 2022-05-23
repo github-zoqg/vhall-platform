@@ -1,6 +1,7 @@
 /***
  * 配置官方参考链接：https://cli.vuejs.org/zh/config/
  */
+const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 const _ = require('lodash');
@@ -11,6 +12,7 @@ const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
+const { fstat } = require('fs');
 
 // 是否开发环境
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -270,6 +272,16 @@ const sharedConfig = {
     }
   }
 };
+
+// 根据项目固定不同的端口，可配置
+const portFile = path.join(__dirname, 'devport.json');
+if (fs.existsSync(portFile)) {
+  const portCfg = require(portFile);
+  const port = portCfg[argv.project];
+  if (port) {
+    sharedConfig.devServer.port = port;
+  }
+}
 
 if (['serve', 'build'].includes(cmd)) {
   // 动态修改运行环境的版本号
