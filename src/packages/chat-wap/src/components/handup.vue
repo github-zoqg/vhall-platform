@@ -176,12 +176,12 @@
               if (flag) {
                 this.applyMic();
               } else {
-                this.$toast(this.$t('interact.interact_1039'));
+                this.$toast(this.$t('interact.interact_1040'));
                 this.closeConnectPop();
               }
             });
         } else {
-          this.$toast(this.$t('interact.interact_1039'));
+          this.$toast(this.$t('interact.interact_1040'));
           this.closeConnectPop();
         }
       },

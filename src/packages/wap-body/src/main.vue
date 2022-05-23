@@ -116,8 +116,7 @@
             await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
           }
         } else {
-          //  this.$t('interact.interact_1039')
-          Toast(this.$t('interact.interact_1039'));
+          Toast(this.$t('interact.interact_1040'));
         }
       }
       if (this.isInGroup) {

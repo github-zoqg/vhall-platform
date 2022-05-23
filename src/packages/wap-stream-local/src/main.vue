@@ -274,7 +274,7 @@
             });
             if (!_flag) {
               this.speakOff();
-              this.$toast(this.$t('interact.interact_1039'));
+              this.$toast(this.$t('interact.interact_1040'));
               return;
             }
           }

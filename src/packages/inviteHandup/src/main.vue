@@ -132,12 +132,12 @@
               if (flag) {
                 this.customAgreeConnect();
               } else {
-                this.$toast(this.$t('interact.interact_1039'));
+                this.$toast(this.$t('interact.interact_1040'));
                 this.refuseInviteConnect();
               }
             });
         } else {
-          this.$toast(this.$t('interact.interact_1039'));
+          this.$toast(this.$t('interact.interact_1040'));
           this.refuseInviteConnect();
         }
       },
