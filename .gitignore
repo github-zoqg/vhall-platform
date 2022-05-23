@@ -3,6 +3,7 @@ node_modules
 /dist
 .history
 middle-event-sdk
+devport.json
 
 
 # local env files
