@@ -215,8 +215,6 @@
           this.liveErrorTip = this.$t('message.message_1008');
         } else if (
           err.code == 516324 ||
-          err.code == 516324 ||
-          err.code == 512562 ||
           err.code == 512562 ||
           err.code == 512571 ||
           err.code == 512002
@@ -238,6 +236,14 @@
           window.location.href = err.data.url;
         } else if (err.code == 611001) {
           this.liveErrorTip = '互动初始化失败，' + err.msg;
+        } else if (err.code == 511006 || err.code == 511007) {
+          if (this.$route.query?.token) {
+            this.liveErrorTip = this.$tec(err.code) || err.msg;
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            location.reload();
+          }
         } else {
           this.liveErrorTip = this.$tec(err.code) || err.msg;
         }

@@ -166,6 +166,14 @@
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
+        } else if (err.code == 511006 || err.code == 511007) {
+          if (this.$route.query?.token) {
+            this.liveErrorTip = this.$tec(err.code) || err.msg;
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            location.reload();
+          }
         } else {
           this.liveErrorTip = this.$tec(err.code) || err.msg;
         }

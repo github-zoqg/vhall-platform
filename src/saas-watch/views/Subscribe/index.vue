@@ -158,6 +158,17 @@
           case 512539:
             this.errorData.errorPageTitle = 'embed_verify'; // 观看页为嵌入页，设置观看限制为付费、邀请码、白名单、付费or邀请码、设置了报名报单时，访问观看页时，页面提示
             break;
+          case 511006: // token 校验失败，清空token，刷新页面
+          case 511007:
+            if (this.$route.query?.token) {
+              this.errorData.errorPageTitle = 'embed_verify';
+              this.errorData.errorPageText = this.$tec(err.code) || err.msg;
+            } else {
+              localStorage.removeItem('token');
+              localStorage.removeItem('userInfo');
+              location.reload();
+            }
+            break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
             this.errorData.errorPageText = this.$tec(err.code) || err.msg;

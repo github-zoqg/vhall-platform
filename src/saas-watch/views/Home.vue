@@ -254,6 +254,17 @@
           case 611001:
             this.errorData.errorPageTitle = '互动初始化失败，' + err.msg;
             break;
+          case 511006: // token 校验失败，清空token，刷新页面
+          case 511007:
+            if (this.$route.query?.token) {
+              this.errorData.errorPageTitle = 'embed_verify';
+              this.errorData.errorPageText = this.$tec(err.code) || err.msg;
+            } else {
+              localStorage.removeItem('token');
+              localStorage.removeItem('userInfo');
+              location.reload();
+            }
+            break;
           default:
             this.errorData.errorPageTitle = 'embed_verify';
             this.errorData.errorPageText = this.$tec(err.code) || err.msg;
