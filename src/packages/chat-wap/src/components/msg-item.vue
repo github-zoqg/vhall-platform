@@ -542,7 +542,6 @@
         > div {
           background: rgba(255, 209, 201, 0.2);
           border-radius: 40px;
-          padding: 10px 24px;
         }
         .role {
           border-radius: 16px;
@@ -601,7 +600,6 @@
     }
     .new-gift {
       padding-left: 0;
-      padding-top: 26px;
       position: relative;
       display: block;
       &.interact {
@@ -615,7 +613,7 @@
       }
 
       .interact-gift-box {
-        padding-left: 24px;
+        padding: 0 24px;
         margin-right: 10px;
         text-align: left;
         width: 100%;
