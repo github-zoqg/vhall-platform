@@ -2,7 +2,7 @@
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
-        <img class="tool gift-img" src="./img/like-3.1.4.png" @click="opneGifts" />
+        <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
           ref="gifts"
           :isEmbed="localRoomInfo.isEmbed"
@@ -14,7 +14,7 @@
       </div>
       <!-- 打赏 -->
       <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
-        <img class="tool redpacket-img" src="./img/like-3.1.4.png" @click="openReward" />
+        <img class="tool redpacket-img" src="./img/icon_reward.png" @click="openReward" />
         <RewardCard
           ref="reward"
           :webinarData="webinarData"
@@ -28,7 +28,7 @@
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
-          <img class="tool share-img" src="./img/like-3.1.4.png" />
+          <img class="tool share-img" src="./img/icon_share.png" />
         </a>
       </div>
 
