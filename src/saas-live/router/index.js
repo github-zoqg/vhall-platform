@@ -87,12 +87,12 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
-    // 根据不同的页面，动态加载不同的配置
-    const pageConfig = await import(`../page-config/${to.meta.page}.js`);
-    window.$serverConfig = pageConfig.default;
-    window.$serverConfig._page = to.meta.page;
-  }
+  // if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+  //   // 根据不同的页面，动态加载不同的配置
+  //   const pageConfig = await import(`../page-config/${to.meta.page}.js`);
+  //   window.$serverConfig = pageConfig.default;
+  //   window.$serverConfig._page = to.meta.page;
+  // }
 
   const res = await grayInit(to);
   console.log('---grayInit---', res);

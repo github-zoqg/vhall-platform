@@ -59,7 +59,9 @@
         <!-- 计时器 -->
         <div v-if="openTimer" class="pr">
           <i v-if="showTimer" class="circle"></i>
-          <img src="./img/timer.png" alt="" @click="openTimerHandle" />
+          <div class="vmp-timer-icon">
+            <img src="./img/timer.png" alt="" @click="openTimerHandle" class="show_img" />
+          </div>
         </div>
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
@@ -85,7 +87,7 @@
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
-          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" />
+          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" alt="" class="show_img" />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
           <vh-gifts
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
@@ -100,7 +102,9 @@
       <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <!-- 打赏 -->
         <div class="vh-icon-box">
-          <img src="./img/reward-icon.png" alt="" @click="onClickReward" />
+          <div class="vmp-reward-icon">
+            <img src="./img/reward-icon.png" alt="" @click="onClickReward" class="show_img" />
+          </div>
           <reward ref="reward" />
         </div>
       </li>
@@ -446,6 +450,20 @@
       .vh-gifts-wrap {
         border-radius: 16px;
         position: relative;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+        border-radius: 16px;
+        cursor: pointer;
+        margin-left: 16px;
+        img.show_img {
+          width: 32px;
+          height: 32px;
+          -webkit-transform-origin: left center;
+          transform-origin: left center;
+          margin: -1px 0 0 0;
+        }
       }
     }
     &__center {
@@ -485,6 +503,38 @@
           padding: 7px 28px;
         }
       }
+    }
+  }
+  .vmp-reward-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #ff9d30 0%, #ff9e31 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img.show_img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: -1px 0 0 0;
+    }
+  }
+  .vmp-timer-icon {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #5464f7 0%, #848cfe 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img.show_img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: -3px 0 0 0;
     }
   }
 </style>
