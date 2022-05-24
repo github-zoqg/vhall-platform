@@ -18,10 +18,11 @@
           <ul v-if="QuestionList && QuestionList.length">
             <li v-for="(item, index) in QuestionList" :key="index">
               <div class="data-time">
-                {{ item.created_at | chatTime }}
+                {{ item.created_at.substr(11, 5) }}
               </div>
 
               <div class="data-text">
+                <span v-if="index == 0" class="_block"></span>
                 <span class="data-text_circle">
                   <i class="num"></i>
                 </span>
@@ -157,7 +158,7 @@
       .container-data {
         height: 100%;
         margin-top: 80px;
-        padding: 100px 30px 60px;
+        padding: 100px 40px 60px;
         background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
         position: relative;
         overflow: auto;
@@ -175,7 +176,7 @@
           }
         }
         .data-time {
-          line-height: 1.2;
+          line-height: 1.6;
           font-size: 28px;
           display: inline-block;
           width: 100px;
@@ -186,12 +187,21 @@
           position: relative;
           padding-right: 28px;
           width: calc(100% - 100px);
+          ._block {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            background: #f2faff;
+            top: 0px;
+            left: -5px;
+          }
           .write {
-            line-height: 1.2;
+            line-height: 1.6;
             font-size: 28px;
             position: absolute;
             color: #3562fa;
-            right: 28px;
+            right: 0;
             cursor: pointer;
           }
           .write_over {
@@ -205,7 +215,7 @@
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #3562fa;
-            top: 0;
+            top: 10px;
             left: -11px;
             position: absolute;
             .num {

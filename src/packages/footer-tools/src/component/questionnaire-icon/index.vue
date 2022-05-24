@@ -13,6 +13,7 @@
             </div>
 
             <div class="data-text">
+              <span v-if="index == 0" class="_block"></span>
               <span class="data-text_circle">
                 <i class="num"></i>
               </span>
@@ -170,6 +171,15 @@
           position: relative;
           padding-right: 16px;
           width: calc(100% - 50px);
+          ._block {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            background: #f2faff;
+            top: 0px;
+            left: -5px;
+          }
           .write {
             position: absolute;
             color: #3562fa;
@@ -192,7 +202,7 @@
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #3562fa;
-            top: 0;
+            top: 3px;
             left: -6px;
             position: absolute;
             .num {
