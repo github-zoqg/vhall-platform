@@ -648,7 +648,7 @@
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : this.pageConfig.page),
           limit: this.pageConfig.limit,
-          reset_device_status: this.mode == 6 ? 0 : this.isVideoPolling
+          reset_device_status: 0
         };
 
         //如果存在输入搜索人员的值
