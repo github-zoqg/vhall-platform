@@ -356,6 +356,7 @@
 </script>
 
 <style lang="less">
+  @font-dark-qa-second: #666666;
   .vhsaas-chat-operator {
     width: calc(100% - 48px);
     padding: 12px 24px 11px;
@@ -458,16 +459,16 @@
       }
       textarea.vhsaas-chat-operator__textarea {
         &::-webkit-input-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &:-moz-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &::-moz-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &:-ms-input-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
       }
       .vhsaas-chat-operator__textarea-show-limit {
