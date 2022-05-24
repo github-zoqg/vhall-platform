@@ -95,6 +95,14 @@
         } else {
           return this.$t('interact_tools.interact_tools_1069');
         }
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
+      }
+    },
+    watch: {
+      isSmallPlayer() {
+        this.setSetingHeight();
       }
     },
     mounted() {
@@ -284,7 +292,10 @@
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100;
+        this.popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
       },
       // 打开打赏弹框
       showReward() {

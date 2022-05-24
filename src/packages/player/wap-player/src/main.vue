@@ -791,7 +791,7 @@
         color: #fff;
         display: flex;
         justify-content: space-between;
-        z-index: 30;
+        z-index: 1;
         padding-left: 24px;
         top: 50%;
         transform: translate(0, -50%);

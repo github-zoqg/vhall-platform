@@ -109,6 +109,11 @@
         return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
+    watch: {
+      isSmallPlayer() {
+        this.setSetingHeight();
+      }
+    },
     beforeCreate() {
       this.giftsServer = useGiftsServer();
       this.msgServer = useMsgServer();
@@ -305,7 +310,6 @@
        * 计算 设置的弹层高度
        */
       setSetingHeight() {
-        console.log(this.$domainStore.state.playerServer.isSmallPlayer, 'setPlayerSize');
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
@@ -313,6 +317,11 @@
         if (this.isEmbed) {
           baseHeight = playerHeight;
         }
+        console.log(
+          this.$domainStore.state.playerServer.isSmallPlayer,
+          this.isSmallPlayer,
+          'setPlayerSize'
+        );
         this.popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
         // const headerDom = document.getElementById('header');
