@@ -4,6 +4,7 @@
       title="插播文件"
       :visible.sync="insertVideoVisible"
       :close-on-click-modal="false"
+      :modal-append-to-body="false"
       width="800px"
     >
       <div class="vmp-insert-video-wrap">

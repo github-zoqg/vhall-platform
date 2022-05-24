@@ -98,7 +98,12 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
-  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
+  import {
+    boxEventOpitons,
+    isWechat,
+    isWechatCom,
+    getQueryString
+  } from '@/packages/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import authBox from './components/confirm.vue';
   export default {
@@ -316,6 +321,8 @@
         let queryString = '';
         let open_id = '';
         let userId = '';
+        let shareId = getQueryString('shareId');
+        let share_id = getQueryString('share_id');
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -324,6 +331,16 @@
             queryString = this.$route.query.refer
               ? `?refer=${this.$route.query.refer}&isIndependent=0`
               : '?isIndependent=0';
+            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+            if (queryString.indexOf('?') != -1) {
+              queryString += share_id ? `&share_id=${share_id}` : '';
+              queryString += shareId ? `&shareId=${shareId}` : '';
+            } else if (queryString.indexOf('?') == -1 && share_id) {
+              queryString += share_id ? `?share_id=${share_id}` : '';
+            } else if (queryString.indexOf('?') == -1 && shareId) {
+              queryString += shareId ? `?shareId=${shareId}` : '';
+            }
+            // 邀请卡分享
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             break;
@@ -515,6 +532,8 @@
       authSubmit(value) {
         let queryString = '';
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        let share_id = getQueryString('share_id');
+        let shareId = getQueryString('share_id');
         let params = {
           type: type,
           webinar_id: this.webinarId,
@@ -539,10 +558,20 @@
               }, 1000);
             }
           } else if (res.code === 512525) {
-            // 填写报名表单
+            // 开启了报名表单的时候，需要跳转至报名表单界面，这个时候还没有参会
             queryString = this.$route.query.refer
               ? `?refer=${this.$route.query.refer}&isIndependent=0`
               : '?isIndependent=0';
+            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+            if (queryString.indexOf('?') != -1) {
+              queryString += share_id ? `&share_id=${share_id}` : '';
+              queryString += shareId ? `&shareId=${shareId}` : '';
+            } else if (queryString.indexOf('?') == -1 && share_id) {
+              queryString += share_id ? `?share_id=${share_id}` : '';
+            } else if (queryString.indexOf('?') == -1 && shareId) {
+              queryString += shareId ? `?shareId=${shareId}` : '';
+            }
+            // 邀请卡
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
           } else {

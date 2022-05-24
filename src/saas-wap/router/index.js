@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
-import grayInit from '@/packages/app-shared/gray-init';
+import grayInit from '@/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
 import { wxAuthCheck } from '../../packages/app-shared/utils/wechat';
-import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 Vue.use(VueRouter);
 

@@ -93,9 +93,9 @@
         }
         this.visible = true;
         this.showEmoji = false;
-        setTimeout(() => {
-          document.querySelector('textarea#textareaChat').focus();
-        }, 0);
+        this.$nextTick(() => {
+          this.$refs.textareaChat.focus();
+        });
       },
       //点击发送按钮
       send() {
@@ -117,9 +117,9 @@
       //处理失去焦点
       handleOnBlur() {
         // this.showEmoji = false;
-        window.document.body.scrollTop = '0px';
-        window.document.activeElement.scrollIntoViewIfNeeded(true);
-        window.scroll(0, 0);
+        // window.document.body.scrollTop = '0px';
+        // window.document.activeElement.scrollIntoViewIfNeeded(true);
+        // window.scroll(0, 0);
       },
       //处理获得焦点
       handleOnFocus() {
@@ -229,6 +229,7 @@
 
         .send-menu {
           width: 66px;
+          min-width: 66px;
           height: 66px;
           border-radius: 50%;
           display: flex;
