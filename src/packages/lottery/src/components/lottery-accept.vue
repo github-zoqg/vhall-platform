@@ -9,7 +9,7 @@
           v-model="reciveInfo[item.field_key]"
           :placeholder="$tdefault(item.placeholder)"
           maxlength="200"
-          @keyup.native.stop="foo()"
+          @keyup.native.stop="noop()"
           @input.native="handleInput(item.field_key)"
         ></el-input>
         <textarea
@@ -20,7 +20,7 @@
           rows="2"
           class="address-textarea"
           maxlength="200"
-          @keyup.stop="foo"
+          @keyup.stop="noop"
         ></textarea>
       </el-form-item>
     </el-form>
@@ -111,7 +111,7 @@
         }
       },
       // 空函数，阻止输入框空格按键事件冒泡，触发播放器暂停/播放
-      foo() {},
+      noop() {},
       // 滚动条初始化
       overlayScrollbarInit() {
         this.$nextTick(() => {
@@ -166,45 +166,42 @@
       // 提交领奖人信息
       postWinnerInfo() {
         // 表单校验
-        if (this.validateWinnerInfo()) {
-          const lotteryUserRemark = [];
-          this.stepHtmlList.forEach(ele => {
-            if (ele.field_key != 'name' && ele.field_key != 'phone') {
-              ele.field_value = this.reciveInfo[ele.field_key];
-              lotteryUserRemark.push(ele);
-            }
+        if (!this.validateWinnerInfo()) return false;
+        const lotteryUserRemark = [];
+        this.stepHtmlList.forEach(ele => {
+          if (ele.field_key != 'name' && ele.field_key != 'phone') {
+            ele.field_value = this.reciveInfo[ele.field_key];
+            lotteryUserRemark.push(ele);
+          }
+        });
+        const failure = err => {
+          this.$message({
+            message: err.msg,
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
           });
-          this.lotteryServer
-            .acceptPrize({
-              lottery_id: this.lotteryId,
-              lottery_user_name: this.reciveInfo.name,
-              lottery_user_phone: this.reciveInfo.phone,
-              lottery_user_remark: JSON.stringify(lotteryUserRemark)
-            })
-            .then(res => {
-              if (res.code === 200) {
-                this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
-                this.$nextTick(() => {
-                  this.$emit('navTo', 'LotterySuccess');
-                });
-              } else {
-                this.$message({
-                  message: res.msg,
-                  showClose: true,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            })
-            .catch(err => {
-              this.$message({
-                message: err.msg,
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
+        };
+        this.lotteryServer
+          .acceptPrize({
+            lottery_id: this.lotteryId,
+            lottery_user_name: this.reciveInfo.name,
+            lottery_user_phone: this.reciveInfo.phone,
+            lottery_user_remark: JSON.stringify(lotteryUserRemark)
+          })
+          .then(res => {
+            if (res.code === 200) {
+              this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+              this.$nextTick(() => {
+                this.$emit('navTo', 'LotterySuccess');
               });
-            });
-        }
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
       }
     }
   };

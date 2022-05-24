@@ -7,8 +7,13 @@
         prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
       }}”
     </p>
-    <div class="lottery-accept-btn" @click="acceptLottery">
+    <!-- 领奖 -->
+    <div v-if="needTakeAward" class="lottery-accept-btn" @click="acceptLottery">
       {{ $t('interact_tools.interact_tools_1017') }}
+    </div>
+    <!-- 中奖列表 -->
+    <div v-else-if="showWinnerList" class="lottery-accept-btn" @click="navToWinnerList">
+      {{ $t('interact_tools.interact_tools_1012') }}
     </div>
     <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close" />
   </div>
@@ -26,6 +31,18 @@
         type: Object,
         default() {
           return {};
+        }
+      },
+      needTakeAward: {
+        type: Boolean,
+        default() {
+          return true;
+        }
+      },
+      showWinnerList: {
+        type: Boolean,
+        default() {
+          return false;
         }
       }
     },
@@ -45,6 +62,9 @@
       },
       acceptLottery() {
         this.$emit('navTo', 'LotteryAccept');
+      },
+      navToWinnerList() {
+        this.$emit('navTo', 'LotteryWinner');
       }
     }
   };
@@ -69,7 +89,7 @@
       color: #ffffff;
       font-weight: 500;
       margin-top: 32px;
-      padding-left: 20px;
+      // padding-left: 20px;
     }
     .win-lottery-desc {
       font-size: 16px;
