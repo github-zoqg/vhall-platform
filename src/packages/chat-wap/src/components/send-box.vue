@@ -287,7 +287,7 @@
       this.userServer = useUserServer();
     },
     created() {
-      this.childrenCom = window.$serverConfig[this.cuid].children;
+      this.childrenCom = this.cuid ? window.$serverConfig[this.cuid].children : [];
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }

@@ -54,7 +54,7 @@
           }"
         ></span>
         <img
-          src="./images/red-package-1.png"
+          :src="require('@/packages/app-shared/assets/img/wap/gift/reward.png')"
           alt=""
           class="gift-img red-package"
           v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
@@ -81,8 +81,6 @@
         effectsMap: {
           鲜花: 'bg-flower',
           咖啡: 'bg-coffee',
-          赞: 'bg-praise',
-          鼓掌: 'bg-applause',
           666: 'bg-666'
           // 'bg-custom': 'bg-custom' //用户自定义礼物
         },
@@ -120,7 +118,6 @@
         maxQueueLen: 3
       });
 
-      let i = 0;
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
       //     app_id: 'fd8d3653',
@@ -351,9 +348,6 @@
       &.default {
         background-image: url(images/red-package-bg.png);
       }
-      &.bg-applause {
-        background-image: url(images/applause-bg.png);
-      }
       &.bg-coffee {
         background-image: url(images/coffee-bg.png);
       }
@@ -362,9 +356,6 @@
       }
       &.bg-flower {
         background-image: url(images/flower-bg.png);
-      }
-      &.bg-praise {
-        background-image: url(images/praise-bg.png);
       }
       &.bg-666 {
         background-image: url(images/666-bg.png);

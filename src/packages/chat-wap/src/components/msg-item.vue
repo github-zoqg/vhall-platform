@@ -80,7 +80,15 @@
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
+          <div
+            v-if="source.content.source_status == 1"
+            class="gift-zdy"
+            :style="{
+              backgroundImage: 'url(' + source.content.gift_url + ')'
+            }"
+          ></div>
           <img
+            v-else
             class="new-gift-img"
             :src="
               require('@/packages/app-shared/assets/img/wap/chat/' +
@@ -534,7 +542,6 @@
         > div {
           background: rgba(255, 209, 201, 0.2);
           border-radius: 40px;
-          padding: 10px 24px;
         }
         .role {
           border-radius: 16px;
@@ -593,7 +600,6 @@
     }
     .new-gift {
       padding-left: 0;
-      padding-top: 26px;
       position: relative;
       display: block;
       &.interact {
@@ -607,7 +613,7 @@
       }
 
       .interact-gift-box {
-        padding-left: 24px;
+        padding: 0 24px;
         margin-right: 10px;
         text-align: left;
         width: 100%;
@@ -635,6 +641,14 @@
           display: flex;
           justify-content: center;
           align-items: center;
+        }
+        .gift-zdy {
+          width: 44px;
+          height: 44px;
+          background-color: white;
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
         }
       }
       .new-gift-img,
