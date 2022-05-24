@@ -441,7 +441,6 @@
       },
       //处理分组讨论频道变更
       handleChannelChange() {
-        this.page = 0;
         useChatServer().clearChatMsg();
         this.getHistoryMsg();
       },

@@ -220,7 +220,6 @@
     },
     created() {
       this.initViewData();
-      this.page = 0;
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -305,7 +304,6 @@
       },
       //处理分组讨论频道变更
       handleChannelChange() {
-        this.page = 0;
         useChatServer().clearChatMsg();
         this.getHistoryMessage();
       },
@@ -314,8 +312,8 @@
         const data = {
           room_id: this.roomId,
           // webinar_id: this.webinar_id,
-          pos: this.page * 10,
-          limit: 50 // 所有端统一显示50条
+          pos: this.pos,
+          limit: this.pageSize // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
@@ -323,7 +321,6 @@
         }
         await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
-        this.scrollBottom();
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
@@ -394,8 +391,10 @@
           return;
         }
         const offsetPos = this.pos;
+        await this.getHistoryMessage();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
+          // alert(this.chatList.length - offsetPos);
           this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
         });
       }
