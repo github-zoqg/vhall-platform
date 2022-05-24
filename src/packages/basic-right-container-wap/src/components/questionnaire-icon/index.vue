@@ -10,7 +10,7 @@
       v-model="showQuestionList"
       position="bottom"
       :overlay="false"
-      :style="{ maxHeight: popHeight }"
+      :style="{ maxHeight: popHeight, zIndex: 31 }"
     >
       <div class="vmp-questionnaire-list_container">
         <img class="q_header" src="./images/header.png" alt="" />
@@ -143,6 +143,7 @@
     .questionnaire_base {
       height: 100%;
       background: transparent;
+      z-index: 31 !important;
     }
     .vmp-questionnaire-list_container {
       height: calc(100% - 80px);
