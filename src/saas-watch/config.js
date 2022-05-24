@@ -343,6 +343,11 @@ export const serverConfig = {
       cuid: ['comLottery'],
       method: 'handleClickIcon'
     },
+    emitTakeAward: {
+      cuid: ['comLottery'],
+      method: 'hanldeTakeAward',
+      args: ['$0']
+    },
     //红包弹窗
     emitClickRedPacketIcon: {
       cuid: ['comRedPacket'],

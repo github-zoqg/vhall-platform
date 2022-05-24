@@ -3,7 +3,6 @@
     class="vhall-lottery-wap"
     v-if="dialogVisible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
-    @click.stop="dialogVisible = false"
   >
     <component
       :is="lotteryView"
@@ -15,7 +14,6 @@
       :lottery-id="lotteryId"
       :lottery-info="lotteryInfo"
       :need-take-award="needTakeAward"
-      :win-lottery-history="winLotteryHistory"
       @need-Login="handleGoLogin"
       @close="close"
       @navTo="changeView"
@@ -39,8 +37,7 @@
       LotteryWin: () => import('./components/lottery-win.vue'), // 中奖界面
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
-      LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
-      LotteryHistory: () => import('./components/lottery-history.vue') //抽奖历史
+      LotterySuccess: () => import('./components/lottery-success.vue') // 领取结果页面
     },
     provide() {
       return {
@@ -51,9 +48,9 @@
       const zIndexServerState = this.zIndexServer.state;
       return {
         zIndexServerState,
-        dialogVisible: true, // 主窗口显隐
+        dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryHistory', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -137,8 +134,6 @@
        */
       async handleClickIcon() {
         const list = await this.lotteryServer.initIconStatus();
-        console.log('------handleClickIcon-------');
-        console.log(list);
         if (!list.length) return; // 没有抽奖历史,不可能有点击事件
         const lastLottery = list[0]; // 倒序排列
         if (lastLottery.lottery_status === 0) {
@@ -148,8 +143,27 @@
           this.lotteryView = 'LotteryPending';
         } else {
           this.lotteryView = 'LotteryHistory';
-          this.winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
+          const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
+          if (winLotteryHistory.length) {
+            this.lotteryServer.$emit('ShowHistory', winLotteryHistory); // 弹起中奖历史
+            return false;
+          } else {
+            // 弹出无中奖
+            this.showWinnerList = false;
+            this.prizeInfo = {};
+            this.lotteryView = 'LotteryMiss';
+          }
         }
+        this.dialogVisible = true;
+        this.zIndexServer.setDialogZIndex('lottery');
+      },
+      /**
+       * @description 注册事件
+       */
+      hanldeTakeAward(lottery) {
+        this.lotteryId = lottery.id;
+        this.setFitment(lottery);
+        this.lotteryView = 'LotteryAccept';
         this.dialogVisible = true;
         this.zIndexServer.setDialogZIndex('lottery');
       },

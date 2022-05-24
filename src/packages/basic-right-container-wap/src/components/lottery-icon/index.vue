@@ -2,6 +2,14 @@
   <div class="icon-wrap" v-if="showIcon" @click="checkLotteryIcon">
     <img src="./images/icon.png" alt="" />
     <i class="dot" v-if="dotVisible" />
+    <!-- 关闭的遮罩层 -->
+    <div
+      class="transparent-layer"
+      v-if="lotteryListoryVisible"
+      @click="lotteryListoryVisible = false"
+    >
+      <lottery-history />
+    </div>
   </div>
 </template>
 <script>
@@ -9,6 +17,7 @@
    * @description 红包的图标 + 小红点
    */
   import { useLotteryServer } from 'middle-domain';
+  import lotteryHistory from './lottery-history.vue';
   export default {
     name: 'LotteryIcon',
     data() {
