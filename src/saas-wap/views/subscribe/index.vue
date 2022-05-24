@@ -139,7 +139,6 @@
         });
       },
       handleErrorCode(err) {
-        let currentQuery = location.search;
         if (err.code == 512522) {
           this.liveErrorTip = this.$t('message.message_1009');
         } else if (err.code == 512541) {
@@ -154,15 +153,20 @@
         ) {
           this.liveErrorTip = this.$t('message.message_1004');
         } else if (err.code == 512503 || err.code == 512502) {
-          currentQuery =
-            currentQuery.indexOf('nickname=') != -1
-              ? currentQuery.replace('nickname=', 'name=')
-              : currentQuery;
-          currentQuery =
-            currentQuery.indexOf('record_id=') > -1
-              ? currentQuery.replace('record_id=', 'rid=')
-              : currentQuery;
-          window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+          if (this.embedObj?.embed || this.embedObj?.embedVideo) {
+            let _embedQuery = location.search;
+            _embedQuery =
+              _embedQuery.indexOf('nickname=') != -1
+                ? _embedQuery.replace('nickname=', 'name=')
+                : _embedQuery;
+            _embedQuery =
+              _embedQuery.indexOf('record_id=') > -1
+                ? _embedQuery.replace('record_id=', 'rid=')
+                : _embedQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+          } else {
+            window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+          }
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
