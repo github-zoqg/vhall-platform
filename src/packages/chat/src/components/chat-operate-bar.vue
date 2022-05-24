@@ -1,5 +1,13 @@
 <template>
-  <div class="vmp-chat-operate-container" ref="chatOperateContainer">
+  <div
+    :class="[
+      'vmp-chat-operate-container',
+      {
+        'chat-operate-live': !isWatch
+      }
+    ]"
+    ref="chatOperateContainer"
+  >
     <div class="operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
         <!--表情-->
@@ -161,6 +169,12 @@
         const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
         const { webinar = {} } = watchInitData;
         return webinar.type;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
       }
     },
     props: {
@@ -394,8 +408,11 @@
     @font-error: #fb3a32;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    border-top: 1px solid #3a3a48;
+    padding: 10px 24px;
+    &.chat-operate-live {
+      padding: 10px 10px;
+    }
+    border-top: 1px solid #1a1a1a;
     background-color: #2d2d2d;
     position: absolute;
     box-sizing: border-box;
