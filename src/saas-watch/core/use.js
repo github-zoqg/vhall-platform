@@ -71,6 +71,8 @@ import VmpSubscribeBody from '@/packages/subscribe-body/index';
 
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
+// 摄像头检测及设置
+import VmpCameraCheck from '@/packages/camera-check/index';
 
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
@@ -133,5 +135,6 @@ export function initUse() {
   Vue.use(VmpStreamDesktopScreen);
   Vue.use(VmpInsertStream);
   Vue.use(VmpMicInvited);
+  Vue.use(VmpCameraCheck);
   Vue.use(VmpViewRestriction);
 }

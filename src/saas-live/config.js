@@ -103,7 +103,8 @@ export const serverConfig = {
       'liveTimer',
       'comRebroadcast',
       'comRebroadcastList',
-      'comMicInvited'
+      'comMicInvited',
+      'comVideoPollingSetting'
     ]
   },
 
@@ -175,6 +176,7 @@ export const serverConfig = {
       'comMediaPlayMenu',
       'comInteractMenu',
       'comGroupMenu',
+      'comVideoPollMenu',
       'comShareMenu',
       'comExitGroupMenu',
       'comLottery',
@@ -390,6 +392,24 @@ export const serverConfig = {
         // 点击分组讨论菜单
         cuid: ['comGroupDiscussion'],
         method: 'toggle'
+      }
+    ]
+  },
+  // 视频轮巡讨论菜单
+  comVideoPollMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'vh-saas-iconfont vh-saas-Videoroundtour',
+      text: '视频轮巡',
+      kind: 'videoPolling',
+      auth: 'video_polling',
+      disable: true
+    },
+    handleClick: [
+      {
+        // 点击分组讨论菜单
+        cuid: ['comVideoPollingSetting'],
+        method: 'showVideoPollingSetting'
       }
     ]
   },
@@ -863,6 +883,22 @@ export const serverConfig = {
         method: 'handleUnpublishComplate'
       }
     ]
+  },
+  // *******分屏页面****结束
+
+  // *******视频轮询页面****开始
+  // 【视频轮询页面】根组件
+  videoPollingRoot: {
+    component: 'VmpAirContainer',
+    children: ['videoPollingContainer']
+  },
+  // 【视频轮询页面】分屏组件
+  videoPollingContainer: {
+    component: 'VmpVideoPolling'
+  },
+  // 视频轮巡设置弹窗
+  comVideoPollingSetting: {
+    component: 'VmpPollingSetting'
   },
   // *******分屏页面****结束
 
