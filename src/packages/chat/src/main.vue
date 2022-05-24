@@ -40,7 +40,12 @@
           emitQuestionnaireEvent
         }"
         @tobottom="toBottom"
-      ></virtual-list>
+        @totop="onTotop"
+      >
+        <div class="chat_loading" slot="header" v-show="overflow && isLoading">
+          {{ $t('common.common_1001') }}
+        </div>
+      </virtual-list>
       <div class="chat-content__tip-box">
         <div
           v-show="
@@ -115,7 +120,6 @@
       VirtualList
     },
     data() {
-      const { chatList } = useChatServer().state;
       return {
         MsgItem,
         chatServerState: useChatServer().state,
@@ -134,10 +138,7 @@
         userId: '',
         //游客或用户id
         accountId: '',
-        //聊天消息列表
-        chatList: chatList,
-        //聊天消息页码
-        page: 0,
+
         /** domain中读取的数据结束 */
         /** 消息提示 */
         //未读消息数量
@@ -207,7 +208,12 @@
         // 是否展示欢迎语
         isShowWelcome: false,
         //加载聊天历史完成
-        historyloaded: false
+        historyloaded: false,
+        //聊天消息是否有滚动条
+        overflow: false,
+        //每次加载的消息条数
+        pageSize: 20,
+        isLoading: false
       };
     },
     computed: {
@@ -254,6 +260,12 @@
       //当前直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      chatList() {
+        return this.$domainStore.state.chatServer.chatList;
+      },
+      pos() {
+        return this.$domainStore.state.chatServer.pos;
       }
     },
     watch: {
@@ -263,6 +275,7 @@
       chatList: function () {
         if (this.isBottom()) {
           this.scrollBottom();
+          this.checkOverflow();
         }
       },
       // 聊天免登录的配置项更改，重新计算是否需要登录聊天
@@ -434,15 +447,17 @@
       },
       // 获取历史消息
       async getHistoryMsg() {
+        this.isLoading = true;
         const params = {
           // webinar_id: this.webinarId,
           room_id: this.roomId,
-          pos: Number(this.page) * 50,
-          limit: 50
+          pos: this.pos,
+          limit: this.pageSize
         };
-        await useChatServer().getHistoryMsg(params);
+        const res = await useChatServer().getHistoryMsg(params);
         this.historyloaded = true;
-        this.page++;
+        this.isLoading = false;
+        return res;
       },
       //抽奖情况检查
       emitLotteryEvent(msg) {
@@ -625,6 +640,25 @@
             }, 3000);
           }, 1000);
         }
+      },
+      async onTotop() {
+        if (this.isLoading) {
+          return;
+        }
+        const offsetPos = this.pos;
+        const { list } = await this.getHistoryMsg();
+        const vsl = this.$refs.chatlist;
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+        });
+      },
+      checkOverflow() {
+        this.$nextTick(() => {
+          const vsl = this.$refs.chatlist;
+          if (vsl) {
+            this.overflow = vsl.getScrollSize() > vsl.getClientSize();
+          }
+        });
       }
     }
   };
@@ -694,6 +728,12 @@
     }
     .chat-content {
       position: relative;
+      .chat_loading {
+        color: #fff;
+        text-align: center;
+        font-size: 12px;
+        line-height: 30px;
+      }
       .vmp-chat-msg-item {
       }
       &__get-list-btn-container {

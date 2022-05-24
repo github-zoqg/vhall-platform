@@ -27,6 +27,7 @@
             emitQuestionnaireEvent,
             joinInfo
           }"
+          @totop="onTotop"
           @tobottom="toBottom"
         ></virtual-list>
 
@@ -78,10 +79,8 @@
     },
     mixins: [emitter],
     data() {
-      const { chatList } = this.chatServer.state;
       return {
         msgItem,
-        chatList: chatList,
         //新消息信息集合体
         messageType: {
           atList: false,
@@ -98,10 +97,6 @@
         unReadMessageCount: 0,
         //活动信息
         webinar: {},
-        //当前页数
-        page: 1,
-        //是否已经下拉刷新
-        isPullingDown: false,
         //关键词列表
         keywordList: [],
         //房间号
@@ -118,7 +113,12 @@
         virtual: {
           showlist: false,
           contentHeight: 0
-        }
+        },
+        //聊天消息是否有滚动条
+        overflow: false,
+        //每次加载的消息条数
+        pageSize: 20,
+        isLoading: false
       };
     },
     watch: {
@@ -204,6 +204,12 @@
       //黄金链路配置
       configList() {
         return this.roomBaseServer.state.configList;
+      },
+      chatList() {
+        return this.$domainStore.state.chatServer.chatList;
+      },
+      pos() {
+        return this.$domainStore.state.chatServer.pos;
       }
     },
     beforeCreate() {
@@ -382,6 +388,16 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      async onTotop() {
+        if (this.isLoading) {
+          return;
+        }
+        const offsetPos = this.pos;
+        const vsl = this.$refs.chatlist;
+        this.$nextTick(() => {
+          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+        });
       }
     }
   };
