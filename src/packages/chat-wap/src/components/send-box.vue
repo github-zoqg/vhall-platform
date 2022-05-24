@@ -25,7 +25,9 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted" class="span__speak__disable">
+              {{ $t('chat.chat_1079') }}
+            </span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>
               {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
@@ -500,6 +502,9 @@
           .van-field__body {
             height: 100%;
           }
+        }
+        .span__speak__disable {
+          color: #bfbfbf;
         }
       }
       .interact-wrapper {
