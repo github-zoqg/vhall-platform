@@ -3,7 +3,9 @@ const baseConfig = require('./webpack.base.config');
 
 const htmlConfig = {
   cdnJs: {
-    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js'
+    vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js',
+    // 开发环境domain
+    MiddleDomain: 'http://localhost:10001/lib/middle-domain.js'
   }
 };
 

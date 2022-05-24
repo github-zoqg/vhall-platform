@@ -108,9 +108,9 @@
     watch: {
       //观察私聊列表变动，如果有新消息，滚动到底部
       chatList: function () {
-        if (this.isBottom()) {
-          this.scrollBottom();
-        }
+        // if (this.isBottom()) {
+        this.scrollBottom();
+        // }
       },
       //观察黄金链路权限变化，更新输入框的状态
       configList: {

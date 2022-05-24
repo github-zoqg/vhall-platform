@@ -10,7 +10,8 @@ import {
   useDesktopShareServer,
   useInsertFileServer,
   useMediaSettingServer,
-  useVirtualAudienceServer
+  useVirtualAudienceServer,
+  useVideoPollingServer
 } from 'middle-domain';
 
 export default async function () {
@@ -31,10 +32,15 @@ export default async function () {
   if (!roomBaseServer) {
     throw Error('get roomBaseServer exception');
   }
-
+  //预分组导入获取不到group_id，提前进行初始化
+  if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
+    await groupServer.initPresetGroup();
+  }
   const promiseList = [
     // configList 和 黄金链路串行执行
     roomBaseServer.getConfigList().then(async () => {
+      // 获取视频论巡配置项 TODO:后面观看端权限统一处理之后，这个就不需要调了
+      await roomBaseServer.getVideoPollingConfig();
       //黄金链路
       await roomBaseServer.startGetDegradationInterval({
         staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
@@ -77,17 +83,29 @@ export default async function () {
   ];
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
-  // 互动、分组直播进行设备检测
-  if ([3, 6].includes(liveMode) && liveType == 1) {
+  // 互动、分组直播进行设备检测 或者是视频直播并且开启了视频轮巡权限
+  if (
+    liveType == 1 &&
+    ([3, 6].includes(liveMode) ||
+      (liveMode == 2 && roomBaseServer.state.configList['video_polling'] == 1))
+  ) {
     // 获取媒体许可，设置设备状态
     promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
   }
 
   await Promise.all(promiseList);
   console.log('%c------黄金链路请求配置项完成', 'color:pink');
-  console.log(roomBaseServer.state.configList);
   console.log('%c------多语言请求配置', 'color:pink');
   console.log(roomBaseServer.state.languages);
+  // 互动进行设备检测 或者是视频直播并且开启了视频轮巡权限
+  if (
+    liveType == 1 &&
+    roomBaseServer.state.configList['video_polling'] == 1 &&
+    (liveMode == 3 || liveMode == 2)
+  ) {
+    // 获取媒体许可，设置设备状态
+    useVideoPollingServer().init({ isWatch: true });
+  }
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
