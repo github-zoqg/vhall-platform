@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-pc-reward-effect-full-screen" v-show="showEffectStatus">
     <SvgaPlayer v-show="isSvga" ref="svgaPlayer" class="player-zone" @finish="finishedPlay" />
-    <ImgPlayer v-show="!isSvga" ref="gifPlayer" class="player-zone" @finish="finishedPlay" />
+    <ImgPlayer v-show="!isSvga" ref="gifPlayer" @finish="finishedPlay" />
   </div>
 </template>
 
@@ -51,7 +51,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 5000
+        minTaskTime: 4000
       });
 
       /*  //测试数据

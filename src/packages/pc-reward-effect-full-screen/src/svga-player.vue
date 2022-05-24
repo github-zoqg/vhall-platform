@@ -33,7 +33,6 @@
         parser = new SVGA.Parser('#svga-player');
       },
       startPlay(reload) {
-        // const path = `${this.$imgHost}/${reload.full_screen_image_url}`;
         // const path = `https://static.vhallyun.com/mp-prod/af/4e/af4edf96a16a48d1229ea5c00d9d47d8.svga`;
         let source = '';
         if (reload.data.type == 'reward_pay_ok') {
