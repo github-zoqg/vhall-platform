@@ -395,7 +395,9 @@ export default {
     form_1082: 'Verification',
     form_1083: 'This item is required',
     form_1084: 'Please enter the correct integer',
-    form_1085: 'address'
+    form_1085: 'address',
+    form_1087: 'Submitted successfully, thank you for your participation',
+    form_1088: 'Submitted successfully'
   },
   menu: {
     menu_1001: 'Doc',
