@@ -202,7 +202,7 @@
           <div class="vmp-share__img__box">
             <img
               v-if="qrcode"
-              :src="`//aliqr.e.vhall.com/qr.png?t=${encodeURIComponent(qrcode)}`"
+              :src="`//aliqr.e.vhall.com/qr.png?s=7&t=${encodeURIComponent(qrcode)}`"
               alt=""
             />
             <div

@@ -111,7 +111,7 @@
         this.shareOtherVisible = true;
         const shareId = `${this.roomBaseState.watchInitData.share_id}-3`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
-        this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
+        this.shareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
       },
       // 打开qq分享
       openQqDialog() {
@@ -145,7 +145,7 @@
         // 微博是 3
         const shareId = `${this.roomBaseState.watchInitData.share_id}-2`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
-        const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
+        const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
         const p = {
           url: weiboShareUrl,
           title: this.$t('nav.nav_1027')
@@ -168,7 +168,7 @@
               this.$route.params.id
             }?invite_id=${join_info.join_id || ''}`
           );
-          this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
+          this.shareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
         }
       },
       // 复制地址
