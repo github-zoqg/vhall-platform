@@ -309,6 +309,7 @@
       },
       // 获取历史消息
       async getHistoryMessage() {
+        this.isLoading = true;
         const data = {
           room_id: this.roomId,
           // webinar_id: this.webinar_id,
@@ -321,7 +322,7 @@
         }
         await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
-        this.isLoading = true;
+        this.isLoading = false;
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
