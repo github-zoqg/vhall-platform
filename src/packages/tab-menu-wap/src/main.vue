@@ -598,7 +598,7 @@
       width: 100%;
       flex: 1 1 auto;
       overflow: hidden;
-      height: 100%;
+      height: calc(100% - 90px);
     }
 
     .vmp-tab-menu-scroll-container {

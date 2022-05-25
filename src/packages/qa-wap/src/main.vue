@@ -86,18 +86,24 @@
         return this.watchInitData.webinar.id;
       },
       isEmbed() {
-        return this.embedObj.embed || this.embedObj.embedVideo;
+        return (
+          this.$domainStore.state.roomBaseServer.embedObj.embed ||
+          this.$domainStore.state.roomBaseServer.embedObj.embedVideo
+        );
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
+      }
+    },
+    watch: {
+      isSmallPlayer() {
+        this.changeChatHeight();
       }
     },
     components: { SendBox },
-    // watch: {
-    //   qaList: function () {
-    //     this.scrollBottom();
-    //   }
-    // },
     created() {
       this.menuServer = useMenuServer();
       this.getQAHistroy();
@@ -211,6 +217,18 @@
       },
       showMyQA(status) {
         this.isOnlyMine = status;
+      },
+      //
+      changeChatHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight;
+        }
+        this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
       }
     }
   };

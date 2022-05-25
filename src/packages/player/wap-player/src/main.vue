@@ -205,9 +205,11 @@
           <div class="control_left">
             <span class="pos" @click="startPlay">
               <van-circle
-                v-model="currentRate"
-                :rate="rate"
+                v-model="currentTime"
+                :rate="parseInt(totalTime)"
+                :speed="1 / parseInt(totalTime)"
                 size="34px"
+                color="#fb3a32"
                 layer-color="rgba(255, 255, 255, 0.2)"
               ></van-circle>
               <i
@@ -342,6 +344,10 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
           1
         );
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     data() {
@@ -411,6 +417,7 @@
           } else {
             document.querySelector('.vmp-basic-bd').classList.remove('small_player');
           }
+          this.setSetingHeight();
         }
       }
     },
@@ -463,6 +470,21 @@
       // }
     },
     methods: {
+      /**
+       * 计算 设置tab-content高度
+       */
+      setSetingHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight;
+        }
+        let popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+        document.querySelector('.tab-content').style.height = popHeight;
+      },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
       },
@@ -791,7 +813,7 @@
         color: #fff;
         display: flex;
         justify-content: space-between;
-        z-index: 1;
+        z-index: 11;
         padding-left: 24px;
         top: 50%;
         transform: translate(0, -50%);
@@ -803,7 +825,7 @@
               position: absolute;
               top: 50%;
               left: 50%;
-              transform: translate(-50%, -50%);
+              transform: translate(-50%, -39%);
             }
           }
           .control_center {
