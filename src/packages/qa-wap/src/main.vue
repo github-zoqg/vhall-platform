@@ -38,7 +38,7 @@
       @login="handleLogin"
       key="qa"
       :is-banned="isBanned"
-      :is-all-banned="allBanned"
+      :is-all-banned="allBanned && qa_allBanned_status"
     ></send-box>
   </div>
 </template>
@@ -70,6 +70,7 @@
         unReadMessageCount: 0, // 是否点击了只看我的
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        qa_allBanned_status: useChatServer().state.allBannedModuleList.qa_status, //全体禁言对问答是否生效
         watchInitData: useRoomBaseServer().state.watchInitData,
         //虚拟列表配置
         virtual: {
@@ -207,8 +208,11 @@
           this.isBanned = res;
         });
         //监听全体禁言通知
-        chatServer.$on('allBanned', res => {
-          this.allBanned = res;
+        chatServer.$on('allBanned', (status, msg) => {
+          this.allBanned = status;
+          if (msg) {
+            this.qa_allBanned_status = msg.qa_status == 1 ? true : false;
+          }
         });
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {

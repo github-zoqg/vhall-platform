@@ -26,7 +26,7 @@
     <send-box
       ref="sendBox"
       currentTab="private"
-      :isAllBanned="allBanned"
+      :isAllBanned="allBanned && private_allBanned_status"
       :isBanned="isBanned"
       @sendPrivate="sendMsg"
     ></send-box>
@@ -82,7 +82,8 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false
+        showSendBox: false,
+        private_allBanned_status: useChatServer().state.allBannedModuleList.private_chat_status //全体禁言对问答是否生效
       };
     },
     computed: {
@@ -187,8 +188,11 @@
           this.isBanned = res;
         });
         //监听全体禁言通知
-        this.chatServer.$on('allBanned', res => {
-          this.allBanned = res;
+        this.chatServer.$on('allBanned', (status, msg) => {
+          this.allBanned = status;
+          if (msg) {
+            this.private_allBanned_status = msg.private_chat_status == 1 ? true : false;
+          }
         });
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
