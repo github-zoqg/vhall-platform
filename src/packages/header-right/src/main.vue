@@ -154,7 +154,11 @@
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
       isStreamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
+            1
+        );
       },
       // 是否为第三方发起
       isThirdStream() {
