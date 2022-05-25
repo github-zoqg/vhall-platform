@@ -144,7 +144,7 @@ const serverConfig = {
     // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
-      method: 'open'
+      method: 'handleClickIcon'
     },
     // 红包弹窗
     emitClickRedPacketIcon: {

@@ -3,15 +3,15 @@
   <van-popup
     v-model="popupVisible"
     position="bottom"
-    :overlay="false"
     class="lottery-popup"
     get-container="body"
+    closeable
   >
     <!-- 抽奖标题 -->
-    <header class="title-bar">
+    <!-- <header class="title-bar">
       {{ $t('interact_tools.interact_tools_1003') }}
       <i class="vh-iconfont vh-line-close" @click="close"></i>
-    </header>
+    </header> -->
     <section class="content-wrapper">
       <component
         :is="lotteryView"
@@ -21,9 +21,12 @@
         :showWinnerList="showWinnerList"
         :prizeInfo="prizeInfo"
         :lotteryInfo="lotteryInfo"
+        :win-lottery-history="winLotteryHistory"
+        :need-take-award="needTakeAward"
         @needLogin="handleGoLogin"
         @close="close"
         @navTo="changeView"
+        @takeAward="handleTakeAward"
       />
     </section>
   </van-popup>
@@ -32,8 +35,7 @@
 <script>
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
-  const LOTTERY_PUSH = 'lottery_push'; //发起抽奖
-  const LOTTERY_RESULT_NOTICE = 'lottery_result_notice'; // 抽奖结束
+
   export default {
     name: 'VmpLotteryWap',
     components: {
@@ -42,7 +44,8 @@
       LotteryWin: () => import('./components/lottery-win.vue'), // 中奖界面
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
-      LotterySuccess: () => import('./components/lottery-success.vue') // 领取结果页面
+      LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
+      LotteryHistory: () => import('./components/lottery-history.vue') // 领取结果页面
     },
     provide() {
       return {
@@ -57,8 +60,10 @@
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
+        needTakeAward: true, // 是否需要领奖
         lotteryId: '', // 抽奖的信息id(接口返回)
-        lotteryInfo: {} // 抽奖信息
+        lotteryInfo: {}, // 抽奖信息
+        winLotteryHistory: [] // 中奖历史
       };
     },
     beforeCreate() {
@@ -92,11 +97,12 @@
       /**
        * @description 点开抽奖(按钮或者聊天)
        */
-      open(uuid = '') {
+      open2(uuid = '') {
         this.lotteryServer.checkLottery(uuid).then(res => {
           const data = res.data;
           this.lotteryId = data.id;
           this.showWinnerList = !!data.publish_winner;
+          this.needTakeAward = !!data.need_take_award;
           if (data.lottery_status === 0) {
             // 抽奖中
             // 抽奖进行中
@@ -119,21 +125,52 @@
           this.popupVisible = true;
         });
       },
-
+      /**
+       * @description 点击聊天按钮
+       */
+      async handleClickIcon() {
+        const list = await this.lotteryServer.initIconStatus();
+        if (!list.length) return; // 没有抽奖历史,不可能有点击事件
+        const lastLottery = list[0]; // 倒序排列
+        if (lastLottery.lottery_status === 0) {
+          // 抽奖中,显示抽奖面板
+          // 抽奖进行中
+          this.setFitment(lastLottery);
+          this.lotteryView = 'LotteryPending';
+        } else {
+          const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
+          if (winLotteryHistory.length) {
+            this.winLotteryHistory = winLotteryHistory;
+            this.lotteryView = 'LotteryHistory';
+          } else {
+            // 弹出无中奖
+            this.showWinnerList = false;
+            this.prizeInfo = {};
+            this.lotteryView = 'LotteryMiss';
+          }
+        }
+        this.popupVisible = true;
+      },
       /**
        * @description 注册事件
        */
       initMsgEvent() {
-        this.lotteryServer.$on(LOTTERY_PUSH, this.callBackLotteryPush);
-        this.lotteryServer.$on(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
+        this.lotteryServer.$on(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
           this.popupVisible = false;
         });
       },
       removeMsgEvent() {
-        this.lotteryServer.$off(LOTTERY_PUSH, this.callBackLotteryPush);
-        this.lotteryServer.$off(LOTTERY_RESULT_NOTICE, this.callBackResultNotice);
+        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.callBackLotteryPush);
+        this.lotteryServer.$off(
+          this.lotteryServer.Events.LOTTERY_RESULT_NOTICE,
+          this.callBackResultNotice
+        );
       },
       // 抽奖开始消息推送
       callBackLotteryPush(msg) {
@@ -220,6 +257,8 @@
           img_order: payload.img_order
         };
         this.lotteryInfo = payload;
+        this.showWinnerList = !!payload.publish_winner;
+        this.needTakeAward = !!payload.need_take_award;
       },
       /**
        * @description 判断是否是自己
@@ -245,6 +284,15 @@
       handleGoLogin() {
         this.popupVisible = false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      /**
+       * @description 提交中奖信息
+       */
+      handleTakeAward(lottery) {
+        this.lotteryId = lottery.id;
+        this.setFitment(lottery);
+        this.lotteryView = 'LotteryAccept';
+        this.popupVisible = true;
       }
     }
   };
@@ -252,7 +300,7 @@
 
 <style lang="less" scoped>
   .lottery-popup {
-    height: calc(100% - 422px);
+    // height: calc(100% - 422px);
   }
   .title-bar {
     position: relative;
@@ -273,7 +321,7 @@
   }
   .content-wrapper {
     box-sizing: border-box;
-    padding: 36px 30px;
-    min-height: calc(100% - 90px);
+    // padding: 36px 30px;
+    // min-height: calc(100% - 90px);
   }
 </style>

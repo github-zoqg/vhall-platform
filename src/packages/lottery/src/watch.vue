@@ -98,7 +98,7 @@
       /**
        * @description 点击聊天获取抽奖内容
        */
-      async open(uuid = '') {
+      async open3(uuid = '') {
         try {
           const res = await this.lotteryServer.checkLottery(uuid);
           const data = res.data;
@@ -158,9 +158,9 @@
         this.zIndexServer.setDialogZIndex('lottery');
       },
       /**
-       * @description 注册事件
+       * @description 提交中奖信息
        */
-      hanldeTakeAward(lottery) {
+      handleTakeAward(lottery) {
         this.lotteryId = lottery.id;
         this.setFitment(lottery);
         this.lotteryView = 'LotteryAccept';

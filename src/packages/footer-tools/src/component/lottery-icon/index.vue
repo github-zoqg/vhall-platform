@@ -52,8 +52,6 @@
     },
     methods: {
       handleShowHistory(list = []) {
-        console.log('handleShowHistory  handleShowHistory');
-        console.log(list);
         this.winLotteryHistory = list;
         this.lotteryListoryVisible = true;
       },

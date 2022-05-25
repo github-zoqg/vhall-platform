@@ -57,7 +57,7 @@
         </div>
       </li>
     </ul>
-    <button @click="submit" class="get-award">
+    <button @click="submit" :class="['get-award', verified ? '' : 'disabled']">
       {{ $t('interact_tools.interact_tools_1019') }}
     </button>
   </div>
@@ -74,11 +74,22 @@
         name: '',
         phone: '',
         remarks: '',
-        winForm: [] // 中奖信息表单
+        winForm: [], // 中奖信息表单
+        verified: false
       };
     },
     async created() {
       await this.winFromInfo();
+    },
+    watch: {
+      winForm: {
+        deep: true,
+        handler(forms) {
+          this.verified = forms.every(form => {
+            return form.is_required !== 1 || form.field_value.trim() !== '';
+          });
+        }
+      }
     },
     methods: {
       handleInput(e) {
@@ -140,6 +151,7 @@
           })
           .then(() => {
             this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+            this.lotteryServer.initIconStatus();
             this.$toast(this.$t('interact_tools.interact_tools_1067'));
             this.$nextTick(() => {
               this.$emit('navTo', 'LotterySuccess');
@@ -199,6 +211,10 @@
       border-radius: 14px;
       color: #fff;
       margin: 56px auto 0px auto;
+      &.disabled {
+        opacity: 0.7;
+        pointer-events: none;
+      }
     }
   }
   .tips {

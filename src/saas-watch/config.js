@@ -345,7 +345,7 @@ export const serverConfig = {
     },
     emitTakeAward: {
       cuid: ['comLottery'],
-      method: 'hanldeTakeAward',
+      method: 'handleTakeAward',
       args: ['$0']
     },
     //红包弹窗

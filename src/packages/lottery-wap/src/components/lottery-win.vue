@@ -9,7 +9,14 @@
         prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
       }}"
     </div>
-    <button @click="acceptLottery">{{ $t('interact_tools.interact_tools_1017') }}</button>
+    <!-- <button @click="acceptLottery">{{ $t('interact_tools.interact_tools_1017') }}</button> -->
+    <!-- 领奖 -->
+    <button v-if="needTakeAward" @click="acceptLottery">
+      {{ $t('interact_tools.interact_tools_1017') }}
+    </button>
+    <button v-else-if="showWinnerList" @click="navToWinnerList">
+      {{ $t('interact_tools.interact_tools_1012') }}
+    </button>
   </div>
 </template>
 <script>
@@ -20,6 +27,9 @@
     methods: {
       acceptLottery() {
         this.$emit('navTo', 'LotteryAccept');
+      },
+      navToWinnerList() {
+        this.$emit('navTo', 'LotteryWinner');
       }
     }
   };
