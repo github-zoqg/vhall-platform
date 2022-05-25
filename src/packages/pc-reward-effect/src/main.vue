@@ -120,7 +120,7 @@
         maxQueueLen: 3
       });
 
-      let i = 0;
+      // let i = 0;
       // setInterval(() => {
       //   this.watchRewardServer.$emit('reward_pay_ok', {
       //     app_id: 'fd8d3653',
