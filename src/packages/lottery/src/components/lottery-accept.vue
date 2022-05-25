@@ -25,7 +25,7 @@
       </el-form-item>
     </el-form>
     <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p>
-    <div class="winner-info__submit-btn" @click="postWinnerInfo">
+    <div :class="['winner-info__submit-btn', verified ? '' : 'disabled']" @click="postWinnerInfo">
       {{ $t('interact_tools.interact_tools_1019') }}
     </div>
     <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
@@ -36,7 +36,6 @@
   /**
    * @description 领奖页面(大部分逻辑复用saas)
    */
-  import OverlayScrollbars from 'overlayscrollbars';
   import LotteryHeader from './lottery-header';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
@@ -71,20 +70,24 @@
       return {
         stepHtmlList: [],
         reciveInfo: {},
-        overlayScrollbar: null,
-        osComponentOptions: {
-          resize: 'none',
-          paddingAbsolute: true,
-          className: 'os-theme-light os-theme-vhall',
-          scrollbars: {
-            autoHide: 'leave',
-            autoHideDelay: 200
-          },
-          overflowBehavior: {
-            x: 'hidden'
-          }
-        }
+        verified: false // 提交按钮状态
       };
+    },
+    watch: {
+      reciveInfo: {
+        deep: true,
+        handler(info) {
+          let relt = true;
+          this.stepHtmlList.forEach(ele => {
+            if (ele.is_required == 1) {
+              if (info[ele.field_key] == '' || info[ele.field_key].trim() == '') {
+                relt = false;
+              }
+            }
+          });
+          this.verified = relt;
+        }
+      }
     },
     async created() {
       await this.initStepHtmlList();
@@ -93,12 +96,7 @@
         retReciveInfo[element.field_key] = '';
       });
       this.reciveInfo = retReciveInfo;
-      // await this.$nextTick();
-      // this.overlayScrollbarInit();
     },
-    // mounted() {
-    //   // 滚动条初始化
-    // },
     methods: {
       async initStepHtmlList() {
         await this.lotteryServer.getDrawPrizeInfo().then(res => {
@@ -112,20 +110,6 @@
       },
       // 空函数，阻止输入框空格按键事件冒泡，触发播放器暂停/播放
       noop() {},
-      // 滚动条初始化
-      overlayScrollbarInit() {
-        this.$nextTick(() => {
-          console.log(document.getElementById('address-textarea'));
-          this.overlayScrollbar = OverlayScrollbars(document.getElementById('address-textarea'), {
-            paddingAbsolute: true,
-            className: 'os-theme-light os-theme-vhall',
-            scrollbars: {
-              autoHide: 'leave',
-              autoHideDelay: 200
-            }
-          });
-        });
-      },
       close() {
         this.$emit('close');
       },
@@ -192,6 +176,7 @@
           .then(res => {
             if (res.code === 200) {
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+              this.lotteryServer.initIconStatus();
               this.$nextTick(() => {
                 this.$emit('navTo', 'LotterySuccess');
               });
@@ -342,6 +327,10 @@
       left: 50%;
       transform: translateX(-80px);
       font-size: 14px;
+      &.disabled {
+        opacity: 0.7;
+        pointer-events: none;
+      }
     }
     &.big {
       background: url(../img/bg-winner-info-big.png);

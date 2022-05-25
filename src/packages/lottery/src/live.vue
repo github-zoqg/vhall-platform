@@ -45,10 +45,10 @@
     },
     data() {
       return {
-        dialogVisible: true, // 整个组件的显隐(包括背景遮罩)
+        dialogVisible: false, // 整个组件的显隐(包括背景遮罩)
         fitment: {}, // 正在进行中的抽奖信息
         prizeShow: false, // 趣味抽奖
-        lotteryContentShow: true, // 发起抽奖
+        lotteryContentShow: false, // 发起抽奖
         lotteryResultShow: false, // 抽奖结果
         lotteryInfoId: null, // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
