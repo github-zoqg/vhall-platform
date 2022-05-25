@@ -212,7 +212,7 @@
         //聊天消息是否有滚动条
         overflow: false,
         //每次加载的消息条数
-        pageSize: 20,
+        pageSize: 50,
         isLoading: false
       };
     },
