@@ -35,7 +35,7 @@
       return {
         lotteryServerState,
         winLotteryHistory: [], // 中奖的抽奖历史
-        lotteryListoryVisible: true
+        lotteryListoryVisible: false
       };
     },
     beforeCreate() {
