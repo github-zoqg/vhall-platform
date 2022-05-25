@@ -43,7 +43,12 @@
     </div>
 
     <div class="vmp-chat-input__send-btn-box">
-      <div class="vmp-chat-input__send-btn" @click="sendMsgThrottle">
+      <div
+        class="vmp-chat-input__send-btn"
+        :class="{ disable: inputStatus.disable }"
+        :disabled="inputStatus.disable"
+        @click="sendMsgThrottle"
+      >
         <i class="vh-iconfont vh-line-send"></i>
       </div>
     </div>
@@ -540,6 +545,12 @@
       .vh-line-send {
         font-size: 18px;
         color: #e6e6e6;
+      }
+      &.disable {
+        cursor: default;
+        .vh-iconfont {
+          color: #666666;
+        }
       }
     }
   }

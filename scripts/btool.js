@@ -20,7 +20,7 @@ const cLog = console.log;
  *  lLen 左边key的长度
  *  rLen 右边value的长度
  */
-function bootstripTip(tips, { tLen = 40, lLen = 14, rLen = 19 } = {}) {
+function bootstripTip(tips, { tLen = 44, lLen = 12, rLen = 25 } = {}) {
   const chalkBorder = chalk.hex('#0FA86E'); //边框
   const chalkLabel = chalk.hex('#00AED0').bold;
   cLog(chalkBorder('╭'.padEnd(tLen - 1, '─') + '╮'));
