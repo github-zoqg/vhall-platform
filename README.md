@@ -137,17 +137,17 @@ node scripts/cli-service.js build --project=${项目} --mode=${环境} --hash=${
 #### <font color=blue size=3 >1、组件开发`</font>`
 
 (1) 多数情况项组件在 packages 目录下编写。
- (2) 组件如果是多单词，采用短横线连接.
- 例如： 语言切换组件 language-choice
- (3) packages 目录下组件名称导出名称统一采用 vmp 开头
- 例如： 语言切换组件 name: 'VmpLanguageChoice'
- (4) 组件名称采用 UpperCamelCase(大驼峰)命名法。
- 例如： 语言切换组件 VmpLanguageChoice
+(2) 组件如果是多单词，采用短横线连接.
+例如： 语言切换组件 language-choice
+(3) packages 目录下组件名称导出名称统一采用 vmp 开头
+例如： 语言切换组件 name: 'VmpLanguageChoice'
+(4) 组件名称采用 UpperCamelCase(大驼峰)命名法。
+例如： 语言切换组件 VmpLanguageChoice
 
 #### <font color=blue size=3 >2、主题皮肤`</font>`
 
 (1) 约定在每个项目的 assets/styles/skins 目录下写皮肤样式
- (2) 在每个项目的 config.js 中配置初始主题皮肤，名称和 skins 目录下的样式名称一致。
+(2) 在每个项目的 config.js 中配置初始主题皮肤，名称和 skins 目录下的样式名称一致。
 
 ```js
 export const globalConfig = {
@@ -210,3 +210,10 @@ eslint 检查集成了 prettier 规则，通常只需要在 prettier.config.js �
 # 提交时转换为LF，检出时不转换
 git config --global core.autocrlf input
 ```
+
+## 本地安装不成功问题
+
+feature_v7.1.0 安装包不上的，问题最快的解决办法。
+node_modules 删掉了之后，
+从 test5 拷贝一下 yarn.lock 放入。
+在执行 yarn install 的时候，就能安装上了。
