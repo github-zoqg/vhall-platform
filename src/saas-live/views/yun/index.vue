@@ -6,6 +6,7 @@
 
 <script>
   import { Domain, useInteractiveServer } from 'middle-domain';
+  import grayInit from '@/packages/app-shared/gray-init';
   export default {
     data() {
       return {
@@ -14,6 +15,7 @@
     },
     async created() {
       const interactiveServer = useInteractiveServer();
+      await grayInit(this.$route);
       const domain = await this.init();
       !/embed/.test(location.search) && (await interactiveServer.baseInit());
       domain.initVhallReport(
@@ -41,7 +43,7 @@
       init() {
         // 初始化直播房间
         const { il_id } = this.$route.params;
-        console.log(this.$route.params, 'this.$route.params');
+        console.log(this.$route, 'this.$route.params');
         const {
           token,
           nickname = '',
