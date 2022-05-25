@@ -172,7 +172,7 @@
         if (msg.context?.role_name == 4 || msg.context?.role == 4) {
           this.$message.warning({
             message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
+              n: msg.context?.nickname || msg.context?.nick_name || msg.context?.nickName
             })
           });
         }
