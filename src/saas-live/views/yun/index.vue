@@ -6,7 +6,7 @@
 
 <script>
   import { Domain, useInteractiveServer } from 'middle-domain';
-  import grayInit from '@/packages/app-shared/gray-init';
+  // import grayInit from '@/packages/app-shared/gray-init';
   export default {
     data() {
       return {
