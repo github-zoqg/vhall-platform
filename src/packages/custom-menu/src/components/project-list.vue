@@ -233,7 +233,7 @@
     flex-direction: column;
     width: 284px;
     height: 261px;
-    margin: 0px 8px 8px;
+    margin: 0px 8px 16px;
     border-radius: 4px;
     padding: 0px;
     &__cover {
