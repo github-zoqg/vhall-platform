@@ -260,7 +260,7 @@
           this.roomBaseServer.getStreamStatus();
         } else {
           let flag = await this.roomBaseServer.selectSeat({
-            webinar_id: this.$route.params.il_id,
+            webinar_id: this.$route.params.id,
             seat_id: this.$route.query.seat_id,
             uuid: this.$route.query.uuid
           });
