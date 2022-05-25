@@ -321,6 +321,7 @@
         }
         await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
+        this.isLoading = true;
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
