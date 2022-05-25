@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="vh-chose-active-box" :class="{ 'live-check-page': pagetype == 'subscribe' }">
+    <div class="vh-chose-active-box" :class="{ 'live-check-page': isSubscribe }">
       <!-- 单个视频 -->
       <div
         v-for="item in activeList"
@@ -44,7 +44,7 @@
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
 
   export default {
-    props: ['checkedList', 'pagetype'],
+    props: ['checkedList'],
     data() {
       return {
         activeList: [],
@@ -57,6 +57,9 @@
       },
       hasDelayPermission() {
         return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
+      },
+      isSubscribe() {
+        return this.roomBaseServer.state.watchInitData.status === 'subscribe';
       }
     },
     watch: {

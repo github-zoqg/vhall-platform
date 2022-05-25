@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-custom-menu-imglink" :class="{ 'qr-preview-page': pagetype == 'subscribe' }">
+  <div class="vmp-custom-menu-imglink" :class="{ 'qr-preview-page': isSubscribe }">
     <div class="qr-previewbox">
       <div class="qrbox">
         <img :src="info.imageSrc" alt="" @click="jump" />
@@ -16,10 +16,11 @@
     props: {
       info: {
         required: false
-      },
-      pagetype: {
-        type: String,
-        default: 'watch'
+      }
+    },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status === 'subscribe';
       }
     },
     data() {
