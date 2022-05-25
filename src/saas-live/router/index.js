@@ -72,9 +72,10 @@ const routes = [
     component: () => import('@/saas-live/views/clientEmbed/index')
   },
   {
-    path: '/lives/yun/:il_id', // 云导播
+    path: '/lives/yun/:id', // 云导播
     name: 'yun',
-    component: () => import('@/saas-live/views/yun')
+    component: () => import('@/saas-live/views/yun'),
+    meta: { keepAlive: false, grayType: 'webinar' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页

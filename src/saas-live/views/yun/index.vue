@@ -6,6 +6,7 @@
 
 <script>
   import { Domain, useInteractiveServer } from 'middle-domain';
+  // import grayInit from '@/packages/app-shared/gray-init';
   export default {
     data() {
       return {
@@ -14,6 +15,9 @@
     },
     async created() {
       const interactiveServer = useInteractiveServer();
+      console.log(this.$route, 'this.$route.params');
+
+      // await grayInit(this.$route);
       const domain = await this.init();
       !/embed/.test(location.search) && (await interactiveServer.baseInit());
       domain.initVhallReport(
@@ -40,8 +44,8 @@
     methods: {
       init() {
         // 初始化直播房间
-        const { il_id } = this.$route.params;
-        console.log(this.$route.params, 'this.$route.params');
+        const { id } = this.$route.params;
+        console.log(this.$route, 'this.$route.params');
         const {
           token,
           nickname = '',
@@ -70,7 +74,7 @@
             live_token: /embed/.test(location.search) && token_type != 0 ? assistant_token : liveT
           },
           initRoom: {
-            webinar_id: il_id, //活动id
+            webinar_id: id, //活动id
             seat_id: seat_id,
             clientType: /embed/.test(location.search) ? 'send' : 'sendYun', //客户端类型
             nickname,
