@@ -1,7 +1,8 @@
 <template>
   <div class="vhall-praise">
     <div ref="dianzan" class="v-praise-dom" @touchstart="support">
-      <img class="tool givealike-img" src="../img/icon_like.png" />
+      <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
+      <img class="tool givealike-img" v-else src="../img/icon_like.png" />
       <span v-if="like">{{ like | transformWatchPraise }}</span>
     </div>
     <div>

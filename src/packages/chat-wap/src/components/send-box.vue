@@ -52,13 +52,13 @@
             <img
               v-if="!handUpStatus"
               class="tool shangmai-img"
-              src="../img/default_avatar.png"
+              src="../img/icon_wheat.png"
               @click="$refs.handup.openConnectPop()"
             />
             <img
               v-else
               class="tool shangmaizhong-img"
-              src="../img/default_avatar.png"
+              src="../img/icon_wheat_ing.png"
               @click="$refs.handup.openConnectPop()"
             />
             <span class="red-dot" v-if="handUpStatus"></span>
