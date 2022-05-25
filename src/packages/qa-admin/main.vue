@@ -418,7 +418,8 @@
           type="textarea"
           :rows="5"
           resize="none"
-          v-model.trim="sendMessage.text"
+          @blur="sendMessage.text = $event.target.value.trim()"
+          v-model="sendMessage.text"
         ></el-input>
         <span class="len-tip">
           <i

@@ -115,10 +115,6 @@ export const serverConfig = {
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    options: {
-      keepAspectRatio: false,
-      hasPager: false
-    },
     // 打开对话框
     emitOpenDocList: {
       cuid: 'dlgDocList',
@@ -646,7 +642,7 @@ export const serverConfig = {
   // 单视频嵌入页面配置
   embedVideoLayerRoot: {
     component: 'VmpAirContainer',
-    children: ['embedVideoLayerBody']
+    children: ['embedVideoLayerBody', 'comWatchAuth']
   },
   // 中间主区域容器
   embedVideoLayerBody: {
