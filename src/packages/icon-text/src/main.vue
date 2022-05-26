@@ -50,7 +50,13 @@
       '$domainStore.state.roomBaseServer.watchInitData.webinar.is_director': {
         immediate: true,
         handler: function (val) {
-          if (val == 1 && this.cuid == 'comShareDesktopMenu') {
+          if (
+            val == 1 &&
+            this.cuid == 'comShareDesktopMenu' &&
+            this.$domainStore.state.roomBaseServer.watchInitData.permissionKey[
+              'webinar.director'
+            ] == 1
+          ) {
             this.setHiddenState(true);
           }
         }
