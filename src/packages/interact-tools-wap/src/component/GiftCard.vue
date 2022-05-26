@@ -40,7 +40,7 @@
                 <span v-if="btnDisabled">{{ `${timer}s` }}</span>
               </div>
             </div>
-            <div class="block"></div>
+            <div class="block" v-if="filterGift.length > 8"></div>
           </div>
         </div>
       </div>
