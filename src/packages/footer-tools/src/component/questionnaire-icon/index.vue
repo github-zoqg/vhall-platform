@@ -157,6 +157,7 @@
       width: 32px;
       height: 32px;
       cursor: pointer;
+      margin: 0;
     }
     .vmp-questionnaire-list_container {
       position: absolute;
