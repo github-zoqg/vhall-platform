@@ -360,7 +360,7 @@
       // 免费礼物
       payFree(params) {
         // 如果开启聊天高并发配置项，免费礼物通过聊天消息发送
-        if (this.joinInfoInGift.hideChatHistory || this.isEmbed) {
+        if (this.joinInfoInGift.hideChatHistory) {
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',

@@ -128,6 +128,20 @@
   .vmp-questionnaire-icon {
     color: #fff;
     position: relative;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    background: linear-gradient(180deg, #5ac1ff 0%, #2578ff 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-left: 16px;
+    img.show_img {
+      width: 32px;
+      height: 32px;
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      margin: -1px 0 0 0;
+    }
     .vmp-dot {
       position: absolute;
       display: inline-block;
