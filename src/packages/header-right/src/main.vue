@@ -164,10 +164,6 @@
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
-      // 设备状态
-      deviceStatus() {
-        return useMediaCheckServer().state.deviceInfo?.device_status;
-      },
       // 云导播台是否有流
       director_stream() {
         return this.$domainStore.state.roomBaseServer.director_stream == 1;
