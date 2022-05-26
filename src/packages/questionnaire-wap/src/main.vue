@@ -49,7 +49,7 @@
       open(questionnaireId) {
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
-            this.$toast(this.$t('form.form_1037'));
+            this.$toast(this.$t('form.form_1087'));
           } else {
             this.popupVisible = true;
             this.$nextTick(() => {
@@ -67,7 +67,7 @@
             nickname: msg.nick_name,
             avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
             content: {
-              text_content: this.$t('chat.chat_1030'),
+              text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
               questionnaire_id: msg.questionnaire_id
             },
             roleName: msg.room_role,
@@ -89,10 +89,10 @@
         });
         this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
           if (res.code === 200) {
-            this.$toast(this.$t('interact_tools.interact_tools_1068'));
+            this.$toast(this.$t('form.form_1088'));
             this.popupVisible = false;
           } else {
-            this.$toast(this.$t('form.form_1037'));
+            this.$toast(this.$t('form.form_1087'));
             this.popupVisible = false;
           }
         });
@@ -163,7 +163,7 @@
   .vmp-question-wap {
     width: 100%;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.25);
     position: fixed;
     top: 0;
     left: 0;
