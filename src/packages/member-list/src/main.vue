@@ -655,10 +655,7 @@
               const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
               _this.totalNum = _this.isInGroup
                 ? msg.uv
-                : msg.uv -
-                  ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                    ? groupUsersNumber
-                    : 0);
+                : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUsersNumber : 0);
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
@@ -834,10 +831,7 @@
           if (isLive) {
             _this.totalNum = _this.isInGroup
               ? msg.uv
-              : msg.uv -
-                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                  ? groupUserNum
-                  : 0);
+              : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUserNum : 0);
             _this.memberServer.updateState('totalNum', _this.totalNum);
           }
 

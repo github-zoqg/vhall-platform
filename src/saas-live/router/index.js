@@ -73,10 +73,25 @@ const routes = [
     meta: { page: 'client-embed' }
   },
   {
+    path: '/lives/yun/:id', // 云导播
+    name: 'yun',
+    component: () => import('@/saas-live/views/yun'),
+    meta: { keepAlive: false, grayType: 'webinar' }
+  },
+  {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
     meta: { title: '系统异常' },
     component: () => import('../views/ErrorPage/error.vue')
+  },
+
+  {
+    // 其它没有匹配到的路由都会跳至此模块(404）
+    // 该路由为必须路由，不需要权限，必须放在最后
+    path: '*',
+    name: 'notfound',
+    component: NotFound,
+    meta: { keepAlive: false, grayType: '' }
   }
 ];
 

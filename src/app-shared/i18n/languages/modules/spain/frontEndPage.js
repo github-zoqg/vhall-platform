@@ -387,7 +387,9 @@ export default {
     form_1079: 'Contraseña',
     form_1080: 'El contenido no puede ser mayor de 60 caracteres',
     form_1081: 'El contenido no puede ser mayor de 60 caracteres',
-    form_1082: 'Verificación'
+    form_1082: 'Verificación',
+    form_1087: 'Enviar con éxito, gracias por su participación',
+    form_1088: 'Enviar con éxito'
   },
   menu: {
     menu_1001: 'Documentación',

@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-input-modal" v-show="visible">
+  <div class="chat-input-modal" :class="isXAndWxWork ? 'isXAndWxWork' : ''" v-show="visible">
     <div class="input-info">
       <div class="send-box" @click="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
@@ -56,6 +56,7 @@
 <script>
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
   import EventBus from '../js/Events.js';
+  import { isMse } from '../js/utils.js';
 
   export default {
     name: 'VmpChatWapInputModal',
@@ -82,8 +83,30 @@
         EventBus.$emit('showEmoji', this.showEmoji);
       }
     },
+    computed: {
+      isXAndWxWork() {
+        const u = navigator.userAgent;
+        const IsMse = isMse();
+        //ios终端
+        if (IsMse.os === 'ios') {
+          if (screen.height >= 812) {
+            //是iphoneX
+            if (u.match(/wxwork/)) {
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            //不是iphoneX
+            return false;
+          }
+        }
+        return false;
+      }
+    },
     mounted() {
       this.eventListener();
+      console.log('userAgent:', navigator.userAgent);
     },
     methods: {
       //显示模态窗
@@ -93,9 +116,9 @@
         }
         this.visible = true;
         this.showEmoji = false;
-        setTimeout(() => {
-          document.querySelector('textarea#textareaChat').focus();
-        }, 0);
+        this.$nextTick(() => {
+          this.$refs.textareaChat.focus();
+        });
       },
       //点击发送按钮
       send() {
@@ -117,9 +140,9 @@
       //处理失去焦点
       handleOnBlur() {
         // this.showEmoji = false;
-        window.document.body.scrollTop = '0px';
-        window.document.activeElement.scrollIntoViewIfNeeded(true);
-        window.scroll(0, 0);
+        // window.document.body.scrollTop = '0px';
+        // window.document.activeElement.scrollIntoViewIfNeeded(true);
+        // window.scroll(0, 0);
       },
       //处理获得焦点
       handleOnFocus() {
@@ -190,13 +213,20 @@
 <style lang="less">
   .chat-input-modal {
     width: 100%;
-    position: relative;
+    position: fixed;
     z-index: 9999;
     min-height: 94px;
-    margin-top: -94px;
+    bottom: 0;
+    left: 0;
     font-size: 28px;
     background-color: #f0f0f0;
 
+    &.isXAndWxWork {
+      bottom: 60px !important;
+      .tools {
+        bottom: 80px !important;
+      }
+    }
     &::after {
       content: '';
       position: absolute;
@@ -229,6 +259,7 @@
 
         .send-menu {
           width: 66px;
+          min-width: 66px;
           height: 66px;
           border-radius: 50%;
           display: flex;

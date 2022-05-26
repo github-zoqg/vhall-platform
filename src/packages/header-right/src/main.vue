@@ -3,12 +3,17 @@
     <section class="vmp-header-right_btn-box">
       <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
       <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
-      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3">
+      <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3 && !isStreamYun">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
       <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
-        <div v-if="liveStep == 1" class="vmp-header-right_btn" @click="handleStartClick">
+        <div
+          v-if="liveStep == 1"
+          class="vmp-header-right_btn"
+          :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+          @click="handleStartClick"
+        >
           {{ isRecord ? '开始录制' : '开始直播' }}
         </div>
         <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
@@ -148,9 +153,16 @@
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
       },
+      isStreamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+      },
       // 是否为第三方发起
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      // 云导播台是否有流
+      director_stream() {
+        return this.$domainStore.state.roomBaseServer.director_stream == 1;
       }
     },
     components: {
@@ -171,7 +183,12 @@
        * 补充：第三方发起时，不在进行设备状态的相关提示
        *    若助理，则无需进行提示，助理是不存在上麦的
        */
-      if (this.deviceStatus == 2 && this.roleName != 3 && !this.isThirdStream) {
+      if (
+        this.deviceStatus == 2 &&
+        this.roleName != 3 &&
+        !this.isThirdStream &&
+        !this.isStreamYun
+      ) {
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
@@ -184,10 +201,13 @@
         } else {
           this.liveStep = 2;
         }
-        // 如果开启了分屏
-        if (this.splitScreenServer.state.isOpenSplitScreen) {
+        // 如果开启了分屏 或者是 云导播
+        if (this.splitScreenServer.state.isOpenSplitScreen || this.isStreamYun) {
           this.handlePublishComplate();
         }
+      }
+      if (this.isStreamYun) {
+        this.roomBaseServer.getStreamStatus();
       }
     },
     methods: {
@@ -417,9 +437,11 @@
       },
       // 开始直播/录制事件
       handleStartClick() {
+        // 如果是云导播活动 并且没有流
+        if (this.isStreamYun && !this.director_stream) return false;
         this.liveStep = 2;
-        if (this.isThirdStream) {
-          // 若是选择第三方发起，则直接进行调用接口更改liveStep状态
+        if (this.isThirdStream || this.isStreamYun) {
+          // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
           this.handlePublishComplate();
         } else {
           // 派发推流事件
@@ -461,8 +483,8 @@
           return;
         }
 
-        if (res.code == 200 && interactToolStatus.start_type == 4) {
-          // 如果是第三方推流直接生成回放
+        // 如果是第三方推流直接生成回放 云导播逻辑相同
+        if (res.code == 200 && (interactToolStatus.start_type == 4 || this.isStreamYun)) {
           this.handleSaveVodInLive();
           this.liveStep = 1;
         }
@@ -624,6 +646,10 @@
       padding: 0 10px;
       cursor: pointer;
       background-color: @bg-error-light;
+    }
+    .right_btn_dis {
+      background: #fc5659;
+      opacity: 0.5;
     }
     .vmp-header-right_duration {
       &-end {

@@ -3,7 +3,7 @@
     <div class="vmp-notice-list_icon">
       <div class="icon-num">{{ noticeNum > 99 ? '99+' : noticeNum }}</div>
       <div class="icon-img" @click="getNoticeHistoryList">
-        <img src="./img/notice-icon.png" alt="" />
+        <img src="./img/notice-icon.png" alt="" class="show_img" />
       </div>
     </div>
     <div class="common-notice-light-mask" v-if="isShowNotice" @click="closeNoticeList"></div>
@@ -149,15 +149,19 @@
     &_icon {
       position: relative;
       .icon-img {
+        position: relative;
         height: 32px;
         width: 32px;
         line-height: 32px;
-        border-radius: 50%;
-        position: relative;
+        background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+        border-radius: 16px;
         cursor: pointer;
-        img {
-          height: 32px;
+        margin-left: 16px;
+        img.show_img {
           width: 32px;
+          -webkit-transform-origin: left center;
+          transform-origin: left center;
+          margin: -1px 0 0 0;
         }
       }
       .icon-num {

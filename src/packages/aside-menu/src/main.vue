@@ -52,6 +52,10 @@
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
+      // 是否为云导播活动
+      streamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+      },
       // 是否开启了插播
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
@@ -236,6 +240,10 @@
               // 主持人
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
+                // 云导播隐藏桌面共享icon
+                if (this.streamYun) {
+                  vn.setHiddenState(true);
+                }
                 vn.setDisableState(false);
                 // 如果主持人把别人设为了主讲人，或者有人正在演示，桌面共享禁用
                 if (
