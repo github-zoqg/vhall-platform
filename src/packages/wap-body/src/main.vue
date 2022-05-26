@@ -108,7 +108,7 @@
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
-        await this.checkMediaPermission();
+        await this.checkMediaPermission('isUseMic');
       }
       if (this.isInGroup) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
@@ -186,17 +186,26 @@
           }
         });
       },
-      async checkMediaPermission() {
+      // isUseMic：是否调用上麦接口[ 只有在刷新时，才会执行上麦 ]
+      async checkMediaPermission(isUseMic) {
         let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         if (_flag) {
-          let res = await useMicServer().userSpeakOn();
-          if (res.code == 200) {
-            await this.interactiveServer.destroy();
-            await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          if (isUseMic) {
+            let res = await useMicServer().userSpeakOn();
+            if (res.code == 200) {
+              await this.resetInteractive();
+            }
+          } else {
+            await this.resetInteractive();
           }
         } else {
           Toast(this.$t('interact.interact_1040'));
         }
+      },
+      // 重置互动SDK实例
+      async resetInteractive() {
+        await this.interactiveServer.destroy();
+        await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
       },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
@@ -238,6 +247,7 @@
           useMediaCheckServer().state.deviceInfo.device_status == 0 &&
           index != 7
         ) {
+          // 此时调用完，设备状态要么是1  要么是2
           await this.checkMediaPermission();
         }
       }
