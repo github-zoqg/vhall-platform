@@ -531,7 +531,16 @@ export const serverConfig = {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal']
+    children: ['comStreamLocal', 'comPcPlayerLiveYun']
+  },
+  // 云导播播放器&本地流推送组件
+  comPcPlayerLiveYun: {
+    component: 'VmpPcPlayerLiveYun',
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    }
   },
   // 远端流
   comStreamRemote: {
@@ -600,6 +609,13 @@ export const serverConfig = {
     saveOptions: [
       {
         cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ],
+    changeMediaOption: [
+      {
+        cuid: 'comPcPlayerLiveYun',
         method: 'switchStreamType',
         args: ['$0']
       }
@@ -915,5 +931,10 @@ export const serverConfig = {
   // 邀请上麦弹窗
   comMicInvited: {
     component: 'VmpMicInvited'
+  },
+  // 【云导播页面】本地流&播放器
+  liveStreamYunRoot: {
+    component: 'VmpAirContainer',
+    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
   }
 };

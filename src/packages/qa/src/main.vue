@@ -94,6 +94,7 @@
         tipMsg: '',
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        qa_allBanned_status: useChatServer().state.allBannedModuleList.qa_status, //全体禁言对问答是否生效
         watchInitData: useRoomBaseServer().state.watchInitData
       };
     },
@@ -181,8 +182,11 @@
           this.initInputStatus();
         });
         //监听全体禁言通知
-        chatServer.$on('allBanned', res => {
-          this.allBanned = res;
+        chatServer.$on('allBanned', (status, msg) => {
+          this.allBanned = status;
+          if (msg) {
+            this.qa_allBanned_status = msg.qa_status == 1 ? true : false;
+          }
           this.initInputStatus();
         });
         useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
@@ -192,10 +196,10 @@
         });
       },
       initInputStatus() {
-        this.inputStatus.disable = this.isBanned || this.allBanned;
+        this.inputStatus.disable = this.isBanned || (this.allBanned && this.qa_allBanned_status);
         if (this.isBanned) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
-        } else if (this.allBanned) {
+        } else if (this.allBanned && this.qa_allBanned_status) {
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         } else {
           this.inputStatus.placeholder = this.$t('chat.chat_1003');
