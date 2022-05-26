@@ -170,6 +170,10 @@
     computed: {
       devices() {
         return this.mediaState.devices;
+      },
+      // 是否为云导播活动
+      streamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     beforeCreate() {
@@ -385,6 +389,12 @@
       sendChangeEvent() {
         const diffOptions = this._diffOptions;
         if (Object.keys(diffOptions) === 0) return;
+        if (this.streamYun) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'changeMediaOption', diffOptions)
+          );
+          return false;
+        }
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
       },

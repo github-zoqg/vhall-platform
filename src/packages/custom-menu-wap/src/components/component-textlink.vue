@@ -34,12 +34,13 @@
     padding: 0px 24px;
     .textlink {
       width: 100%;
-      height: 24px;
+      // height: 24px;
       font-size: 28px;
       font-weight: 400;
       color: #3562fa !important;
       line-height: 28px;
       word-break: break-all;
+      margin: 20px 0px;
       // text-align: center;
       & > span:hover {
         cursor: pointer;
