@@ -1073,10 +1073,11 @@
           font-weight: 400;
           color: #999999;
           line-height: 20px;
-          text-align: center;
+          text-align: left;
           margin-top: 16px;
           .vmp-cash-link {
-            color: #5cb8ff;
+            margin-left: 5px;
+            color: #3562fa;
             cursor: pointer;
           }
         }

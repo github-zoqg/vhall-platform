@@ -804,13 +804,12 @@
     .cash-protol {
       margin-top: 32px;
       height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      text-align: left;
       font-size: 28px;
 
       .cash-link {
-        color: #5cb8ff;
+        margin-left: 8px;
+        color: #3562fa;
       }
     }
   }
