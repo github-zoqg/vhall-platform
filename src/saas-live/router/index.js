@@ -4,7 +4,7 @@ import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
-import grayInit from '@/packages/app-shared/gray-init';
+import grayInit from '@/app-shared/gray-init';
 // import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
@@ -14,13 +14,13 @@ const routes = [
     path: '/lives/room/:id',
     component: Home,
     name: 'LiveRoom',
-    meta: { title: '直播间', grayType: 'webinar' }
+    meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/recordvideo/:id',
     component: () => import('../views/RecordVideo/index.vue'),
     name: 'RecordVideo',
-    meta: { title: '录制视频', grayType: 'webinar' }
+    meta: { title: '录制视频', grayType: 'webinar', page: 'record' }
   },
   {
     path: '/lives/keylogin/:id/:role_name',
@@ -50,7 +50,7 @@ const routes = [
     path: '/lives/split-screen/:id',
     name: 'SplitScreen',
     component: () => import('../views/SplitScreen.vue'),
-    meta: { title: '分屏', grayType: 'webinar' }
+    meta: { title: '分屏', grayType: 'webinar', page: 'split-screen' }
   },
   {
     path: '/lives/video-polling/:id',
@@ -69,13 +69,29 @@ const routes = [
   {
     path: '/lives/client/:il_id', // 客户端嵌入
     name: 'Client',
-    component: () => import('@/saas-live/views/clientEmbed/index')
+    component: () => import('@/saas-live/views/clientEmbed/index'),
+    meta: { page: 'client-embed' }
+  },
+  {
+    path: '/lives/yun/:id', // 云导播
+    name: 'yun',
+    component: () => import('@/saas-live/views/yun'),
+    meta: { keepAlive: false, grayType: 'webinar' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
     meta: { title: '系统异常' },
     component: () => import('../views/ErrorPage/error.vue')
+  },
+
+  {
+    // 其它没有匹配到的路由都会跳至此模块(404）
+    // 该路由为必须路由，不需要权限，必须放在最后
+    path: '*',
+    name: 'notfound',
+    component: NotFound,
+    meta: { keepAlive: false, grayType: '' }
   }
 ];
 
@@ -86,6 +102,13 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+  //   // 根据不同的页面，动态加载不同的配置
+  //   const pageConfig = await import(`../page-config/${to.meta.page}.js`);
+  //   window.$serverConfig = pageConfig.default;
+  //   window.$serverConfig._page = to.meta.page;
+  // }
+
   const res = await grayInit(to);
   console.log('---grayInit---', res);
   if (res) {

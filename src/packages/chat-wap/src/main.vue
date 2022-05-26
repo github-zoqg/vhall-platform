@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-chat-wap">
-    <div class="vmp-chat-wap__content">
+    <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
         v-if="hideChatHistory && !chatList.length && !historyLoaded"
@@ -13,9 +13,8 @@
       <div ref="chatContent" class="virtual-content">
         <virtual-list
           v-if="virtual.showlist"
-          :style="{ height: virtual.contentHeight + 'px' }"
           ref="chatlist"
-          class="virtual-list"
+          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
           :keeps="20"
           :estimate-size="100"
           :data-key="'count'"
@@ -30,7 +29,6 @@
           @totop="onTotop"
           @tobottom="toBottom"
         ></virtual-list>
-
         <div
           class="vmp-chat-wap__content__new-msg-tips"
           v-show="isHasUnreadAtMeMsg"
@@ -41,7 +39,14 @@
         </div>
       </div>
     </div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @touchstart="closeOverlay"
+      @click="closeOverlay"
+    ></div>
     <send-box
+      ref="sendBox"
       :currentTab="3"
       :isAllBanned="allBanned"
       :isBanned="isBanned"
@@ -64,12 +69,16 @@
     useRoomBaseServer,
     useGroupServer,
     useMicServer,
-    useMenuServer
+    useMenuServer,
+    useMsgServer
   } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/packages/app-shared/mixins/emitter';
+  import EventBus from './js/Events.js';
+  import { isMse } from './js/utils.js';
+
   export default {
     name: 'VmpChatWap',
     components: {
@@ -118,7 +127,13 @@
         overflow: false,
         //每次加载的消息条数
         pageSize: 50,
-        isLoading: false
+        isLoading: false,
+        //聊天内容高度
+        chatlistHeight: 0,
+        //android的内初始部高度
+        innerHeight: 0,
+        //显示输入组件
+        showSendBox: false
       };
     },
     watch: {
@@ -229,8 +244,58 @@
       if (!this.hideChatHistory) {
         this.getHistoryMessage();
       }
+      const IsMse = isMse();
+      if (IsMse.os === 'android') {
+        this.innerHeight = window.innerHeight;
+        window.addEventListener('resize', this.resizeAndroid);
+      } else if (IsMse.os === 'ios') {
+        window.addEventListener('focusin', this.focusinIOS);
+        window.addEventListener('focusout', this.focusoutIOS);
+      }
+      this.initEvent();
+      this.eventListener();
+    },
+    beforeDestroy() {
+      //移除事件
+      window.removeEventListener('resize', this.resizeAndroid);
+      window.removeEventListener('focusin', this.focusinIOS);
+      window.removeEventListener('focusout', this.focusoutIOS);
     },
     methods: {
+      //初始化eventbus
+      initEvent() {
+        EventBus.$on('showEmoji', e => {
+          this.$nextTick(() => {
+            if (e) {
+              this.chatlistHeight =
+                this.$refs.chatContentMain.clientHeight - this.$refs.sendBox.$el.clientHeight + 60;
+              // this.scrollBottom();
+            } else {
+              this.chatlistHeight = this.virtual.contentHeight;
+            }
+          });
+        });
+      },
+      resizeAndroid() {
+        const newInnerHeight = window.innerHeight;
+        if (this.innerHeight > newInnerHeight) {
+          // 键盘弹出事件处理
+          // alert('android 键盘弹窗事件');
+          //this.scrollBottom();
+        } else {
+          // 键盘收起事件处理
+          // alert('android 键盘收起事件处理');
+        }
+      },
+      focusoutIOS() {
+        // 键盘收起事件处理
+        // alert('iphone 键盘收起事件处理');
+      },
+      focusinIOS() {
+        // 键盘弹出事件处理
+        // alert('iphone 键盘弹出事件处理');
+        // this.scrollBottom();
+      },
       showWelcomeTxt() {
         // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
         this.welcomeText &&
@@ -250,6 +315,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         // const giftsServer = useGiftsServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
@@ -298,8 +364,15 @@
           this.$nextTick(() => {
             this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
+            this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();
           });
+        });
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type == 'live_start') {
+            chatServer.clearChatMsg();
+            this.getHistoryMessage();
+          }
         });
       },
       //处理分组讨论频道变更
@@ -399,6 +472,17 @@
           // alert(this.chatList.length - offsetPos);
           this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
         });
+      },
+      // eventBus监听
+      eventListener() {
+        //监听聊天组件是否打开
+        EventBus.$on('showSendBox', e => {
+          this.showSendBox = e;
+        });
+      },
+      //关闭遮罩层
+      closeOverlay() {
+        EventBus.$emit('showSendBox', false);
       }
     }
   };
@@ -419,8 +503,13 @@
       }
     }
     &__content {
-      height: calc(100% - 120px);
-      overflow: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 94px;
+      overflow-x: hidden;
+      overflow-y: auto;
       &__get-list-btn-container {
         width: 100%;
         text-align: center;
@@ -448,6 +537,14 @@
           margin-left: 19px;
         }
       }
+    }
+    > .overlay {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: transparent;
     }
   }
 </style>
