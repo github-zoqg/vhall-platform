@@ -54,14 +54,6 @@ export default async function () {
   ];
   virtualAudienceServer.init();
 
-  const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
-  const liveType = roomBaseServer.state.watchInitData.webinar.type;
-
-  // 互动、分组直播 并且 为直播模式，才进行设备检测
-  if ([3, 6].includes(liveMode) && liveType == 1) {
-    // 获取媒体许可，设置设备状态
-    promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
-  }
   await Promise.all(promiseList);
 
   // 调用聚合接口
@@ -133,4 +125,5 @@ export default async function () {
   window.micServer = micServer;
   window.playerServer = playerServer;
   window.insertFileServer = insertFileServer;
+  window.mediaCheckServer = mediaCheckServer;
 }
