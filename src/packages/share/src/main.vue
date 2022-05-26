@@ -106,14 +106,14 @@
           this.introduceText = this.$t('nav.nav_1023');
         }
       },
-      // 打开微信弹窗
+      // 打开微信弹窗 - 3
       openWeixinDialog() {
         this.shareOtherVisible = true;
         const shareId = `${this.roomBaseState.watchInitData.share_id}-3`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
         this.shareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
       },
-      // 打开qq分享
+      // 打开qq分享 - 2
       openQqDialog() {
         const p = {
           /* 获取URL，可加上来自分享到QQ标识，方便统计 */
@@ -140,10 +140,9 @@
         const url = 'http://connect.qq.com/widget/shareqq/index.html?' + s.join('&');
         window.open(url);
       },
-      // 打开微博
+      // 打开微博 - 1
       openWeiboDialog() {
-        // 微博是 3
-        const shareId = `${this.roomBaseState.watchInitData.share_id}-2`;
+        const shareId = `${this.roomBaseState.watchInitData.share_id}-1`;
         const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
         const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?t=${url}`;
         const p = {

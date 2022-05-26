@@ -189,7 +189,7 @@
     box-sizing: border-box;
 
     &-wrapper {
-      padding: 0 14px 16px;
+      padding: 16px 16px 0 0;
     }
     .subscribe-wrap {
       display: flex;
@@ -377,7 +377,7 @@
 
     @media screen and (min-width: 1367px) and (max-width: 1600px) {
       .subscribe-wrap-item {
-        width: 300px;
+        width: 305px;
         height: 273px;
         margin: 0px 0px 16px 16px;
         &_cover {

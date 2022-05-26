@@ -69,6 +69,7 @@
         :input-status="inputStatus"
         :webinar-id="webinarId"
         :all-banned="allBanned"
+        :allBannedModuleList="allBannedModuleList"
         :chat-list="chatList"
         :at-list="atList"
         :chat-login-status="chatLoginStatus"
@@ -169,6 +170,7 @@
         },
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
+        allBannedModuleList: useChatServer().state.allBannedModuleList,
         // 聊天是否需要登录
         chatLoginStatus: false,
 
@@ -577,17 +579,20 @@
         });
       },
       //处理全体禁言切换
-      handleChangeAllBanned(flag) {
+      handleChangeAllBanned(data) {
         let params = {
           room_id: this.roomId,
-          status: flag ? 1 : 0
+          status: data.status ? 1 : 0,
+          chat_status: data.chat_status ? 1 : 0,
+          qa_status: data.qa_status ? 1 : 0,
+          private_chat_status: data.private_chat_status ? 1 : 0
         };
         useChatServer()
           .setAllBanned(params)
           .then(res => {
-            this.allBanned = flag;
+            this.allBanned = data.status;
             //数据上报埋点--全体禁言切换
-            window.vhallReportForProduct?.report(flag ? 110116 : 110117);
+            window.vhallReportForProduct?.report(data.status ? 110116 : 110117);
             return res;
           })
           .catch(error => {

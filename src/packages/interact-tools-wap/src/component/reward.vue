@@ -331,6 +331,7 @@
     }
     ul {
       display: flex;
+      box-sizing: border-box;
       padding: 0 30px;
       justify-content: space-between;
       li {
