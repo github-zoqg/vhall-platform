@@ -108,16 +108,7 @@
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
-        let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
-        if (_flag) {
-          let res = await useMicServer().userSpeakOn();
-          if (res.code == 200) {
-            await this.interactiveServer.destroy();
-            await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
-          }
-        } else {
-          Toast(this.$t('interact.interact_1040'));
-        }
+        await this.checkMediaPermission();
       }
       if (this.isInGroup) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
@@ -195,6 +186,18 @@
           }
         });
       },
+      async checkMediaPermission() {
+        let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        if (_flag) {
+          let res = await useMicServer().userSpeakOn();
+          if (res.code == 200) {
+            await this.interactiveServer.destroy();
+            await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+          }
+        } else {
+          Toast(this.$t('interact.interact_1040'));
+        }
+      },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
         // 1 主持人    3 助理
@@ -228,6 +231,14 @@
             confirmButtonText: this.$t('common.common_1010'),
             message: title
           });
+        }
+        // 分组内的小组切换 -> 会自动重置互动初始化 -> 查看当前是否需要自动上麦 ====> 仅需判断可获取权限+未检测设备
+        if (
+          this.$domainStore.state.interactiveServer.mobileOnWheat &&
+          useMediaCheckServer().state.deviceInfo.device_status == 0 &&
+          index != 7
+        ) {
+          await this.checkMediaPermission();
         }
       }
     }
