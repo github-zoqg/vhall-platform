@@ -254,8 +254,9 @@
             }
           }
           &_title {
-            padding: 0 35px 0 16px;
+            padding: 0 44px 0 16px;
             word-break: break-word;
+            text-align: justify;
             padding-bottom: 16px;
             color: #1a1a1a;
             border-left: 1px dashed #3562fa;
