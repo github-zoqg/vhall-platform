@@ -475,7 +475,7 @@
   @media screen and (min-width: 1601px) and (max-width: 1920px) {
     .vmp-subscribe-body-intro,
     .vmp-subscribe-body-tab {
-      width: 1528px;
+      width: 1228px;
       margin: 0 auto;
     }
   }
