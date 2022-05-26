@@ -264,7 +264,7 @@
       },
       // 嘉宾取消申请
       handleApplyCancleClick() {
-        window.vhallReportForProduct?.report(110146);
+        window.vhallReportForProduct?.report(110152);
         useMicServer()
           .userCancelApply()
           .then(() => {
