@@ -68,7 +68,7 @@
           :disabled="inputStatus.disable"
           @click="sendMessage"
         >
-          <i class="icon iconfont iconfasong_icon"></i>
+          <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
     </div>
@@ -359,21 +359,21 @@
   @font-dark-qa-second: #666666;
   .vhsaas-chat-operator {
     width: calc(100% - 48px);
-    padding: 12px 24px 11px;
+    padding: 10px 24px;
     background: @bg-dark-section;
     border-top: 1px solid @bg-dark-normal;
     position: absolute;
     bottom: 0;
   }
   .vhsaas-chat-operator__header-wrapper {
-    height: 18px;
+    height: 19px;
     margin-bottom: 9px;
+    line-height: 19px;
     position: relative;
     .vh-line-expression {
       cursor: pointer;
       font-size: 18px;
       color: #999999;
-      vertical-align: top;
       &:hover {
         color: @font-dark-normal;
       }
@@ -519,13 +519,13 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .iconfasong_icon {
+        .vh-line-send {
           font-size: 18px;
           color: @font-dark-normal;
         }
         &.disable {
           cursor: default;
-          .iconfasong_icon {
+          .vh-line-send {
             color: #666666;
           }
         }
