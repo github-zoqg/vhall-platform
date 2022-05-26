@@ -86,12 +86,6 @@ export default async function () {
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   // 1-音频 2-视频 3-互动 6-分组
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
-  console.log(
-    '%c video_polling',
-    'color:blue',
-    roomBaseServer.state.configList['video_polling'],
-    liveMode
-  );
   // 视频直播并且开启了视频轮巡权限
   if (liveType == 1 && liveMode != 6 && roomBaseServer.state.configList['video_polling'] == 1) {
     // 获取媒体许可，设置设备状态
