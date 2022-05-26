@@ -201,7 +201,7 @@
         .data-text {
           display: flex;
           position: relative;
-          padding-right: 28px;
+          padding-right: 80px;
           width: calc(100% - 100px);
           ._block {
             display: inline-block;
@@ -226,8 +226,8 @@
           }
           &_circle {
             display: inline-block;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #3562fa;
@@ -247,7 +247,7 @@
             }
           }
           &_title {
-            padding: 0 60px 60px 32px;
+            padding: 0 0 60px 32px;
             color: #1a1a1a;
             line-height: 1.6;
             word-break: break-word;
