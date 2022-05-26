@@ -64,7 +64,8 @@
     useRoomBaseServer,
     useGroupServer,
     useMicServer,
-    useMenuServer
+    useMenuServer,
+    useMsgServer
   } from 'middle-domain';
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
@@ -250,6 +251,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         // const giftsServer = useGiftsServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
@@ -300,6 +302,12 @@
             this.virtual.showlist = data.cuid == this.cuid;
             this.scrollBottom();
           });
+        });
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type == 'live_start') {
+            chatServer.clearChatMsg();
+            this.getHistoryMessage();
+          }
         });
       },
       //处理分组讨论频道变更

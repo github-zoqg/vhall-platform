@@ -388,6 +388,9 @@
           if (msg.data.type == 'live_over') {
             this.allBanned = false;
             // this.onSwitchShowSponsor(false);
+          } else if (msg.data.type == 'live_start') {
+            chatServer.clearChatMsg();
+            this.getHistoryMsg();
           }
         });
       },
