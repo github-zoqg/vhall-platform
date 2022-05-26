@@ -94,11 +94,12 @@
           上麦
         </i>
 
-        <!-- 设备有问题不能上麦 -->
+        <!-- 设备有问题不能上麦  仅限视频轮巡活动展示-->
         <template
           v-if="
             tabIndex === 1 &&
-            [1, '1'].includes(isInteract) &&
+            this.isVideoPolling &&
+            this.mode != 6 &&
             [2, '2'].includes(userInfo.device_status)
           "
         >
@@ -165,11 +166,12 @@
           class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
           style="color: #fb3a32; font-size: 15px"
         ></i>
-        <!--设备有问题-->
+        <!--设备有问题  仅限视频轮巡活动展示-->
         <i
           v-if="
             tabIndex === 1 &&
-            [1, '1'].includes(isInteract) &&
+            this.isVideoPolling &&
+            this.mode != 6 &&
             [2, '2'].includes(userInfo.device_status)
           "
           style="color: #fb3a32; font-size: 15px; vertical-align: middle"
@@ -741,6 +743,10 @@
           this.isInApplyUsers &&
           !this.userInfo.is_speak
         );
+      },
+      // 是否开启视频轮巡
+      isVideoPolling() {
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
       }
     },
     methods: {
