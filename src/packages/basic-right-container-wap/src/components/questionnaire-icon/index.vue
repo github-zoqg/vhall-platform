@@ -1,5 +1,8 @@
 <template>
-  <div class="icon-wrap" v-if="questionnaireServerState.iconVisible">
+  <div
+    class="icon-wrap"
+    v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
+  >
     <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" />
     <i class="dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
@@ -58,6 +61,18 @@
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    },
+    watch: {
+      QuestionList: {
+        handler: function (val) {
+          if (val) {
+            let arr = val.filter(item => item.is_answered == 0);
+            if (arr.length > 0) {
+              this.questionnaireServer.setDotVisible(true);
+            }
+          }
+        }
       }
     },
     beforeCreate() {
@@ -221,8 +236,8 @@
             position: absolute;
             .num {
               display: inline-block;
-              width: 7px;
-              height: 7px;
+              width: 12px;
+              height: 12px;
               border-radius: 50%;
               background: #3562fa;
               position: absolute;

@@ -1,5 +1,8 @@
 <template>
-  <div class="vmp-questionnaire-icon" v-if="questionnaireServerState.iconVisible">
+  <div
+    class="vmp-questionnaire-icon"
+    v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
+  >
     <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" />
     <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
@@ -64,6 +67,20 @@
         return this.questionnaireServer.state.QuestionList;
       }
     },
+    watch: {
+      QuestionList: {
+        handler: function (val) {
+          if (val) {
+            let arr = val.filter(item => item.is_answered == 0);
+            if (arr.length > 0) {
+              this.questionnaireServer.setDotVisible(true);
+            } else {
+              this.questionnaireServer.setDotVisible(false);
+            }
+          }
+        }
+      }
+    },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({
         mode: 'watch'
@@ -71,6 +88,10 @@
     },
     created() {
       this.questionnaireServer.checkIconStatus();
+      this.questionnaireServer.getSurveyList();
+      this.questionnaireServer.$on('questionnaire_push', msg => {
+        this.questionnaireServer.getSurveyList();
+      });
     },
     methods: {
       async checkQuestionnaireIcon() {
@@ -218,7 +239,7 @@
             }
           }
           &_title {
-            padding: 0 29px 0 16px;
+            padding: 0 35px 0 16px;
             word-break: break-word;
             padding-bottom: 16px;
             color: #1a1a1a;
