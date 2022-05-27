@@ -3,15 +3,11 @@
   <van-popup
     v-model="popupVisible"
     position="bottom"
-    class="lottery-popup"
+    class="vmp-lottery"
     get-container="body"
+    round
     closeable
   >
-    <!-- 抽奖标题 -->
-    <!-- <header class="title-bar">
-      {{ $t('interact_tools.interact_tools_1003') }}
-      <i class="vh-iconfont vh-line-close" @click="close"></i>
-    </header> -->
     <section class="content-wrapper">
       <component
         :is="lotteryView"
@@ -54,9 +50,9 @@
     },
     data() {
       return {
-        popupVisible: false, // 主窗口显隐
+        popupVisible: true, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: '', // 抽奖组件视图名称
+        lotteryView: 'LotterySuccess', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -298,30 +294,23 @@
   };
 </script>
 
-<style lang="less" scoped>
-  .lottery-popup {
-    // height: calc(100% - 422px);
-  }
-  .title-bar {
-    position: relative;
-    font-size: 32px;
-    font-weight: 500;
-    color: rgba(68, 68, 68, 1);
-    text-align: center;
-    height: 90px;
-    line-height: 90px;
-    border-bottom: 1px solid #d4d4d4;
-    i {
-      position: absolute;
-      top: 50%;
-      left: 94%;
-      transform: translate(-50%, -50%);
-      font-size: 27px;
+<style lang="less">
+  .vmp-lottery {
+    .content-wrapper {
+      box-sizing: border-box;
     }
-  }
-  .content-wrapper {
-    box-sizing: border-box;
-    // padding: 36px 30px;
-    // min-height: calc(100% - 90px);
+    // 组件内所有的按钮样式
+    .vmp-lottery-btn {
+      display: inline-block;
+      width: 360px;
+      height: 90px;
+      background: #fb2626;
+      border-radius: 45px;
+      line-height: 90px;
+      text-align: center;
+      // font-weight: 500;
+      font-size: 32px;
+      color: #fff;
+    }
   }
 </style>
