@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-input-modal" v-show="visible">
+  <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
       <div class="send-box" @click="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
@@ -56,7 +56,7 @@
 <script>
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
   import EventBus from '../js/Events.js';
-
+  import { isMse } from '../js/utils.js';
   export default {
     name: 'VmpChatWapInputModal',
     props: {
@@ -83,6 +83,16 @@
     watch: {
       showEmoji() {
         EventBus.$emit('showEmoji', this.showEmoji);
+      }
+    },
+    computed: {
+      smFix() {
+        console.log('screen.height --', screen.height);
+        if (screen.height < 667) {
+          return true;
+        } else {
+          return false;
+        }
       }
     },
     mounted() {
@@ -124,26 +134,28 @@
         // window.document.body.scrollTop = '0px';
         // window.document.activeElement.scrollIntoViewIfNeeded(true);
         // window.scroll(0, 0);
-        this.smFix();
+        // this.doSmFix();
       },
       //处理获得焦点
       handleOnFocus() {
         if (this.showEmoji) {
           this.showEmoji = false;
         }
-        this.smFix();
+        // this.doSmFix();
       },
-      smFix() {
+      /*  doSmFix() {
         const this_p = this.$parent.$parent;
         let sendBoxEL = this_p.$refs.sendBox.$el.getBoundingClientRect();
         let chatWapEL = this_p.$refs[this.refName].getBoundingClientRect();
         if (sendBoxEL.top < chatWapEL.top) {
           this_p.smFix = true;
+          this.smFix = true;
         } else {
           this_p.smFix = false;
+          this.smFix = false;
         }
         console.log('-------------------', sendBoxEL.top, chatWapEL.top);
-      },
+      }, */
       //选中表情
       inputEmoji(item = {}) {
         this.inputValue += item.name;
@@ -207,10 +219,10 @@
 <style lang="less">
   .smFix {
     .chat-input-modal {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      margin-top: 0;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
     }
   }
   .chat-input-modal {
@@ -222,6 +234,12 @@
     font-size: 28px;
     background-color: #f0f0f0;
 
+    &.smFix {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
+    }
     &::after {
       content: '';
       position: absolute;
@@ -315,6 +333,11 @@
         right: 20px;
         bottom: 20px;
         align-items: flex-end;
+        // 判断iphoneX  填充到最底部
+        @supports (bottom: env(safe-area-inset-bottom)) {
+          bottom: calc(env(safe-area-inset-bottom) + 20px);
+        }
+
         .btn {
           width: 104px;
           height: 74px;
