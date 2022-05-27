@@ -47,6 +47,10 @@
       },
       roleName() {
         return this.$domainStore.state.roomBaseServer?.join_info?.role_name;
+      },
+      // 是否为云导播
+      streamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     beforeCreate() {
@@ -97,7 +101,7 @@
        * 调起转播
        */
       async open() {
-        if (this.isShow) {
+        if (this.isShow || this.streamYun) {
           return;
         }
         const { watchInitData } = this.roomBaseServer.state;

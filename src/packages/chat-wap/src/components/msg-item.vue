@@ -33,13 +33,19 @@
     <template v-else-if="source.type == 'questionnaire_push'">
       <div class="msg-item interact">
         <div
-          class="interact-msg"
+          class="interact-msg question_msg_bg"
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName | roleFilter }}{{ source.roleName != 1 ? source.nickname : ''
-          }}{{ source.content.text_content }},{{ $t('common.common_1030') }}
-          <span class="highlight">{{ $t('chat.chat_1060') }}</span>
+          <span
+            class="interact-content__role-name"
+            :class="source.roleName | roleClassFilterForMsg"
+          >
+            <span>{{ source.roleName | roleFilter }}</span>
+          </span>
+          {{ source.roleName != 1 ? source.nickname : '' }}{{ source.content.text_content }}
+          <!-- <span class="highlight">{{ $t('chat.chat_1060') }}</span> -->
+          <span class="highlight">点击查看详情</span>
         </div>
       </div>
     </template>
@@ -473,6 +479,28 @@
         padding: 20px 60px;
         position: relative;
         border-width: 0;
+        .interact-content__role-name {
+          color: @font-link;
+          background-color: rgba(53, 98, 250, 0.2);
+          border-radius: 9px;
+          padding: 4px 8px;
+          font-size: 22px;
+          line-height: 16px;
+          margin: 2px 4px 0;
+          border-radius: 500px;
+          &.host {
+            background-color: rgba(251, 58, 50, 0.2);
+            color: #fb3a32;
+          }
+          &.assistant {
+            background-color: rgba(166, 166, 166, 0.15);
+            color: #3562fa;
+          }
+          &.guest {
+            background-color: rgba(53, 98, 250, 0.2);
+            color: #a6a6a6;
+          }
+        }
         input {
           background-color: transparent;
           position: relative;
@@ -502,6 +530,14 @@
         }
         .reward-text {
           margin-top: 13px;
+        }
+      }
+      .question_msg_bg {
+        padding: 10px 24px;
+        background: rgba(255, 209, 201, 0.2);
+        border-radius: 500px;
+        &::after {
+          border: 0 !important;
         }
       }
     }

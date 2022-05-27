@@ -5,6 +5,7 @@
     :class="[
       miniElement === 'screen' ? 'mini' : 'normal',
       { 'is-watch': isWatch },
+      { 'is-embed': isEmbed && isWatch },
       { 'has-stream-list': hasStreamList },
       { 'share-screen': isShareScreen }
     ]"
@@ -113,6 +114,10 @@
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 是否是嵌入
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       //是否在分组里
       isInGroup() {
@@ -561,6 +566,9 @@
       &.has-stream-list {
         top: 80px;
       }
+    }
+    &.is-embed {
+      width: calc(100% - 360px);
     }
     &.mini {
       width: 360px;
