@@ -36,10 +36,12 @@
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
+        const watchInitData = roomBaseServer.state.watchInitData;
+
         domain.initVhallReport(
           {
             bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+            user_id: watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
             t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
@@ -65,6 +67,10 @@
           type: 'log' // log 日志埋点，event 业务数据埋点
         });
         const res = await roomState();
+
+        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
+        document.title = watchInitData.webinar.subject;
+
         // 如果浏览器不支持
         if (res === 'isBrowserNotSupport') {
           this.state = 3;

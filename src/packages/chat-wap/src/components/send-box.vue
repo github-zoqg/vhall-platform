@@ -25,7 +25,9 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted" class="span__speak__disable">
+              {{ $t('chat.chat_1079') }}
+            </span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>
               {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
@@ -76,16 +78,16 @@
         </div>
       </div>
     </div>
-    <chat-wap-input-modal
-      ref="chatWapInputModal"
+    <chat-wap-input
+      ref="chatWapInput"
       @sendMsg="sendMessage"
       :showTabType="currentTab"
-    ></chat-wap-input-modal>
+    ></chat-wap-input>
   </div>
 </template>
 
 <script>
-  import chatWapInputModal from './chatWapInputModal';
+  import chatWapInput from './chatWapInput';
   import EventBus from '../js/Events';
   import { emojiToPath } from '@/packages/chat/src/js/emoji';
   import {
@@ -157,7 +159,7 @@
       }
     },
     components: {
-      chatWapInputModal,
+      chatWapInput,
       Handup
     },
     data() {
@@ -252,7 +254,7 @@
       isMuted() {
         return (
           (this.webinar.type == 5 || this.webinar.type == 4) &&
-          this.configList['ui.watch_record_no_chatting'] == 1
+          this.configList['ui.watch_record_no_chatting'] === 1
         );
       },
       avatar() {
@@ -347,14 +349,16 @@
 
         if (this.currentTab == 3) {
           if (this.waitTimeFlag) {
-            this.$refs.chatWapInputModal.openModal();
+            EventBus.$emit('showSendBox', true);
+            this.$refs.chatWapInput.openModal();
           } else {
             this.$toast(this.$t('chat.chat_1068', { n: this.waitTime }));
           }
         } else if (this.currentTab == 'qa' && this.time != 0) {
           this.$toast(this.$t('chat.chat_1080', { n: this.time }));
         } else {
-          this.$refs.chatWapInputModal.openModal();
+          EventBus.$emit('showSendBox', true);
+          this.$refs.chatWapInput.openModal();
         }
       },
       //计算延迟时间
@@ -426,6 +430,8 @@
 </script>
 <style lang="less" scoped>
   .vmp-send-box {
+    background-color: #fff;
+
     &::after {
       content: '';
       position: absolute;
@@ -445,66 +451,81 @@
     // position: fixed;
     transition: 0.35s all;
     z-index: 22;
+
     &__content {
       width: 100%;
-      height: 120px;
-      background-color: #fff;
-      padding: 0 30px;
+      height: 94px;
+      padding: 0 32px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
+
       .content-input {
         flex: 1;
         display: flex;
         align-items: center;
+
         .content-input__placeholder {
           background-color: #f5f5f5;
           color: #444;
           border-radius: 40px;
           width: 100%;
-          height: 80px;
-          line-height: 80px;
+          height: 60px;
+          line-height: 60px;
           padding: 2px 20px;
+
           .login-btn {
             padding-left: 10px;
             color: #007aff;
           }
         }
       }
+
       // add 新增
       .content-input__update-chat ::v-deep {
         height: 60px;
         line-height: 60px;
         width: 100%;
+
         .emoji {
           float: left;
         }
+
         .van-cell__value {
           padding-top: 4px;
           background: #f5f5f5;
           height: 100%;
+
           .van-field__body {
             height: 100%;
           }
         }
+        .span__speak__disable {
+          color: #bfbfbf;
+        }
       }
+
       .interact-wrapper {
         margin-left: 40px;
         text-align: right;
         height: 40px;
         padding-right: 10px;
+
         .icon-wrapper {
           color: #666;
           display: inline-block;
           margin-right: 36px;
           text-align: center;
+
           &:last-child {
             margin-right: 0;
             font-size: 43px;
           }
+
           .iconyaoqingka {
             font-size: 44px;
           }
+
           .vh-saas-iconfont,
           .vh-iconfont {
             font-size: 47px;
@@ -522,6 +543,7 @@
           }
         }
       }
+
       .only-my {
         color: #fb3a32;
       }
@@ -530,10 +552,12 @@
       }
     }
   }
+
   .user-avatar-wrap {
     vertical-align: middle;
     display: inline-flex;
     margin-right: 12px;
+
     img {
       width: 100%;
       height: 100%;
@@ -541,12 +565,14 @@
       border-radius: 100%;
     }
   }
+
   .user-avatar-wrap__avatar {
     width: 60px;
     height: 60px;
     vertical-align: middle;
     display: inline-flex;
     border-radius: 100%;
+
     img {
       width: 100%;
       height: 100%;
@@ -554,6 +580,7 @@
       border-radius: 100%;
     }
   }
+
   @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
     .send-msg-wrapper {
       position: absolute;
@@ -561,10 +588,12 @@
       bottom: env(safe-area-inset-bottom);
     }
   }
+
   .send-msg-wrapper-top {
     bottom: 0;
     height: 460px;
     transition: 0.5s all;
+
     .emoji-box {
       position: absolute;
       width: 100%;
@@ -575,6 +604,7 @@
       bottom: 0;
       overflow-y: scroll;
       background-color: #fff;
+
       img {
         width: 48px;
         height: 48px;
@@ -583,6 +613,7 @@
       }
     }
   }
+
   .vc-switch ::v-deep {
     display: none !important;
   }

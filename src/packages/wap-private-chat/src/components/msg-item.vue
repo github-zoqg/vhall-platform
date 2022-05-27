@@ -140,7 +140,7 @@
     }
     .private-chat-msg__item-main {
       margin: 0 30px;
-      padding: 20px 0 0;
+      padding: 10px 0;
       display: flex;
       align-items: flex-start;
       &__avatar-wrap {

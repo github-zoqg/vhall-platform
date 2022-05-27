@@ -54,7 +54,12 @@
         </span>
       </div>
       <div class="input-bar__textarea-box__send-btn-box">
-        <div class="input-bar__textarea-box__send-btn" @click="sendMessage">
+        <div
+          class="input-bar__textarea-box__send-btn"
+          :class="{ disable: inputStatus.disable }"
+          :disabled="inputStatus.disable"
+          @click="sendMessage"
+        >
           <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
@@ -258,6 +263,9 @@
       },
       //发送消息
       async sendMessage() {
+        if (this.inputStatus.disable) {
+          return;
+        }
         if (this.inputValue.trim() === '') {
           return this.$message({
             message: this.$t('chat.chat_1009'),
@@ -305,8 +313,9 @@
     // 链接字体颜色
     @font-link: #3562fa;
     @active-color: #fb3a32;
-    width: calc(100% - 48px);
-    padding: 12px 24px 11px;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
     background: #2a2a2a;
     border-top: 1px solid #1a1a1a;
     position: absolute;
@@ -355,10 +364,9 @@
         margin-left: 10px;
       }
       .vh-line-expression {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 0;
-        margin-bottom: 1px;
         &:hover {
           color: @active-color;
           cursor: pointer;
@@ -370,7 +378,7 @@
       justify-content: space-between;
       align-items: flex-end;
       .input-bar__textarea-box {
-        width: 240px;
+        width: 264px;
         background-color: #1a1a1a;
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
@@ -423,7 +431,7 @@
         color: @font-dark-normal;
       }
       .input-bar__textarea-box__textarea-placeholder {
-        width: 220px;
+        width: 264px;
         background-color: @bg-dark-normal;
         font-size: 14px;
         color: @font-dark-normal;
@@ -453,6 +461,12 @@
         .vh-line-send {
           font-size: 18px;
           color: #e6e6e6;
+        }
+        &.disable {
+          cursor: default;
+          .vh-iconfont {
+            color: #666666;
+          }
         }
       }
     }

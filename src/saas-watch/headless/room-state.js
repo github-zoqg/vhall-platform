@@ -96,6 +96,7 @@ export default async function () {
   console.log('%c------黄金链路请求配置项完成', 'color:pink');
   console.log('%c------多语言请求配置', 'color:pink');
   console.log(roomBaseServer.state.languages);
+
   // 互动进行设备检测 或者是视频直播并且开启了视频轮巡权限
   if (
     liveType == 1 &&
