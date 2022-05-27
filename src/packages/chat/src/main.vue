@@ -287,6 +287,7 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      useChatServer().init();
     },
     mounted() {
       //初始化配置
