@@ -65,6 +65,10 @@
        */
       filterMenuList() {
         return this.menuList.filter(item => {
+          // 云导播推流页媒体设置菜单
+          if (/lives\/yun/.test(location.pathname)) {
+            return !['basic-setting', 'audio-out-setting'].includes(item.id);
+          }
           // 基础设置显隐
           if (item.id === 'basic-setting' && !this.isShowBasic) return false;
 
@@ -84,6 +88,10 @@
     created() {
       this.roomBaseServer = useRoomBaseServer();
       this.initViewData();
+      // 如果是云导播推流页
+      if (/lives\/yun/.test(location.pathname)) {
+        this.onClickItem({ id: 'video-setting', text: 'setting.setting_1003' });
+      }
     },
     methods: {
       /**

@@ -11,9 +11,11 @@
         />
       </div>
       <!-- 文案 -->
-      <h1>
-        {{ $tdefault(redPacketInfo.describe) | overHidden(8) }}
-      </h1>
+      <div class="vhsaas-red-packet-desc__wrap">
+        <h1 class="vhsaas-red-packet-desc">
+          {{ $tdefault(redPacketInfo.describe) }}
+        </h1>
+      </div>
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"
         :src="redPacketInfo.avatar || ''"
@@ -21,7 +23,7 @@
         class="vhsaas-red-packet-avatar"
       />
       <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
-      <p>
+      <p class="vhsaas-red-packet-sender">
         {{
           (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | overHidden(8)
         }}
@@ -181,17 +183,31 @@
     text-align: center;
     width: 100%;
     left: 0;
-    h1 {
+    .vhsaas-red-packet-desc {
+      &__wrap {
+        width: 440px;
+        height: 120px; // 最多2行的高度
+        margin: 44px auto 0;
+        position: relative;
+        text-align: center;
+      }
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /**autoprefixer: ignore next */
+      -webkit-box-orient: vertical;
+      width: 100%;
       font-size: 44px;
-      font-family: PingFangSC-Medium, PingFang SC;
       font-weight: 500;
       color: #fee4b3;
       line-height: 60px;
-      margin-top: 104px;
     }
-    p {
+    .vhsaas-red-packet-sender {
       font-size: 28px;
-      font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: #fee4b3;
       line-height: 20px;
