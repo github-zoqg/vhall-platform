@@ -67,46 +67,12 @@
   };
 </script>
 <style lang="less">
-    .vmp-lottery-icon {
-  <<<<<<< HEAD
-      margin-left: 16px; //撑开左间距
-      .vmp-icon-wrap {
-        color: #fff;
-        position: relative;
-        display: inline;
-        .vmp-dot {
-          position: absolute;
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          background: #fb3a32;
-          border: 1px solid #2a2a2a;
-          border-radius: 50%;
-          right: -3px;
-          position: absolute;
-        }
-        .lottery-icon {
-          width: 32px;
-          height: 32px;
-          cursor: pointer;
-        }
-  =======
+  .vmp-lottery-icon {
+    margin-left: 16px; //撑开左间距
+    .vmp-icon-wrap {
       color: #fff;
       position: relative;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      background: linear-gradient(180deg, #fca810 0%, #ff9e31 100%);
-      border-radius: 16px;
-      cursor: pointer;
-      margin-left: 16px;
-      img.show_img {
-        width: 32px;
-        height: 32px;
-        -webkit-transform-origin: left center;
-        transform-origin: left center;
-        margin: -1px 0 0 0;
-      }
+      display: inline;
       .vmp-dot {
         position: absolute;
         display: inline-block;
@@ -117,22 +83,27 @@
         border-radius: 50%;
         right: -3px;
         position: absolute;
-  >>>>>>> main
       }
-      .transparent-layer {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 11;
-        background: transparent;
-      }
-      .vmp-lottery-history-container {
-        position: absolute;
-        right: 12px;
-        bottom: 60px;
-        z-index: 12;
+      .lottery-icon {
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
       }
     }
+    .transparent-layer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 11;
+      background: transparent;
+    }
+    .vmp-lottery-history-container {
+      position: absolute;
+      right: 12px;
+      bottom: 60px;
+      z-index: 12;
+    }
+  }
 </style>
