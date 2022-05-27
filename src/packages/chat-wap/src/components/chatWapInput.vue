@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-input-modal" :class="isXAndWxWork ? 'isXAndWxWork' : ''" v-show="visible">
+  <div class="chat-input-modal" v-show="visible">
     <div class="input-info">
       <div class="send-box" @click="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
@@ -56,7 +56,6 @@
 <script>
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
   import EventBus from '../js/Events.js';
-  import { isMse } from '../js/utils.js';
 
   export default {
     name: 'VmpChatWapInputModal',
@@ -64,6 +63,9 @@
       showTabType: {
         type: [String, Number],
         default: ''
+      },
+      refName: {
+        default: 'chatWap'
       }
     },
     data() {
@@ -81,27 +83,6 @@
     watch: {
       showEmoji() {
         EventBus.$emit('showEmoji', this.showEmoji);
-      }
-    },
-    computed: {
-      isXAndWxWork() {
-        const u = navigator.userAgent;
-        const IsMse = isMse();
-        //ios终端
-        if (IsMse.os === 'ios') {
-          if (screen.height >= 812) {
-            //是iphoneX
-            if (u.match(/wxwork/)) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            //不是iphoneX
-            return false;
-          }
-        }
-        return false;
       }
     },
     mounted() {
@@ -143,12 +124,25 @@
         // window.document.body.scrollTop = '0px';
         // window.document.activeElement.scrollIntoViewIfNeeded(true);
         // window.scroll(0, 0);
+        this.smFix();
       },
       //处理获得焦点
       handleOnFocus() {
         if (this.showEmoji) {
           this.showEmoji = false;
         }
+        this.smFix();
+      },
+      smFix() {
+        const this_p = this.$parent.$parent;
+        let sendBoxEL = this_p.$refs.sendBox.$el.getBoundingClientRect();
+        let chatWapEL = this_p.$refs[this.refName].getBoundingClientRect();
+        if (sendBoxEL.top < chatWapEL.top) {
+          this_p.smFix = true;
+        } else {
+          this_p.smFix = false;
+        }
+        console.log('-------------------', sendBoxEL.top, chatWapEL.top);
       },
       //选中表情
       inputEmoji(item = {}) {
@@ -211,22 +205,23 @@
 </script>
 
 <style lang="less">
+  .smFix {
+    .chat-input-modal {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      margin-top: 0;
+    }
+  }
   .chat-input-modal {
     width: 100%;
-    position: fixed;
+    position: relative;
     z-index: 9999;
     min-height: 94px;
-    bottom: 0;
-    left: 0;
+    margin-top: -94px;
     font-size: 28px;
     background-color: #f0f0f0;
 
-    &.isXAndWxWork {
-      bottom: 60px !important;
-      .tools {
-        bottom: 80px !important;
-      }
-    }
     &::after {
       content: '';
       position: absolute;
