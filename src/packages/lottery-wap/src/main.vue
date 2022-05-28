@@ -206,7 +206,7 @@
           this.popupVisible = true;
           this.lotteryView = view;
         };
-        if (!!this.popupVisible) {
+        if (this.popupVisible) {
           this.popupVisible = false; // 先关闭,出现弹窗效果
           await this.$nextTick();
           const st = setTimeout(() => {
