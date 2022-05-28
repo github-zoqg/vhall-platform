@@ -1,6 +1,16 @@
 <template>
-  <div class="lottery-pending">
-    <img :src="fitment.url" alt />
+  <div class="vmp-lottery-pending">
+    <p class="lottery-title">{{ fitment.title }}</p>
+    <p class="lottery-remark">
+      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
+    </p>
+    <div class="lottery-pending-bg">
+      <img
+        :class="[fitment.img_order === 2 ? 'slot-machine' : '', 'lottery-pending-animation']"
+        :src="fitment.url"
+        alt
+      />
+    </div>
     <template v-if="needJoin">
       <i18n path="interact_tools.interact_tools_1065" tag="p">
         <span style="color: #ff5659" place="n">{{ lotteryInfo.command }}</span>
@@ -9,9 +19,6 @@
         {{ $t('interact_tools.interact_tools_1008') }}
       </button>
     </template>
-    <p v-else class="lottery-start-text">
-      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-    </p>
   </div>
 </template>
 <script>
@@ -91,38 +98,37 @@
   };
 </script>
 <style lang="less" scoped>
-  .lottery-pending {
-    width: 100%;
-    height: 100%;
-    font-size: 32px;
-    font-family: PingFangSC-Regular, PingFang SC;
-    font-weight: 400;
-    color: #444444;
-    img {
-      width: 440px;
-      height: 440px;
-      margin: 0px auto;
-      display: block;
+  .vmp-lottery-pending {
+    text-align: center;
+    color: #ffebc9;
+    text-shadow: 0px 3px 6px rgba(218, 111, 17, 0.6);
+    .lottery-title {
+      font-weight: 500;
+      font-size: 32px;
+      margin-bottom: 5px;
     }
-    p {
-      text-align: center;
-      margin: 40px 0px;
+    .lottery-remark {
+      font-size: 24px;
+      line-height: 34px;
+      margin: 0;
     }
-    .lottery-start-text {
-      color: #ff5659;
-      line-height: 40px;
+    .lottery-pending-bg {
+      width: 680px;
+      height: 750px;
+      background-image: url('../img/lottery-pendding-bg.png');
+      background-size: 100%;
+      background-repeat: no-repeat;
+      position: relative;
     }
-    button {
-      display: block;
-      width: 364px;
-      height: 90px;
-      background: #fb3a32;
-      border-radius: 14px;
-      margin: 0px auto;
-      // padding-bottom: 20px;
-      color: #fff;
-      line-height: 90px;
-      text-align: center;
+    .lottery-pending-animation {
+      position: absolute;
+      width: 500px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      &.slot-machine {
+        transform: translate(-48%, -50%);
+      }
     }
   }
 </style>

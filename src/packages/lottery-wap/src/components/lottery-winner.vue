@@ -52,7 +52,7 @@
       &:not(:last-child) {
         border-bottom: 1px solid rgba(#fcc7c7, 0.6);
       }
-      ::after {
+      &:after {
         clear: left;
       }
       .avatar {
