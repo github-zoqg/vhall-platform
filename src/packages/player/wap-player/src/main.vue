@@ -205,11 +205,11 @@
           <div class="control_left">
             <span class="pos" @click="startPlay">
               <van-circle
-                v-model="currentTime"
+                v-model="currentTimeFormate"
                 :rate="parseInt(totalTime)"
-                :speed="1 / parseInt(totalTime)"
+                :speed="isPlayering ? 0.5 : 0"
                 size="34px"
-                color="#fb3a32"
+                :color="isLiving ? 'transparent' : '#fb3a32'"
                 layer-color="rgba(255, 255, 255, 0.2)"
               ></van-circle>
               <i
@@ -218,9 +218,9 @@
               ></i>
             </span>
             <span class="control_center">
-              <div class="status_tip">语音播放中</div>
+              <div class="status_tip">语音播放中...</div>
 
-              <div class="player_time">
+              <div class="player_time" v-if="!isLiving">
                 {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
               </div>
             </span>
@@ -352,6 +352,7 @@
     },
     data() {
       return {
+        asd: 1,
         isNoBuffer: false,
         // promptFlag: false,
         isOpenSpeed: false,
@@ -404,14 +405,14 @@
         lang: {},
         languageList: [],
         isSmallPlayer: false,
-        currentRate: 0,
-        rate: 0
+        currentTimeFormate: 1
       };
     },
     watch: {
       // 监听播放器大小
       isSmallPlayer: {
         handler: function (val) {
+          console.log(val, 'vmp-wap-body-endingvmp-wap-body-ending');
           if (val) {
             document.querySelector('.vmp-basic-bd').classList.add('small_player');
           } else {
@@ -419,6 +420,13 @@
           }
           this.setSetingHeight();
         }
+      },
+      currentTime(val) {
+        console.log(val, this.isPlayering, this.totalTime, 'currentTime');
+        if (!this.isPlayering) {
+          this.currentTimeFormate = parseInt(val) || 1;
+        }
+        console.log(this.currentTimeFormate, 'currentTimeFormate');
       }
     },
     beforeCreate() {
@@ -468,6 +476,14 @@
       // } else {
       //   this.isOrientation = false;
       // }
+      // 直播结束音频直播改变播放器大小
+      this.playerServer.$on('live_over', e => {
+        if (this.isAudio) {
+          console.log(e, '直播结束音频直播改变播放器大小');
+          this.changePlayerSize(false);
+          document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+        }
+      });
     },
     methods: {
       /**
@@ -478,12 +494,14 @@
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
         let baseHeight = playerHeight + 100 + 90;
+        let calssname = '.tab-content';
         if (this.isEmbed) {
           baseHeight = playerHeight;
+          calssname = '.tab-content-embed';
         }
         let popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-        document.querySelector('.tab-content').style.height = popHeight;
+        document.querySelector(calssname).style.height = popHeight;
       },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
@@ -501,6 +519,7 @@
       },
       // 暂停
       pause() {
+        this.currentTimeFormate = parseInt(this.currentTime);
         this.playerServer && this.playerServer.pause();
       },
       // 判断是直播还是回放 活动状态
@@ -809,14 +828,18 @@
       .foot_control {
         position: absolute;
         width: 100%;
+        height: 100%;
         bottom: 0%;
         color: #fff;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         z-index: 11;
         padding-left: 24px;
         top: 50%;
         transform: translate(0, -50%);
+        background: url('./img/smallPlayer.png');
+        background-size: 100% 100%;
         .control_left {
           display: flex;
           .pos {
@@ -825,25 +848,23 @@
               position: absolute;
               top: 50%;
               left: 50%;
-              transform: translate(-50%, -39%);
+              transform: translate(-50%, -57%);
             }
           }
           .control_center {
             padding-left: 16px;
+            font-size: 24px;
             .status_tip {
               position: relative;
-              font-size: 24px;
             }
             .player_time {
-              position: absolute;
-              bottom: 0;
+              position: relative;
+              top: 18px;
             }
           }
         }
         .control_right {
-          position: relative;
           padding-right: 24px;
-          top: 25%;
           .set_center {
             padding-right: 20px;
           }
