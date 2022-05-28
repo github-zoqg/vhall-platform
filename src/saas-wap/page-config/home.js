@@ -92,7 +92,6 @@ const serverConfig = {
       }
     ],
     emitChangeChatHeight: [
-      //权限验证
       {
         cuid: 'comChatWap',
         method: 'changeChatHeight',

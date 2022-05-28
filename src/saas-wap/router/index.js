@@ -21,7 +21,6 @@ const routes = [
     meta: { title: '直播间嵌入', grayType: 'webinar' },
     redirect: to => {
       if (to.query.embed === 'video') {
-        console.log(to, 'to123');
         // 单视频嵌入
         return {
           name: 'LiveEmbedVideoRoom',

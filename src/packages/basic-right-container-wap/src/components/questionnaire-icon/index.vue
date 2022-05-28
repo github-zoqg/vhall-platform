@@ -61,6 +61,9 @@
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
     watch: {
@@ -73,6 +76,9 @@
             }
           }
         }
+      },
+      isSmallPlayer() {
+        this.setSetingHeight();
       }
     },
     beforeCreate() {
@@ -88,9 +94,10 @@
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px 80px为顶部图片一般高度
-        let baseHeight = 522 - 80;
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 - 80;
         if (this.isEmbed) {
-          baseHeight = 422 - 80;
+          baseHeight = playerHeight - 80;
         }
         this.popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';

@@ -98,6 +98,9 @@
       //用户信息
       userInfo() {
         return this.userServer.state.userInfo;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
     watch: {
@@ -106,6 +109,9 @@
         // if (this.isBottom()) {
         this.scrollBottom();
         // }
+      },
+      isSmallPlayer() {
+        this.changeChatHeight();
       }
     },
     beforeCreate() {
