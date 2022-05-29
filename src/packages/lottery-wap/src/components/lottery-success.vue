@@ -4,14 +4,17 @@
     <p class="submit-lottery-text">
       {{ $t('interact_tools.interact_tools_1013') }}
     </p>
-    <button class="vmp-lottery-btn" @click="navToWinnerList">
+    <button v-if="showWinnerList" class="vmp-lottery-btn" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
   </div>
 </template>
 <script>
+  import props from './props';
+
   export default {
     name: 'LotterySuccess',
+    mixins: [props],
     methods: {
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');

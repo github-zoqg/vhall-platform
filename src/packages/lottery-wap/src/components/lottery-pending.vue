@@ -97,7 +97,7 @@
     }
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vmp-lottery-pending {
     text-align: center;
     color: #ffebc9;

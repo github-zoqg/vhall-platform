@@ -119,7 +119,7 @@
           {{ repeatWinning ? '已开启，已中奖者可再次参与抽奖' : '开启后，已中奖者可再次参与抽奖' }}
         </span>
       </el-form-item>
-      <el-form-item label="领奖信息" class="repeat-winning">
+      <el-form-item size="mini" label="领奖信息" class="repeat-winning">
         <el-switch
           v-model="needTakeAward"
           active-color="#FB3A32"
@@ -133,7 +133,7 @@
           }}
         </span>
       </el-form-item>
-      <el-form-item label="中奖名单" class="repeat-winning">
+      <el-form-item size="mini" label="中奖名单" class="repeat-winning">
         <el-switch v-model="showWinner" active-color="#FB3A32" inactive-color="#CECECE"></el-switch>
         <span>
           {{ showWinner ? '已开启，抽奖结束后显示中奖名单' : '开启后，抽奖结束后显示中奖名单' }}
