@@ -88,7 +88,13 @@
     computed: {
       smFix() {
         console.log('screen.height --', screen.height);
-        if (screen.height < 667) {
+        // if (screen.height < 667) {
+        //   return true;
+        // } else {
+        //   return false;
+        // }
+        const IsMse = isMse();
+        if (IsMse.os === 'android') {
           return true;
         } else {
           return false;
