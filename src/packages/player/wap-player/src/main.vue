@@ -205,11 +205,10 @@
           <div class="control_left">
             <span class="pos" @click="startPlay">
               <van-circle
-                v-model="currentTimeFormate"
+                v-model="sliderVal"
                 :rate="parseInt(totalTime)"
-                :speed="isPlayering ? 0.5 : 0"
                 size="34px"
-                :color="isLiving ? 'transparent' : '#fb3a32'"
+                :color="currentTime <= 0 ? 'transparent' : '#fb3a32'"
                 layer-color="rgba(255, 255, 255, 0.2)"
               ></van-circle>
               <i
@@ -404,8 +403,7 @@
         isOrientation: false,
         lang: {},
         languageList: [],
-        isSmallPlayer: false,
-        currentTimeFormate: 1
+        isSmallPlayer: false
       };
     },
     watch: {
@@ -420,13 +418,6 @@
           }
           this.setSetingHeight();
         }
-      },
-      currentTime(val) {
-        console.log(val, this.isPlayering, this.totalTime, 'currentTime');
-        if (!this.isPlayering) {
-          this.currentTimeFormate = parseInt(val) || 1;
-        }
-        console.log(this.currentTimeFormate, 'currentTimeFormate');
       }
     },
     beforeCreate() {
@@ -519,7 +510,6 @@
       },
       // 暂停
       pause() {
-        this.currentTimeFormate = parseInt(this.currentTime);
         this.playerServer && this.playerServer.pause();
       },
       // 判断是直播还是回放 活动状态
