@@ -62,8 +62,13 @@
         </span>
       </div>
       <div class="vhsaas-chat-operator__send-btn-box">
-        <div class="vhsaas-chat-operator__send-btn" @click="sendMessage">
-          <i class="icon iconfont iconfasong_icon"></i>
+        <div
+          class="vhsaas-chat-operator__send-btn"
+          :class="{ disable: inputStatus.disable }"
+          :disabled="inputStatus.disable"
+          @click="sendMessage"
+        >
+          <i class="vh-iconfont vh-line-send"></i>
         </div>
       </div>
     </div>
@@ -259,6 +264,9 @@
       },
       //发送消息
       async sendMessage() {
+        if (this.inputStatus.disable) {
+          return;
+        }
         if (this.inputValue.trim() === '') {
           return this.$message({
             message: this.$t('chat.chat_1009'),
@@ -348,23 +356,24 @@
 </script>
 
 <style lang="less">
+  @font-dark-qa-second: #666666;
   .vhsaas-chat-operator {
     width: calc(100% - 48px);
-    padding: 12px 24px 11px;
+    padding: 10px 24px;
     background: @bg-dark-section;
     border-top: 1px solid @bg-dark-normal;
     position: absolute;
     bottom: 0;
   }
   .vhsaas-chat-operator__header-wrapper {
-    height: 18px;
+    height: 19px;
     margin-bottom: 9px;
+    line-height: 19px;
     position: relative;
     .vh-line-expression {
       cursor: pointer;
-      font-size: 19px;
+      font-size: 18px;
       color: #999999;
-      vertical-align: top;
       &:hover {
         color: @font-dark-normal;
       }
@@ -374,7 +383,7 @@
       display: inline-flex;
       align-items: center;
       vertical-align: top;
-      line-height: 21px;
+      line-height: 18px;
       .only-me-item__checkbox {
         display: inline-block;
         margin-right: 8px;
@@ -407,7 +416,7 @@
       .only-me-item__label {
         // margin-left: 5px;
         font-size: 14px;
-        line-height: 21px;
+        line-height: 18px;
         color: #999999;
       }
     }
@@ -450,16 +459,16 @@
       }
       textarea.vhsaas-chat-operator__textarea {
         &::-webkit-input-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &:-moz-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &::-moz-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
         &:-ms-input-placeholder {
-          color: @font-dark-second;
+          color: @font-dark-qa-second;
         }
       }
       .vhsaas-chat-operator__textarea-show-limit {
@@ -510,9 +519,15 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        .iconfasong_icon {
+        .vh-line-send {
           font-size: 18px;
           color: @font-dark-normal;
+        }
+        &.disable {
+          cursor: default;
+          .vh-line-send {
+            color: #666666;
+          }
         }
       }
     }

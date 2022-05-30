@@ -12,8 +12,12 @@ export default function () {
   const isWechatBrowser = isWechat();
   const inviteCode = getQueryString('invite');
 
-  // 判断是否是微信分享来的
-  if (getQueryString('shareId') || getQueryString('share_id')) {
+  // 判断是否是微信分享来的 【判定若用户参会了，才创建邀请关系】
+  if (
+    roomBaseServer.state.watchInitData.join_info &&
+    roomBaseServer.state.watchInitData.join_info.join_id &&
+    (getQueryString('shareId') || getQueryString('share_id'))
+  ) {
     roomBaseServer.bindShare({
       share: getQueryString('shareId') || getQueryString('share_id')
     });

@@ -190,10 +190,21 @@
         const groupServer = useGroupServer();
         //收到问答开启消息
         qaServer.$on(qaServer.Events.QA_OPEN, msg => {
-          this.setVisible({ visible: true, type: 'v5' });
+          this.setVisible({
+            visible: true,
+            type: 'v5',
+            name:
+              this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                ? this.$t('common.common_1004')
+                : msg.data.name
+          });
           chatServer.addChatToList({
             content: {
-              text_content: this.$t('chat.chat_1026')
+              //观看端显示编辑后的问答名称，发起端不变，消息体默认返回“问答”
+              text_content:
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                  ? this.$t('chat.chat_1026', { n: this.$t('common.common_1004') })
+                  : this.$t('chat.chat_1026', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
             type: msg.data.type,
@@ -206,12 +217,27 @@
           this.setVisible({ visible: false, type: 'private' });
           chatServer.addChatToList({
             content: {
-              text_content: this.$t('chat.chat_1081')
+              text_content:
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                  ? this.$t('chat.chat_1081', { n: this.$t('common.common_1004') })
+                  : this.$t('chat.chat_1081', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
             type: msg.data.type,
             interactStatus: true
           });
+        });
+        //收到问答修改消息
+        qaServer.$on(qaServer.Events.QA_SET, msg => {
+          if (this.roleName == 2) {
+            this.setTabName({
+              type: 'v5',
+              name:
+                this.roleName != 2 || !msg.data.name || msg.data.name == '问答'
+                  ? this.$t('common.common_1004')
+                  : msg.data.name
+            });
+          }
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
@@ -306,10 +332,16 @@
 
         if (chatIndex <= -1) return;
         const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        const QAName =
+          this.roleName == 1 ||
+          !roomState.interactToolStatus.question_name ||
+          roomState.interactToolStatus.question_name == '问答'
+            ? this.$t('common.common_1004')
+            : roomState.interactToolStatus.question_name;
         this.addItemByIndex(index, {
           type: 'v5',
-          name: this.$t('common.common_1004'), // name只有自定义菜单有用，其他默认不采用而走i18n
-          text: this.$t('common.common_1004'), // 同上
+          name: QAName, // name只有自定义菜单有用，其他默认不采用而走i18n
+          text: QAName, // 同上
           visible: roomState.interactToolStatus.question_status && !this.isInGroup ? true : false,
           status: 3 //1 永久显示, 2 永久隐藏, 3 直播中、回放中显示, 4 停播、预约页显示
         });
@@ -441,15 +473,20 @@
        * @param {String} type 后端传过来的 menu type
        * @param {String|Number} id [非必传] 菜单id，由后端返得，特别是自定义菜单依赖menuId来显示内容
        */
-      setVisible({ visible = true, type, id }) {
+      setVisible({ visible = true, type, id, name }) {
         const tab = this.getItem({ type, id });
         if (!tab) return;
         tab.visible = visible;
+        name && (tab.name = name);
         if (tab.id == this.selectedId) {
           visible === false && this.jumpToNearestItemById(tab.id);
         }
       },
-
+      setTabName({ type, id, name }) {
+        const tab = this.getItem({ type, id });
+        if (!tab) return;
+        name && (tab.name = name);
+      },
       /**
        * 设置小红点的显隐
        * @param {Boolean} visible [true|false] 显隐值
