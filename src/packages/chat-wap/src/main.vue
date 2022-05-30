@@ -394,9 +394,10 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-        await this.chatServer.getHistoryMsg(data, 'h5');
+        const res = await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
         this.isLoading = false;
+        return res;
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
@@ -467,11 +468,11 @@
           return;
         }
         const offsetPos = this.pos;
-        await this.getHistoryMessage();
+        const { list } = await this.getHistoryMessage();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
           // alert(this.chatList.length - offsetPos);
-          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+          this.$refs.chatlist.scrollToIndex(list.length);
         });
       },
       // eventBus监听
