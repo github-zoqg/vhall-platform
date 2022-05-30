@@ -7,7 +7,7 @@
       <div class="msg-item interact">
         <div class="interact-msg">
           <template v-if="['question_answer_open', 'question_answer_close'].includes(source.type)">
-            {{ source.roleName | roleFilter }}
+            <span style="color: #595959">{{ source.roleName | roleFilter }}</span>
           </template>
           {{ source.content.text_content }}
         </div>
@@ -409,7 +409,7 @@
     .msg-showtime {
       padding: 15px 0 5px;
       font-size: 24px;
-      color: #888888;
+      color: #595959;
       text-align: center;
     }
     .msg-item {
@@ -584,14 +584,14 @@
           box-sizing: border-box;
           border-radius: 500px;
         }
-        color: #444;
+        color: #262626;
         p {
           text-align: center;
           line-height: 1;
         }
         .highlight {
           padding-left: 10px;
-          color: #007aff;
+          color: #0a7ff5;
         }
         .reward-text {
           margin-top: 13px;
@@ -634,7 +634,7 @@
         }
         .new-gift-content {
           font-size: 28px;
-          transform: scale(0.9);
+          // transform: scale(0.9);
           color: #262626;
         }
         .flex-box {
@@ -653,7 +653,7 @@
       }
       .new-gift-img,
       .new-award-img {
-        width: 40px;
+        width: 47px;
       }
       .reward_txt {
         color: #d67900;

@@ -7,6 +7,11 @@
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
+        class="vh-saas-iconfont vh-saas-line-public1"
+        @click="showPublic"
+        v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
+      ></i>
+      <i
         class="attention"
         :class="{
           'vh-iconfont vh-line-collection': attentionStatus == 0,
@@ -14,11 +19,6 @@
         }"
         v-if="groupInitData && !groupInitData.isInGroup && watchInitData.webinar.mode != 6"
         @click="attentionApi"
-      ></i>
-      <i
-        class="vh-saas-iconfont vh-saas-a-color-officialaccount"
-        @click="showPublic"
-        v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
       ></i>
     </span>
   </div>
