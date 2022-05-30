@@ -65,7 +65,6 @@
     methods: {
       // 去领奖
       takeAward(lottery) {
-        if (!this.available(lottery)) return; // 二次拦截
         this.$emit('takeAward', lottery);
       },
       close() {
@@ -201,9 +200,9 @@
         .dot {
           background: #fb3a32;
         }
-        .vmp-lottery-content {
-          cursor: pointer;
-        }
+        // .vmp-lottery-content {
+        //   cursor: pointer;
+        // }
       }
     }
     .vmp-lottery-content {

@@ -132,9 +132,20 @@
        * @description 提交中奖信息
        */
       handleTakeAward(lottery) {
+        let LotteryView = 'LotteryAccept';
+        if (lottery.take_award === 1) {
+          // 已领奖
+          LotteryView = 'LotterySuccess';
+        } else if (lottery.need_take_award === 1) {
+          // 尚未领取
+          LotteryView = 'LotteryAccept';
+        } else {
+          // 不需要领取
+          LotteryView = 'LotteryWin';
+        }
         this.lotteryId = lottery.id;
         this.setFitment(lottery);
-        this.lotteryView = 'LotteryAccept';
+        this.lotteryView = LotteryView;
         this.dialogVisible = true;
         this.zIndexServer.setDialogZIndex('lottery');
       },
