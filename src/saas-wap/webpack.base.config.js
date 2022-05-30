@@ -35,9 +35,8 @@ const htmlConfig = {
   cdnCss: {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     // Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
-    iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.2/iconfont.css',
-    iconfont: '//at.alicdn.com/t/font_3120276_xdf0iarge7e.css'
+    iconfontCommon: '//at.alicdn.com/t/font_3120276_xdf0iarge7e.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.2/iconfont.css'
   }
 };
 
