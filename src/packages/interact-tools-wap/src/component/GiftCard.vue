@@ -253,18 +253,19 @@
               open_id: open_id
             };
           } else {
-            params = {
-              gift_id: this.currentGift.id,
-              channel: 'WEIXIN',
-              service_code: 'H5_PAY',
-              room_id: this.localRoomInfo.roomId
-            };
             // 嵌入页不需要授权
             if (!this.isEmbed) {
               //重新授权
               payAuthStatus = 1;
               const payUrl = buildPayUrl(this.$route);
               authWeixinAjax(this.$route, payUrl, () => {});
+            } else {
+              params = {
+                gift_id: this.currentGift.id,
+                channel: 'WEIXIN',
+                service_code: 'H5_PAY',
+                room_id: this.localRoomInfo.roomId
+              };
             }
           }
         } else {
