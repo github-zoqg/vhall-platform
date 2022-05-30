@@ -232,6 +232,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.menuServer = useMenuServer();
+      this.chatServer.init();
     },
     created() {
       this.initViewData();
