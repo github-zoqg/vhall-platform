@@ -256,7 +256,7 @@
             params = {
               gift_id: this.currentGift.id,
               channel: 'WEIXIN',
-              service_code: 'JSAPI',
+              service_code: 'H5_PAY',
               room_id: this.localRoomInfo.roomId
             };
             // 嵌入页不需要授权
