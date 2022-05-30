@@ -1142,12 +1142,6 @@
           handleEndGroupDiscuss(msg);
         });
 
-        // 暂停讨论
-        this.groupServer.$on('group_switch_stop', msg => {
-          console.log('group_switch_stop', msg);
-          handleEndGroupDiscuss(msg);
-        });
-
         // 踢出小组
         this.groupServer.$on('ROOM_GROUP_KICKOUT', msg => {
           handleGroupKicked(msg);
