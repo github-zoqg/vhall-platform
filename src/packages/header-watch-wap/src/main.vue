@@ -204,15 +204,15 @@
     padding: 0 30px;
     .host-user-info {
       .ellipsis();
-      font-size: 30px;
-      line-height: 100px;
+      font-size: 28px;
+      line-height: 71px;
       width: 350px;
       .img-box {
         display: inline-block;
         border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        border: 2px solid #e3e3e3;
+        width: 48px;
+        height: 48px;
+        // border: 2px solid #e3e3e3;
         vertical-align: middle;
         margin-right: 10px;
       }
@@ -225,7 +225,7 @@
       justify-content: space-between;
       i {
         margin-left: 37px;
-        font-size: 38px;
+        font-size: 30px;
       }
     }
     .icon-default {

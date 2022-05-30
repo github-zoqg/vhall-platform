@@ -131,7 +131,7 @@
             </span>
           </p>
           <!-- 图文消息 -->
-          <div class="msg-content_body_pre" :class="multi ? 'multi' : ''">
+          <div class="msg-content_body_pre">
             <!-- 回复消息 -->
             <template
               v-if="
@@ -277,13 +277,13 @@
       }
     },
     computed: {
-      multi() {
-        if (this.msgContent.indexOf('<br/>') == -1) {
-          return false;
-        } else {
-          return true;
-        }
-      },
+      // multi() {
+      //   if (this.msgContent.indexOf('<br/>') == -1) {
+      //     return false;
+      //   } else {
+      //     return true;
+      //   }
+      // },
       showTime() {
         if (!this.source.sendTime) {
           return '';
@@ -424,7 +424,7 @@
         .chat-avatar {
           border-radius: 50%;
           display: block;
-          border: 2px solid #e3e3e3;
+          // border: 2px solid #e3e3e3;
           object-fit: cover;
         }
         .chat-phone {
@@ -442,12 +442,12 @@
           margin-bottom: 12px;
           height: 34px;
           .nickname {
-            font-size: 22px;
+            font-size: 28px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: #666;
+            color: #8c8c8c;
             max-width: 300px;
             line-height: 34px;
             margin-right: 8px;
@@ -459,16 +459,16 @@
             border-radius: 50px;
             font-size: 20px;
             &.host {
-              background-color: rgba(252, 86, 89, 0.2);
-              color: #fb3a32;
+              background-color: #ffd1c9;
+              color: #fb2626;
             }
             &.assistant {
-              background-color: rgba(166, 166, 166, 0.2);
-              color: #a6a6a6;
+              background-color: #ade1ff;
+              color: #0a7ff5;
             }
             &.guest {
-              background-color: rgba(77, 161, 255, 0.2);
-              color: #4da1ff;
+              background-color: #ade1ff;
+              color: #0a7ff5;
             }
           }
         }
@@ -481,14 +481,14 @@
             left: -11px;
             top: 14px;
           }
-          &.multi {
-            .msg-content_body {
-              padding: 12px;
-              .chat-text {
-                line-height: 39px;
-              }
-            }
-          }
+          // &.multi {
+          //   .msg-content_body {
+          //     padding: 12px;
+          //     .chat-text {
+          //       line-height: 39px;
+          //     }
+          //   }
+          // }
         }
         .reply-color {
           color: #4da1ff;
@@ -505,8 +505,9 @@
           display: inline-block;
           padding: 16px;
           word-break: break-all;
-          color: #444;
-          line-height: 36px;
+          color: #262626;
+          line-height: 40px;
+          font-size: 28px;
           background-color: #f7f7f7;
           border-radius: 8px;
           span {
@@ -514,7 +515,6 @@
           }
           .chat-text {
             display: block;
-            line-height: 28px;
           }
           .msg-content_chat-img {
             display: inline-block;
