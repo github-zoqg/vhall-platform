@@ -658,7 +658,7 @@
         const { list } = await this.getHistoryMsg();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+          this.$refs.chatlist.scrollToIndex(list.length);
         });
       },
       checkOverflow() {
