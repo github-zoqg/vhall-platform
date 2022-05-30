@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-wap">
+  <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
     <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
@@ -133,7 +133,9 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false
+        showSendBox: false,
+        //小屏适配
+        smFix: false
       };
     },
     watch: {
