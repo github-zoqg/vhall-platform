@@ -1,7 +1,7 @@
 <template>
   <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
-      <div class="send-box" @click="operateEmoji">
+      <div class="send-box" @touchstart.stop.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
           class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
@@ -44,10 +44,10 @@
         />
       </div>
       <div class="tools">
-        <div class="btn" @click="delInput">
+        <div class="btn" @touchstart="delInput">
           <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn send" @click="send">发送</div>
+        <div class="btn send" @touchstart="send">发送</div>
       </div>
     </div>
   </div>
@@ -218,6 +218,11 @@
       },
       operateEmoji() {
         this.showEmoji = !this.showEmoji;
+        this.$nextTick(() => {
+          if (this.showEmoji) {
+            this.$refs.textareaChat.blur();
+          }
+        });
         //设置只读属性可以暂时禁止键盘
         // this.$refs.textareaChat.$el.setAttribute('readonly', 'readonly');
         // this.$refs.textareaChat.focus();
