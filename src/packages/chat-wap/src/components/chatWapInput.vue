@@ -1,7 +1,7 @@
 <template>
   <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
-      <div class="send-box" @touchstart="operateEmoji">
+      <div class="send-box" @touchstart.stop.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
           class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
