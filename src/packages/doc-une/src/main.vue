@@ -736,6 +736,11 @@
             this.docServer.state.currentCid = '';
           }
         } else if (fileType === 'board') {
+          if (this.isInGroup && !this.docServer.state.switchStatus) {
+            // 小组中演示白板，需要调一下设置观众可见，否则生成的小组回放视频看不见白板
+            // 文档没有该问题，因为演示文档（默认观众可见）时，会调用一次设置观众可见
+            this.docServer.setSwitchStatus(true);
+          }
           // 切换到白板
           if (this.docServer.state.boardCid) {
             await this.docServer.activeContainer(this.docServer.state.boardCid);
