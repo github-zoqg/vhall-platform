@@ -643,11 +643,13 @@
         })
           .then(async () => {
             const res = await this.groupServer.groupDisband(id);
-            // 回放生成成功
-            if (res.data.record_id > 0) {
-              this.$message.success('小组回放视频生成成功');
-            } else {
-              this.$message.error('小组讨论视频生成失败');
+            if (this.groupServer.state.groupInitData.switch_status != 2) {
+              // 回放生成成功
+              if (res.data.record_id > 0) {
+                this.$message.success('小组回放视频生成成功');
+              } else {
+                this.$message.error('小组讨论视频生成失败');
+              }
             }
             await this.roomBaseServer.getInavToolStatus();
           })
