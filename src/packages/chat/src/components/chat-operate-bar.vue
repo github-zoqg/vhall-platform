@@ -102,7 +102,7 @@
                   @change="toggleMutedAllStatus"
                 />
               </div>
-              <div class="chat-setting-box__item">
+              <div class="chat-setting-box__item" v-if="2">
                 <el-checkbox
                   v-for="(item, index) in bannedMoudleList"
                   :key="index"
@@ -175,6 +175,10 @@
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
         );
+      },
+      //是否显示全体禁言复选框
+      showBannedCheckbox() {
+        return [1, '1'].includes(this.configList['ui.is_show_estoppel']);
       }
     },
     props: {

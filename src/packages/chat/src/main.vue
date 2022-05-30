@@ -227,6 +227,7 @@
       hideChatHistory() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
+
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
