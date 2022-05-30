@@ -57,7 +57,8 @@
           (watchInitData.webinar.mode == 3 ||
             watchInitData.webinar.no_delay_webinar == 1 ||
             watchInitData.webinar.mode == 6) &&
-          watchInitData.webinar.type == 1
+          watchInitData.webinar.type == 1 &&
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed
         );
       },
       // 是否开启举手
