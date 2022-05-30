@@ -44,10 +44,10 @@
         />
       </div>
       <div class="tools">
-        <div class="btn" @click="delInput">
+        <div class="btn" @touchstart="delInput">
           <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn send" @click="send">发送</div>
+        <div class="btn send" @touchstart="send">发送</div>
       </div>
     </div>
   </div>
