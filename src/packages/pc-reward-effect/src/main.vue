@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-reward-effect">
+  <div class="vmp-reward-effect" v-if="showEffectStatus">
     <transition-group name="right-left">
       <div
         v-for="rewardEffectInfo in rewardEffectList"
@@ -69,10 +69,11 @@
     useRoomBaseServer,
     useGiftsServer,
     useChatServer,
-    useWatchRewardServer
+    useWatchRewardServer,
+    useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/packages/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffect',
@@ -89,7 +90,7 @@
         //是否屏蔽特效
         hideEffect: false,
         rewardEffectList: [],
-        // rewardEffectInfo: null,
+        showEffectStatus: false, //是否显示礼物动画, 如果当前tab为聊天时才显示
         taskQueue: null // 飘窗列队
       };
     },
@@ -107,7 +108,7 @@
       this.watchRewardServer = useWatchRewardServer();
       this.giftsServer = useGiftsServer();
       this.chatServer = useChatServer();
-      console.log('wap this.roomBaseServer------->', this.roomBaseServer);
+      this.menuServer = useMenuServer();
       this.listenServer();
     },
 
@@ -238,6 +239,19 @@
             });
           }
         });
+        // 自定义菜单服务事件监听
+        this.menuServer.$on('tab-switched', data => {
+          console.log('reward-effect tab-switched------>', this.cuid, data);
+          /**
+           * { cuid, menuId }
+           * 如果当前tab 激活的是聊天
+           */
+          if (this.cuid == 'comPcRewardEffect' && data.type == 3) {
+            this.showEffectStatus = true;
+          } else {
+            this.showEffectStatus = false;
+          }
+        });
       },
       // 礼物用户头像
       gift_user_avatar(rewardEffectInfo) {
@@ -340,7 +354,7 @@
     overflow: hidden;
     padding-top: 8px;
     left: 16px;
-    top: 60px;
+    top: 45px;
     z-index: 100;
     .reward-effect-box {
       width: 234px;

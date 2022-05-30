@@ -364,10 +364,9 @@
         margin-left: 10px;
       }
       .vh-line-expression {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 0;
-        margin-bottom: 1px;
         &:hover {
           color: @active-color;
           cursor: pointer;
