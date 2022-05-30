@@ -240,8 +240,8 @@
               // 主持人
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
-                // 云导播隐藏桌面共享icon
-                if (this.streamYun) {
+                // 云导播/音频直播隐藏桌面共享icon
+                if (this.streamYun || this.webinarMode == 1) {
                   vn.setHiddenState(true);
                 }
                 vn.setDisableState(false);

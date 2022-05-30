@@ -253,6 +253,12 @@
               open_id: open_id
             };
           } else {
+            params = {
+              gift_id: this.currentGift.id,
+              channel: 'WEIXIN',
+              service_code: 'JSAPI',
+              room_id: this.localRoomInfo.roomId
+            };
             // 嵌入页不需要授权
             if (!this.isEmbed) {
               //重新授权
