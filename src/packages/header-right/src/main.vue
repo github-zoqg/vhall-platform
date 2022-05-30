@@ -32,11 +32,7 @@
       <!-- 嘉宾显示申请上麦按钮 -->
       <template v-if="roleName == 4 && isLiving && !isInGroup && deviceStatus != 2">
         <!-- 申请上麦按钮 -->
-        <div
-          v-if="!isApplying && !isSpeakOn"
-          class="vmp-header-right_btn"
-          @click="handleApplyClick"
-        >
+        <div v-if="!isApplying && !isSpeakOn" class="vmp-header-right_btn" @click="mediaCheckClick">
           申请上麦
         </div>
         <!-- 等待应答按钮 -->
@@ -211,6 +207,25 @@
       }
     },
     methods: {
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.handleApplyClick();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.handleApplyClick();
+              } else {
+                this.$message.warning(this.$t('interact.interact_1039'));
+              }
+            });
+        } else {
+          this.$message.warning(this.$t('interact.interact_1039'));
+        }
+      },
       // 嘉宾点击申请上麦
       handleApplyClick() {
         window.vhallReportForProduct?.report(110131);

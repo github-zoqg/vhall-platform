@@ -93,7 +93,8 @@
         const params = {
           room_id: useRoomBaseServer().state.watchInitData?.interact?.room_id,
           pos: pos || this.pageConfig.page,
-          limit: this.pageConfig.limit
+          limit: this.pageConfig.limit,
+          reset_device_status: 1
         };
 
         return this.memberServer
