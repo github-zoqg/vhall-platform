@@ -44,7 +44,7 @@ process.env.NODE_ENV = nodeEnv;
 btool.bootstripTip({
   Project: project,
   Version: pkg.version,
-  Environment: `.env.${vueMode}`,
+  Mode: `.env.${vueMode}`,
   NODE_ENV: nodeEnv
 });
 

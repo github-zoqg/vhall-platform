@@ -356,7 +356,7 @@
       },
       //提取url参数
       extractionUrlParams() {
-        const url = window.location.href;
+        const url = decodeURIComponent(window.location.href);
         const mapObj = {};
         if (url.indexOf('?') !== -1) {
           let _index = -1;

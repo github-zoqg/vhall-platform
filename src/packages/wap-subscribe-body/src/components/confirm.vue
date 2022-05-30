@@ -2,7 +2,8 @@
   <section class="subscribe-wap-auth" @click.self="close">
     <div>
       <div class="title-box">
-        <p class="title">{{ optionInfo.title || '' }}</p>
+        <!-- 7.0.6迭代删除
+        <p class="title">{{ optionInfo.title || '' }}</p> -->
         <p class="sub-title">{{ optionInfo.placeHolder || '' }}</p>
       </div>
       <div class="content">
