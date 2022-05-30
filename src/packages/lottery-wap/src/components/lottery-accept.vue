@@ -121,7 +121,6 @@
           .then(() => {
             this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
             this.lotteryServer.initIconStatus();
-            this.$toast(this.$t('interact_tools.interact_tools_1067'));
             if (this.showWinnerList) {
               this.$emit('navTo', 'LotterySuccess');
             } else {

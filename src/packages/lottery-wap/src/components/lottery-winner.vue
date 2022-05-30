@@ -41,7 +41,7 @@
       padding: 0 24px;
     }
     .lottery-winner-wrap {
-      max-height: 435px;
+      height: 440px;
       background: rgba(#fff, 0.8);
       border-radius: 16px;
     }
