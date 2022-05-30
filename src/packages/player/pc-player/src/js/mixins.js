@@ -134,6 +134,7 @@ const playerMixins = {
       // 结束直播
       this.playerServer.$on('live_over', data => {
         console.log(data);
+        this.playerServer && this.playerServer.destroy();
         this.isLivingEnd = true;
       });
       // 支付成功

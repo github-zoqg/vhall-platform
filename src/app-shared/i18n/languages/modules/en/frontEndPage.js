@@ -491,7 +491,11 @@ export default {
     interact_tools_1072: 'QR code',
     interact_tools_1073: 'Reward {n}',
     interact_tools_1074: 'Unfortunately',
-    interact_tools_1075: 'Applaud'
+    interact_tools_1075: 'Applaud',
+    interact_tools_1076: 'Records',
+    interact_tools_1077: 'To get',
+    interact_tools_1078: 'Got',
+    interact_tools_1079: 'Winning'
   },
   setting: {
     setting_1002: 'View settings',
@@ -576,9 +580,9 @@ export default {
     cash_1009:
       'Amount ranging from 1 to 800 Yuan can be withdrawn online at one time. At the request of State Taxation Administration, single withdrawal of more than 800 Yuan by individual users will incur personal income tax. Please send the following information to finance@vhall.com.',
     cash_1010:
-      'Individual users: System account, name, ID number,\nBanking information (account holder, account number, bank name)',
+      'Individual users: System account, name, ID number,\r\nBanking information (account holder, account number, bank name)',
     cash_1011:
-      'Corporate users: Scanned copy of System account and business license with official seal\nBanking information (account holder, account number, bank name)',
+      'Corporate users: Scanned copy of System account and business license with official seal\r\nBanking information (account holder, account number, bank name)',
     cash_1012:
       'Company/personal information and banking information must correspond with each other',
     cash_1013: 'Does the withdraw occur any charge, and if yes, how much?',
@@ -595,7 +599,7 @@ export default {
     cash_1022: 'Done and continue to withdraw',
     cash_1023: 'Scan QR-code with WeChat to blnd your account',
     cash_1024: 'Then the withdrawal will continue',
-    cash_1025: 'Please enter the withdrawal amount',
+    cash_1025: 'Please enter the withdrawal amount (maximum ¥800  for a single transaction)',
     cash_1026: 'WeChat',
     cash_1027: 'Withdraw now',
     cash_1028: 'I consent',
@@ -741,7 +745,9 @@ export default {
     interact_1038:
       'The organizer has turned on the video tour function, and you will see your video screen on the host\'s side. Please ensure that the video equipment is all normal, and click "{n}" to set the media.',
     interact_1039:
-      'Only after obtaining the permission of camera and microphone can you participate in the connection'
+      'Only after obtaining the permission of camera and microphone can you participate in the connection',
+    interact_1040:
+      'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions'
   },
   doc: {
     doc_1001: 'This documentation is loading',

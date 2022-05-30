@@ -56,7 +56,12 @@
   </section>
 </template>
 <script>
-  import { useMicServer, useInteractiveServer, useMsgServer } from 'middle-domain';
+  import {
+    useMicServer,
+    useInteractiveServer,
+    useMsgServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   export default {
     name: 'Handup',
     data() {
@@ -149,7 +154,7 @@
         if (this.lowerWheatFun) {
           return;
         }
-        this.applyMic();
+        this.mediaCheckClick();
       },
       // 打开连麦弹框
       openConnectPop() {
@@ -158,6 +163,27 @@
       // 关闭弹窗
       closeConnectPop() {
         this.showConnectMic = false;
+      },
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.applyMic();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.applyMic();
+              } else {
+                this.$toast(this.$t('interact.interact_1040'));
+                this.closeConnectPop();
+              }
+            });
+        } else {
+          this.$toast(this.$t('interact.interact_1040'));
+          this.closeConnectPop();
+        }
       },
       // 主动上麦方法
       applyMic() {

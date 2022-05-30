@@ -26,6 +26,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
   import { getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -76,28 +77,25 @@
         // 初始化数据上报
         console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
         // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
-        domain.initVhallReport(
-          {
-            bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-            webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            os: getVhallReportOs(),
-            type: 2, //播放平台 2: wap
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            pf: 3, // wap
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-          },
-          {
-            namespace: 'saas', //业务线
-            env: 'test', // 环境
-            method: 'post' // 上报方式
-          }
-        );
+        domain.initVhallReport({
+          bu: 0,
+          user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+          webinar_id: this.$route.params.id,
+          t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          os: getVhallReportOs(),
+          type: 2, //播放平台 2: wap
+          entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          pf: 3, // wap
+          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+        });
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
         this.addEventListener();
+        //上报日志
+        logRoomInitSuccess();
       } catch (err) {
+        //上报日志
+        logRoomInitFailed({ error: err });
         console.error('---初始化直播房间出现异常--', err);
         console.error(err);
         this.state = 2;
@@ -129,6 +127,12 @@
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
             ...this.$route.query // 第三方地址栏传参
+          },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            method: 'post' // 上报方式
           }
         });
       },
