@@ -54,7 +54,11 @@
       },
       // 是否为云导播活动
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
+            1
+        );
       },
       // 是否开启了插播
       isInsertFilePushing() {
