@@ -109,7 +109,13 @@
           lotteryView = 'LotteryPending';
         } else {
           const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
-          if (winLotteryHistory.length) {
+          if (winLotteryHistory.length === 1) {
+            // 只有一个中奖,显示中奖结果
+            this.lotteryId = lastLottery.lottery_id;
+            this.setFitment(lastLottery);
+            lotteryView = 'LotteryWin';
+          } else if (winLotteryHistory.length > 1) {
+            // 两条以上中奖记录,显示中奖历史
             this.winLotteryHistory = winLotteryHistory;
             lotteryView = 'LotteryHistory';
           } else {
@@ -188,6 +194,7 @@
             ? this.lotteryServer.Events.LOTTERY_WIN
             : this.lotteryServer.Events.LOTTERY_MISS
         );
+        this.lotteryServer.initIconStatus(); // 更新小红点的显隐
         await this.changeView(lotteryResult ? 'LotteryWin' : 'LotteryMiss');
       },
       close() {

@@ -96,40 +96,6 @@
         });
       },
       /**
-       * @description 点击聊天获取抽奖内容
-       */
-      async open3(uuid = '') {
-        try {
-          const res = await this.lotteryServer.checkLottery(uuid);
-          const data = res.data;
-          this.lotteryId = data.id;
-          this.showWinnerList = !!data.publish_winner;
-          this.needTakeAward = !!data.need_take_award;
-          if (data.lottery_status === 0) {
-            // 抽奖进行中
-            this.setFitment(data);
-            this.lotteryView = 'LotteryPending';
-          } else {
-            this.setFitment(data);
-            if (data.win === 1) {
-              // 中奖
-              if (data.take_award) {
-                this.lotteryView = 'LotterySuccess';
-              } else {
-                this.lotteryView = 'LotteryWin';
-              }
-            } else {
-              // 未中奖
-              this.lotteryView = 'LotteryMiss';
-            }
-          }
-          this.dialogVisible = true;
-          this.zIndexServer.setDialogZIndex('lottery');
-        } catch (e) {
-          console.error('查询抽奖状态接口: ', e);
-        }
-      },
-      /**
        * @description 点击聊天按钮
        */
       async handleClickIcon() {
@@ -142,9 +108,14 @@
           this.setFitment(lastLottery);
           this.lotteryView = 'LotteryPending';
         } else {
-          this.lotteryView = 'LotteryHistory';
           const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
-          if (winLotteryHistory.length) {
+          if (winLotteryHistory.length === 1) {
+            // 只中奖一次,显示该次中奖结果
+            this.lotteryId = lastLottery.lottery_id;
+            this.lotteryView = 'LotteryWin';
+            this.setFitment(lastLottery);
+          } else if (winLotteryHistory.length > 1) {
+            // 中奖记录2条以上显示中奖历史
             this.lotteryServer.$emit('ShowHistory', winLotteryHistory); // 弹起中奖历史
             return false;
           } else {
@@ -243,6 +214,7 @@
             ? this.lotteryServer.Events.LOTTERY_WIN
             : this.lotteryServer.Events.LOTTERY_MISS
         );
+        this.lotteryServer.initIconStatus(); // 更新小红点的显隐
       },
       close() {
         this.dialogVisible = false;
