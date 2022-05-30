@@ -140,7 +140,7 @@
         window.addEventListener('focusin', this.focusinIOS);
         window.addEventListener('focusout', this.focusoutIOS);
       }
-      this.initEvent();
+      // this.initEvent();
       this.eventListener();
       window.aaaa = this.scrollBottom;
     },
