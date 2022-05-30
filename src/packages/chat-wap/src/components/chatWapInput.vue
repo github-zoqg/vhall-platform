@@ -29,7 +29,7 @@
         @focus="handleOnFocus"
       ></el-input>
       <div class="send-box">
-        <div class="send-menu" @click="send">
+        <div class="send-menu" @touchstart="send">
           <span class="iconfonts vh-iconfont vh-line-send"></span>
         </div>
       </div>
