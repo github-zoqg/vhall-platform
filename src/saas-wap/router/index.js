@@ -127,25 +127,25 @@ const router = new VueRouter({
   routes
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const res = await grayInit(to);
-//   if (res) {
-//     console.log('---grayInit---', res);
-//     //处理限流逻辑
-//     if (res.code == 200) {
-//       wxAuthCheck(to, next);
-//     } else {
-//       next({
-//         name: 'PageError',
-//         params: {
-//           id: to.params.id,
-//           code: res.code
-//         }
-//       });
-//     }
-//   } else {
-//     wxAuthCheck(to, next);
-//   }
-// });
+router.beforeEach(async (to, from, next) => {
+  const res = await grayInit(to);
+  if (res) {
+    console.log('---grayInit---', res);
+    //处理限流逻辑
+    if (res.code == 200) {
+      wxAuthCheck(to, next);
+    } else {
+      next({
+        name: 'PageError',
+        params: {
+          id: to.params.id,
+          code: res.code
+        }
+      });
+    }
+  } else {
+    wxAuthCheck(to, next);
+  }
+});
 
 export default router;
