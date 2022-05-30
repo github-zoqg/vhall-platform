@@ -83,7 +83,7 @@
           </div>
         </div>
       </div>
-      <div class="subscribe_tabs">
+      <div :class="showBottomBtn ? 'subscribe_tabs' : ''">
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>

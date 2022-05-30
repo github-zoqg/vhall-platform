@@ -39,6 +39,11 @@
       this.menuServer = useMenuServer();
       this.recommendServer = useRecommendServer();
     },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      }
+    },
     mounted() {
       this.setDefaultAdvs();
       this.initScroll();
@@ -136,11 +141,11 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: auto;
+    overflow-y: auto;
     .vmp-recommend-list {
       display: block;
       width: 100%;
-      height: 100%;
+      // height: 100%;
       margin-bottom: 100px;
       overflow: hidden;
     }

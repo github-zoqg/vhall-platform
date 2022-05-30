@@ -60,6 +60,11 @@
         pos: 0
       };
     },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      }
+    },
     // props: ['goodList', 'goodsListInfo'],
     // watch: {
     //   // goodList: {
