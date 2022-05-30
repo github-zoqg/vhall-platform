@@ -80,6 +80,7 @@
     </div>
     <chat-wap-input
       ref="chatWapInput"
+      :refName="refName"
       @sendMsg="sendMessage"
       :showTabType="currentTab"
     ></chat-wap-input>
@@ -150,6 +151,11 @@
       onlineMicStatus: {
         type: Boolean,
         default: false
+      },
+      //父组件的ref
+      refName: {
+        type: String,
+        default: 'chatWap'
       }
     },
     filters: {

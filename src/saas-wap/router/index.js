@@ -22,18 +22,20 @@ const routes = [
     redirect: to => {
       if (to.query.embed === 'video') {
         // 单视频嵌入
-        return {
-          name: 'LiveEmbedVideoRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientvideo'));
+        // return {
+        //   name: 'LiveEmbedVideoRoom',
+        //   query: to.query,
+        //   params: to.params
+        // };
       } else {
         // 完全嵌入
-        return {
-          name: 'LiveEmbedFullRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientfull'));
+        // return {
+        //   name: 'LiveEmbedFullRoom',
+        //   query: to.query,
+        //   params: to.params
+        // };
       }
     }
   },

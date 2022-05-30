@@ -352,6 +352,9 @@
       this.playerServer = usePlayerServer();
       this.subscribeServer = useSubscribeServer();
     },
+    beforeDestroy() {
+      this.playerServer.destroy();
+    },
     computed: {
       // 是否观看端
       isWatch() {
