@@ -124,9 +124,12 @@
         return (
           (this.userInfo.role_name == 1 || this.userInfo.role_name == 4) &&
           // 不是云导播
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director != 1 &&
-          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] !=
-            1
+          !(
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.permissionKey[
+              'webinar.director'
+            ] == 1
+          )
         );
       },
       // 是否为云导播活动
