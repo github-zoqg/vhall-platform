@@ -647,7 +647,7 @@
             if (res.data.record_id > 0) {
               this.$message.success('小组回放视频生成成功');
             } else {
-              this.$message.error('小组讨论视频时长过短，不支持生成回放');
+              this.$message.error('小组讨论视频生成失败');
             }
             await this.roomBaseServer.getInavToolStatus();
           })
