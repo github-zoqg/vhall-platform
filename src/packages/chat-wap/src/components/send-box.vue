@@ -246,6 +246,7 @@
         //注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
