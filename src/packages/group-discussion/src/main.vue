@@ -688,6 +688,10 @@
       },
       // 暂停讨论
       handlePauseDiscussion() {
+        if (this._isNotAllowPauseOrProceed) {
+          this.$message('请勿频繁操作');
+          return;
+        }
         this.$confirm('暂停讨论，全部组员将返回到主直播间，确定暂停讨论？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -696,6 +700,10 @@
         }).then(() => {
           // 暂停讨论
           this.groupServer.pauseDiscussion().then(() => {
+            this._isNotAllowPauseOrProceed = true;
+            setTimeout(() => {
+              this._isNotAllowPauseOrProceed = false;
+            }, 10000);
             // 设置groupServer中的分组状态
             this.groupServer.setGroupInitData('switch_status', 3);
             console.warn('暂停讨论成功');
@@ -705,6 +713,10 @@
       },
       // 继续讨论
       handleProceedDiscussion() {
+        if (this._isNotAllowPauseOrProceed) {
+          this.$message('请勿频繁操作');
+          return;
+        }
         this.$confirm('确定是否继续讨论？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -713,6 +725,10 @@
         }).then(() => {
           // 继续讨论
           this.groupServer.proceedDiscussion().then(() => {
+            this._isNotAllowPauseOrProceed = true;
+            setTimeout(() => {
+              this._isNotAllowPauseOrProceed = false;
+            }, 10000);
             // 设置groupServer中的分组状态
             this.groupServer.setGroupInitData('switch_status', 1);
             console.warn('继续讨论成功');
