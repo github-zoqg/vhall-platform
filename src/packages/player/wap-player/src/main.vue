@@ -436,10 +436,6 @@
       this.lang = this.roomBaseServer.state.languages.lang;
     },
     mounted() {
-      if (this.isAudio) {
-        this.changePlayerSize(true);
-        // document.querySelector('.vmp-basic-bd').classList.add('small_player');
-      }
       let isMES = false;
       VhallPlayer.probe({}, data => {
         isMES = data.MediaSourceExtensions;
