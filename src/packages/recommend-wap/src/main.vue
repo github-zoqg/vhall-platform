@@ -39,15 +39,20 @@
       this.menuServer = useMenuServer();
       this.recommendServer = useRecommendServer();
     },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      }
+    },
     mounted() {
       this.setDefaultAdvs();
-      this.initScroll();
-      this.menuServer.$on('tab-switched', async data => {
-        if (this.cuid === data.cuid) {
-          await this.$nextTick();
-          this.scroll && this.scroll.refresh();
-        }
-      });
+      // this.initScroll();
+      // this.menuServer.$on('tab-switched', async data => {
+      //   if (this.cuid === data.cuid) {
+      //     await this.$nextTick();
+      //     this.scroll && this.scroll.refresh();
+      //   }
+      // });
     },
     methods: {
       /**
@@ -136,11 +141,11 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: auto;
+    overflow-y: auto;
     .vmp-recommend-list {
       display: block;
       width: 100%;
-      height: 100%;
+      // height: 100%;
       margin-bottom: 100px;
       overflow: hidden;
     }
