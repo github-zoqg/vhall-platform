@@ -104,8 +104,24 @@
     mounted() {
       this.eventListener();
       console.log('userAgent:', navigator.userAgent);
+      const IsMse = isMse();
+      if (IsMse.os === 'ios') {
+        window.addEventListener('focusin', this.focusinIOS);
+        window.addEventListener('focusout', this.focusoutIOS);
+      }
     },
     methods: {
+      focusoutIOS() {
+        // 键盘收起事件处理
+        //  // alert('iphone 键盘收起事件处理');
+        document.querySelector('body').classList.remove('fixIphoneX');
+      },
+      focusinIOS() {
+        // 键盘弹出事件处理
+        // alert('iphone 键盘弹出事件处理');
+        // this.scrollBottom();
+        document.querySelector('body').classList.add('fixIphoneX');
+      },
       //显示模态窗
       openModal(text = '') {
         if (!['', null, void 0].includes(text)) {
@@ -223,6 +239,16 @@
 </script>
 
 <style lang="less">
+  // body {
+  //   padding-bottom: 0 !important;
+  // }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+    .fixIphoneX {
+      padding-bottom: 0 !important;
+    }
+  }
+
   .smFix {
     .chat-input-modal {
       position: fixed !important;
@@ -246,6 +272,7 @@
       left: 0 !important;
       margin-top: 0 !important;
     }
+
     &::after {
       content: '';
       position: absolute;
