@@ -13,6 +13,8 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+
   import ComponentDesimg from './components/component-desimg.vue';
   import ComponentQrcode from './components/component-qrcode.vue';
   import ComponentTitle from './components/component-title.vue';
@@ -71,6 +73,14 @@
               menu.componentName = `component-${componentMap[menu.component_id]}`;
               return menu;
             });
+          } else if (res.code === 513059) {
+            // 当前自定义菜单被删除 v7.1.3新增
+            // 增加toask提示，并删除该menu tap
+            // 点击桌面共享
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitDeleteMenu', [{ visible: false, type: '', id }])
+            );
+            this.$toast(res.msg);
           }
         } catch (error) {
           this.loading = false;

@@ -27,6 +27,7 @@
             </p>
           </template>
         </main>
+        <!-- 7.0.6迭代删除
         <div
           class="vmp-intro-block__auth"
           v-if="
@@ -57,7 +58,7 @@
                 : ''
             }}
           </span>
-        </div>
+        </div> -->
       </section>
       <section class="vmp-intro-block vmp-intro-block-content">
         <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
@@ -239,7 +240,8 @@
 
         img {
           margin: 16px 0;
-          width: 100%;
+          max-width: 100%;
+          height: auto;
         }
         strong {
           font-weight: bold;

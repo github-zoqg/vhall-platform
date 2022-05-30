@@ -17,6 +17,12 @@
           @click="initPage"
         />
         问卷
+        <span class="headBtnGroup" v-if="showTip">
+          <el-button type="text" @click="openSet" class="name_set_button">
+            修改「问卷」显示名称
+          </el-button>
+          <i class="vh-iconfont vh-line-question" @click="showPreview"></i>
+        </span>
       </header>
       <section class="question__content">
         <div class="vhall-question__content" v-show="showQuestionnaireTable">
@@ -75,7 +81,7 @@
                     <span class="vhall-question__content-list__colmun-action">
                       <span class="item" @click="publish(item)">推送</span>
                       <span class="item" @click="prevQuestion(item.question_id)">预览</span>
-                      <span class="item" @click="editQuestion(item.question_id)">编辑</span>
+                      <span class="item" @click="editQuestion(item)">编辑</span>
                       <span @click.prevent.stop class="item">
                         <el-dropdown
                           @command="handleCommand"
@@ -135,6 +141,7 @@
         </section>
       </section>
     </el-dialog>
+
     <el-dialog
       :visible.sync="saveDialogVisible"
       custom-class="save-dialog"
@@ -155,6 +162,54 @@
           确 定
         </el-button>
         <el-button @click="saveQuestionnaire(false)" round>取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 别名设置弹框 -->
+    <el-dialog :visible.sync="dialogNameSet" custom-class="save-dialog" width="400px" title="提示">
+      <div>
+        <div class="async__ctx">
+          <el-input v-model="alias" :placeholder="'请输入名称'" maxlength="8">
+            <div slot="suffix" style="font-size: 10px; color: #999; margin-top: 13px">
+              <span
+                :style="{
+                  color: alias.length == 8 ? '#fb3a32' : alias.length > 0 ? '#3562fa' : '#999'
+                }"
+              >
+                {{ alias.length }}
+              </span>
+              <span>/</span>
+              <span>8</span>
+            </div>
+          </el-input>
+          <p class="setname_tip">
+            可将名称修改为「投票」「报名」等，修改后用户观看直播时看到的是修改后的名称
+          </p>
+        </div>
+        <div class="setname_button">
+          <el-button type="primary" size="medium" @click="saveAlias" round>保存</el-button>
+          <el-button
+            plain
+            size="medium"
+            @click="closeDialogNameSet"
+            round
+            class="hover_button_cancel"
+          >
+            取消
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 图列展示弹框 -->
+    <el-dialog
+      :visible.sync="dialogPreview"
+      custom-class="preview_dialog"
+      width="740px"
+      :show-close="true"
+    >
+      <div class="img_base">
+        <img src="./images/Q_preview.png" alt="" class="img_size" />
       </div>
     </el-dialog>
   </div>
@@ -190,7 +245,11 @@
         shareQuestionnaire: true, // 同步到管理
         prevQuestionnaireId: false, // 显示预览状态的相关UI
         saving: false, //保存中的状态
-        totalPages: 0 // 总页数
+        totalPages: 0, // 总页数
+        dialogNameSet: false,
+        dialogPreview: false,
+        alias: '问卷',
+        showTip: false
       };
     },
     computed: {
@@ -232,6 +291,7 @@
       },
       initPage() {
         this.firstLoad = false;
+        this.showTip = false;
         this.showQuestionnaireTable = true;
         this.prevQuestionnaireId = null;
         this.queryQuestionnaireList(true);
@@ -317,15 +377,21 @@
         this.showQuestionnaireTable = false;
         this.prevQuestionnaireId = null;
         this.questionnaireServer.renderCreatQuestionnaire(selector);
+        this.showTip = true;
+        // 若当前是创建出发，alias别名设置为 ‘’
+        this.alias = '问卷';
       },
       /**
        * @description 编辑问卷
        */
-      editQuestion(id) {
+      editQuestion(row) {
+        console.log(row, '131231');
         const selector = '#qn-server-box';
         this.showQuestionnaireTable = false;
+        this.showTip = true;
         this.prevQuestionnaireId = null;
-        this.questionnaireServer.renderCreatQuestionnaire(selector, id);
+        this.alias = row.alias || '问卷';
+        this.questionnaireServer.renderCreatQuestionnaire(selector, row.question_id);
       },
       setReportData(data) {
         const { id, title, description, detail, imgUrl } = data;
@@ -547,10 +613,14 @@
         this.saveDialogVisible = false;
         this.showQuestionnaireTable = true;
         this.saving = true;
+        if (this.alias) {
+          this.questionnaireCreateInfo.alias = this.alias;
+        }
         this.questionnaireServer
           .saveQuestionnaire(this.questionnaireCreateInfo, this.shareQuestionnaire && confirm)
           .then(res => {
             console.log('saveQuestionnaire', res);
+            this.showTip = false;
             if (confirm) {
               // 确认同步才需要弹窗提示
               this.$message({
@@ -611,7 +681,13 @@
       },
       // 复制
       copy(id) {
-        this.questionnaireServer.copyQuestionnaire(id).then(res => {
+        const params = {
+          surveyId: id
+        };
+        if (this.alias) {
+          params.alias = this.alias;
+        }
+        this.questionnaireServer.copyQuestionnaire(params).then(res => {
           this.$message({
             type: res.code == 200 ? 'success' : 'error',
             message: res.msg
@@ -681,15 +757,63 @@
         this.queryParams.pageNum++;
         this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
         this.queryQuestionnaireList();
+      },
+      // 问卷别名设置
+      openSet() {
+        this.dialogNameSet = true;
+      },
+      // 确定 or 取消的时候，数据还原。若为‘’，默认为问卷
+      closeDialogNameSet() {
+        this.dialogNameSet = false;
+        this.alias = this.alias || '问卷';
+      },
+      // 问卷别名设置样式预览
+      showPreview() {
+        this.dialogPreview = true;
+      },
+      // 问卷别名修改
+      saveAlias() {
+        this.questionnaireServer.setAlias(this.alias);
+        this.dialogNameSet = false;
       }
     }
   };
 </script>
 <style lang="less">
   .questionnaire-lve {
+    .vh-line-question {
+      color: #999;
+    }
     .el-dialog__wrapper {
       height: 100vh;
       overflow: hidden;
+    }
+    .preview_dialog {
+      .img_base {
+        padding: 4px;
+        border-radius: 4px;
+        background: #000;
+        img {
+          width: 100%;
+        }
+      }
+      .el-dialog__header {
+        padding: 0;
+      }
+      .el-dialog__body {
+        height: 0px;
+        padding: 0;
+      }
+      .el-dialog__headerbtn {
+        right: 0px;
+        top: -30px;
+        .el-dialog__close {
+          color: white;
+        }
+      }
+      .img_size {
+        width: 100%;
+      }
     }
   }
   .questionnaire-dialog {
@@ -732,6 +856,22 @@
         border-top-color: #fff;
       }
     }
+  }
+  .setname_tip {
+    margin-top: 10px;
+    color: #666;
+  }
+  .setname_button {
+    text-align: right;
+    margin-top: 10px;
+    .hover_button_cancel:hover {
+      color: #fb3a32;
+      border-color: #fb3a32;
+    }
+  }
+  .name_set_button {
+    margin-right: 8px;
+    color: #3562fa !important;
   }
 </style>
 <style lang="less">

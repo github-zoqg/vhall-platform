@@ -200,7 +200,6 @@
       handleClick(type) {
         this.tabType = type;
         this.dataList = [];
-        this.tabType === 'live' ? (this.tabList[0].total = 0) : (this.tabList[1].total = 0);
         this.searchHandle();
       },
       getPlanFunc() {
@@ -233,6 +232,7 @@
       searchHandle() {
         this.query.pos = 0;
         this.query.pageNumber = 1;
+        this.tabList.total = 0;
         this.getDataList();
       },
       // 区分是获取直播列表 还是 主题列表
@@ -260,7 +260,7 @@
           .then(res => {
             this.isBool = true;
             this.loading = false;
-            if (res && res.code === 200) {
+            if (res && res.code === 200 && this.tabType === 'live') {
               const list = res.data.list;
               list.map(item => {
                 item.share_link = `${
@@ -278,7 +278,7 @@
                 console.log('触发了结尾');
                 this.isPullingDown = false;
               }
-              this.tabList[0].total = res.data.total;
+              this.tabList.total = res.data.total;
             }
           })
           .catch(error => {
@@ -286,7 +286,7 @@
             console.log('触发了异常this.isBool', this.isBool);
             console.log(error);
             this.dataList = [];
-            this.tabList[0].total = 0;
+            this.tabList.total = 0;
             this.loading = false;
           });
       },
@@ -308,28 +308,30 @@
             this.isBool = true;
             console.log('this.isBool', this.isBool);
             this.loading = false;
-            const list = res.data.list || [];
-            list.map(item => {
-              item.share_link = `${
-                window.location.origin +
-                (process.env.VUE_APP_WAP_WATCH || '') +
-                process.env.VUE_APP_ROUTER_BASE_URL
-              }/special/detail?id=${item.id}`;
-            });
-            if (list.length > 0) {
-              // this.dataList.unshift(...list);
-              this.dataList = this.dataList.concat(list);
-            } else {
-              this.isPullingDown = false;
+            if (res && res.code === 200 && this.tabType !== 'live') {
+              const list = res.data.list || [];
+              list.map(item => {
+                item.share_link = `${
+                  window.location.origin +
+                  (process.env.VUE_APP_WAP_WATCH || '') +
+                  process.env.VUE_APP_ROUTER_BASE_URL
+                }/special/detail?id=${item.id}`;
+              });
+              if (list.length > 0) {
+                // this.dataList.unshift(...list);
+                this.dataList = this.dataList.concat(list);
+              } else {
+                this.isPullingDown = false;
+              }
+              this.tabList.total = res.data.total;
             }
-            this.tabList[1].total = res.data.total;
           })
           .catch(error => {
             this.isBool = true;
             console.log('this.isBool', this.isBool);
             console.log(error);
             this.dataList = [];
-            this.tabList[1].total = 0;
+            this.tabList.total = 0;
             this.loading = false;
           })
           .finally(() => {});
