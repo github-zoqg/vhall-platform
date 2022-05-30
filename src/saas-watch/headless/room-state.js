@@ -15,7 +15,6 @@ import {
 } from 'middle-domain';
 
 export default async function () {
-  console.log('----------------测试异步--------------------------服务初始化开始-----------');
   console.log('%c------服务初始化 开始', 'color:blue');
   const roomBaseServer = useRoomBaseServer();
   const msgServer = useMsgServer();

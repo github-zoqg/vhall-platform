@@ -93,9 +93,7 @@
           } catch (e) {
             console.log('嵌入', e);
           }
-          console.log('----------------测试异步--------------------------初始化房间前-----------');
           const domain = await this.initReceiveLive(this.clientType);
-          console.log('----------------测试异步--------------------------初始化房间后-----------');
           await roomState();
           // 是否跳转预约页
           if (
