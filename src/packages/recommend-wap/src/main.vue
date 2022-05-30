@@ -46,13 +46,13 @@
     },
     mounted() {
       this.setDefaultAdvs();
-      // this.initScroll();
-      // this.menuServer.$on('tab-switched', async data => {
-      //   if (this.cuid === data.cuid) {
-      //     await this.$nextTick();
-      //     this.scroll && this.scroll.refresh();
-      //   }
-      // });
+      this.initScroll();
+      this.menuServer.$on('tab-switched', async data => {
+        if (this.cuid === data.cuid) {
+          await this.$nextTick();
+          this.scroll && this.scroll.refresh();
+        }
+      });
     },
     methods: {
       /**
