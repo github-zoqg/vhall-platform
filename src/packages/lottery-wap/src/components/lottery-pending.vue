@@ -23,7 +23,9 @@
     >
       {{ $t('interact_tools.interact_tools_1008') }}
     </button>
-    <i class="vh-iconfont vh-line-circle-close vmp-close-btn" @click="close"></i>
+    <div class="close-btn-wrap">
+      <i class="vh-iconfont vh-line-circle-close vmp-close-btn" @click="close"></i>
+    </div>
   </div>
 </template>
 <script>
@@ -152,8 +154,11 @@
         background: linear-gradient(273.19deg, #046ffd 7.83%, #00b9f5 97.59%);
       }
     }
-    .vmp-close-btn {
+    .close-btn-wrap {
       margin-top: 45px;
+      text-align: center;
+    }
+    .vmp-close-btn {
       color: #fff;
       font-size: 54px;
     }

@@ -99,32 +99,39 @@
        */
       async handleClickIcon() {
         const list = await this.lotteryServer.initIconStatus();
-        if (!list.length) return; // 没有抽奖历史,不可能有点击事件
-        const lastLottery = list[0]; // 倒序排列
         let lotteryView = 'LotteryPending';
-        if (lastLottery.lottery_status === 0) {
-          // 抽奖中,显示抽奖面板
-          // 抽奖进行中
-          this.setFitment(lastLottery);
-          lotteryView = 'LotteryPending';
-        } else {
-          const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
-          if (winLotteryHistory.length === 1) {
-            // 只有一个中奖,显示中奖结果
-            this.lotteryId = lastLottery.lottery_id;
+        const lotteryMiss = () => {
+          // 弹出无中奖
+          this.showWinnerList = false;
+          this.prizeInfo = {};
+          lotteryView = 'LotteryMiss';
+        };
+        if (list.length) {
+          const lastLottery = list[0]; // 倒序排列
+          if (lastLottery.lottery_status === 0) {
+            // 抽奖中,显示抽奖面板
+            // 抽奖进行中
             this.setFitment(lastLottery);
-            lotteryView = 'LotteryWin';
-          } else if (winLotteryHistory.length > 1) {
-            // 两条以上中奖记录,显示中奖历史
-            this.winLotteryHistory = winLotteryHistory;
-            lotteryView = 'LotteryHistory';
+            lotteryView = 'LotteryPending';
           } else {
-            // 弹出无中奖
-            this.showWinnerList = false;
-            this.prizeInfo = {};
-            lotteryView = 'LotteryMiss';
+            const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
+            if (winLotteryHistory.length === 1) {
+              // 只有一个中奖,显示中奖结果
+              this.lotteryId = lastLottery.lottery_id;
+              this.setFitment(lastLottery);
+              lotteryView = 'LotteryWin';
+            } else if (winLotteryHistory.length > 1) {
+              // 两条以上中奖记录,显示中奖历史
+              this.winLotteryHistory = winLotteryHistory;
+              lotteryView = 'LotteryHistory';
+            } else {
+              lotteryMiss();
+            }
           }
+        } else {
+          lotteryMiss();
         }
+
         await this.changeView(lotteryView);
       },
       /**
