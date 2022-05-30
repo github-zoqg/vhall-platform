@@ -102,7 +102,7 @@
                   @change="toggleMutedAllStatus"
                 />
               </div>
-              <div class="chat-setting-box__item" v-if="2">
+              <div class="chat-setting-box__item" v-if="showBannedCheckbox">
                 <el-checkbox
                   v-for="(item, index) in bannedMoudleList"
                   :key="index"
