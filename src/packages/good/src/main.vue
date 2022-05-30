@@ -554,7 +554,7 @@
   @media screen and (min-width: 1601px) and (max-width: 1920px) {
     .vh-goods {
       &.subscribe_goods {
-        width: 1480px;
+        width: 1228px;
         .subscribe_item {
           width: 450px;
           height: 200px;
