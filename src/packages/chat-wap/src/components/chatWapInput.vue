@@ -189,6 +189,9 @@
       //选中表情
       inputEmoji(item = {}) {
         this.inputValue += item.name;
+        // if (this.inputValue.length > 140) {
+        //   this.inputValue = this.inputValue.substring(0, 140);
+        // }
         // this.showEmoji = false;
       },
       closeSendBox() {
@@ -292,9 +295,9 @@
       padding: 15px 32px;
 
       .send-box {
-        width: 66px;
-        height: 66px;
-        min-height: 66px;
+        width: 64px;
+        height: 64px;
+        min-height: 64px;
         color: #262626;
         display: flex;
         align-items: center;
@@ -305,9 +308,9 @@
         }
 
         .send-menu {
-          width: 66px;
-          min-width: 66px;
-          height: 66px;
+          width: 64px;
+          min-width: 64px;
+          height: 64px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -324,18 +327,18 @@
       }
 
       .textarea {
-        flex: 1;
-        min-height: 64px;
-
         textarea {
           min-height: 64px !important;
-          padding: 18px 24px !important;
+          padding: 12px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;
         }
         .el-textarea__inner::-webkit-input-placeholder {
           font-size: 28px !important;
+        }
+        .el-textarea__inner {
+          line-height: 40px;
         }
       }
     }
@@ -348,11 +351,12 @@
       .text-limit {
         background-color: #fff;
         position: absolute;
-        bottom: 20px;
+        bottom: 16px;
         right: 12px;
         font-size: 24px;
-        color: rgba(89, 89, 89, 0.8);
-        padding: 2px 6px;
+        color: #bfbfbf;
+        padding-left: 4px;
+        line-height: 32px;
         > span {
           color: #fb2626;
         }

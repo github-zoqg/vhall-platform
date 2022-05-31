@@ -3,9 +3,11 @@
     <div ref="dianzan" class="v-praise-dom" @touchstart="support">
       <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
       <img class="tool givealike-img" v-else src="../img/icon_like.png" />
-      <span v-if="like">{{ like | transformWatchPraise }}</span>
     </div>
-    <div>
+    <span v-if="like" class="like" :class="like < 10 ? 'single' : ''">
+      {{ like | transformWatchPraise }}
+    </span>
+    <div class="like-effect">
       <div class="hello"></div>
     </div>
   </div>
@@ -109,28 +111,27 @@
 </script>
 <style lang="less">
   .vhall-praise {
-    // width: 60px;
-    position: relative;
     user-select: none;
-
+    .like {
+      display: flex;
+      align-items: flex-end;
+      color: #fb2626;
+      position: absolute;
+      top: 7px;
+      right: 16px;
+      height: 28px;
+      font-size: 20px;
+      line-height: 20px;
+      font-weight: 400;
+      &.single {
+        right: 29px;
+      }
+    }
+    .like-effect {
+      position: relative;
+    }
     .v-praise-dom {
       position: relative;
-      & > span {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        color: #fff;
-        padding: 4px 8px;
-        background-color: #ff3030;
-        position: absolute;
-        top: 0px;
-        left: 25px;
-        height: 28px;
-        line-height: 1;
-        // text-align: center;
-        border-radius: 12px;
-        // display: block;
-      }
 
       .vh-saas-iconfont {
         // font-size: 42px;
