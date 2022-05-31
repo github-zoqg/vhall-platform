@@ -1,7 +1,7 @@
 <template>
   <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
-      <div class="send-box" @touchstart.stop.prevent="operateEmoji">
+      <div class="send-box" @touchend.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
           class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
@@ -9,27 +9,32 @@
           title="键盘"
         ></i>
       </div>
-      <el-input
-        type="textarea"
-        class="textarea"
-        autosize
-        show-word-limit
-        :placeholder="
-          showTabType == 'qa'
-            ? $t('chat.chat_1066')
-            : showTabType == 'private'
-            ? $t('chat.chat_1045')
-            : $t('chat.chat_1021')
-        "
-        v-model="inputValue"
-        id="textareaChat"
-        ref="textareaChat"
-        :maxlength="140"
-        @blur="handleOnBlur"
-        @focus="handleOnFocus"
-      ></el-input>
+      <div class="inputGroup">
+        <el-input
+          type="textarea"
+          class="textarea"
+          autosize
+          :placeholder="
+            showTabType == 'qa'
+              ? $t('chat.chat_1066')
+              : showTabType == 'private'
+              ? $t('chat.chat_1045')
+              : $t('chat.chat_1021')
+          "
+          v-model="inputValue"
+          id="textareaChat"
+          ref="textareaChat"
+          :maxlength="140"
+          @blur="handleOnBlur"
+          @focus="handleOnFocus"
+        ></el-input>
+        <span class="text-limit" v-show="inputValue.length >= 140">
+          <span>{{ inputValue.length }}</span>
+          /140
+        </span>
+      </div>
       <div class="send-box">
-        <div class="send-menu" @touchstart="send">
+        <div class="send-menu" :class="inputValue ? '' : 'noMsg'" @touchend.prevent="send">
           <span class="iconfonts vh-iconfont vh-line-send"></span>
         </div>
       </div>
@@ -44,10 +49,10 @@
         />
       </div>
       <div class="tools">
-        <div class="btn" @touchstart="delInput">
+        <div class="btn" @touchend.prevent="delInput">
           <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn send" @touchstart="send">发送</div>
+        <div class="btn send" @touchend.prevent="send">发送</div>
       </div>
     </div>
   </div>
@@ -143,6 +148,9 @@
         EventBus.$emit('showSendBox', false);
         this.$emit('sendMsg', inputValue);
         this.cancel();
+        this.$nextTick(() => {
+          this.$refs.textareaChat.blur();
+        });
       },
       //取消
       cancel() {
@@ -270,24 +278,12 @@
     margin-top: -94px;
     font-size: 28px;
     background-color: #f0f0f0;
-
+    box-shadow: 0px -1px 1px #f1f1f1;
     &.smFix {
       position: fixed !important;
       bottom: 0 !important;
       left: 0 !important;
       margin-top: 0 !important;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      /* prettier-ignore */
-      border-bottom: 1PX solid #D9D9D9;
-      left: 0;
-      top: 0;
-      transform-origin: 0 bottom;
-      opacity: 1;
     }
 
     .input-info {
@@ -318,6 +314,9 @@
           justify-content: center;
           background-color: #fff;
 
+          &.noMsg {
+            opacity: 0.4;
+          }
           .vh-iconfont {
             font-size: 34px;
           }
@@ -327,11 +326,10 @@
       .textarea {
         flex: 1;
         min-height: 64px;
-        margin: 0 24px;
 
         textarea {
           min-height: 64px !important;
-          padding: 10px 24px !important;
+          padding: 18px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;
@@ -342,6 +340,24 @@
       }
     }
 
+    .inputGroup {
+      flex: 1;
+      min-height: 64px;
+      margin: 0 24px;
+      position: relative;
+      .text-limit {
+        background-color: #fff;
+        position: absolute;
+        bottom: 20px;
+        right: 12px;
+        font-size: 24px;
+        color: rgba(89, 89, 89, 0.8);
+        padding: 2px 6px;
+        > span {
+          color: #fb2626;
+        }
+      }
+    }
     .send-box__bottom--emoji {
       position: relative;
       width: 100%;
