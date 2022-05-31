@@ -339,22 +339,23 @@
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
         this.msgContent = this.urlToLink(this.source.content.text_content);
-        this.source.atList.forEach(a => {
-          // TODO历史列表aList与直播中格式不一致作
-          const userName = `@${a.nick_name || a.nickName} `;
-          const match =
-            this.source.content &&
-            this.source.content.text_content &&
-            this.source.content.text_content.indexOf(userName) != -1;
-          if (match) {
-            this.msgContent = this.urlToLink(
-              this.source.content.text_content.replace(
-                userName,
-                `<span style='color:#3562fa'>${userName}</span>`
-              )
-            );
-          }
-        });
+        this.source.atList &&
+          this.source.atList.forEach(a => {
+            // TODO历史列表aList与直播中格式不一致作
+            const userName = `@${a.nick_name || a.nickName} `;
+            const match =
+              this.source.content &&
+              this.source.content.text_content &&
+              this.source.content.text_content.indexOf(userName) != -1;
+            if (match) {
+              this.msgContent = this.urlToLink(
+                this.source.content.text_content.replace(
+                  userName,
+                  `<span style='color:#3562fa'>${userName}</span>`
+                )
+              );
+            }
+          });
         if (
           (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
