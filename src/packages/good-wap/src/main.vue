@@ -124,7 +124,7 @@
         this.loading = true;
         this.num++;
         this.pos = parseInt((this.num - 1) * this.limit);
-        this.queryAdsList();
+        this.queryGoodsList();
       },
       /**
        * 查询商品列表
