@@ -508,6 +508,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
+      background-color: #f7f7f7;
       .virtual-list {
         height: 100%;
         overflow: auto;

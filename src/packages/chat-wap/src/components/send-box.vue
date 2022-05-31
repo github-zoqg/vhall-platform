@@ -442,18 +442,18 @@
 <style lang="less" scoped>
   .vmp-send-box {
     background-color: #fff;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      /* prettier-ignore */
-      border-bottom: 1PX solid #e2e2e2;
-      left: 0;
-      top: 0;
-      transform-origin: 0 bottom;
-      opacity: 1;
-    }
+    box-shadow: 0px -1px 1px #f1f1f1;
+    // &::after {
+    //   content: '';
+    //   position: absolute;
+    //   width: 100%;
+    //   /* prettier-ignore */
+    //   border-bottom: 1PX solid #e2e2e2;
+    //   left: 0;
+    //   top: 0;
+    //   transform-origin: 0 bottom;
+    //   opacity: 1;
+    // }
 
     position: absolute;
     left: 0;
