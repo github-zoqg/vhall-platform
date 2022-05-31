@@ -1,7 +1,7 @@
 <template>
   <div class="lottery-accept">
     <header class="title">{{ title }}</header>
-    <section class="form-wrap">
+    <div class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
           <div :class="[item.is_required === 1 ? 'required' : '', 'form-item__input']">
@@ -23,10 +23,10 @@
           </div>
         </li>
       </ul>
-      <div @click="submit" :class="['vmp-lottery-btn', 'submit-btn', verified ? '' : 'disabled']">
+      <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
-      </div>
-    </section>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -191,7 +191,15 @@
       }
     }
     .submit-btn {
-      width: 686px;
+      width: 100%;
+      display: inline-block;
+      height: 90px;
+      background: #fb2626;
+      border-radius: 45px;
+      line-height: 90px;
+      text-align: center;
+      font-size: 32px;
+      color: #fff;
       &.disabled {
         pointer-events: none;
         opacity: 0.4;

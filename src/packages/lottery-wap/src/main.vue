@@ -315,7 +315,6 @@
       border-radius: 45px;
       line-height: 90px;
       text-align: center;
-      // font-weight: 500;
       font-size: 32px;
       color: #fff;
     }
