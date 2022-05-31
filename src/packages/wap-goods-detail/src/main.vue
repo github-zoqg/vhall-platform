@@ -1,38 +1,41 @@
 <template>
   <div class="vh-goods-wrapper-detail" v-if="show">
-    <p class="btn-close" @click="goBack">
-      <i class="vh-iconfont vh-line-close"></i>
-    </p>
     <div class="conents">
-      <van-swipe :autoplay="5000" indicator-color="white">
-        <van-swipe-item v-for="(item, index) in info.img_list" :key="index">
-          <div class="imgBox">
-            <img :src="item.img_url" alt />
+      <p class="btn-close" @click="handleClose">
+        <i class="vh-iconfont vh-line-close"></i>
+      </p>
+      <div class="vh-goods-wrapper-detail-contents">
+        <div class="vh-goods-wrapper-detail-imgs">
+          <van-swipe @change="onChange">
+            <van-swipe-item v-for="(i, index) in info.img_list" :key="index">
+              <img :src="i.img_url" alt="" class="has-img" />
+            </van-swipe-item>
+            <template #indicator>
+              <div class="custom-indicator">{{ current + 1 }}/{{ info.img_list.length }}</div>
+            </template>
+          </van-swipe>
+        </div>
+        <div class="vh-goods-wrapper-detail-info">
+          <div class="vh-goods-wrapper-detail-info-price">
+            <span class="price-tip">优惠价</span>
+            <i>￥</i>
+            <span class="price" v-html="info.discountText"></span>
+            <span class="price-through">
+              <i>￥</i>
+              <span v-html="info.priceText"></span>
+            </span>
           </div>
-        </van-swipe-item>
-      </van-swipe>
-      <div class="price">
-        <template v-if="info.discount_price">
-          <span>
-            <b>￥</b>
-            {{ info.discount_price }}
-          </span>
-          <s>￥{{ info.price }}</s>
-        </template>
-        <template v-else>
-          <span>
-            <b>￥</b>
-            {{ info.price }}
-          </span>
-        </template>
+          <div class="price-title">{{ info.name }}</div>
+          <div class="price-des">{{ info.description }}</div>
+        </div>
       </div>
-      <div class="introduction">
-        <P class="title">{{ info.name }}</P>
-        <p class="info">{{ info.description }}</p>
+      <div class="vh-goods-wrapper-detail-btn">
+        <span v-if="info.shop_url" @click.stop="handleBuy(info.shop_url)">访问店铺</span>
+        <span @click.stop="handleBuy(info.goods_url)">立即购买</span>
       </div>
     </div>
-    <button class="btn-buy" @click="buy">{{ $t('menu.menu_1007') }}</button>
     <van-popup v-model="showTaoTip" class="tao-wrap">
+      <i class="vh-iconfont vh-line-close" @click="showTaoTip = false"></i>
       <div class="tao-password">
         <span>{{ $t('webinar.webinar_1013') }}</span>
         <span>{{ info.tao_password }}</span>
@@ -50,7 +53,8 @@
       return {
         show: false,
         showTaoTip: false,
-        info: {}
+        info: {},
+        current: 0
       };
     },
     // mounted() {
@@ -69,7 +73,7 @@
       /**
        * 购买
        */
-      buy() {
+      handleBuy(url) {
         if (this.info.tao_password) {
           this.showTaoTip = true;
         } else {
@@ -80,12 +84,16 @@
               market_tools_status: 1 // 购买
             });
           }
-          window.open(this.info.goods_url);
+          window.open(url);
           // window.location.href = this.info.goods_url;
         }
       },
-      goBack() {
+      handleClose() {
         this.show = false;
+        this.current = 0;
+      },
+      onChange(index) {
+        this.current = index;
       }
     }
   };
@@ -99,105 +107,162 @@
     z-index: 3000;
     height: 100%;
     width: 100%;
-    background: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    .conents {
+      height: calc(100% - 220px);
+      overflow-y: auto;
+      position: relative;
+      top: 220px;
+      border-radius: 32px 32px 0 0;
+    }
     .btn-close {
       z-index: 99;
-      position: fixed;
+      position: absolute;
       right: 30px;
       top: 30px;
-      width: 60px;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.5);
+      width: 48px;
+      height: 48px;
+      background: rgba(0, 0, 0, 0.6);
       border-radius: 50%;
-      line-height: 60px;
+      line-height: 48px;
       text-align: center;
       color: white;
       i {
         font-size: 24px;
       }
     }
-    .conents {
-      height: calc(100% - 110px);
-      overflow-y: auto;
-    }
-    .good-info {
-      padding-bottom: 120px;
-    }
-    .imgBox {
+    .vh-goods-wrapper-detail-contents {
       width: 100%;
-      height: 750px;
-      background: #fff;
-      img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-    }
-    .price {
-      height: 80px;
-      background: rgba(252, 86, 89, 1);
-      font-size: 30px;
-      color: rgba(255, 255, 255, 1);
-      padding: 0 30px;
-      s,
-      span {
-        display: inline-block;
-        line-height: 80px;
-      }
-      span {
-        height: 100%;
-        margin-right: 20px;
-        font-size: 36px;
-        b {
-          font-size: 26px;
+      .vh-goods-wrapper-detail-imgs {
+        height: 720px;
+        border-radius: 32px 32px 0 0;
+        position: relative;
+        .has-img {
+          width: 100%;
+          height: 100%;
+          object-fit: fill;
+          transform: translate3d(0, 0, 0);
+          border-radius: 32px 32px 0 0;
+        }
+        .van-swipe-item {
+          width: 100%;
+          height: 720px;
+          display: flex;
+        }
+        .custom-indicator {
+          position: absolute;
+          bottom: 22px;
+          right: 24px;
+          width: 91px;
+          height: 44px;
+          line-height: 44px;
+          text-align: center;
+          color: #fff;
+          border-radius: 22px;
+          font-size: 28px;
+          background: rgba(0, 0, 0, 0.4);
         }
       }
-      s {
-        font-size: 30px;
-        color: rgba(255, 255, 255, 1);
+      .vh-goods-wrapper-detail-info {
+        padding: 24px 32px;
+        overflow-y: auto;
+        height: 254px;
+        background: #ffffff;
+        &-price {
+          height: 40px;
+          .price-tip {
+            padding: 2px 5px;
+            background: #fff0f0;
+            border-radius: 2px;
+            color: #fb3a32;
+            font-size: 14px;
+            margin-right: 5px;
+          }
+          i {
+            color: #fb2626;
+            font-size: 10px;
+          }
+          .price {
+            font-size: 28px;
+            color: #fb2626;
+          }
+          .price ::v-deep > .remainder {
+            font-size: 10px;
+          }
+          .price-through {
+            font-size: 20px;
+            color: #8c8c8c;
+            padding-left: 10px;
+            text-decoration: line-through;
+            i {
+              color: #8c8c8c;
+            }
+          }
+          .price-through ::v-deep > .remainder {
+            font-size: 10px;
+          }
+        }
+        .price-title {
+          padding-top: 19px;
+          font-size: 32px;
+          font-weight: 500;
+          color: #262626;
+          line-height: 45px;
+        }
+        .price-des {
+          padding-top: 8px;
+          font-size: 24px;
+          font-weight: 400;
+          color: #595959;
+          line-height: 33px;
+        }
       }
     }
-    .introduction {
-      padding: 0 30px 20px;
-      background: #fff;
-      .title {
-        padding: 30px 0;
-        font-size: 36px;
-        font-weight: bold;
-        color: rgba(34, 34, 34, 1);
-      }
-      .info {
-        font-size: 28px;
-        line-height: 40px;
-        color: rgba(136, 136, 136, 1);
-        word-break: break-all;
-      }
-    }
-    .btn-buy {
-      height: 110px;
-      background: rgba(252, 86, 89, 1);
-      position: fixed;
+    .vh-goods-wrapper-detail-btn {
+      position: absolute;
       bottom: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
+      right: 0;
+      text-align: right;
       width: 100%;
-      font-size: 40px;
-      color: rgba(255, 255, 255, 1);
-    }
-    .btnDisabled {
-      background: #a9a9a9;
+      height: 140px;
+      background: #fff;
+      padding-top: 27px;
+      padding-bottom: 33px;
+      box-shadow: 0px -1px 0px 0px #f0f0f0;
+      span {
+        display: inline-block;
+        width: 200px;
+        height: 80px;
+        line-height: 82px;
+        text-align: center;
+        color: #fff;
+        border-radius: 40px;
+        &:first-child {
+          background: #fc9600;
+          margin-right: 16px;
+        }
+        &:last-child {
+          background: #fb2626;
+        }
+      }
     }
     // 淘口令
     .tao-wrap {
       width: 630px;
-      min-height: 444px;
+      min-height: 414px;
       border-radius: 14px;
       background: rgba(255, 255, 255, 1);
       overflow: hidden;
-      padding: 30px 40px;
+      padding: 30px 40px 40px 40px;
+      .vh-line-close {
+        position: absolute;
+        right: 36px;
+        top: 33px;
+        color: #8c8c8c;
+        font-size: 21px;
+        width: 21px;
+        height: 21px;
+      }
       .tao-password {
         display: flex;
         flex-direction: column;
@@ -205,30 +270,37 @@
           line-height: 50px;
 
           &:nth-child(1) {
-            font-weight: bolder;
+            width: 100%;
+            height: 45px;
+            font-size: 32px;
+            font-weight: 400;
+            color: #262626;
+            line-height: 45px;
+            margin: 7px 0 40px 0;
             text-align: center;
-            margin: 0 0 20px;
-            color: #000;
-            font-size: 36px;
           }
           &:nth-child(2) {
             border: 2px solid #dddddd;
             padding: 20px;
-            width: 550px;
+            width: 542px;
+            min-height: 174px;
             margin: 0 auto 20px;
-            font-size: 24px;
-            min-height: 214px;
+            font-size: 28px;
             border-radius: 8px;
-            color: #666;
+            font-weight: 400;
+            color: #262626;
             word-break: break-all;
+            line-height: 40px;
           }
           &:nth-child(3) {
-            font-size: 28px;
-            color: #333;
-            line-height: 40px;
-            text-align: center;
+            text-align: left;
             margin: 0 auto;
-            width: 494px;
+            width: 556px;
+            height: 80px;
+            font-size: 28px;
+            font-weight: 400;
+            color: #595959;
+            line-height: 40px;
           }
         }
       }

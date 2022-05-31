@@ -7,26 +7,51 @@
       @load="onLoad"
       class="vh-goods_list"
     >
-      <van-cell v-for="good in goodsList" :key="good.goods_id" class="vh-goods_item">
-        <div class="good-cover">
-          <img :src="good.covarImage" />
+      <van-cell
+        v-for="good in goodsList"
+        :key="good.goods_id"
+        class="vh-goods_item"
+        @click="showDetailDialog(good)"
+      >
+        <div class="vh-goods_item-cover">
+          <template v-for="i in good.img_list">
+            <img v-if="i.is_cover == 1" :key="i.img_id" :src="i.img_url" alt="" />
+          </template>
         </div>
-        <div class="goods-info">
-          <p class="title">{{ good.name }}</p>
-          <p class="price">
-            <template v-if="good.discount_price != 0">
-              <span>￥{{ good.discount_price }}</span>
-              <s>￥{{ good.price }}</s>
-            </template>
-            <template v-else>
-              <span>￥{{ good.price }}</span>
-            </template>
-          </p>
-          <p>
-            <button class="check-info" @click="showDetailDialog(good)">
-              {{ $t('chat.chat_1031') }}
-            </button>
-          </p>
+        <div class="vh-goods_item-info">
+          <div class="vh-goods_item-info__top">
+            <div class="name" :class="{ showEllipse: computeFieldLength(good.name) > 15 }">
+              {{ good.name }}
+            </div>
+            <div
+              class="describe"
+              style="
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 1;
+                overflow: hidden;
+              "
+            >
+              {{ good.description }}
+            </div>
+          </div>
+          <div>
+            <div v-if="good.showDiscountPrice" class="discount_price">￥{{ good.price }}</div>
+            <div class="other-info">
+              <div v-if="good.showDiscountPrice" class="discount">
+                <span class="price-tip">优惠价</span>
+                <i>￥</i>
+                <span class="price" v-html="good.discountText"></span>
+              </div>
+              <div v-else>
+                <i>￥</i>
+                <span class="price" v-html="good.priceText"></span>
+              </div>
+              <div>
+                <button class="buy" @click.stop="handleBuy(good.goods_url)">购买</button>
+              </div>
+            </div>
+          </div>
         </div>
       </van-cell>
     </van-list>
@@ -108,6 +133,29 @@
       this.buildDataList(this.roomBaseServer.state.goodsDefault, false);
     },
     methods: {
+      // 中英文字符计算
+      computeFieldLength(str) {
+        var l = str.length;
+        var fieldLength = 0;
+        for (let i = 0; i < l; i++) {
+          if ((str.charCodeAt(i) & 0xff00) !== 0) {
+            fieldLength += 1;
+          } else {
+            fieldLength += 0.5;
+          }
+        }
+        return Math.ceil(fieldLength);
+      },
+      // 格式化
+      filterDiscount(val) {
+        if (val.indexOf('.') > -1) {
+          const i = val.slice(0, val.indexOf('.'));
+          const r = val.slice(val.indexOf('.'));
+          return `${i}<span class="remainder">${r}</span>`;
+        } else {
+          return val;
+        }
+      },
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -124,7 +172,7 @@
         this.loading = true;
         this.num++;
         this.pos = parseInt((this.num - 1) * this.limit);
-        this.queryAdsList();
+        this.queryGoodsList();
       },
       /**
        * 查询商品列表
@@ -151,9 +199,14 @@
         const list = data.goods_list;
         const currentGoodList = this.goodsList;
         if (list && list.length > 0) {
-          list.forEach(item => {
-            const covarImage = item.img_list.find(ele => ele.is_cover == 1);
-            item.covarImage = covarImage ? covarImage.img_url : item.img_list[0].img_url;
+          list.map(item => {
+            if (item.discount_price && Number(item.discount_price) > 0) {
+              item.showDiscountPrice = true;
+              item.discountText = this.filterDiscount(item.discount_price);
+            } else {
+              item.showDiscountPrice = false;
+            }
+            item.priceText = this.filterDiscount(item.price);
           });
         }
 
@@ -169,6 +222,9 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
         );
+      },
+      handleBuy(val) {
+        window.open(val);
       }
     }
   };
@@ -187,7 +243,7 @@
       overflow: hidden;
       margin-bottom: 100px;
       touch-action: pan-y;
-      .vh-goods_item {
+      /* .vh-goods_item {
         padding: 15px 30px;
         position: relative;
         .goods-info {
@@ -239,6 +295,99 @@
             border-radius: 10px;
             object-fit: scale-down;
           }
+        }
+      } */
+      /* 新商品样式 */
+      .vh-goods_item {
+        padding: 24px 32px 18px 32px;
+        border-bottom: 1px solid #f0f0f0;
+        clear: both;
+        &-cover {
+          width: 200px;
+          height: 200px;
+          float: left;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+          }
+        }
+        &-info {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding-left: 24px;
+          width: calc(100% - 200px);
+          .name {
+            color: #262626;
+            font-size: 28px;
+            line-height: 38px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            text-align: left;
+          }
+          .describe {
+            color: #595959;
+            font-size: 24px;
+            padding-top: 10px;
+            line-height: 30px;
+          }
+          .discount_price {
+            color: #8c8c8c;
+            font-size: 16px;
+            height: 40px;
+            display: inline-block;
+            text-decoration: line-through;
+          }
+          .other-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            .discount {
+              .price-tip {
+                padding: 2px 5px;
+                background: #fff0f0;
+                border-radius: 2px;
+                color: #fb3a32;
+                font-size: 14px;
+              }
+            }
+            i {
+              color: #fb2626;
+              font-size: 10px;
+            }
+            .price {
+              font-size: 28px;
+              color: #fb2626;
+            }
+            .price ::v-deep > .remainder {
+              font-size: 10px;
+            }
+            .buy {
+              display: inline-block;
+              width: 110px;
+              height: 54px;
+              line-height: 50px;
+              border-radius: 32px;
+              border: 1px solid #8c8c8c;
+              color: #595959;
+              font-size: 24px;
+              text-align: center;
+              background: #fff;
+              position: absolute;
+              right: 0;
+              bottom: 0;
+            }
+          }
+        }
+        &-info__top {
+          min-height: 106px;
         }
       }
     }
