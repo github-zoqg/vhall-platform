@@ -19,7 +19,7 @@ const htmlConfig = {
 
     Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
-    imageYunDun: '//cnstatic01.e.vhall.com/load.min.js?t=201903281201',
+    imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt:
       '//cnstatic01.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
     loadJs: '//cnstatic01.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
