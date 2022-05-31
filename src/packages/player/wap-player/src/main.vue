@@ -217,7 +217,7 @@
               ></i>
             </span>
             <span class="control_center">
-              <div :class="isLiving ? 'status_tip' : ''">语音播放中...</div>
+              <div :class="isLiving ? 'status_tip' : ''">{{ $t('player.player_1014') }}</div>
 
               <div class="player_time" v-if="!isLiving">
                 {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
@@ -225,7 +225,7 @@
             </span>
           </div>
           <div class="control_right">
-            <span class="set_center" @click.stop="refresh">
+            <span class="set_center" @click.stop="refresh" v-if="isLiving">
               <i class="vh-iconfont vh-line-refresh-left"></i>
             </span>
             <span @click="changePlayerSize(false)">
