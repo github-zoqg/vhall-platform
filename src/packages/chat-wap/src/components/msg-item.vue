@@ -587,7 +587,7 @@
         }
       }
       .interact-msg {
-        padding: 20px 60px;
+        padding: 20px 24px;
         position: relative;
         border-width: 0;
         .interact-content__role-name {
