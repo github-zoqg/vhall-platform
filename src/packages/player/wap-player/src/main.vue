@@ -72,10 +72,15 @@
           <span @click="changePlayerSize(true)">
             <i class="vh-iconfont vh-line-arrow-left"></i>
           </span>
-          <p>
-            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            &nbsp;{{ hotNum | formatHotNum }}
-          </p>
+          <span>
+            <span class="hot_num">
+              <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+              {{ hotNum | formatHotNum }}
+            </span>
+            <span @click="openLanguage" v-if="languageList.length > 1" class="hot_num">
+              {{ lang.key == 1 ? '中文' : 'EN' }}
+            </span>
+          </span>
         </div>
         <!-- 倍速、清晰度切换 -->
         <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
@@ -97,9 +102,6 @@
         >
           <!-- 倍速和画质合并 -->
           <div class="vmp-wap-player-speed">
-            <span @click="openLanguage" v-if="languageList.length > 1">
-              {{ lang.key == 1 ? '中文' : 'EN' }}
-            </span>
             <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
               {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
             </span>
@@ -207,7 +209,8 @@
               <van-circle
                 v-model="sliderVal"
                 :rate="parseInt(totalTime)"
-                size="34px"
+                size="32px"
+                :stroke-width="100"
                 :color="currentTime <= 0 ? 'transparent' : '#fb3a32'"
                 layer-color="rgba(255, 255, 255, 0.2)"
               ></van-circle>
@@ -834,7 +837,7 @@
               position: absolute;
               top: 50%;
               left: 50%;
-              transform: translate(-50%, -57%);
+              transform: translate(-50%, -50%);
             }
           }
           .control_center {
@@ -1052,16 +1055,18 @@
       position: absolute;
       font-size: 28px;
       z-index: 5;
-      p {
+      .hot_num {
         border-radius: 44px;
         height: 48px;
         line-height: 48px;
         padding: 0 16px;
         text-align: center;
+        margin-left: 20px;
         background: rgba(0, 0, 0, 0.5);
         i {
           vertical-align: bottom;
           font-size: 28px;
+          padding-right: 4px;
         }
       }
       &.opcity-flase {
