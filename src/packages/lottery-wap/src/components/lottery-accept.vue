@@ -23,12 +23,9 @@
           </div>
         </li>
       </ul>
-      <button
-        @click="submit"
-        :class="['vmp-lottery-btn', 'submit-btn', verified ? '' : 'disabled']"
-      >
+      <div @click="submit" :class="['vmp-lottery-btn', 'submit-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
-      </button>
+      </div>
     </section>
   </div>
 </template>
