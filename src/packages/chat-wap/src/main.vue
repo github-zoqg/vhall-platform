@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-wap">
+  <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
     <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
@@ -133,7 +133,9 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false
+        showSendBox: false,
+        //小屏适配
+        smFix: false
       };
     },
     watch: {
@@ -232,6 +234,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.menuServer = useMenuServer();
+      this.chatServer.init();
     },
     created() {
       this.initViewData();
@@ -252,7 +255,7 @@
         window.addEventListener('focusin', this.focusinIOS);
         window.addEventListener('focusout', this.focusoutIOS);
       }
-      this.initEvent();
+      // this.initEvent();
       this.eventListener();
     },
     beforeDestroy() {
@@ -393,9 +396,10 @@
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-        await this.chatServer.getHistoryMsg(data, 'h5');
+        const res = await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
         this.isLoading = false;
+        return res;
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
@@ -466,11 +470,11 @@
           return;
         }
         const offsetPos = this.pos;
-        await this.getHistoryMessage();
+        const { list } = await this.getHistoryMessage();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
           // alert(this.chatList.length - offsetPos);
-          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+          this.$refs.chatlist.scrollToIndex(list.length);
         });
       },
       // eventBus监听

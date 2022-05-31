@@ -628,9 +628,20 @@
               return;
             }
             // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-            if (useMediaCheckServer().state.deviceInfo.device_status == 2) {
+            let device_status = useMediaCheckServer().state.deviceInfo.device_status;
+            if (device_status == 2) {
               this.speakOff();
               return;
+            } else if (device_status == 0 && [2, 4].includes(this.joinInfo.role_name)) {
+              // 观众 嘉宾
+              let _flag = await this.mediaCheckServer.getMediaInputPermission({
+                isNeedBroadcast: this.isVideoPolling && this.mode != 6
+              });
+              if (!_flag) {
+                this.speakOff();
+                this.$message.warning(this.$t('interact.interact_1039'));
+                return;
+              }
             }
 
             console.log('[stream-local] vrtc_connect_success startPush');
