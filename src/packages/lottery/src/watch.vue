@@ -230,7 +230,6 @@
             ? this.lotteryServer.Events.LOTTERY_WIN
             : this.lotteryServer.Events.LOTTERY_MISS
         );
-        this.lotteryServer.initIconStatus(); // 更新小红点的显隐
       },
       close() {
         this.dialogVisible = false;

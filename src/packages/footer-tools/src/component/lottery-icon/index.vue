@@ -5,16 +5,12 @@
       <i class="vmp-dot" v-if="lotteryServerState.docVisible" />
     </span>
     <!-- 关闭的遮罩层 -->
-    <div
-      class="transparent-layer"
-      v-if="lotteryListoryVisible"
-      @click.stop="lotteryListoryVisible = false"
-    ></div>
+    <div class="transparent-layer" v-if="lotteryListoryVisible" @click.stop="closeHistory"></div>
     <div class="vmp-lottery-history-container" v-if="lotteryListoryVisible">
       <lottery-history
         :win-lottery-history="winLotteryHistory"
         @takeAward="handleTakeAward"
-        @close="lotteryListoryVisible = false"
+        @close="closeHistory"
       />
     </div>
   </div>
@@ -45,12 +41,22 @@
     },
     created() {
       this.lotteryServer.initIconStatus();
-      this.lotteryServer.$on('ShowHistory', this.handleShowHistory);
+      this.initEvent();
     },
     beforeDestroy() {
-      this.lotteryServer.$off('ShowHistory', this.handleShowHistory);
+      this.removeEvent();
     },
     methods: {
+      initEvent() {
+        this.lotteryServer.$on('ShowHistory', this.handleShowHistory);
+        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
+        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
+      },
+      removeEvent() {
+        this.lotteryServer.$off('ShowHistory', this.handleShowHistory);
+        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
+        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
+      },
       handleShowHistory(list = []) {
         this.winLotteryHistory = list;
         this.lotteryListoryVisible = true;
@@ -62,6 +68,9 @@
       handleTakeAward(lottery) {
         this.lotteryListoryVisible = false;
         this.$emit('takeAward', lottery);
+      },
+      closeHistory() {
+        this.lotteryListoryVisible = false;
       }
     }
   };

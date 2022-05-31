@@ -65,7 +65,6 @@
     methods: {
       // 去领奖
       takeAward(lottery) {
-        // if (!this.available(lottery)) return; // 二次拦截
         this.$emit('takeAward', lottery);
       },
       close() {
@@ -189,9 +188,8 @@
         height: 7px;
         border-radius: 50%;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 2px;
+        left: 2px;
         background: #d3cecf;
       }
       &.unclaimed {

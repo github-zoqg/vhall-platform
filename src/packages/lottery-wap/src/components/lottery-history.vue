@@ -140,13 +140,6 @@
       text-shadow: 0 4px 0 #fff;
       z-index: 2;
     }
-    // .close-btn {
-    //   position: absolute;
-    //   top: 27px;
-    //   right: 34px;
-    //   color: #666;
-    //   cursor: pointer;
-    // }
     .vmp-lottery-wrap-container {
       padding-right: 2px; // 滚动条效果距离
     }
@@ -157,7 +150,6 @@
     }
     .vmp-win-lottery {
       margin-left: 70px;
-
       &:last-child .vmp-lottery-content-wrap {
         padding-bottom: 0;
       }
@@ -185,9 +177,8 @@
         height: 14px;
         border-radius: 50%;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 2px;
+        left: 2px;
         background: #d3cecf;
       }
       &.unclaimed {
@@ -200,9 +191,6 @@
         .dot {
           background: #fb3a32;
         }
-        // .vmp-lottery-content {
-        //   cursor: pointer;
-        // }
       }
     }
     .vmp-lottery-content {
