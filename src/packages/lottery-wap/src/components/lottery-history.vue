@@ -90,7 +90,7 @@
       display: inline-block;
       position: relative;
       .line {
-        width: 176px;
+        width: calc(100% + 16px);
         height: 20px;
         border-radius: 10px;
         background: #f3c9c8;

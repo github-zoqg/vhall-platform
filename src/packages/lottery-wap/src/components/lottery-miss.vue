@@ -1,6 +1,6 @@
 <template>
   <div class="no-win-lottery">
-    <img class="no-win-lottery-img" :src="prizeInfo.image_url || noLotteryImg" alt srcset />
+    <img class="no-win-lottery-img" :src="noLotteryImg" alt srcset />
     <p class="lottery-result">{{ $t('interact_tools.interact_tools_1022') }}</p>
     <p class="no-win-tip">
       {{

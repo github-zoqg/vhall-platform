@@ -1,6 +1,6 @@
 <template>
   <div class="lottery-accept">
-    <header class="title">{{ $t('interact_tools.interact_tools_1003') }}</header>
+    <header class="title">{{ title }}</header>
     <section class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
@@ -45,6 +45,11 @@
         verified: false
       };
     },
+    computed: {
+      title() {
+        return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
+      }
+    },
     filters: {
       errorMsg(fieldKey = '') {
         const map = {
@@ -56,7 +61,6 @@
         return `请输入正确的信息${field}`;
       }
     },
-
     watch: {
       winForm: {
         deep: true,
@@ -190,7 +194,7 @@
       }
     }
     .submit-btn {
-      width: 100%;
+      width: 686px;
       &.disabled {
         pointer-events: none;
         opacity: 0.4;

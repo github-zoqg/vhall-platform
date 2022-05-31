@@ -94,7 +94,7 @@
       display: inline-block;
       position: relative;
       .line {
-        width: 88px;
+        width: calc(100% + 8px);
         height: 10px;
         border-radius: 5px;
         background: #f3c9c8;
