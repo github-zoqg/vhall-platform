@@ -278,6 +278,13 @@
 </script>
 <style lang="less">
   .vhall-lottery-wap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 102;
     line-height: initial; // 清除父容器的css影响
     .lottery__close-btn {
       position: absolute;
@@ -288,16 +295,5 @@
       color: #ffffff;
       cursor: pointer;
     }
-  }
-</style>
-<style lang="less" scoped>
-  .vhall-lottery-wap {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 102;
   }
 </style>

@@ -5,7 +5,7 @@
         <span class="star star-1"></span>
         <span class="star star-2"></span>
         <span class="star star-3"></span>
-        <h1 class="vmp-lottery-title">中奖记录</h1>
+        <h1 class="vmp-lottery-title">{{ $t('interact_tools.interact_tools_1076') }}</h1>
         <div class="line"></div>
       </div>
     </header>
@@ -20,10 +20,10 @@
             <section class="vmp-lottery-content" @click="takeAward(lottery)">
               <div class="vmp-lottery-content__top">
                 <span class="vmp-award-name">
-                  {{ lottery.award_snapshoot | awardName }}
+                  {{ filterAwardName(lottery.award_snapshoot) }}
                 </span>
                 <span class="vmp-award-status">
-                  {{ lottery | awardStatus }}
+                  {{ filterAwardStatus(lottery) }}
                 </span>
               </div>
               <div class="vmp-lottery-content__bottom">
@@ -47,21 +47,6 @@
         }
       }
     },
-    filters: {
-      awardName(award) {
-        if (!award) return '奖品';
-        return award?.award_name || '奖品';
-      },
-      awardStatus(lottery) {
-        if (lottery.take_award === 1) {
-          return '已领取';
-        } else if (lottery.need_take_award === 0) {
-          return '已中奖';
-        } else {
-          return '领取';
-        }
-      }
-    },
     methods: {
       // 去领奖
       takeAward(lottery) {
@@ -73,6 +58,19 @@
       // 符合领奖条件
       available(lottery) {
         return lottery.take_award === 0 && lottery.need_take_award === 1;
+      },
+      filterAwardName(award) {
+        if (!award) return this.$t('interact_tools.interact_tools_1009');
+        return award?.award_name || this.$t('interact_tools.interact_tools_1009');
+      },
+      filterAwardStatus(lottery) {
+        if (lottery.take_award === 1) {
+          return this.$t('interact_tools.interact_tools_1078');
+        } else if (lottery.need_take_award === 0) {
+          return this.$t('interact_tools.interact_tools_1079');
+        } else {
+          return this.$t('interact_tools.interact_tools_1077');
+        }
       }
     }
   };
@@ -136,7 +134,7 @@
     }
     .vmp-lottery-title {
       position: relative;
-      width: 80px;
+      min-width: 80px;
       color: #000;
       font-size: 20px;
       font-weight: 500;

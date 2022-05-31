@@ -1,6 +1,6 @@
 <template>
   <div class="lottery-accept">
-    <header class="title">抽奖</header>
+    <header class="title">{{ $t('interact_tools.interact_tools_1003') }}</header>
     <section class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
@@ -124,7 +124,7 @@
             if (this.showWinnerList) {
               this.$emit('navTo', 'LotterySuccess');
             } else {
-              this.$toast(this.$t('interact_tools.interact_tools_1067'));
+              this.$toast(this.$t('interact_tools.interact_tools_1013'));
               this.$emit('close');
             }
           })

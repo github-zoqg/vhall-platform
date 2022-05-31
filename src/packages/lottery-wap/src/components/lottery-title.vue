@@ -67,7 +67,7 @@
     }
     .vmp-lottery-title {
       position: relative;
-      width: 160px;
+      min-width: 160px;
       color: #000;
       font-size: 40px;
       font-weight: 500;

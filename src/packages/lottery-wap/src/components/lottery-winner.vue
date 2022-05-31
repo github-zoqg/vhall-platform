@@ -1,6 +1,6 @@
 <template>
   <div class="lottery-winner-list">
-    <lottery-title title="中奖记录" />
+    <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="winner-content">
       <ul class="lottery-winner-wrap">
         <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
