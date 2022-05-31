@@ -685,7 +685,7 @@
       }
       .new-gift-img,
       .new-award-img {
-        width: 47px;
+        width: 40px;
       }
       .reward_txt {
         color: #d67900;
