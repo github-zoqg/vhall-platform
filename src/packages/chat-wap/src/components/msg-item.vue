@@ -2,12 +2,25 @@
   <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
     <!-- 发起抽奖/问答 -->
     <template
-      v-if="['lottery_push', 'question_answer_open', 'question_answer_close'].includes(source.type)"
+      v-if="
+        ['lottery_push', 'question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
+          source.type
+        )
+      "
     >
       <div class="msg-item interact">
         <div class="interact-msg">
-          <template v-if="['question_answer_open', 'question_answer_close'].includes(source.type)">
-            <span style="color: #595959">{{ source.roleName | roleFilter }}</span>
+          <template
+            v-if="
+              ['question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
+                source.type
+              )
+            "
+          >
+            {{ source.roleName != 1 ? source.nickname : '' }}
+            <span class="role" :class="source.roleName | roleClassFilter">
+              <span>{{ source.roleName | roleFilter }}</span>
+            </span>
           </template>
           {{ source.content.text_content }}
         </div>
@@ -114,11 +127,11 @@
         </div>
         <div class="msg-content">
           <!-- 签到消息头部 相类似的可优化 -->
-          <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">
+          <!-- <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">
             {{ $t('interact_tools.interact_tools_1024') }}
-          </p>
+          </p> -->
           <!-- 正常聊天消息 -->
-          <p class="msg-content_name" v-else>
+          <p class="msg-content_name">
             <span class="nickname">
               {{ source.nickname }}
             </span>
@@ -510,7 +523,7 @@
           color: #262626;
           line-height: 40px;
           font-size: 28px;
-          background-color: #f7f7f7;
+          background-color: #fff;
           border-radius: 8px;
           span {
             word-break: break-word;
