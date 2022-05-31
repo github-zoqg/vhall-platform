@@ -19,6 +19,7 @@
   import { getQueryString } from '@/packages/app-shared/utils/tool';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   export default {
     name: 'vmpSubscribe',
     data() {
@@ -92,7 +93,11 @@
           ) {
             this.goWatchPage(this.clientType);
           }
+          //上报日志
+          logRoomInitSuccess();
         } catch (err) {
+          //上报日志
+          logRoomInitFailed({ error: err });
           console.error('---初始化直播房间出现异常--', err);
           if (![512534, 512502, 512503, 511007, 511006].includes(Number(err.code))) {
             this.state = 2;
@@ -111,6 +116,12 @@
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
             ...this.$route.query // 第三方地址栏传参
+          },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            method: 'post' // 上报方式
           }
         });
       },

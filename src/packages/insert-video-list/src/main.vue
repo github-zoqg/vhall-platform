@@ -4,7 +4,7 @@
       title="插播文件"
       :visible.sync="insertVideoVisible"
       :close-on-click-modal="false"
-      :modal-append-to-body="false"
+      :append-to-body="true"
       width="800px"
     >
       <div class="vmp-insert-video-wrap">
@@ -136,8 +136,13 @@
         width="642px"
         :before-close="closeBefore"
         :close-on-click-modal="true"
+        :append-to-body="true"
       >
-        <video-preview ref="videoPreview" :videoParam="videoParam"></video-preview>
+        <video-preview
+          ref="videoPreview"
+          :isShowController="true"
+          :videoParam="videoParam"
+        ></video-preview>
       </el-dialog>
     </template>
   </div>
@@ -456,7 +461,10 @@
       handlePreview(video) {
         this.previewDialog = true;
         if (video.transcode_status == 1) {
-          this.videoParam = video;
+          this.videoParam = {
+            autoplay: true,
+            ...video
+          };
         } else {
           this.$message.warning('只有转码成功才能查看');
         }

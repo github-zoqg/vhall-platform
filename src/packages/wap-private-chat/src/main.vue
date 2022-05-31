@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-private-chat">
+  <div class="vmp-wap-private-chat" ref="chatWapPrivate" :class="smFix ? 'smFix' : ''">
     <div class="vmp-wap-private-chat__wrapper" ref="chatContentMain">
       <div class="vmp-private-chat__content" ref="chatContent">
         <virtual-list
@@ -28,6 +28,7 @@
       currentTab="private"
       :isAllBanned="allBanned && private_allBanned_status"
       :isBanned="isBanned"
+      refName="chatWapPrivate"
       @sendPrivate="sendMsg"
     ></send-box>
   </div>
@@ -83,7 +84,9 @@
         innerHeight: 0,
         //显示输入组件
         showSendBox: false,
-        private_allBanned_status: useChatServer().state.allBannedModuleList.private_chat_status //全体禁言对问答是否生效
+        private_allBanned_status: useChatServer().state.allBannedModuleList.private_chat_status, //全体禁言对问答是否生效
+        //小屏适配
+        smFix: false
       };
     },
     computed: {
@@ -126,7 +129,7 @@
         window.addEventListener('focusin', this.focusinIOS);
         window.addEventListener('focusout', this.focusoutIOS);
       }
-      this.initEvent();
+      // this.initEvent();
       this.eventListener();
     },
     beforeDestroy() {

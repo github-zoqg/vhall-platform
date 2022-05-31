@@ -352,6 +352,9 @@
       this.playerServer = usePlayerServer();
       this.subscribeServer = useSubscribeServer();
     },
+    beforeDestroy() {
+      this.playerServer.destroy();
+    },
     computed: {
       // 是否观看端
       isWatch() {
@@ -381,6 +384,7 @@
       },
       isShowContainer() {
         return (
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
           (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
             this.$domainStore.state.micServer.isSpeakOn ||
             this.isLivingEnd) &&

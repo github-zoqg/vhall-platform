@@ -54,7 +54,11 @@
       },
       // 是否为云导播活动
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
+            1
+        );
       },
       // 是否开启了插播
       isInsertFilePushing() {
@@ -240,8 +244,8 @@
               // 主持人
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
-                // 云导播隐藏桌面共享icon
-                if (this.streamYun) {
+                // 云导播/音频直播隐藏桌面共享icon
+                if (this.streamYun || this.webinarMode == 1) {
                   vn.setHiddenState(true);
                 }
                 vn.setDisableState(false);

@@ -1,5 +1,5 @@
 <template>
-  <div class="qa">
+  <div class="qa" ref="chatWapQA" :class="smFix ? 'smFix' : ''">
     <div class="qa-content-wrapper" ref="chatContentMain">
       <div class="qa-content" ref="qaContent">
         <virtual-list
@@ -37,6 +37,7 @@
       @sendQa="sendQa"
       @login="handleLogin"
       key="qa"
+      refName="chatWapQA"
       :is-banned="isBanned"
       :is-all-banned="allBanned && qa_allBanned_status"
     ></send-box>
@@ -82,7 +83,9 @@
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
-        showSendBox: false
+        showSendBox: false,
+        //小屏适配
+        smFix: false
       };
     },
     computed: {
@@ -137,7 +140,7 @@
         window.addEventListener('focusin', this.focusinIOS);
         window.addEventListener('focusout', this.focusoutIOS);
       }
-      this.initEvent();
+      // this.initEvent();
       this.eventListener();
       window.aaaa = this.scrollBottom;
     },
