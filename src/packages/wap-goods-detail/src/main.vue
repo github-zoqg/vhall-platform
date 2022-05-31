@@ -109,7 +109,7 @@
     width: 100%;
     background: rgba(0, 0, 0, 0.7);
     .conents {
-      height: calc(100% - 220px);
+      height: calc(100vh - 220px);
       overflow-y: auto;
       position: relative;
       top: 220px;
@@ -166,7 +166,7 @@
       .vh-goods-wrapper-detail-info {
         padding: 24px 32px;
         overflow-y: auto;
-        height: 254px;
+        height: calc(100vh - 1080px);
         background: #ffffff;
         &-price {
           height: 40px;
