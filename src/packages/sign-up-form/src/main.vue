@@ -934,7 +934,7 @@
                   message: this.$t('form.form_1029'),
                   trigger: 'change'
                 };
-              } else if (item.type === 5) {
+              } else if (item.type === 5 && item.is_must) {
                 // 地域
                 rules[item.id] = {
                   required: !!item.is_must,
@@ -1358,15 +1358,17 @@
           } else if (item.type === 5) {
             // 地域
             !answer.address && (answer.address = []);
-            const provinec = this.provinces.find(ele => ele.value == this.province) || {
+            const provinec = (this.provinces &&
+              this.provinces.find(ele => ele.value == this.province)) || {
               label: '',
               value: ''
             };
-            const city = this.cityList.find(ele => ele.value == this.city) || {
+            const city = (this.cityList && this.cityList.find(ele => ele.value == this.city)) || {
               label: '',
               value: ''
             };
-            const county = this.countyList.find(ele => ele.value == this.form[item.id]) || {
+            const county = (this.countyList &&
+              this.countyList.find(ele => ele.value == this.form[item.id])) || {
               label: '',
               value: ''
             };

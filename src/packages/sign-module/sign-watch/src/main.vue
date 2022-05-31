@@ -2,14 +2,14 @@
   <div class="vmp-sign-watch">
     <div v-show="isShowCircle" class="vmp-sign-watch_icon" @click="reShowSignBox">
       <i class="sign-circle"></i>
-      <img src="./img/icon@2x.png" alt="" />
+      <img src="./img/icon@2x.png" alt="" class="show_img" />
     </div>
     <div
       v-show="showSign"
       class="vmp-sign-watch_sign"
       :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
-      <div class="sign_container">
+      <div :class="['sign_container', isEmbed ? 'sign_embed_container' : '']">
         <div class="sign_content">
           <p class="sign_title">{{ title }}</p>
           <CountDown :duration="duration" :consume="sign_time" class="sign_counter"></CountDown>
@@ -130,6 +130,11 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      isEmbed() {
+        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
+        const { embedObj } = this.roomBaseServer.state;
+        return embedObj.embed && !embedObj.embedVideo;
       }
     },
     methods: {
@@ -213,13 +218,21 @@
 <style lang="less">
   .vmp-sign-watch {
     &_icon {
+      position: relative;
       width: 32px;
       height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      position: relative;
-      margin-left: 16px;
       line-height: 32px;
+      background: linear-gradient(180deg, #878eff 0%, #5565ff 100%);
+      border-radius: 16px;
+      cursor: pointer;
+      margin-left: 16px;
+      img.show_img {
+        width: 32px;
+        height: 32px;
+        -webkit-transform-origin: left center;
+        transform-origin: left center;
+        margin: -1px 0 0 0;
+      }
       .sign-circle {
         position: absolute;
         top: -2px;
@@ -288,6 +301,11 @@
           color: #fff;
         }
       }
+    }
+  }
+  @media screen and (max-height: 580px) {
+    .sign_embed_container {
+      margin-top: 0px !important;
     }
   }
 </style>

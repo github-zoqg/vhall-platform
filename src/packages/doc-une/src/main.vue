@@ -687,12 +687,6 @@
           console.error('获取容器列表数据失败：', ex);
           this.docServer.setDocLoadComplete();
         }
-        if (this.isWatch && !this.docServer.state.switchStatus) {
-          // 如果是观看端，并且是观众不可见，结束
-          console.log('[doc] 是观看端，并且是观众不可见');
-          this.docServer.setDocLoadComplete();
-          return;
-        }
         console.log('[doc] recoverLastDocs containerList:', this.docServer.state.containerList);
         if (this.docServer.state.containerList.length === 0) {
           // 没有文档
@@ -1155,7 +1149,7 @@
         }
 
         &.selected {
-          color: #fc5659;
+          color: #fb3a32;
           cursor: pointer;
         }
       }

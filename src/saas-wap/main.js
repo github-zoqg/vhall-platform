@@ -1,46 +1,38 @@
 import Vue from 'vue';
+// 控制台日志打印处理
+import '@/app-shared/extension/vh-console';
+// js内置对象扩展
+import '@/app-shared/extension/native-ext';
+// 移动端字体大小自适应处理
+import './init-global/resize-font-size';
+// 全局属性的定义
+import './init-global/prototype';
+// 导入根组件
 import App from './App.vue';
-import '@/packages/app-shared/utils/vlog';
+// 导入路由
 import router from './router';
 import Vh5Ui from 'vh5-ui';
-import { initGlobalAPI, i18n } from './core';
-import domainStore from './domain';
-import '@/packages/app-shared/filters/index';
 import 'vh5-ui/lib/index.css';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
+// 引入国际化组件
+import i18n from '@/app-shared/i18n/index';
+// domain store
+import domainStore from './init-global/store';
+// 组件use
+import './init-global/use';
+// 全局混入
+import '@/app-shared/mixins/index';
+// 全局指令
+// import '@/app-shared/directives/index';
+// 全局过滤器
+import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
-
-import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
-
-// sentry模块
-// import * as Sentry from '@sentry/vue';
-// import { Integrations } from '@sentry/tracing';
-
-// 初始化
-initGlobalAPI();
-//初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
-Vue.use(OverlayScrollbarsPlugin);
 Vue.use(Vh5Ui);
 Vue.config.productionTip = false;
-Vue.config.devtools = true;
-
-// if (process.env.NODE_ENV !== 'development') {
-//   // Sentry监控探针
-//   Sentry.init({
-//     Vue,
-//     dsn: 'https://840242dc84b6435fbe79ebd7850f2a9a@sentry.vhall.com/20',
-//     release: `${process.env.VUE_APP_BUILD_VERSION}`,
-//     // environment 上报的环境 建议 按照 测试、生产区分
-//     environment: process.env.NODE_ENV,
-//     integrations: [],
-//     // Set tracesSampleRate to 1.0 to capture 100%
-//     // of transactions for performance monitoring.
-//     // We recommend adjusting this value in production
-//     tracesSampleRate: 1.0
-//   });
-// }
+if (process.env.NODE_ENV !== 'production') {
+  Vue.config.devtools = true;
+}
 
 new Vue({
   router,

@@ -1,6 +1,6 @@
 <template>
   <div class="lives-wrapbox">
-    <live-list :checked-list="info.webinars" :pagetype="pagetype" @link="linkWatch" />
+    <live-list :checked-list="info.webinars" @link="linkWatch" />
   </div>
 </template>
 <script>
@@ -15,10 +15,6 @@
     props: {
       info: {
         required: false
-      },
-      pagetype: {
-        type: String,
-        default: 'watch'
       }
     },
     computed: {

@@ -399,6 +399,10 @@
           this.interactToolStatus.doc_permission == this.userId &&
           this.roleName == 4
         );
+      },
+      // 是否开启视频轮巡
+      isVideoPolling() {
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'];
       }
     },
     methods: {
@@ -655,10 +659,7 @@
               const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
               _this.totalNum = _this.isInGroup
                 ? msg.uv
-                : msg.uv -
-                  ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                    ? groupUsersNumber
-                    : 0);
+                : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUsersNumber : 0);
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
@@ -834,10 +835,7 @@
           if (isLive) {
             _this.totalNum = _this.isInGroup
               ? msg.uv
-              : msg.uv -
-                ([1, 2, '1', '2'].includes(_this.interactToolStatus.is_open_switch)
-                  ? groupUserNum
-                  : 0);
+              : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUserNum : 0);
             _this.memberServer.updateState('totalNum', _this.totalNum);
           }
 
@@ -1292,7 +1290,8 @@
         const params = {
           room_id: this.roomId,
           pos: pos || (this.pageConfig.page <= 0 ? 0 : this.pageConfig.page),
-          limit: this.pageConfig.limit
+          limit: this.pageConfig.limit,
+          reset_device_status: 0
         };
 
         //如果存在输入搜索人员的值

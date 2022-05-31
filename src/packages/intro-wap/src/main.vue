@@ -245,7 +245,8 @@
 
         img {
           margin: 16px 0;
-          width: 100%;
+          max-width: 100%;
+          height: auto;
         }
         strong {
           font-weight: bold;

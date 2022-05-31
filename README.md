@@ -23,6 +23,7 @@ project: 项目
 project
 │
 ├── script  # 项目编译工具
+│    ├────...
 │    ├────btool.js # 项目编译辅助工具
 │    └────cli-service.js  # 实际编译启动工具
 │
@@ -31,9 +32,6 @@ project
 │    └────...
 │
 ├── src
-│    ├────demo-live # demoPC直播项目
-│    │    ├────...
-│    │
 │    ├────saas-live # saasPC直播端
 │    │    ├────...
 │    │    ├────...
@@ -43,7 +41,12 @@ project
 │    │    ├────webpack.dev.config #项目开发环境配置
 │    │    └────webpack.prod.config #项目生产环境配置
 │    │
-│    ├────saas-watch # saasPC观看端
+│    ├────saas-wap # saas wap观看端
+│    │    ├────...
+│    │    ├────...
+│    │    └────...
+│    │
+│    ├────saas-watch # saas PC观看端
 │    │    ├────...
 │    │    ├────...
 │    │    └────...
@@ -84,14 +87,8 @@ project
 
 ```shell
 
-## [demo-live]项目启动
-yarn demo
-
-## [saas-live]项目启动
-yarn run serve 或 yarn run serve:saas-live
-
-## [zhike-live]项目启动
-yarn run serve:zhike-live
+## [saas-live]项目331任务启动
+npm run serve:saas-live:331 或 yarn serve:saas-live:331
 
 ## ...
 
@@ -101,11 +98,12 @@ yarn run serve:zhike-live
 
 ```shell
 
-## 编译[demo-live]项目
-npm run build:demo-live
-
 ## 编译[saas-live]项目
 npm run build:saas-live
+
+## jenkins持续集成（运维支持）
+node scripts/cli-service.js build --project=${project} --mode=${mode}
+> 其中：${project} 表示要构建的项目，${mode} 表示构建环境，会从根目录读取.en.${mode} 文件配置信息
 
 ```
 
@@ -217,3 +215,5 @@ feature_v7.1.0 安装包不上的，问题最快的解决办法。
 node_modules 删掉了之后，
 从 test5 拷贝一下 yarn.lock 放入。
 在执行 yarn install 的时候，就能安装上了。
+问题 2：日志查询地址？
+sentry: https://sentry.vhall.com/

@@ -71,6 +71,7 @@ export const serverConfig = {
       'comMediaSetting',
       'comWatchPayFee',
       'comMicInvited',
+      'comCameraCheck',
       'comViewRestriction'
     ]
   },
@@ -108,16 +109,25 @@ export const serverConfig = {
       cuid: 'comShare',
       method: 'shareOtherDialog',
       args: ['$0']
-    }
+    },
+    // 删除自定义菜单tab
+    emitDeleteMenu: [
+      {
+        cuid: 'comTabMenu',
+        method: 'setVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comSubscribeTabMenu',
+        method: 'setVisible',
+        args: ['$0']
+      }
+    ]
   },
 
   // 文档白板组件
   comDocUne: {
     component: 'VmpDocUne',
-    options: {
-      keepAspectRatio: false,
-      hasPager: false
-    },
     // 打开对话框
     emitOpenDocList: {
       cuid: 'dlgDocList',
@@ -317,6 +327,11 @@ export const serverConfig = {
     emitClickMediaSetting: {
       cuid: 'comMediaSetting',
       method: 'showMediaSetting'
+    },
+    // 打开摄像头检测
+    emitClickCameraCheck: {
+      cuid: 'comCameraCheck',
+      method: 'showCameraCheck'
     },
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
@@ -521,6 +536,17 @@ export const serverConfig = {
       }
     ]
   },
+  // 摄像头检测及设置
+  comCameraCheck: {
+    component: 'VmpCameraCheck',
+    saveOptions: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
+  },
 
   // 预约页面配置
   layerSubscribeRoot: {
@@ -638,7 +664,7 @@ export const serverConfig = {
   // 单视频嵌入页面配置
   embedVideoLayerRoot: {
     component: 'VmpAirContainer',
-    children: ['embedVideoLayerBody']
+    children: ['embedVideoLayerBody', 'comWatchAuth']
   },
   // 中间主区域容器
   embedVideoLayerBody: {

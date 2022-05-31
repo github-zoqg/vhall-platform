@@ -36,6 +36,32 @@
         return this.$domainStore.state.roomBaseServer.configList;
       }
     },
+    watch: {
+      // 音频直播隐藏桌面共享icon
+      '$domainStore.state.roomBaseServer.watchInitData.webinar.mode': {
+        immediate: true,
+        handler: function (val) {
+          if (val == 1 && this.cuid == 'comShareDesktopMenu') {
+            this.setHiddenState(true);
+          }
+        }
+      },
+      // 云导播隐藏桌面共享icon
+      '$domainStore.state.roomBaseServer.watchInitData.webinar.is_director': {
+        immediate: true,
+        handler: function (val) {
+          if (
+            val == 1 &&
+            this.cuid == 'comShareDesktopMenu' &&
+            this.$domainStore.state.roomBaseServer.watchInitData.permissionKey[
+              'webinar.director'
+            ] == 1
+          ) {
+            this.setHiddenState(true);
+          }
+        }
+      }
+    },
 
     methods: {
       // 设置选中转态
@@ -71,6 +97,10 @@
           }
           case 'board': {
             window.vhallReportForProduct?.report(110026);
+            break;
+          }
+          case 'videoPolling': {
+            window.vhallReportForProduct?.report(110148);
             break;
           }
           case 'share': {

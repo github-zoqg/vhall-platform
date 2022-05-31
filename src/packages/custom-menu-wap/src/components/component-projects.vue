@@ -1,6 +1,6 @@
 <template>
   <div class="lives-wrapbox">
-    <project-list :checked-list="info.subjects" :pagetype="pagetype" @link="linkWatch" />
+    <project-list :checked-list="info.subjects" @link="linkWatch" />
   </div>
 </template>
 <script>
@@ -16,10 +16,6 @@
     props: {
       info: {
         required: false
-      },
-      pagetype: {
-        type: String,
-        default: 'watch'
       }
     },
     data() {

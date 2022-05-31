@@ -11,7 +11,7 @@
       <div class="invite-box">
         <p class="invite-desc">{{ $t('interact.interact_1031', { n: roleName }) }}</p>
         <div class="invite-btn-box">
-          <button class="btn btn-agree" :disabled="btnDisabled" @click="customAgreeConnect">
+          <button class="btn btn-agree" :disabled="btnDisabled" @click="mediaCheckClick">
             {{ $t('interact.interact_1009') }}
           </button>
           <!-- 拒绝上麦 -->
@@ -24,7 +24,13 @@
   </section>
 </template>
 <script>
-  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useChatServer,
+    useRoomBaseServer,
+    useMicServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpInviteHandup',
@@ -114,6 +120,27 @@
       closeInviteConnectPop() {
         this.showInviteConnectMic = false;
       },
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.customAgreeConnect();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.customAgreeConnect();
+              } else {
+                this.$toast(this.$t('interact.interact_1040'));
+                this.refuseInviteConnect();
+              }
+            });
+        } else {
+          this.$toast(this.$t('interact.interact_1040'));
+          this.refuseInviteConnect();
+        }
+      },
       // 同意邀请上麦
       customAgreeConnect() {
         this.btnDisabled = true;
@@ -126,10 +153,15 @@
           .then(res => {
             this.btnDisabled = false;
             if (res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513345) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+              } else {
+                this.$message.error(res.msg);
+              }
+            } else {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
+              useMicServer().userSpeakOn();
             }
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
-            useMicServer().userSpeakOn();
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');

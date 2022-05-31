@@ -52,6 +52,14 @@
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
+      // 是否为云导播活动
+      streamYun() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
+            1
+        );
+      },
       // 是否开启了插播
       isInsertFilePushing() {
         return this.$domainStore.state.insertFileServer.isInsertFilePushing;
@@ -236,6 +244,10 @@
               // 主持人
               if (this.webinarType === 1 && !this.isInGroup) {
                 vn.setHiddenState(false);
+                // 云导播/音频直播隐藏桌面共享icon
+                if (this.streamYun || this.webinarMode == 1) {
+                  vn.setHiddenState(true);
+                }
                 vn.setDisableState(false);
                 // 如果主持人把别人设为了主讲人，或者有人正在演示，桌面共享禁用
                 if (
@@ -404,6 +416,15 @@
               vn.setDisableState(false);
             } else {
               vn.setHiddenState(true);
+            }
+          } else if (vn.kind === 'videoPolling') {
+            if (this.webinarType == 1) {
+              vn.setDisableState(false);
+              vn.setHiddenState(false);
+            }
+            if (this.webinarType != 1) {
+              vn.setDisableState(true);
+              continue;
             }
           }
         }

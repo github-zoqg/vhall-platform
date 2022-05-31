@@ -247,6 +247,13 @@
               payAuthStatus = 1;
               const payUrl = buildPayUrl(this.$route);
               authWeixinAjax(this.$route, payUrl, () => {});
+            } else {
+              params = {
+                gift_id: this.currentGift.id,
+                channel: 'WEIXIN',
+                service_code: 'H5_PAY',
+                room_id: this.localRoomInfo.roomId
+              };
             }
           }
         } else {
@@ -348,7 +355,7 @@
       // 免费礼物
       payFree(params) {
         // 如果开启聊天高并发配置项，免费礼物通过聊天消息发送
-        if (this.joinInfoInGift.hideChatHistory || this.isEmbed) {
+        if (this.joinInfoInGift.hideChatHistory) {
           const msgData = {
             type: 'permit',
             event_type: 'free_gift_send',

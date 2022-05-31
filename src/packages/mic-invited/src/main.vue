@@ -7,7 +7,7 @@
       :title="$t('account.account_1061')"
       :confirmText="$t('common.common_1010')"
       :cancelText="btnText"
-      @onSubmit="confirmSave"
+      @onSubmit="mediaCheckClick"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
     >
@@ -16,7 +16,13 @@
   </aside>
 </template>
 <script>
-  import { useMsgServer, useChatServer, useRoomBaseServer, useMicServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useChatServer,
+    useRoomBaseServer,
+    useMicServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
@@ -101,6 +107,31 @@
         this.btnText = this.$t('interact.interact_1010');
         this.waitTime = 30;
       },
+      // 上麦前进行媒体检测函数别名  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.confirmSave();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.waitTime > 0 ? this.confirmSave() : '';
+              } else {
+                this.mediaCheckFail();
+              }
+            });
+        } else {
+          this.mediaCheckFail();
+        }
+      },
+      // 上麦前进行媒体检测失败
+      mediaCheckFail() {
+        this.$message.warning(this.$t('interact.interact_1039'));
+        this.isConfirmVisible = false;
+        this.closeConfirm();
+      },
       // 接受邀请
       confirmSave() {
         useMicServer()
@@ -111,10 +142,15 @@
           })
           .then(res => {
             if (res.code !== 200) {
-              this.$message.error(res.msg);
+              if (res.code == 513345) {
+                this.$message.warning(this.$t('interact.interact_1037'));
+              } else {
+                this.$message.error(res.msg);
+              }
+            } else {
+              useMicServer().userSpeakOn();
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             }
-            useMicServer().userSpeakOn();
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;

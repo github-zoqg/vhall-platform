@@ -56,7 +56,12 @@
   </section>
 </template>
 <script>
-  import { useMicServer, useInteractiveServer } from 'middle-domain';
+  import {
+    useMicServer,
+    useInteractiveServer,
+    useMsgServer,
+    useMediaCheckServer
+  } from 'middle-domain';
   export default {
     name: 'Handup',
     data() {
@@ -117,6 +122,25 @@
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
       });
+      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
+      useMsgServer().$onMsg('ROOM_MSG', msg => {
+        let temp = Object.assign({}, msg);
+        if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
+          temp.data = JSON.parse(temp.data);
+        }
+        const { type = '' } = temp.data || {};
+        console.log('11110-0-0-0-0-0-2222', temp, this.joinInfo.third_party_user_id);
+        if (type === 'vrtc_connect_refused') {
+          if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
+          this.lowerWheatFun && clearInterval(this.lowerWheatFun);
+          this.lowerWheatFun = null;
+          this.isWaitting = false;
+          this.handText = this.$t('interact.interact_1001');
+          this.showConnectMic = false;
+          this.$emit('handupLoading', false);
+          this.closeConnectPop();
+        }
+      });
     },
     methods: {
       // 下麦操作
@@ -130,7 +154,7 @@
         if (this.lowerWheatFun) {
           return;
         }
-        this.applyMic();
+        this.mediaCheckClick();
       },
       // 打开连麦弹框
       openConnectPop() {
@@ -139,6 +163,27 @@
       // 关闭弹窗
       closeConnectPop() {
         this.showConnectMic = false;
+      },
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
+          this.applyMic();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.applyMic();
+              } else {
+                this.$toast(this.$t('interact.interact_1040'));
+                this.closeConnectPop();
+              }
+            });
+        } else {
+          this.$toast(this.$t('interact.interact_1040'));
+          this.closeConnectPop();
+        }
       },
       // 主动上麦方法
       applyMic() {
