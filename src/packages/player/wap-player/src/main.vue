@@ -217,7 +217,7 @@
               ></i>
             </span>
             <span class="control_center">
-              <div class="status_tip">语音播放中...</div>
+              <div :class="isLiving ? 'status_tip' : ''">语音播放中...</div>
 
               <div class="player_time" v-if="!isLiving">
                 {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
@@ -842,6 +842,8 @@
             font-size: 24px;
             .status_tip {
               position: relative;
+              top: 50%;
+              transform: translate(0, -50%);
             }
             .player_time {
               position: relative;
