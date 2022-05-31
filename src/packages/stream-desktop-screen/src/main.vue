@@ -298,6 +298,8 @@
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
           if (msg.data.type === 'vrtc_speaker_switch') {
+            // 小组中，组长变更不会停止桌面共享
+            if (this.isInGroup) return;
             // 自己正在发起桌面共享
             if (
               this.isShareScreen &&
