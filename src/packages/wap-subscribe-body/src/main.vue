@@ -83,7 +83,7 @@
           </div>
         </div>
       </div>
-      <div :class="showBottomBtn ? 'subscribe_tabs' : ''">
+      <div :class="isScorllTab ? 'subscribe_tabs' : ''">
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
@@ -192,6 +192,7 @@
         popupLivingStart: false, // 开播提醒
         subscribeText: '',
         showBottomBtn: false,
+        isScorllTab: false,
         authInfo: {},
         textAuth: '',
         isHidden: true,
@@ -296,7 +297,9 @@
         let dom = document.querySelector('.vmp-subscribe-body-info');
         dom.addEventListener('scroll', e => {
           let scrollTop = e.target.scrollTop;
+          console.log(scrollTop);
           this.showBottomBtn = scrollTop >= 100 ? true : false;
+          this.isScorllTab = scrollTop >= 150 ? true : false;
         });
       },
       listenEvents() {
@@ -642,40 +645,6 @@
           window.location.href = sourceUrl;
         } else {
           window.location.reload();
-        }
-      },
-      filterText(verify, status) {
-        switch (verify) {
-          case 0:
-            // 免费
-            this.subscribeText = status
-              ? this.$t('appointment.appointment_1006')
-              : this.$t('appointment.appointment_1017');
-            break;
-          case 1:
-            // 密码
-            this.subscribeText = status
-              ? this.$t('appointment.appointment_1006')
-              : this.$t('appointment.appointment_1025');
-            break;
-          case 2:
-            // 白名单
-            this.subscribeText = status
-              ? this.$t('appointment.appointment_1006')
-              : this.$t('appointment.appointment_1025');
-            break;
-          case 3:
-            // 付费
-            this.subscribeText = status
-              ? this.$t('appointment.appointment_1006')
-              : this.$t('webinar.webinar_1024') + '¥' + this.subOption.fee;
-            break;
-          case 4:
-            // 邀请码
-            this.subscribeText = status
-              ? this.$t('appointment.appointment_1006')
-              : this.$t('appointment.appointment_1025');
-            break;
         }
       },
       initPage() {
