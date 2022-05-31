@@ -11,8 +11,7 @@ import './init-global/prototype';
 import App from './App.vue';
 // 导入路由
 import router from './router';
-import Vh5Ui from 'vh5-ui';
-import 'vh5-ui/lib/index.css';
+
 // 引入国际化组件
 import i18n from '@/app-shared/i18n/index';
 // domain store
@@ -28,7 +27,7 @@ import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
-Vue.use(Vh5Ui);
+
 Vue.config.productionTip = false;
 if (process.env.NODE_ENV !== 'production') {
   Vue.config.devtools = true;
