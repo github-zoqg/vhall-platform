@@ -17,7 +17,7 @@
               )
             "
           >
-            {{ source.roleName != 1 ? source.nickname : '' }}
+            {{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
@@ -50,7 +50,7 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName != 1 ? source.nickname : '' }}
+          {{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
@@ -66,7 +66,7 @@
           <div>
             <div class="flex-box">
               <p class="new-gift-name">
-                {{ source.nickName | overHidden(10) }}
+                {{ source.nickName | overHidden(8) }}
               </p>
               <p class="new-gift-content">
                 {{ $t('chat.chat_1029') }}
@@ -88,7 +88,7 @@
       <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box">
           <span class="new-gift-name">
-            {{ source.nickname | overHidden(10) }}
+            {{ source.nickname | overHidden(8) }}
           </span>
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
@@ -133,7 +133,7 @@
           <!-- 正常聊天消息 -->
           <p class="msg-content_name">
             <span class="nickname">
-              {{ source.nickname }}
+              {{ source.nickname | overHidden(8) }}
             </span>
             <span
               v-if="source.roleName && source.roleName != '2'"
@@ -326,6 +326,13 @@
       this.handleAt();
     },
     methods: {
+      overHidden(value = '', len = 0) {
+        if (value === null || value === undefined) return '';
+        if (value.length > len) {
+          return value.substring(0, len) + '...';
+        }
+        return value;
+      },
       // 点击查看抽奖信息
       checkLotteryDetail(e, msgData) {
         this.emitLotteryEvent(msgData?.content?.msg?.data);
@@ -699,7 +706,7 @@
       }
       .new-gift-img,
       .new-award-img {
-        width: 40px;
+        width: 47px;
       }
       .reward_txt {
         color: #d67900;
@@ -724,3 +731,4 @@
     }
   }
 </style>
+width: 40px;
