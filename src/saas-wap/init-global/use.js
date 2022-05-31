@@ -1,5 +1,5 @@
 import Vue from 'vue';
-
+import Vh5Ui from 'vh5-ui';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -36,6 +36,7 @@ import VmpChatWap from '@/packages/chat-wap';
 import VmpGoodsDetail from '@/packages/wap-goods-detail';
 
 import 'overlayscrollbars/css/OverlayScrollbars.css';
+import 'vh5-ui/lib/index.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 
 //wap互动工具box
@@ -127,7 +128,7 @@ Vue.use(VmpChapterWap);
 Vue.use(VmpQaWap);
 Vue.use(VmpQuestionnaireWap);
 Vue.use(VmpRedPacketWap);
-
+Vue.use(Vh5Ui);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpWapSignUpForm);
 Vue.use(VmpWapDesktopScreen);
