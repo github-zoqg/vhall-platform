@@ -1,5 +1,13 @@
 <template>
-  <div class="vmp-chat-operate-container" ref="chatOperateContainer">
+  <div
+    :class="[
+      'vmp-chat-operate-container',
+      {
+        'chat-operate-live': !isWatch
+      }
+    ]"
+    ref="chatOperateContainer"
+  >
     <div class="operate-container__tool-bar">
       <div class="operate-container__tool-bar__left">
         <!--表情-->
@@ -94,6 +102,16 @@
                   @change="toggleMutedAllStatus"
                 />
               </div>
+              <div class="chat-setting-box__item" v-if="showBannedCheckbox">
+                <el-checkbox
+                  v-for="(item, index) in bannedMoudleList"
+                  :key="index"
+                  :label="item.name"
+                  v-model="item.status"
+                  :disabled="item.isDisable || !allBanned"
+                  @change="setAllBanned(allBanned)"
+                ></el-checkbox>
+              </div>
               <div
                 class="chat-setting-box__item join-chat-btn"
                 @click="joinChatAuth"
@@ -124,7 +142,7 @@
 </template>
 
 <script>
-  import { useGroupServer } from 'middle-domain';
+  import { useGroupServer, useChatServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
@@ -151,6 +169,16 @@
         const { watchInitData = {} } = this.$domainStore.state.roomBaseServer;
         const { webinar = {} } = watchInitData;
         return webinar.type;
+      },
+      // 是否观看端
+      isWatch() {
+        return !['send', 'record', 'clientEmbed'].includes(
+          this.$domainStore.state.roomBaseServer.clientType
+        );
+      },
+      //是否显示全体禁言复选框
+      showBannedCheckbox() {
+        return [1, '1'].includes(this.configList['ui.is_show_estoppel']);
       }
     },
     props: {
@@ -185,6 +213,12 @@
       allBanned: {
         type: Boolean,
         default: () => false
+      },
+      allBannedModuleList: {
+        type: Object,
+        default: () => {
+          return {};
+        }
       },
       //活动id
       webinarId: {
@@ -223,14 +257,38 @@
         //聊天审核链接
         chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
         //是否是助理
-        assistantType: this.$route.query.assistantType
+        assistantType: this.$route.query.assistantType,
+        //禁言模块列表
+        bannedMoudleList: {
+          chat: {
+            status: true, //this.allBannedModuleList.chat_status,
+            name: '聊天',
+            isDisable: true
+          },
+          qa: {
+            status: this.allBannedModuleList.qa_status,
+            name: '问答',
+            isDisable: false
+          },
+          privateChat: {
+            status: this.allBannedModuleList.private_chat_status,
+            name: '私聊',
+            isDisable: false
+          }
+        }
       };
     },
     beforeCreate() {
       this.groupServer = useGroupServer();
     },
-    mounted() {},
+    mounted() {
+      this.listenEvents();
+    },
     methods: {
+      listenEvents() {
+        //监听全体禁言通知
+        useChatServer().$on('allBanned', res => {});
+      },
       //隐藏设置弹窗
       hidechatOptions() {
         this.isFilterShow = false;
@@ -241,8 +299,17 @@
           this.$message.error('直播未开始禁止调用');
           return;
         }
-        this.$emit('changeAllBanned', val);
+        this.setAllBanned(val);
         window.vhallReportForProduct?.report(val ? 110116 : 110117);
+      },
+      setAllBanned(status) {
+        const { chat, qa, privateChat } = this.bannedMoudleList;
+        this.$emit('changeAllBanned', {
+          status,
+          chat_status: chat.status,
+          qa_status: qa.status,
+          private_chat_status: privateChat.status
+        });
       },
       //进入聊天审核
       joinChatAuth() {
@@ -326,6 +393,15 @@
       openPrivateChatModal() {
         this.$emit('openPrivateChatModal');
       }
+    },
+    watch: {
+      allBannedModuleList: {
+        handler: function (data) {
+          this.bannedMoudleList.qa.status = data.qa_status;
+          this.bannedMoudleList.privateChat.status = data.private_chat_status;
+        },
+        deep: true
+      }
     }
   };
 </script>
@@ -336,9 +412,12 @@
     @font-error: #fb3a32;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    border-top: 1px solid #3a3a48;
-    background-color: #2d2d2d;
+    padding: 10px 24px;
+    &.chat-operate-live {
+      padding: 10px 10px;
+    }
+    border-top: 1px solid @bg-dark-normal;
+    background-color: @bg-dark-section;
     position: absolute;
     box-sizing: border-box;
     left: 0;
@@ -347,14 +426,13 @@
     .operate-container__tool-bar {
       display: flex;
       align-items: center;
-      height: 18px;
+      height: 19px;
       margin-bottom: 9px;
       position: relative;
       .vh-saas-a-line-zhikanzhubanfang {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 10px;
-        margin-bottom: 1px;
         &:hover {
           color: #ccc;
           cursor: pointer;
@@ -414,9 +492,9 @@
           display: none;
           position: absolute;
           bottom: 30px;
-          right: 0;
-          width: 180px;
-          padding: 4px 0;
+          right: -15px;
+          width: 236px;
+          padding: 4px 20px;
           border-radius: 4px;
           background-color: #fff;
           text-align: left;
@@ -425,11 +503,27 @@
           &__item {
             height: 40px;
             line-height: 40px;
-            padding: 0 15px;
-            &:hover {
-              color: @active-color;
-              background-color: #f0f1fe;
+            padding-bottom: 4px;
+            color: #1a1a1a;
+          }
+          .el-checkbox {
+            color: #1a1a1a;
+            &.is-disabled {
+              .el-checkbox__label {
+                color: #b3b3b3 !important;
+              }
+
+              .el-checkbox__input.is-checked .el-checkbox__inner {
+                background-color: #b3b3b3 !important;
+                border-color: #b3b3b3 !important;
+              }
             }
+            .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
+              border-color: #fff;
+            }
+          }
+          .el-checkbox__input.is-checked + .el-checkbox__label {
+            color: #1a1a1a;
           }
           .switch-box {
             .switch-title {
@@ -439,10 +533,7 @@
             }
           }
           .join-chat-btn {
-            &:hover {
-              cursor: pointer;
-              color: @active-color;
-            }
+            border-top: 1px solid #e2e2e2;
           }
         }
       }
@@ -523,10 +614,9 @@
         background-position: center;
       }
       .vh-line-expression {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 0;
-        margin-bottom: 1px;
         &:hover {
           color: @active-color;
           cursor: pointer;

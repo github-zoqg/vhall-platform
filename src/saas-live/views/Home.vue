@@ -19,6 +19,7 @@
   import Chrome from './Chrome';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   import {
     Domain,
     useRoomBaseServer,
@@ -55,24 +56,17 @@
           environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
           systemKey: 2
         });
-        domain.initVhallReport(
-          {
-            bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-            webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            os: 10,
-            type: 4,
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            pf: 7,
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-          },
-          {
-            namespace: 'saas', //业务线
-            env: 'test', // 环境
-            method: 'post' // 上报方式
-          }
-        );
+        domain.initVhallReport({
+          bu: 0,
+          user_id: roomBaseServer.state.watchInitData.join_info.join_id,
+          webinar_id: this.$route.params.id,
+          t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          os: 10,
+          type: 4,
+          entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          pf: 7,
+          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+        });
         // 产品侧数据埋点初始化（只有发起端用）
         domain.initVhallReportForProduct({
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
@@ -83,21 +77,19 @@
           webinar_id: watchInitData.webinar.id // 活动 id
         });
         window.vhallReport.report('ENTER_WATCH');
-        window.vhallLog({
-          tag: 'doc', // 日志所属功能模块
-          data: {
-            user_id: 20001,
-            user_name: 'hello world',
-            url: 'https://t.e.vhall.com'
-          },
-          type: 'log' // log 日志埋点，event 业务数据埋点
-        });
         await roomState();
+
+        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
+        document.title = watchInitData.webinar.subject;
 
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         this.addEventListener();
+        //上报日志
+        logRoomInitSuccess({ isSend: true });
       } catch (err) {
+        //上报日志
+        logRoomInitFailed({ isSend: true, error: err });
         console.error('---初始化直播房间出现异常--');
         console.error(err);
         if (err.code == 510008) {
@@ -133,6 +125,12 @@
             email,
             check_online: 1, // 检查主持人是否在房间.
             visitor_id: sessionStorage.getItem('visitorId_home') || ''
+          },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            method: 'post' // 上报方式
           }
         });
       },

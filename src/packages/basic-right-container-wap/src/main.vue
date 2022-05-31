@@ -8,7 +8,7 @@
         <div class="have"></div>
         <img src="./image/icon.png" />
       </div>
-      <div class="icon-wrap">
+      <div class="icon-wrap" v-if="!isVod">
         <lottery-icon @clickIcon="checkLotteryIcon" />
       </div>
       <!-- 红包 -->
@@ -53,6 +53,9 @@
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isVod() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 5;
       }
     },
     watch: {

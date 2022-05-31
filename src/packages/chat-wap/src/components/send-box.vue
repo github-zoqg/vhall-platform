@@ -25,7 +25,9 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned || isAllBanned || isMuted">{{ $t('chat.chat_1079') }}</span>
+            <span v-if="isBanned || isAllBanned || isMuted" class="span__speak__disable">
+              {{ $t('chat.chat_1079') }}
+            </span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>
               {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
@@ -80,6 +82,7 @@
     </div>
     <chat-wap-input
       ref="chatWapInput"
+      :refName="refName"
       @sendMsg="sendMessage"
       :showTabType="currentTab"
     ></chat-wap-input>
@@ -150,6 +153,11 @@
       onlineMicStatus: {
         type: Boolean,
         default: false
+      },
+      //父组件的ref
+      refName: {
+        type: String,
+        default: 'chatWap'
       }
     },
     filters: {
@@ -241,7 +249,7 @@
         //注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
-          this.device_status != 2 &&
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
@@ -302,26 +310,13 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1003'));
-        }
+        this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1002'));
-        }
+        this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
-      });
-      // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
-      useMicServer().$on('vrtc_connect_apply_cancel', msg => {
-        this.lowerWheatFun && clearInterval(this.lowerWheatFun);
-        this.lowerWheatFun = null;
-        this.isWaitting = false;
-        this.handText = this.$t('interact.interact_1001');
-        this.showConnectMic = false;
-        this.$emit('handupLoading', false);
       });
       window.chat = this;
     },
@@ -515,6 +510,9 @@
           .van-field__body {
             height: 100%;
           }
+        }
+        .span__speak__disable {
+          color: #bfbfbf;
         }
       }
 

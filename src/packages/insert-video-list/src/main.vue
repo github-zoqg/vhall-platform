@@ -4,6 +4,7 @@
       title="插播文件"
       :visible.sync="insertVideoVisible"
       :close-on-click-modal="false"
+      :append-to-body="true"
       width="800px"
     >
       <div class="vmp-insert-video-wrap">
@@ -135,8 +136,13 @@
         width="642px"
         :before-close="closeBefore"
         :close-on-click-modal="true"
+        :append-to-body="true"
       >
-        <video-preview ref="videoPreview" :videoParam="videoParam"></video-preview>
+        <video-preview
+          ref="videoPreview"
+          :isShowController="true"
+          :videoParam="videoParam"
+        ></video-preview>
       </el-dialog>
     </template>
   </div>
@@ -205,7 +211,13 @@
         console.log('---点击插播文件按钮----', insertStreamInfo);
 
         // 如果是直播状态需要判断当前主持人是否是用网页发起直播
-        if (watchInitData.switch.start_type != 1 && watchInitData.webinar.type == 1) {
+        // 嘉宾：设为主讲人的时候 可以插播
+        // 助理： 如果是网页发起，一直都有插播。如果是客户端发起，不支持插播文件，存在提示
+        if (
+          watchInitData.switch.start_type != 1 &&
+          watchInitData.webinar.type == 1 &&
+          watchInitData.join_info.role_name == 3
+        ) {
           this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
             title: '提示',
             confirmButtonText: '知道了',
@@ -449,7 +461,10 @@
       handlePreview(video) {
         this.previewDialog = true;
         if (video.transcode_status == 1) {
-          this.videoParam = video;
+          this.videoParam = {
+            autoplay: true,
+            ...video
+          };
         } else {
           this.$message.warning('只有转码成功才能查看');
         }

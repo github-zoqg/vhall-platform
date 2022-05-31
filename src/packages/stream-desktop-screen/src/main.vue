@@ -5,6 +5,7 @@
     :class="[
       miniElement === 'screen' ? 'mini' : 'normal',
       { 'is-watch': isWatch },
+      { 'is-embed': isEmbed && isWatch },
       { 'has-stream-list': hasStreamList },
       { 'share-screen': isShareScreen }
     ]"
@@ -39,7 +40,7 @@
     <div
       class="vmp-desktop-screen-exchange"
       @click="exchangeVideoDocs"
-      v-if="(!isSpeakOn && roleName == 2) || roleName == 3"
+      v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
     >
       <p>
         <el-tooltip :content="$t('player.player_1008')" placement="top">
@@ -113,6 +114,10 @@
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
+      },
+      // 是否是嵌入
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       //是否在分组里
       isInGroup() {
@@ -396,6 +401,7 @@
                 // 重新布局旁路
                 console.log('[screen] 桌面共享推流成功');
                 this.interactiveServer.resetLayout();
+                this.docServer.resetLayoutByMiniElement();
 
                 this.setDesktop('1');
               })
@@ -413,11 +419,11 @@
           });
       },
       // 停止共享
-      stopShare() {
-        this.desktopShareServer.stopShareScreen().then(() => {
-          this.setDesktop('0');
-          this.interactiveServer.resetLayout();
-        });
+      async stopShare() {
+        await this.desktopShareServer.stopShareScreen();
+        this.setDesktop('0');
+        this.interactiveServer.resetLayout();
+        this.docServer.resetLayoutByMiniElement();
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
@@ -560,6 +566,9 @@
       &.has-stream-list {
         top: 80px;
       }
+    }
+    &.is-embed {
+      width: calc(100% - 360px);
     }
     &.mini {
       width: 360px;

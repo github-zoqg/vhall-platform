@@ -103,7 +103,8 @@ export const serverConfig = {
       'liveTimer',
       'comRebroadcast',
       'comRebroadcastList',
-      'comMicInvited'
+      'comMicInvited',
+      'comVideoPollingSetting'
     ]
   },
 
@@ -175,6 +176,7 @@ export const serverConfig = {
       'comMediaPlayMenu',
       'comInteractMenu',
       'comGroupMenu',
+      'comVideoPollMenu',
       'comShareMenu',
       'comExitGroupMenu',
       'comLottery',
@@ -393,6 +395,24 @@ export const serverConfig = {
       }
     ]
   },
+  // 视频轮巡讨论菜单
+  comVideoPollMenu: {
+    component: 'VmpIconText',
+    options: {
+      icon: 'vh-saas-iconfont vh-saas-Videoroundtour',
+      text: '视频轮巡',
+      kind: 'videoPolling',
+      auth: 'video_polling',
+      disable: true
+    },
+    handleClick: [
+      {
+        // 点击分组讨论菜单
+        cuid: ['comVideoPollingSetting'],
+        method: 'showVideoPollingSetting'
+      }
+    ]
+  },
   // 分享菜单
   comShareMenu: {
     component: 'VmpIconText',
@@ -511,7 +531,16 @@ export const serverConfig = {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal']
+    children: ['comStreamLocal', 'comPcPlayerLiveYun']
+  },
+  // 云导播播放器&本地流推送组件
+  comPcPlayerLiveYun: {
+    component: 'VmpPcPlayerLiveYun',
+    // 打开媒体设置
+    emitClickMediaSetting: {
+      cuid: 'comMediaSetting',
+      method: 'showMediaSetting'
+    }
   },
   // 远端流
   comStreamRemote: {
@@ -580,6 +609,13 @@ export const serverConfig = {
     saveOptions: [
       {
         cuid: 'comStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ],
+    changeMediaOption: [
+      {
+        cuid: 'comPcPlayerLiveYun',
         method: 'switchStreamType',
         args: ['$0']
       }
@@ -866,6 +902,22 @@ export const serverConfig = {
   },
   // *******分屏页面****结束
 
+  // *******视频轮询页面****开始
+  // 【视频轮询页面】根组件
+  videoPollingRoot: {
+    component: 'VmpAirContainer',
+    children: ['videoPollingContainer']
+  },
+  // 【视频轮询页面】分屏组件
+  videoPollingContainer: {
+    component: 'VmpVideoPolling'
+  },
+  // 视频轮巡设置弹窗
+  comVideoPollingSetting: {
+    component: 'VmpPollingSetting'
+  },
+  // *******分屏页面****结束
+
   // 客户端嵌入页组件
   embedClientRoot: {
     component: 'VmpEmbedClient',
@@ -879,5 +931,10 @@ export const serverConfig = {
   // 邀请上麦弹窗
   comMicInvited: {
     component: 'VmpMicInvited'
+  },
+  // 【云导播页面】本地流&播放器
+  liveStreamYunRoot: {
+    component: 'VmpAirContainer',
+    children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
   }
 };

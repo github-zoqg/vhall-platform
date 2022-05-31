@@ -433,6 +433,10 @@
 .el-radio__inner:hover {
   border-color: @seleted-color-normal;
 }
+.el-checkbox-button__inner,
+.el-radio {
+  font-weight: 400;
+}
 /*----------------------------------------- 日期选择效果重置-----------------------------------------*/
 .el-date-table td.today span {
   color: @seleted-color-normal;
@@ -580,8 +584,8 @@
 
   &:hover {
     color: @font-error-low;
-    background: @hover-light-normal;
-    border: 1px solid @hover-light-normal;
+    background: @active-normal;
+    border: 1px solid @active-normal;
   }
 
   &:focus {

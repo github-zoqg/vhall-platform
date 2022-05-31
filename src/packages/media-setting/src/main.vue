@@ -170,6 +170,10 @@
     computed: {
       devices() {
         return this.mediaState.devices;
+      },
+      // 是否为云导播活动
+      streamYun() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
       }
     },
     beforeCreate() {
@@ -178,9 +182,6 @@
     created() {
       this._originCaptureState = {}; // 原始选中的数据
       this._diffOptions = {}; // 差异数据（更改的数据）
-
-      window.mediaSettingServer = this.mediaSettingServer;
-      window.mediaComponent = this;
     },
     async mounted() {
       const { watchInitData } = useRoomBaseServer().state;
@@ -370,13 +371,17 @@
        */
       getDiffOptions() {
         const source = this._originCaptureState;
-        let current = { ...this.mediaState };
-
-        if (this.isRepublishMode) current.isRepublishMode = true;
 
         const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
+        let diff = getDiffObject(source, { ...this.mediaState }, { ignoreKeys });
 
-        return getDiffObject(source, current, { ignoreKeys });
+        if (this.isRepublishMode) {
+          diff = Object.assign(diff, {
+            isRepublishMode: true
+          });
+        }
+
+        return diff;
       },
       /**
        * 发送变化事件
@@ -384,6 +389,12 @@
       sendChangeEvent() {
         const diffOptions = this._diffOptions;
         if (Object.keys(diffOptions) === 0) return;
+        if (this.streamYun) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'changeMediaOption', diffOptions)
+          );
+          return false;
+        }
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
       },

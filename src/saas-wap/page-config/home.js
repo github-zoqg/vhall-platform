@@ -262,7 +262,19 @@ const serverConfig = {
     component: 'VmpGoodsDetail'
   },
   comCustomMenuWap: {
-    component: 'VmpCustomMenuWap'
+    component: 'VmpCustomMenuWap',
+    emitDeleteMenu: [
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comSubcribeTabMenuWap',
+        method: 'setVisible',
+        args: ['$0']
+      }
+    ]
   },
   // 二维码弹框
   comOfficial: {

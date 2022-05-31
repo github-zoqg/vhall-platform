@@ -33,16 +33,16 @@
     <template v-else-if="source.type == 'questionnaire_push'">
       <div class="msg-item interact">
         <div
-          class="interact-msg"
+          class="interact-msg question_msg_bg"
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
           {{ source.roleName != 1 ? source.nickname : '' }}
           <span class="role" :class="source.roleName | roleClassFilter">
-            &nbsp;{{ source.roleName | roleFilter }}
+            <span>{{ source.roleName | roleFilter }}</span>
           </span>
           {{ source.content.text_content }}，{{ $t('common.common_1030') }}
-          <span class="highlight">{{ $t('chat.chat_1060') }}</span>
+          <span class="highlight">点击查看详情</span>
         </div>
       </div>
     </template>
@@ -130,6 +130,21 @@
               {{ source.roleName | roleFilter }}
             </span>
           </p>
+          <!-- <div class="msg-content_name" v-else>
+            <p>
+              <span
+                v-if="source.roleName && source.roleName != '2'"
+                class="role"
+                :class="source.roleName | roleClassFilter"
+              >
+                {{ source.roleName | roleFilter }}
+              </span>
+              <span class="nickname">
+                {{ source.nickname | overHidden(8) }}
+              </span>
+            </p>
+            <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
+          </div> -->
           <!-- 图文消息 -->
           <div class="msg-content_body_pre">
             <!-- 回复消息 -->
@@ -310,41 +325,23 @@
       handleAt() {
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
-        if (!this.source.atList || !this.source.atList.length) {
-          this.msgContent = this.urlToLink(this.source.content.text_content);
-        } else {
-          let at = false;
-          this.source.atList.forEach(a => {
-            // TODO历史列表aList与直播中格式不一致作
-            const userName = `@${a.nick_name || a.nickName} `;
-            const match =
-              this.source.content &&
-              this.source.content.text_content &&
-              this.source.content.text_content.indexOf(userName) != -1;
-            if (match) {
-              if (at) {
-                this.msgContent = this.urlToLink(
-                  this.msgContent.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              } else {
-                this.msgContent = this.urlToLink(
-                  this.source.content.text_content.replace(
-                    userName,
-                    `<span style='color:#3562fa'>${userName}</span>`
-                  )
-                );
-              }
-              at = true;
-            } else {
-              this.msgContent = at
-                ? this.urlToLink(this.msgContent)
-                : this.urlToLink(this.source.content.text_content);
-            }
-          });
-        }
+        this.msgContent = this.urlToLink(this.source.content.text_content);
+        this.source.atList.forEach(a => {
+          // TODO历史列表aList与直播中格式不一致作
+          const userName = `@${a.nick_name || a.nickName} `;
+          const match =
+            this.source.content &&
+            this.source.content.text_content &&
+            this.source.content.text_content.indexOf(userName) != -1;
+          if (match) {
+            this.msgContent = this.urlToLink(
+              this.source.content.text_content.replace(
+                userName,
+                `<span style='color:#3562fa'>${userName}</span>`
+              )
+            );
+          }
+        });
         if (
           (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
@@ -451,6 +448,11 @@
             max-width: 300px;
             line-height: 34px;
             margin-right: 8px;
+          }
+          .send_time {
+            font-size: 24px;
+            font-weight: 400;
+            color: #8c8c8c;
           }
           .role {
             margin-right: 10px;
@@ -567,6 +569,28 @@
         padding: 20px 60px;
         position: relative;
         border-width: 0;
+        .interact-content__role-name {
+          color: @font-link;
+          background-color: rgba(53, 98, 250, 0.2);
+          border-radius: 9px;
+          padding: 4px 8px;
+          font-size: 22px;
+          line-height: 16px;
+          margin: 2px 4px 0;
+          border-radius: 500px;
+          &.host {
+            background-color: rgba(251, 58, 50, 0.2);
+            color: #fb3a32;
+          }
+          &.assistant {
+            background-color: rgba(166, 166, 166, 0.15);
+            color: #3562fa;
+          }
+          &.guest {
+            background-color: rgba(53, 98, 250, 0.2);
+            color: #a6a6a6;
+          }
+        }
         input {
           background-color: transparent;
           position: relative;
@@ -595,6 +619,14 @@
         }
         .reward-text {
           margin-top: 13px;
+        }
+      }
+      .question_msg_bg {
+        padding: 10px 24px;
+        background: rgba(255, 209, 201, 0.2);
+        border-radius: 500px;
+        &::after {
+          border: 0 !important;
         }
       }
     }

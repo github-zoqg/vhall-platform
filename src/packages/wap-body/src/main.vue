@@ -47,7 +47,14 @@
   </div>
 </template>
 <script>
-  import { useMsgServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useGroupServer,
+    useRoomBaseServer,
+    useMediaCheckServer,
+    useMicServer,
+    useInteractiveServer
+  } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
   export default {
@@ -67,6 +74,7 @@
       },
       isShowContainer() {
         return (
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
           (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
             this.$domainStore.state.micServer.isSpeakOn) &&
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
@@ -87,10 +95,12 @@
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
+      this.roomBaseServer = useRoomBaseServer();
+      this.interactiveServer = useInteractiveServer();
     },
     async created() {
       if (
-        [3, 6].includes(this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode) &&
+        this.$domainStore.state.interactiveServer.mobileOnWheat &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
       ) {
         await this.$dialog.alert({
@@ -98,6 +108,11 @@
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
         });
+        await this.checkMediaPermission('isUseMic');
+      }
+      if (this.isInGroup) {
+        let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
+        this.gobackHome(1, this.groupServer.state.groupInitData.name, { sender_id: report_data });
       }
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
@@ -171,6 +186,27 @@
           }
         });
       },
+      // isUseMic：是否调用上麦接口[ 只有在刷新时，才会执行上麦 ]
+      async checkMediaPermission(isUseMic) {
+        let _flag = await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        if (_flag) {
+          if (isUseMic) {
+            let res = await useMicServer().userSpeakOn();
+            if (res.code == 200) {
+              await this.resetInteractive();
+            }
+          } else {
+            await this.resetInteractive();
+          }
+        } else {
+          this.$toast(this.$t('interact.interact_1040'));
+        }
+      },
+      // 重置互动SDK实例
+      async resetInteractive() {
+        await this.interactiveServer.destroy();
+        await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
+      },
       // 返回主房间提示
       async gobackHome(index, name, msg) {
         // 1 主持人    3 助理
@@ -204,6 +240,15 @@
             confirmButtonText: this.$t('common.common_1010'),
             message: title
           });
+        }
+        // 分组内的小组切换 -> 会自动重置互动初始化 -> 查看当前是否需要自动上麦 ====> 仅需判断可获取权限+未检测设备
+        if (
+          this.$domainStore.state.interactiveServer.mobileOnWheat &&
+          useMediaCheckServer().state.deviceInfo.device_status == 0 &&
+          index != 7
+        ) {
+          // 此时调用完，设备状态要么是1  要么是2
+          await this.checkMediaPermission();
         }
       }
     }

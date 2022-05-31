@@ -19,6 +19,7 @@
   import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   export default {
     name: 'Subcribe',
     components: {
@@ -72,54 +73,61 @@
       }
     },
     async mounted() {
-      try {
-        console.log('%c---初始化直播房间 开始', 'color:blue');
-        // 初始化直播房间
-        let clientType = 'standard';
-        const roomBaseServer = useRoomBaseServer();
-        // 判断是否是嵌入/单视频嵌入
-        try {
-          const _param = {
-            isEmbed: false,
-            isEmbedVideo: false
-          };
-          if (location.pathname.indexOf('embedclient') != -1) {
-            _param.isEmbed = true;
-            clientType = 'embed';
-          }
-          if (getQueryString('embed') == 'video') {
-            _param.isEmbedVideo = true;
-          }
-          roomBaseServer.setEmbedObj(_param);
-        } catch (e) {
-          console.log('嵌入', e);
-        }
-        await this.initReceiveLive(clientType);
-        // 是否跳转预约页
-        if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
-          this.goWatchPage(clientType);
-          return;
-        }
-        await subscribeState();
-        bindWeiXin();
-        console.log('%c---初始化直播房间 完成', 'color:blue');
-
-        document.title = roomBaseServer.state.languages.curLang.subject;
-        let lang = roomBaseServer.state.languages.lang;
-        this.$i18n.locale = lang.type;
-        this.setBottom();
-        // 初始化数据上报
-        console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
-        // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
-        this.state = 1;
-      } catch (err) {
-        console.error('---初始化直播房间出现异常2222222--');
-        console.error(err);
-        this.state = 2;
-        this.handleErrorCode(err);
-      }
+      this.initRoom();
     },
     methods: {
+      async initRoom() {
+        try {
+          console.log('%c---初始化直播房间 开始', 'color:blue');
+          // 初始化直播房间
+          let clientType = 'standard';
+          const roomBaseServer = useRoomBaseServer();
+          // 判断是否是嵌入/单视频嵌入
+          try {
+            const _param = {
+              isEmbed: false,
+              isEmbedVideo: false
+            };
+            if (location.pathname.indexOf('embedclient') != -1) {
+              _param.isEmbed = true;
+              clientType = 'embed';
+            }
+            if (getQueryString('embed') == 'video') {
+              _param.isEmbedVideo = true;
+            }
+            roomBaseServer.setEmbedObj(_param);
+          } catch (e) {
+            console.log('嵌入', e);
+          }
+          await this.initReceiveLive(clientType);
+          // 是否跳转预约页
+          if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
+            this.goWatchPage(clientType);
+            return;
+          }
+          await subscribeState();
+          bindWeiXin();
+          console.log('%c---初始化直播房间 完成', 'color:blue');
+
+          document.title = roomBaseServer.state.languages.curLang.subject;
+          let lang = roomBaseServer.state.languages.lang;
+          this.$i18n.locale = lang.type;
+          this.setBottom();
+          // 初始化数据上报
+          console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
+          // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
+          this.state = 1;
+          //上报日志
+          logRoomInitSuccess();
+        } catch (err) {
+          //上报日志
+          logRoomInitFailed({ error: err });
+          console.error('---初始化直播房间出现异常2222222--');
+          console.error(err);
+          this.state = 2;
+          this.handleErrorCode(err);
+        }
+      },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
         const { token } = this.$route.query;
@@ -135,6 +143,12 @@
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
             ...this.$route.query // 第三方地址栏传参
+          },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            method: 'post' // 上报方式
           }
         });
       },
@@ -153,10 +167,31 @@
         ) {
           this.liveErrorTip = this.$t('message.message_1004');
         } else if (err.code == 512503 || err.code == 512502) {
-          window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+          if (this.embedObj?.embed || this.embedObj?.embedVideo) {
+            let _embedQuery = location.search;
+            _embedQuery =
+              _embedQuery.indexOf('nickname=') != -1
+                ? _embedQuery.replace('nickname=', 'name=')
+                : _embedQuery;
+            _embedQuery =
+              _embedQuery.indexOf('record_id=') > -1
+                ? _embedQuery.replace('record_id=', 'rid=')
+                : _embedQuery;
+            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+          } else {
+            window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+          }
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址
           window.location.href = err.data.url;
+        } else if (err.code == 511006 || err.code == 511007) {
+          if (this.$route.query?.token) {
+            this.liveErrorTip = this.$tec(err.code) || err.msg;
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
+            this.initRoom();
+          }
         } else {
           this.liveErrorTip = this.$tec(err.code) || err.msg;
         }

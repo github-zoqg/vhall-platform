@@ -290,16 +290,14 @@
           return;
         }
 
-        if (this.docServer.state.switchStatus) {
-          // 确定文档最外层节点显示，并且文档dom绑定ID成功
-          await this.$nextTick();
-          // 初始化文档最外层节点大小
-          const { width, height } = this.getDocViewRect();
-          await this.docServer.recover({
-            width,
-            height
-          });
-        }
+        // 确定文档最外层节点显示，并且文档dom绑定ID成功
+        await this.$nextTick();
+        // 初始化文档最外层节点大小
+        const { width, height } = this.getDocViewRect();
+        await this.docServer.recover({
+          width,
+          height
+        });
       },
 
       // 翻页

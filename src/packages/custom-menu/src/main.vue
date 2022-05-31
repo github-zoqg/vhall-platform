@@ -91,6 +91,15 @@
               menu.componentName = `component-${componentMap[menu.component_id]}`;
               return menu;
             });
+          } else if (res.code === 513059) {
+            // 当前自定义菜单被删除 v7.1.3新增
+            // 增加toask提示，并删除该menu tap
+            // 点击桌面共享
+            this.handleSendEvent('emitDeleteMenu', [{ visible: false, type: '', id }]);
+            this.$message({
+              type: 'error',
+              message: res.msg
+            });
           }
         } catch (error) {
           this.loading = false;

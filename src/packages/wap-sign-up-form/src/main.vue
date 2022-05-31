@@ -352,7 +352,7 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone } from '@/packages/app-shared/utils/tool';
+  import { validEmail, validPhone, getQueryString } from '@/packages/app-shared/utils/tool';
   import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
@@ -678,6 +678,7 @@
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
+              // 不支持的活动类型（flash）
               window.location.href = `${window.location.origin}/${this.webinar_id}`;
             }
           });
@@ -973,6 +974,18 @@
               } else if (this.$route.query.invite) {
                 queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
               }
+              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+              const share_id = getQueryString('share_id');
+              const shareId = getQueryString('shareId');
+              if (queryString.indexOf('?') != -1) {
+                queryString += share_id ? `&share_id=${share_id}` : '';
+                queryString += shareId ? `&shareId=${shareId}` : '';
+              } else if (queryString.indexOf('?') == -1 && share_id) {
+                queryString += share_id ? `?share_id=${share_id}` : '';
+              } else if (queryString.indexOf('?') == -1 && shareId) {
+                queryString += shareId ? `?shareId=${shareId}` : '';
+              }
+              // 出错后异常跳转
               window.location.href =
                 window.location.protocol +
                 process.env.VUE_APP_WAP_WATCH +
@@ -996,6 +1009,17 @@
               queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
             } else if (this.$route.query.invite) {
               queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
+            }
+            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+            const share_id = getQueryString('share_id');
+            const shareId = getQueryString('shareId');
+            if (queryString.indexOf('?') != -1) {
+              queryString += share_id ? `&share_id=${share_id}` : '';
+              queryString += shareId ? `&shareId=${shareId}` : '';
+            } else if (queryString.indexOf('?') == -1 && share_id) {
+              queryString += share_id ? `?share_id=${share_id}` : '';
+            } else if (queryString.indexOf('?') == -1 && shareId) {
+              queryString += shareId ? `?shareId=${shareId}` : '';
             }
             if (res.data.webinar.type == 2) {
               this.startTime = res.data.webinar.start_time;
@@ -1024,6 +1048,7 @@
           })
           .catch(e => {
             if (e.code == 512503 || e.code == 512502) {
+              // 不支持的活动类型（flash）
               window.location.href = `${window.location.origin}/${this.webinar_id}`;
             }
           });
@@ -1436,6 +1461,17 @@
                   queryString = this.$route.query.invite
                     ? `?invite=${this.$route.query.invite}`
                     : '';
+                }
+                //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+                const share_id = getQueryString('share_id');
+                const shareId = getQueryString('shareId');
+                if (queryString.indexOf('?') != -1) {
+                  queryString += share_id ? `&share_id=${share_id}` : '';
+                  queryString += shareId ? `&shareId=${shareId}` : '';
+                } else if (queryString.indexOf('?') == -1 && share_id) {
+                  queryString += share_id ? `?share_id=${share_id}` : '';
+                } else if (queryString.indexOf('?') == -1 && shareId) {
+                  queryString += shareId ? `?shareId=${shareId}` : '';
                 }
                 window.location.href =
                   window.location.protocol +

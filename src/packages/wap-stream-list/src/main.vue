@@ -279,11 +279,12 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
-      // 检测是否支持连麦&&非视频直播&&非回放，不支持直接进行提示
+      // 检测是否支持连麦&&互动或分组&&直播状态，不支持直接进行提示
       if (
         useMediaCheckServer().state.isBrowserNotSupport &&
-        this.roomBaseServer.state.watchInitData.webinar.mode != 2 &&
-        this.webinarType != 5
+        (this.roomBaseServer.state.watchInitData.webinar.mode == 3 ||
+          this.roomBaseServer.state.watchInitData.webinar.mode == 6) &&
+        this.webinarType == 1
       ) {
         return this.$toast(this.$t('other.other_1010'));
       }

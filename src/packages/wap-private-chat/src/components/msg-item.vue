@@ -16,22 +16,21 @@
         />
       </div>
       <div class="private-chat-msg__item-main__msg-content">
-        <p class="msg-content_name">
-          <span
-            v-if="source.roleName && source.roleName != '2'"
-            class="role"
-            :class="source.roleName | roleClassFilter"
-          >
-            {{ source.roleName | roleFilter }}
-          </span>
-          <span class="nickname">{{ source.nickname }}</span>
-        </p>
+        <div class="msg-content_name">
+          <p>
+            <span
+              v-if="source.roleName && source.roleName != '2'"
+              class="role"
+              :class="source.roleName | roleClassFilter"
+            >
+              {{ source.roleName | roleFilter }}
+            </span>
+            <span class="nickname">{{ source.nickname | overHidden(8) }}</span>
+          </p>
+          <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
+        </div>
         <!-- 图文消息 -->
-        <p
-          v-if="source.content.text_content"
-          class="msg-content_body"
-          v-html="source.content.text_content"
-        ></p>
+        <p v-if="msgContent" class="msg-content_body" v-html="msgContent"></p>
         <p v-if="source.content.image_urls" class="msg-content_chat-img-wrapper">
           <img
             @tap="$emit('preview', img)"
@@ -63,7 +62,8 @@
     },
     data() {
       return {
-        defaultAvatar: defaultAvatar
+        defaultAvatar: defaultAvatar,
+        msgContent: ''
       };
     },
     computed: {
@@ -85,6 +85,47 @@
         //游客
         return 'guest';
       }
+    },
+    mounted() {
+      this.handleMsg(this.source.content.text_content);
+    },
+    methods: {
+      handleMsg(msg) {
+        this.msgContent = this.urlToLink(msg);
+      },
+      // 将聊天消息中的链接用 a 标签包裹
+      urlToLink(str) {
+        if (!str) return '';
+
+        // 提取聊天内容中的 img 标签
+        const regImg = /<img.*?(?:>|\/>)/g;
+        const imgArr = str.match(regImg);
+
+        // 提取聊天内容中除去 img 标签以外的部分
+        const strArr = str.split(regImg);
+        // eslint-disable-next-line no-useless-escape
+        const regUrl =
+          /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+
+        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
+        strArr.forEach((item, index) => {
+          const tempStr = item.replace(regUrl, function (match) {
+            return `<a class='msg-item__content-body__content-link' href='${match}' target='_blank'>${match}</a>`;
+          });
+          strArr[index] = tempStr;
+        });
+
+        // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
+        if (imgArr) {
+          const imgArrLength = imgArr.length;
+          let imgIndex = 0;
+          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+            imgIndex++;
+          }
+        }
+        return strArr.join('');
+      }
     }
   };
 </script>
@@ -99,7 +140,7 @@
     }
     .private-chat-msg__item-main {
       margin: 0 30px;
-      padding: 20px 0 0;
+      padding: 10px 0;
       display: flex;
       align-items: flex-start;
       &__avatar-wrap {
@@ -118,6 +159,7 @@
           display: flex;
           padding-left: 10px;
           align-items: center;
+          justify-content: space-between;
           margin-bottom: 5px;
           .nickname {
             font-size: 22px;
@@ -148,6 +190,11 @@
               background-color: rgba(77, 161, 255, 0.2);
               color: #4da1ff;
             }
+          }
+          .send_time {
+            font-size: 24px;
+            font-weight: 400;
+            color: #8c8c8c;
           }
         }
         .msg-content_body {

@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
-import grayInit from '@/packages/app-shared/gray-init';
+import grayInit from '@/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
 import { wxAuthCheck } from '../../packages/app-shared/utils/wechat';
-import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 Vue.use(VueRouter);
 
@@ -23,18 +22,20 @@ const routes = [
     redirect: to => {
       if (to.query.embed === 'video') {
         // 单视频嵌入
-        return {
-          name: 'LiveEmbedVideoRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientvideo'));
+        // return {
+        //   name: 'LiveEmbedVideoRoom',
+        //   query: to.query,
+        //   params: to.params
+        // };
       } else {
         // 完全嵌入
-        return {
-          name: 'LiveEmbedFullRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientfull'));
+        // return {
+        //   name: 'LiveEmbedFullRoom',
+        //   query: to.query,
+        //   params: to.params
+        // };
       }
     }
   },

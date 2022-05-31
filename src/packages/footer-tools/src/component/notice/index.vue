@@ -3,9 +3,10 @@
     <div class="vmp-notice-list_icon">
       <div class="icon-num">{{ noticeNum > 99 ? '99+' : noticeNum }}</div>
       <div class="icon-img" @click="getNoticeHistoryList">
-        <img src="./img/notice-icon.png" alt="" />
+        <img src="./img/notice-icon.png" alt="" class="show_img" />
       </div>
     </div>
+    <div class="common-notice-light-mask" v-if="isShowNotice" @click="closeNoticeList"></div>
     <div class="vmp-notice-list_container" v-if="isShowNotice">
       <div class="container-data">
         <ul v-if="noticeList.length" v-infinite-scroll="moreLoadData">
@@ -22,6 +23,7 @@
           </li>
         </ul>
       </div>
+      <div class="container-data__shadow"></div>
       <div class="container-close">
         <i class="vh-iconfont vh-line-close" @click="closeNoticeList"></i>
       </div>
@@ -147,15 +149,19 @@
     &_icon {
       position: relative;
       .icon-img {
+        position: relative;
         height: 32px;
         width: 32px;
         line-height: 32px;
-        border-radius: 50%;
-        position: relative;
+        background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+        border-radius: 16px;
         cursor: pointer;
-        img {
-          height: 32px;
+        margin-left: 16px;
+        img.show_img {
           width: 32px;
+          -webkit-transform-origin: left center;
+          transform-origin: left center;
+          margin: -1px 0 0 0;
         }
       }
       .icon-num {
@@ -174,10 +180,19 @@
         border: solid 1px @border-tools-color;
       }
     }
+    .common-notice-light-mask {
+      width: 100%;
+      position: fixed;
+      height: 100%;
+      background: transparent;
+      top: 0;
+      left: 0;
+      z-index: 11;
+    }
     &_container {
       position: absolute;
-      right: -48px;
-      bottom: 50px;
+      right: -32px;
+      bottom: 64px;
       z-index: 12;
       width: 492px;
       height: 382px;
@@ -188,8 +203,8 @@
         position: absolute;
         top: 108px;
         left: 60px;
-        width: 352px;
-        max-height: 267px;
+        width: 355px;
+        max-height: 254px;
         padding-right: 20px;
         overflow: auto;
         color: @font-light-normal;
@@ -242,6 +257,24 @@
             border-radius: 2px;
           }
         }
+        &::-webkit-scrollbar {
+          /*滚动条*/
+          width: 6px;
+          background: transparent !important;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          height: 50px;
+          border-radius: 10px;
+          background: #cccccc !important;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent !important;
+        }
+      }
+      .container-data__shadow {
+        height: 8px;
+        box-shadow: 0 8px 0 rgb(51 51 51 / 24%), 0 2px 0 rgb(0 0 0 / 5%);
       }
       .container-close {
         position: absolute;
@@ -249,8 +282,9 @@
         right: 75px;
         cursor: pointer;
         .vh-iconfont {
-          font-size: 12px;
-          color: @font-error;
+          font-size: 16px;
+          color: #666666;
+          color: @font-light-second;
         }
       }
     }

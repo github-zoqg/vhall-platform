@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-wap">
+  <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
     <!-- 礼物动画组件 -->
     <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
     <!-- 礼物动画组件-svga -->
@@ -16,6 +16,7 @@
       </p>
       <div ref="chatContent" class="virtual-content">
         <virtual-list
+          v-if="virtual.showlist"
           ref="chatlist"
           :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
           :keeps="20"
@@ -29,6 +30,7 @@
             emitQuestionnaireEvent,
             joinInfo
           }"
+          @totop="onTotop"
           @tobottom="toBottom"
         ></virtual-list>
         <div
@@ -41,7 +43,12 @@
         </div>
       </div>
     </div>
-    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @touchstart="closeOverlay"
+      @click="closeOverlay"
+    ></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -67,7 +74,8 @@
     useRoomBaseServer,
     useGroupServer,
     useMicServer,
-    useMenuServer
+    useMenuServer,
+    useMsgServer
   } from 'middle-domain';
   // import { ImagePreview } from 'vh5-ui';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
@@ -85,10 +93,8 @@
     },
     mixins: [emitter],
     data() {
-      const { chatList } = this.chatServer.state;
       return {
         msgItem,
-        chatList: chatList,
         //新消息信息集合体
         messageType: {
           atList: false,
@@ -105,10 +111,6 @@
         unReadMessageCount: 0,
         //活动信息
         webinar: {},
-        //当前页数
-        page: 1,
-        //是否已经下拉刷新
-        isPullingDown: false,
         //关键词列表
         keywordList: [],
         //房间号
@@ -126,13 +128,20 @@
           showlist: false,
           contentHeight: 0
         },
+        //聊天消息是否有滚动条
+        overflow: false,
+        //每次加载的消息条数
+        pageSize: 50,
+        isLoading: false,
         //聊天内容高度
         chatlistHeight: 0,
         //android的内初始部高度
         innerHeight: 0,
         //显示输入组件
         showSendBox: false,
-        childrenCom: []
+        childrenCom: [],
+        //小屏适配
+        smFix: false
       };
     },
     watch: {
@@ -218,6 +227,12 @@
       //黄金链路配置
       configList() {
         return this.roomBaseServer.state.configList;
+      },
+      chatList() {
+        return this.$domainStore.state.chatServer.chatList;
+      },
+      pos() {
+        return this.$domainStore.state.chatServer.pos;
       }
     },
     beforeCreate() {
@@ -225,11 +240,11 @@
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
       this.menuServer = useMenuServer();
+      this.chatServer.init();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.initViewData();
-      this.page = 0;
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -247,7 +262,7 @@
         window.addEventListener('focusin', this.focusinIOS);
         window.addEventListener('focusout', this.focusoutIOS);
       }
-      this.initEvent();
+      // this.initEvent();
       this.eventListener();
     },
     beforeDestroy() {
@@ -264,7 +279,7 @@
             if (e) {
               this.chatlistHeight =
                 this.$refs.chatContentMain.clientHeight - this.$refs.sendBox.$el.clientHeight + 60;
-              this.scrollBottom();
+              // this.scrollBottom();
             } else {
               this.chatlistHeight = this.virtual.contentHeight;
             }
@@ -276,7 +291,7 @@
         if (this.innerHeight > newInnerHeight) {
           // 键盘弹出事件处理
           // alert('android 键盘弹窗事件');
-          this.scrollBottom();
+          //this.scrollBottom();
         } else {
           // 键盘收起事件处理
           // alert('android 键盘收起事件处理');
@@ -289,7 +304,7 @@
       focusinIOS() {
         // 键盘弹出事件处理
         // alert('iphone 键盘弹出事件处理');
-        this.scrollBottom();
+        // this.scrollBottom();
       },
       showWelcomeTxt() {
         // 注意： 欢迎语不能跟弹框重合，需要有点距离，此处进行了特殊处理
@@ -310,6 +325,7 @@
       },
       listenChatServer() {
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         // const giftsServer = useGiftsServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
@@ -362,28 +378,35 @@
             this.scrollBottom();
           });
         });
+        msgServer.$onMsg('ROOM_MSG', msg => {
+          if (msg.data.type == 'live_start') {
+            chatServer.clearChatMsg();
+            this.getHistoryMessage();
+          }
+        });
       },
       //处理分组讨论频道变更
       handleChannelChange() {
-        this.page = 0;
         useChatServer().clearChatMsg();
         this.getHistoryMessage();
       },
       // 获取历史消息
       async getHistoryMessage() {
+        this.isLoading = true;
         const data = {
           room_id: this.roomId,
           // webinar_id: this.webinar_id,
-          pos: this.page * 10,
-          limit: 50 // 所有端统一显示50条
+          pos: this.pos,
+          limit: this.pageSize // 所有端统一显示50条
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
-        await this.chatServer.getHistoryMsg(data, 'h5');
+        const res = await this.chatServer.getHistoryMsg(data, 'h5');
         this.historyLoaded = true;
-        this.scrollBottom();
+        this.isLoading = false;
+        return res;
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
@@ -448,6 +471,18 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      async onTotop() {
+        if (this.isLoading) {
+          return;
+        }
+        const offsetPos = this.pos;
+        const { list } = await this.getHistoryMessage();
+        const vsl = this.$refs.chatlist;
+        this.$nextTick(() => {
+          // alert(this.chatList.length - offsetPos);
+          this.$refs.chatlist.scrollToIndex(list.length);
+        });
       },
       // eventBus监听
       eventListener() {
@@ -520,7 +555,6 @@
     > .overlay {
       width: 100vw;
       height: 100vh;
-      z-index: 21;
       position: fixed;
       left: 0;
       top: 0;
