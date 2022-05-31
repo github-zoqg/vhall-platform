@@ -1,7 +1,7 @@
 <template>
   <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
-      <div class="send-box" @touchstart.stop.prevent="operateEmoji">
+      <div class="send-box" @touchend.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
           class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
@@ -29,7 +29,7 @@
         @focus="handleOnFocus"
       ></el-input>
       <div class="send-box">
-        <div class="send-menu" @touchstart="send">
+        <div class="send-menu" @touchend.prevent="send">
           <span class="iconfonts vh-iconfont vh-line-send"></span>
         </div>
       </div>
@@ -44,10 +44,10 @@
         />
       </div>
       <div class="tools">
-        <div class="btn" @touchstart="delInput">
+        <div class="btn" @touchend.prevent="delInput">
           <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn send" @touchstart="send">发送</div>
+        <div class="btn send" @touchend.prevent="send">发送</div>
       </div>
     </div>
   </div>
@@ -143,6 +143,9 @@
         EventBus.$emit('showSendBox', false);
         this.$emit('sendMsg', inputValue);
         this.cancel();
+        this.$nextTick(() => {
+          this.$refs.textareaChat.blur();
+        });
       },
       //取消
       cancel() {
