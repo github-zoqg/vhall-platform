@@ -50,7 +50,11 @@
       },
       // 是否为云导播
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
+            1
+        );
       }
     },
     beforeCreate() {
