@@ -14,7 +14,7 @@
       :lottery-id="lotteryId"
       :lottery-info="lotteryInfo"
       :need-take-award="needTakeAward"
-      @need-Login="handleGoLogin"
+      @needLogin="handleGoLogin"
       @close="close"
       @navTo="changeView"
     />
