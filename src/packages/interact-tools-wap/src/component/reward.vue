@@ -276,6 +276,8 @@
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return;
         }
+        this.chooseMoney(0, this.moneyList[0]);
+        this.note = '';
         this.showRewardCard = true;
       },
       textBlur() {

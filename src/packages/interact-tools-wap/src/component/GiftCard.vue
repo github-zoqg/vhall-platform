@@ -416,9 +416,9 @@
     height: 100%;
     background: linear-gradient(55.94deg, #fdf1ed 9.51%, #f3f2ff 102.75%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
-    padding-top: 106px;
+    padding-top: 70px;
+    padding-bottom: 88px;
     .swiper-box {
-      height: 610px;
       padding: 0 32px;
       overflow-y: auto;
       .van-swipe-item {
