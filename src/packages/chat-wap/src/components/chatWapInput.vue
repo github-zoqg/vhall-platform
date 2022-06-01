@@ -50,9 +50,14 @@
       </div>
       <div class="tools">
         <div class="btn" @touchend.prevent="delInput">
-          <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
+          <span
+            :class="inputValue ? '' : 'noMsgText'"
+            class="iconfonts vh-saas-iconfont vh-saas-delete"
+          ></span>
         </div>
-        <div class="btn send" @touchend.prevent="send">发送</div>
+        <div class="btn send" :class="inputValue ? '' : 'noMsgText'" @touchend.prevent="send">
+          发送
+        </div>
       </div>
     </div>
   </div>
@@ -276,6 +281,7 @@
       margin-top: 0 !important;
     }
   }
+
   .chat-input-modal {
     width: 100%;
     position: relative;
@@ -285,6 +291,13 @@
     font-size: 28px;
     background-color: #f0f0f0;
     box-shadow: 0px -1px 1px #f1f1f1;
+    .noMsg {
+      opacity: 0.4 !important;
+    }
+    .noMsgText {
+      background-color: #fff !important;
+      color: #d9d9d9 !important;
+    }
     &.smFix {
       position: fixed !important;
       bottom: 0 !important;
@@ -320,9 +333,6 @@
           justify-content: center;
           background-color: #fff;
 
-          &.noMsg {
-            opacity: 0.4;
-          }
           .vh-iconfont {
             font-size: 34px;
           }

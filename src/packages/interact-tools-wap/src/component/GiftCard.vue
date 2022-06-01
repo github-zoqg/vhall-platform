@@ -419,6 +419,7 @@
     padding-top: 70px;
     padding-bottom: 88px;
     .swiper-box {
+      max-height: 610px;
       padding: 0 32px;
       overflow-y: auto;
       .van-swipe-item {
