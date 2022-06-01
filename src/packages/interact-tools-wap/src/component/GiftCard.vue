@@ -374,7 +374,7 @@
           };
           if (this.msgServer) {
             this.msgServer.sendChatMsg(msgData, context);
-            this.$toast(this.$t('interact_tools.interact_tools_1031'));
+            //  this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();
             this.btnDisabled = true;
             this.handlerTimer = setInterval(() => {
@@ -392,7 +392,7 @@
         }
         this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.code == 200) {
-            this.$toast(this.$t('interact_tools.interact_tools_1031'));
+            // this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();
             this.btnDisabled = true;
             this.handlerTimer = setInterval(() => {
@@ -425,7 +425,7 @@
       .van-swipe-item {
         display: grid;
         justify-content: flex-start;
-        grid-template-columns: repeat(4, 146px);
+        grid-template-columns: repeat(4, 160px);
         grid-gap: 16px;
       }
       .block {

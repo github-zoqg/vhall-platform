@@ -117,13 +117,7 @@
       <div v-if="showTime" class="msg-showtime">{{ showTime }}</div>
       <div class="msg-item">
         <div class="avatar-wrap">
-          <img
-            class="chat-avatar"
-            width="35"
-            height="35"
-            :src="source.avatar || defaultAvatar"
-            alt
-          />
+          <img class="chat-avatar" :src="source.avatar || defaultAvatar" alt />
         </div>
         <div class="msg-content">
           <!-- 签到消息头部 相类似的可优化 -->
@@ -440,6 +434,8 @@
         position: relative;
         margin-right: 10px;
         .chat-avatar {
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
           display: block;
           // border: 2px solid #e3e3e3;
@@ -537,7 +533,7 @@
           }
           .chat-text {
             display: block;
-            line-height: 40px;
+            line-height: 1.4;
           }
           .msg-content_chat-img {
             display: inline-block;
