@@ -45,7 +45,7 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info">
+    <div class="vmp-subscribe-body-info" :class="isScorllTab ? 'vmp-subscribe-body_embed' : ''">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -784,9 +784,12 @@
       }
     }
     &-info {
-      height: calc(100% - 422px);
+      height: 100%;
       overflow-y: auto;
       width: 100%;
+      &.vmp-subscribe-body_embed {
+        height: calc(100% - 422px);
+      }
       background: #f2f2f2;
       .subscribe_into {
         background: #fff;
