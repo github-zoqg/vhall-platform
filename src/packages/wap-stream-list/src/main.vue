@@ -48,7 +48,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          {{ hotNum | formatHotNum }}
         </p>
       </div>
       <!-- 播放 -->
@@ -533,6 +533,7 @@
           i {
             vertical-align: bottom;
             font-size: 28px;
+            margin-right: 4px;
           }
         }
       }
