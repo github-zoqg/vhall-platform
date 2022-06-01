@@ -850,13 +850,13 @@
       width: 520px;
       margin: 0 auto;
       margin-top: 32px;
-      height: 90px;
+      height: 80px;
       background: #fb3a32;
       border-radius: 50px;
       color: #fff;
       text-align: center;
       .subscribe_btn {
-        line-height: 90px;
+        line-height: 80px;
         font-size: 32px;
       }
       &.is-subscribe {
@@ -876,8 +876,8 @@
       span {
         display: inline-block;
         width: 280px;
-        height: 90px;
-        line-height: 90px;
+        height: 80px;
+        line-height: 80px;
         text-align: center;
         border-radius: 50px;
         background: #fb3a32;

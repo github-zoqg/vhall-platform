@@ -30,7 +30,7 @@
             </span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>
-              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
+              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1021') }}
             </span>
           </div>
         </template>

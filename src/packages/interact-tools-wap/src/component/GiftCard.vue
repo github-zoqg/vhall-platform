@@ -419,6 +419,7 @@
     padding-top: 70px;
     padding-bottom: 88px;
     .swiper-box {
+      max-height: 610px;
       padding: 0 32px;
       overflow-y: auto;
       .van-swipe-item {
@@ -440,7 +441,9 @@
       justify-content: space-between;
       .info {
         margin: 0 auto;
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
         .gift-img {
           width: 130px;
           height: 130px;

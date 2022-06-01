@@ -69,12 +69,12 @@
         justify-content: space-between;
         .title {
           font-size: 32px;
-          font-weight: 500;
+          font-weight: 600;
           color: #262626;
           line-height: 45px;
         }
         .vh-iconfont {
-          font-size: 20px;
+          font-size: 28px;
           color: #8c8c8c;
         }
       }

@@ -529,7 +529,8 @@
           padding: 16px;
           word-break: break-all;
           color: #262626;
-          line-height: 40px;
+          line-height: 1.4;
+          // line-height: 40px;
           font-size: 28px;
           background-color: #fff;
           border-radius: 0 8px 8px 8px;
@@ -538,16 +539,19 @@
           }
           .chat-text {
             display: block;
+            line-height: 40px;
           }
           .msg-content_chat-img {
             display: inline-block;
-            margin-top: 12px;
             margin-right: 8px;
             width: 84px;
             height: 86px;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+          }
+          & :nth-last-child(2) {
+            margin-right: 0;
           }
         }
         .emoji-img {
