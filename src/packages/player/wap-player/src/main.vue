@@ -207,7 +207,7 @@
           <div class="control_left">
             <span class="pos" @click="startPlay">
               <van-circle
-                v-model="sliderVal"
+                v-model="circleSliderVal"
                 :rate="parseInt(totalTime)"
                 size="32px"
                 :stroke-width="100"
@@ -374,7 +374,7 @@
         isWarnPreview: false, // 是否是暖场视频
         currentTime: 0, // 视频当前播放时长
         voice: 60, //声音
-        sliderVal: 0.001, //进度条显示
+        sliderVal: 0, //进度条显示
         totalTime: 0, // 视频总时长
         currentQualitys: {
           def: 'same'
@@ -406,7 +406,8 @@
         isOrientation: false,
         lang: {},
         languageList: [],
-        isSmallPlayer: false
+        isSmallPlayer: false,
+        circleSliderVal: 0
       };
     },
     watch: {
@@ -421,6 +422,9 @@
           }
           this.setSetingHeight();
         }
+      },
+      sliderVal(val) {
+        this.circleSliderVal = val;
       }
     },
     beforeCreate() {
