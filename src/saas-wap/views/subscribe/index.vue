@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="vmp-basic-layout"
-    :class="{
+  <!-- :class="{
       'vmp-basic-layout__noHeader': !showHeader,
       'vmp-basic-layout__hasBottom': showBottom
-    }"
-  >
+    }" -->
+  <div class="vmp-basic-layout">
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
@@ -112,7 +110,7 @@
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
-          this.setBottom();
+          // this.setBottom();
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
