@@ -45,7 +45,7 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info">
+    <div class="vmp-subscribe-body-info" :class="isEmbed ? 'vmp-subscribe-body-info_embed' : ''">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -53,7 +53,10 @@
         <template v-else>
           <p class="vod_title">直播回放中</p>
         </template>
-        <div class="subscribe_into_container" v-if="subOption.hide_subscribe == 1">
+        <div
+          class="subscribe_into_container"
+          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType == 1)"
+        >
           <div class="subscribe_into_other" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
@@ -799,6 +802,9 @@
       width: 100%;
       position: relative;
       background: #f2f2f2;
+      &_embed {
+        height: calc(100% - 422px);
+      }
       .subscribe_into {
         background: #fff;
         padding: 40px 0;
@@ -903,6 +909,7 @@
         width: 92%;
         padding: 0 12px;
         font-size: 28px;
+        font-family: Arial;
         &::-webkit-input-placeholder {
           color: #bfbfbf;
         }
