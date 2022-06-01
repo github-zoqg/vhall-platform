@@ -209,13 +209,6 @@
           }
           if (isSpeakOn) {
             this.startPush();
-          } else if (
-            this.mode === 6 &&
-            !this.chatServer.state.banned &&
-            !this.chatServer.state.allBanned
-          ) {
-            // 是分组活动 + 非禁言状态 + 非全体禁言状 + 开启自动上麦 =>  调用上麦接口 => 收到上麦成功消息
-            await this.userSpeakOn();
           }
         }
       },
@@ -271,9 +264,19 @@
         this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
           // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-          if (this.mediaCheckServer.state.deviceInfo.device_status == 2) {
+          let device_status = this.mediaCheckServer.state.deviceInfo.device_status;
+          if (device_status == 2) {
             this.speakOff();
             return;
+          } else if (device_status == 0) {
+            let _flag = await this.mediaCheckServer.getMediaInputPermission({
+              isNeedBroadcast: false
+            });
+            if (!_flag) {
+              this.speakOff();
+              this.$toast(this.$t('interact.interact_1040'));
+              return;
+            }
           }
           console.log('[stream-local] vrtc_connect_success startPush');
 

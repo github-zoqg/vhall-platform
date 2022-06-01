@@ -267,6 +267,13 @@
               payAuthStatus = 1;
               const payUrl = buildPayUrl(this.$route);
               authWeixinAjax(this.$route, payUrl, () => {});
+            } else {
+              params = {
+                gift_id: this.currentGift.id,
+                channel: 'WEIXIN',
+                service_code: 'H5_PAY',
+                room_id: this.localRoomInfo.roomId
+              };
             }
           }
         } else {

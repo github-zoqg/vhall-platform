@@ -80,6 +80,7 @@
     </div>
     <chat-wap-input
       ref="chatWapInput"
+      :refName="refName"
       @sendMsg="sendMessage"
       :showTabType="currentTab"
     ></chat-wap-input>
@@ -150,6 +151,11 @@
       onlineMicStatus: {
         type: Boolean,
         default: false
+      },
+      //父组件的ref
+      refName: {
+        type: String,
+        default: 'chatWap'
       }
     },
     filters: {
@@ -240,7 +246,7 @@
         //注意分组里的这个is_banned字段，并没有跟随禁言、解除禁言事件及时更新，所以在分组里，wap改用聊天的isBanned字段
         return (
           this.webinar.type == 1 &&
-          this.device_status != 2 &&
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
           [
             this.connectMicShow &&
               !this.isAllBanned &&
@@ -300,16 +306,12 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1003'));
-        }
+        this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$toast(this.$t('interact.interact_1002'));
-        }
+        this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
       });
       window.chat = this;

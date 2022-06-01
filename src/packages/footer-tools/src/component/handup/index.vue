@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-handup" v-if="device_status === 1 && isInteractLive && !isBanned && !allBanned">
+  <div class="vmp-handup" v-if="isInteractLive && !isBanned && !allBanned">
     <!-- // 分组内 20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-  import { useMicServer, useChatServer, useMsgServer } from 'middle-domain';
+  import { useMicServer, useChatServer, useMsgServer, useMediaCheckServer } from 'middle-domain';
   export default {
     name: 'VmpHandup',
     data() {
@@ -57,7 +57,8 @@
           (watchInitData.webinar.mode == 3 ||
             watchInitData.webinar.no_delay_webinar == 1 ||
             watchInitData.webinar.mode == 6) &&
-          watchInitData.webinar.type == 1
+          watchInitData.webinar.type == 1 &&
+          !this.$domainStore.state.interactiveServer.initInteractiveFailed
         );
       },
       // 是否开启举手
@@ -95,15 +96,11 @@
       });
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$message.success(this.$t('interact.interact_1003'));
-        }
+        this.$message.success(this.$t('interact.interact_1003'));
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        if (parseInt(this.device_status) === 1) {
-          this.$message.success(this.$t('interact.interact_1002'));
-        }
+        this.$message.success(this.$t('interact.interact_1002'));
       });
       //监听禁言通知
       useChatServer().$on('banned', res => {
@@ -153,12 +150,33 @@
         }
       },
       // 举手按钮点击事件
-      handleHandClick() {
+      async handleHandClick() {
         this.loading = true;
         if (this.isApplyed) {
           this.userCancelApply();
         } else {
+          this.mediaCheckClick();
+        }
+      },
+      // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
+      async mediaCheckClick() {
+        const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+        if (device_status == 1) {
           this.userApply();
+        } else if (device_status == 0) {
+          useMediaCheckServer()
+            .getMediaInputPermission({ isNeedBroadcast: false })
+            .then(flag => {
+              if (flag) {
+                this.userApply();
+              } else {
+                this.$message.warning(this.$t('interact.interact_1039'));
+                this.loading = false;
+              }
+            });
+        } else {
+          this.$message.warning(this.$t('interact.interact_1039'));
+          this.loading = false;
         }
       },
       // 申请上麦

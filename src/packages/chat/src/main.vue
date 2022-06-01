@@ -227,6 +227,7 @@
       hideChatHistory() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
+
       //视图中渲染的消息,为了实现主看主办方效果
       renderList() {
         return this.isOnlyShowSponsor
@@ -287,6 +288,7 @@
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
+      useChatServer().init();
     },
     mounted() {
       //初始化配置
@@ -656,7 +658,7 @@
         const { list } = await this.getHistoryMsg();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToIndex(this.chatList.length - offsetPos);
+          this.$refs.chatlist.scrollToIndex(list.length);
         });
       },
       checkOverflow() {
