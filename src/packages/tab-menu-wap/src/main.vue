@@ -661,6 +661,9 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
+        &:first-child {
+          padding-left: 12px;
+        }
 
         .item-text {
           display: flex;

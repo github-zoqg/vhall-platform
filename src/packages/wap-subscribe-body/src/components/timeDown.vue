@@ -162,8 +162,10 @@
       color: #262626;
       line-height: 65px;
       display: inline-block;
-      min-width: 70px;
+      min-width: 80px;
       text-align: right;
+      padding: 0 5px;
+      font-family: 'DIN Alternate';
     }
   }
 </style>

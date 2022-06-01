@@ -46,8 +46,12 @@
       </template>
     </div>
     <div
-      class="vmp-subscribe-body-info"
-      :class="isEmbed || subOption.hide_subscribe == 1 ? 'vmp-subscribe-body_embed' : ''"
+      :class="[
+        'vmp-subscribe-body-info',
+        {
+          'vmp-subscribe-body_embed': isEmbed || subOption.hide_subscribe == 1
+        }
+      ]"
     >
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
@@ -75,7 +79,7 @@
             :class="[
               'subscribe_into_person',
               {
-                isSubscribe: subOption.is_subscribe == 1
+                'is-subscribe': subOption.is_subscribe == 1
               }
             ]"
             @click="authCheck(subOption.verify)"
@@ -108,7 +112,7 @@
           :class="[
             'subscribe_into_person',
             {
-              isSubscribe: subOption.is_subscribe == 1
+              'is-subscribe': subOption.is_subscribe == 1
             }
           ]"
           @click="authCheck(subOption.verify)"
@@ -825,7 +829,7 @@
         line-height: 90px;
         font-size: 32px;
       }
-      &.isSubscribe {
+      &.is-subscribe {
         background: #fff;
         border: 1px solid #fb3a32;
         color: #fb3a32;
