@@ -441,7 +441,9 @@
       justify-content: space-between;
       .info {
         margin: 0 auto;
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
         .gift-img {
           width: 130px;
           height: 130px;
