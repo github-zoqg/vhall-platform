@@ -294,6 +294,10 @@
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     padding: 90px 32px 40px;
 
+    @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 40px) !important;
+    }
+
     .van-field {
       border-radius: 8px;
     }

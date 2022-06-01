@@ -68,7 +68,7 @@
         >
           <p>
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            {{ hotNum | formatHotNum }}
+            <span>{{ hotNum | formatHotNum }}</span>
           </p>
         </div>
         <!-- 倍速、清晰度切换 -->
