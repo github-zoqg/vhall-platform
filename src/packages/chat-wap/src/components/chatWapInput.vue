@@ -240,6 +240,8 @@
         this.$nextTick(() => {
           if (this.showEmoji) {
             this.$refs.textareaChat.blur();
+          } else {
+            this.$refs.textareaChat.focus();
           }
         });
         //设置只读属性可以暂时禁止键盘
