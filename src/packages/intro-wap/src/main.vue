@@ -241,7 +241,7 @@
         // padding-bottom: 30px;
         color: #595959;
         word-break: break-all;
-        line-height: 1.2;
+        line-height: 1.4;
         p {
           word-break: break-all;
         }

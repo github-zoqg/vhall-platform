@@ -661,14 +661,15 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
-        &:first-child {
-          padding-left: 12px;
-        }
+        // &:first-child {
+        //   padding-left: 12px;
+        // }
 
         .item-text {
           display: flex;
           align-items: center;
           line-height: 1.2;
+          font-size: 30px;
         }
 
         .tips {
