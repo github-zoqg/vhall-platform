@@ -1393,7 +1393,7 @@
             return pair[1];
           }
         }
-        return false;
+        return '';
       },
       //我已报名--验证
       submitVerify() {
