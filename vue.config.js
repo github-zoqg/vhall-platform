@@ -12,7 +12,6 @@ const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
-const { fstat } = require('fs');
 
 // 是否开发环境
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
