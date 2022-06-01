@@ -68,7 +68,7 @@
         >
           <p>
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            &nbsp;{{ hotNum | formatHotNum }}
+            {{ hotNum | formatHotNum }}
           </p>
         </div>
         <!-- 倍速、清晰度切换 -->
@@ -915,6 +915,7 @@
         i {
           vertical-align: bottom;
           font-size: 28px;
+          margin-right: 4px;
         }
       }
       &.opcity-flase {
@@ -1072,10 +1073,10 @@
             padding: 0 12px;
             border: 3px solid #fff;
             border-radius: 24px;
-            display: inline-block;
-            height: 30px;
-            text-align: center;
-            line-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
             font-size: 20px;
           }
           .barrage {
