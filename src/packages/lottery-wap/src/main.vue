@@ -117,9 +117,13 @@
             const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
             if (winLotteryHistory.length === 1) {
               // 只有一个中奖,显示中奖结果
-              this.lotteryId = lastLottery.lottery_id;
+              this.lotteryId = lastLottery.id;
+              if (lastLottery.take_award === 1) {
+                lotteryView = 'LotterySuccess'; // 已领取提示已提交
+              } else {
+                lotteryView = 'LotteryWin'; // 为领取显示中奖结果
+              }
               this.setFitment(lastLottery);
-              lotteryView = 'LotteryWin';
             } else if (winLotteryHistory.length > 1) {
               // 两条以上中奖记录,显示中奖历史
               this.winLotteryHistory = winLotteryHistory;

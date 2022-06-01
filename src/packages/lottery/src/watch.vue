@@ -110,14 +110,19 @@
           const lastLottery = list[0]; // 倒序排列
           if (lastLottery.lottery_status === 0) {
             // 抽奖中,显示抽奖面板
+            this.lotteryId = lastLottery.id;
             this.setFitment(lastLottery);
             this.lotteryView = 'LotteryPending';
           } else {
             const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖(返回列表是中奖+抽奖中,二次校验防止数据异常)
             if (winLotteryHistory.length === 1) {
               // 只中奖一次,显示该次中奖结果
-              this.lotteryId = lastLottery.lottery_id;
-              this.lotteryView = 'LotteryWin';
+              this.lotteryId = lastLottery.id;
+              if (lastLottery.take_award === 1) {
+                this.lotteryView = 'LotterySuccess'; // 已领取提示已提交
+              } else {
+                this.lotteryView = 'LotteryWin'; // 为领取显示中奖结果
+              }
               this.setFitment(lastLottery);
             } else if (winLotteryHistory.length > 1) {
               // 中奖记录2条以上显示中奖历史
