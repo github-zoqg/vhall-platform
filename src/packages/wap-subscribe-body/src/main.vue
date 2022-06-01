@@ -45,7 +45,10 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info" :class="isScorllTab ? 'vmp-subscribe-body_embed' : ''">
+    <div
+      class="vmp-subscribe-body-info"
+      :class="isEmbed || subOption.hide_subscribe == 1 ? 'vmp-subscribe-body_embed' : ''"
+    >
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -297,8 +300,9 @@
         let dom = document.querySelector('.vmp-subscribe-body-info');
         dom.addEventListener('scroll', e => {
           let scrollTop = e.target.scrollTop;
+          // console.log(scrollTop);
           if (this.subOption.hide_subscribe == 0) {
-            this.isScorllTab = scrollTop >= 100 ? true : false;
+            this.isScorllTab = scrollTop >= 85 ? true : false;
           } else {
             this.showBottomBtn = scrollTop >= 100 ? true : false;
             this.isScorllTab = scrollTop >= 150 ? true : false;
@@ -811,6 +815,7 @@
     .subscribe_into_person {
       width: 520px;
       margin: 0 auto;
+      margin-top: 32px;
       height: 90px;
       background: #fb3a32;
       border-radius: 50px;
