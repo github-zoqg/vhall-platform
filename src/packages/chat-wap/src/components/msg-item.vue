@@ -696,8 +696,9 @@
           align-items: center;
         }
         .gift-zdy {
-          width: 44px;
-          height: 44px;
+          margin-left: 8px;
+          width: 40px;
+          height: 40px;
           background-color: white;
           background-size: contain;
           background-repeat: no-repeat;
@@ -706,7 +707,8 @@
       }
       .new-gift-img,
       .new-award-img {
-        width: 47px;
+        margin-left: 8px;
+        width: 40px;
       }
       .reward_txt {
         color: #d67900;
