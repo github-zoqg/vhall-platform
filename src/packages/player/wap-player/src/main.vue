@@ -784,7 +784,7 @@
         this.isOpenlang = true;
       },
       showLabelFun(eventTime) {
-        this.sliderVal = (eventTime / this.totalTime) * 100;
+        this.sliderVal = this.totalTime ? (eventTime / this.totalTime) * 100 : 0;
         this.playerServer.setCurrentTime(eventTime, () => {
           this.$toast('调整播放时间失败');
         });
@@ -842,6 +842,7 @@
           }
           .control_center {
             padding-left: 16px;
+            padding-top: 4px;
             font-size: 24px;
             .status_tip {
               position: relative;
@@ -850,7 +851,7 @@
             }
             .player_time {
               position: relative;
-              top: 18px;
+              top: 16px;
             }
           }
         }
@@ -1082,7 +1083,7 @@
         -webkit-transition: all 1s;
       }
       .vh-line-arrow-left {
-        font-size: 20px;
+        font-size: 32px;
       }
     }
     &-tips {
