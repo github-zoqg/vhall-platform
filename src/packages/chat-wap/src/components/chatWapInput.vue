@@ -1,7 +1,7 @@
 <template>
-  <div class="chat-input-modal" :class="isXAndWxWork ? 'isXAndWxWork' : ''" v-show="visible">
+  <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
-      <div class="send-box" @click="operateEmoji">
+      <div class="send-box" @touchstart.stop.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
         <i
           class="iconfonts vh-saas-iconfont vh-saas-jianpan_icon"
@@ -29,7 +29,7 @@
         @focus="handleOnFocus"
       ></el-input>
       <div class="send-box">
-        <div class="send-menu" @click="send">
+        <div class="send-menu" @touchstart="send">
           <span class="iconfonts vh-iconfont vh-line-send"></span>
         </div>
       </div>
@@ -44,10 +44,10 @@
         />
       </div>
       <div class="tools">
-        <div class="btn" @click="delInput">
+        <div class="btn" @touchstart="delInput">
           <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
         </div>
-        <div class="btn send" @click="send">发送</div>
+        <div class="btn send" @touchstart="send">发送</div>
       </div>
     </div>
   </div>
@@ -57,13 +57,15 @@
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
   import EventBus from '../js/Events.js';
   import { isMse } from '../js/utils.js';
-
   export default {
     name: 'VmpChatWapInputModal',
     props: {
       showTabType: {
         type: [String, Number],
         default: ''
+      },
+      refName: {
+        default: 'chatWap'
       }
     },
     data() {
@@ -84,31 +86,42 @@
       }
     },
     computed: {
-      isXAndWxWork() {
-        const u = navigator.userAgent;
+      smFix() {
+        console.log('screen.height --', screen.height);
+        // if (screen.height < 667) {
+        //   return true;
+        // } else {
+        //   return false;
+        // }
         const IsMse = isMse();
-        //ios终端
-        if (IsMse.os === 'ios') {
-          if (screen.height >= 812) {
-            //是iphoneX
-            if (u.match(/wxwork/)) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            //不是iphoneX
-            return false;
-          }
+        if (IsMse.os === 'android') {
+          return true;
+        } else {
+          return false;
         }
-        return false;
       }
     },
     mounted() {
       this.eventListener();
       console.log('userAgent:', navigator.userAgent);
+      const IsMse = isMse();
+      if (IsMse.os === 'ios') {
+        window.addEventListener('focusin', this.focusinIOS);
+        window.addEventListener('focusout', this.focusoutIOS);
+      }
     },
     methods: {
+      focusoutIOS() {
+        // 键盘收起事件处理
+        //  // alert('iphone 键盘收起事件处理');
+        document.querySelector('body').classList.remove('fixIphoneX');
+      },
+      focusinIOS() {
+        // 键盘弹出事件处理
+        // alert('iphone 键盘弹出事件处理');
+        // this.scrollBottom();
+        document.querySelector('body').classList.add('fixIphoneX');
+      },
       //显示模态窗
       openModal(text = '') {
         if (!['', null, void 0].includes(text)) {
@@ -143,13 +156,28 @@
         // window.document.body.scrollTop = '0px';
         // window.document.activeElement.scrollIntoViewIfNeeded(true);
         // window.scroll(0, 0);
+        // this.doSmFix();
       },
       //处理获得焦点
       handleOnFocus() {
         if (this.showEmoji) {
           this.showEmoji = false;
         }
+        // this.doSmFix();
       },
+      /*  doSmFix() {
+        const this_p = this.$parent.$parent;
+        let sendBoxEL = this_p.$refs.sendBox.$el.getBoundingClientRect();
+        let chatWapEL = this_p.$refs[this.refName].getBoundingClientRect();
+        if (sendBoxEL.top < chatWapEL.top) {
+          this_p.smFix = true;
+          this.smFix = true;
+        } else {
+          this_p.smFix = false;
+          this.smFix = false;
+        }
+        console.log('-------------------', sendBoxEL.top, chatWapEL.top);
+      }, */
       //选中表情
       inputEmoji(item = {}) {
         this.inputValue += item.name;
@@ -190,6 +218,11 @@
       },
       operateEmoji() {
         this.showEmoji = !this.showEmoji;
+        this.$nextTick(() => {
+          if (this.showEmoji) {
+            this.$refs.textareaChat.blur();
+          }
+        });
         //设置只读属性可以暂时禁止键盘
         // this.$refs.textareaChat.$el.setAttribute('readonly', 'readonly');
         // this.$refs.textareaChat.focus();
@@ -211,22 +244,40 @@
 </script>
 
 <style lang="less">
+  // body {
+  //   padding-bottom: 0 !important;
+  // }
+
+  @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+    .fixIphoneX {
+      padding-bottom: 0 !important;
+    }
+  }
+
+  .smFix {
+    .chat-input-modal {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
+    }
+  }
   .chat-input-modal {
     width: 100%;
-    position: fixed;
+    position: relative;
     z-index: 9999;
     min-height: 94px;
-    bottom: 0;
-    left: 0;
+    margin-top: -94px;
     font-size: 28px;
     background-color: #f0f0f0;
 
-    &.isXAndWxWork {
-      bottom: 60px !important;
-      .tools {
-        bottom: 80px !important;
-      }
+    &.smFix {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
     }
+
     &::after {
       content: '';
       position: absolute;
@@ -320,6 +371,11 @@
         right: 20px;
         bottom: 20px;
         align-items: flex-end;
+        // 判断iphoneX  填充到最底部
+        @supports (bottom: env(safe-area-inset-bottom)) {
+          bottom: calc(env(safe-area-inset-bottom) + 20px);
+        }
+
         .btn {
           width: 104px;
           height: 74px;

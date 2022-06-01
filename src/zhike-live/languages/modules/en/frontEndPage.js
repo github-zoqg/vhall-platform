@@ -304,7 +304,7 @@ export default {
     chat_1078: 'There is a new message',
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
-    chat_1081: 'Q&A locked',
+    chat_1081: '{n} locked',
     chat_1092: 'You have been muted'
   },
   form: {
@@ -359,7 +359,7 @@ export default {
     form_1047: 'Select date & time',
     form_1048: 'Select time',
     form_1049: 'Add column options',
-    form_1050: 'Required:',
+    form_1050: 'Required',
     form_1051: 'Add row options',
     form_1052: 'Add options',
     form_1053: 'Please enter a title',
@@ -535,7 +535,7 @@ export default {
     message_1007: 'You have been banned from accessing the current event!',
     message_1008: 'The event is hit and the upper limit of audience has been exceeded!',
     message_1009:
-      'Participating in the event as a host and cannot watch it.\nRecommend to clear the browser cookies before visiting~',
+      'Participating in the event as a host and cannot watch it.\r\nRecommend to clear the browser cookies before visiting~',
     message_1010: 'The network is running short',
     message_1011:
       'Your IE browser version is outdated, please upgrade to version IE10 and above. Recommend to use Chrome browser~',
@@ -576,9 +576,9 @@ export default {
     cash_1009:
       'Amount ranging from 1 to 800 Yuan can be withdrawn online at one time. At the request of State Taxation Administration, single withdrawal of more than 800 Yuan by individual users will incur personal income tax. Please send the following information to finance@vhall.com.',
     cash_1010:
-      'Individual users: VHALL account, name, ID number,\nBanking information (account holder, account number, bank name)',
+      'Individual users: System account, name, ID number,\nBanking information (account holder, account number, bank name)',
     cash_1011:
-      'Corporate users: Scanned copy of VHALL account and business license with official seal\nBanking information (account holder, account number, bank name)',
+      'Corporate users: Scanned copy of System account and business license with official seal\nBanking information (account holder, account number, bank name)',
     cash_1012:
       'Company/personal information and banking information must correspond with each other',
     cash_1013: 'Does the withdraw occur any charge, and if yes, how much?',
@@ -598,7 +598,7 @@ export default {
     cash_1025: 'Please enter the withdrawal amount (maximum ¥800  for a single transaction)',
     cash_1026: 'WeChat',
     cash_1027: 'Withdraw now',
-    cash_1028: 'Submission means consent',
+    cash_1028: 'I consent',
     cash_1029: 'User Exchange Agreement',
     cash_1030: 'Please enter a numeric value',
     cash_1031: 'The withdrawal amount is at least  ¥1',
@@ -739,7 +739,11 @@ export default {
     interact_1037:
       'Currently on display, cannot apply for video connection at the moment, please try again later',
     interact_1038:
-      'The organizer has turned on the video tour function, and you will see your video screen on the host\'s side. Please ensure that the video equipment is all normal, and click "{n}" to set the media.'
+      'The organizer has turned on the video tour function, and you will see your video screen on the host\'s side. Please ensure that the video equipment is all normal, and click "{n}" to set the media.',
+    interact_1039:
+      'Only after obtaining the permission of camera and microphone can you participate in the connection',
+    interact_1040:
+      'To participate in the connection, you need to obtain camera and microphone permissions, you can refresh and reapply'
   },
   doc: {
     doc_1001: 'This documentation is loading',

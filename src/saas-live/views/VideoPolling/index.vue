@@ -13,6 +13,7 @@
 
 <script>
   import videoPollingState from '../../headless/video-polling-state';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
@@ -33,25 +34,23 @@
         // 初始化直播房间
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
+        const watchInitData = roomBaseServer.state.watchInitData;
 
-        domain.initVhallReport(
-          {
-            bu: 0,
-            user_id: roomBaseServer.state.watchInitData.join_info.join_id,
-            webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            os: 10,
-            type: 4,
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            pf: 7,
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
-          },
-          {
-            namespace: 'saas', //业务线
-            env: 'test', // 环境
-            method: 'post' // 上报方式
-          }
-        );
+        domain.initVhallReport({
+          bu: 0,
+          user_id: watchInitData.join_info.join_id,
+          webinar_id: this.$route.params.id,
+          t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          os: 10,
+          type: 4,
+          entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          pf: 7,
+          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+        });
+
+        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
+        document.title = watchInitData.webinar.subject;
+
         const res = await videoPollingState();
         // 如果浏览器不支持
         if (res === 'isBrowserNotSupport') {
@@ -60,7 +59,11 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
+        //上报日志
+        logRoomInitSuccess({ isSend: true });
       } catch (err) {
+        //上报日志
+        logRoomInitFailed({ isSend: true, error: err });
         console.error('---初始化直播房间出现异常--');
         console.error(err);
         if (err.code == 510008) {
@@ -109,6 +112,12 @@
             check_online: 0, // 不检查主持人是否在房间
             nickname,
             email
+          },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            method: 'post' // 上报方式
           }
         });
       }

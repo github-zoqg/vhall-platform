@@ -102,7 +102,7 @@
                   @change="toggleMutedAllStatus"
                 />
               </div>
-              <div class="chat-setting-box__item">
+              <div class="chat-setting-box__item" v-if="showBannedCheckbox">
                 <el-checkbox
                   v-for="(item, index) in bannedMoudleList"
                   :key="index"
@@ -175,6 +175,10 @@
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
         );
+      },
+      //是否显示全体禁言复选框
+      showBannedCheckbox() {
+        return [1, '1'].includes(this.configList['ui.is_show_estoppel']);
       }
     },
     props: {
@@ -412,8 +416,8 @@
     &.chat-operate-live {
       padding: 10px 10px;
     }
-    border-top: 1px solid #1a1a1a;
-    background-color: #2d2d2d;
+    border-top: 1px solid @bg-dark-normal;
+    background-color: @bg-dark-section;
     position: absolute;
     box-sizing: border-box;
     left: 0;
@@ -422,14 +426,13 @@
     .operate-container__tool-bar {
       display: flex;
       align-items: center;
-      height: 18px;
+      height: 19px;
       margin-bottom: 9px;
       position: relative;
       .vh-saas-a-line-zhikanzhubanfang {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 10px;
-        margin-bottom: 1px;
         &:hover {
           color: #ccc;
           cursor: pointer;
@@ -611,10 +614,9 @@
         background-position: center;
       }
       .vh-line-expression {
-        font-size: 19px;
+        font-size: 18px;
         color: #999;
         margin-left: 0;
-        margin-bottom: 1px;
         &:hover {
           color: @active-color;
           cursor: pointer;

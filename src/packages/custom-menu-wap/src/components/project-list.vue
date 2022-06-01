@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="vh-chose-active-box" :class="{ 'project-check-page': pagetype == 'subscribe' }">
+    <div class="vh-chose-active-box" :class="{ 'project-check-page': isSubscribe }">
       <!-- 单个视频 -->
       <div
         v-for="item in activeList"
@@ -31,7 +31,7 @@
   import { useCustomMenuServer } from 'middle-domain';
 
   export default {
-    props: ['checkedList', 'pagetype'],
+    props: ['checkedList'],
     data() {
       return {
         activeList: [],
@@ -42,6 +42,11 @@
     watch: {
       checkedList: function () {
         this.getActiveList();
+      }
+    },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       }
     },
     beforeCreate() {
