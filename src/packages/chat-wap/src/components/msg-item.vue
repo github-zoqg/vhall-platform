@@ -532,7 +532,7 @@
           line-height: 40px;
           font-size: 28px;
           background-color: #fff;
-          border-radius: 8px;
+          border-radius: 0 8px 8px 8px;
           span {
             word-break: break-word;
           }
