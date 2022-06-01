@@ -68,7 +68,7 @@
         >
           <p>
             <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            &nbsp;{{ hotNum | formatHotNum }}
+            {{ hotNum | formatHotNum }}
           </p>
         </div>
         <!-- 倍速、清晰度切换 -->
@@ -173,10 +173,7 @@
                   </span>
                 </span>
                 <!-- 右侧icon集合 -->
-                <p class="vmp-wap-player-control-icons-right">
-                  <span @click="openQuality" v-if="!isWarnPreview" class="icons-quality">
-                    {{ formatQualityText(currentQualitys.def) }}
-                  </span>
+                <div class="vmp-wap-player-control-icons-right">
                   <span
                     class="icons-quality icons-speed"
                     @click="openSpeed"
@@ -184,12 +181,16 @@
                   >
                     {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
                   </span>
+                  <span @click="openQuality" v-if="!isWarnPreview" class="icons-quality">
+                    {{ formatQualityText(currentQualitys.def) }}
+                  </span>
+
                   <span
                     @click="openBarrage"
                     v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
                   >
                     <i
-                      :class="`vh-iconfont ${
+                      :class="`barrage vh-iconfont ${
                         danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
                       }`"
                     ></i>
@@ -201,7 +202,7 @@
                       }`"
                     ></i>
                   </span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -914,6 +915,7 @@
         i {
           vertical-align: bottom;
           font-size: 28px;
+          margin-right: 4px;
         }
       }
       &.opcity-flase {
@@ -1061,24 +1063,24 @@
           }
         }
         &-right {
+          display: flex;
+          align-items: center;
           span {
-            margin-left: 16px;
+            margin-left: 34px;
             vertical-align: middle;
           }
           .icons-quality {
-            border: 1px solid #fff;
-            border-radius: 20px;
-            display: inline-block;
-            width: 90px;
-            height: 40px;
-            text-align: center;
-            line-height: 40px;
-            font-size: 28px;
-            margin-left: 0;
-            transform: scale(0.8);
+            padding: 0 12px;
+            border: 3px solid #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            font-size: 20px;
           }
-          .icons-speed {
-            margin-right: -8px;
+          .barrage {
+            font-size: 30px;
           }
         }
         // .icon-zanting_icon{

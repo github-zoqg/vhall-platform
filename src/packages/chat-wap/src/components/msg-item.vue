@@ -539,16 +539,19 @@
           }
           .chat-text {
             display: block;
+            line-height: 40px;
           }
           .msg-content_chat-img {
             display: inline-block;
-            margin-top: 12px;
             margin-right: 8px;
             width: 84px;
             height: 86px;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+          }
+          & :nth-last-child(2) {
+            margin-right: 0;
           }
         }
         .emoji-img {

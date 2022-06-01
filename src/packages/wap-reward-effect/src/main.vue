@@ -393,13 +393,14 @@
       margin-left: 13px;
     }
     .nick-name {
-      font-size: 28px;
-      font-weight: 500;
+      font-size: 24px;
+      line-height: 28px;
       color: #ffffff;
       margin-right: 8px;
     }
     .gift-name {
       font-size: 24px;
+      line-height: 24px;
       color: #ffffff;
       opacity: 0.8;
     }
