@@ -529,6 +529,8 @@
           padding: 16px;
           word-break: break-all;
           color: #262626;
+          line-height: 1.4;
+          // line-height: 40px;
           font-size: 28px;
           background-color: #fff;
           border-radius: 8px;
