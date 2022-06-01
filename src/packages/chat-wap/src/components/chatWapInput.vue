@@ -88,6 +88,9 @@
     watch: {
       showEmoji() {
         EventBus.$emit('showEmoji', this.showEmoji);
+        if (!this.showEmoji && !this.visible) {
+          this.focusoutIOS();
+        }
       }
     },
     computed: {
