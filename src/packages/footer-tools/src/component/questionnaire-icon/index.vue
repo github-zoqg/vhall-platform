@@ -90,8 +90,12 @@
       this.questionnaireServer.checkIconStatus();
       this.questionnaireServer.getSurveyList();
       this.questionnaireServer.$on('questionnaire_push', msg => {
-        this.questionnaireServer.getSurveyList();
         this.isShowQuestionList = false;
+      });
+      this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
+        if (res.code === 200) {
+          this.questionnaireServer.getSurveyList();
+        }
       });
     },
     methods: {

@@ -73,6 +73,8 @@
             let arr = val.filter(item => item.is_answered == 0);
             if (arr.length > 0) {
               this.questionnaireServer.setDotVisible(true);
+            } else {
+              this.questionnaireServer.setDotVisible(false);
             }
           }
         }
@@ -90,8 +92,12 @@
       this.questionnaireServer.checkIconStatus();
       this.setSetingHeight();
       this.questionnaireServer.$on('questionnaire_push', msg => {
-        this.questionnaireServer.getSurveyList();
         this.closeQuestionList();
+      });
+      this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
+        if (res.code === 200) {
+          this.questionnaireServer.getSurveyList();
+        }
       });
     },
     methods: {
