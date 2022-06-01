@@ -297,7 +297,7 @@
         let dom = document.querySelector('.vmp-subscribe-body-info');
         dom.addEventListener('scroll', e => {
           let scrollTop = e.target.scrollTop;
-          if (this.isEmbed && this.webinarType == 2) {
+          if (this.subOption.hide_subscribe == 0) {
             this.isScorllTab = scrollTop >= 100 ? true : false;
           } else {
             this.showBottomBtn = scrollTop >= 100 ? true : false;
@@ -363,12 +363,6 @@
           this.subOption.hide_subscribe = webinar.hide_subscribe;
         }
         if (webinar.type == 2) {
-          // 嵌入页没有预约页
-          if (this.isEmbed && this.webinarType == 2) {
-            this.subOption.hide_subscribe == 0;
-            this.showBottomBtn = false;
-            return;
-          }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
