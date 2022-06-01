@@ -14,7 +14,7 @@
             {{ startTime }}
           </p>
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p v-if="watchInitData.subscribe.show">
+            <p v-if="watchInitData.subscribe.show" class="subscribe_people">
               <i18n path="appointment.appointment_1018">
                 <span place="n">{{ watchInitData.subscribe.num }}</span>
               </i18n>
@@ -22,7 +22,7 @@
           </template>
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-            <p v-if="watchInitData.online.show">
+            <p v-if="watchInitData.online.show" class="subscribe_people">
               <!-- <i class="vh-iconfont vh-line-user"></i> -->
               {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
             </p>
@@ -152,7 +152,7 @@
     flex-direction: column;
 
     .vmp-intro-block {
-      padding: 32px 24px;
+      padding: 32px 24px 0 24px;
       background-color: #fff;
       position: relative;
 
@@ -162,7 +162,7 @@
 
       &-content {
         flex: 1 1 auto;
-        padding-top: 0;
+        padding-top: 32px;
       }
 
       &__headtitle {
@@ -232,10 +232,13 @@
           display: flex;
           align-items: center;
         }
+        .subscribe_people {
+          font-family: Arial;
+        }
       }
 
       &__content-main {
-        padding-bottom: 30px;
+        // padding-bottom: 30px;
         color: #595959;
         word-break: break-all;
         line-height: 1.2;
