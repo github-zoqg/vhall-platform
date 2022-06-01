@@ -26,7 +26,10 @@
           v-for="item of visibleMenu"
           :ref="item.id"
           class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :class="{
+            'vmp-tab-menu-item__active': selectedId === item.id,
+            'vmp-tab-menu-item_subscrbe': isSubscribe
+          }"
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
@@ -661,9 +664,11 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
-        // &:first-child {
-        //   padding-left: 12px;
-        // }
+        &_subscrbe {
+          &:first-child {
+            padding-left: 12px;
+          }
+        }
 
         .item-text {
           display: flex;
