@@ -215,8 +215,8 @@ const sharedConfig = {
   // 向 CSS 相关的 loader 传递选项
   // 可支持 css\postcss\sass\less\stylus-loader
   css: {
-    // 是否将组件中的 CSS 提取至一个独立的 CSS 文件中
-    extract: true,
+    // 是否将组件中的 CSS 提取至一个独立的 CSS 文件中(开发模式设为false,支持热更新)
+    extract: isDev ? false : true,
     // 开启 CSS source maps?
     sourceMap: false,
     // css预设器
