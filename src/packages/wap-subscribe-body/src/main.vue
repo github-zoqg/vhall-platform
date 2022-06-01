@@ -90,7 +90,7 @@
           </div>
         </div>
       </div>
-      <div :class="isScorllTab ? 'subscribe_tabs' : ''">
+      <div class="subscribe_tabs" :class="{ top_menu: isScorllTab }">
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
@@ -302,15 +302,23 @@
     methods: {
       handleScroll() {
         let dom = document.querySelector('.vmp-subscribe-body-info');
+        //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
+        const menuDom = document.querySelector('.vmp-tab-menu__header');
+        const offsetTop = menuDom.offsetTop;
         dom.addEventListener('scroll', e => {
           let scrollTop = e.target.scrollTop;
-          // console.log(scrollTop);
-          if (this.subOption.hide_subscribe == 0) {
-            this.isScorllTab = scrollTop >= 85 ? true : false;
+          if (scrollTop > offsetTop) {
+            this.isScorllTab = true;
           } else {
-            this.showBottomBtn = scrollTop >= 100 ? true : false;
-            this.isScorllTab = scrollTop >= 150 ? true : false;
+            this.isScorllTab = false;
           }
+          // console.log(scrollTop);
+          // if (this.subOption.hide_subscribe == 0) {
+          //   this.isScorllTab = scrollTop >= 85 ? true : false;
+          // } else {
+          //   this.showBottomBtn = scrollTop >= 100 ? true : false;
+          //   this.isScorllTab = scrollTop >= 150 ? true : false;
+          // }
         });
       },
       listenEvents() {
@@ -792,9 +800,10 @@
       }
     }
     &-info {
-      height: 100%;
+      height: calc(100% - 493px);
       overflow-y: auto;
       width: 100%;
+      position: relative;
       &.vmp-subscribe-body_embed {
         height: calc(100% - 422px);
       }
@@ -813,7 +822,28 @@
         }
       }
       .subscribe_tabs {
-        height: 100%;
+        &.top_menu {
+          .vmp-tab-menu__header {
+            position: fixed;
+            top: 493px;
+            z-index: 10;
+            background: #fff;
+          }
+        }
+        .tab-content {
+          height: auto;
+          position: initial;
+          .vmp-tab-menu {
+            position: initial;
+            height: auto;
+            .vmp-intro {
+              height: auto;
+            }
+            .vmp-tab-container {
+              height: auto;
+            }
+          }
+        }
       }
     }
     .subscribe_into_person {
