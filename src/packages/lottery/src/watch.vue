@@ -114,7 +114,7 @@
             this.setFitment(lastLottery);
             this.lotteryView = 'LotteryPending';
           } else {
-            const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖(返回列表是中奖+抽奖中,二次校验防止数据异常)
+            const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
             if (winLotteryHistory.length === 1) {
               // 只中奖一次,显示该次中奖结果
               this.lotteryId = lastLottery.id;
