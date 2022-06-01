@@ -213,11 +213,12 @@
                 :stroke-width="100"
                 :color="currentTime <= 0 ? 'transparent' : '#fb3a32'"
                 layer-color="rgba(255, 255, 255, 0.2)"
-              ></van-circle>
-              <i
-                class="vh-iconfont"
-                :class="isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'"
-              ></i>
+              >
+                <i
+                  class="vh-iconfont"
+                  :class="isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'"
+                ></i>
+              </van-circle>
             </span>
             <span class="control_center">
               <div :class="isLiving ? 'status_tip' : ''">{{ $t('player.player_1014') }}</div>
@@ -828,7 +829,7 @@
         align-items: center;
         z-index: 11;
         padding-left: 24px;
-        top: 50%;
+        top: 52%;
         transform: translate(0, -50%);
         background: url('./img/smallPlayer.png');
         background-size: 100% 100%;
@@ -838,6 +839,7 @@
             position: relative;
             .vh-iconfont {
               position: absolute;
+              font-size: 32px;
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%);
@@ -854,7 +856,7 @@
             }
             .player_time {
               position: relative;
-              top: 16px;
+              top: 8px;
             }
           }
         }
@@ -1087,6 +1089,7 @@
       }
       .vh-line-arrow-left {
         font-size: 32px;
+        line-height: 48px;
       }
     }
     &-tips {
