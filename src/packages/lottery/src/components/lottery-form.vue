@@ -320,6 +320,7 @@
         }
         if (!this.prizeNum) {
           this.$message.warning('请输入中奖人数');
+          return;
         }
         if (this.prizeNum > this.getPrizeCount) {
           this.$message.warning('中奖人数不可以大于参与抽奖人员数');
