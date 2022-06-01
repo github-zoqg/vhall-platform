@@ -162,7 +162,7 @@
       },
       // 金额校验
       submit() {
-        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^[0-9]\.[0-9]([0-9])?$)/;
+        const reg = /(^[1-9]\d*(.\d{1,2})?)|(^0\.[1-9][0-9]?)|(^0\.[0-9][1-9])/;
         const fee = this.money || this.btnMoney;
         if (reg.test(fee)) {
           this.rewardPay(fee);
