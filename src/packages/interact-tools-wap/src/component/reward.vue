@@ -293,6 +293,11 @@
     background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     padding: 90px 32px 40px;
+
+    .van-field {
+      border-radius: 8px;
+    }
+
     ul {
       display: flex;
       align-items: center;

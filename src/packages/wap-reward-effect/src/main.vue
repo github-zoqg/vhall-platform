@@ -301,8 +301,7 @@
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 44px;
       }
-      &.bg-coffee,
-      &.bg-rocket {
+      &.bg-coffee {
         background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
         .gift-img {
           background-image: url(images/bg3.png);
@@ -330,7 +329,8 @@
           margin-left: -2px;
         }
       }
-      &.bg-love {
+      &.bg-love,
+      &.bg-rocket {
         background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
         .gift-img {
           background-image: url(images/bg2.png);
