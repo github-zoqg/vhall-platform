@@ -45,14 +45,7 @@
         </template>
       </template>
     </div>
-    <div
-      :class="[
-        'vmp-subscribe-body-info',
-        {
-          'vmp-subscribe-body_embed': isEmbed || subOption.hide_subscribe == 1
-        }
-      ]"
-    >
+    <div class="vmp-subscribe-body-info">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -90,7 +83,12 @@
           </div>
         </div>
       </div>
-      <div class="subscribe_tabs" :class="{ top_menu: isScorllTab }">
+      <div
+        :class="[
+          'subscribe_tabs',
+          { top_menu: isScorllTab && !isEmbed, embed_menu: isEmbed && isScorllTab }
+        ]"
+      >
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
@@ -312,13 +310,6 @@
           } else {
             this.isScorllTab = false;
           }
-          // console.log(scrollTop);
-          // if (this.subOption.hide_subscribe == 0) {
-          //   this.isScorllTab = scrollTop >= 85 ? true : false;
-          // } else {
-          //   this.showBottomBtn = scrollTop >= 100 ? true : false;
-          //   this.isScorllTab = scrollTop >= 150 ? true : false;
-          // }
         });
       },
       listenEvents() {
@@ -354,7 +345,7 @@
         this.subOption.reg_form = webinar.reg_form; // 是否开启报名表单
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
-        // this.subOption.hide_subscribe = webinar.hide_subscribe;
+        this.subOption.hide_subscribe = webinar.hide_subscribe;
         if (webinar.type == 2 && subscribe.show == 1) {
           this.subOption.num = subscribe.num;
         }
@@ -371,14 +362,11 @@
           this.subOption.needAgreement = true;
         }
         // 如果是嵌入页并且没有开播，预约按钮不显示
-        if (this.isEmbed && this.webinarType == 2) {
-          this.subOption.hide_subscribe == 0;
-          this.showBottomBtn = false;
-          return;
-        } else {
-          this.subOption.hide_subscribe = webinar.hide_subscribe;
-        }
         if (webinar.type == 2) {
+          if (this.isEmbed) {
+            this.showBottomBtn = false;
+            return;
+          }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
@@ -804,9 +792,6 @@
       overflow-y: auto;
       width: 100%;
       position: relative;
-      &.vmp-subscribe-body_embed {
-        height: calc(100% - 422px);
-      }
       background: #f2f2f2;
       .subscribe_into {
         background: #fff;
@@ -826,6 +811,14 @@
           .vmp-tab-menu__header {
             position: fixed;
             top: 493px;
+            z-index: 10;
+            background: #fff;
+          }
+        }
+        &.embed_menu {
+          .vmp-tab-menu__header {
+            position: fixed;
+            top: 422px;
             z-index: 10;
             background: #fff;
           }
