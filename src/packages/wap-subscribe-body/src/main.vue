@@ -307,8 +307,14 @@
           let scrollTop = e.target.scrollTop;
           if (scrollTop > offsetTop) {
             this.isScorllTab = true;
+            if (this.webinarType == 2 && this.isEmbed) {
+              this.showBottomBtn = false;
+            } else {
+              this.showBottomBtn = true;
+            }
           } else {
             this.isScorllTab = false;
+            this.showBottomBtn = false;
           }
         });
       },
