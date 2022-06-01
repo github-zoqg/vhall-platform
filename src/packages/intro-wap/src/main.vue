@@ -24,7 +24,7 @@
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
               <!-- <i class="vh-iconfont vh-line-user"></i> -->
-              {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
+              {{ $t('common.common_1013') }} {{ personCount | formatHotNum }} 人
             </p>
           </template>
         </main>
@@ -152,7 +152,7 @@
     flex-direction: column;
 
     .vmp-intro-block {
-      padding: 32px 24px;
+      padding: 32px 24px 0 24px;
       background-color: #fff;
       position: relative;
 
@@ -162,7 +162,7 @@
 
       &-content {
         flex: 1 1 auto;
-        padding-top: 0;
+        padding-top: 32px;
       }
 
       &__headtitle {
@@ -224,7 +224,7 @@
 
           height: 40px;
           font-size: 28px;
-          font-family: PingFangSC;
+          font-family: Arial;
           font-weight: 400;
           color: #595959;
           line-height: 40px;
@@ -235,10 +235,10 @@
       }
 
       &__content-main {
-        padding-bottom: 30px;
+        // padding-bottom: 30px;
         color: #595959;
         word-break: break-all;
-        line-height: 1.2;
+        line-height: 1.4;
         p {
           word-break: break-all;
         }

@@ -27,8 +27,6 @@
                   ? $t('webinar.webinar_1018')
                   : webinarType == 2
                   ? $t('common.common_1019')
-                  : webinarType == 3
-                  ? $t('common.common_1020')
                   : webinarType == 4
                   ? $t('common.common_1024')
                   : $t('common.common_1021')
@@ -45,7 +43,7 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info" :class="isScorllTab ? 'vmp-subscribe-body_embed' : ''">
+    <div class="vmp-subscribe-body-info" :class="isEmbed ? 'vmp-subscribe-body-info_embed' : ''">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -53,7 +51,10 @@
         <template v-else>
           <p class="vod_title">直播回放中</p>
         </template>
-        <div class="subscribe_into_container" v-if="subOption.hide_subscribe == 1">
+        <div
+          class="subscribe_into_container"
+          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType == 1)"
+        >
           <div class="subscribe_into_other" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
@@ -72,7 +73,7 @@
             :class="[
               'subscribe_into_person',
               {
-                isSubscribe: subOption.is_subscribe == 1
+                'is-subscribe': subOption.is_subscribe == 1
               }
             ]"
             @click="authCheck(subOption.verify)"
@@ -83,7 +84,12 @@
           </div>
         </div>
       </div>
-      <div :class="isScorllTab ? 'subscribe_tabs' : ''">
+      <div
+        :class="[
+          'subscribe_tabs',
+          { top_menu: isScorllTab && !isEmbed, embed_menu: isEmbed && isScorllTab }
+        ]"
+      >
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
@@ -105,7 +111,7 @@
           :class="[
             'subscribe_into_person',
             {
-              isSubscribe: subOption.is_subscribe == 1
+              'is-subscribe': subOption.is_subscribe == 1
             }
           ]"
           @click="authCheck(subOption.verify)"
@@ -295,13 +301,21 @@
     methods: {
       handleScroll() {
         let dom = document.querySelector('.vmp-subscribe-body-info');
+        //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
+        const menuDom = document.querySelector('.vmp-tab-menu__header');
+        const offsetTop = menuDom.offsetTop;
         dom.addEventListener('scroll', e => {
           let scrollTop = e.target.scrollTop;
-          if (this.subOption.hide_subscribe == 0) {
-            this.isScorllTab = scrollTop >= 100 ? true : false;
+          if (scrollTop > offsetTop) {
+            this.isScorllTab = true;
+            if (this.webinarType == 2 && this.isEmbed) {
+              this.showBottomBtn = false;
+            } else {
+              this.showBottomBtn = true;
+            }
           } else {
-            this.showBottomBtn = scrollTop >= 100 ? true : false;
-            this.isScorllTab = scrollTop >= 150 ? true : false;
+            this.isScorllTab = false;
+            this.showBottomBtn = false;
           }
         });
       },
@@ -338,7 +352,7 @@
         this.subOption.reg_form = webinar.reg_form; // 是否开启报名表单
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
-        // this.subOption.hide_subscribe = webinar.hide_subscribe;
+        this.subOption.hide_subscribe = webinar.hide_subscribe;
         if (webinar.type == 2 && subscribe.show == 1) {
           this.subOption.num = subscribe.num;
         }
@@ -355,14 +369,11 @@
           this.subOption.needAgreement = true;
         }
         // 如果是嵌入页并且没有开播，预约按钮不显示
-        if (this.isEmbed && this.webinarType == 2) {
-          this.subOption.hide_subscribe == 0;
-          this.showBottomBtn = false;
-          return;
-        } else {
-          this.subOption.hide_subscribe = webinar.hide_subscribe;
-        }
         if (webinar.type == 2) {
+          if (this.isEmbed) {
+            this.showBottomBtn = false;
+            return;
+          }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
@@ -784,13 +795,14 @@
       }
     }
     &-info {
-      height: 100%;
+      height: calc(100% - 493px);
       overflow-y: auto;
       width: 100%;
-      &.vmp-subscribe-body_embed {
+      position: relative;
+      background: #f2f2f2;
+      &_embed {
         height: calc(100% - 422px);
       }
-      background: #f2f2f2;
       .subscribe_into {
         background: #fff;
         padding: 40px 0;
@@ -805,22 +817,52 @@
         }
       }
       .subscribe_tabs {
-        height: 100%;
+        &.top_menu {
+          .vmp-tab-menu__header {
+            position: fixed;
+            top: 493px;
+            z-index: 10;
+            background: #fff;
+          }
+        }
+        &.embed_menu {
+          .vmp-tab-menu__header {
+            position: fixed;
+            top: 422px;
+            z-index: 10;
+            background: #fff;
+          }
+        }
+        .tab-content {
+          height: auto;
+          position: initial;
+          .vmp-tab-menu {
+            position: initial;
+            height: auto;
+            .vmp-intro {
+              height: auto;
+            }
+            .vmp-tab-container {
+              height: auto;
+            }
+          }
+        }
       }
     }
     .subscribe_into_person {
       width: 520px;
       margin: 0 auto;
-      height: 90px;
+      margin-top: 32px;
+      height: 80px;
       background: #fb3a32;
       border-radius: 50px;
       color: #fff;
       text-align: center;
       .subscribe_btn {
-        line-height: 90px;
+        line-height: 80px;
         font-size: 32px;
       }
-      &.isSubscribe {
+      &.is-subscribe {
         background: #fff;
         border: 1px solid #fb3a32;
         color: #fb3a32;
@@ -837,8 +879,8 @@
       span {
         display: inline-block;
         width: 280px;
-        height: 90px;
-        line-height: 90px;
+        height: 80px;
+        line-height: 80px;
         text-align: center;
         border-radius: 50px;
         background: #fb3a32;
@@ -865,6 +907,7 @@
         width: 92%;
         padding: 0 12px;
         font-size: 28px;
+        font-family: Arial;
         &::-webkit-input-placeholder {
           color: #bfbfbf;
         }
