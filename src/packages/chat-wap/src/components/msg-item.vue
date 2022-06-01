@@ -537,6 +537,7 @@
           }
           .chat-text {
             display: block;
+            line-height: 40px;
           }
           .msg-content_chat-img {
             display: inline-block;
