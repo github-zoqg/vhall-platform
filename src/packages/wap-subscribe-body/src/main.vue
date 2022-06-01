@@ -307,8 +307,10 @@
           let scrollTop = e.target.scrollTop;
           if (scrollTop > offsetTop) {
             this.isScorllTab = true;
+            this.showBottomBtn = true;
           } else {
             this.isScorllTab = false;
+            this.showBottomBtn = false;
           }
         });
       },
