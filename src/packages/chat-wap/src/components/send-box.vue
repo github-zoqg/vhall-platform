@@ -524,7 +524,7 @@
         .icon-wrapper {
           color: #666;
           display: inline-block;
-          margin-right: 36px;
+          margin-right: 24px;
           text-align: center;
 
           &:last-child {
