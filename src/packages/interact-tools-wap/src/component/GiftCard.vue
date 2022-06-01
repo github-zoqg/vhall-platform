@@ -426,7 +426,7 @@
         display: grid;
         justify-content: flex-start;
         grid-template-columns: repeat(4, 146px);
-        grid-gap: 30px;
+        grid-gap: 16px;
       }
       .block {
         height: 270px;
@@ -489,7 +489,7 @@
           width: 100%;
           height: 54px;
           min-height: 54px;
-          background: rgba(252, 84, 89, 1);
+          background: #fb3a32;
           border-radius: 0 0 10px 10px;
           font-size: 28px;
           color: #ffffff;
