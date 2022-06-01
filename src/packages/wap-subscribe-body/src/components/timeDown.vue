@@ -151,7 +151,6 @@
 <style lang="less">
   .subscribe_into_down {
     width: 100%;
-    margin-bottom: 32px;
     text-align: center;
     span {
       font-size: 20px;
