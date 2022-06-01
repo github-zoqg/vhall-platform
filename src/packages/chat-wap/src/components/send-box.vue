@@ -466,7 +466,7 @@
     &__content {
       width: 100%;
       height: 94px;
-      padding: 0 32px;
+      padding: 0 24px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
