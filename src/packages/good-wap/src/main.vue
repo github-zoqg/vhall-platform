@@ -36,7 +36,14 @@
             </div>
           </div>
           <div>
-            <div v-if="good.showDiscountPrice" class="discount_price">￥{{ good.price }}</div>
+            <div
+              :style="{
+                visibility: good.showDiscountPrice ? 'visible' : 'hidden'
+              }"
+              class="discount_price"
+            >
+              ￥{{ good.price }}
+            </div>
             <div class="other-info">
               <div v-if="good.showDiscountPrice" class="discount">
                 <span class="price-tip">优惠价</span>
@@ -300,7 +307,7 @@
       /* 新商品样式 */
       .vh-goods_item {
         padding: 24px 32px 18px 32px;
-        border-bottom: 1px solid #f0f0f0;
+        /* border-bottom: 1px solid #f0f0f0; */
         clear: both;
         &-cover {
           width: 200px;
