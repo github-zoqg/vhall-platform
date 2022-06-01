@@ -863,7 +863,7 @@
         .control_right {
           padding-right: 24px;
           .set_center {
-            padding-right: 20px;
+            padding-right: 32px;
           }
         }
       }
