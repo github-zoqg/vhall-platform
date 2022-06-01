@@ -27,8 +27,6 @@
                   ? $t('webinar.webinar_1018')
                   : webinarType == 2
                   ? $t('common.common_1019')
-                  : webinarType == 3
-                  ? $t('common.common_1020')
                   : webinarType == 4
                   ? $t('common.common_1024')
                   : $t('common.common_1021')
