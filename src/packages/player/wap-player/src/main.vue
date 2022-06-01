@@ -374,7 +374,7 @@
         isWarnPreview: false, // 是否是暖场视频
         currentTime: 0, // 视频当前播放时长
         voice: 60, //声音
-        sliderVal: 0, //进度条显示
+        sliderVal: 0.001, //进度条显示
         totalTime: 0, // 视频总时长
         currentQualitys: {
           def: 'same'
@@ -445,7 +445,6 @@
       });
       const { record } = this.roomBaseState.watchInitData;
       // 判断是否支持加密视频播放
-      console.log(isMES, '是否支持MES');
       if (record && record.paas_record_id && record.encrypt_status == 2 && !isMES) {
         this.encrypt = false;
         return false;
@@ -784,7 +783,7 @@
         this.isOpenlang = true;
       },
       showLabelFun(eventTime) {
-        this.sliderVal = this.totalTime ? (eventTime / this.totalTime) * 100 : 0;
+        this.sliderVal = (eventTime / this.totalTime) * 100;
         this.playerServer.setCurrentTime(eventTime, () => {
           this.$toast('调整播放时间失败');
         });

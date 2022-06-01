@@ -91,6 +91,7 @@
       this.questionnaireServer.getSurveyList();
       this.questionnaireServer.$on('questionnaire_push', msg => {
         this.questionnaireServer.getSurveyList();
+        this.isShowQuestionList = false;
       });
     },
     methods: {

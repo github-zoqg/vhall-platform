@@ -89,6 +89,10 @@
     created() {
       this.questionnaireServer.checkIconStatus();
       this.setSetingHeight();
+      this.questionnaireServer.$on('questionnaire_push', msg => {
+        this.questionnaireServer.getSurveyList();
+        this.closeQuestionList();
+      });
     },
     methods: {
       setSetingHeight() {
