@@ -231,7 +231,7 @@ git config --global core.autocrlf input
 -webkit-box-orient: vertical;
 ```
 
-##### 问题 4：如何固定 saas 每个项目开发启动时的版本号
+##### 问题 4：如何固定 saas 每个项目开发启动时的端口号
 
 解决方案：
 在工程根目录下创建 devport.json 文件，编写内容：
