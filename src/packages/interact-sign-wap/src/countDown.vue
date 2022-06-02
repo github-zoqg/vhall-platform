@@ -108,6 +108,7 @@
       font-size: 50px;
       color: @font-light-normal;
       font-weight: bold;
+      font-family: 'DIN Alternate';
       // background-color: #fff;
     }
     // &-ani {
