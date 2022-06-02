@@ -116,7 +116,7 @@
       display: flex;
       & > div {
         font-size: 43px;
-        margin-right: 48px;
+        margin-right: 24px;
         display: flex;
         align-items: center;
         &:last-child {

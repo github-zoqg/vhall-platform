@@ -517,14 +517,14 @@
       }
 
       .interact-wrapper {
-        margin-left: 40px;
+        margin-left: 32px;
         text-align: right;
-        padding-right: 10px;
+        padding-right: 8px;
 
         .icon-wrapper {
           color: #666;
           display: inline-block;
-          margin-right: 36px;
+          margin-right: 24px;
           text-align: center;
 
           &:last-child {
@@ -571,7 +571,7 @@
   .user-avatar-wrap {
     vertical-align: middle;
     display: inline-flex;
-    margin-right: 12px;
+    margin-right: 24px;
 
     img {
       width: 100%;
