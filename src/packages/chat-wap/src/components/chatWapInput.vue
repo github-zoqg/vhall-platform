@@ -438,6 +438,7 @@
     input::-webkit-input-placeholder {
       /* placeholder字体大小  */
       font-size: 14px;
+      color: #bfbfbf;
     }
   }
 </style>
