@@ -64,7 +64,7 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          {{ source.content.text_content }}，{{ $t('common.common_1030') }}
+          {{ source.content.text_content }}
           <span class="highlight">点击查看</span>
         </div>
       </div>
@@ -96,7 +96,7 @@
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
-        <div class="interact-gift-box">
+        <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
           <span class="new-gift-name">
             {{ source.nickname | overHidden(8) }}
           </span>
@@ -735,6 +735,9 @@
         align-items: center;
         border: none;
         position: relative;
+        &.zdy {
+          padding-right: 90px;
+        }
         p {
           text-align: left;
           font-weight: 400;
