@@ -478,6 +478,7 @@
           document.querySelector('.vmp-basic-bd').classList.remove('small_player');
         }
       });
+      this.setSetingHeight();
     },
     methods: {
       /**
@@ -850,7 +851,7 @@
             padding-top: 4px;
             font-size: 24px;
             .status_tip {
-              position: relative;
+              position: absolute;
               top: 50%;
               transform: translate(0, -50%);
             }
