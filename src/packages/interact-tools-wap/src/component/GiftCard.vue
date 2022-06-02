@@ -441,12 +441,13 @@
       justify-content: space-between;
       .info {
         margin: 0 auto;
+        padding-top: 15px;
         display: flex;
         align-items: center;
         flex-direction: column;
         .gift-img {
-          width: 130px;
-          height: 130px;
+          width: 120px;
+          height: 120px;
           img {
             width: 100%;
             height: 100%;
@@ -475,10 +476,7 @@
           font-family: PingFangSC;
           font-weight: 400;
           color: #8c8c8c;
-          margin-top: 12px;
-          &.free {
-            font-size: 18px;
-          }
+          margin-top: 18px;
         }
       }
 
