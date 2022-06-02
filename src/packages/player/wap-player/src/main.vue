@@ -7,11 +7,11 @@
       </div>
       <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
         <!-- 播放器背景图片 -->
-        <div class="vmp-wap-player-prompt" v-if="isShowPoster">
+        <div class="vmp-wap-player-prompt" v-if="isShowPoster && !isSmallPlayer">
           <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
         </div>
         <!-- 播放 按钮 -->
-        <div v-show="!isPlayering && !isVodEnd" class="vmp-wap-player-pause">
+        <div v-show="!isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
           <p @click="startPlay">
             <i class="vh-iconfont vh-line-video-play"></i>
           </p>
@@ -63,13 +63,24 @@
         <!-- 观看次数  -->
         <div
           class="vmp-wap-player-header"
-          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview"
+          v-show="
+            roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
+          "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
-          <p>
-            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            &nbsp;{{ hotNum | formatHotNum }}
-          </p>
+          <!-- 播放器缩小按钮 -->
+          <span @click="changePlayerSize(true)">
+            <i class="vh-iconfont vh-line-arrow-left"></i>
+          </span>
+          <span>
+            <span class="hot_num">
+              <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+              {{ hotNum | formatHotNum }}
+            </span>
+            <span @click="openLanguage" v-if="languageList.length > 1" class="hot_num">
+              {{ lang.key == 1 ? '中文' : 'EN' }}
+            </span>
+          </span>
         </div>
         <!-- 倍速、清晰度切换 -->
         <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
@@ -86,14 +97,11 @@
         <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
         <div
           class="vmp-wap-player-footer"
-          v-show="isPlayering"
+          v-show="isPlayering && !isSmallPlayer"
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
           <!-- 倍速和画质合并 -->
           <div class="vmp-wap-player-speed">
-            <span @click="openLanguage" v-if="languageList.length > 1">
-              {{ lang.key == 1 ? '中文' : 'EN' }}
-            </span>
             <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
               {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
             </span>
@@ -193,6 +201,43 @@
             </div>
           </div>
         </div>
+
+        <!-- 小屏控制按钮 -->
+        <div v-show="isSmallPlayer" class="foot_control">
+          <div class="control_left">
+            <span class="pos" @click="startPlay">
+              <van-circle
+                v-model="circleSliderVal"
+                :rate="parseInt(totalTime)"
+                size="32px"
+                :stroke-width="100"
+                :color="currentTime <= 0 ? 'transparent' : '#fb3a32'"
+                layer-color="rgba(255, 255, 255, 0.2)"
+              >
+                <i
+                  class="vh-iconfont"
+                  :class="isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'"
+                ></i>
+              </van-circle>
+            </span>
+            <span class="control_center">
+              <div :class="isLiving ? 'status_tip' : ''">{{ $t('player.player_1014') }}</div>
+
+              <div class="player_time" v-if="!isLiving">
+                {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+              </div>
+            </span>
+          </div>
+          <div class="control_right">
+            <span class="set_center" @click.stop="refresh" v-if="isLiving">
+              <i class="vh-iconfont vh-line-refresh-left"></i>
+            </span>
+            <span @click="changePlayerSize(false)">
+              <i class="vh-iconfont vh-line-arrow-right"></i>
+            </span>
+          </div>
+        </div>
+
         <van-popup
           v-model="isOpenSpeed"
           :overlay="false"
@@ -302,10 +347,15 @@
           Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
           1
         );
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     data() {
       return {
+        asd: 1,
         isNoBuffer: false,
         // promptFlag: false,
         isOpenSpeed: false,
@@ -356,8 +406,27 @@
         encrypt: true,
         isOrientation: false,
         lang: {},
-        languageList: []
+        languageList: [],
+        isSmallPlayer: false,
+        circleSliderVal: 0
       };
+    },
+    watch: {
+      // 监听播放器大小
+      isSmallPlayer: {
+        handler: function (val) {
+          console.log(val, 'vmp-wap-body-endingvmp-wap-body-ending');
+          if (val) {
+            document.querySelector('.vmp-basic-bd').classList.add('small_player');
+          } else {
+            document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+          }
+          this.setSetingHeight();
+        }
+      },
+      sliderVal(val) {
+        this.circleSliderVal = val;
+      }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
@@ -381,7 +450,6 @@
       });
       const { record } = this.roomBaseState.watchInitData;
       // 判断是否支持加密视频播放
-      console.log(isMES, '是否支持MES');
       if (record && record.paas_record_id && record.encrypt_status == 2 && !isMES) {
         this.encrypt = false;
         return false;
@@ -402,8 +470,34 @@
       // } else {
       //   this.isOrientation = false;
       // }
+      // 直播结束音频直播改变播放器大小
+      this.playerServer.$on('live_over', e => {
+        if (this.isAudio) {
+          console.log(e, '直播结束音频直播改变播放器大小');
+          this.changePlayerSize(false);
+          document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+        }
+      });
+      this.setSetingHeight();
     },
     methods: {
+      /**
+       * 计算 设置tab-content高度
+       */
+      setSetingHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 90;
+        let calssname = '.tab-content';
+        if (this.isEmbed) {
+          baseHeight = playerHeight;
+          calssname = '.tab-content-embed';
+        }
+        let popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+        document.querySelector(calssname).style.height = popHeight;
+      },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
       },
@@ -704,6 +798,15 @@
       replay() {
         this.isVodEnd = false;
         this.startPlay();
+      },
+      // 改变播放器大小
+      changePlayerSize(data) {
+        console.log(data, 'data');
+        this.isSmallPlayer = data;
+        this.playerServer.setPlayerSize(data);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeChatHeight', [data])
+        );
       }
     }
   };
@@ -715,6 +818,56 @@
     &-video {
       height: 100%;
       width: 100%;
+      position: relative;
+      .foot_control {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        bottom: 0%;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 11;
+        padding-left: 24px;
+        top: 52%;
+        transform: translate(0, -50%);
+        background: url('./img/smallPlayer.png');
+        background-size: 100% 100%;
+        .control_left {
+          display: flex;
+          .pos {
+            position: relative;
+            .vh-iconfont {
+              position: absolute;
+              font-size: 32px;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            }
+          }
+          .control_center {
+            padding-left: 16px;
+            padding-top: 4px;
+            font-size: 24px;
+            .status_tip {
+              position: absolute;
+              top: 50%;
+              transform: translate(0, -50%);
+            }
+            .player_time {
+              position: relative;
+              top: 8px;
+            }
+          }
+        }
+        .control_right {
+          padding-right: 24px;
+          .set_center {
+            padding-right: 32px;
+          }
+        }
+      }
     }
     .player-encrypt {
       width: 100%;
@@ -909,16 +1062,18 @@
       position: absolute;
       font-size: 28px;
       z-index: 5;
-      p {
+      .hot_num {
         border-radius: 44px;
         height: 48px;
         line-height: 48px;
         padding: 0 16px;
         text-align: center;
+        margin-left: 20px;
         background: rgba(0, 0, 0, 0.5);
         i {
           vertical-align: bottom;
           font-size: 28px;
+          padding-right: 4px;
         }
       }
       &.opcity-flase {
@@ -932,6 +1087,10 @@
         transition: all 1s;
         z-index: 6;
         -webkit-transition: all 1s;
+      }
+      .vh-line-arrow-left {
+        font-size: 32px;
+        line-height: 48px;
       }
     }
     &-tips {
@@ -1096,6 +1255,13 @@
           }
         }
       }
+    }
+  }
+
+  // js动态添加播放器收起样式
+  .vmp-basic-container {
+    .small_player {
+      height: 130px !important;
     }
   }
 </style>

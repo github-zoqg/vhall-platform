@@ -56,7 +56,10 @@
       // },
       // signInVisible(newValue) {
       //   // EventBus.$emit('signShow', newValue);
-      // },
+      // }
+      isSmallPlayer() {
+        this.setSetingHeight();
+      },
       isInGroup: {
         handler: function (val) {
           if (val) {
@@ -71,6 +74,9 @@
       },
       signinInfo() {
         return this.roomBaseServer.state.signInfo;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
     beforeCreate() {
@@ -80,10 +86,7 @@
     },
     async created() {
       this.init();
-      let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-      // postcss 换算基数为75 头部+播放器区域高为 522px
-      this.popHeight = document.body.clientHeight - (522 / 75) * parseFloat(htmlFontSize) + 'px';
-      // 结束讨论
+      this.setSetingHeight();
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         const { groupInitData } = this.groupServer.state;
         if (!groupInitData.isInGroup && !this.signinInfo.is_signed && this.signinInfo.id) {
@@ -152,6 +155,15 @@
       });
     },
     methods: {
+      //  * 计算 设置的弹层高度
+      setSetingHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100;
+        this.popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+      },
       // 初次进入已存在签到计时器
       init() {
         if (this.signinInfo && !this.signinInfo.is_signed && this.signinInfo.id) {

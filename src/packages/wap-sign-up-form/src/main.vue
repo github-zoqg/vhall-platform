@@ -1406,6 +1406,9 @@
             phone: this.verifyForm.phone,
             refer
           };
+          if (!params.refer) {
+            delete params.refer;
+          }
 
           if (this.isPhoneValidate) {
             params.verify_code = this.verifyForm.code;

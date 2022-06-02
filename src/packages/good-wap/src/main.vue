@@ -241,6 +241,7 @@
     width: 100%;
     height: 100%;
     background: #fff;
+    overflow: auto;
     .vh-goods_list {
       display: block;
       width: 100%;
