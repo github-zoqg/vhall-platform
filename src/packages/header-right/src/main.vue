@@ -518,7 +518,9 @@
         if (res.code == 200) {
           this._recordId = res.data.sid; // 场次id
           // 派发事件，结束推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickEndLive', [{ source: 'live_over' }])
+          );
         }
       },
       // 录制 生成回放
