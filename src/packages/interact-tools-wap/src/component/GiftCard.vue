@@ -476,7 +476,7 @@
           font-family: PingFangSC;
           font-weight: 400;
           color: #8c8c8c;
-          margin-top: 18px;
+          margin-top: 12px;
         }
       }
 
@@ -499,6 +499,9 @@
           background: #ccc;
           border-color: #ccc;
           color: #fff;
+        }
+        .money {
+          margin-top: 0;
         }
       }
     }
