@@ -3,13 +3,17 @@
     <!-- 发起抽奖/问答 -->
     <template
       v-if="
-        ['lottery_push', 'question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
-          source.type
-        )
+        [
+          'lottery_push',
+          'question_answer_open',
+          'question_answer_close',
+          'sign_in_push',
+          'red_envelope_ok'
+        ].includes(source.type)
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">
+        <div class="interact-msg" :class="source.type">
           <template
             v-if="
               ['question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
@@ -21,6 +25,12 @@
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
+          </template>
+          <template v-if="source.type == 'red_envelope_ok'">
+            <img
+              class="new-award-img"
+              :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
+            />
           </template>
           {{ source.content.text_content }}
         </div>
@@ -163,12 +173,12 @@
                 source.atList.length == 0
               "
             >
-              <p class="reply-msg">
-                <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
-                ：
-                <span v-html="source.replyMsg.content.text_content" />
-              </p>
               <div class="msg-content_body">
+                <p class="reply-msg">
+                  <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                  ：
+                  <span v-html="source.replyMsg.content.text_content" />
+                </p>
                 <p class="reply-msg-content">
                   <span class="reply-color">
                     {{ $t('chat.chat_1036') }}
@@ -216,7 +226,11 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="msgContent" class="chat-text"></span>
+                <span
+                  v-html="msgContent"
+                  class="chat-text"
+                  :class="!!msgContent && source.content.image_urls.length != 0 ? 'existImg' : ''"
+                ></span>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
@@ -488,11 +502,11 @@
               color: #fb2626;
             }
             &.assistant {
-              background-color: #ade1ff;
+              background-color: rgba(173, 225, 255, 0.5);
               color: #0a7ff5;
             }
             &.guest {
-              background-color: #ade1ff;
+              background-color: rgba(173, 225, 255, 0.5);
               color: #0a7ff5;
             }
           }
@@ -524,13 +538,24 @@
           line-height: 40px;
           margin: 8px 0;
           color: #999;
-          padding-left: 10px;
+          padding-left: 18px;
+          position: relative;
           .reply-msg-content {
             word-break: break-word;
           }
           .chat-text {
             display: inline-block;
             line-height: 1.4;
+          }
+          &::after {
+            content: ' ';
+            width: 6px;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #bfbfbf;
+            border-radius: 3px;
           }
         }
         .msg-content_body {
@@ -539,7 +564,7 @@
           padding: 16px;
           word-break: break-all;
           color: #262626;
-          line-height: 1.4;
+          // line-height: 1.4;
           // line-height: 40px;
           font-size: 28px;
           background-color: #fff;
@@ -550,12 +575,16 @@
           .chat-text {
             display: block;
             line-height: 1.4;
+            &.existImg {
+              margin-bottom: 8px;
+            }
           }
           .msg-content_chat-img {
             display: inline-block;
             margin-right: 8px;
             width: 84px;
             height: 86px;
+            border-radius: 4px;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -591,11 +620,11 @@
             color: #fb2626;
           }
           &.assistant {
-            background: rgba(173, 225, 255, 0.5);
+            background-color: rgba(173, 225, 255, 0.5);
             color: #0a7ff5;
           }
           &.guest {
-            background: rgba(173, 225, 255, 0.5);
+            background-color: rgba(173, 225, 255, 0.5);
             color: #0a7ff5;
           }
         }
@@ -604,6 +633,10 @@
         padding: 20px 24px;
         position: relative;
         border-width: 0;
+        &.red_envelope_ok {
+          display: flex;
+          align-items: center;
+        }
         .interact-content__role-name {
           color: @font-link;
           background-color: rgba(53, 98, 250, 0.2);
@@ -654,6 +687,10 @@
         }
         .reward-text {
           margin-top: 13px;
+        }
+        .new-award-img {
+          margin-right: 8px;
+          width: 40px;
         }
       }
       .question_msg_bg {
