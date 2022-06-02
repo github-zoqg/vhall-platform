@@ -18,7 +18,7 @@
             !['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localSpeaker.accountId || (isStreamYun && joinInfo.role_name == 1)"
+        v-show="localSpeaker.accountId || (isStreamYun && joinInfo.role_name == 1) || isRecord"
       >
         <!-- 云导播活动 -->
         <vmp-air-container
@@ -119,6 +119,10 @@
       };
     },
     computed: {
+      // 是否是录制
+      isRecord() {
+        return this.$domainStore.state.roomBaseServer.clientType == 'record';
+      },
       // 1直播
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
