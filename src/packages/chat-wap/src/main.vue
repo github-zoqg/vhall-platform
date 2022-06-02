@@ -500,6 +500,9 @@
 </script>
 
 <style lang="less">
+  .van-image-preview__overlay {
+    background-color: rgb(0, 0, 0);
+  }
   .vmp-chat-wap {
     height: 100%;
     overflow: hidden;
