@@ -186,6 +186,7 @@
                   </span>
 
                   <span
+                    class="barrageSpan"
                     @click="openBarrage"
                     v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
                   >
@@ -1080,7 +1081,9 @@
             font-size: 20px;
           }
           .barrage {
-            font-size: 30px;
+            font-size: 34px;
+            position: relative;
+            top: 2px;
           }
         }
         // .icon-zanting_icon{
