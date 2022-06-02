@@ -757,7 +757,7 @@
       }
       &__tip-box {
         position: absolute;
-        z-index: 1;
+        z-index: 0;
         bottom: 5px;
         left: 50%;
         transform: translate(-50%, 0);
