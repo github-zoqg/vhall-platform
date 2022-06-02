@@ -643,6 +643,7 @@
         &.red_envelope_ok {
           display: flex;
           align-items: center;
+          padding-left: 84px;
         }
         .interact-content__role-name {
           color: @font-link;
@@ -696,8 +697,9 @@
           margin-top: 13px;
         }
         .new-award-img {
-          margin-right: 8px;
-          width: 40px;
+          width: 60px;
+          position: absolute;
+          left: 24px;
         }
       }
       .question_msg_bg {
@@ -725,7 +727,6 @@
 
       .interact-gift-box {
         padding: 0 84px 0 24px;
-        margin-right: 10px;
         text-align: left;
         width: 100%;
         height: 48px;
