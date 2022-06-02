@@ -22,6 +22,10 @@ if (openLog) {
   if (window.eruda) {
     // 移动端使用eruda工具
     window.eruda.init();
+  } else {
+    loadjs('https://s4.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js', function () {
+      window.eruda && window.eruda.init();
+    });
   }
 }
 

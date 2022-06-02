@@ -25,9 +25,6 @@ const htmlConfig = {
     // iOSUserScalable: '//s3.e.vhall.com/common-static/middle/iOSUserScalable/1.1.0/index.min.js',
     ElementUi: '//s3.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
-    // 通过s4域名加载, 移动端网页调试神器
-    Erdua: '//s4.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js',
-
     // 可以延迟加载的
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
