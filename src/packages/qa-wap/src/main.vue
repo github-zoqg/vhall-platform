@@ -104,11 +104,22 @@
       webinarId() {
         return this.watchInitData.webinar.id;
       },
-      // isEmbed() {
-      //   return this.embedObj.embed || this.embedObj.embedVideo;
-      // },
+      isEmbed() {
+        return (
+          this.$domainStore.state.roomBaseServer.embedObj.embed ||
+          this.$domainStore.state.roomBaseServer.embedObj.embedVideo
+        );
+      },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
+      }
+    },
+    watch: {
+      isSmallPlayer() {
+        this.changeChatHeight();
       }
     },
     components: {
@@ -288,6 +299,18 @@
       },
       showMyQA(status) {
         this.isOnlyMine = status;
+      },
+      // 音频模式播放器大小变动 高度重新计算
+      changeChatHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight + 120 + 90;
+        }
+        this.chatlistHeight = this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
       },
       // eventBus监听
       eventListener() {
