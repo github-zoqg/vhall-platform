@@ -2,7 +2,10 @@
   <div
     :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
     class="vmp-stream-local"
-    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId, fullscreen: isFullScreen }"
+    :class="{
+      'vmp-stream-local__publish': localSpeaker.streamId || isRecording,
+      fullscreen: isFullScreen
+    }"
   >
     <!-- 流容器 -->
     <section
@@ -284,6 +287,11 @@
       SaasAlert
     },
     computed: {
+      // 是否是正在录制录制
+      isRecording() {
+        // 录制中，也会将liveStatus置为1
+        return this.$domainStore.state.roomBaseServer.watchInitData.is_recording;
+      },
       // 主讲人权限
       doc_permission() {
         if (this.isInGroup) {
@@ -571,16 +579,16 @@
       // 检查推流
       async checkStartPush() {
         console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.getSpeakerStatus());
-        if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
+        if (this.roomBaseServer.state.watchInitData.webinar.type != 1 && !this.isRecording) {
           return;
         }
 
-        // 实例化后是否是上麦状态
-        const isSpeakOn = this.micServer.getSpeakerStatus();
+        // 实例化后是否是上麦状态,如果是录制中，默认在麦上
+        const isSpeakOn = this.micServer.getSpeakerStatus() || this.isRecording;
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         // 如果在转播，不推流
-        const hasRebroadcast = this.roomBaseServer.state.watchInitData.rebroadcast.id;
+        const hasRebroadcast = this.roomBaseServer.state.watchInitData.rebroadcast?.id;
 
         if (
           useMediaCheckServer().state.deviceInfo.device_status != 2 &&

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import roomState from '../../headless/room-state.js';
+  import roomState from '../../headless/record-video-state.js';
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';

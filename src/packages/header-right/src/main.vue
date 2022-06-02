@@ -192,7 +192,7 @@
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
-      if (watchInitData.webinar.type == 1) {
+      if (watchInitData.webinar.type == 1 || watchInitData.is_recording == 1) {
         this.liveDuration = watchInitData.webinar.live_time;
         this.calculateLiveDuration();
         // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
@@ -413,6 +413,8 @@
           if (res.code == 200) {
             this.liveStep = 3;
             this.calculateLiveDuration();
+
+            this.roomBaseServer.state.watchInitData.is_recording = 1;
           }
           return;
         }
@@ -485,7 +487,7 @@
         this.liveStep = 4;
 
         // 如果正在开启转播
-        if (watchInitData.rebroadcast.id) {
+        if (watchInitData.rebroadcast?.id) {
           // 先结束转播
           await this.rebroadcastServer.stop({
             webinar_id: watchInitData.webinar.id,
@@ -518,7 +520,9 @@
         if (res.code == 200) {
           this._recordId = res.data.sid; // 场次id
           // 派发事件，结束推流
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickEndLive'));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickEndLive', [{ source: 'live_over' }])
+          );
         }
       },
       // 录制 生成回放
