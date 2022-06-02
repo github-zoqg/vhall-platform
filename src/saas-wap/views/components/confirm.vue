@@ -3,7 +3,7 @@
     <div>
       <div class="title-box">
         <p class="title">
-          {{ title || $t('account.account_1061') }}
+          {{ title }}
         </p>
         <i class="vh-iconfont vh-line-close" @click="close"></i>
       </div>
@@ -61,7 +61,7 @@
       width: 100%;
       background-color: #fff;
       border-radius: 32px;
-      padding: 50px 60px;
+      padding: 40px 60px;
       .title-box {
         width: 100%;
         display: flex;
@@ -93,7 +93,7 @@
         width: 340px;
         height: 80px;
         font-size: 28px;
-        font-family: PingFangSC;
+        font-family: Arial, Helvetica, sans-serif;
         font-weight: 400;
         color: #fff;
         line-height: 80px;

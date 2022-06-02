@@ -340,7 +340,13 @@
       <br />
       &nbsp;
     </p>
-    <alertBox v-if="isSubmitSuccess" @authClose="signCloseConfirm" @authSubmit="signStartConfirm">
+    <alertBox
+      v-if="isSubmitSuccess"
+      :title="$t('account.account_1061')"
+      :titleBtn="$t('common.common_1033')"
+      @authClose="signStartConfirm"
+      @authSubmit="signStartConfirm"
+    >
       <div slot="content">
         <i18n path="form.form_1032">
           <span place="n">{{ startTime }}</span>
@@ -917,9 +923,6 @@
           process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
           `/lives/watch/${this.webinar_id}${this.queryString}`;
-      },
-      signCloseConfirm() {
-        this.isSubmitSuccess = false;
       },
       //提交表单到服务器
       submitSignUpForm() {

@@ -21,7 +21,7 @@
                 </i18n>
               </div>
             </div>
-            <span class="subscribe-type">
+            <span class="subscribe-type" v-if="webinarType != 3">
               {{
                 webinarType == 1
                   ? $t('webinar.webinar_1018')
@@ -55,14 +55,14 @@
           class="subscribe_into_container"
           v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType == 1)"
         >
-          <div class="subscribe_into_other" v-if="showSubscribeBtn">
+          <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
               {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
             </span>
           </div>
           <div
-            class="subscribe_into_person"
+            class="subscribe_into_person subscribe_into_center"
             v-else-if="subOption.needAgreement"
             @click="showAgreement"
           >
@@ -71,7 +71,7 @@
           <div
             v-else
             :class="[
-              'subscribe_into_person',
+              'subscribe_into_person subscribe_into_center',
               {
                 'is-subscribe': subOption.is_subscribe == 1
               }
@@ -754,8 +754,8 @@
           font-size: 24px;
           font-family: PingFangSC-Medium, PingFang SC;
           color: #fff;
-          i {
-            font-size: 10px;
+          .vh-iconfont {
+            font-size: 18px;
           }
         }
         .living_end {
@@ -852,7 +852,6 @@
     .subscribe_into_person {
       width: 520px;
       margin: 0 auto;
-      margin-top: 32px;
       height: 80px;
       background: #fb3a32;
       border-radius: 50px;
@@ -867,6 +866,9 @@
         border: 1px solid #fb3a32;
         color: #fb3a32;
       }
+    }
+    .subscribe_into_center {
+      margin-top: 32px;
     }
     .subscribe_into_other {
       border-radius: 50px;
