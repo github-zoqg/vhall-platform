@@ -30,7 +30,8 @@
               @focus="clearMoney()"
               v-model.trim="money"
               :placeholder="`￥${$t('interact_tools.interact_tools_1046')}`"
-              @blur="textBlur"
+              @input="handleInput"
+              @blur="handleBlur"
             />
           </div>
         </div>
@@ -42,7 +43,6 @@
               @input="changeDes"
               maxlength="15"
               :placeholder="`${$t('interact_tools.interact_tools_1047')}!`"
-              @blur="textBlur"
             />
             <span class="text-limit">{{ note.length }}/15</span>
           </div>
@@ -76,7 +76,7 @@
     data() {
       return {
         moneyList: [
-          { value: 1.88, active: false },
+          { value: 1.88, active: true },
           { value: 8.88, active: false },
           { value: 88.88, active: false }
         ],
@@ -160,24 +160,72 @@
         }
         this.btnMoney = '';
       },
-      // 金额校验
-      submit() {
-        const reg = /(^[1-9]\d*(.\d{1,2})?)|(^0\.[1-9][0-9]?)|(^0\.[0-9][1-9])/;
-        const fee = this.money || this.btnMoney;
-        if (reg.test(fee)) {
-          this.rewardPay(fee);
+      // 输入金额校验
+      handleInput(e) {
+        let targetValue = e.target.value;
+        if (targetValue != '') {
+          let str = targetValue;
+          const len1 = str.substr(0, 1);
+          const len2 = str.substr(1, 1);
+          // 如果第一位是0，第二位不是点，就用数字把点替换掉
+          if (str.length > 1 && len1 == 0 && len2 != '.') {
+            str = str.substr(1, 1);
+          }
+          // 第一位不能是.
+          if (len1 == '.') {
+            str = '';
+          }
+          // 限制只能输入一个小数点
+          if (str.indexOf('.') != -1) {
+            const str_ = str.substr(str.indexOf('.') + 1);
+            if (str_.indexOf('.') != -1) {
+              str = str.substr(0, str.indexOf('.') + str_.indexOf('.') + 1);
+            }
+          }
+          // 正则替换，保留数字和小数点
+          // eslint-disable-next-line no-useless-escape
+          str = str.replace(/[^\d^\.]+/g, '');
+          // 如果需要保留小数点后两位，则用下面公式
+          if (str.indexOf('.') > -1 && str.length - str.indexOf('.') > 3) {
+            str = str.slice(0, str.indexOf('.') + 3);
+            this.$toast(this.$t('cash.cash_1034'));
+          }
+          this.money = str;
+          this.clearMoney();
         } else {
-          this.$toast(this.$t('interact_tools.interact_tools_1070'));
+          this.moneyList[0].active = true;
+          this.btnMoney = this.moneyList[0].value;
         }
       },
+      // 金额校验
+      checkoutGiveMoney(val) {
+        const isNum = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
+        if (isNum.test(Number(val))) {
+          return true;
+        } else {
+          this.$toast(this.$t('interact_tools.interact_tools_1070'));
+          return false;
+        }
+      },
+      submit() {
+        let _money = 0;
+        if (this.money) {
+          if (!this.checkoutGiveMoney(Number(this.money).toFixed(2))) return;
+          _money = Number(this.money).toFixed(2);
+        } else {
+          const selectBtn = this.moneyList.find(item => item.active);
+          _money = Number(selectBtn.value);
+        }
+        this.rewardPay(_money);
+      },
       /**
-     * @param {Number} type-1微信 2支付宝
-     * @return 返回 code：200，
-     * data：{  下面两个参数必有且只存在其一，jsApiParameters代表本页面唤起微信支付，前提是页面做了微信授权，url代表需要跳转页面支付
-     * jsApiParameters:{}
-     * url:''
-       }
-     */
+       * @param {Number} type-1微信 2支付宝
+       * @return 返回 code：200，
+       * data：{  下面两个参数必有且只存在其一，jsApiParameters代表本页面唤起微信支付，前提是页面做了微信授权，url代表需要跳转页面支付
+       * jsApiParameters:{}
+       * url:''
+         }
+      */
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
@@ -288,7 +336,6 @@
       },
       // 打开打赏弹框
       showReward() {
-        // console.log(123123, this.localRoomInfo);
         if (!this.localRoomInfo.isLogin) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return;
@@ -296,8 +343,11 @@
         this.setSetingHeight();
         this.showRewardCard = true;
       },
-      textBlur() {
-        // window.scroll(0, 0)
+      handleBlur() {
+        if (!this.money) {
+          this.moneyList[0].active = true;
+          this.btnMoney = this.moneyList[0].value;
+        }
       }
     }
   };
