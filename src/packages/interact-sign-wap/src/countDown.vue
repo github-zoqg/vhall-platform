@@ -17,7 +17,7 @@
         class="progress"
         cx="50%"
         cy="50%"
-        r="42"
+        :r="r"
         fill="transparent"
         stroke="#FED8D6"
         stroke-dasharray="0"
@@ -28,7 +28,7 @@
         class="progress progress-bar"
         cx="50%"
         cy="50%"
-        r="42"
+        :r="r"
         fill="transparent"
         stroke="url(#greenGradient)"
         :stroke-dasharray="perimeter"
@@ -51,7 +51,7 @@
     name: 'countDown',
     data() {
       return {
-        perimeter: Math.PI * 94
+        r: 42 //圆的半径
       };
     },
     props: {
@@ -69,8 +69,11 @@
         const ret = this.consume / this.duration;
         return ret > 1 ? 1 : ret;
       },
+      perimeter() {
+        return Math.PI * 2 * this.r;
+      },
       progress() {
-        return Math.PI * 94 * this.percent;
+        return this.perimeter * this.percent;
       },
       remainder() {
         // eslint-disable-next-line one-var
