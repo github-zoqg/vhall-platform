@@ -119,7 +119,7 @@ const getNodeEnv = mode => {
     }
   }
   const lineArr = line.split('=');
-  return lineArr[1];
+  return String.prototype.trim(lineArr[1]);
 };
 
 /**
