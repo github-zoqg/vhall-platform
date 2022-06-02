@@ -1125,6 +1125,10 @@
             case 'group_disband':
               _this.updateOnlineUserList();
               break;
+            case 'group_switch_proceed':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              _this.updateOnlineUserList();
+              break;
             default:
               break;
           }
