@@ -65,7 +65,7 @@
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
           {{ source.content.text_content }}，{{ $t('common.common_1030') }}
-          <span class="highlight">点击查看详情</span>
+          <span class="highlight">点击查看</span>
         </div>
       </div>
     </template>
