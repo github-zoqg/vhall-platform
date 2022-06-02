@@ -1393,7 +1393,7 @@
             return pair[1];
           }
         }
-        return '';
+        return false;
       },
       //我已报名--验证
       submitVerify() {
@@ -1406,6 +1406,9 @@
             phone: this.verifyForm.phone,
             refer
           };
+          if (!params.refer) {
+            delete params.refer;
+          }
 
           if (this.isPhoneValidate) {
             params.verify_code = this.verifyForm.code;
