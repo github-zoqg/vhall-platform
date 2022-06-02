@@ -168,7 +168,7 @@
             <template
               v-if="
                 source.replyMsg &&
-                source.replyMsg.type &&
+                source.replyMsg.content &&
                 source.atList &&
                 source.atList.length == 0
               "
@@ -532,7 +532,15 @@
         .reply-color {
           color: #fc9600;
           float: left;
+          line-height: 1.4;
           margin-right: 8px !important;
+        }
+        .reply-msg-content {
+          word-break: break-word;
+          display: flex;
+          .reply-color {
+            min-width: 60px;
+          }
         }
         .reply-msg {
           line-height: 40px;
@@ -540,9 +548,6 @@
           color: #999;
           padding-left: 18px;
           position: relative;
-          .reply-msg-content {
-            word-break: break-word;
-          }
           .chat-text {
             display: inline-block;
             line-height: 1.4;
@@ -630,9 +635,11 @@
         }
       }
       .interact-msg {
-        padding: 20px 24px;
+        padding: 4px 24px;
         position: relative;
         border-width: 0;
+        height: 48px;
+        line-height: 40px;
         &.red_envelope_ok {
           display: flex;
           align-items: center;
@@ -717,14 +724,16 @@
       }
 
       .interact-gift-box {
-        padding: 0 24px;
+        padding: 0 84px 0 24px;
         margin-right: 10px;
         text-align: left;
         width: 100%;
+        height: 48px;
         display: flex;
         justify-content: center;
         align-items: center;
         border: none;
+        position: relative;
         p {
           text-align: left;
           font-weight: 400;
@@ -732,7 +741,6 @@
         }
         .new-gift-name {
           font-size: 28px;
-          max-width: 240px;
           margin-right: 8px;
           color: #595959;
         }
@@ -747,9 +755,11 @@
           align-items: center;
         }
         .gift-zdy {
-          margin-left: 8px;
-          width: 40px;
-          height: 40px;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          position: absolute;
+          right: 24px;
           background-color: white;
           background-size: contain;
           background-repeat: no-repeat;
@@ -758,8 +768,9 @@
       }
       .new-gift-img,
       .new-award-img {
-        margin-left: 8px;
-        width: 40px;
+        width: 60px;
+        position: absolute;
+        right: 24px;
       }
       .reward_txt {
         color: #d67900;
