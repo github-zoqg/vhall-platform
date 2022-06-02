@@ -169,18 +169,24 @@
                 <span v-html="source.replyMsg.content.text_content" />
               </p>
               <div class="msg-content_body">
-                <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="msgContent" class="chat-text"></span>
-                <div
-                  @click="$emit('preview', img)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
+                <p class="reply-msg-content">
+                  <span class="reply-color">
+                    {{ $t('chat.chat_1036') }}
+                  </span>
+                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
+                </p>
+                <div class="imgs">
+                  <div
+                    @click="$emit('preview', img)"
+                    class="msg-content_chat-img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
@@ -419,7 +425,7 @@
   .vmp-chat-wap-msg-item {
     pointer-events: auto;
     .msg-showtime {
-      padding: 15px 0 5px;
+      padding: 8px 0 24px;
       font-size: 24px;
       color: #595959;
       text-align: center;
@@ -510,14 +516,22 @@
           // }
         }
         .reply-color {
-          color: #4da1ff;
+          color: #fc9600;
           float: left;
+          margin-right: 8px !important;
         }
         .reply-msg {
           line-height: 40px;
           margin: 8px 0;
           color: #999;
           padding-left: 10px;
+          .reply-msg-content {
+            word-break: break-word;
+          }
+          .chat-text {
+            display: inline-block;
+            line-height: 1.4;
+          }
         }
         .msg-content_body {
           position: relative;
@@ -600,16 +614,16 @@
           margin: 2px 4px 0;
           border-radius: 500px;
           &.host {
-            background-color: rgba(251, 58, 50, 0.2);
-            color: #fb3a32;
+            background: rgba(251, 38, 38, 0.1);
+            color: #fb2626;
           }
           &.assistant {
-            background-color: rgba(166, 166, 166, 0.15);
-            color: #3562fa;
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
           }
           &.guest {
-            background-color: rgba(53, 98, 250, 0.2);
-            color: #a6a6a6;
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
           }
         }
         input {
