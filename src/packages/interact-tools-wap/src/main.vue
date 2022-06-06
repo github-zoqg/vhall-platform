@@ -13,7 +13,7 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
+      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward" class="redpacket-box">
         <img class="tool redpacket-img" src="./img/icon_reward.png" @click="openReward" />
         <RewardCard
           ref="reward"
@@ -23,7 +23,7 @@
         />
       </div>
       <!-- 邀请卡 -->
-      <div v-if="showInviteCard && !localRoomInfo.isEmbed">
+      <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box">
         <a
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
@@ -132,6 +132,18 @@
     .vh-iconfont {
       font-size: 47px;
       color: #666666;
+    }
+    .share-box {
+      position: relative;
+      top: 2px;
+      .tool {
+        width: 50px;
+        height: 50px;
+      }
+    }
+    .redpacket-box {
+      position: relative;
+      top: -2px;
     }
   }
 </style>

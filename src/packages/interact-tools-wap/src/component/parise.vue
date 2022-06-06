@@ -117,7 +117,7 @@
       align-items: flex-end;
       color: #fb2626;
       position: absolute;
-      top: 7px;
+      top: 0px;
       right: 16px;
       height: 28px;
       font-size: 20px;
