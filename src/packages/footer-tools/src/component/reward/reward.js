@@ -102,6 +102,8 @@ export default {
         }
         this.customRewardInfo.money = str;
         this.activeItem = 3;
+      } else {
+        this.activeItem = 0;
       }
     },
     // open支付金额设置弹框
