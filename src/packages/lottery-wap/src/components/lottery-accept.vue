@@ -94,14 +94,15 @@
       verify() {
         let relt = true;
         this.winForm.map(item => {
-          if (item.field_key == 'phone') {
+          if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
+            // 当手机号为必填,或者有输入手机号才正则校验
             const phone = item.field_value.replace(/\s/g, '');
             const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
             if (!regs.test(phone)) {
               item.error = true;
               relt = false;
             }
-          } else if ((item.is_required == 1) == 1 && item.field_value == '') {
+          } else if (item.is_required === 1 && item.field_value == '') {
             item.error = true;
             relt = false;
           } else {
