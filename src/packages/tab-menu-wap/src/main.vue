@@ -28,7 +28,7 @@
           class="vmp-tab-menu-item"
           :class="{
             'vmp-tab-menu-item__active': selectedId === item.id,
-            'vmp-tab-menu-item_subscrbe': isSubscribe
+            'vmp-tab-menu-item_subscrbe': !isToggleBtnVisible
           }"
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
@@ -678,11 +678,11 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
-        // &_subscrbe {
-        //   &:first-child {
-        //     padding-left: 0;
-        //   }
-        // }
+        &_subscrbe {
+          &:first-child {
+            padding-left: 0;
+          }
+        }
 
         .item-text {
           display: flex;
