@@ -11,7 +11,7 @@
         <img src="../../assets/images/loading.gif" alt="" />
       </div>
       <p class="vmp-msgtip__text">{{ $t(this.code) }}</p>
-      <el-button
+      <van-button
         type="primary"
         size="small"
         round
@@ -20,7 +20,7 @@
       >
         {{ $t('common.common_1035') }}
         <span class="timer-count" v-show="secondText != 0">({{ secondText }}S)</span>
-      </el-button>
+      </van-button>
     </div>
   </div>
 </template>
