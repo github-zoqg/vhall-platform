@@ -215,7 +215,7 @@
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.qaContent.offsetHeight;
+            this.virtual.contentHeight = this.$refs.qaContent?.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
             this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();
