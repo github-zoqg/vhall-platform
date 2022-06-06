@@ -973,11 +973,12 @@
       top: 24px;
       width: 80px;
       z-index: 6;
+
       span {
         width: 100%;
         display: block;
         height: 36px;
-        padding: 0 5px;
+        padding: 0 16px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 0.5);
         text-align: center;
