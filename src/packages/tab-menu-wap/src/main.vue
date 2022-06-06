@@ -662,7 +662,6 @@
       overflow-x: auto;
       display: flex;
       flex-wrap: nowrap;
-      overflow-x: auto;
 
       &::-webkit-scrollbar {
         display: none;
@@ -679,11 +678,11 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
-        &_subscrbe {
-          &:first-child {
-            padding-left: 12px;
-          }
-        }
+        // &_subscrbe {
+        //   &:first-child {
+        //     padding-left: 0;
+        //   }
+        // }
 
         .item-text {
           display: flex;

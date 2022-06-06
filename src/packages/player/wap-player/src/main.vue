@@ -2,7 +2,8 @@
   <div class="vmp-wap-player">
     <template v-if="encrypt">
       <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
-        <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
+        <van-loading color="#fb2626" />
+        <!-- <img class="vmp-wap-player-prompt-load" src="./img/load.gif" /> -->
         <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
       </div>
       <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
@@ -147,7 +148,7 @@
               <van-slider
                 v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
                 v-model="sliderVal"
-                active-color="rgba(252,86,89,.7)"
+                active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
                 @change="changeSlider"
               >
@@ -159,9 +160,11 @@
                 <span class="vmp-wap-player-control-icons-left">
                   <i
                     @click="startPlay"
-                    :class="`vh-iconfont ${
-                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                    }`"
+                    :class="[
+                      'vh-iconfont',
+                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play',
+                      { 'vh-line-left-vod': !isLiving }
+                    ]"
                   ></i>
                   <i
                     class="vh-iconfont vh-line-refresh-left"
@@ -765,9 +768,8 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      &-load {
-        width: 60px;
-        margin-bottom: 20px;
+      &-text {
+        margin-top: 20px;
       }
       &-poster {
         width: 100%;
@@ -1055,13 +1057,17 @@
           font-size: 32px;
         }
         &-left {
+          // vertical-align: middle;
+          .vh-line-left-vod {
+            vertical-align: text-top;
+          }
           .vh-line-refresh-left,
           &-time {
             padding-left: 15px;
-            // vertical-align: middle;
           }
           .vh-line-refresh-left {
             font-size: 28px;
+            // vertical-align: bottom;
           }
         }
         &-right {
