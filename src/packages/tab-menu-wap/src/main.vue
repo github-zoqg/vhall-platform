@@ -663,11 +663,11 @@
         color: #595959;
         cursor: pointer;
         user-select: none;
-        &_subscrbe {
-          &:first-child {
-            padding-left: 0;
-          }
-        }
+        // &_subscrbe {
+        //   &:first-child {
+        //     padding-left: 0;
+        //   }
+        // }
 
         .item-text {
           display: flex;

@@ -148,7 +148,7 @@
               <van-slider
                 v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
                 v-model="sliderVal"
-                active-color="rgba(252,86,89,.7)"
+                active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
                 @change="changeSlider"
               >
@@ -160,9 +160,11 @@
                 <span class="vmp-wap-player-control-icons-left">
                   <i
                     @click="startPlay"
-                    :class="`vh-iconfont ${
-                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                    }`"
+                    :class="[
+                      'vh-iconfont',
+                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play',
+                      { 'vh-line-left-vod': !isLiving }
+                    ]"
                   ></i>
                   <i
                     class="vh-iconfont vh-line-refresh-left"
@@ -1055,17 +1057,16 @@
         }
         &-left {
           // vertical-align: middle;
-          .vh-a-line-videopause {
-            vertical-align: middle;
+          .vh-line-left-vod {
+            vertical-align: text-top;
           }
           .vh-line-refresh-left,
           &-time {
             padding-left: 15px;
-            vertical-align: middle;
           }
           .vh-line-refresh-left {
             font-size: 28px;
-            vertical-align: bottom;
+            // vertical-align: bottom;
           }
         }
         &-right {
