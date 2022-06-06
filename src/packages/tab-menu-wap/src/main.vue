@@ -180,9 +180,24 @@
       await this.$nextTick(0);
       this.setSkinInfo();
       this.selectDefault();
+      this.computedWidth();
     },
 
     methods: {
+      computedWidth() {
+        let childNodes = document.querySelector('.vmp-tab-menu-scroll-container').childNodes;
+        let childWidth = 0;
+        childNodes.forEach(e => {
+          childWidth += e.clientWidth; //每个item的padding
+        });
+        childWidth += 24; //tab的padding
+        console.log(childWidth, '------------', screen.width);
+        if (screen.width > childWidth) {
+          this.isToggleBtnVisible = false;
+        } else {
+          this.isToggleBtnVisible = true;
+        }
+      },
       async setSkinInfo() {
         const { skinInfo } = this.$domainStore.state.roomBaseServer;
 

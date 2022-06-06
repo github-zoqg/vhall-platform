@@ -735,7 +735,7 @@
           top: 28px;
           left: 32px;
           display: inline-block;
-          padding: 8px 15px;
+          padding: 6px 16px;
           text-align: center;
           color: #fff;
           background: rgba(0, 0, 0, 0.5);
@@ -746,11 +746,10 @@
           position: absolute;
           right: 32px;
           top: 28px;
-          width: 80px;
           cursor: pointer;
           display: block;
           height: 36px;
-          padding: 0 5px;
+          padding: 0 16px;
           border-radius: 24px;
           background: rgba(0, 0, 0, 0.5);
           text-align: center;

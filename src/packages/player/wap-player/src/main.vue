@@ -910,8 +910,8 @@
       z-index: 5;
       p {
         border-radius: 44px;
-        height: 48px;
-        line-height: 48px;
+        height: 36px;
+        line-height: 36px;
         padding: 0 16px;
         text-align: center;
         background: rgba(0, 0, 0, 0.5);
@@ -975,11 +975,12 @@
       top: 24px;
       width: 80px;
       z-index: 6;
+
       span {
         width: 100%;
         display: block;
         height: 36px;
-        padding: 0 5px;
+        padding: 0 16px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 0.5);
         text-align: center;
