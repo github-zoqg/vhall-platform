@@ -45,7 +45,7 @@
   } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
   import VirtualList from 'vue-virtual-scroll-list';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   import EventBus from '@/packages/chat-wap/src/js/Events.js';
   import { isMse } from './js/utils.js';
   export default {
