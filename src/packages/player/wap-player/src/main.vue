@@ -986,7 +986,7 @@
         font-family: PingFangSC-Medium, PingFang SC;
         color: #fff;
         i {
-          font-size: 10px;
+          font-size: 18px;
         }
         // &:nth-child(2) {
         //   margin: 40px 0;
