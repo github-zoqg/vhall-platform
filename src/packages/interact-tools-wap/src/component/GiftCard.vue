@@ -1,6 +1,6 @@
 <template>
   <section>
-    <van-popup v-model="showgiftCard" round position="bottom" closeable>
+    <van-popup class="gift-van-popup" v-model="showgiftCard" round position="bottom" closeable>
       <div class="gift-wrap">
         <div class="swiper-box">
           <div class="van-swipe-item">
@@ -502,5 +502,8 @@
         }
       }
     }
+  }
+  .gift-van-popup {
+    padding-bottom: 0 !important;
   }
 </style>
