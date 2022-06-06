@@ -10,7 +10,6 @@ const htmlConfig = {
   // cdn js
   cdnJs: {
     // 第三方依赖
-    lodash: '//s1.e.vhall.com/common-static/middle/lodash/4.17.21/lodash.min.js',
     vue: '//s1.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.min.js',
     VueRouter: '//s1.e.vhall.com/common-static/middle/vue-router/3.5.3/dist/vue-router.min.js',
     Moment: '//s1.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
