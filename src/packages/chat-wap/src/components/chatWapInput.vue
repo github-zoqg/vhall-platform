@@ -345,10 +345,14 @@
         textarea {
           background-color: #f0f0f0;
           min-height: 64px !important;
-          padding: 12px 24px !important;
+          padding: 20px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;
+          border: none;
+          -webkit-appearance: none; /*去除阴影边框*/
+          outline: none;
+          -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /*点击高亮的颜色*/
         }
         .el-textarea__inner::-webkit-input-placeholder {
           font-size: 28px !important;
