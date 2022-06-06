@@ -476,7 +476,7 @@ const serverConfig = {
     component: 'VmpTabMenuWap',
     options: {
       // 是否展示左右按钮
-      isToggleBtnVisible: false,
+      // isToggleBtnVisible: false,
       /**
        * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
        * 此配置主要涉及到type对应哪个cuid
