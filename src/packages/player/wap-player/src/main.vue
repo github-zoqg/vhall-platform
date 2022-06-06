@@ -908,8 +908,8 @@
       z-index: 5;
       p {
         border-radius: 44px;
-        height: 48px;
-        line-height: 48px;
+        height: 36px;
+        line-height: 36px;
         padding: 0 16px;
         text-align: center;
         background: rgba(0, 0, 0, 0.5);
