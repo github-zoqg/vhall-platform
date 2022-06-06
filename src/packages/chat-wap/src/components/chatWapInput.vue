@@ -291,7 +291,7 @@
     min-height: 94px;
     margin-top: -94px;
     font-size: 28px;
-    background-color: #f0f0f0;
+    background-color: #fff;
     box-shadow: 0px -1px 1px #f1f1f1;
     .noMsg {
       opacity: 0.4 !important;
@@ -333,7 +333,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #fff;
+          background-color: #f0f0f0;
 
           .vh-iconfont {
             font-size: 34px;
@@ -343,11 +343,16 @@
 
       .textarea {
         textarea {
+          background-color: #f0f0f0;
           min-height: 64px !important;
-          padding: 12px 24px !important;
+          padding: 20px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;
+          border: none;
+          -webkit-appearance: none; /*去除阴影边框*/
+          outline: none;
+          -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /*点击高亮的颜色*/
         }
         .el-textarea__inner::-webkit-input-placeholder {
           font-size: 28px !important;
@@ -364,7 +369,7 @@
       margin: 0 24px;
       position: relative;
       .text-limit {
-        background-color: #fff;
+        background-color: #f0f0f0;
         position: absolute;
         bottom: 16px;
         right: 12px;
@@ -438,6 +443,7 @@
     input::-webkit-input-placeholder {
       /* placeholder字体大小  */
       font-size: 14px;
+      color: #bfbfbf;
     }
   }
 </style>

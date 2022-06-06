@@ -42,7 +42,9 @@
           >
             <div slot="extra">
               <span class="text-limit">
-                <span>{{ note.length }}</span>
+                <span :class="note.length > 0 ? (note.length >= 15 ? 'text-ful' : 'text-can') : ''">
+                  {{ note.length }}
+                </span>
                 /15
               </span>
             </div>
@@ -353,8 +355,11 @@
         right: 20px;
         font-size: 28px;
         color: rgba(89, 89, 89, 0.8);
-        > span {
-          color: rgba(10, 127, 245, 0.8);
+        .text-ful {
+          color: rgba(251, 38, 38, 0.8);
+        }
+        .text-can {
+          color: rgba(59, 153, 247, 0.8);
         }
       }
     }

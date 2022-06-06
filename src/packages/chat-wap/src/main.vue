@@ -43,12 +43,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="overlay"
-      v-show="showSendBox"
-      @touchstart="closeOverlay"
-      @click="closeOverlay"
-    ></div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -500,6 +495,9 @@
 </script>
 
 <style lang="less">
+  .van-image-preview__overlay {
+    background-color: rgb(0, 0, 0) !important;
+  }
   .vmp-chat-wap {
     height: 100%;
     overflow: hidden;

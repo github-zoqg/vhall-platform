@@ -1,6 +1,6 @@
 <template>
   <section>
-    <van-popup v-model="showgiftCard" round position="bottom" closeable>
+    <van-popup class="gift-van-popup" v-model="showgiftCard" round position="bottom" closeable>
       <div class="gift-wrap">
         <div class="swiper-box">
           <div class="van-swipe-item">
@@ -8,7 +8,7 @@
               v-for="(secItem, secIndex) in filterGift"
               :key="secIndex"
               class="gift-box"
-              :class="{ active: secItem.active }"
+              :class="{ active: secItem.active, disabledColor: btnDisabled || !currentGift.id }"
             >
               <div class="info">
                 <div class="border-1px gift-img" @click="chooseGift(secIndex, secItem)">
@@ -30,12 +30,7 @@
                   }}
                 </p>
               </div>
-              <div
-                v-show="secItem.active"
-                @click="giveGiftSubmit"
-                class="btn"
-                :class="{ disabledColor: btnDisabled || !currentGift.id }"
-              >
+              <div v-show="secItem.active" @click="giveGiftSubmit" class="btn">
                 {{ $t('interact_tools.interact_tools_1030') }}
                 <span v-if="btnDisabled">{{ `${timer}s` }}</span>
               </div>
@@ -441,12 +436,13 @@
       justify-content: space-between;
       .info {
         margin: 0 auto;
+        padding-top: 15px;
         display: flex;
         align-items: center;
         flex-direction: column;
         .gift-img {
-          width: 130px;
-          height: 130px;
+          width: 120px;
+          height: 120px;
           img {
             width: 100%;
             height: 100%;
@@ -470,21 +466,25 @@
           margin-top: 5px;
         }
         .money {
-          font-size: 12px;
-          line-height: 18px;
+          font-size: 18px;
+          line-height: 24px;
           font-family: PingFangSC;
           font-weight: 400;
           color: #8c8c8c;
           margin-top: 12px;
-          &.free {
-            font-size: 18px;
-          }
         }
       }
 
       &.active {
         border: 2px solid #fb3a32;
         border-radius: 12px;
+
+        &.disabledColor {
+          border: 2px solid rgba(251, 58, 50, 0.6);
+          .btn {
+            background: rgba(251, 38, 38, 0.6);
+          }
+        }
         .btn {
           width: 100%;
           height: 54px;
@@ -497,12 +497,13 @@
           justify-content: center;
           align-items: center;
         }
-        .disabledColor {
-          background: #ccc;
-          border-color: #ccc;
-          color: #fff;
+        .money {
+          margin-top: 0;
         }
       }
     }
+  }
+  .gift-van-popup {
+    padding-bottom: 0 !important;
   }
 </style>

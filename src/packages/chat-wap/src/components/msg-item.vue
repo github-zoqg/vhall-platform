@@ -3,13 +3,17 @@
     <!-- 发起抽奖/问答 -->
     <template
       v-if="
-        ['lottery_push', 'question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
-          source.type
-        )
+        [
+          'lottery_push',
+          'question_answer_open',
+          'question_answer_close',
+          'sign_in_push',
+          'red_envelope_ok'
+        ].includes(source.type)
       "
     >
       <div class="msg-item interact">
-        <div class="interact-msg">
+        <div class="interact-msg" :class="source.type">
           <template
             v-if="
               ['question_answer_open', 'question_answer_close', 'sign_in_push'].includes(
@@ -21,6 +25,12 @@
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
+          </template>
+          <template v-if="source.type == 'red_envelope_ok'">
+            <img
+              class="new-award-img"
+              :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
+            />
           </template>
           {{ source.content.text_content }}
         </div>
@@ -54,8 +64,8 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          {{ source.content.text_content }}，{{ $t('common.common_1030') }}
-          <span class="highlight">点击查看详情</span>
+          {{ source.content.text_content }}
+          <span class="highlight">点击查看</span>
         </div>
       </div>
     </template>
@@ -86,7 +96,7 @@
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
-        <div class="interact-gift-box">
+        <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
           <span class="new-gift-name">
             {{ source.nickname | overHidden(8) }}
           </span>
@@ -158,29 +168,35 @@
             <template
               v-if="
                 source.replyMsg &&
-                source.replyMsg.type &&
+                source.replyMsg.content &&
                 source.atList &&
                 source.atList.length == 0
               "
             >
-              <p class="reply-msg">
-                <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
-                ：
-                <span v-html="source.replyMsg.content.text_content" />
-              </p>
               <div class="msg-content_body">
-                <span class="reply-color">{{ $t('chat.chat_1036') }}：</span>
-                <span v-html="msgContent" class="chat-text"></span>
-                <div
-                  @click="$emit('preview', img)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
+                <p class="reply-msg">
+                  <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                  ：
+                  <span v-html="source.replyMsg.content.text_content" />
+                </p>
+                <p class="reply-msg-content">
+                  <span class="reply-color">
+                    {{ $t('chat.chat_1036') }}
+                  </span>
+                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
+                </p>
+                <div class="imgs">
+                  <div
+                    @click="$emit('preview', img)"
+                    class="msg-content_chat-img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
@@ -210,7 +226,11 @@
             >
               <div class="msg-content_body">
                 <span class="reply-color"></span>
-                <span v-html="msgContent" class="chat-text"></span>
+                <span
+                  v-html="msgContent"
+                  class="chat-text"
+                  :class="!!msgContent && source.content.image_urls.length != 0 ? 'existImg' : ''"
+                ></span>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
@@ -419,7 +439,7 @@
   .vmp-chat-wap-msg-item {
     pointer-events: auto;
     .msg-showtime {
-      padding: 15px 0 5px;
+      padding: 8px 0 24px;
       font-size: 24px;
       color: #595959;
       text-align: center;
@@ -482,11 +502,11 @@
               color: #fb2626;
             }
             &.assistant {
-              background-color: #ade1ff;
+              background-color: rgba(173, 225, 255, 0.5);
               color: #0a7ff5;
             }
             &.guest {
-              background-color: #ade1ff;
+              background-color: rgba(173, 225, 255, 0.5);
               color: #0a7ff5;
             }
           }
@@ -510,14 +530,38 @@
           // }
         }
         .reply-color {
-          color: #4da1ff;
+          color: #fc9600;
           float: left;
+          line-height: 1.4;
+          margin-right: 8px !important;
+        }
+        .reply-msg-content {
+          word-break: break-word;
+          display: flex;
+          .reply-color {
+            min-width: 60px;
+          }
         }
         .reply-msg {
           line-height: 40px;
           margin: 8px 0;
           color: #999;
-          padding-left: 10px;
+          padding-left: 18px;
+          position: relative;
+          .chat-text {
+            display: inline-block;
+            line-height: 1.4;
+          }
+          &::after {
+            content: ' ';
+            width: 6px;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #bfbfbf;
+            border-radius: 3px;
+          }
         }
         .msg-content_body {
           position: relative;
@@ -525,7 +569,7 @@
           padding: 16px;
           word-break: break-all;
           color: #262626;
-          line-height: 1.4;
+          // line-height: 1.4;
           // line-height: 40px;
           font-size: 28px;
           background-color: #fff;
@@ -536,12 +580,16 @@
           .chat-text {
             display: block;
             line-height: 1.4;
+            &.existImg {
+              margin-bottom: 8px;
+            }
           }
           .msg-content_chat-img {
             display: inline-block;
             margin-right: 8px;
             width: 84px;
             height: 86px;
+            border-radius: 4px;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -577,19 +625,26 @@
             color: #fb2626;
           }
           &.assistant {
-            background: rgba(173, 225, 255, 0.5);
+            background-color: rgba(173, 225, 255, 0.5);
             color: #0a7ff5;
           }
           &.guest {
-            background: rgba(173, 225, 255, 0.5);
+            background-color: rgba(173, 225, 255, 0.5);
             color: #0a7ff5;
           }
         }
       }
       .interact-msg {
-        padding: 20px 24px;
+        padding: 4px 24px;
         position: relative;
         border-width: 0;
+        height: 48px;
+        line-height: 40px;
+        &.red_envelope_ok {
+          display: flex;
+          align-items: center;
+          padding-left: 84px;
+        }
         .interact-content__role-name {
           color: @font-link;
           background-color: rgba(53, 98, 250, 0.2);
@@ -600,16 +655,16 @@
           margin: 2px 4px 0;
           border-radius: 500px;
           &.host {
-            background-color: rgba(251, 58, 50, 0.2);
-            color: #fb3a32;
+            background: rgba(251, 38, 38, 0.1);
+            color: #fb2626;
           }
           &.assistant {
-            background-color: rgba(166, 166, 166, 0.15);
-            color: #3562fa;
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
           }
           &.guest {
-            background-color: rgba(53, 98, 250, 0.2);
-            color: #a6a6a6;
+            background: rgba(173, 225, 255, 0.5);
+            color: #0a7ff5;
           }
         }
         input {
@@ -641,6 +696,11 @@
         .reward-text {
           margin-top: 13px;
         }
+        .new-award-img {
+          width: 60px;
+          position: absolute;
+          left: 24px;
+        }
       }
       .question_msg_bg {
         padding: 10px 24px;
@@ -666,14 +726,18 @@
       }
 
       .interact-gift-box {
-        padding: 0 24px;
-        margin-right: 10px;
+        padding: 0 84px 0 24px;
         text-align: left;
         width: 100%;
+        height: 48px;
         display: flex;
         justify-content: center;
         align-items: center;
         border: none;
+        position: relative;
+        &.zdy {
+          padding-right: 90px;
+        }
         p {
           text-align: left;
           font-weight: 400;
@@ -681,7 +745,6 @@
         }
         .new-gift-name {
           font-size: 28px;
-          max-width: 240px;
           margin-right: 8px;
           color: #595959;
         }
@@ -696,9 +759,11 @@
           align-items: center;
         }
         .gift-zdy {
-          margin-left: 8px;
-          width: 40px;
-          height: 40px;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          position: absolute;
+          right: 24px;
           background-color: white;
           background-size: contain;
           background-repeat: no-repeat;
@@ -707,8 +772,9 @@
       }
       .new-gift-img,
       .new-award-img {
-        margin-left: 8px;
-        width: 40px;
+        width: 60px;
+        position: absolute;
+        right: 24px;
       }
       .reward_txt {
         color: #d67900;

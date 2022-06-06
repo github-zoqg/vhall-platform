@@ -132,7 +132,7 @@
     }
     .v-praise-dom {
       position: relative;
-
+      top: 2px;
       .vh-saas-iconfont {
         // font-size: 42px;
         font-size: 47px;

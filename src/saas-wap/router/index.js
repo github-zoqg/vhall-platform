@@ -83,6 +83,12 @@ const routes = [
     component: () => import('@/packages/wap-sign-up-form'),
     meta: { grayType: 'webinar' }
   },
+  {
+    path: '/test',
+    component: () => import('../views/TestPage.vue'),
+    meta: { grayType: '' },
+    name: 'test'
+  },
   // 错误页、升级页
   {
     path: '/upgrading',
