@@ -365,7 +365,7 @@
       margin: 0 24px;
       position: relative;
       .text-limit {
-        background-color: #fff;
+        background-color: #f0f0f0;
         position: absolute;
         bottom: 16px;
         right: 12px;

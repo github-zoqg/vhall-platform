@@ -17,12 +17,7 @@
         ></virtual-list>
       </div>
     </div>
-    <div
-      class="overlay"
-      v-show="showSendBox"
-      @touchstart="closeOverlay"
-      @click="closeOverlay"
-    ></div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
       ref="sendBox"
       currentTab="private"
