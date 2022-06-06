@@ -116,14 +116,15 @@
           } else {
             const winLotteryHistory = list.filter(lot => lot.win === 1); // 中奖
             if (winLotteryHistory.length === 1) {
+              const winLottery = winLotteryHistory[0];
               // 只中奖一次,显示该次中奖结果
-              this.lotteryId = lastLottery.id;
-              if (lastLottery.take_award === 1) {
+              this.lotteryId = winLottery.id;
+              if (winLottery.take_award === 1) {
                 this.lotteryView = 'LotterySuccess'; // 已领取提示已提交
               } else {
                 this.lotteryView = 'LotteryWin'; // 为领取显示中奖结果
               }
-              this.setFitment(lastLottery);
+              this.setFitment(winLottery);
             } else if (winLotteryHistory.length > 1) {
               // 中奖记录2条以上显示中奖历史
               this.lotteryServer.$emit('ShowHistory', winLotteryHistory); // 弹起中奖历史
