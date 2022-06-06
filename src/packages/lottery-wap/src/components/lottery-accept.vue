@@ -112,6 +112,10 @@
       },
       submit() {
         if (!this.verify()) return false;
+
+        const failure = err => {
+          this.$toast(this.$t(err.msg));
+        };
         this.lotteryServer
           .acceptPrize({
             lottery_user_name: this.winForm[0].field_value,
@@ -119,18 +123,22 @@
             lottery_user_remark: JSON.stringify(this.winForm),
             lottery_id: this.lotteryId
           })
-          .then(() => {
-            this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
-            this.lotteryServer.initIconStatus();
-            if (this.showWinnerList) {
-              this.$emit('navTo', 'LotterySuccess');
+          .then(res => {
+            if (res.code === 200) {
+              this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+              this.lotteryServer.initIconStatus();
+              if (this.showWinnerList) {
+                this.$emit('navTo', 'LotterySuccess');
+              } else {
+                this.$toast(this.$t('interact_tools.interact_tools_1013'));
+                this.$emit('close');
+              }
             } else {
-              this.$toast(this.$t('interact_tools.interact_tools_1013'));
-              this.$emit('close');
+              failure(res);
             }
           })
-          .catch(e => {
-            this.$toast(this.$t(e.msg));
+          .catch(err => {
+            failure(err);
           });
       }
     }

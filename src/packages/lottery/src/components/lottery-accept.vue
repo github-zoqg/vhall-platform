@@ -133,13 +133,13 @@
               ) {
                 throw ele.field;
               }
-              if (ele.field_key == 'phone') {
-                const phone = this.reciveInfo[ele.field_key].replace(/\s/g, '');
-                const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
-                if (!regs.test(phone)) {
-                  throw '手机号格式错误'; // eslint-disable-line
-                }
-              }
+              // if (ele.field_key == 'phone') {
+              //   const phone = this.reciveInfo[ele.field_key].replace(/\s/g, '');
+              //   const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
+              //   if (!regs.test(phone)) {
+              //     throw '手机号格式错误'; // eslint-disable-line
+              //   }
+              // }
             }
           });
         } catch (error) {

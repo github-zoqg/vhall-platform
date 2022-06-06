@@ -136,7 +136,7 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: auto;
     .vmp-recommend-list {
       display: block;
       width: 100%;
