@@ -647,7 +647,6 @@
       overflow-x: auto;
       display: flex;
       flex-wrap: nowrap;
-      overflow-x: auto;
 
       &::-webkit-scrollbar {
         display: none;
@@ -666,7 +665,7 @@
         user-select: none;
         &_subscrbe {
           &:first-child {
-            padding-left: 12px;
+            padding-left: 0;
           }
         }
 

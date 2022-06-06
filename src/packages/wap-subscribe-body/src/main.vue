@@ -370,6 +370,13 @@
         }
         // 如果是嵌入页并且没有开播，预约按钮不显示
         if (webinar.type == 2) {
+          if (
+            (join_info.is_subscribe == 1 || webinar.hide_subscribe == 0) &&
+            warmup.warmup_paas_record_id &&
+            webinar.type == 2
+          ) {
+            this.showVideo = true;
+          }
           if (this.isEmbed) {
             this.showBottomBtn = false;
             return;
@@ -391,9 +398,6 @@
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
-        }
-        if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
-          this.showVideo = true;
         }
       },
       playerAuthCheck(info) {

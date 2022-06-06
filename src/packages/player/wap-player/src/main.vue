@@ -2,7 +2,8 @@
   <div class="vmp-wap-player">
     <template v-if="encrypt">
       <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
-        <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
+        <van-loading color="#fb2626" />
+        <!-- <img class="vmp-wap-player-prompt-load" src="./img/load.gif" /> -->
         <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
       </div>
       <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
@@ -764,9 +765,8 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      &-load {
-        width: 60px;
-        margin-bottom: 20px;
+      &-text {
+        margin-top: 20px;
       }
       &-poster {
         width: 100%;
@@ -1053,13 +1053,18 @@
           font-size: 32px;
         }
         &-left {
+          // vertical-align: middle;
+          .vh-a-line-videopause {
+            vertical-align: middle;
+          }
           .vh-line-refresh-left,
           &-time {
             padding-left: 15px;
-            // vertical-align: middle;
+            vertical-align: middle;
           }
           .vh-line-refresh-left {
             font-size: 28px;
+            vertical-align: bottom;
           }
         }
         &-right {
