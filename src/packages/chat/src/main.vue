@@ -341,9 +341,9 @@
         const msgServer = useMsgServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
-          this.targetId = '';
           if (!this.isBottom()) {
             if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
+              this.targetId = '';
               tipMsgTimer && clearTimeout(tipMsgTimer);
               this.isHasUnreadNormalMsg = true;
               this.isHasUnreadAtMeMsg = false;
@@ -358,6 +358,8 @@
         chatServer.$on('atMe', msg => {
           if (!this.isBottom()) {
             this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1075');
             tipMsgTimer && clearTimeout(tipMsgTimer);
@@ -370,6 +372,8 @@
         chatServer.$on('replyMe', msg => {
           if (!this.isBottom()) {
             this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = true;
             this.tipMsg = this.$t('chat.chat_1076');
             tipMsgTimer && clearTimeout(tipMsgTimer);
@@ -621,7 +625,7 @@
       //获取目标消息索引
       getTargetIndex(id) {
         return this.chatList.findIndex(item => {
-          return (item.msgId = id);
+          return item.msgId == id;
         });
       },
       //滚动到底部
@@ -629,6 +633,8 @@
         this.$nextTick(() => {
           this.$refs.chatlist.scrollToBottom();
           this.isHasUnreadNormalMsg = false;
+          this.isHasUnreadAtMeMsg = false;
+          this.isHasUnreadReplyMsg = false;
           this.unReadMessageCount = 0;
         });
       },
@@ -640,9 +646,15 @@
         } else {
           this.scrollBottom();
         }
+        this.isHasUnreadNormalMsg = false;
+        this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
         this.unReadMessageCount = 0;
       },
       toBottom() {
+        this.isHasUnreadNormalMsg = false;
+        this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部

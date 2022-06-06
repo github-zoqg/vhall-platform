@@ -31,7 +31,10 @@
         ></virtual-list>
         <div
           class="vmp-chat-wap__content__new-msg-tips"
-          v-show="isHasUnreadAtMeMsg"
+          v-show="
+            unReadMessageCount !== 0 &&
+            (isHasUnreadNormalMsg || isHasUnreadAtMeMsg || isHasUnreadReplyMsg)
+          "
           @click="scrollToTarget"
         >
           <span>{{ tipMsg }}</span>
@@ -100,8 +103,12 @@
         },
         //消息提示
         tipMsg: '',
-        //是否有未读
+        //是否有常规未读消息
+        isHasUnreadNormalMsg: false,
+        //是否有@我的未读消息
         isHasUnreadAtMeMsg: false,
+        //是否有未读的回复消息
+        isHasUnreadReplyMsg: false,
         //新消息数量
         unReadMessageCount: 0,
         //活动信息
@@ -135,7 +142,9 @@
         //显示输入组件
         showSendBox: false,
         //小屏适配
-        smFix: false
+        smFix: false,
+        //回复或@消息id
+        targetId: ''
       };
     },
     watch: {
@@ -323,23 +332,32 @@
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
+            this.targetId = '';
+            this.isHasUnreadNormalMsg = true;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
           this.dispatch('TabContent', 'noticeHint', 3);
         });
         //监听@我的消息
-        chatServer.$on('atMe', () => {
+        chatServer.$on('atMe', msg => {
           if (!this.isBottom()) {
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1075');
           }
         });
         //监听回复我的消息
-        chatServer.$on('replyMe', () => {
+        chatServer.$on('replyMe', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = true;
             this.tipMsg = this.$t('chat.chat_1076');
           }
         });
@@ -412,25 +430,37 @@
           lazyLoad: true
         });
       },
+      //获取目标消息索引
+      getTargetIndex(id) {
+        return this.chatList.findIndex(item => {
+          return item.msgId == id;
+        });
+      },
       //滚动到目标处
       scrollToTarget() {
-        const index = this.chatList.length - this.unReadMessageCount;
-        this.$refs.chatlist.scrollToIndex(index);
-        this.unReadMessageCount = 0;
-        this.isHasUnreadAtMeMsg = false;
+        const index = this.getTargetIndex(this.targetId);
+        if (index > -1) {
+          this.$refs.chatlist.scrollToIndex(index);
+        } else {
+          this.scrollBottom();
+        }
       },
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
+          this.isHasUnreadNormalMsg = false;
           this.isHasUnreadAtMeMsg = false;
+          this.isHasUnreadReplyMsg = false;
         });
       },
       //监听滚动条滚动到底部
       toBottom() {
         this.unReadMessageCount = 0;
+        this.isHasUnreadNormalMsg = false;
         this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
       },
       //滚动条是否在最底部
       isBottom() {
