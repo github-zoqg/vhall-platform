@@ -96,11 +96,11 @@
         return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
-    watch: {
-      isSmallPlayer() {
-        this.setSetingHeight();
-      }
-    },
+    // watch: {
+    //   isSmallPlayer() {
+    //     this.setSetingHeight();
+    //   }
+    // },
     beforeCreate() {
       this.giftsServer = useGiftsServer();
       this.msgServer = useMsgServer();
@@ -310,7 +310,7 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100;
+        let baseHeight = playerHeight + 71;
         if (this.isEmbed) {
           baseHeight = playerHeight;
         }
@@ -351,7 +351,7 @@
       },
       // open礼物弹框
       showgift() {
-        this.setSetingHeight();
+        // this.setSetingHeight();
         this.showgiftCard = true;
         // 每次点开礼物弹框的时候，默认礼物图标未选中
         if (this.currentGift) {

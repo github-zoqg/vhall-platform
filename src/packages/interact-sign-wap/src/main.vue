@@ -55,9 +55,9 @@
       // signInVisible(newValue) {
       //   // EventBus.$emit('signShow', newValue);
       // }
-      isSmallPlayer() {
-        this.setSetingHeight();
-      },
+      // isSmallPlayer() {
+      //   this.setSetingHeight();
+      // },
       isInGroup: {
         handler: function (val) {
           if (val) {
@@ -84,7 +84,6 @@
     },
     async created() {
       this.init();
-      this.setSetingHeight();
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         const { groupInitData } = this.groupServer.state;
         if (!groupInitData.isInGroup && !this.signinInfo.is_signed && this.signinInfo.id) {
@@ -158,7 +157,7 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100;
+        let baseHeight = playerHeight + 71;
         this.popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
       },
