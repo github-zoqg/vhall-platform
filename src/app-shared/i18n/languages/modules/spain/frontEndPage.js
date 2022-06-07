@@ -193,7 +193,6 @@ export default {
     login_1030: 'Consentimiento y cumplimiento',
     login_1031: 'Condiciones de servicio'
   },
-  undefined: {},
   register: {
     register_1001: 'Bienvenida a registrarse Vhall en vivo',
     register_1002: 'Registrar un nuevo usuario',
@@ -517,7 +516,7 @@ export default {
   },
   message: {
     message_1001:
-      'El patrocinador ha configurado una función de encriptación de video,\r\nSe recomienda utilizar la última versión del navegador Chrome para ver',
+      'El patrocinador ha configurado una función de encriptación de video,\nSe recomienda utilizar la última versión del navegador Chrome para ver',
     message_1002: 'No se admite la indicación de encriptación de video',
     message_1003: 'La cuenta ha visto esta actividad en otros dispositivos',
     message_1004: '¡Este video está fuera de línea!',
@@ -527,12 +526,12 @@ export default {
     message_1008:
       '¡El sitio de la actividad está demasiado animado y el número de personas ha excedido el límite superior!',
     message_1009:
-      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\r\nSe recomienda borrar las cookies del navegador antes de visitar ~',
+      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\nSe recomienda borrar las cookies del navegador antes de visitar ~',
     message_1010: 'La red se está agotando',
     message_1011:
-      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\r\nversión, se recomienda utilizar el navegador Chrome para ver ~',
+      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\nversión, se recomienda utilizar el navegador Chrome para ver ~',
     message_1012:
-      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\r\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
+      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
     message_1013: 'Falta la página, el ingeniero está en camino ...',
     message_1014: 'Transcodificación de video',
     message_1015: 'Falló la validación del valor K, a punto de saltar',
