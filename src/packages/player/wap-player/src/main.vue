@@ -1261,12 +1261,9 @@
       }
     }
     &-popup {
-      // width: 200px;
-      // position: absolute;
-      // transform: none;
-      // height: 100%;
-      // top: 0;
-      // background: rgba(0, 0, 0, 0.7);
+      &.van-popup {
+        padding-bottom: 30px;
+      }
       ul {
         display: flex;
         width: 100%;
