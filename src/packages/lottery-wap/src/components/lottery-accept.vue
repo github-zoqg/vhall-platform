@@ -116,21 +116,15 @@
                 }`
               );
               return true;
-            } else if (item.field_key == 'phone') {
-              const phone = item.field_value.replace(/\s/g, '');
-              const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
-              if (!regs.test(phone)) {
-                this.$toast(`手机号格式错误`);
-                return true;
-              } else {
-                return false;
-              }
             } else {
               return false;
             }
           });
           if (unCheck) return;
         }
+        const failure = err => {
+          this.$toast(this.$t(err.msg));
+        };
         this.lotteryServer
           .acceptPrize({
             lottery_user_name: this.winForm[0].field_value,
@@ -138,15 +132,19 @@
             lottery_user_remark: JSON.stringify(this.winForm),
             lottery_id: this.lotteryId
           })
-          .then(() => {
-            this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
-            this.$toast(this.$t('interact_tools.interact_tools_1067'));
-            this.$nextTick(() => {
-              this.$emit('navTo', 'LotterySuccess');
-            });
+          .then(res => {
+            if (res.code === 200) {
+              this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+              this.$toast(this.$t('interact_tools.interact_tools_1067'));
+              this.$nextTick(() => {
+                this.$emit('navTo', 'LotterySuccess');
+              });
+            } else {
+              failure(res);
+            }
           })
-          .catch(e => {
-            this.$toast(this.$t(e.msg));
+          .catch(err => {
+            failure(err);
           });
       }
     }

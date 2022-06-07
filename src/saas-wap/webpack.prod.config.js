@@ -4,14 +4,17 @@ const domainVersion = require('../../package.json').domainVersion;
 
 const htmlConfig = {
   cdnJs: {
-    MiddleEventSdk: '//cnstatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
-    MiddleDomain: `//cnstatic01.e.vhall.com/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
+    MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
+    MiddleDomain: `//s2.e.vhall.com/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
   },
   // dns-prefetch
   dnsPrefetch: {
     open: true, //是否开启dns预解
     dns: {
-      cnstatic01: 'cnstatic01.e.vhall.com'
+      cnstatic01: 'cnstatic01.e.vhall.com',
+      staticVhallyun: 'static.vhallyun.com',
+      s1: 's1.e.vhall.com',
+      s2: 's2.e.vhall.com'
     }
   }
 };
