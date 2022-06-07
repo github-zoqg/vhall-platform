@@ -447,7 +447,7 @@
         this.addDialogVisible = false;
         this.noticeDialogVisible = false;
         this.chooseDialogVisible = false;
-        if (this.groupSwitchStatus === 0) {
+        if (this.groupSwitchStatus == 0) {
           // 显示设置对话框
           this.groupServer.state.panelShow = false;
           this.settingDialogVisible = true;
@@ -716,7 +716,12 @@
       // 继续讨论
       handleProceedDiscussion() {
         if (this._isNotAllowPauseOrProceed) {
-          this.$message('请勿频繁操作');
+          this.$message({
+            message: '请勿频繁操作',
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
           return;
         }
         this.$confirm('确定是否继续讨论？', '提示', {
@@ -733,7 +738,6 @@
             }, 10000);
             // 设置groupServer中的分组状态
             this.groupServer.setGroupInitData('switch_status', 1);
-            console.warn('继续讨论成功');
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });
