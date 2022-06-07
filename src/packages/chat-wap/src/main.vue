@@ -467,6 +467,19 @@
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
       },
+      // 音频模式播放器大小变动 高度重新计算
+      changeChatHeight(data) {
+        console.log(data, 'data1313');
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = data == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight + 120 + 90;
+        }
+        this.chatlistHeight = this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
+      },
       async onTotop() {
         if (this.isLoading) {
           return;

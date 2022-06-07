@@ -91,6 +91,14 @@
           source = source.filter(item => item.price === '0');
         }
         return source;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
+      }
+    },
+    watch: {
+      isSmallPlayer() {
+        this.setSetingHeight();
       }
     },
     beforeCreate() {
@@ -301,10 +309,16 @@
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        let baseHeight = 522;
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100;
         if (this.isEmbed) {
-          baseHeight = 422;
+          baseHeight = playerHeight;
         }
+        console.log(
+          this.$domainStore.state.playerServer.isSmallPlayer,
+          this.isSmallPlayer,
+          'setPlayerSize'
+        );
         this.popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
         // const headerDom = document.getElementById('header');

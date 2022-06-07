@@ -336,6 +336,9 @@
           justify-content: center;
           background-color: #f0f0f0;
 
+          &.noMsg {
+            opacity: 0.4;
+          }
           .vh-iconfont {
             font-size: 34px;
           }

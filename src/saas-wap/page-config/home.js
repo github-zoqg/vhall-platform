@@ -90,6 +90,13 @@ const serverConfig = {
         method: 'playerAuthCheck',
         args: ['$0'] // 获取动态参数的第一个
       }
+    ],
+    emitChangeChatHeight: [
+      {
+        cuid: 'comChatWap',
+        method: 'changeChatHeight',
+        args: ['$0'] // 获取动态参数的第一个
+      }
     ]
   },
   comWapStreamList: {

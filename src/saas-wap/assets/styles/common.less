@@ -71,8 +71,10 @@ textarea {
 .vmp-basic-layout {
   width: 100%;
   height: 100%;
-  background: #fff;
+  // background: #fff;
   .vmp-basic-container {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
   }
@@ -82,6 +84,7 @@ textarea {
     background-color: #000;
     box-sizing: border-box;
     display: flex;
+    flex: none;
     flex-direction: column;
     position: relative;
     overflow: hidden;
@@ -157,6 +160,7 @@ textarea {
 .tab-content {
   height: calc(100% - 493px);
   // background-color: #aaa;
+  flex: auto;
   position: relative;
 }
 // 嵌入页没有头部
@@ -172,7 +176,7 @@ textarea {
 }
 .vmp-basic-layout__noHeader {
   .tab-content {
-    height: 100%;
+    height: calc(100% - 422px);
   }
   &.vmp-basic-layout__hasBottom {
     .tab-content {
