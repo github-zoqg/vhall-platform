@@ -101,11 +101,11 @@
         return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
-    watch: {
-      isSmallPlayer() {
-        this.setSetingHeight();
-      }
-    },
+    // watch: {
+    //   isSmallPlayer() {
+    //     this.setSetingHeight();
+    //   }
+    // },
     mounted() {
       this.chatServer = useChatServer();
       this.rewardServer = useWatchRewardServer();
@@ -160,6 +160,7 @@
         }
         this.btnMoney = '';
       },
+      textBlur() {},
       // 输入金额校验
       handleInput(e) {
         let targetValue = e.target.value;
