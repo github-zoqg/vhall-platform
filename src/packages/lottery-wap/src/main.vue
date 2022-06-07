@@ -300,7 +300,7 @@
       background: transparent;
     }
     .close {
-      font-size: 23px;
+      font-size: 32px;
       position: absolute;
       top: 37px;
       right: 36px;

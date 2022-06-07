@@ -111,6 +111,7 @@
       </ul>
       <el-form-item size="mini" label="重复中奖" class="repeat-winning">
         <el-switch
+          class="lottery-form-switch"
           v-model="repeatWinning"
           active-color="#FB3A32"
           inactive-color="#CECECE"
@@ -121,6 +122,7 @@
       </el-form-item>
       <el-form-item size="mini" label="领奖信息" class="repeat-winning">
         <el-switch
+          class="lottery-form-switch"
           v-model="needTakeAward"
           active-color="#FB3A32"
           inactive-color="#CECECE"
@@ -134,7 +136,12 @@
         </span>
       </el-form-item>
       <el-form-item size="mini" label="中奖名单" class="repeat-winning">
-        <el-switch v-model="showWinner" active-color="#FB3A32" inactive-color="#CECECE"></el-switch>
+        <el-switch
+          class="lottery-form-switch"
+          v-model="showWinner"
+          active-color="#FB3A32"
+          inactive-color="#CECECE"
+        ></el-switch>
         <span>
           {{ showWinner ? '已开启，抽奖结束后显示中奖名单' : '开启后，抽奖结束后显示中奖名单' }}
         </span>
@@ -461,6 +468,8 @@
     font-size: 12px;
     color: #999;
     margin-bottom: 0;
+    height: 24px;
+    line-height: 24px;
     span {
       color: #fb3a32;
     }
@@ -579,6 +588,10 @@
         color: #fb3a32;
       }
     }
+  }
+  .lottery-form-switch {
+    position: relative;
+    top: -2px;
   }
 </style>
 <style lang="less">

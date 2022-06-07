@@ -115,12 +115,12 @@
     .lottery-title {
       font-weight: 500;
       font-size: 32px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+      line-height: 44px;
     }
     .lottery-remark {
       font-size: 24px;
-      line-height: 34px;
-      margin-top: 5px auto 0;
+      line-height: 32px;
     }
     .lottery-pending-wrap {
       width: 656px;
