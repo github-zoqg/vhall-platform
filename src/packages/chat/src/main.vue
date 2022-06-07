@@ -16,10 +16,7 @@
       :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
     >
       <!-- {{ configList['ui.hide_chat_history'] }} -->
-      <p
-        v-if="hideChatHistory && !chatList.length && !historyloaded"
-        class="chat-content__get-list-btn-container"
-      >
+      <p v-if="!hideChatHistory" class="chat-content__get-list-btn-container">
         <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
       </p>
 
@@ -215,17 +212,15 @@
         overflow: false,
         //每次加载的消息条数
         pageSize: 50,
-        isLoading: false
+        isLoading: false,
+        //隐藏拉取历史聊天按钮
+        hideChatHistory: false
       };
     },
     computed: {
       isEmbed() {
         // 是不是音视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
-      },
-      //是否开启手动加载聊天历史记录
-      hideChatHistory() {
-        return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
       //视图中渲染的消息,为了实现主看主办方效果
@@ -298,10 +293,10 @@
       this.initInputStatus();
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
-      //拉取聊天历史
-      if (!this.hideChatHistory) {
-        this.getHistoryMsg();
-      }
+      // //拉取聊天历史
+      // if (!this.hideChatHistory) {
+      //   this.getHistoryMsg();
+      // }
       //监听domain层chatServer通知
       this.listenChatServer();
 
@@ -461,7 +456,7 @@
           limit: this.pageSize
         };
         const res = await useChatServer().getHistoryMsg(params);
-        this.historyloaded = true;
+        this.hideChatHistory = true;
         this.isLoading = false;
         return res;
       },
@@ -749,6 +744,10 @@
         display: block;
         text-align: center;
         padding-top: 10px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
       }
       &__get-list-btn {
         cursor: pointer;
