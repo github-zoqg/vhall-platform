@@ -949,6 +949,9 @@
       }
     }
     &-popup {
+      &.van-popup {
+        padding-bottom: 30px;
+      }
       ul {
         display: flex;
         flex-direction: column;
