@@ -1296,7 +1296,7 @@
                 reject();
               }
             }
-          }, 100);
+          }, 130);
         });
       },
       PopAlertOfflineClose() {
