@@ -55,7 +55,6 @@
       @showUserPopup="showUserPopup"
       @login="handleLogin"
       @sendEnd="sendMsgEnd"
-      :cuid="cuid"
     ></send-box>
   </div>
 </template>

@@ -418,7 +418,6 @@
       // 监听播放器大小
       isSmallPlayer: {
         handler: function (val) {
-          console.log(val, 'vmp-wap-body-endingvmp-wap-body-ending');
           if (val) {
             document.querySelector('.vmp-basic-bd').classList.add('small_player');
           } else {
