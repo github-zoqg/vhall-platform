@@ -503,6 +503,11 @@ const serverConfig = {
         method: 'handleAgreeWitthTerms'
       }
     ]
+  },
+  // *******单视频嵌入页面****结束
+  // *******app问卷嵌入页面****开始
+  appEmbedQuestionLayerRoot: {
+    component: 'VmpAirContainer'
   }
   // *******单视频嵌入页面****结束
 };
