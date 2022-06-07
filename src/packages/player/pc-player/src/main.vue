@@ -14,7 +14,11 @@
     @mouseleave="wrapLeave"
   >
     <div
-      id="vmp-player"
+      :id="
+        warmUpVideoList.length <= 1 || isLiving
+          ? 'vmp-player'
+          : `vmp-player-vod_${warmUpVideoList[warmUpIndex]}`
+      "
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -339,6 +343,7 @@
         marquee: {}, // 跑马灯
         water: {}, //水印
         agreement: false,
+        warmUpIndex: 0,
         playerOtherOptions: {
           barrage_button: 0,
           progress_bar: 0,
@@ -367,6 +372,12 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      playIndex() {
+        return this.$domainStore.state.playerServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.playerServer.warmUpVideoList;
       },
       // 背景图片
       webinarsBgImg() {
@@ -451,7 +462,10 @@
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
         let params = {
-          videoNode: 'vmp-player'
+          videoNode:
+            this.warmUpVideoList.length <= 1 || this.isLiving
+              ? 'vmp-player'
+              : `vmp-player-vod_${this.warmUpVideoList[this.warmUpIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -541,6 +555,9 @@
             if (this.isAutoPlay) {
               this.play();
             }
+          }
+          if (this.playerOtherOptions.autoplay == 1) {
+            this.play();
           }
         });
       },
