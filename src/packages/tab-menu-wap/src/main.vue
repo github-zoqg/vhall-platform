@@ -43,7 +43,7 @@
       <span
         v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
-        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
         @click="next"
       >
         <i class="vh-iconfont vh-line-arrow-right" />
@@ -629,22 +629,24 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        width: 24px;
-        height: 100%;
+        min-width: 24px;
         text-align: center;
         font-size: 14px;
-        color: #999;
+        color: #8c8c8c;
         height: 100%;
         cursor: pointer;
 
         &.disabledClick {
           i {
-            color: rgba(153, 153, 153, 0.4);
+            color: rgba(140, 140, 140, 0.4);
           }
         }
 
         &:hover {
           color: #666;
+        }
+        .vh-iconfont {
+          font-weight: 600;
         }
       }
     }

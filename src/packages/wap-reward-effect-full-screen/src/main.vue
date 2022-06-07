@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-wap-reward-effect-full-screen" v-show="showEffectStatus">
+  <div
+    class="vmp-wap-reward-effect-full-screen"
+    :class="customTemp ? 'customTemp' : ''"
+    v-show="showEffectStatus"
+  >
     <SvgaPlayer v-show="isSvga" ref="svgaPlayer" class="player-zone" @finish="finishedPlay" />
     <ImgPlayer v-show="!isSvga" ref="gifPlayer" class="player-zone" @finish="finishedPlay" />
   </div>
@@ -25,7 +29,8 @@
         hideEffect: false,
         showEffectStatus: false,
         taskQueue: null, // 飘窗列队
-        isSvga: true
+        isSvga: true,
+        customTemp: false //临时处理666和咖啡
       };
     },
     components: {
@@ -138,6 +143,7 @@
         this.showEffectStatus = true;
         this.visible = true;
         let compontent;
+        this.customTemp = false;
         // 自定义礼物
         if (reload.data.source_status == 1 && reload.data.type !== 'reward_pay_ok') {
           compontent = this.$refs.gifPlayer;
@@ -145,6 +151,10 @@
         } else {
           compontent = this.$refs.svgaPlayer;
           this.isSvga = true;
+
+          if (reload.data.gift_name == '666' || reload.data.gift_name == '咖啡') {
+            this.customTemp = true;
+          }
         }
 
         console.time('startPlay');
@@ -187,6 +197,14 @@
     .player-zone {
       width: 100%;
       height: 100%;
+    }
+    &.customTemp {
+      .player-zone {
+        width: 50%;
+        height: 50%;
+        margin: 50% 50%;
+        transform: translate(-50%, -40%);
+      }
     }
   }
 </style>

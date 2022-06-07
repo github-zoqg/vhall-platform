@@ -1,6 +1,13 @@
 <template>
   <section>
-    <van-popup class="gift-van-popup" v-model="showgiftCard" round position="bottom" closeable>
+    <van-popup
+      class="gift-van-popup"
+      v-model="showgiftCard"
+      get-container="#app"
+      round
+      position="bottom"
+      closeable
+    >
       <div class="gift-wrap">
         <div class="swiper-box">
           <div class="van-swipe-item">
