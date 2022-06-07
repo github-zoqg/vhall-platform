@@ -2,14 +2,22 @@
   <div class="vmp-subscribe-body">
     <div :class="isEmbed ? 'vmp-subscribe-body-embed' : 'vmp-subscribe-body-intro'">
       <div class="subscribe-img">
-        <div class="subscribe-img-box" v-if="!showVideo">
-          <!-- 背景图片 未完成验证-->
-          <img :src="webinarsBgImg" />
-        </div>
-        <div class="subscribe-img-box" v-else>
-          <!-- 完成验证、并且有暖场视频 加载播放器 -->
-          <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
-        </div>
+        <template v-if="!showVideo">
+          <div class="subscribe-img-box">
+            <!-- 背景图片 未完成验证-->
+            <img :src="webinarsBgImg" />
+          </div>
+        </template>
+        <template v-else>
+          <div class="subscribe-img-box" v-show="playIndex % 2 === 0">
+            <!-- 完成验证、并且有暖场视频 加载播放器 -->
+            <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
+          </div>
+          <div class="subscribe-img-box" v-show="playIndex % 2 === 1">
+            <!-- 完成验证、并且有暖场视频 加载播放器 -->
+            <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
+          </div>
+        </template>
       </div>
       <div class="subscribe-language" v-if="isEmbed && languageList.length > 1 && showBottom">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
@@ -108,6 +116,9 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
+      playIndex() {
+        return this.$domainStore.state.playerServer.playIndex;
+      },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;
       },
@@ -190,7 +201,7 @@
             this.showVideo = true;
           }
         } else {
-          if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
+          if (warmup.warmup_paas_record_id && webinar.type == 2) {
             this.showVideo = true;
           }
         }
