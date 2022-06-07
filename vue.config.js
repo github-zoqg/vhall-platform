@@ -156,7 +156,11 @@ function getPlugins() {
         }
       }),
       // 修改文件内容替换路由标记
-      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData)
+      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData),
+      // 限制构建的chunk数量
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 5
+      })
     );
   }
   return plugins;
