@@ -946,7 +946,7 @@
                 : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
             if (result && result.code == 200) {
-              if (this.groupServer.state.groupInitData.join_role == 20) {
+              if (this.groupServer.state.groupInitData.join_role == 20 && this.isInGroup) {
                 // 如果是组长结束了观众的演示
                 this.$message({
                   message: '结束演示',
