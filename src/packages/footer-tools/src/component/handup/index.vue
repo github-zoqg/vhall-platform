@@ -8,7 +8,7 @@
         size="medium"
         round
         :disabled="loading"
-        v-if="isInGroup ? +this.groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
+        v-if="isInGroup ? +groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
       </el-button>
@@ -19,7 +19,7 @@
         type="primary"
         size="medium"
         :disabled="loading"
-        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
+        v-if="isInGroup ? +groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
         {{ $t('interact.interact_1007') }}

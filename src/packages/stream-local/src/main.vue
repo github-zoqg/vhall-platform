@@ -125,7 +125,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && groupRole != 20"
+            v-if="isInGroup ? groupRole != 20 : joinInfo.role_name != 1"
           ></span>
         </el-tooltip>
       </p>
@@ -191,12 +191,12 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && groupRole != 20"
+            v-if="isInGroup ? groupRole != 20 : joinInfo.role_name != 1"
           ></span>
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (groupRole == 20 && isInGroup)"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->
@@ -402,7 +402,7 @@
       },
       autoSpeak() {
         // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 观众 + 不在麦上 + 非同意主持人的邀请上麦 + 非自己申请上麦
-        if (this.groupRole == 20) {
+        if (this.groupRole == 20 && this.isInGroup) {
           return false;
         } else {
           return (

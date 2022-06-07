@@ -331,7 +331,9 @@
           account_id: info.sender_id,
           ...info.context,
           role_name:
-            (info.context.groupInitData && info.context.groupInitData.join_role) ||
+            (info.context.groupInitData &&
+              info.context.groupInitData.isInGroup &&
+              info.context.groupInitData.join_role) ||
             (info.context && info.context.role_name)
         };
         if (temp && Object.prototype.hasOwnProperty.call(temp, 'nick_name')) {
