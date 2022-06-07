@@ -17,12 +17,7 @@
         ></virtual-list>
       </div>
     </div>
-    <div
-      class="overlay"
-      v-show="showSendBox"
-      @touchstart="closeOverlay"
-      @click="closeOverlay"
-    ></div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
       ref="sendBox"
       currentTab="private"
@@ -206,7 +201,7 @@
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
             this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();

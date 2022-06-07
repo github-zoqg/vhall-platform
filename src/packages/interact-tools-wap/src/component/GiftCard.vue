@@ -1,54 +1,50 @@
 <template>
   <section>
     <van-popup
-      get-container="#otherPopupContainer"
+      class="gift-van-popup"
       v-model="showgiftCard"
+      get-container="#app"
+      round
       position="bottom"
-      :overlay="false"
-      :style="{ height: popHeight }"
+      closeable
     >
       <div class="gift-wrap">
-        <header>
-          {{ $t('interact_tools.interact_tools_1029') }}
-          <i class="vh-iconfont vh-line-close" @click="close"></i>
-        </header>
-        <van-swipe
-          class="swiper-box"
-          indicator-color="#888"
-          :loop="filterGift.length != 1"
-          @change="swiperChange"
-        >
-          <van-swipe-item v-for="(item, index) in filterGift" :key="index" class="swiper-box-item">
+        <div class="swiper-box">
+          <div class="van-swipe-item">
             <div
-              v-for="(secItem, secIndex) in item"
+              v-for="(secItem, secIndex) in filterGift"
               :key="secIndex"
               class="gift-box"
-              :class="{ active: secItem.active }"
+              :class="{ active: secItem.active, disabledColor: btnDisabled || !currentGift.id }"
             >
-              <div class="border-1px gift-img" @click="chooseGift(index, secItem, item)">
-                <img :src="`${secItem.image_url}`" alt />
+              <div class="info">
+                <div class="border-1px gift-img" @click="chooseGift(secIndex, secItem)">
+                  <img v-if="secItem.source_status == 1" :src="`${secItem.image_url}`" alt />
+                  <img
+                    v-else
+                    :src="
+                      require('@/packages/app-shared/assets/img/wap/gift/' + secItem.name + '.png')
+                    "
+                    alt
+                  />
+                </div>
+                <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
+                <p class="money" :class="{ free: secItem.price == 0 }">
+                  {{
+                    secItem.price == 0
+                      ? $t('interact_tools.interact_tools_1058')
+                      : `￥${secItem.price}`
+                  }}
+                </p>
               </div>
-              <p class="title">{{ $t(secItem.name) }}</p>
-              <p class="money">
-                {{
-                  secItem.price == 0
-                    ? $t('interact_tools.interact_tools_1058')
-                    : `￥${secItem.price}`
-                }}
-              </p>
+              <div v-show="secItem.active" @click="giveGiftSubmit" class="btn">
+                {{ $t('interact_tools.interact_tools_1030') }}
+                <span v-if="btnDisabled">{{ `${timer}s` }}</span>
+              </div>
             </div>
-          </van-swipe-item>
-        </van-swipe>
-        <footer>
-          <button
-            @click="giveGiftSubmit"
-            :disabled="btnDisabled || !currentGift.id"
-            :class="{ disabledColor: btnDisabled || !currentGift.id }"
-          >
-            {{ $t('interact_tools.interact_tools_1030') }}
-            <span v-if="btnDisabled">{{ `${timer}s` }}</span>
-          </button>
-        </footer>
+            <div class="block" v-if="filterGift.length > 8"></div>
+          </div>
+        </div>
       </div>
     </van-popup>
   </section>
@@ -94,16 +90,7 @@
         if (this.isEmbed) {
           source = source.filter(item => item.price === '0');
         }
-        const arr = [];
-        const rate = Math.ceil(source.length / 8);
-        for (let i = 0; i < rate; i++) {
-          if (source.length >= 8) {
-            arr.push(source.splice(0, 8));
-          } else {
-            arr.push(source);
-          }
-        }
-        return arr;
+        return source;
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
@@ -167,9 +154,9 @@
         });
       },
       // 选择礼物
-      chooseGift(index, currentItem, item) {
+      chooseGift(index, currentItem) {
         this.currentGift = currentItem;
-        for (const iterator of item) {
+        for (const iterator of this.filterGift) {
           iterator.active = false;
         }
         currentItem.active = true;
@@ -233,6 +220,9 @@
        * 赠送礼物
        */
       giveGiftSubmit() {
+        if (this.btnDisabled || !this.currentGift.id) {
+          return;
+        }
         this.close();
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
@@ -400,7 +390,7 @@
           };
           if (this.msgServer) {
             this.msgServer.sendChatMsg(msgData, context);
-            this.$toast(this.$t('interact_tools.interact_tools_1031'));
+            //  this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();
             this.btnDisabled = true;
             this.handlerTimer = setInterval(() => {
@@ -418,7 +408,7 @@
         }
         this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
           if (res.code == 200) {
-            this.$toast(this.$t('interact_tools.interact_tools_1031'));
+            // this.$toast(this.$t('interact_tools.interact_tools_1031'));
             this.close();
             this.btnDisabled = true;
             this.handlerTimer = setInterval(() => {
@@ -440,102 +430,101 @@
 <style lang="less">
   .gift-wrap {
     height: 100%;
-    header {
-      position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: rgba(68, 68, 68, 1);
-      letter-spacing: 3px;
-      text-align: center;
-      height: 90px;
-      line-height: 90px;
-      // @include border(bottom);
-      border-bottom: 1px solid rgba(212, 212, 212, 1);
-      i {
-        position: absolute;
-        top: 50%;
-        left: 94%;
-        transform: translate(-50%, -50%);
-        font-size: 27px;
-      }
-    }
+    background: linear-gradient(55.94deg, #fdf1ed 9.51%, #f3f2ff 102.75%);
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    padding-top: 70px;
+    padding-bottom: 88px;
     .swiper-box {
-      height: calc(100% - 226px);
-      padding: 16px 0;
-      overflow-y: scroll;
+      max-height: 610px;
+      padding: 0 32px;
+      overflow-y: auto;
       .van-swipe-item {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
+        display: grid;
+        justify-content: flex-start;
+        grid-template-columns: repeat(4, 160px);
+        grid-gap: 16px;
       }
-    }
-    .disabledColor {
-      background: #ccc;
-      border-color: #ccc;
-      color: #fff;
+      .block {
+        height: 270px;
+      }
     }
     .gift-box {
-      width: 25%;
-      height: 230px;
-      min-width: 180px;
-      margin-top: 10px;
-      display: inline-block;
-      text-align: center;
-      > div {
-        width: 110px;
-        height: 110px;
+      width: 160px;
+      height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      .info {
         margin: 0 auto;
-        display: inline-block;
-        img {
-          width: 100%;
-          height: 100%;
-          margin-top: 20px;
-          object-fit: scale-down;
+        padding-top: 15px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        .gift-img {
+          width: 120px;
+          height: 120px;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: scale-down;
+          }
         }
-        &.active {
-          border: 1px solid #fc5459;
-          // @include border-1px(#fc5459);
+
+        > p {
+          text-align: center;
+        }
+        .title {
+          font-size: 24px;
+          font-family: PingFangSC;
+          font-weight: 400;
+          line-height: 24px;
+          color: #262626;
+          width: 144px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          margin-top: 5px;
+        }
+        .money {
+          font-size: 18px;
+          line-height: 24px;
+          font-family: PingFangSC;
+          font-weight: 400;
+          color: #8c8c8c;
+          margin-top: 12px;
         }
       }
-      > p {
-        margin-top: 16px;
-        text-align: center;
-      }
-      .title {
-        font-size: 24px;
-        font-family: PingFangSC;
-        font-weight: 400;
-        line-height: 32px;
-        color: #222;
-      }
-      .money {
-        font-size: 20px;
-        font-family: PingFangSC;
-        font-weight: 400;
-        line-height: 20px;
-        color: #444;
-      }
+
       &.active {
         border: 2px solid #fb3a32;
         border-radius: 12px;
+
+        &.disabledColor {
+          border: 2px solid rgba(251, 58, 50, 0.6);
+          .btn {
+            background: rgba(251, 38, 38, 0.6);
+          }
+        }
+        .btn {
+          width: 100%;
+          height: 54px;
+          min-height: 54px;
+          background: #fb3a32;
+          border-radius: 0 0 10px 10px;
+          font-size: 28px;
+          color: #ffffff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .money {
+          margin-top: 0;
+        }
       }
     }
-    footer {
-      width: 364px;
-      padding: 0 30px;
-      margin: 0 auto;
-      button {
-        width: 100%;
-        height: 90px;
-        background: rgba(252, 84, 89, 1);
-        border-radius: 10px;
-        font-size: 36px;
-        font-family: PingFangSC;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 1);
-        line-height: 90px;
-        text-align: center;
-      }
-    }
+  }
+  .gift-van-popup {
+    padding-bottom: 0 !important;
   }
 </style>

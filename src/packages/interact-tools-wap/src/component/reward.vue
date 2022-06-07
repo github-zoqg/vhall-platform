@@ -1,18 +1,14 @@
 <template>
   <section>
     <van-popup
-      get-container="#otherPopupContainer"
+      get-container="#app"
       v-model="showRewardCard"
+      class="reward-van-popup"
       position="bottom"
-      :overlay="false"
-      :style="{ height: popHeight }"
+      round
+      closeable
     >
       <div class="reward-wrap">
-        <header>
-          {{ $t('interact_tools.interact_tools_1044') }}
-          <i class="vh-iconfont vh-line-close" @click="close"></i>
-        </header>
-        <p class="title">{{ $t('interact_tools.interact_tools_1045') }}</p>
         <ul>
           <li
             v-for="(item, index) in moneyList"
@@ -20,36 +16,42 @@
             :class="{ active: item.active }"
             @click="chooseMoney(index, item)"
           >
-            {{ item.value }}
+            <span>
+              <span class="item">￥</span>
+              <span v-html="item.value"></span>
+            </span>
           </li>
         </ul>
         <div class="otherMoney">
-          <div>
-            <input
-              type="number"
-              @focus="clearMoney()"
-              v-model.trim="money"
-              :placeholder="`￥${$t('interact_tools.interact_tools_1046')}`"
-              @input="handleInput"
-              @blur="handleBlur"
-            />
-          </div>
+          <van-field
+            v-model.trim="money"
+            :label="$t('interact_tools.interact_tools_1046')"
+            type="number"
+            :placeholder="`￥0.00`"
+            input-align="right"
+            @blur="textBlur"
+            @focus="clearMoney()"
+          />
         </div>
         <div class="notes">
-          <div>
-            <input
-              type="text"
-              v-model="note"
-              @input="changeDes"
-              maxlength="15"
-              :placeholder="`${$t('interact_tools.interact_tools_1047')}!`"
-            />
-            <span class="text-limit">{{ note.length }}/15</span>
-          </div>
+          <van-field
+            type="text"
+            v-model="note"
+            maxlength="15"
+            :placeholder="`${$t('interact_tools.interact_tools_1047')}!`"
+            @blur="textBlur"
+          >
+            <div slot="extra">
+              <span class="text-limit">
+                <span :class="note.length > 0 ? (note.length >= 15 ? 'text-ful' : 'text-can') : ''">
+                  {{ note.length }}
+                </span>
+                /15
+              </span>
+            </div>
+          </van-field>
         </div>
-        <footer>
-          <button @click="submit">{{ btnTxt }}</button>
-        </footer>
+        <button class="btn" @click="submit">{{ btnTxt }}</button>
       </div>
     </van-popup>
   </section>
@@ -81,7 +83,6 @@
           { value: 88.88, active: false }
         ],
         showRewardCard: false,
-        popHeight: '60%',
         money: '',
         btnMoney: '', // 选中按钮上面的金额
         note: ''
@@ -140,15 +141,6 @@
         if (msg.rewarder_id == this.webinarData.join_info.third_party_user_id) {
           console.log('收到打上成功消息，关闭弹窗');
           this.close();
-        }
-      },
-      // 长度判断修改
-      changeDes(e) {
-        const val = e.target.value;
-        if (val.length > 20) {
-          this.note = val.substr(0, 20);
-        } else {
-          this.note = val;
         }
       },
       // 金额选择
@@ -336,22 +328,14 @@
         this.note = '';
         this.money = '';
       },
-      //  * 计算 设置的弹层高度
-      setSetingHeight() {
-        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-        // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100;
-        this.popHeight =
-          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-      },
       // 打开打赏弹框
       showReward() {
         if (!this.localRoomInfo.isLogin) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return;
         }
-        this.setSetingHeight();
+        this.chooseMoney(0, this.moneyList[0]);
+        this.note = '';
         this.showRewardCard = true;
       },
       handleBlur() {
@@ -365,135 +349,94 @@
 </script>
 
 <style lang="less">
+  .reward-van-popup {
+    padding-bottom: 0 !important;
+  }
   .reward-wrap {
-    header {
-      position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: rgba(68, 68, 68, 1);
-      letter-spacing: 3px;
-      text-align: center;
-      height: 90px;
-      line-height: 90px;
-      border-bottom: 1px solid rgba(212, 212, 212, 1);
-      i {
-        position: absolute;
-        top: 50%;
-        left: 94%;
-        transform: translate(-50%, -50%);
-        font-size: 27px;
-      }
+    height: 100%;
+    background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 90px 32px 40px;
+
+    @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 40px) !important;
     }
-    .title {
-      text-align: center;
-      font-size: 30px;
-      color: rgba(68, 68, 68, 1);
-      margin: 30px 0px;
+
+    .van-field {
+      border-radius: 8px;
     }
+
     ul {
       display: flex;
-      box-sizing: border-box;
-      padding: 0 30px;
+      align-items: center;
       justify-content: space-between;
       li {
-        width: 30%;
-        text-align: center;
-        display: inline-block;
-        height: 80px;
-        line-height: 78px;
-        color: #444444;
+        width: 218px;
+        height: 132px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1a1a1a;
         border-radius: 8px;
-        border: 1px solid #d4d4d4;
-        font-size: 36px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        font-size: 40px;
+        font-weight: 500;
         &.active {
-          color: white;
-          border-radius: 8px;
-          background-color: #fc5459;
-          border: 1px solid #fc5459;
+          background: rgba(255, 209, 201, 0.2);
+          border: 4px solid #fb2626;
+        }
+        .item {
+          font-size: 24px;
+          font-weight: 400;
         }
       }
     }
 
     .otherMoney,
     .notes {
-      margin: 30px;
-      padding: 0 30px;
-      height: 90px;
+      margin: 24px 0;
+      height: 80px;
       display: flex;
-      color: rgba(68, 68, 68, 1);
-      justify-content: space-between;
+      color: #8c8c8c;
       border-radius: 8px;
-      border: 1px solid #d4d4d4;
-      font-size: 30px;
-      > div {
-        input {
-          width: 100%;
-          height: 100%;
-          line-height: normal;
-        }
-        input[type='number']::-webkit-input-placeholder,
-        input[type='text']::-webkit-input-placeholder {
-          color: #a0a0a0;
-          font-size: 30px;
-        }
+      font-size: 28px;
+      input {
+        color: #262626;
       }
     }
 
-    .otherMoney {
-      > div {
-        height: 100%;
-        flex-grow: 1;
-      }
-    }
     .notes {
-      margin-bottom: 170px;
-      > div {
-        height: 100%;
-        width: 100%;
-        position: relative;
-        input {
-          padding-right: 120px;
-        }
-        .text-limit {
-          position: absolute;
-          line-height: 88px;
-          top: 0px;
-          right: 20px;
-          font-size: 30px;
-        }
+      input {
+        padding-right: 100px;
       }
-      .van-cell__value::v-deep {
-        padding-top: 4px;
-        background: #f5f5f5;
-        height: 100%;
-        .van-field__body {
-          height: 100%;
+      .text-limit {
+        position: absolute;
+        line-height: 80px;
+        top: 0px;
+        right: 20px;
+        font-size: 28px;
+        color: rgba(89, 89, 89, 0.8);
+        .text-ful {
+          color: rgba(251, 38, 38, 0.8);
         }
-        .van-field__word-limit {
-          margin-top: -24px;
+        .text-can {
+          color: rgba(59, 153, 247, 0.8);
         }
       }
     }
-    footer {
+    .btn {
       width: 100%;
-      position: fixed;
-      bottom: 40px;
-      padding: 0 30px;
-      background: white;
-      margin-top: 30px;
-      z-index: 99;
-      button {
-        width: 100%;
-        height: 94px;
-        background: rgba(252, 84, 89, 1);
-        border-radius: 10px;
-        font-size: 36px;
-        font-family: PingFangSC;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 1);
-        line-height: 94px;
-        text-align: center;
-      }
+      height: 80px;
+      background: #fb2626;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      margin-top: 60px;
     }
   }
 </style>
