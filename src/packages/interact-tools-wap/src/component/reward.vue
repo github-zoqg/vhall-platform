@@ -1,8 +1,9 @@
 <template>
   <section>
     <van-popup
-      get-container="#otherPopupContainer"
+      get-container="#app"
       v-model="showRewardCard"
+      class="reward-van-popup"
       position="bottom"
       round
       closeable
@@ -290,6 +291,9 @@
 </script>
 
 <style lang="less">
+  .reward-van-popup {
+    padding-bottom: 0 !important;
+  }
   .reward-wrap {
     height: 100%;
     background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
