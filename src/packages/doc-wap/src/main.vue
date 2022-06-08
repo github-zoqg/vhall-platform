@@ -2,10 +2,12 @@
   <div
     id="docWrapper"
     class="vmp-doc-wap"
-    :class="[`vmp-doc-wap--${displayMode}`]"
+    :class="[`vmp-doc-wap--${displayMode}`, `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`]"
     :style="{
       height:
-        docViewRect.height > 0 && displayMode !== 'fullscreen ' ? docViewRect.height + 'px' : '100%'
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%',
+      minHeight:
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%'
     }"
     v-show="switchStatus"
     ref="docWrapper"
@@ -51,14 +53,28 @@
       </div>
     </div>
 
-    <!-- 全屏切换 -->
-    <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
-      <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
-      <i v-else class="vh-iconfont vh-line-amplification"></i>
-    </div>
-    <!-- 文档拖动后还原 -->
-    <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
-      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+    <div
+      class="tools"
+      :style="{
+        transform:
+          docViewRect.height > 0 && (displayMode !== 'fullscreen' || !isPortrait)
+            ? 'none'
+            : 'translateY(' + docViewRect.height / 2 + 'px)'
+      }"
+    >
+      <!-- 全屏切换 -->
+      <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
+        <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
+        <i v-else class="vh-iconfont vh-line-amplification"></i>
+      </div>
+      <!-- 文档拖动后还原 -->
+      <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
+        <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+      </div>
+      <!-- 文档横屏 -->
+      <div v-show="!!currentCid" @click="doRotate" class="btn-doc-rotate">
+        <i class="vh-iconfont vh-line-send"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -114,6 +130,10 @@
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
+      // 是否是竖屏
+      isPortrait() {
+        return this.docServer.state.isPortrait;
+      },
       // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
@@ -164,6 +184,8 @@
           this.recoverLastDocs();
         });
       }
+      this.resizeDoc();
+      window.addEventListener('resize', this.resizeDoc);
     },
     methods: {
       /**
@@ -256,17 +278,16 @@
        * 获取文档白板容器大小
        */
       getDocViewRect() {
-        let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
         let h = 0;
-        if (!rect || rect.width <= 0 || rect.height <= 0) {
-          // 竖屏
-          w =
-            window.screen.height < window.screen.width ? window.screen.height : window.screen.width;
+        //是否竖屏
+        if (this.isPortrait) {
+          w = window.screen.width;
+          h = (9 * w) / 16;
         } else {
-          w = rect.width;
+          h = window.screen.height;
+          w = (16 * h) / 9;
         }
-        h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
         console.log('[doc] ', this.docViewRect);
         return { width: w, height: h };
@@ -310,6 +331,7 @@
             this.docServer.prevStep();
           }
         } else if (type === 'next') {
+          this.docServer;
           if (this.pageNum < this.pageTotal) {
             this.docServer.nextStep();
           }
@@ -329,7 +351,24 @@
             boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
           );
         }
-      }
+      },
+      //监听系统横竖屏
+      resizeDoc(e) {
+        const newOir = window.innerWidth < window.innerHeight;
+        console.log(
+          '【resizeDoc】:',
+          'window.innerHeight: ' + window.innerHeight,
+          'window.innerWidth: ' + window.innerWidth,
+          'isPortrait:' + this.docServer.state.isPortrait
+        );
+        if (newOir != this.docServer.state.isPortrait) {
+          //方向发生了变化就重新计算文档大小
+          this.docServer.state.isPortrait = newOir;
+          this.getDocViewRect();
+        }
+      },
+      //自定义横竖屏
+      doRotate() {}
     },
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
@@ -346,7 +385,7 @@
     flex-direction: column;
     background-color: #f2f2f2;
     color: #fff;
-
+    position: relative;
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
@@ -398,34 +437,33 @@
       }
     }
 
-    .btn-doc-fullscreen {
+    .tools {
       position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 0.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
+      right: 0;
+      top: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9;
-    }
+      margin-top: 20px;
+      > div {
+        margin-right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9;
+      }
+      .btn-doc-fullscreen {
+      }
 
-    .btn-doc-restore {
-      position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 1.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9;
+      .btn-doc-restore {
+      }
+
+      .btn-doc-rotate {
+      }
     }
 
     .btn-pager {
@@ -469,6 +507,43 @@
             position: absolute;
             transform: translate(-50%, -50%);
             overflow: visible !important;
+          }
+        }
+      }
+
+      .tools {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+        .btn-doc-fullscreen {
+        }
+        .btn-doc-restore {
+        }
+        .btn-doc-rotate {
+        }
+      }
+      &.doc-landscape {
+        .tools {
+          position: absolute;
+          right: 0;
+          bottom: 10px;
+          top: auto;
+          display: flex;
+          align-items: center;
+          margin-top: 0;
+          > div {
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+          }
+          .btn-doc-fullscreen {
+          }
+          .btn-doc-restore {
+          }
+          .btn-doc-rotate {
           }
         }
       }
