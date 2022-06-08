@@ -691,7 +691,12 @@
       // 暂停讨论
       handlePauseDiscussion() {
         if (this._isNotAllowPauseOrProceed) {
-          this.$message('请勿频繁操作');
+          this.$message({
+            message: '请勿频繁操作',
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
           return;
         }
         this.$confirm('暂停讨论，全部组员将返回到主直播间，确定暂停讨论？', '提示', {

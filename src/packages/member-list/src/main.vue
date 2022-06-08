@@ -657,7 +657,7 @@
 
             // 如果是发起端
             if (isLive) {
-              const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
+              const groupUsersNumber = _this.getGroupedUserLength();
               _this.totalNum = _this.isInGroup
                 ? msg.uv
                 : msg.uv - (_this.groupInitData.switch_status == 1 ? groupUsersNumber : 0);
@@ -829,9 +829,7 @@
           const isWatch = _this.isWatch;
           if (msg?.context?.isAuthChat) return; // 如果是聊天审核页面不做任何操作
           const groupUserNum =
-            _this.groupServer.state.groupedUserList.length >= 1
-              ? _this.groupServer.state.groupedUserList.length - 1
-              : 0;
+            _this.getGroupedUserLength() >= 1 ? _this.getGroupedUserLength() - 1 : 0;
 
           if (isLive) {
             _this.totalNum = _this.isInGroup
@@ -1059,7 +1057,7 @@
           if (_this.isInGroup) return;
 
           if (isLive) {
-            _this.totalNum = msg.uv - _this.groupServer.state.groupedUserList.length;
+            _this.totalNum = msg.uv - _this.getGroupedUserLength();
             _this.totalNum = _this.totalNum >= 0 ? _this.totalNum : 0;
             // 如果sender_id==自己
             if (msg.sender_id == _this.userId) {
@@ -1830,6 +1828,14 @@
         if (this.$refs && this.$refs.scroll) {
           this.$refs.scroll.refresh();
         }
+      },
+      getGroupedUserLength() {
+        if (!this.groupServer.state.groupedUserList) return 0;
+        if (!this.groupServer.state.groupedUserList.length) return 0;
+        return this.groupServer.state.groupedUserList.reduce(
+          (preVal, curVal) => preVal + curVal.group_joins.length,
+          0
+        );
       }
     }
   };
