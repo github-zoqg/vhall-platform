@@ -226,6 +226,9 @@
       overflow-x: hidden;
       .el-form-item__content {
         line-height: 0;
+        overflow: hidden;
+
+        border-radius: 4px;
       }
       .el-form-item {
         margin-bottom: 8px;
@@ -236,7 +239,6 @@
       .el-input__inner {
         height: 36px;
         background: rgba(254, 239, 228, 0.9);
-        border-radius: 4px;
         padding-left: 22px;
         border: none;
         &:hover {
@@ -253,11 +255,10 @@
         }
       }
       .address-textarea {
-        width: 235px;
+        width: 236px;
         height: 44px;
         line-height: 20px;
         background: rgba(254, 239, 228, 0.9);
-        border-radius: 4px;
         border-color: transparent;
       }
       #address-textarea {
@@ -288,6 +289,16 @@
         overflow: visible !important;
       }
     }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 2px;
+    }
   }
 
   .lottery-winner-info {
@@ -303,9 +314,11 @@
     align-items: center;
     position: relative;
     .winner-info-form {
-      width: 260px;
+      box-sizing: border-box;
+      width: 268px; //
       // height: 150px;
       margin-top: 24px;
+      padding: 0 4px; // 左右4px给滚动条
       .required-flag {
         position: absolute;
         color: #666666;
