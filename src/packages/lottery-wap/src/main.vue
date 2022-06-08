@@ -230,7 +230,7 @@
           const st = setTimeout(() => {
             clearTimeout(st);
             opneView(view);
-          }, 400);
+          }, 600);
         } else {
           opneView(view);
         }
