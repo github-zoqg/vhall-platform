@@ -22,7 +22,8 @@
                   <img
                     v-if="
                       secItem.source_status == 1 ||
-                      (secItem.source_status == 0 && ['赞', '鼓掌', '鲜花'].includes(secItem.name))
+                      (secItem.source_status == 0 &&
+                        ['赞', '鼓掌', '掌声', '鲜花'].includes(secItem.name))
                     "
                     :src="`${secItem.image_url}`"
                     alt
