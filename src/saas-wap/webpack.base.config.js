@@ -27,7 +27,6 @@ const htmlConfig = {
     // 可以延迟加载的
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
-    jsencrypt: '//s3.e.vhall.com/common-static/middle/jsencrypt/3.2.1/dist/jsencrypt.min.js',
 
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
