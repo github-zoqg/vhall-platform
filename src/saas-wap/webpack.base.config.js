@@ -17,8 +17,6 @@ const htmlConfig = {
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
     ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
-    jsCookie: '//s2.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
-
     // 通过s3域名加载
     Vant: '//s3.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     loadLazyWap: '//s3.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',

@@ -17,8 +17,6 @@ const htmlConfig = {
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
     ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
-    jsCookie: '//s2.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
-
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
 
