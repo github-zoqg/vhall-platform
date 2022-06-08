@@ -320,8 +320,8 @@ if (['serve', 'build'].includes(cmd)) {
     );
   }
 
-  console.log(chalk.bold.bgBlue(` vueConfig `));
-  console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
+  // console.log(chalk.bold.bgBlue(` vueConfig `));
+  // console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
 
   // 导出
   module.exports = vueConfig;
