@@ -65,7 +65,7 @@
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
           {{ source.content.text_content }}
-          <span class="highlight">点击查看</span>
+          <span class="highlight">{{ $t('chat.chat_1029') }}</span>
         </div>
       </div>
     </template>
