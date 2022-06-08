@@ -19,13 +19,15 @@ const openLog = debugStatusCache == 1 || debugSwitch;
 if (openLog) {
   // 防止当前页面跳转后丢失开关状态
   sessionStorage.setItem(cacheKey, 1);
-  if (window.eruda) {
+  if (process.env.VUE_APP_IS_WAP) {
     // 移动端使用eruda工具
-    window.eruda.init();
-  } else {
-    loadjs('https://s4.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js', function () {
-      window.eruda && window.eruda.init();
-    });
+    if (window.eruda) {
+      window.eruda.init();
+    } else {
+      loadjs('//s4.e.vhall.com/common-static/middle/eruda/2.4.1/eruda.js', function () {
+        window.eruda && window.eruda.init();
+      });
+    }
   }
 }
 

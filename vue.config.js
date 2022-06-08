@@ -53,13 +53,16 @@ function getPlugins() {
         //化蝶观看端(pc、wap)域名
         VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS),
         //化蝶发起端域名
-        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS)
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS),
+
+        // 是否wap端
+        VUE_APP_IS_WAP: argv.project === 'saas-wap'
       }
     })
   ];
 
   if (!isDev) {
-    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    // 修改中台项目路由base为项目名: xxxx/saas-live/xxx
     if (argv.middle) {
       process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
     }
@@ -317,8 +320,8 @@ if (['serve', 'build'].includes(cmd)) {
     );
   }
 
-  // console.log(chalk.bold.bgBlue(` vueConfig `));
-  // console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
+  console.log(chalk.bold.bgBlue(` vueConfig `));
+  console.log(chalk.bold.green(JSON.stringify(vueConfig).replace('/,/g', ',\r\n')));
 
   // 导出
   module.exports = vueConfig;
