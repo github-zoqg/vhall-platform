@@ -39,7 +39,7 @@ module.exports = {
       filename: 'index.html',
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
-      version: pkg.version,
+      version: process.env.VUE_APP_BUILD_VERSION,
       hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       ...htmlConfig
     }

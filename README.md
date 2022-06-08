@@ -200,14 +200,48 @@ eslint 检查集成了 prettier 规则，通常只需要在 prettier.config.js �
 
 ## 常见问题
 
-问题 1：windows 系统用户 git 默认设置 core.autocrlf 为 true ，clone 项目之后代码会因为自动转 crlf 导致 eslint 报错。
+##### 问题 1：windows 系统用户 git 默认设置 core.autocrlf 为 true ，clone 项目之后代码会因为自动转 crlf 导致 eslint 报错。
 
-解决方法： 更改配置 core.autocrlf 为 input 重新 clone 代码。
+解决方案： 更改配置 core.autocrlf 为 input 重新 clone 代码。
 
 ```shell
 # 提交时转换为LF，检出时不转换
 git config --global core.autocrlf input
 ```
 
-问题 2：日志查询地址？
-sentry: https://sentry.vhall.com/
+##### 问题 2：日志查询地址？
+
+解决方案：sentry: https://sentry.vhall.com/
+
+##### 问题 3：编译的时控制台报警告：Second Autoprefixer control comment was ignored. Autoprefixer applies control comment to whole block, not to next rules.
+
+原因及解决方案：这是因为 autoprefixer 版本不一样。
+以前的写法是这样的
+
+```css
+/* autoprefixer: off */
+-webkit-box-orient: vertical;
+/* autoprefixer: on */
+```
+
+我们用的是 8.6.5 版本，要改成：
+
+```css
+/* autoprefixer: ignore next */
+-webkit-box-orient: vertical;
+```
+
+##### 问题 4：如何固定 saas 每个项目开发启动时的端口号
+
+解决方案：
+在工程根目录下创建 devport.json 文件，编写内容：
+
+```json
+{
+  "saas-live": 8080,
+  "saas-watch": 8081,
+  "saas-wap": 8082
+}
+```
+
+该文件不纳入 git 管理，开发人员可修改文件中的端口号，以满足自己的开发习惯。

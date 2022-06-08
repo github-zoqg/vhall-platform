@@ -16,14 +16,14 @@
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
             <p v-if="watchInitData.subscribe.show">
               <i class="vh-iconfont vh-line-user"></i>
-              {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }} 人
+              {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }}
             </p>
           </template>
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
               <i class="vh-iconfont vh-line-user"></i>
-              {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }} 人
+              {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }}
             </p>
           </template>
         </main>
