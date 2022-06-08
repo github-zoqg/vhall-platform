@@ -158,6 +158,7 @@
       async 'visibleMenu.length'() {
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
+        this.computedWidth();
       },
       ['roomBaseServer.state.configList']: {
         deep: true,
