@@ -224,9 +224,6 @@
       },
       chatList() {
         return this.$domainStore.state.chatServer.chatList;
-      },
-      pos() {
-        return this.$domainStore.state.chatServer.pos;
       }
     },
     beforeCreate() {
@@ -245,7 +242,7 @@
       this.listenChatServer();
       this.showWelcomeTxt();
       if (!this.hideChatHistory) {
-        this.getHistoryMessage();
+        this.getHistoryMessage(true);
       }
       const IsMse = isMse();
       if (IsMse.os === 'android') {
@@ -384,13 +381,15 @@
         this.getHistoryMessage();
       },
       // 获取历史消息
-      async getHistoryMessage() {
+      async getHistoryMessage(isfirst) {
         this.isLoading = true;
         const data = {
+          isfirst,
           room_id: this.roomId,
-          // webinar_id: this.webinar_id,
-          pos: this.pos,
-          limit: this.pageSize // 所有端统一显示50条
+          msg_id: this.chatList[0]?.msgId,
+          limit: this.pageSize,
+          is_role: 0,
+          anchor_path: this.chatList[0]?.msgId ? 'down' : undefined //up 拉新,down拉旧
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
@@ -482,7 +481,6 @@
         if (this.isLoading) {
           return;
         }
-        const offsetPos = this.pos;
         const { list } = await this.getHistoryMessage();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
