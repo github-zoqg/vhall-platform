@@ -17,7 +17,7 @@ const htmlConfig = {
     jsCookie: '//s1.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
 
-    Vant: '//cnstatic01.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
+    // Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt:
@@ -39,9 +39,10 @@ const htmlConfig = {
   // cdn css
   cdnCss: {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
-    iconfontCommon: '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.4/iconfont.css',
-    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.4/iconfont.css'
+    // Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
+    iconfontCommon:
+      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.css',
+    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.css'
   }
 };
 

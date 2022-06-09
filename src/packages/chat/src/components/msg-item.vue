@@ -251,13 +251,25 @@
                   : `${$t('chat.chat_1032')}${source.content.gift_name}`
               }}
             </span>
+            <div
+              v-if="source.content.source_status == 1"
+              class="gift-zdy"
+              :style="{
+                backgroundImage: 'url(' + source.content.gift_url + ')'
+              }"
+            ></div>
             <img
+              v-else
               class="interact-tools-content__img"
               :class="{
                 'interact-tools-content__img-scale': source.content.source_status === '0',
                 'interact-tools-content__img-reward': !source.content.gift_url
               }"
-              :src="source.content.gift_url || require('../img/red-package-1.png')"
+              :src="
+                require('@/packages/app-shared/assets/img/wap/chat/' +
+                  source.content.gift_name +
+                  '.png') || require('@/packages/app-shared/assets/img/wap/chat/reward.png')
+              "
               :alt="$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="source.type === 'reward_pay_ok'" />
@@ -810,6 +822,17 @@
             &-reward {
               transform: scale(0.8);
             }
+          }
+          .gift-zdy {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            background-color: white;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-left: 7px;
+            vertical-align: middle;
           }
         }
       }

@@ -2,7 +2,8 @@
   <div class="vmp-wap-player">
     <template v-if="encrypt">
       <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
-        <img class="vmp-wap-player-prompt-load" src="./img/load.gif" />
+        <van-loading color="#fb2626" />
+        <!-- <img class="vmp-wap-player-prompt-load" src="./img/load.gif" /> -->
         <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
       </div>
       <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
@@ -84,11 +85,13 @@
         </div>
         <!-- 倍速、清晰度切换 -->
         <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
-          {{ $t('player.player_1009') }}
-          <span v-if="isSetQuality">{{ formatQualityText(currentQualitys.def) }}</span>
+          <span v-if="isSetQuality">
+            {{ $t('player.player_1009') }}
+            <span class="red">{{ formatQualityText(currentQualitys.def) }}</span>
+          </span>
           <span v-if="isSetSpeed">
             <i18n path="player.player_1015" style="color: #fff">
-              <span place="n">
+              <span place="n" class="red">
                 {{ currentSpeed == 1 ? $t('player.player_1025') : currentSpeed }}
               </span>
             </i18n>
@@ -102,12 +105,16 @@
         >
           <!-- 倍速和画质合并 -->
           <div class="vmp-wap-player-speed">
-            <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
+            <span @click="openLanguage" v-if="languageList.length > 1">
+              {{ lang.key == 1 ? 'CN' : 'EN' }}
+              <i class="vh-iconfont vh-line-arrow-down"></i>
+            </span>
+            <!-- <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
               {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
             </span>
             <span @click="openQuality" v-if="!isWarnPreview">
               {{ formatQualityText(currentQualitys.def) }}
-            </span>
+            </span> -->
           </div>
           <div class="vmp-wap-player-control">
             <!-- 试看逻辑不加 按照线上 -->
@@ -152,7 +159,7 @@
               <van-slider
                 v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
                 v-model="sliderVal"
-                active-color="rgba(252,86,89,.7)"
+                active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
                 @change="changeSlider"
               >
@@ -164,9 +171,11 @@
                 <span class="vmp-wap-player-control-icons-left">
                   <i
                     @click="startPlay"
-                    :class="`vh-iconfont ${
-                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                    }`"
+                    :class="[
+                      'vh-iconfont',
+                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play',
+                      { 'vh-line-left-vod': !isLiving }
+                    ]"
                   ></i>
                   <i
                     class="vh-iconfont vh-line-refresh-left"
@@ -178,13 +187,25 @@
                   </span>
                 </span>
                 <!-- 右侧icon集合 -->
-                <p class="vmp-wap-player-control-icons-right">
+                <div class="vmp-wap-player-control-icons-right">
                   <span
+                    class="icons-quality icons-speed"
+                    @click="openSpeed"
+                    v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview"
+                  >
+                    {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
+                  </span>
+                  <span @click="openQuality" v-if="!isWarnPreview" class="icons-quality">
+                    {{ formatQualityText(currentQualitys.def) }}
+                  </span>
+
+                  <span
+                    class="barrageSpan"
                     @click="openBarrage"
                     v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
                   >
                     <i
-                      :class="`vh-iconfont ${
+                      :class="`barrage vh-iconfont ${
                         danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'
                       }`"
                     ></i>
@@ -196,7 +217,7 @@
                       }`"
                     ></i>
                   </span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -238,13 +259,7 @@
           </div>
         </div>
 
-        <van-popup
-          v-model="isOpenSpeed"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenSpeed" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="item in UsableSpeed"
@@ -256,13 +271,7 @@
             </li>
           </ul>
         </van-popup>
-        <van-popup
-          v-model="isOpenQuality"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenQuality" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="item in qualitysList"
@@ -274,13 +283,7 @@
             </li>
           </ul>
         </van-popup>
-        <van-popup
-          v-model="isOpenlang"
-          :overlay="false"
-          position="right"
-          style="z-index: 12"
-          class="vmp-wap-player-popup"
-        >
+        <van-popup v-model="isOpenlang" position="bottom" round class="vmp-wap-player-popup">
           <ul>
             <li
               v-for="(item, index) in languageList"
@@ -415,7 +418,6 @@
       // 监听播放器大小
       isSmallPlayer: {
         handler: function (val) {
-          console.log(val, 'vmp-wap-body-endingvmp-wap-body-ending');
           if (val) {
             document.querySelector('.vmp-basic-bd').classList.add('small_player');
           } else {
@@ -488,7 +490,7 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100 + 90;
+        let baseHeight = playerHeight + 71 + 90;
         let calssname = '.tab-content';
         if (this.isEmbed) {
           baseHeight = playerHeight;
@@ -637,9 +639,9 @@
           .then(res => {
             if (res.code == 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
-              this.marquee = res.data['screen-config'].data;
-              this.water = res.data['water-mark'].data;
-              this.playerOtherOptions = res.data['basic-config'].data;
+              this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
+              this.water = res.data['water-mark'] && res.data['water-mark'].data;
+              this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
               this.initPlayer();
             }
           });
@@ -921,9 +923,8 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      &-load {
-        width: 60px;
-        margin-bottom: 20px;
+      &-text {
+        margin-top: 20px;
       }
       &-poster {
         width: 100%;
@@ -1064,8 +1065,8 @@
       z-index: 5;
       .hot_num {
         border-radius: 44px;
-        height: 48px;
-        line-height: 48px;
+        height: 36px;
+        line-height: 36px;
         padding: 0 16px;
         text-align: center;
         margin-left: 20px;
@@ -1073,7 +1074,7 @@
         i {
           vertical-align: bottom;
           font-size: 28px;
-          padding-right: 4px;
+          margin-right: 4px;
         }
       }
       &.opcity-flase {
@@ -1107,8 +1108,11 @@
       z-index: 2;
       transform: translateX(-50%);
       span {
-        color: #fb2626;
+        color: #fff;
         padding-left: 5px;
+      }
+      .red {
+        color: #fb2626;
       }
     }
     &-audie {
@@ -1128,24 +1132,28 @@
     &-speed {
       position: absolute;
       right: 32px;
-      top: 50%;
-      width: 88px;
-      transform: translateY(-60%);
+      top: 24px;
+      width: 80px;
       z-index: 6;
+
       span {
         width: 100%;
         display: block;
-        height: 48px;
+        height: 36px;
+        padding: 0 16px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 0.5);
         text-align: center;
-        line-height: 48px;
+        line-height: 36px;
         font-size: 24px;
         font-family: PingFangSC-Medium, PingFang SC;
         color: #fff;
-        &:nth-child(2) {
-          margin: 40px 0;
+        i {
+          font-size: 18px;
         }
+        // &:nth-child(2) {
+        //   margin: 40px 0;
+        // }
       }
     }
     &-control {
@@ -1205,20 +1213,45 @@
         justify-content: space-between;
         align-items: center;
         padding-top: 15px;
+        .vh-iconfont {
+          font-size: 32px;
+        }
         &-left {
+          // vertical-align: middle;
+          .vh-line-left-vod {
+            vertical-align: text-top;
+          }
           .vh-line-refresh-left,
           &-time {
             padding-left: 15px;
-            vertical-align: middle;
+          }
+          .vh-line-refresh-left {
+            font-size: 28px;
+            // vertical-align: bottom;
           }
         }
         &-right {
-          i {
-            padding-left: 15px;
+          display: flex;
+          align-items: center;
+          span {
+            margin-left: 34px;
+            vertical-align: middle;
           }
-        }
-        .vh-iconfont {
-          font-size: 30px;
+          .icons-quality {
+            padding: 0 12px;
+            border: 3px solid #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            font-size: 20px;
+          }
+          .barrage {
+            font-size: 34px;
+            position: relative;
+            top: 2px;
+          }
         }
         // .icon-zanting_icon{
         //   font-size: 34px;
@@ -1227,12 +1260,9 @@
       }
     }
     &-popup {
-      width: 200px;
-      position: absolute;
-      // transform: none;
-      height: 100%;
-      // top: 0;
-      background: rgba(0, 0, 0, 0.7);
+      &.van-popup {
+        padding-bottom: 30px;
+      }
       ul {
         display: flex;
         width: 100%;
@@ -1240,15 +1270,15 @@
         flex-direction: column;
         justify-content: center;
         flex-wrap: wrap;
-        padding: 30px 0;
+        // padding: 30px 0;
         li {
           width: 100%;
-          height: 60px;
-          line-height: 60px;
+          height: 100px;
+          line-height: 100px;
           font-size: 28px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: rgba(255, 255, 255, 1);
+          color: #262626;
           text-align: center;
           &.popup-active {
             color: #fb2626;

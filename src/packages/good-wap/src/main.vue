@@ -1,6 +1,68 @@
 <template>
   <div class="vh-goods-wrapper">
-    <ul class="vh-goods_list">
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+      class="vh-goods_list"
+    >
+      <van-cell
+        v-for="good in goodsList"
+        :key="good.goods_id"
+        class="vh-goods_item"
+        @click="showDetailDialog(good)"
+      >
+        <div class="vh-goods_item-cover">
+          <template v-for="i in good.img_list">
+            <img v-if="i.is_cover == 1" :key="i.img_id" :src="i.img_url" alt="" />
+          </template>
+        </div>
+        <div class="vh-goods_item-info">
+          <div class="vh-goods_item-info__top">
+            <div class="name" :class="{ showEllipse: computeFieldLength(good.name) > 15 }">
+              {{ good.name }}
+            </div>
+            <div
+              class="describe"
+              style="
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 1;
+                overflow: hidden;
+              "
+            >
+              {{ good.description }}
+            </div>
+          </div>
+          <div>
+            <div
+              :style="{
+                visibility: good.showDiscountPrice ? 'visible' : 'hidden'
+              }"
+              class="discount_price"
+            >
+              ￥{{ good.price }}
+            </div>
+            <div class="other-info">
+              <div v-if="good.showDiscountPrice" class="discount">
+                <span class="price-tip">优惠价</span>
+                <i>￥</i>
+                <span class="price" v-html="good.discountText"></span>
+              </div>
+              <div v-else>
+                <i>￥</i>
+                <span class="price" v-html="good.priceText"></span>
+              </div>
+              <div>
+                <button class="buy" @click.stop="handleBuy(good.goods_url)">购买</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </van-cell>
+    </van-list>
+    <!-- <ul class="vh-goods_list">
       <li class="vh-goods_item" v-for="good in goodsList" :key="good.goods_id">
         <div class="good-cover">
           <img :src="good.covarImage" />
@@ -24,13 +86,7 @@
         </div>
       </li>
     </ul>
-    <div class="vh-loading" v-if="showLoading">{{ $t('common.common_1001') }}</div>
-    <!-- 商品详情 -->
-    <!-- <goods-info
-      v-if="openGoodInfo && goodItem"
-      :info="goodItem"
-      @close="openGoodInfo = false"
-    ></goods-info> -->
+    <div class="vh-loading" v-if="showLoading">{{ $t('common.common_1001') }}</div> -->
   </div>
 </template>
 
@@ -38,59 +94,26 @@
   import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
-  import BScroll from '@better-scroll/core';
-  import Pullup from '@better-scroll/pull-up';
-  BScroll.use(Pullup);
-  // import goodsInfo from './detail';
 
   export default {
     name: 'VmpGoodListWap',
-    // components: {
-    //   goodsInfo
-    // },
     data() {
       return {
         goodsList: [],
-        scroll: null,
-        // openGoodInfo: false,
-        // goodItem: null,
-        showLoading: false,
+        finished: false,
+        loading: false,
         total: 0,
+        num: 1,
         limit: 10,
-        pos: 0
+        pos: 0,
+        totalPages: 0
       };
     },
-    // props: ['goodList', 'goodsListInfo'],
-    // watch: {
-    //   // goodList: {
-    //   //   handler(val) {
-    //   //     if (val) {
-    //   //       this.list = val;
-    //   //     }
-    //   //   },
-    //   //   immediate: true,
-    //   //   deep: true
-    //   // },
-    //   // goodsListInfo: {
-    //   //   handler(val) {
-    //   //     if (val) {
-    //   //       this.total = val.total;
-    //   //       this.limit = 10;
-    //   //       this.pos = val.pos;
-    //   //     }
-    //   //   },
-    //   //   immediate: true,
-    //   //   deep: true
-    //   // },
-    //   // goodsList: {
-    //   //   handler(val) {
-    //   //     console.log('wap watch goodsList------------->', val);
-    //   //     this.$nextTick(() => {
-    //   //       this.scroll && this.scroll.refresh();
-    //   //     });
-    //   //   }
-    //   // }
-    // },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.goodServer = useGoodServer();
@@ -99,28 +122,47 @@
     },
     created() {
       // 自定义菜单服务事件监听
-      this.menuServer.$on('tab-switched', data => {
-        console.log('wap tab-switched------>', this.cuid, data);
-        /**
-         * { cuid, menuId }
-         */
-        if (this.cuid == data.cuid) {
-          this.$nextTick(() => {
-            this.refreshScroll();
-          });
-        }
-      });
+      // this.menuServer.$on('tab-switched', data => {
+      //   console.log('wap tab-switched------>', this.cuid, data);
+      //   /**
+      //    * { cuid, menuId }
+      //    */
+      //   if (this.cuid == data.cuid) {
+      //     this.$nextTick(() => {
+      //       this.refreshScroll();
+      //     });
+      //   }
+      // });
     },
     mounted() {
       this.initConfig();
 
-      // 初始化滚动
-      this.handlerScroll();
-
-      // this.webinar_id = this.roomBaseServer.state.watchInitData.webinar.id;
       this.buildDataList(this.roomBaseServer.state.goodsDefault, false);
     },
     methods: {
+      // 中英文字符计算
+      computeFieldLength(str) {
+        var l = str.length;
+        var fieldLength = 0;
+        for (let i = 0; i < l; i++) {
+          if ((str.charCodeAt(i) & 0xff00) !== 0) {
+            fieldLength += 1;
+          } else {
+            fieldLength += 0.5;
+          }
+        }
+        return Math.ceil(fieldLength);
+      },
+      // 格式化
+      filterDiscount(val) {
+        if (val.indexOf('.') > -1) {
+          const i = val.slice(0, val.indexOf('.'));
+          const r = val.slice(val.indexOf('.'));
+          return `${i}<span class="remainder">${r}</span>`;
+        } else {
+          return val;
+        }
+      },
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -128,71 +170,32 @@
           Object.assign(this.$data, widget.options);
         }
       },
-      /**
-       * 对外提供的更新滚动条的方法
-       */
-      refreshScroll() {
-        console.log('refreshScroll-------->', this.scroll);
-        if (this.scroll) {
-          this.scroll.refresh();
+      onLoad() {
+        if (this.num >= this.totalPages) {
+          this.finished = true;
+          this.loading = false;
+          return false;
         }
-      },
-      /**
-       * 构建列表成功之后的回调, 让列表计算高滚动
-       */
-      handlerScroll() {
-        const wrapper = document.querySelector('.vh-goods-wrapper');
-        window['GoodScroll'] = this.scroll = new BScroll(wrapper, {
-          pullUpLoad: true,
-          bindToWrapper: true,
-          scrollX: false,
-          scrollY: true,
-          bounce: true,
-          click: true,
-          tap: 'tap'
-        });
-        this.handleBindScrollEvent();
-        console.log('handlerInitScroll-------->', this.scroll);
-      },
-      handleBindScrollEvent() {
-        window.addEventListener(
-          'resize',
-          debounce(() => {
-            this.refreshScroll();
-          }, 200)
-        );
-        this.scroll.on('pullingUp', () => {
-          // console.log('handleBindScrollEvent pullingUp--------->');
-          this.queryGoodsList();
-        });
+        this.loading = true;
+        this.num++;
+        this.pos = parseInt((this.num - 1) * this.limit);
+        this.queryGoodsList();
       },
       /**
        * 查询商品列表
        */
       queryGoodsList() {
-        if (this.showLoading || this.pos + this.limit >= this.total) {
-          return false;
-        }
-
-        this.showLoading = true;
-
         this.goodServer
           .queryGoodsList({
             webinar_id: this.$route.params.id,
-            pos: this.pos + this.limit,
+            pos: this.pos,
             limit: 10
           })
           .then(res => {
             if (res.code == 200 && res.data && res.data.goods_list) {
               this.buildDataList(res.data, true);
-              this.showLoading = false;
-              this.scroll.finishPullUp();
+              this.loading = false;
             }
-          })
-          .catch(e => {
-            console.error('queryGoodsList--------->', e);
-            this.showLoading = false;
-            this.scroll.finishPullUp();
           });
       },
       /**
@@ -203,9 +206,14 @@
         const list = data.goods_list;
         const currentGoodList = this.goodsList;
         if (list && list.length > 0) {
-          list.forEach(item => {
-            const covarImage = item.img_list.find(ele => ele.is_cover == 1);
-            item.covarImage = covarImage ? covarImage.img_url : item.img_list[0].img_url;
+          list.map(item => {
+            if (item.discount_price && Number(item.discount_price) > 0) {
+              item.showDiscountPrice = true;
+              item.discountText = this.filterDiscount(item.discount_price);
+            } else {
+              item.showDiscountPrice = false;
+            }
+            item.priceText = this.filterDiscount(item.price);
           });
         }
 
@@ -214,23 +222,16 @@
         } else {
           this.goodsList = list;
         }
-
         this.total = data.total;
-        this.pos = data.pos;
-        this.limit = data.limit;
-
-        this.$nextTick(() => {
-          console.log('buildDataList nextTick-------->');
-          this.refreshScroll();
-        });
+        this.totalPages = Math.ceil(this.total / this.limit);
       },
       showDetailDialog(goodsItem) {
-        // this.openGoodInfo = true;
-        // this.goodItem = good;
-
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
         );
+      },
+      handleBuy(val) {
+        window.open(val);
       }
     }
   };
@@ -240,14 +241,17 @@
   .vh-goods-wrapper {
     width: 100%;
     height: 100%;
+    overflow: auto;
     background: #fff;
     overflow: auto;
     .vh-goods_list {
       display: block;
       width: 100%;
+      // height: 100%;
       overflow: hidden;
+      margin-bottom: 100px;
       touch-action: pan-y;
-      .vh-goods_item {
+      /* .vh-goods_item {
         padding: 15px 30px;
         position: relative;
         .goods-info {
@@ -273,7 +277,7 @@
           }
           .check-info {
             position: absolute;
-            bottom: 15px;
+            bottom: 2px;
             height: 60px;
             padding: 0 8px;
             line-height: 60px;
@@ -299,6 +303,99 @@
             border-radius: 10px;
             object-fit: scale-down;
           }
+        }
+      } */
+      /* 新商品样式 */
+      .vh-goods_item {
+        padding: 24px 32px 18px 32px;
+        /* border-bottom: 1px solid #f0f0f0; */
+        clear: both;
+        &-cover {
+          width: 200px;
+          height: 200px;
+          float: left;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+          }
+        }
+        &-info {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding-left: 24px;
+          width: calc(100% - 200px);
+          .name {
+            color: #262626;
+            font-size: 28px;
+            line-height: 38px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            text-align: left;
+          }
+          .describe {
+            color: #595959;
+            font-size: 24px;
+            padding-top: 10px;
+            line-height: 30px;
+          }
+          .discount_price {
+            color: #8c8c8c;
+            font-size: 16px;
+            height: 40px;
+            display: inline-block;
+            text-decoration: line-through;
+          }
+          .other-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            .discount {
+              .price-tip {
+                padding: 2px 5px;
+                background: #fff0f0;
+                border-radius: 2px;
+                color: #fb3a32;
+                font-size: 14px;
+              }
+            }
+            i {
+              color: #fb2626;
+              font-size: 10px;
+            }
+            .price {
+              font-size: 28px;
+              color: #fb2626;
+            }
+            .price ::v-deep > .remainder {
+              font-size: 10px;
+            }
+            .buy {
+              display: inline-block;
+              width: 110px;
+              height: 54px;
+              line-height: 50px;
+              border-radius: 32px;
+              border: 1px solid #8c8c8c;
+              color: #595959;
+              font-size: 24px;
+              text-align: center;
+              background: #fff;
+              position: absolute;
+              right: 0;
+              bottom: 0;
+            }
+          }
+        }
+        &-info__top {
+          min-height: 106px;
         }
       }
     }
