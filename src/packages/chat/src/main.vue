@@ -210,12 +210,10 @@
 
         // 是否展示欢迎语
         isShowWelcome: false,
-        //加载聊天历史完成
-        historyloaded: false,
         //聊天消息是否有滚动条
         overflow: false,
         //每次加载的消息条数
-        pageSize: 20,
+        pageSize: 50,
         isLoading: false,
         //隐藏拉取历史聊天按钮
         hideChatHistory: false
@@ -460,7 +458,7 @@
         const params = {
           isfirst,
           room_id: this.roomId,
-          msg_id: this.chatList[0]?.msgId,
+          msg_id: this.getFirstMsg()?.msgId,
           limit: this.pageSize,
           is_role: this.isOnlyShowSponsor ? 1 : 0,
           anchor_path: this.chatList[0]?.msgId ? 'down' : undefined //up 拉新,down拉旧
@@ -469,6 +467,12 @@
         this.hideChatHistory = true;
         this.isLoading = false;
         return res;
+      },
+      //获取第一条有msgid的消息
+      getFirstMsg() {
+        return this.chatList.find(item => {
+          return item.msgId;
+        });
       },
       //抽奖情况检查
       emitLotteryEvent(msg) {
