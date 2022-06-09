@@ -13,6 +13,7 @@ import {
   useDesktopShareServer,
   useInsertFileServer,
   useMediaCheckServer,
+  usePlayerServer,
   useChatServer
 } from 'middle-domain';
 
@@ -42,6 +43,7 @@ export default new DomainStore.Store({
     desktopShareServer: useDesktopShareServer().state,
     insertFileServer: useInsertFileServer().state,
     mediaCheckServer: useMediaCheckServer().state,
+    playerServer: usePlayerServer().state,
     chatServer: useChatServer().state
   }
 });

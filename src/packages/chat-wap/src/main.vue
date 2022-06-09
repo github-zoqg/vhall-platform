@@ -75,7 +75,7 @@
   import { ImagePreview } from 'vant';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   import EventBus from './js/Events.js';
   import { isMse } from './js/utils.js';
 
@@ -464,6 +464,19 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      // 音频模式播放器大小变动 高度重新计算
+      changeChatHeight(data) {
+        console.log(data, 'data1313');
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = data == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight + 120 + 90;
+        }
+        this.chatlistHeight = this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
       },
       async onTotop() {
         if (this.isLoading) {

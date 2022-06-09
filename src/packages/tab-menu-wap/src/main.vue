@@ -146,6 +146,9 @@
       },
       roleName() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
     watch: {
@@ -177,9 +180,27 @@
       await this.$nextTick(0);
       this.setSkinInfo();
       this.selectDefault();
+      this.setSetingHeight();
     },
 
     methods: {
+      /**
+       * 计算 设置tab-content高度
+       */
+      setSetingHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 90;
+        let calssname = '.tab-content';
+        if (this.isEmbed) {
+          baseHeight = playerHeight;
+          calssname = '.tab-content-embed';
+        }
+        let popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+        document.querySelector(calssname).style.height = popHeight;
+      },
       async setSkinInfo() {
         const { skinInfo } = this.$domainStore.state.roomBaseServer;
 
@@ -634,7 +655,7 @@
       width: 100%;
       flex: 1 1 auto;
       overflow: hidden;
-      height: 100%;
+      height: calc(100% - 90px);
     }
 
     .vmp-tab-menu-scroll-container {

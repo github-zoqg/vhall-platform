@@ -45,7 +45,7 @@
   } from 'middle-domain';
   import sendBox from '@/packages/chat-wap/src/components/send-box';
   import VirtualList from 'vue-virtual-scroll-list';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   import EventBus from '@/packages/chat-wap/src/js/Events.js';
   import { isMse } from './js/utils.js';
   export default {
@@ -101,6 +101,9 @@
       //用户信息
       userInfo() {
         return this.userServer.state.userInfo;
+      },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
     watch: {
@@ -109,6 +112,9 @@
         // if (this.isBottom()) {
         this.scrollBottom();
         // }
+      },
+      isSmallPlayer() {
+        this.changeChatHeight();
       }
     },
     beforeCreate() {
@@ -260,6 +266,18 @@
       //关闭遮罩层
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
+      },
+      // 音频模式播放器大小变动 高度重新计算
+      changeChatHeight() {
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 100 + 120 + 90;
+        if (this.isEmbed) {
+          baseHeight = playerHeight + 120 + 90;
+        }
+        this.chatlistHeight = this.virtual.contentHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
       }
     }
   };

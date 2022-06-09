@@ -26,5 +26,8 @@
       width: 100%;
       /* pointer-events: none; */
     }
+    strong {
+      font-weight: bold !important;
+    }
   }
 </style>
