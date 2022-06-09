@@ -2,7 +2,11 @@
   <div
     id="docWrapper"
     class="vmp-doc-wap"
-    :class="[`vmp-doc-wap--${displayMode}`, `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`]"
+    :class="[
+      `vmp-doc-wap--${displayMode}`,
+      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `${rotateNum ? 'rotate' + rotateNum : ''}`
+    ]"
     :style="{
       height:
         docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%',
@@ -57,7 +61,7 @@
       class="tools"
       :style="{
         transform:
-          docViewRect.height > 0 && (displayMode !== 'fullscreen' || !isPortrait)
+          docViewRect.height > 0 && (displayMode !== 'fullscreen' || !isPortrait || !!rotateNum)
             ? 'none'
             : 'translateY(' + docViewRect.height / 2 + 'px)'
       }"
@@ -72,7 +76,11 @@
         <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
       </div>
       <!-- 文档横屏 -->
-      <div v-show="!!currentCid" @click="doRotate" class="btn-doc-rotate">
+      <div
+        v-show="!!currentCid && displayMode == 'fullscreen'"
+        @click="doRotate"
+        class="btn-doc-rotate"
+      >
         <i class="vh-iconfont vh-line-send"></i>
       </div>
     </div>
@@ -88,6 +96,7 @@
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { F } from 'caniuse-lite/data/agents';
 
   export default {
     name: 'VmpDocWap',
@@ -102,7 +111,8 @@
           height: 0
         },
         rebroadcastStartTimer: null,
-        rebroadcastStopTimer: null
+        rebroadcastStopTimer: null,
+        rotateNum: 0 //旋转角度
       };
     },
     computed: {
@@ -196,6 +206,7 @@
         this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
         // 切换后还原位置
         this.docServer.zoomReset();
+        this.rotateNum = 0;
       },
 
       // 文档移动后还原
@@ -282,10 +293,10 @@
         let h = 0;
         //是否竖屏
         if (this.isPortrait) {
-          w = window.screen.width;
+          w = window.innerWidth;
           h = (9 * w) / 16;
         } else {
-          h = window.screen.height;
+          h = window.innerHeight;
           w = (16 * h) / 9;
         }
         this.docViewRect = { width: w, height: h };
@@ -364,11 +375,17 @@
         if (newOir != this.docServer.state.isPortrait) {
           //方向发生了变化就重新计算文档大小
           this.docServer.state.isPortrait = newOir;
+          this.rotateNum = 0;
           this.getDocViewRect();
         }
       },
       //自定义横竖屏
-      doRotate() {}
+      doRotate() {
+        this.rotateNum = this.rotateNum === 0 ? 90 : 0;
+        this.getDocViewRect();
+        console.log('screen.orientation-> ', window.screen.orientation);
+        // document.body.setAttribute('class', 'rotate90');
+      }
     },
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
@@ -377,6 +394,27 @@
   };
 </script>
 <style lang="less">
+  .rotate90 {
+    min-height: 100vw !important;
+    height: 100vw !important;
+    width: 100vh !important;
+    top: 50%;
+    height: 50%;
+    left: 50%;
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(90deg);
+    .tools {
+      top: 100vw;
+      margin-top: -80px;
+      .btn-doc-fullscreen {
+      }
+      .btn-doc-restore {
+      }
+      .btn-doc-rotate {
+      }
+    }
+  }
+
   .vmp-doc-wap {
     width: 100%;
     height: 100%;
@@ -539,6 +577,26 @@
             width: 30px;
             height: 30px;
           }
+          .btn-doc-fullscreen {
+          }
+          .btn-doc-restore {
+          }
+          .btn-doc-rotate {
+          }
+        }
+      }
+      &.rotate90 {
+        min-height: 100vw !important;
+        height: 100vw !important;
+        width: 100vh !important;
+        top: 50%;
+        height: 50%;
+        left: 50%;
+        transform-origin: center;
+        transform: translate(-50%, -50%) rotate(90deg);
+        .tools {
+          top: 100vw;
+          margin-top: -80px;
           .btn-doc-fullscreen {
           }
           .btn-doc-restore {
