@@ -128,7 +128,7 @@
         // 键盘收起事件处理
         //  // alert('iphone 键盘收起事件处理');
         document.querySelector('body').classList.remove('fixIphoneX');
-        this.cancel();
+        //this.cancel();
       },
       focusinIOS() {
         // 键盘弹出事件处理

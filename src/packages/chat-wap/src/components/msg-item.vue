@@ -71,7 +71,7 @@
     </template>
     <!-- 打赏 -->
     <template v-else-if="source.type == 'reward_pay_ok'">
-      <div class="msg-item new-gift">
+      <div class="msg-item new-gift reward_pay_ok">
         <div class="interact-gift-box">
           <div>
             <div class="flex-box">
@@ -768,6 +768,12 @@
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
+        }
+      }
+      &.reward_pay_ok {
+        .interact-gift-box {
+          height: 88px;
+          padding: 0 80px 0 24px;
         }
       }
       .new-gift-img,
