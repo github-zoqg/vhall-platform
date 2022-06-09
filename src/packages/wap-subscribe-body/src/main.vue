@@ -337,6 +337,7 @@
         this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
           this.showBottomBtn = false;
+          this.isLiveEnd = true;
           this.$refs.timeDowner.clearTimer();
           this.subscribeText = this.$t('player.player_1017');
         });
