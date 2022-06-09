@@ -3,7 +3,7 @@
       'vmp-basic-layout__noHeader': !showHeader,
       'vmp-basic-layout__hasBottom': showBottom
     }" -->
-  <div class="vmp-basic-layout">
+  <div class="vmp-basic-layout" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0">
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
