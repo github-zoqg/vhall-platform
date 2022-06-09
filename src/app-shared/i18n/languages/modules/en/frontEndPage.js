@@ -765,8 +765,7 @@ export default {
     webinar_1001: 'Close',
     webinar_1002: 'No red packet left~',
     webinar_1003: 'Deposited in  account',
-    webinar_1004:
-      'Wechat user could click the photo icon in the chatting area to withdraw',
+    webinar_1004: 'Wechat user could click the photo icon in the chatting area to withdraw',
     webinar_1005:
       'Other user could copy the watching link to browser, then click the photo icon after log in and withdraw the money',
     webinar_1006: 'No data',
