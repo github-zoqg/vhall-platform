@@ -723,6 +723,7 @@
       height: 422px;
       width: 100%;
       position: relative;
+      overflow: hidden;
       .subscribe-bg {
         width: 100%;
         height: 100%;
