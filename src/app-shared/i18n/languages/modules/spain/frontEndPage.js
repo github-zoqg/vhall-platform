@@ -582,7 +582,7 @@ export default {
     cash_1022: 'Configurar y continuar retirando',
     cash_1023: 'Por favor, utilice WeChat para escanear el código y vincular su cuenta por cobrar',
     cash_1024: 'Una vez que la vinculación sea exitosa, el retiro continuará automáticamente',
-    cash_1025: 'Por favor, ingrese el monto del retiro (máximo 800 para una sola transacción)',
+    cash_1025: 'Por favor, ingrese el monto del retiro',
     cash_1026: 'A la cuenta de WeChat',
     cash_1027: 'Retirar en seguida',
     cash_1028: 'Presentar significa que estoy de acuerdo',
