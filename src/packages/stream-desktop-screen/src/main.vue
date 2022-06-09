@@ -320,15 +320,20 @@
               this.stopShare();
             }
           }
-          // 主持人进出小组如果正在演示桌面共享，需要停止共享
-
-          if (msg.data.type === 'group_manager_enter' && msg.data.role == 1) {
+          // 主持人进入小组（开始讨论/继续讨论）如果正在演示桌面共享，需要停止共享
+          if (msg.data.type === 'group_manager_enter' || msg.data.type === 'group_switch_proceed') {
             // 自己正在发起桌面共享
             if (
               this.roleName == 1 &&
               this.isShareScreen &&
               this.accountId == this.desktopShareInfo.accountId
             ) {
+              this.stopShare();
+            }
+          }
+          // 暂停 + 结束 讨论,需要停止共享
+          if (msg.data.type === 'group_switch_end' || msg.data.type === 'group_switch_stop') {
+            if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
               this.stopShare();
             }
           }
