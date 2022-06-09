@@ -50,9 +50,14 @@
       </div>
       <div class="tools">
         <div class="btn" @touchend.prevent="delInput">
-          <span class="iconfonts vh-saas-iconfont vh-saas-delete"></span>
+          <span
+            :class="inputValue ? '' : 'noMsgText'"
+            class="iconfonts vh-saas-iconfont vh-saas-delete"
+          ></span>
         </div>
-        <div class="btn send" @touchend.prevent="send">发送</div>
+        <div class="btn send" :class="inputValue ? '' : 'noMsgText'" @touchend.prevent="send">
+          发送
+        </div>
       </div>
     </div>
   </div>
@@ -88,6 +93,9 @@
     watch: {
       showEmoji() {
         EventBus.$emit('showEmoji', this.showEmoji);
+        if (!this.showEmoji && !this.visible) {
+          this.focusoutIOS();
+        }
       }
     },
     computed: {
@@ -120,6 +128,7 @@
         // 键盘收起事件处理
         //  // alert('iphone 键盘收起事件处理');
         document.querySelector('body').classList.remove('fixIphoneX');
+        this.cancel();
       },
       focusinIOS() {
         // 键盘弹出事件处理
@@ -232,6 +241,8 @@
         this.$nextTick(() => {
           if (this.showEmoji) {
             this.$refs.textareaChat.blur();
+          } else {
+            this.$refs.textareaChat.focus();
           }
         });
         //设置只读属性可以暂时禁止键盘
@@ -273,6 +284,7 @@
       margin-top: 0 !important;
     }
   }
+
   .chat-input-modal {
     width: 100%;
     position: relative;
@@ -280,8 +292,15 @@
     min-height: 94px;
     margin-top: -94px;
     font-size: 28px;
-    background-color: #f0f0f0;
+    background-color: #fff;
     box-shadow: 0px -1px 1px #f1f1f1;
+    .noMsg {
+      opacity: 0.4 !important;
+    }
+    .noMsgText {
+      background-color: #fff !important;
+      color: #d9d9d9 !important;
+    }
     &.smFix {
       position: fixed !important;
       bottom: 0 !important;
@@ -315,7 +334,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #fff;
+          background-color: #f0f0f0;
 
           &.noMsg {
             opacity: 0.4;
@@ -328,11 +347,16 @@
 
       .textarea {
         textarea {
+          background-color: #f0f0f0;
           min-height: 64px !important;
-          padding: 12px 24px !important;
+          padding: 20px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;
+          border: none;
+          -webkit-appearance: none; /*去除阴影边框*/
+          outline: none;
+          -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /*点击高亮的颜色*/
         }
         .el-textarea__inner::-webkit-input-placeholder {
           font-size: 28px !important;
@@ -349,7 +373,7 @@
       margin: 0 24px;
       position: relative;
       .text-limit {
-        background-color: #fff;
+        background-color: #f0f0f0;
         position: absolute;
         bottom: 16px;
         right: 12px;
@@ -423,6 +447,7 @@
     input::-webkit-input-placeholder {
       /* placeholder字体大小  */
       font-size: 14px;
+      color: #bfbfbf;
     }
   }
 </style>

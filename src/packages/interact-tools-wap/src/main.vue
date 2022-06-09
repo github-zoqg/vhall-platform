@@ -2,7 +2,7 @@
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
-        <i class="vh-saas-iconfont vh-saas-color-gift" @click="opneGifts"></i>
+        <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
           ref="gifts"
           :isEmbed="localRoomInfo.isEmbed"
@@ -13,8 +13,8 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward">
-        <i class="vh-saas-iconfont vh-saas-a-color-redpacket" @click="openReward"></i>
+      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward" class="redpacket-box">
+        <img class="tool redpacket-img" src="./img/icon_reward.png" @click="openReward" />
         <RewardCard
           ref="reward"
           :webinarData="webinarData"
@@ -23,12 +23,12 @@
         />
       </div>
       <!-- 邀请卡 -->
-      <div v-if="showInviteCard && !localRoomInfo.isEmbed">
+      <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box">
         <a
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
-          <i class="vh-iconfont vh-line-share"></i>
+          <img class="tool share-img" src="./img/icon_share.png" />
         </a>
       </div>
 
@@ -116,16 +116,34 @@
       display: flex;
       & > div {
         font-size: 43px;
-        margin-right: 36px;
+        margin-right: 24px;
+        display: flex;
+        align-items: center;
         &:last-child {
           margin-right: 0px;
         }
+      }
+      .tool {
+        width: 48px;
+        height: 48px;
       }
     }
     .vh-saas-iconfont,
     .vh-iconfont {
       font-size: 47px;
       color: #666666;
+    }
+    .share-box {
+      position: relative;
+      top: 2px;
+      .tool {
+        width: 50px;
+        height: 50px;
+      }
+    }
+    .redpacket-box {
+      position: relative;
+      top: -2px;
     }
   }
 </style>

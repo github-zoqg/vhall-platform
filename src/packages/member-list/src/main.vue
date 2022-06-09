@@ -826,7 +826,7 @@
         function handleUserLeaveRoom(msg) {
           const isLive = _this.isLive;
           const isWatch = _this.isWatch;
-          if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
+          if (msg?.context?.isAuthChat) return; // 如果是聊天审核页面不做任何操作
           const groupUserNum =
             _this.groupServer.state.groupedUserList.length >= 1
               ? _this.groupServer.state.groupedUserList.length - 1

@@ -51,7 +51,7 @@ export const serverConfig = {
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comPcRewardEffect', 'comTabMenu']
+    children: ['comPcRewardEffect', 'comTabMenu', 'comPcRewardEffectFullScreen']
   },
   /*** 布局定义end */
 
@@ -418,6 +418,11 @@ export const serverConfig = {
       cuid: 'comPcRewardEffect',
       method: 'setHideEffect',
       args: ['$0']
+    },
+    emitHideEffectFullScreen: {
+      cuid: 'comPcRewardEffectFullScreen',
+      method: 'setHideEffect',
+      args: ['$0']
     }
   },
   //成员列表组件
@@ -498,6 +503,10 @@ export const serverConfig = {
   // 礼物动画组件
   comPcRewardEffect: {
     component: 'VmpPcRewardEffect'
+  },
+  // 全屏礼物动画组件
+  comPcRewardEffectFullScreen: {
+    component: 'VmpPcRewardEffectFullScreen'
   },
   // 推荐
   comRecommend: {
