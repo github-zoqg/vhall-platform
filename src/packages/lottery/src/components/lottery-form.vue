@@ -553,12 +553,10 @@
       border-radius: 4px;
       float: left;
       padding: 0 8px;
-      // width: 115px;
       height: 32px;
       line-height: 32px;
       color: #666;
       margin-right: 8px;
-      // text-indent: 6px;
       background: #f7f7f7;
       span {
         cursor: pointer;
@@ -591,7 +589,7 @@
   }
   .lottery-form-switch {
     position: relative;
-    top: -2px;
+    top: -1px;
   }
 </style>
 <style lang="less">

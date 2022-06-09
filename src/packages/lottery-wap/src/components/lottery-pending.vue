@@ -11,7 +11,7 @@
     </p>
     <div class="lottery-pending-wrap">
       <img
-        :class="[fitment.img_order === 2 ? 'slot-machine' : '', 'lottery-pending-animation']"
+        :class="[`machine-${fitment.img_order}`, 'lottery-pending-animation']"
         :src="fitment.url"
         alt
       />
@@ -123,7 +123,7 @@
       line-height: 32px;
     }
     .lottery-pending-wrap {
-      width: 656px;
+      width: 700px;
       height: 550px;
       background-image: url('../img/lottery-pendding-bg.png');
       background-size: 100%;
@@ -133,13 +133,19 @@
     }
     .lottery-pending-animation {
       position: absolute;
-      width: 500px;
+      width: 475px; // 默认的转轮
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      &.slot-machine {
+      &.machine-2 {
+        // 老虎机
+        width: 520px;
         // 老虎机的设计图问题,需要css手动偏移
         transform: translate(-48%, -50%);
+      }
+      &.machine-3 {
+        // 扭蛋
+        width: 500px;
       }
     }
     .vmp-lottery-btn {
@@ -155,12 +161,14 @@
       }
     }
     .close-btn-wrap {
-      margin-top: 45px;
+      margin-top: 20px;
       text-align: center;
     }
     .vmp-close-btn {
       color: #fff;
       font-size: 54px;
+      display: inline-block;
+      height: 58px;
     }
   }
 </style>

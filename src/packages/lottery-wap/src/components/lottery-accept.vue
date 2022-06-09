@@ -154,17 +154,20 @@
       color: #262626;
       text-align: center;
       line-height: 100px;
-      border-bottom: 1px solid #f0f0f0;
     }
     .form-wrap {
       padding: 0 32px;
       margin: 50px 0 60px;
     }
+    .form {
+      max-height: 498px;
+      overflow: auto;
+    }
     .form-item {
       &__input {
         position: relative;
         padding-left: 37px;
-        border-bottom: 1px solid rgba(#c2c2c2, 0.5);
+        border-bottom: 1px solid rgba(#f0f0f0);
         &.required:before {
           display: inline-block;
           width: 12px;

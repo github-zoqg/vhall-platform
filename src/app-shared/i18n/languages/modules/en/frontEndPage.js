@@ -766,9 +766,9 @@ export default {
     webinar_1002: 'No red packet left~',
     webinar_1003: 'Deposited in  account',
     webinar_1004:
-      'Users who log on to wechat to grab a red envelope can follow the public account "VHALL\'s Live" and withdraw money from the red envelope proceeds',
+      'Wechat user could click the photo icon in the chatting area to withdraw',
     webinar_1005:
-      'If you log in any other way, please log on to e.vhall.com and withdraw your money from revenue Management',
+      'Other user could copy the watching link to browser, then click the photo icon after log in and withdraw the money',
     webinar_1006: 'No data',
     webinar_1007: 'Paused',
     webinar_1008: 'End of the timing',
