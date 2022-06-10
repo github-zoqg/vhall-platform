@@ -294,7 +294,16 @@
         //     this.subscribeStream();
         //   }
         // });
-
+        // 主持人进入小组（开始讨论/继续讨论）如果正在演示桌面共享，需要停止共享
+        this.groupServer.$on(this.groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
+          if (
+            this.roleName == 1 &&
+            this.isShareScreen &&
+            this.accountId == this.desktopShareInfo.accountId
+          ) {
+            this.stopShare();
+          }
+        });
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
           if (msg.data.type === 'vrtc_speaker_switch') {
@@ -337,17 +346,6 @@
               isShareScreen: this.isShareScreen,
               accountId: this.accountId == this.desktopShareInfo.accountId
             });
-          }
-          // 主持人进入小组（开始讨论/继续讨论）如果正在演示桌面共享，需要停止共享
-          if (msg.data.type === 'group_manager_enter' || msg.data.type === 'group_switch_proceed') {
-            // 自己正在发起桌面共享
-            if (
-              this.roleName == 1 &&
-              this.isShareScreen &&
-              this.accountId == this.desktopShareInfo.accountId
-            ) {
-              this.stopShare();
-            }
           }
           // 暂停 + 结束 讨论,需要停止共享
           if (msg.data.type === 'group_switch_end' || msg.data.type === 'group_switch_stop') {
