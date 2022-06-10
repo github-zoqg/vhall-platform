@@ -70,9 +70,10 @@
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
-          <span @click="changePlayerSize(true)">
+          <span @click="changePlayerSize(true)" v-if="isAudio">
             <i class="vh-iconfont vh-line-arrow-left"></i>
           </span>
+          <span v-else></span>
           <span>
             <span class="hot_num">
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
