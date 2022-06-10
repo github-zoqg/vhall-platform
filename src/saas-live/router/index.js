@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
 import NotFound from '../views/NotFound.vue';
-import ChatAuth from '@/packages/chat-auth/index';
+// import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
 // import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
@@ -12,7 +11,7 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/lives/room/:id',
-    component: Home,
+    component: () => import(/* webpackChunkName: "Home" */ '../views/Home.vue'),
     name: 'LiveRoom',
     meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
@@ -37,7 +36,7 @@ const routes = [
   {
     path: '/lives/authchat/:id',
     name: 'ChatAuth',
-    component: ChatAuth,
+    component: () => import(/* webpackChunkName: "ChatAuth" */ '@/packages/chat-auth/index'),
     meta: { title: '聊天审核', grayType: 'webinar' }
   },
   {

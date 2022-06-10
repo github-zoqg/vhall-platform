@@ -27,6 +27,7 @@
     useInteractiveServer,
     useMicServer
   } from 'middle-domain';
+  alert('home');
   export default {
     name: 'Home',
     components: {
