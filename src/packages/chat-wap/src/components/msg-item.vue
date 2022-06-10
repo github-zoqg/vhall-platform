@@ -773,7 +773,11 @@
       &.reward_pay_ok {
         .interact-gift-box {
           height: 88px;
-          padding: 0 80px 0 24px;
+          padding: 0 74px 0 24px;
+          .reward_txt {
+            line-height: 1;
+            margin-top: 4px;
+          }
         }
       }
       .new-gift-img,

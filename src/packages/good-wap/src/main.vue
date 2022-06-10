@@ -336,6 +336,7 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
+            /* autoprefixer: ignore next */
             -webkit-box-orient: vertical;
             text-align: left;
           }
