@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-subscribe-body">
+  <div class="vmp-subscribe-body" :class="showHeader ? 'vmp-subscribe-body_embed' : ''">
     <div class="vmp-subscribe-body-container">
       <template v-if="isTryVideo">
         <div class="subscribe-bg">
@@ -43,7 +43,7 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info" :class="isEmbed ? 'vmp-subscribe-body-info_embed' : ''">
+    <div class="vmp-subscribe-body-info">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -87,7 +87,7 @@
       <div
         :class="[
           'subscribe_tabs',
-          { top_menu: isScorllTab && !isEmbed, embed_menu: isEmbed && isScorllTab }
+          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
         ]"
       >
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
@@ -236,6 +236,17 @@
         const isEmbed = this.roomBaseServer.state.embedObj.embedVideo;
         const isLive = this.webinarType == 1 || this.webinarType == 5;
         if (agreement && !isEmbed && isLive) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      showHeader() {
+        if (this.isEmbed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
           return true;
         } else {
           return false;
@@ -715,10 +726,13 @@
 </script>
 <style lang="less">
   .vmp-subscribe-body {
-    height: 100%;
+    height: calc(100% - 71px);
     width: 100%;
     position: relative;
     z-index: 2;
+    &.vmp-subscribe-body_embed {
+      height: 100%;
+    }
     &-container {
       height: 422px;
       width: 100%;
@@ -799,14 +813,11 @@
       }
     }
     &-info {
-      height: calc(100% - 493px);
+      height: calc(100% - 422px);
       overflow-y: auto;
       width: 100%;
       position: relative;
       background: #f2f2f2;
-      &_embed {
-        height: calc(100% - 422px);
-      }
       .subscribe_into {
         background: #fff;
         padding: 40px 0;
