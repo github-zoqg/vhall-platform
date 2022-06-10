@@ -333,6 +333,14 @@
           }
           // 暂停 + 结束 讨论,需要停止共享
           if (msg.data.type === 'group_switch_end' || msg.data.type === 'group_switch_stop') {
+            console.log(
+              '分组退出-1-1-1-1',
+              msg.data.type,
+              msg.data,
+              this.roleName,
+              this.isShareScreen,
+              this.accountId == this.desktopShareInfo.accountId
+            );
             if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
               this.stopShare();
             }
