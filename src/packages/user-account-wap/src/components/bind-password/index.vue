@@ -133,7 +133,7 @@
       // 数据校验--旧密码
       validtorOldPassword() {
         if (this.pwdForm.old_password === '') {
-          this.errorTip.old_password = this.$t('account.account_1071');
+          this.errorTip.old_password = this.$t('appointment.appointment_1022');
           return false;
         } else {
           this.errorTip.old_password = '';
@@ -143,7 +143,7 @@
       // 数据校验--新密码
       validtorPassword() {
         if (this.pwdForm.password === '') {
-          this.errorTip.password = this.$t('account.account_1071');
+          this.errorTip.password = this.$t('appointment.appointment_1022');
           return false;
         } else if (!passwordReg.test(this.pwdForm.password)) {
           this.errorTip.password = this.$t('account.account_1072');

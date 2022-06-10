@@ -1,6 +1,6 @@
 import { useUserServer, useRoomBaseServer } from 'middle-domain';
 import { isWechat, getQueryString } from './tool';
-import { Toast } from 'vant';
+import { Toast } from 'vh5-ui';
 
 /**
  *  路由拦截需要的构建登录地址

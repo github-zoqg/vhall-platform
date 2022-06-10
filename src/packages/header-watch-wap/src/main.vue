@@ -7,6 +7,11 @@
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
+        class="vh-saas-iconfont vh-saas-line-public1"
+        @click="showPublic"
+        v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
+      ></i>
+      <i
         class="attention"
         :class="{
           'vh-iconfont vh-line-collection': attentionStatus == 0,
@@ -14,11 +19,6 @@
         }"
         v-if="groupInitData && !groupInitData.isInGroup && watchInitData.webinar.mode != 6"
         @click="attentionApi"
-      ></i>
-      <i
-        class="vh-saas-iconfont vh-saas-a-color-officialaccount"
-        @click="showPublic"
-        v-if="officicalInfo.status == 0 && officicalInfo.img != ''"
       ></i>
     </span>
   </div>
@@ -196,7 +196,7 @@
 
 <style lang="less">
   .vh-header-box {
-    height: 100px;
+    height: 71px;
     background: rgba(255, 255, 255, 1);
     display: flex;
     justify-content: space-between;
@@ -204,15 +204,15 @@
     padding: 0 30px;
     .host-user-info {
       .ellipsis();
-      font-size: 30px;
-      line-height: 100px;
+      font-size: 28px;
+      line-height: 71px;
       width: 350px;
       .img-box {
         display: inline-block;
         border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        border: 2px solid #e3e3e3;
+        width: 48px;
+        height: 48px;
+        // border: 2px solid #e3e3e3;
         vertical-align: middle;
         margin-right: 10px;
       }
@@ -225,7 +225,7 @@
       justify-content: space-between;
       i {
         margin-left: 37px;
-        font-size: 38px;
+        font-size: 30px;
       }
     }
     .icon-default {

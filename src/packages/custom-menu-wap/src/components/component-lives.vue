@@ -43,7 +43,7 @@
 <style lang="less" scoped>
   .lives-wrapbox {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 80px;
   }
   /deep/ .menus-checkedBox {
     width: 100%;

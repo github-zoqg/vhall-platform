@@ -304,7 +304,8 @@ export default {
     chat_1079: 'You have been muted',
     chat_1080: "So frequent. Please send in {n} S'",
     chat_1081: '{n} locked',
-    chat_1092: 'You have been muted'
+    chat_1092: 'You have been muted',
+    chat_1093: 'Click for details'
   },
   form: {
     form_1001: 'Name',

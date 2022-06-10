@@ -7,32 +7,37 @@
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="greenGradient" x1="0" y1="100%" x2="100%" y2="0">
-          <stop offset="0%" stop-color="#fb3a32" />
-          <stop offset="50%" stop-color="#fb3a32" />
-          <stop offset="100%" stop-color="#FFA32B" />
+        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FC4E2A" />
+          <stop offset="100%" stop-color="#FC9A32" />
         </linearGradient>
       </defs>
+      <!-- 内环 -->
       <circle
         class="progress"
         cx="50%"
         cy="50%"
-        r="47"
+        :r="r"
         fill="transparent"
-        stroke="url(#greenGradient)"
-        stroke-dasharray="1"
+        stroke="#FED8D6"
+        stroke-dasharray="0"
         stroke-dashoffset="1"
       ></circle>
+      <!-- 外环 -->
       <circle
         class="progress progress-bar"
         cx="50%"
         cy="50%"
-        r="47"
+        :r="r"
         fill="transparent"
-        stroke="#F5F5F5"
+        stroke="url(#greenGradient)"
         :stroke-dasharray="perimeter"
         :stroke-dashoffset="progress"
+        stroke-linecap="round"
+        stroke-width="7"
       ></circle>
+      <!-- 小白点 -->
+      <circle cx="92" cy="50%" r="2" fill="white"></circle>
     </svg>
 
     <div class="countdown-core">
@@ -46,7 +51,7 @@
     name: 'countDown',
     data() {
       return {
-        perimeter: Math.PI * 94
+        r: 42 //圆的半径
       };
     },
     props: {
@@ -64,8 +69,11 @@
         const ret = this.consume / this.duration;
         return ret > 1 ? 1 : ret;
       },
+      perimeter() {
+        return Math.PI * 2 * this.r;
+      },
       progress() {
-        return Math.PI * 94 * this.percent;
+        return this.perimeter * this.percent;
       },
       remainder() {
         // eslint-disable-next-line one-var
@@ -86,13 +94,13 @@
 <style lang="less" scoped>
   .countdown {
     position: relative;
-    width: 238px;
-    height: 238px;
+    width: 240px;
+    height: 240px;
     &-core {
-      width: 180px;
-      height: 180px;
+      width: 210px;
+      height: 210px;
       border-radius: 50%;
-      background-color: #fff2f0;
+      // background-color: #fff2f0;
       position: absolute;
       left: 50%;
       top: 50%;
@@ -100,24 +108,24 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 48px;
-      color: #fb3a32;
+      font-size: 50px;
+      color: @font-light-normal;
       font-weight: bold;
+      font-family: 'DIN Alternate';
+      // background-color: #fff;
     }
-    &-ani {
-      width: 238px;
-      height: 238px;
-    }
+    // &-ani {
+    //   width: 238px;
+    //   height: 238px;
+    // }
     > svg {
       transform: rotate(-90deg);
     }
   }
   .progress {
-    stroke-width: 12px;
+    stroke-width: 8px;
   }
   .progress-bar {
-    transform: rotate(-90deg);
-    transform: rotateX(180deg);
     transform-origin: 50%;
     stroke-width: 14px;
   }

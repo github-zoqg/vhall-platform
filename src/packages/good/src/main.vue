@@ -273,14 +273,14 @@
           width: 100%;
           font-size: 14px;
           color: @font-dark-normal;
-          line-height: 22px;
+          line-height: 20px;
           overflow: hidden;
           text-align: left;
         }
         .describe {
           width: 200px;
           height: 18px;
-          line-height: 18px;
+          line-height: 20px;
           font-size: 12px;
           color: #999999;
           overflow: hidden;
@@ -448,7 +448,7 @@
           .describe {
             width: 100%;
             height: 36px;
-            line-height: 18px;
+            line-height: 20px;
             word-break: break-word;
             font-size: 12px;
             color: #666;
