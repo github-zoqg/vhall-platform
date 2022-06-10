@@ -163,7 +163,7 @@
         position: absolute;
         top: 32px;
         left: -12px;
-        border-radius: 50%;
+        border-radius: 11px;
         background: #fff4f4;
         border: 1px solid;
         border-color: #d3cecf;
@@ -172,7 +172,7 @@
         display: inline-block;
         width: 14px;
         height: 14px;
-        border-radius: 50%;
+        border-radius: 7px;
         position: absolute;
         top: 2px;
         left: 2px;
