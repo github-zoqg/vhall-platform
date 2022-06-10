@@ -9,12 +9,12 @@
           </div>
         </template>
         <template v-else>
-          <div class="subscribe-img-box" v-show="initIndex % 2 === 0">
-            <!-- 完成验证、并且有暖场视频 加载播放器 -->
+          <div class="subscribe-img-box">
+            <!-- 完成验证、并且有暖场视频 加载播放器 第一个播放器-->
             <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
           </div>
-          <div class="subscribe-img-box" v-show="initIndex % 2 === 1">
-            <!-- 完成验证、并且有暖场视频 加载播放器 -->
+          <div class="subscribe-img-box" v-if="warmUpVideoList.length > 1">
+            <!-- 完成验证、并且有暖场视频 加载播放器 第二个播放器-->
             <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
           </div>
         </template>
@@ -119,6 +119,9 @@
       },
       initIndex() {
         return this.$domainStore.state.playerServer.initIndex;
+      },
+      playIndex() {
+        return this.$domainStore.state.playerServer.playIndex;
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
