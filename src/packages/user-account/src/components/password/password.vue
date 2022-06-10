@@ -158,7 +158,7 @@
       const verifyEnterPwd = (rule, value, callback) => {
         const pattern = /^([0-9a-zA-Z_`!~@#$%^*+=,.?;'":)(}{/\\|<>&[-]|]){6,30}$/;
         if (value === '') {
-          callback(new Error(this.$t('account.account_1071')));
+          callback(new Error(this.$t('appointment.appointment_1022')));
         } else if (!pattern.exec(value)) {
           callback(new Error(this.$t('account.account_1072')));
         } else {
