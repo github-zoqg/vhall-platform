@@ -9,11 +9,11 @@
           </div>
         </template>
         <template v-else>
-          <div class="subscribe-img-box" v-show="playIndex % 2 === 0">
+          <div class="subscribe-img-box" v-show="initIndex % 2 === 0">
             <!-- 完成验证、并且有暖场视频 加载播放器 -->
             <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
           </div>
-          <div class="subscribe-img-box" v-show="playIndex % 2 === 1">
+          <div class="subscribe-img-box" v-show="initIndex % 2 === 1">
             <!-- 完成验证、并且有暖场视频 加载播放器 -->
             <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
           </div>
@@ -84,6 +84,7 @@
         wxQr: '',
         zfQr: '',
         lang: {},
+        isLoaderTwoPlayer: false,
         languageList: [],
         subOption: {
           startTime: '',
@@ -116,8 +117,11 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
-      playIndex() {
-        return this.$domainStore.state.playerServer.playIndex;
+      initIndex() {
+        return this.$domainStore.state.playerServer.initIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
       },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;

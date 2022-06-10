@@ -17,7 +17,7 @@
       :id="
         warmUpVideoList.length <= 1 || isLiving
           ? 'vmp-player'
-          : `vmp-player-vod_${warmUpVideoList[warmUpIndex]}`
+          : `vmp-player-vod_${warmUpVideoList[playIndex + 1]}`
       "
       class="vmp-player-watch"
       ref="playerWatch"
@@ -343,7 +343,6 @@
         marquee: {}, // 跑马灯
         water: {}, //水印
         agreement: false,
-        warmUpIndex: 0,
         playerOtherOptions: {
           barrage_button: 0,
           progress_bar: 0,
@@ -377,7 +376,7 @@
         return this.$domainStore.state.playerServer.playIndex;
       },
       warmUpVideoList() {
-        return this.$domainStore.state.playerServer.warmUpVideoList;
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
       },
       // 背景图片
       webinarsBgImg() {
@@ -465,7 +464,7 @@
           videoNode:
             this.warmUpVideoList.length <= 1 || this.isLiving
               ? 'vmp-player'
-              : `vmp-player-vod_${this.warmUpVideoList[this.warmUpIndex]}`
+              : `vmp-player-vod_${this.warmUpVideoList[this.playIndex + 1]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -760,18 +759,31 @@
           }
         } else {
           if (webinar.type === 3) return; //结束状态
-          let _id = warmup.warmup_paas_record_id
-            ? warmup.warmup_paas_record_id
-            : record.preview_paas_record_id;
-          this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
-          if (this.vodType === 'shikan') {
+          if (webinar.type === 5) {
+            // 试看
+            this.vodType = 'shikan';
             this.isTryPreview = true;
             this.getShiPreview();
-          } else if (this.vodType === 'warm') {
-            this.isWarnPreview = true;
+            this.optionTypeInfo('vod', record.preview_paas_record_id);
+          } else {
+            if (this.warmUpVideoList.length) {
+              this.vodType = 'warm';
+              this.isWarnPreview = true;
+              this.optionTypeInfo('vod', this.warmUpVideoList[this.playIndex + 1]);
+            }
           }
-          // 暖场视频或者试看
-          this.optionTypeInfo('vod', _id);
+          // let _id = warmup.warmup_paas_record_id
+          //   ? warmup.warmup_paas_record_id
+          //   : record.preview_paas_record_id;
+          // this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
+          // if (this.vodType === 'shikan') {
+          //   this.isTryPreview = true;
+          //   this.getShiPreview();
+          // } else if (this.vodType === 'warm') {
+          //   this.isWarnPreview = true;
+          // }
+          // // 暖场视频或者试看
+          // this.optionTypeInfo('vod', _id);
         }
       },
       optionTypeInfo(type, id) {
