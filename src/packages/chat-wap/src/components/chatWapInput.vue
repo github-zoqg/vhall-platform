@@ -134,7 +134,9 @@
         // 键盘弹出事件处理
         // alert('iphone 键盘弹出事件处理');
         // this.scrollBottom();
-        document.querySelector('body').classList.add('fixIphoneX');
+        if (this.visible) {
+          document.querySelector('body').classList.add('fixIphoneX');
+        }
       },
       //显示模态窗
       openModal(text = '') {
