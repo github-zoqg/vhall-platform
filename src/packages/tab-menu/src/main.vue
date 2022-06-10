@@ -207,6 +207,7 @@
                   : this.$t('chat.chat_1026', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
+            nickname: msg.data.nick_name,
             type: msg.data.type,
             interactStatus: true
           });
@@ -223,6 +224,7 @@
                   : this.$t('chat.chat_1081', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
+            nickname: msg.data.nick_name,
             type: msg.data.type,
             interactStatus: true
           });

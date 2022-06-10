@@ -1,5 +1,9 @@
 <template>
   <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
+    <!-- 礼物动画组件 -->
+    <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+    <!-- 礼物动画组件-svga -->
+    <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
     <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
@@ -31,7 +35,10 @@
         ></virtual-list>
         <div
           class="vmp-chat-wap__content__new-msg-tips"
-          v-show="isHasUnreadAtMeMsg"
+          v-show="
+            unReadMessageCount !== 0 &&
+            (isHasUnreadNormalMsg || isHasUnreadAtMeMsg || isHasUnreadReplyMsg)
+          "
           @click="scrollToTarget"
         >
           <span>{{ tipMsg }}</span>
@@ -39,12 +46,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="overlay"
-      v-show="showSendBox"
-      @touchstart="closeOverlay"
-      @click="closeOverlay"
-    ></div>
+    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -72,7 +74,7 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-  import { ImagePreview } from 'vant';
+  // import { ImagePreview } from 'vh5-ui';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
@@ -100,8 +102,12 @@
         },
         //消息提示
         tipMsg: '',
-        //是否有未读
+        //是否有常规未读消息
+        isHasUnreadNormalMsg: false,
+        //是否有@我的未读消息
         isHasUnreadAtMeMsg: false,
+        //是否有未读的回复消息
+        isHasUnreadReplyMsg: false,
         //新消息数量
         unReadMessageCount: 0,
         //活动信息
@@ -134,8 +140,11 @@
         innerHeight: 0,
         //显示输入组件
         showSendBox: false,
+        childrenCom: [],
         //小屏适配
-        smFix: false
+        smFix: false,
+        //回复或@消息id
+        targetId: ''
       };
     },
     watch: {
@@ -237,6 +246,7 @@
       this.chatServer.init();
     },
     created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
       this.initViewData();
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
@@ -323,23 +333,32 @@
         //监听到新消息过来
         chatServer.$on('receiveMsg', () => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
+            this.targetId = '';
+            this.isHasUnreadNormalMsg = true;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.unReadMessageCount++;
             this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
           }
           this.dispatch('TabContent', 'noticeHint', 3);
         });
         //监听@我的消息
-        chatServer.$on('atMe', () => {
+        chatServer.$on('atMe', msg => {
           if (!this.isBottom()) {
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1075');
           }
         });
         //监听回复我的消息
-        chatServer.$on('replyMe', () => {
+        chatServer.$on('replyMe', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = true;
             this.tipMsg = this.$t('chat.chat_1076');
           }
         });
@@ -365,7 +384,7 @@
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
             this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();
@@ -406,31 +425,43 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
-        ImagePreview({
+        this.$imagePreview({
           images: list,
           startPosition: index,
           lazyLoad: true
         });
       },
+      //获取目标消息索引
+      getTargetIndex(id) {
+        return this.chatList.findIndex(item => {
+          return item.msgId == id;
+        });
+      },
       //滚动到目标处
       scrollToTarget() {
-        const index = this.chatList.length - this.unReadMessageCount;
-        this.$refs.chatlist.scrollToIndex(index);
-        this.unReadMessageCount = 0;
-        this.isHasUnreadAtMeMsg = false;
+        const index = this.getTargetIndex(this.targetId);
+        if (index > -1) {
+          this.$refs.chatlist.scrollToIndex(index);
+        } else {
+          this.scrollBottom();
+        }
       },
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
           this.$refs && this.$refs.chatlist && this.$refs.chatlist.scrollToBottom();
           this.unReadMessageCount = 0;
+          this.isHasUnreadNormalMsg = false;
           this.isHasUnreadAtMeMsg = false;
+          this.isHasUnreadReplyMsg = false;
         });
       },
       //监听滚动条滚动到底部
       toBottom() {
         this.unReadMessageCount = 0;
+        this.isHasUnreadNormalMsg = false;
         this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
       },
       //滚动条是否在最底部
       isBottom() {
@@ -471,9 +502,9 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
         let playerHeight = data == true ? 130 : 422;
-        let baseHeight = playerHeight + 100 + 120 + 90;
+        let baseHeight = playerHeight + 71 + 94 + 90;
         if (this.isEmbed) {
-          baseHeight = playerHeight + 120 + 90;
+          baseHeight = playerHeight + 94 + 90;
         }
         this.chatlistHeight = this.virtual.contentHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);
@@ -506,6 +537,9 @@
 </script>
 
 <style lang="less">
+  .van-image-preview__overlay {
+    background-color: rgb(0, 0, 0) !important;
+  }
   .vmp-chat-wap {
     height: 100%;
     overflow: hidden;
@@ -514,6 +548,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
+      background-color: #f7f7f7;
       .virtual-list {
         height: 100%;
         overflow: auto;
@@ -540,18 +575,21 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 0;
-        height: 60px;
-        background-color: rgba(255, 233, 233, 0.9);
-        border: 1px solid rgba(254, 129, 148, 1);
-        color: #333;
-        font-size: 26px;
+        bottom: 20px;
+        width: 337px;
+        height: 56px;
+        background: #ffffff;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 28px;
+        color: #0a7ff5;
+        font-size: 28px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 0 auto;
         .vh-iconfont {
           font-size: 16px;
-          margin-left: 19px;
+          margin-left: 7px;
         }
       }
     }

@@ -596,13 +596,13 @@
           this.subscribeInsert();
         }
 
-        this.insertFileServer.$on('insert_mic_mute_change', status => {
-          if (status == 'play') {
-            this.$message.warning(this.$t('interact.interact_1026'));
-          } else {
-            this.$message.warning('麦克风开启，对方将听到您的声音');
-          }
-        });
+        // this.insertFileServer.$on('insert_mic_mute_change', status => {
+        //   if (status == 'play') {
+        //     this.$message.warning(this.$t('interact.interact_1026'));
+        //   } else {
+        //     this.$message.warning('麦克风开启，对方将听到您的声音');
+        //   }
+        // });
 
         this.addSDKEvents();
         // 注册发起端独有的事件

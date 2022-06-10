@@ -682,9 +682,9 @@
           .then(res => {
             if (res.code === 200) {
               this.definitionConfig = res.data.definition.data.default_definition;
-              this.marquee = res.data['screen-config'].data;
-              this.water = res.data['water-mark'].data;
-              this.playerOtherOptions = res.data['basic-config'].data;
+              this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
+              this.water = res.data['water-mark'] && res.data['water-mark'].data;
+              this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
               this.initPlayer();
             }
           });
