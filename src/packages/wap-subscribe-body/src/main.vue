@@ -132,7 +132,8 @@
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
-        languageList: []
+        languageList: [],
+        subscribeWarmList: []
       };
     },
     components: {

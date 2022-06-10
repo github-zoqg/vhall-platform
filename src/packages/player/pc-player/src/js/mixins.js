@@ -112,6 +112,13 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
+        if (!this._isFirstInit) {
+          this._isFirstInit = true;
+          if (this.warmUpVideoList.length > 1) {
+            this.playerServer.state.initIndex++;
+            this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          }
+        }
       });
       // 视频错误
       this.playerServer.$on(VhallPlayer.ERROR, () => {
@@ -122,13 +129,27 @@ const playerMixins = {
         // 监听播放完毕状态
         console.log('pc-播放完毕');
         this.isShowPoster = true;
-        if (this.isWarnPreview) return;
-        this.isVodEnd = true;
-        if (this.isVisibleMiniElement) {
-          // 如果回放时没有文档，就不用重置最小值
-          this.roomBaseServer.setChangeElement('doc');
+        // TODO: 如果是暖场视频
+        if (this.isWarnPreview) {
+          if (this.initIndex != this.playIndex) {
+            // this.playIndex = this.initIndex;
+            this.playerServer.setPlayIndex(this.initIndex);
+            if (this.initIndex < this.warmUpVideoList.length) {
+              this.playerServer.initIndex++;
+              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+            } else {
+              this.playerServer.initIndex = 0;
+              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+            }
+          }
+        } else {
+          this.isVodEnd = true;
+          if (this.isVisibleMiniElement) {
+            // 如果回放时没有文档，就不用重置最小值
+            this.roomBaseServer.setChangeElement('doc');
+          }
+          this.displayMode = 'normal';
         }
-        this.displayMode = 'normal';
       });
 
       // 结束直播

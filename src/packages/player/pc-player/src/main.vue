@@ -372,11 +372,19 @@
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
+      // 初始化播放器第几个
+      initIndex() {
+        return this.$domainStore.state.playerServer.initIndex;
+      },
+      // 播放第几个
       playIndex() {
         return this.$domainStore.state.playerServer.playIndex;
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.playerServer.subscribeWarmList;
       },
       // 背景图片
       webinarsBgImg() {
