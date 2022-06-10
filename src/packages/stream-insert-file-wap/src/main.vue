@@ -49,13 +49,13 @@
         this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {
           this.subscribeInsert();
         });
-        this.insertFileServer.$on('insert_mic_mute_change', status => {
-          if (status == 'play') {
-            this.$toast(this.$t('interact.interact_1026'));
-          } else {
-            this.$toast('麦克风开启，对方将听到您的声音');
-          }
-        });
+        // this.insertFileServer.$on('insert_mic_mute_change', status => {
+        //   if (status == 'play') {
+        //     this.$toast(this.$t('interact.interact_1026'));
+        //   } else {
+        //     this.$toast('麦克风开启，对方将听到您的声音');
+        //   }
+        // });
       }
     }
   };

@@ -30,7 +30,7 @@
             </span>
             <!-- 你已被禁言  /  全体禁言中  -->
             <span v-else>
-              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1042') }}
+              {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1021') }}
             </span>
           </div>
         </template>
@@ -51,16 +51,18 @@
             style="position: relative"
             auth="{ 'ui.hide_reward': 0 }"
           >
-            <i
+            <img
               v-if="!handUpStatus"
-              class="vh-saas-iconfont vh-saas-line-shangmai"
+              class="tool shangmai-img"
+              src="../img/icon_wheat.png"
               @click="$refs.handup.openConnectPop()"
-            ></i>
-            <i
+            />
+            <img
               v-else
-              class="vh-saas-iconfont vh-saas-line-shangmaizhong"
+              class="tool shangmaizhong-img"
+              src="../img/icon_wheat_ing.png"
               @click="$refs.handup.openConnectPop()"
-            ></i>
+            />
             <span class="red-dot" v-if="handUpStatus"></span>
             <Handup
               ref="handup"
@@ -74,7 +76,7 @@
         </div>
         <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
           <!-- 底部互动工具组件 comChatWap-->
-          <vmp-air-container cuid="comChatWap"></vmp-air-container>
+          <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
     </div>
@@ -188,7 +190,8 @@
         //举手状态
         handUpStatus: false,
         //只看我的问答
-        isShowMyQA: false
+        isShowMyQA: false,
+        childrenCom: []
       };
     },
     computed: {
@@ -292,6 +295,7 @@
       this.userServer = useUserServer();
     },
     created() {
+      this.childrenCom = this.$parent.cuid ? window.$serverConfig[this.$parent.cuid].children : [];
       if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
       }
@@ -438,18 +442,18 @@
 <style lang="less" scoped>
   .vmp-send-box {
     background-color: #fff;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      /* prettier-ignore */
-      border-bottom: 1PX solid #e2e2e2;
-      left: 0;
-      top: 0;
-      transform-origin: 0 bottom;
-      opacity: 1;
-    }
+    box-shadow: 0px -1px 1px #f1f1f1;
+    // &::after {
+    //   content: '';
+    //   position: absolute;
+    //   width: 100%;
+    //   /* prettier-ignore */
+    //   border-bottom: 1PX solid #e2e2e2;
+    //   left: 0;
+    //   top: 0;
+    //   transform-origin: 0 bottom;
+    //   opacity: 1;
+    // }
 
     position: absolute;
     left: 0;
@@ -462,7 +466,7 @@
     &__content {
       width: 100%;
       height: 94px;
-      padding: 0 32px;
+      padding: 0 24px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -474,7 +478,7 @@
 
         .content-input__placeholder {
           background-color: #f5f5f5;
-          color: #444;
+          color: #bfbfbf;
           border-radius: 40px;
           width: 100%;
           height: 60px;
@@ -513,15 +517,14 @@
       }
 
       .interact-wrapper {
-        margin-left: 40px;
+        margin-left: 32px;
         text-align: right;
-        height: 40px;
-        padding-right: 10px;
+        padding-right: 8px;
 
         .icon-wrapper {
           color: #666;
           display: inline-block;
-          margin-right: 36px;
+          margin-right: 24px;
           text-align: center;
 
           &:last-child {
@@ -537,6 +540,11 @@
           .vh-iconfont {
             font-size: 47px;
             color: #666666;
+          }
+
+          .tool {
+            width: 48px;
+            height: 48px;
           }
 
           .red-dot {
@@ -563,7 +571,7 @@
   .user-avatar-wrap {
     vertical-align: middle;
     display: inline-flex;
-    margin-right: 12px;
+    margin-right: 24px;
 
     img {
       width: 100%;

@@ -307,7 +307,9 @@
         loginRules: {
           phone: [{ validator: validatePhone, trigger: 'blur' }],
           email: [{ validator: validateEmail, trigger: 'blur' }],
-          password: [{ required: true, message: this.$t('account.account_1071'), trigger: 'blur' }],
+          password: [
+            { required: true, message: this.$t('appointment.appointment_1022'), trigger: 'blur' }
+          ],
           code: [{ required: true, message: this.$t('form.form_1020'), trigger: 'blur' }],
           checkPassword: [{ validator: validateCheckPass, trigger: 'blur' }]
         },

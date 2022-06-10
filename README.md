@@ -245,3 +245,12 @@ git config --global core.autocrlf input
 ```
 
 该文件不纳入 git 管理，开发人员可修改文件中的端口号，以满足自己的开发习惯。
+
+## 本地安装不成功问题
+
+feature_v7.1.0 安装包不上的，问题最快的解决办法。
+node_modules 删掉了之后，
+从 test5 拷贝一下 yarn.lock 放入。
+在执行 yarn install 的时候，就能安装上了。
+问题 2：日志查询地址？
+sentry: https://sentry.vhall.com/
