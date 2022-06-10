@@ -96,7 +96,6 @@
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { F } from 'caniuse-lite/data/agents';
 
   export default {
     name: 'VmpDocWap',
@@ -384,7 +383,6 @@
         this.rotateNum = this.rotateNum === 0 ? 90 : 0;
         this.getDocViewRect();
         console.log('screen.orientation-> ', window.screen.orientation);
-        // document.body.setAttribute('class', 'rotate90');
       }
     },
     beforeDestroy() {
@@ -394,27 +392,6 @@
   };
 </script>
 <style lang="less">
-  .rotate90 {
-    min-height: 100vw !important;
-    height: 100vw !important;
-    width: 100vh !important;
-    top: 50%;
-    height: 50%;
-    left: 50%;
-    transform-origin: center;
-    transform: translate(-50%, -50%) rotate(90deg);
-    .tools {
-      top: 100vw;
-      margin-top: -80px;
-      .btn-doc-fullscreen {
-      }
-      .btn-doc-restore {
-      }
-      .btn-doc-rotate {
-      }
-    }
-  }
-
   .vmp-doc-wap {
     width: 100%;
     height: 100%;
