@@ -56,7 +56,6 @@
     useInteractiveServer
   } from 'middle-domain';
   import move from './js/move';
-  import { Dialog, Toast } from 'vant';
   import masksliding from './components/mask.vue';
   export default {
     name: 'VmpWapBody',
@@ -104,7 +103,7 @@
         this.$domainStore.state.interactiveServer.mobileOnWheat &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
       ) {
-        await Dialog.alert({
+        await this.$dialog.alert({
           title: this.$t('account.account_1061'),
           confirmButtonText: this.$t('common.common_1010'),
           message: this.$t('other.other_1009')
@@ -200,7 +199,7 @@
             await this.resetInteractive();
           }
         } else {
-          Toast(this.$t('interact.interact_1040'));
+          this.$toast(this.$t('interact.interact_1040'));
         }
       },
       // 重置互动SDK实例
@@ -235,9 +234,9 @@
             break;
         }
         if (index == 5 || index == 7) {
-          Toast(title);
+          this.$toast(title);
         } else {
-          await Dialog.alert({
+          await this.$dialog.alert({
             title: this.$t('account.account_1061'),
             confirmButtonText: this.$t('common.common_1010'),
             message: title

@@ -51,7 +51,6 @@
 <script>
   import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { Toast } from 'vant';
   export default {
     name: 'VmpWapStreamRemote',
     data() {

@@ -90,7 +90,7 @@
               <input
                 type="password"
                 ref="inputPass"
-                :placeholder="$t('account.account_1071')"
+                :placeholder="$t('appointment.appointment_1022')"
                 v-model.trim="password"
               />
             </div>

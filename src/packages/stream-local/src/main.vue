@@ -558,13 +558,19 @@
         } else {
           if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
             await this.stopPush();
-            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+            const obj = this.$domainStore.state.interactiveServer;
+            console.log('销毁1-1-1-1-1', obj);
+            // 优化代码逻辑，如果是ROLE_HOST角色，需要销毁实例
+            if (obj.isInstanceInit && obj.initRole === 'administrator') {
               await this.interactiveServer.destroy();
-            }
-            if (this.isNoDelay == 1) {
-              await sleep(200);
-              console.log('无延迟---销毁--互动实例');
-              await this.interactiveServer.init();
+              if (this.isNoDelay == 1) {
+                // 优化代码逻辑，如果是ROLE_HOST角色并且是无延迟直播，需要重新初始化为ROLE_AUDIENCE角色
+                await sleep(200);
+                if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+                  console.log('无延迟---初始化互动-1');
+                  await this.interactiveServer.init();
+                }
+              }
             }
           }
         }

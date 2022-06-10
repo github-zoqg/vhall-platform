@@ -54,7 +54,6 @@
     usePlayerServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { Dialog, Toast } from 'vant';
 
   export default {
     name: 'VmpWapStreamLocal',
@@ -215,7 +214,7 @@
       async listenEvents() {
         // 监听设备禁用
         useInteractiveServer().$on('EVENT_STREAM_END', () => {
-          Dialog.alert({
+          this.$dialog.alert({
             title: this.$t('account.account_1061'),
             message: this.$t('interact.interact_1011')
           });
@@ -223,23 +222,27 @@
         // 房间信令异常断开事件
         this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
           console.log('网络异常断开', msg);
-          Dialog.alert({
-            title: this.$t('account.account_1061'),
-            message: '网络异常导致互动房间连接失败'
-          }).then(() => {
-            window.location.reload();
-          });
+          this.$dialog
+            .alert({
+              title: this.$t('account.account_1061'),
+              message: '网络异常导致互动房间连接失败'
+            })
+            .then(() => {
+              window.location.reload();
+            });
         });
 
         // 推流失败
         this.interactiveServer.$on('EVENT_REMOTESTREAM_FAILED', async e => {
           if (e.data.accountId == this.joinInfo.third_party_user_id) {
-            Dialog.alert({
-              title: this.$t('account.account_1061'),
-              message: this.$t('interact.interact_1036')
-            }).then(() => {
-              window.location.reload();
-            });
+            this.$dialog
+              .alert({
+                title: this.$t('account.account_1061'),
+                message: this.$t('interact.interact_1036')
+              })
+              .then(() => {
+                window.location.reload();
+              });
             // Toast(this.$t('因网络问题推流失败，正在重新推流'));
             // await this.stopPush();
             // this.startPush();
