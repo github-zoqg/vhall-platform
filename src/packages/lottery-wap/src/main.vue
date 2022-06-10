@@ -4,6 +4,7 @@
     :position="pending ? 'center' : 'bottom'"
     :class="[pending ? 'pending' : '', 'vmp-lottery']"
     get-container="body"
+    overlay-class="vmp-lottery-popup-overlay"
     round
   >
     <i v-if="!pending" class="vh-iconfont vh-line-close close" @click="close" />
@@ -323,5 +324,8 @@
       font-size: 32px;
       color: #fff;
     }
+  }
+  .vmp-lottery-popup-overlay {
+    background-color: rgba(#000, 0.85); // 遮罩层
   }
 </style>

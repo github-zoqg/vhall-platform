@@ -156,10 +156,11 @@
       line-height: 100px;
     }
     .form-wrap {
-      padding: 0 32px;
+      padding: 0 8px; // 给滚动条样式留空间
       margin: 50px 0 60px;
     }
     .form {
+      padding: 0 24px;
       max-height: 498px;
       overflow: auto;
     }
@@ -190,7 +191,7 @@
       }
     }
     .input-warp {
-      height: 40px;
+      height: 32px;
       margin: 12px 0 25px;
     }
     .form-inpput {
@@ -203,9 +204,10 @@
       }
     }
     .submit-btn {
-      width: 100%;
-      display: inline-block;
+      display: block;
+      width: 686px;
       height: 90px;
+      margin: 0 auto;
       background: #fb2626;
       border-radius: 45px;
       line-height: 90px;
@@ -216,6 +218,15 @@
         pointer-events: none;
         opacity: 0.4;
       }
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 4px;
     }
   }
 </style>
