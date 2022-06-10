@@ -320,6 +320,24 @@
               this.stopShare();
             }
           }
+          if (
+            [
+              'group_manager_enter',
+              'group_switch_proceed',
+              'group_switch_end',
+              'group_switch_stop'
+            ].includes(msg.data.type)
+          ) {
+            console.table({
+              name: '桌面共享-分组讨论',
+              type: msg.data.type,
+              data: JSON.stringify(msg.data),
+              role: this.roleName,
+              isInGroup: this.isInGroup,
+              isShareScreen: this.isShareScreen,
+              accountId: this.accountId == this.desktopShareInfo.accountId
+            });
+          }
           // 主持人进入小组（开始讨论/继续讨论）如果正在演示桌面共享，需要停止共享
           if (msg.data.type === 'group_manager_enter' || msg.data.type === 'group_switch_proceed') {
             // 自己正在发起桌面共享
@@ -333,15 +351,11 @@
           }
           // 暂停 + 结束 讨论,需要停止共享
           if (msg.data.type === 'group_switch_end' || msg.data.type === 'group_switch_stop') {
-            console.log(
-              '分组退出-1-1-1-1',
-              msg.data.type,
-              msg.data,
-              this.roleName,
-              this.isShareScreen,
+            if (
+              this.isInGroup &&
+              this.isShareScreen &&
               this.accountId == this.desktopShareInfo.accountId
-            );
-            if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
+            ) {
               this.stopShare();
             }
           }
