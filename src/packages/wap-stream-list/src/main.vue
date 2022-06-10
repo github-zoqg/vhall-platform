@@ -48,7 +48,7 @@
       >
         <p>
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          &nbsp;{{ hotNum | formatHotNum }}
+          <span>{{ hotNum | formatHotNum }}</span>
         </p>
       </div>
       <!-- 播放 -->
@@ -116,7 +116,6 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { Toast } from 'vant';
   import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
   export default {
     name: 'VmpWapStreamList',
@@ -287,7 +286,7 @@
           this.roomBaseServer.state.watchInitData.webinar.mode == 6) &&
         this.webinarType == 1
       ) {
-        return Toast(this.$t('other.other_1010'));
+        return this.$toast(this.$t('other.other_1010'));
       }
       this.replayPlay = debounce(this.replayPlay, 500);
     },
@@ -320,7 +319,7 @@
         });
         const str =
           msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
-        Toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
+        this.$toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
       addSDKEvents() {
@@ -534,6 +533,7 @@
           i {
             vertical-align: bottom;
             font-size: 28px;
+            margin-right: 4px;
           }
         }
       }

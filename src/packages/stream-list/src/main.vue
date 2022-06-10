@@ -585,6 +585,7 @@
           &:not(.vmp-stream-list__main-screen) {
             .vmp-stream-local__bottom-nickname {
               width: 60px;
+              transform: scale(0.8) translateY(8px);
             }
           }
         }

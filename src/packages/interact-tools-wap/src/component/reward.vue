@@ -1,18 +1,14 @@
 <template>
   <section>
     <van-popup
-      get-container="#otherPopupContainer"
+      get-container="#app"
       v-model="showRewardCard"
+      class="reward-van-popup"
       position="bottom"
-      :overlay="false"
-      :style="{ height: popHeight }"
+      round
+      closeable
     >
       <div class="reward-wrap">
-        <header>
-          {{ $t('interact_tools.interact_tools_1044') }}
-          <i class="vh-iconfont vh-line-close" @click="close"></i>
-        </header>
-        <p class="title">{{ $t('interact_tools.interact_tools_1045') }}</p>
         <ul>
           <li
             v-for="(item, index) in moneyList"
@@ -20,36 +16,42 @@
             :class="{ active: item.active }"
             @click="chooseMoney(index, item)"
           >
-            {{ item.value }}
+            <span>
+              <span class="item">￥</span>
+              <span v-html="item.value"></span>
+            </span>
           </li>
         </ul>
         <div class="otherMoney">
-          <div>
-            <input
-              type="number"
-              @focus="clearMoney()"
-              v-model.trim="money"
-              :placeholder="`￥${$t('interact_tools.interact_tools_1046')}`"
-              @blur="textBlur"
-            />
-          </div>
+          <van-field
+            v-model.trim="money"
+            :label="$t('interact_tools.interact_tools_1046')"
+            type="number"
+            :placeholder="`￥0.00`"
+            input-align="right"
+            @blur="textBlur"
+            @focus="clearMoney()"
+          />
         </div>
         <div class="notes">
-          <div>
-            <input
-              type="text"
-              v-model="note"
-              @input="changeDes"
-              maxlength="15"
-              :placeholder="`${$t('interact_tools.interact_tools_1047')}!`"
-              @blur="textBlur"
-            />
-            <span class="text-limit">{{ note.length }}/15</span>
-          </div>
+          <van-field
+            type="text"
+            v-model="note"
+            maxlength="15"
+            :placeholder="`${$t('interact_tools.interact_tools_1047')}!`"
+            @blur="textBlur"
+          >
+            <div slot="extra">
+              <span class="text-limit">
+                <span :class="note.length > 0 ? (note.length >= 15 ? 'text-ful' : 'text-can') : ''">
+                  {{ note.length }}
+                </span>
+                /15
+              </span>
+            </div>
+          </van-field>
         </div>
-        <footer>
-          <button @click="submit">{{ btnTxt }}</button>
-        </footer>
+        <button class="btn" @click="submit">{{ btnTxt }}</button>
       </div>
     </van-popup>
   </section>
@@ -76,12 +78,11 @@
     data() {
       return {
         moneyList: [
-          { value: 1.88, active: false },
+          { value: 1.88, active: true },
           { value: 8.88, active: false },
           { value: 88.88, active: false }
         ],
         showRewardCard: false,
-        popHeight: '60%',
         money: '',
         btnMoney: '', // 选中按钮上面的金额
         note: ''
@@ -100,11 +101,11 @@
         return this.$domainStore.state.playerServer.isSmallPlayer;
       }
     },
-    watch: {
-      isSmallPlayer() {
-        this.setSetingHeight();
-      }
-    },
+    // watch: {
+    //   isSmallPlayer() {
+    //     this.setSetingHeight();
+    //   }
+    // },
     mounted() {
       this.chatServer = useChatServer();
       this.rewardServer = useWatchRewardServer();
@@ -142,15 +143,6 @@
           this.close();
         }
       },
-      // 长度判断修改
-      changeDes(e) {
-        const val = e.target.value;
-        if (val.length > 20) {
-          this.note = val.substr(0, 20);
-        } else {
-          this.note = val;
-        }
-      },
       // 金额选择
       chooseMoney(index, item) {
         for (const iterator of this.moneyList) {
@@ -168,24 +160,73 @@
         }
         this.btnMoney = '';
       },
-      // 金额校验
-      submit() {
-        const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^[0-9]\.[0-9]([0-9])?$)/;
-        const fee = this.money || this.btnMoney;
-        if (reg.test(fee)) {
-          this.rewardPay(fee);
+      textBlur() {},
+      // 输入金额校验
+      handleInput(e) {
+        let targetValue = e.target.value;
+        if (targetValue != '') {
+          let str = targetValue;
+          const len1 = str.substr(0, 1);
+          const len2 = str.substr(1, 1);
+          // 如果第一位是0，第二位不是点，就用数字把点替换掉
+          if (str.length > 1 && len1 == 0 && len2 != '.') {
+            str = str.substr(1, 1);
+          }
+          // 第一位不能是.
+          if (len1 == '.') {
+            str = '';
+          }
+          // 限制只能输入一个小数点
+          if (str.indexOf('.') != -1) {
+            const str_ = str.substr(str.indexOf('.') + 1);
+            if (str_.indexOf('.') != -1) {
+              str = str.substr(0, str.indexOf('.') + str_.indexOf('.') + 1);
+            }
+          }
+          // 正则替换，保留数字和小数点
+          // eslint-disable-next-line no-useless-escape
+          str = str.replace(/[^\d^\.]+/g, '');
+          // 如果需要保留小数点后两位，则用下面公式
+          if (str.indexOf('.') > -1 && str.length - str.indexOf('.') > 3) {
+            str = str.slice(0, str.indexOf('.') + 3);
+            this.$toast(this.$t('cash.cash_1034'));
+          }
+          this.money = str;
+          this.clearMoney();
         } else {
-          this.$toast(this.$t('interact_tools.interact_tools_1070'));
+          this.moneyList[0].active = true;
+          this.btnMoney = this.moneyList[0].value;
         }
       },
+      // 金额校验
+      checkoutGiveMoney(val) {
+        const isNum = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
+        if (isNum.test(Number(val))) {
+          return true;
+        } else {
+          this.$toast(this.$t('interact_tools.interact_tools_1070'));
+          return false;
+        }
+      },
+      submit() {
+        let _money = 0;
+        if (this.money) {
+          if (!this.checkoutGiveMoney(Number(this.money).toFixed(2))) return;
+          _money = Number(this.money).toFixed(2);
+        } else {
+          const selectBtn = this.moneyList.find(item => item.active);
+          _money = Number(selectBtn.value);
+        }
+        this.rewardPay(_money);
+      },
       /**
-     * @param {Number} type-1微信 2支付宝
-     * @return 返回 code：200，
-     * data：{  下面两个参数必有且只存在其一，jsApiParameters代表本页面唤起微信支付，前提是页面做了微信授权，url代表需要跳转页面支付
-     * jsApiParameters:{}
-     * url:''
-       }
-     */
+       * @param {Number} type-1微信 2支付宝
+       * @return 返回 code：200，
+       * data：{  下面两个参数必有且只存在其一，jsApiParameters代表本页面唤起微信支付，前提是页面做了微信授权，url代表需要跳转页面支付
+       * jsApiParameters:{}
+       * url:''
+         }
+      */
       rewardPay(money) {
         const open_id = sessionStorage.getItem('open_id');
         let params = {};
@@ -288,162 +329,115 @@
         this.note = '';
         this.money = '';
       },
-      //  * 计算 设置的弹层高度
-      setSetingHeight() {
-        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-        // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100;
-        this.popHeight =
-          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-      },
       // 打开打赏弹框
       showReward() {
-        // console.log(123123, this.localRoomInfo);
         if (!this.localRoomInfo.isLogin) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
           return;
         }
-        this.setSetingHeight();
+        this.chooseMoney(0, this.moneyList[0]);
+        this.note = '';
         this.showRewardCard = true;
       },
-      textBlur() {
-        // window.scroll(0, 0)
+      handleBlur() {
+        if (!this.money) {
+          this.moneyList[0].active = true;
+          this.btnMoney = this.moneyList[0].value;
+        }
       }
     }
   };
 </script>
 
 <style lang="less">
+  .reward-van-popup {
+    padding-bottom: 0 !important;
+  }
   .reward-wrap {
-    header {
-      position: relative;
-      font-size: 32px;
-      font-weight: 500;
-      color: rgba(68, 68, 68, 1);
-      letter-spacing: 3px;
-      text-align: center;
-      height: 90px;
-      line-height: 90px;
-      border-bottom: 1px solid rgba(212, 212, 212, 1);
-      i {
-        position: absolute;
-        top: 50%;
-        left: 94%;
-        transform: translate(-50%, -50%);
-        font-size: 27px;
-      }
+    height: 100%;
+    background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 90px 32px 40px;
+
+    @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 40px) !important;
     }
-    .title {
-      text-align: center;
-      font-size: 30px;
-      color: rgba(68, 68, 68, 1);
-      margin: 30px 0px;
+
+    .van-field {
+      border-radius: 8px;
     }
+
     ul {
       display: flex;
-      box-sizing: border-box;
-      padding: 0 30px;
+      align-items: center;
       justify-content: space-between;
       li {
-        width: 30%;
-        text-align: center;
-        display: inline-block;
-        height: 80px;
-        line-height: 78px;
-        color: #444444;
+        width: 218px;
+        height: 132px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1a1a1a;
         border-radius: 8px;
-        border: 1px solid #d4d4d4;
-        font-size: 36px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        font-size: 40px;
+        font-weight: 500;
         &.active {
-          color: white;
-          border-radius: 8px;
-          background-color: #fc5459;
-          border: 1px solid #fc5459;
+          background: rgba(255, 209, 201, 0.2);
+          border: 4px solid #fb2626;
+        }
+        .item {
+          font-size: 24px;
+          font-weight: 400;
         }
       }
     }
 
     .otherMoney,
     .notes {
-      margin: 30px;
-      padding: 0 30px;
-      height: 90px;
+      margin: 24px 0;
+      height: 80px;
       display: flex;
-      color: rgba(68, 68, 68, 1);
-      justify-content: space-between;
+      color: #8c8c8c;
       border-radius: 8px;
-      border: 1px solid #d4d4d4;
-      font-size: 30px;
-      > div {
-        input {
-          width: 100%;
-          height: 100%;
-          line-height: normal;
-        }
-        input[type='number']::-webkit-input-placeholder,
-        input[type='text']::-webkit-input-placeholder {
-          color: #a0a0a0;
-          font-size: 30px;
-        }
+      font-size: 28px;
+      input {
+        color: #262626;
       }
     }
 
-    .otherMoney {
-      > div {
-        height: 100%;
-        flex-grow: 1;
-      }
-    }
     .notes {
-      margin-bottom: 170px;
-      > div {
-        height: 100%;
-        width: 100%;
-        position: relative;
-        input {
-          padding-right: 120px;
-        }
-        .text-limit {
-          position: absolute;
-          line-height: 88px;
-          top: 0px;
-          right: 20px;
-          font-size: 30px;
-        }
+      input {
+        padding-right: 100px;
       }
-      .van-cell__value::v-deep {
-        padding-top: 4px;
-        background: #f5f5f5;
-        height: 100%;
-        .van-field__body {
-          height: 100%;
+      .text-limit {
+        position: absolute;
+        line-height: 80px;
+        top: 0px;
+        right: 20px;
+        font-size: 28px;
+        color: rgba(89, 89, 89, 0.8);
+        .text-ful {
+          color: rgba(251, 38, 38, 0.8);
         }
-        .van-field__word-limit {
-          margin-top: -24px;
+        .text-can {
+          color: rgba(59, 153, 247, 0.8);
         }
       }
     }
-    footer {
+    .btn {
       width: 100%;
-      position: fixed;
-      bottom: 40px;
-      padding: 0 30px;
-      background: white;
-      margin-top: 30px;
-      z-index: 99;
-      button {
-        width: 100%;
-        height: 94px;
-        background: rgba(252, 84, 89, 1);
-        border-radius: 10px;
-        font-size: 36px;
-        font-family: PingFangSC;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 1);
-        line-height: 94px;
-        text-align: center;
-      }
+      height: 80px;
+      background: #fb2626;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      margin-top: 60px;
     }
   }
 </style>
