@@ -342,9 +342,9 @@
       },
       // 初始化直播房间
       initSendLive(params) {
-        const { token } = this.$route.query;
-        if (token) {
-          localStorage.setItem('token', token);
+        const { assistant_token } = this.$route.query;
+        if (assistant_token) {
+          localStorage.setItem('token', assistant_token);
         }
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction'],
