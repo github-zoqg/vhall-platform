@@ -824,7 +824,7 @@
         &.top_menu {
           .vmp-tab-menu__header {
             position: fixed;
-            top: 493px;
+            top: 489px;
             z-index: 10;
             background: #fff;
           }
@@ -832,7 +832,7 @@
         &.embed_menu {
           .vmp-tab-menu__header {
             position: fixed;
-            top: 422px;
+            top: 418px;
             z-index: 10;
             background: #fff;
           }
