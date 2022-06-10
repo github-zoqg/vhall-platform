@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-body">
+  <div class="vmp-wap-body" :class="wapBodyClass" v-show="isShowWapBody">
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd"
@@ -53,7 +53,8 @@
     useRoomBaseServer,
     useMediaCheckServer,
     useMicServer,
-    useInteractiveServer
+    useInteractiveServer,
+    useMenuServer
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
@@ -68,6 +69,48 @@
       };
     },
     computed: {
+      // 选中的自定义菜单的 type
+      menuSelectedType() {
+        return this.$domainStore.state.menuServer.selectedType;
+      },
+      isShowWapBody() {
+        // 如果文档和播放器切换并且自定义菜单选中的不是文档
+        if (this.isWapBodyDocSwitch) {
+          return this.menuSelectedType == 2;
+        }
+        return true;
+      },
+      wapBodyClass() {
+        if (this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-wap-body__bottom';
+        }
+        if (!this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-wap-body__bottom-noheader';
+        }
+        return '';
+      },
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -97,6 +140,7 @@
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
+      this.menuServer = useMenuServer();
     },
     async created() {
       if (
@@ -258,6 +302,24 @@
   .vmp-wap-body {
     position: relative;
     height: 100%;
+    &__bottom {
+      position: fixed;
+      left: 0;
+      top: 573px;
+      width: 100%;
+      height: 422px;
+      z-index: 1;
+      overflow: hidden;
+    }
+    &__bottom-noheader {
+      position: fixed;
+      left: 0;
+      top: 502px;
+      width: 100%;
+      height: 422px;
+      z-index: 1;
+      overflow: hidden;
+    }
     &-ending {
       background-repeat: no-repeat;
       background-size: 100% 100%;
