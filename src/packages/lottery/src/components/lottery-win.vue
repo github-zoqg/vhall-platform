@@ -86,17 +86,21 @@
     .win-lottery-title {
       font-size: 32px;
       line-height: 45px;
-      color: #ffffff;
+      color: #fff;
       font-weight: 500;
       margin-top: 32px;
-      // padding-left: 20px;
     }
     .win-lottery-desc {
+      display: inline-block;
+      width: 272px;
       font-size: 16px;
       line-height: 22px;
-      color: #ffffff;
+      color: #fff;
       margin-top: 5px;
       padding-left: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .lottery-accept-btn {
       width: 160px;
