@@ -70,9 +70,10 @@
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
-          <span @click="changePlayerSize(true)">
+          <span @click="changePlayerSize(true)" v-if="isAudio">
             <i class="vh-iconfont vh-line-arrow-left"></i>
           </span>
+          <span v-else></span>
           <span>
             <span class="hot_num">
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
@@ -487,6 +488,7 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
+        if (this.isSubscribe) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
