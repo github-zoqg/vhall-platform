@@ -8,7 +8,10 @@
     class="qa_popup"
     get-container="body"
   > -->
-    <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
+    <span class="close-btn" @click="close">
+      <i class="vh-iconfont vh-line-close"></i>
+    </span>
+
     <!-- 问卷标题 -->
     <div id="qs-content-box"></div>
   </div>
@@ -171,13 +174,21 @@
   }
   .close-btn {
     position: fixed;
-    color: black;
-    font-size: 60px;
-    width: 50px;
-    height: 50px;
-    top: 50px;
-    right: 50px;
+    width: 48px;
+    height: 48px;
+    top: 16px;
+    right: 16px;
     z-index: 30;
+    border-radius: 28px;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .vh-iconfont {
+      margin-top: 2px;
+      color: #fff;
+      font-size: 25px;
+    }
   }
   .title-bar {
     position: relative;
@@ -233,6 +244,10 @@
     background: #fff;
     height: 100%;
     overflow: auto;
+    .vhall-question-title {
+      max-height: 2.3rem;
+      height: auto;
+    }
   }
   .quest-header {
     z-index: 99;

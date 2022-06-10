@@ -155,7 +155,7 @@
           img_type: 0, // 背景选中样式
           avatar: ''
         },
-        invite_qr_url: `//aliqr.e.vhall.com/qr.png?t=https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/watch/${this.$route.params.id}`,
+        invite_qr_url: `//aliqr.e.vhall.com/qr.png?s=7&t=https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/watch/${this.$route.params.id}`,
         canvasImgUrl: '',
         nickname: ''
       };

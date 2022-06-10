@@ -193,7 +193,6 @@ export default {
     login_1030: 'Consentimiento y cumplimiento',
     login_1031: 'Condiciones de servicio'
   },
-  undefined: {},
   register: {
     register_1001: 'Bienvenida a registrarse Vhall en vivo',
     register_1002: 'Registrar un nuevo usuario',
