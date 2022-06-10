@@ -376,7 +376,7 @@
       isShowDownMicBtn() {
         return (
           (this.joinInfo.role_name == 1 && this.stream.accountId != this.groupLeaderId) ||
-          (this.isInGroup ? this.groupRole == 20 : this.stream.roleName != 1)
+          (this.isInGroup && this.groupRole == 20 && this.stream.roleName != 1)
         );
       },
       isShowSetMainScreenBtn() {
