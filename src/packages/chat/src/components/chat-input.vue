@@ -363,7 +363,12 @@
         if (this.inputStatus.disable) {
           return;
         }
-        this.inputValue += val;
+        const resultVal = this.inputValue + val;
+        // 选择表情，判断添加后是否会超出 140 ，如果超出不能输入
+        if (resultVal.length > 140) {
+          return;
+        }
+        this.inputValue = resultVal;
       },
       //获取输入上传的图片
       getUploadImg() {

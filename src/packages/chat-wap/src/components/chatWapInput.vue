@@ -199,11 +199,12 @@
       }, */
       //选中表情
       inputEmoji(item = {}) {
-        this.inputValue += item.name;
-        // if (this.inputValue.length > 140) {
-        //   this.inputValue = this.inputValue.substring(0, 140);
-        // }
-        // this.showEmoji = false;
+        // 添加表情之后如果会超出 140 ，就不输入了
+        const resultVal = this.inputValue + item.name;
+        if (resultVal.length > 140) {
+          return;
+        }
+        this.inputValue = resultVal;
       },
       closeSendBox() {
         this.visible = false;
