@@ -158,6 +158,10 @@
               //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
               _this.updateOnlineUserList();
               break;
+            case 'group_switch_proceed':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
+              _this.updateOnlineUserList();
+              break;
             default:
               break;
           }
@@ -326,6 +330,10 @@
           }
         } catch (e) {
           console.log(e);
+        }
+        // 不在小组中，并且join消息的人是在小组中的，不处理
+        if (!this.groupInitData.isInGroup && info.context.groupInitData.isInGroup) {
+          return;
         }
         const temp = {
           account_id: info.sender_id,

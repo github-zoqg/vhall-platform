@@ -789,6 +789,10 @@
                   _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 }
               } else {
+                //在主房间，但是是分组内成员上线
+                if (context?.groupInitData?.isInGroup) {
+                  return;
+                }
                 const user = {
                   account_id: msg.sender_id,
                   avatar: context.avatar,
