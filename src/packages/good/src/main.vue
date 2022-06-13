@@ -97,7 +97,7 @@
         if (!wrap) return;
         console.log('商品.....');
         if (this.isSubscribe) {
-          window.addEventListener('scroll', this.scrollLoadGoodsList);
+          window.addEventListener('scroll', this.scrollLoadGoodsList, true);
         } else {
           wrap.addEventListener('scroll', this.scrollLoadGoodsList);
         }
