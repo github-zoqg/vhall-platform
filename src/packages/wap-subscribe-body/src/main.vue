@@ -49,7 +49,7 @@
           <time-down ref="timeDowner"></time-down>
         </template>
         <template v-else>
-          <p class="vod_title">{{ $t('player_1026') }}</p>
+          <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
         <div
           class="subscribe_into_container"
