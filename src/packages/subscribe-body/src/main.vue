@@ -13,10 +13,15 @@
             class="subscribe-img-box"
             v-for="item in subscribeWarmList"
             :key="item"
-            v-show="item == playIndex"
+            :style="{ zIndex: item == warmUpVideoList[playIndex] ? 1 : 0 }"
+            v-show="item == warmUpVideoList[playIndex]"
           >
             <!-- 完成验证、并且有暖场视频 加载播放器 第一个播放器-->
-            <!-- <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container> -->
+            <vmp-air-container
+              cuid="comPcPlayer"
+              :oneself="true"
+              :warmId="item"
+            ></vmp-air-container>
           </div>
         </template>
       </div>

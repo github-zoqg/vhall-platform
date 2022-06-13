@@ -14,11 +14,7 @@
     @mouseleave="wrapLeave"
   >
     <div
-      :id="
-        warmUpVideoList.length <= 1 || isLiving
-          ? 'vmp-player'
-          : `vmp-player-vod_${warmUpVideoList[playIndex + 1]}`
-      "
+      :id="isLiving ? 'vmp-player' : `vmp-player-vod_${subscribeWarmList[initIndex]}`"
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -301,7 +297,10 @@
     components: {
       controlEventPoint
     },
+    props: ['warmId'],
     data() {
+      const initIndex = this.playerServer.state.initIndex;
+      console.log('-----------initIndex--------=========', initIndex);
       return {
         loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
@@ -348,13 +347,14 @@
           progress_bar: 0,
           speed: 0,
           autoplay: false
-        } //播放器配置
+        }, //播放器配置
+        initIndex
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.playerServer = usePlayerServer();
       this.subscribeServer = useSubscribeServer();
+      this.playerServer = usePlayerServer({ extra: true });
     },
     beforeDestroy() {
       this.playerServer.destroy();
@@ -371,10 +371,6 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
-      },
-      // 初始化播放器第几个
-      initIndex() {
-        return this.$domainStore.state.playerServer.initIndex;
       },
       // 播放第几个
       playIndex() {
@@ -450,6 +446,7 @@
     },
     created() {
       if (this.isShowContainer) return;
+
       const { agreement } = this.roomBaseServer.state.watchInitData;
       this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
       this.getWebinerStatus();
@@ -472,7 +469,7 @@
           videoNode:
             this.warmUpVideoList.length <= 1 || this.isLiving
               ? 'vmp-player'
-              : `vmp-player-vod_${this.warmUpVideoList[this.playIndex + 1]}`
+              : `vmp-player-vod_${this.subscribeWarmList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -550,6 +547,8 @@
         }
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
+          console.log(params, '播放器初始化成功123');
+          this.playerServer.openControls(false);
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents();
           this.getListenPlayer();
@@ -777,7 +776,7 @@
             if (this.warmUpVideoList.length) {
               this.vodType = 'warm';
               this.isWarnPreview = true;
-              this.optionTypeInfo('vod', this.warmUpVideoList[this.playIndex + 1]);
+              this.optionTypeInfo('vod', this.subscribeWarmList[this.initIndex]);
             }
           }
           // let _id = warmup.warmup_paas_record_id
@@ -916,6 +915,9 @@
         height: 100% !important;
         object-fit: scale-down !important;
       }
+    }
+    .vhallPlayer-container {
+      z-index: -10 !important;
     }
     #vhy-danmaku-wrapbox {
       z-index: 1;

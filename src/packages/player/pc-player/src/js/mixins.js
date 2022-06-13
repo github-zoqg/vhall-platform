@@ -112,11 +112,15 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
+        debugger;
+        if (this.warmUpVideoList.length > 1 && this.initIndex > this.playIndex) return;
         if (!this._isFirstInit) {
           this._isFirstInit = true;
           if (this.warmUpVideoList.length > 1) {
             this.playerServer.state.initIndex++;
-            this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+            this.playerServer.setWarmVideoList(
+              this.warmUpVideoList[this.playerServer.state.initIndex]
+            );
           }
         }
       });
@@ -132,14 +136,13 @@ const playerMixins = {
         // TODO: 如果是暖场视频
         if (this.isWarnPreview) {
           if (this.initIndex != this.playIndex) {
-            // this.playIndex = this.initIndex;
             this.playerServer.setPlayIndex(this.initIndex);
             if (this.initIndex < this.warmUpVideoList.length) {
               this.playerServer.initIndex++;
-              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.playerServer.initIndex]);
             } else {
               this.playerServer.initIndex = 0;
-              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+              this.playerServer.setWarmVideoList(this.warmUpVideoList[this.playerServer.initIndex]);
             }
           }
         } else {
