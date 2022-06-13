@@ -7,7 +7,7 @@
         :cuid="childrenCom[2]"
         :oneself="true"
       ></vmp-air-container>
-      <div v-if="componentName == 'Doc'" class="embed-doc-box">
+      <div v-if="componentName == 'Doc'" class="embed-doc-box" style="height: 100%">
         <!-- 文档 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
         <!-- 文档列表 -->
