@@ -562,9 +562,12 @@
           .vh-goods_item-info {
             width: 250px;
           }
-          &:nth-child(3n + 2) {
-            margin: 0px 16px;
+          &:nth-child(2n) {
+            margin-left: 16px;
           }
+          /* &:nth-child(3n + 2) {
+            margin: 0px 16px;
+          } */
         }
       }
     }
