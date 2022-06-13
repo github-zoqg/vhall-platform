@@ -65,11 +65,16 @@
       }
       .nickname {
         float: left;
+        width: 550px;
         height: 56px;
         margin-left: 16px;
         font-size: 28px;
         line-height: 56px;
         color: #1a1a1a;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }
