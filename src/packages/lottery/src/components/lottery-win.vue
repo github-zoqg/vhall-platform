@@ -101,6 +101,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: center;
     }
     .lottery-accept-btn {
       width: 160px;
