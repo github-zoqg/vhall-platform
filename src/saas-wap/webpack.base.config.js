@@ -17,7 +17,11 @@ const htmlConfig = {
     jsCookie: '//s1.e.vhall.com/common-static/middle/js-cookie/3.0.1/js.cookie.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
 
-    // Vant: '//s1.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
+    // 通过s3域名加载
+    // Vant: '//s3.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
+    loadLazyWap: '//s3.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
+
+    // 可以延迟加载的
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
     jsencrypt:
