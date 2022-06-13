@@ -112,7 +112,6 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
-        debugger;
         if (this.warmUpVideoList.length > 1 && this.initIndex > this.playIndex) return;
         if (!this._isFirstInit) {
           this._isFirstInit = true;
