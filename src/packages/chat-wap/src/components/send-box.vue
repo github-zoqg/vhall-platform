@@ -352,7 +352,7 @@
         if (
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (this.groupInitData.is_banned && this.groupInitData.isInGroup) ||
+          (this.groupInitData.is_banned == 1 && this.groupInitData.isInGroup) ||
           this.isMuted
         ) {
           return;
