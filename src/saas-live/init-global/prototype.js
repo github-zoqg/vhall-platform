@@ -7,7 +7,6 @@ import moment from 'moment';
 window.$globalConfig = globalConfig;
 // TODO 暂时保留
 window.$serverConfig = serverConfig;
-
 // 初始化全局变量挂载的 vue 实例上
 Vue.prototype.$moment = moment;
 

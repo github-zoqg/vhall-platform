@@ -313,6 +313,7 @@
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
+        console.log('widget', this.cuid, window.$serverConfig);
         if (widget && widget.options) {
           this.chatOptions = widget.options;
         }

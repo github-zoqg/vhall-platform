@@ -2,7 +2,11 @@
   <div class="publish-wrap">
     <div v-if="roomStatus.show" class="vh-embed-live">
       <!-- 聊天 -->
-      <vmp-chat v-if="componentName == 'Chat'"></vmp-chat>
+      <vmp-air-container
+        v-if="componentName == 'Chat'"
+        :cuid="childrenCom[2]"
+        :oneself="true"
+      ></vmp-air-container>
       <div v-if="componentName == 'Doc'" class="embed-doc-box">
         <!-- 文档 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
@@ -72,17 +76,17 @@
       if (this.assistantType == 'doc') {
         this.componentName = 'Doc';
         // TODO: 待优化 dom按时无法获取
-        let dom = document.getElementsByClassName('embed-doc-box')[0];
-        if (!dom) {
-          let timer = setInterval(() => {
-            this.$nextTick(() => {
-              console.log(document.getElementsByClassName('embed-doc-box')[0], 'embed-doc-box');
-            });
-            document.getElementsByClassName('embed-doc-box')[0].style.height =
-              window.innerHeight + 'px';
-            clearInterval(timer);
-          }, 500);
-        }
+        // let dom = document.getElementsByClassName('embed-doc-box')[0];
+        // if (!dom) {
+        //   let timer = setInterval(() => {
+        //     this.$nextTick(() => {
+        //       console.log(document.getElementsByClassName('embed-doc-box')[0], 'embed-doc-box');
+        //     });
+        //     document.getElementsByClassName('embed-doc-box')[0].style.height =
+        //       window.innerHeight + 'px';
+        //     clearInterval(timer);
+        //   }, 500);
+        // }
       } else if (this.assistantType == 'chat') {
         this.componentName = 'Chat';
       } else if (this.assistantType == 'tools') {
