@@ -226,15 +226,17 @@
       min-height: 310px;
       position: fixed;
       left: 50%;
-      margin-left: -300px;
+      // margin-left: -300px;
       top: 50%;
+      left: 50%;
       max-height: 80%;
       overflow: auto;
-      margin-top: -200px;
+      // margin-top: -200px;
       background: #fff;
       border-radius: 6px;
       z-index: 777;
       padding: 10px 0;
+      transform: translate(-50%, -50%);
 
       .payment-title {
         font-weight: 500;

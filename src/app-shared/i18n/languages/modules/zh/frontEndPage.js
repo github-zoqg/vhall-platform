@@ -70,7 +70,8 @@ export default {
     player_1022: '播放',
     player_1023: '调整播放时间失败',
     player_1024: '设置当前时间失败,请稍后重试',
-    player_1025: '正常'
+    player_1025: '正常',
+    player_1026: '直播回放中'
   },
   appointment: {
     appointment_1001: '白名单验证',
