@@ -7,8 +7,13 @@
         prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
       }}”
     </p>
-    <div class="lottery-accept-btn" @click="acceptLottery">
+    <!-- 领奖 -->
+    <div v-if="needTakeAward" class="lottery-accept-btn" @click="acceptLottery">
       {{ $t('interact_tools.interact_tools_1017') }}
+    </div>
+    <!-- 中奖列表 -->
+    <div v-else-if="showWinnerList" class="lottery-accept-btn" @click="navToWinnerList">
+      {{ $t('interact_tools.interact_tools_1012') }}
     </div>
     <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close" />
   </div>
@@ -26,6 +31,18 @@
         type: Object,
         default() {
           return {};
+        }
+      },
+      needTakeAward: {
+        type: Boolean,
+        default() {
+          return true;
+        }
+      },
+      showWinnerList: {
+        type: Boolean,
+        default() {
+          return false;
         }
       }
     },
@@ -45,12 +62,15 @@
       },
       acceptLottery() {
         this.$emit('navTo', 'LotteryAccept');
+      },
+      navToWinnerList() {
+        this.$emit('navTo', 'LotteryWinner');
       }
     }
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .win-lottery-wrapper {
     width: 424px;
     height: 436px;
@@ -66,17 +86,21 @@
     .win-lottery-title {
       font-size: 32px;
       line-height: 45px;
-      color: #ffffff;
+      color: #fff;
       font-weight: 500;
       margin-top: 32px;
-      padding-left: 20px;
     }
     .win-lottery-desc {
+      display: inline-block;
+      width: 272px;
       font-size: 16px;
       line-height: 22px;
-      color: #ffffff;
+      color: #fff;
       margin-top: 5px;
       padding-left: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .lottery-accept-btn {
       width: 160px;

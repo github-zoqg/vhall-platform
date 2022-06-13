@@ -1,88 +1,75 @@
 <template>
-  <div class="lottery-list">
-    <div class="award-info">
-      <img :src="prizeInfo.image_url || defaultLotteryImg" alt="" />
-    </div>
-    <span>{{ prizeInfo.award_name }}</span>
-    <div class="table-title">{{ $t('interact_tools.interact_tools_1020') }}</div>
-    <div class="table-content">
-      <div class="lottery-user" v-for="(item, index) in winnerList" :key="index">
-        <img :src="item.lottery_user_avatar || defaultAvatar" alt />
-        <span>{{ item.lottery_user_nickname }}</span>
-      </div>
+  <div class="lottery-winner-list">
+    <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
+    <div class="winner-content">
+      <ul class="lottery-winner-wrap">
+        <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
+          <img class="avatar" :src="item.lottery_user_avatar || defaultAvatar" alt />
+          <p class="nickname">{{ item.lottery_user_nickname }}</p>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import props from './props';
+  import LotteryTitle from './lottery-title.vue';
   export default {
     name: 'LotteryWinner',
     mixins: [props],
+    components: {
+      LotteryTitle
+    },
     data() {
       return {
-        defaultAvatar: require('../img/avatar_min.png')
+        defaultAvatar
       };
     }
   };
 </script>
 <style lang="less">
-  .lottery-list {
-    font-size: 32px;
-    color: #222;
+  .lottery-winner-list {
+    padding: 40px 0 32px;
     text-align: center;
-    font-family: PingFangSC-Regular, PingFang SC;
-    font-weight: 400;
-    .award-info {
-      width: 120px;
-      height: 120px;
-      border-radius: 100px;
-      background: #eaeaea;
-      margin: 0px auto;
-      margin-bottom: 32px;
-      text-align: center;
-      img {
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-        border-radius: 100px;
-      }
-    }
-    .table-title {
-      box-sizing: border-box;
-      width: 100%;
-      height: 70px;
-      line-height: 70px;
-      text-align: center;
-      font-size: 28px;
-      border-top-right-radius: 16px;
-      border-top-left-radius: 16px;
-      background: #f5f5f5;
-      margin-top: 28px;
-      margin-bottom: 2px;
-    }
-    .table-content {
-      height: 320px;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      overflow-y: scroll;
+    background: linear-gradient(53.35deg, #fdf1ed 14.39%, #f3f2ff 104%);
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    .winner-content {
+      overflow-y: auto;
       touch-action: pan-y;
-      background: #f5f5f5;
-      .lottery-user {
-        width: 100%;
-        height: 80px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        box-sizing: border;
-        padding: 8px 20px;
-        font-size: 22px;
-        img {
-          display: inline-block;
-          width: 64px;
-          height: 64px;
-          border-radius: 32px;
-          margin-right: 16px;
-        }
+      margin-top: 37px;
+      padding: 0 24px;
+    }
+    .lottery-winner-wrap {
+      height: 440px;
+      background: rgba(#fff, 0.8);
+      border-radius: 16px;
+      overflow: auto;
+    }
+    .lottery-user {
+      height: 87px;
+      margin: 0 32px;
+      padding: 16px 0;
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(#fcc7c7, 0.6);
+      }
+      &:after {
+        clear: left;
+      }
+      .avatar {
+        float: left;
+        display: block;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+      }
+      .nickname {
+        float: left;
+        height: 56px;
+        margin-left: 16px;
+        font-size: 28px;
+        line-height: 56px;
+        color: #1a1a1a;
       }
     }
   }

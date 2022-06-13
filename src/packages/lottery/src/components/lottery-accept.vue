@@ -1,5 +1,11 @@
 <template>
-  <div :class="['lottery-winner-info', isEmbed ? 'lottery-winner-embed-info' : '']">
+  <div
+    :class="[
+      'lottery-winner-info',
+      isEmbed ? 'lottery-winner-embed-info' : '',
+      longForm ? 'big' : ''
+    ]"
+  >
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
@@ -9,7 +15,7 @@
           v-model="reciveInfo[item.field_key]"
           :placeholder="$tdefault(item.placeholder)"
           maxlength="200"
-          @keyup.native.stop="foo()"
+          @keyup.native.stop="noop()"
           @input.native="handleInput(item.field_key)"
         ></el-input>
         <textarea
@@ -20,12 +26,12 @@
           rows="2"
           class="address-textarea"
           maxlength="200"
-          @keyup.stop="foo"
+          @keyup.stop="noop"
         ></textarea>
       </el-form-item>
     </el-form>
     <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p>
-    <div class="winner-info__submit-btn" @click="postWinnerInfo">
+    <div :class="['winner-info__submit-btn', verified ? '' : 'disabled']" @click="postWinnerInfo">
       {{ $t('interact_tools.interact_tools_1019') }}
     </div>
     <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
@@ -36,7 +42,6 @@
   /**
    * @description 领奖页面(大部分逻辑复用saas)
    */
-  import OverlayScrollbars from 'overlayscrollbars';
   import LotteryHeader from './lottery-header';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
@@ -65,26 +70,33 @@
         // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
         const { embedObj } = this.roomBaseServer.state;
         return embedObj.embed && !embedObj.embedVideo;
+      },
+      longForm() {
+        return this.stepHtmlList.length > 3;
       }
     },
     data() {
       return {
         stepHtmlList: [],
         reciveInfo: {},
-        overlayScrollbar: null,
-        osComponentOptions: {
-          resize: 'none',
-          paddingAbsolute: true,
-          className: 'os-theme-light os-theme-vhall',
-          scrollbars: {
-            autoHide: 'leave',
-            autoHideDelay: 200
-          },
-          overflowBehavior: {
-            x: 'hidden'
-          }
-        }
+        verified: false // 提交按钮状态
       };
+    },
+    watch: {
+      reciveInfo: {
+        deep: true,
+        handler(info) {
+          let relt = true;
+          this.stepHtmlList.forEach(ele => {
+            if (ele.is_required == 1) {
+              if (info[ele.field_key] == '' || info[ele.field_key].trim() == '') {
+                relt = false;
+              }
+            }
+          });
+          this.verified = relt;
+        }
+      }
     },
     async created() {
       await this.initStepHtmlList();
@@ -93,12 +105,7 @@
         retReciveInfo[element.field_key] = '';
       });
       this.reciveInfo = retReciveInfo;
-      // await this.$nextTick();
-      // this.overlayScrollbarInit();
     },
-    // mounted() {
-    //   // 滚动条初始化
-    // },
     methods: {
       async initStepHtmlList() {
         await this.lotteryServer.getDrawPrizeInfo().then(res => {
@@ -111,21 +118,7 @@
         }
       },
       // 空函数，阻止输入框空格按键事件冒泡，触发播放器暂停/播放
-      foo() {},
-      // 滚动条初始化
-      overlayScrollbarInit() {
-        this.$nextTick(() => {
-          console.log(document.getElementById('address-textarea'));
-          this.overlayScrollbar = OverlayScrollbars(document.getElementById('address-textarea'), {
-            paddingAbsolute: true,
-            className: 'os-theme-light os-theme-vhall',
-            scrollbars: {
-              autoHide: 'leave',
-              autoHideDelay: 200
-            }
-          });
-        });
-      },
+      noop() {},
       close() {
         this.$emit('close');
       },
@@ -166,45 +159,43 @@
       // 提交领奖人信息
       postWinnerInfo() {
         // 表单校验
-        if (this.validateWinnerInfo()) {
-          const lotteryUserRemark = [];
-          this.stepHtmlList.forEach(ele => {
-            if (ele.field_key != 'name' && ele.field_key != 'phone') {
-              ele.field_value = this.reciveInfo[ele.field_key];
-              lotteryUserRemark.push(ele);
-            }
+        if (!this.validateWinnerInfo()) return false;
+        const lotteryUserRemark = [];
+        this.stepHtmlList.forEach(ele => {
+          if (ele.field_key != 'name' && ele.field_key != 'phone') {
+            ele.field_value = this.reciveInfo[ele.field_key];
+            lotteryUserRemark.push(ele);
+          }
+        });
+        const failure = err => {
+          this.$message({
+            message: err.msg,
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
           });
-          this.lotteryServer
-            .acceptPrize({
-              lottery_id: this.lotteryId,
-              lottery_user_name: this.reciveInfo.name,
-              lottery_user_phone: this.reciveInfo.phone,
-              lottery_user_remark: JSON.stringify(lotteryUserRemark)
-            })
-            .then(res => {
-              if (res.code === 200) {
-                this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
-                this.$nextTick(() => {
-                  this.$emit('navTo', 'LotterySuccess');
-                });
-              } else {
-                this.$message({
-                  message: res.msg,
-                  showClose: true,
-                  type: 'error',
-                  customClass: 'zdy-info-box'
-                });
-              }
-            })
-            .catch(err => {
-              this.$message({
-                message: err.msg,
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
+        };
+        this.lotteryServer
+          .acceptPrize({
+            lottery_id: this.lotteryId,
+            lottery_user_name: this.reciveInfo.name,
+            lottery_user_phone: this.reciveInfo.phone,
+            lottery_user_remark: JSON.stringify(lotteryUserRemark)
+          })
+          .then(res => {
+            if (res.code === 200) {
+              this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
+              this.lotteryServer.initIconStatus();
+              this.$nextTick(() => {
+                this.$emit('navTo', 'LotterySuccess');
               });
-            });
-        }
+            } else {
+              failure(res);
+            }
+          })
+          .catch(err => {
+            failure(err);
+          });
       }
     }
   };
@@ -235,6 +226,9 @@
       overflow-x: hidden;
       .el-form-item__content {
         line-height: 0;
+        overflow: hidden;
+
+        border-radius: 4px;
       }
       .el-form-item {
         margin-bottom: 8px;
@@ -245,7 +239,6 @@
       .el-input__inner {
         height: 36px;
         background: rgba(254, 239, 228, 0.9);
-        border-radius: 4px;
         padding-left: 22px;
         border: none;
         &:hover {
@@ -262,11 +255,10 @@
         }
       }
       .address-textarea {
-        width: 235px;
+        width: 236px;
         height: 44px;
         line-height: 20px;
         background: rgba(254, 239, 228, 0.9);
-        border-radius: 4px;
         border-color: transparent;
       }
       #address-textarea {
@@ -297,9 +289,18 @@
         overflow: visible !important;
       }
     }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 2px;
+    }
   }
-</style>
-<style lang="less" scoped>
+
   .lottery-winner-info {
     width: 424px;
     height: 463px;
@@ -313,9 +314,11 @@
     align-items: center;
     position: relative;
     .winner-info-form {
-      width: 260px;
+      box-sizing: border-box;
+      width: 268px; //
       // height: 150px;
       margin-top: 24px;
+      padding: 0 4px; // 左右4px给滚动条
       .required-flag {
         position: absolute;
         color: #666666;
@@ -346,10 +349,17 @@
       left: 50%;
       transform: translateX(-80px);
       font-size: 14px;
+      &.disabled {
+        opacity: 0.7;
+        pointer-events: none;
+      }
     }
     &.big {
       background: url(../img/bg-winner-info-big.png);
       height: 507px;
+      .winner-info-form {
+        max-height: 196px;
+      }
     }
   }
   @media screen and (max-height: 580px) {
