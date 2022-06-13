@@ -832,7 +832,6 @@
         }
       }
       .subscribe_tabs {
-        height: 100%;
         &.top_menu {
           .vmp-tab-menu__header {
             position: fixed;
@@ -850,17 +849,25 @@
           }
         }
         .tab-content {
-          height: 100%;
+          height: auto;
           position: initial;
           .vmp-tab-menu {
             position: initial;
-            height: 100%;
+            height: auto;
             .vmp-intro {
               height: auto;
             }
             .vmp-tab-container {
-              height: 100%;
+              height: auto;
             }
+          }
+          .vh-goods-wrapper {
+            overflow: hidden;
+            height: auto;
+          }
+          .vmp-recommend {
+            overflow: hidden;
+            height: auto;
           }
         }
       }
