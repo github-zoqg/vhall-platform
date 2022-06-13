@@ -69,7 +69,8 @@ export default {
     player_1022: 'Play',
     player_1023: 'Failed to adjust the playback time',
     player_1024: 'Failed to set the time. Please try again later',
-    player_1025: 'normal'
+    player_1025: 'normal',
+    player_1026: 'replaying'
   },
   appointment: {
     appointment_1001: 'Whitelist verification',
@@ -539,7 +540,7 @@ export default {
     message_1007: 'You have been banned from accessing the current event!',
     message_1008: 'The event is hit and the upper limit of audience has been exceeded!',
     message_1009:
-      'Participating in the event as a host and cannot watch it.\nRecommend to clear the browser cookies before visiting~',
+      'Participating in the event as a host and cannot watch it.\r\nRecommend to clear the browser cookies before visiting~',
     message_1010: 'The network is running short',
     message_1011:
       'Your IE browser version is outdated, please upgrade to version IE10 and above. Recommend to use Chrome browser~',
@@ -580,9 +581,9 @@ export default {
     cash_1009:
       'Amount ranging from 1 to 800 Yuan can be withdrawn online at one time. At the request of State Taxation Administration, single withdrawal of more than 800 Yuan by individual users will incur personal income tax. Please send the following information to finance@vhall.com.',
     cash_1010:
-      'Individual users: System account, name, ID number,\nBanking information (account holder, account number, bank name)',
+      'Individual users: System account, name, ID number,\r\nBanking information (account holder, account number, bank name)',
     cash_1011:
-      'Corporate users: Scanned copy of System account and business license with official seal\nBanking information (account holder, account number, bank name)',
+      'Corporate users: Scanned copy of System account and business license with official seal\r\nBanking information (account holder, account number, bank name)',
     cash_1012:
       'Company/personal information and banking information must correspond with each other',
     cash_1013: 'Does the withdraw occur any charge, and if yes, how much?',
