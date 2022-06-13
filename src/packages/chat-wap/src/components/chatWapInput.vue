@@ -159,15 +159,15 @@
         EventBus.$emit('showSendBox', false);
         this.$emit('sendMsg', inputValue);
         this.cancel();
-        this.$nextTick(() => {
-          this.$refs.textareaChat.blur();
-        });
       },
       //取消
       cancel() {
         this.inputValue = '';
         this.showEmoji = false;
         this.visible = false;
+        this.$nextTick(() => {
+          this.$refs.textareaChat.blur();
+        });
       },
       //处理失去焦点
       handleOnBlur() {
