@@ -15,8 +15,14 @@
           interact_token: interactToken
         }"
       >
-        <div v-if="canvasImgUrl" class="picture-uploader-view">
-          <img class="picture-uploader-img" :src="canvasImgUrl" alt="" />
+        <div ref="uploaderView" v-if="canvasImgUrl" class="picture-uploader-view">
+          <el-image
+            :key="'defaultImg' + rand"
+            class="picture-uploader-img"
+            :src="canvasImgUrl"
+            alt=""
+            lazy
+          ></el-image>
           <p class="picture-uploader-controller-panel">
             <span class="icon-wrap-con icon-wrap-change" :class="{ 'icon-wrap-only': !showDelImg }">
               <i class="vh-iconfont vh-line-refresh-right"></i>
@@ -53,7 +59,8 @@
         interactToken: null,
         baseUrl: process.env.VUE_APP_BASE_URL,
         hasUploadImg: false,
-        showDelImg: false
+        showDelImg: false,
+        rand: ''
       };
     },
     created() {
@@ -99,6 +106,14 @@
       onRemove() {
         this.showDelImg = false;
         this.$emit('update:canvasImgUrl', canvasDefaultImg);
+      },
+      selected() {
+        if (
+          this.$refs['uploaderView'] &&
+          this.$refs['uploaderView'].getElementsByTagName('img').length === 0
+        ) {
+          this.rand = (Math.random() * 10000000).toFixed(0);
+        }
       }
     }
   };

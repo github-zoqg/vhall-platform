@@ -246,7 +246,7 @@
       -webkit-line-clamp: 2;
       line-clamp: 2;
       text-align: left;
-      /**autoprefixer: ignore next */
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       max-height: 200px;
     }

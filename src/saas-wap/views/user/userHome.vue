@@ -764,9 +764,8 @@
       display: -moz-inline-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
-      /* autoprefixer: off */
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
-      /* autoprefixer: on */
       word-break: break-all;
     }
     .v-info {

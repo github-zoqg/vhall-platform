@@ -2,7 +2,7 @@
   <div class="vmp-img-stream">
     <img
       ref="capImage"
-      :src="canvasImg"
+      src=""
       alt="图片源"
       crossorigin="anonymous"
       style="margin-right: 20px; vertical-align: top"
@@ -17,7 +17,6 @@
   export default {
     data() {
       return {
-        canvasImg: require('../../img/canvasDefault.png'),
         canvasData: {
           width: 1280,
           height: 720

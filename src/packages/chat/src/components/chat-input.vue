@@ -60,7 +60,7 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
     mixins: [emitter],

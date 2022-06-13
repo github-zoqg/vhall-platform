@@ -38,7 +38,7 @@
       </section>
 
       <section v-show="mediaState.videoType === 'picture'">
-        <picture-uploader :canvasImgUrl.sync="mediaState.canvasImgUrl" />
+        <picture-uploader ref="picUploader" :canvasImgUrl.sync="mediaState.canvasImgUrl" />
       </section>
     </main>
     <footer v-show="mediaState.videoType === 'camera'">
@@ -132,6 +132,7 @@
         this.mediaSettingServer.setState('videoType', value);
 
         if (value === 'picture') {
+          this.$refs['picUploader'].selected();
           return this.destroyStream();
         }
 
