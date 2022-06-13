@@ -46,7 +46,12 @@
         </div>
       </div>
     </div>
-    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @click="closeOverlay"
+      @touchstart="closeOverlay"
+    ></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
