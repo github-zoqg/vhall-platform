@@ -350,7 +350,12 @@ export const serverConfig = {
     // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLottery'],
-      method: 'open'
+      method: 'handleClickIcon'
+    },
+    emitTakeAward: {
+      cuid: ['comLottery'],
+      method: 'handleTakeAward',
+      args: ['$0']
     },
     //红包弹窗
     emitClickRedPacketIcon: {

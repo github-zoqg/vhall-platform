@@ -1,17 +1,31 @@
 <template>
-  <div class="lottery-pending">
-    <img :src="fitment.url" alt />
-    <template v-if="needJoin">
-      <i18n path="interact_tools.interact_tools_1065" tag="p">
-        <span style="color: #ff5659" place="n">{{ lotteryInfo.command }}</span>
-      </i18n>
-      <button @click="joinLottery">
-        {{ $t('interact_tools.interact_tools_1008') }}
-      </button>
-    </template>
-    <p v-else class="lottery-start-text">
+  <div class="vmp-lottery-pending">
+    <!-- 标题 -->
+    <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
+    <!-- 发送参与 -->
+    <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
+      <span class="lottery-remark" place="n">{{ lotteryInfo.command }}</span>
+    </i18n>
+    <p v-else class="lottery-remark">
       {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
     </p>
+    <div class="lottery-pending-wrap">
+      <img
+        :class="[`machine-${fitment.img_order}`, 'lottery-pending-animation']"
+        :src="fitment.url"
+        alt
+      />
+    </div>
+    <button
+      v-if="needJoin"
+      :class="['vmp-lottery-btn', `order-${fitment.img_order}`]"
+      @click="joinLottery"
+    >
+      {{ $t('interact_tools.interact_tools_1008') }}
+    </button>
+    <div class="close-btn-wrap">
+      <i class="vh-iconfont vh-line-circle-close vmp-close-btn" @click="close"></i>
+    </div>
   </div>
 </template>
 <script>
@@ -86,43 +100,75 @@
           .finally(() => {
             this.loading = false;
           });
+      },
+      close() {
+        this.$emit('close');
       }
     }
   };
 </script>
-<style lang="less" scoped>
-  .lottery-pending {
-    width: 100%;
-    height: 100%;
-    font-size: 32px;
-    font-family: PingFangSC-Regular, PingFang SC;
-    font-weight: 400;
-    color: #444444;
-    img {
-      width: 440px;
-      height: 440px;
-      margin: 0px auto;
-      display: block;
+<style lang="less">
+  .vmp-lottery-pending {
+    text-align: center;
+    color: #ffebc9;
+    text-shadow: 0px 3px 6px rgba(218, 111, 17, 0.6);
+    .lottery-title {
+      font-weight: 500;
+      font-size: 32px;
+      margin-bottom: 6px;
+      line-height: 44px;
     }
-    p {
+    .lottery-remark {
+      font-size: 24px;
+      line-height: 32px;
+    }
+    .lottery-pending-wrap {
+      width: 700px;
+      height: 550px;
+      background-image: url('../img/lottery-pendding-bg.png');
+      background-size: 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: relative;
+    }
+    .lottery-pending-animation {
+      position: absolute;
+      width: 475px; // 默认的转轮
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      &.machine-2 {
+        // 老虎机
+        width: 520px;
+        // 老虎机的设计图问题,需要css手动偏移
+        transform: translate(-48%, -50%);
+      }
+      &.machine-3 {
+        // 扭蛋
+        width: 500px;
+      }
+    }
+    .vmp-lottery-btn {
+      // 默认为转盘
+      background: linear-gradient(273.71deg, #ff2313 0%, #fd620c 96.61%);
+      &.order-2 {
+        // 老虎机
+        background: linear-gradient(273.71deg, #fb721d 0%, #f9a61d 96.61%);
+      }
+      &.order-3 {
+        // 扭蛋
+        background: linear-gradient(273.19deg, #046ffd 7.83%, #00b9f5 97.59%);
+      }
+    }
+    .close-btn-wrap {
+      margin-top: 20px;
       text-align: center;
-      margin: 40px 0px;
     }
-    .lottery-start-text {
-      color: #ff5659;
-      line-height: 40px;
-    }
-    button {
-      display: block;
-      width: 364px;
-      height: 90px;
-      background: #fb3a32;
-      border-radius: 14px;
-      margin: 0px auto;
-      // padding-bottom: 20px;
+    .vmp-close-btn {
       color: #fff;
-      line-height: 90px;
-      text-align: center;
+      font-size: 54px;
+      display: inline-block;
+      height: 58px;
     }
   }
 </style>
