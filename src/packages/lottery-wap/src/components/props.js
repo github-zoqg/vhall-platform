@@ -33,6 +33,12 @@ export default {
       default() {
         return {};
       }
+    },
+    needTakeAward: {
+      type: Boolean,
+      default() {
+        return true;
+      }
     }
   },
   data() {

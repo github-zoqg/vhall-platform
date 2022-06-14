@@ -46,7 +46,12 @@
         </div>
       </div>
     </div>
-    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @click="closeOverlay"
+      @touchstart="closeOverlay"
+    ></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -77,7 +82,7 @@
   // import { ImagePreview } from 'vh5-ui';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   import EventBus from './js/Events.js';
   import { isMse } from './js/utils.js';
 
