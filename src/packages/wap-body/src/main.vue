@@ -80,12 +80,27 @@
         }
         return true;
       },
+      isSmallPlayer() {
+        return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
       wapBodyClass() {
+        let className = '';
+        // showHeader: 是否展示顶部header组件，控制台配置
+        // isWapBodyDocSwitch: wapBody 和 文档组件是否切换位置
+        // isSmallPlayer: 音频播放器是否缩小
         if (this.showHeader && this.isWapBodyDocSwitch) {
-          return 'vmp-wap-body__bottom';
+          className = 'vmp-wap-body__bottom';
+          if (this.isSmallPlayer) {
+            className += ' vmp-wap-body__bottom__small';
+          }
+          return className;
         }
         if (!this.showHeader && this.isWapBodyDocSwitch) {
-          return 'vmp-wap-body__bottom-noheader';
+          className = 'vmp-wap-body__bottom-noheader';
+          if (this.isSmallPlayer) {
+            className += ' vmp-wap-body__bottom-noheader__small';
+          }
+          return className;
         }
         return '';
       },
@@ -310,6 +325,9 @@
       height: 422px;
       z-index: 1;
       overflow: hidden;
+      &__small {
+        height: 130px;
+      }
     }
     &__bottom-noheader {
       position: fixed;
@@ -319,6 +337,9 @@
       height: 422px;
       z-index: 1;
       overflow: hidden;
+      &__small {
+        height: 130px;
+      }
     }
     &-ending {
       background-repeat: no-repeat;

@@ -355,6 +355,10 @@
       // 是不是嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
       }
     },
     data() {
@@ -419,7 +423,7 @@
       // 监听播放器大小
       isSmallPlayer: {
         handler: function (val) {
-          if (val) {
+          if (val && !this.isWapBodyDocSwitch) {
             document.querySelector('.vmp-basic-bd').classList.add('small_player');
           } else {
             document.querySelector('.vmp-basic-bd').classList.remove('small_player');
@@ -429,6 +433,14 @@
       },
       sliderVal(val) {
         this.circleSliderVal = val;
+      },
+      isWapBodyDocSwitch() {
+        if (this.isSmallPlayer && !this.isWapBodyDocSwitch) {
+          document.querySelector('.vmp-basic-bd').classList.add('small_player');
+        } else {
+          document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+        }
+        this.setSetingHeight();
       }
     },
     beforeCreate() {
@@ -491,7 +503,7 @@
         if (this.isSubscribe) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
         let baseHeight = playerHeight + 71 + 90;
         let calssname = '.tab-content';
         if (this.isEmbed) {
