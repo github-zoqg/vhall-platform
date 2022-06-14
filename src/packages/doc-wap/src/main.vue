@@ -57,15 +57,8 @@
       </div>
     </div>
 
-    <div
-      class="tools"
-      :style="{
-        transform:
-          docViewRect.height > 0 && (displayMode !== 'fullscreen' || !isPortrait || !!rotateNum)
-            ? 'none'
-            : 'translateY(' + docViewRect.height / 2 + 'px)'
-      }"
-    >
+    <div class="pageGroup">{{ pageNum }}/{{ pageTotal }}</div>
+    <div class="tools">
       <!-- 全屏切换 -->
       <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
         <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
@@ -169,6 +162,14 @@
             this.recoverLastDocs();
           }
         }
+      },
+      rotateNum() {
+        // this.docServer.zoomReset();
+        this.resize();
+        this.docServer.rotate(this.rotateNum);
+        // this.docServer.zoomReset();
+        // const { width, height } = this.getDocViewRect();
+        // this.docServer.recover({ width, height });
       }
     },
     beforeCreate() {
@@ -205,6 +206,7 @@
         this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
         // 切换后还原位置
         this.docServer.zoomReset();
+        this.resize();
         this.rotateNum = 0;
       },
 
@@ -292,8 +294,18 @@
         let h = 0;
         //是否竖屏
         if (this.isPortrait) {
-          w = window.innerWidth;
-          h = (9 * w) / 16;
+          if (this.rotateNum == 90) {
+            h = window.innerWidth;
+            w = (16 * h) / 9;
+          } else {
+            if (this.displayMode !== 'fullscreen') {
+              w = window.innerWidth;
+              h = (9 * w) / 16;
+            } else {
+              w = window.innerWidth;
+              h = window.innerHeight;
+            }
+          }
         } else {
           h = window.innerHeight;
           w = (16 * h) / 9;
@@ -452,6 +464,13 @@
       }
     }
 
+    .pageGroup {
+      position: absolute;
+      right: 50%;
+      top: 100%;
+      margin-top: 20px;
+      color: #ccc;
+    }
     .tools {
       position: absolute;
       right: 0;
@@ -459,6 +478,7 @@
       display: flex;
       align-items: center;
       margin-top: 20px;
+      height: 60px;
       > div {
         margin-right: 30px;
         width: 60px;
@@ -527,12 +547,9 @@
       }
 
       .tools {
-        position: absolute;
         right: 0;
-        top: 50%;
-        display: flex;
-        align-items: center;
-        margin-top: 20px;
+        bottom: 30px;
+        top: auto;
         .btn-doc-fullscreen {
         }
         .btn-doc-restore {
@@ -540,15 +557,18 @@
         .btn-doc-rotate {
         }
       }
+      .pageGroup {
+        right: 50%;
+        bottom: 30px;
+        top: auto;
+      }
       &.doc-landscape {
         .tools {
-          position: absolute;
           right: 0;
           bottom: 10px;
           top: auto;
-          display: flex;
-          align-items: center;
           margin-top: 0;
+          height: 30px;
           > div {
             margin-right: 15px;
             width: 30px;
@@ -561,25 +581,61 @@
           .btn-doc-rotate {
           }
         }
+        .pageGroup {
+          right: 50%;
+          bottom: 30px;
+          top: auto;
+        }
       }
       &.rotate90 {
-        min-height: 100vw !important;
-        height: 100vw !important;
-        width: 100vh !important;
-        top: 50%;
-        height: 50%;
-        left: 50%;
-        transform-origin: center;
-        transform: translate(-50%, -50%) rotate(90deg);
         .tools {
-          top: 100vw;
-          margin-top: -80px;
+          left: -60px;
+          bottom: 100px;
+          top: auto;
+          right: auto;
+          margin-top: 0;
+          height: 60px;
+          transform: rotate(90deg) !important;
+          > div {
+            margin-right: 30px;
+            width: 60px;
+            height: 60px;
+          }
           .btn-doc-fullscreen {
           }
           .btn-doc-restore {
           }
           .btn-doc-rotate {
           }
+        }
+        .btn-pager {
+          position: absolute;
+          transform: rotate(90deg) !important ;
+          background-color: rgba(0, 0, 0, 0.4);
+          width: 64px;
+          height: 64px;
+          border-radius: 100px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10;
+          left: calc(50% - 32px);
+          right: auto;
+          &--prev {
+            top: 60px;
+            bottom: auto;
+          }
+          &--next {
+            top: auto;
+            bottom: 60px;
+          }
+        }
+        .pageGroup {
+          transform: rotate(90deg) !important;
+          bottom: calc(50% - 32px);
+          top: auto;
+          left: 30px;
+          right: auto;
         }
       }
     }
