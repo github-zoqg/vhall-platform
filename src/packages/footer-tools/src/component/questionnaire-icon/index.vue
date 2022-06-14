@@ -268,7 +268,7 @@
             border-radius: 2px;
             .ellipsis {
               display: -webkit-box;
-              /**autoprefixer: ignore next */
+              /* autoprefixer: ignore next */
               -webkit-box-orient: vertical;
               -webkit-line-clamp: 2;
               overflow: hidden;

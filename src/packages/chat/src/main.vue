@@ -109,7 +109,7 @@
   import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   //消息提示定时器
   let tipMsgTimer;
   export default {

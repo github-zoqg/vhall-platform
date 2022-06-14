@@ -24,7 +24,12 @@
         </div>
       </div>
     </div>
-    <div class="overlay" v-show="showSendBox" @click="closeOverlay"></div>
+    <div
+      class="overlay"
+      v-show="showSendBox"
+      @touchstart="closeOverlay"
+      @click="closeOverlay"
+    ></div>
     <send-box
       ref="sendBox"
       currentTab="qa"
@@ -50,7 +55,7 @@
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   import EventBus from '@/packages/chat-wap/src/js/Events.js';
   import { isMse } from './js/utils.js';
   export default {
