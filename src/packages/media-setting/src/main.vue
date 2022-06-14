@@ -184,6 +184,7 @@
       this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
+      window.mediaSetting = this;
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
       const role = watchInitData.join_info?.role_name;
