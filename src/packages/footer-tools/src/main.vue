@@ -76,7 +76,7 @@
       </li>
       <li v-if="isLiving || isEnding">
         <!-- 抽奖 -->
-        <lottery-icon @clickIcon="checkLotteryIcon" />
+        <lottery-icon @clickIcon="checkLotteryIcon" @takeAward="takeAward" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="!isEmbed">
@@ -382,6 +382,9 @@
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      takeAward(lottery) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitTakeAward', [lottery]));
       },
       checkredPacketIcon(redPacketId) {
         window.$middleEventSdk?.event?.send(

@@ -152,9 +152,26 @@
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
       }
     },
     watch: {
+      isWapBodyDocSwitch(val) {
+        const docTabIndex = this.menu.findIndex(item => item.type == 2);
+        if (val) {
+          // 备份一下，还原时候用
+          this._docTabNameCopy = this.menu[docTabIndex].name;
+          this.$set(this.menu, docTabIndex, { ...this.menu[docTabIndex], name: '视频' });
+        } else {
+          this.$set(this.menu, docTabIndex, {
+            ...this.menu[docTabIndex],
+            name: this._docTabNameCopy
+          });
+        }
+      },
       async 'visibleMenu.length'() {
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
@@ -193,6 +210,7 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
+        if (this.isSubscribe) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
@@ -583,6 +601,7 @@
         const item = this.getItem({ type, id });
 
         this.selectedType = item.type;
+        this.menuServer.state.selectedType = type;
         this.selectedId = item.id;
         this.scrollToItem({ id: item.id });
         item.tipsVisible = false;

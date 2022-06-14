@@ -105,7 +105,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 12;
+      z-index: 11;
       &.cover_embed {
         width: calc(100% - 360px) !important;
       }

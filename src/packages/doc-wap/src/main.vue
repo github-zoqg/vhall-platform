@@ -5,7 +5,8 @@
     :class="[
       `vmp-doc-wap--${displayMode}`,
       `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
-      `${rotateNum ? 'rotate' + rotateNum : ''}`
+      `${rotateNum ? 'rotate' + rotateNum : ''}`,
+      wapDocClass
     ]"
     :style="{
       height:
@@ -76,6 +77,10 @@
       >
         <i class="vh-iconfont vh-line-send"></i>
       </div>
+      <!-- 文档播放器位置互换 -->
+      <div v-show="!!currentCid" @click="transposition" class="btn-doc-transposition">
+        <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -108,6 +113,37 @@
       };
     },
     computed: {
+      wapDocClass() {
+        if (this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-doc-wap__top';
+        }
+        if (!this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-doc-wap__top-noheader';
+        }
+        return '';
+      },
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
+      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
@@ -213,6 +249,14 @@
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
+      },
+
+      // 文档播放器互换位置
+      transposition() {
+        this.roomBaseServer.setTranspositionInfo(
+          'isWapBodyDocSwitch',
+          !this.roomBaseServer.state.transpositionInfo.isWapBodyDocSwitch
+        );
       },
 
       // 初始化事件
@@ -353,7 +397,6 @@
             this.docServer.prevStep();
           }
         } else if (type === 'next') {
-          this.docServer;
           if (this.pageNum < this.pageTotal) {
             this.docServer.nextStep();
           }
@@ -413,6 +456,18 @@
     background-color: #f2f2f2;
     color: #fff;
     position: relative;
+    &__top {
+      position: fixed;
+      top: 71px;
+      left: 0;
+    }
+
+    &__top-noheader {
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
