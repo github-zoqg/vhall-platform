@@ -61,7 +61,6 @@
             <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
           </div>
         </div>
-        <!-- 观看次数 :class="[iconShow ? 'opcity-flase' : 'opcity-true']" -->
         <div
           class="vmp-wap-player-header"
           v-show="
