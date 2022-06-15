@@ -1283,8 +1283,8 @@
       width: 200px;
       position: absolute !important;
       // transform: none;
-      height: 422px;
-      top: 0;
+      height: 100%;
+      // top: 0;
       background: rgba(0, 0, 0, 0.7) !important;
       ul {
         display: flex;
