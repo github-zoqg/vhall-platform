@@ -290,7 +290,7 @@
       // 是否是正在录制录制
       isRecording() {
         // 录制中，也会将liveStatus置为1
-        return this.$domainStore.state.roomBaseServer.watchInitData.is_recording;
+        return this.$domainStore.state.roomBaseServer.watchInitData?.record?.is_recording;
       },
       // 主讲人权限
       doc_permission() {
