@@ -67,6 +67,7 @@
           v-show="
             roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
           "
+          :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
