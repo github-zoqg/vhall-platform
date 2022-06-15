@@ -233,6 +233,7 @@
       // 嘉宾点击申请上麦
       handleApplyClick() {
         window.vhallReportForProduct?.report(110131);
+        this._applyInterval && clearInterval(this._applyInterval);
         useMicServer()
           .userApply()
           .then(res => {
