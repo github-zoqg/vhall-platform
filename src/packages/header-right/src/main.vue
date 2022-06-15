@@ -192,8 +192,12 @@
         this.$message.error('发起直播前，请先允许访问摄像头和麦克风');
       }
       const { watchInitData } = this.roomBaseServer.state;
-      if (watchInitData.webinar.type == 1 || watchInitData.is_recording == 1) {
-        this.liveDuration = watchInitData.webinar.live_time;
+      if (watchInitData.webinar.type == 1 || watchInitData?.record?.is_recording == 1) {
+        if (watchInitData?.record?.is_recording == 1) {
+          this.liveDuration = watchInitData.record.record_time;
+        } else {
+          this.liveDuration = watchInitData.webinar.live_time;
+        }
         this.calculateLiveDuration();
         // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
         if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
@@ -414,8 +418,9 @@
           if (res.code == 200) {
             this.liveStep = 3;
             this.calculateLiveDuration();
-
-            this.roomBaseServer.state.watchInitData.is_recording = 1;
+            if (this.roomBaseServer.state.watchInitData?.record) {
+              this.roomBaseServer.state.watchInitData.record.is_recording = 1;
+            }
           }
           return;
         }
