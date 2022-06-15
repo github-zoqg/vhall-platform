@@ -60,15 +60,6 @@
 
     <div class="pageGroup">{{ pageNum }}/{{ pageTotal }}</div>
     <div class="tools">
-      <!-- 全屏切换 -->
-      <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
-        <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
-        <i v-else class="vh-iconfont vh-line-amplification"></i>
-      </div>
-      <!-- 文档拖动后还原 -->
-      <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
-        <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
-      </div>
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"
@@ -77,8 +68,22 @@
       >
         <i class="vh-iconfont vh-line-send"></i>
       </div>
+      <!-- 全屏切换 -->
+      <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
+        <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-a-line-exitfullscreen"></i>
+        <i v-else class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <!-- 文档拖动后还原 -->
+      <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
+        <i class="vh-iconfont vh-line-c-scale-to-original"></i>
+      </div>
+
       <!-- 文档播放器位置互换 -->
-      <div v-show="!!currentCid" @click="transposition" class="btn-doc-transposition">
+      <div
+        v-show="!!currentCid && displayMode != 'fullscreen'"
+        @click="transposition"
+        class="btn-doc-transposition"
+      >
         <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
       </div>
     </div>
@@ -521,10 +526,20 @@
 
     .pageGroup {
       position: absolute;
-      right: 50%;
+      left: 50%;
+      transform: translateX(-50%);
       top: 100%;
-      margin-top: 20px;
-      color: #ccc;
+      margin-top: 48px;
+      color: #fff;
+      min-width: 90px;
+      height: 40px;
+      padding: 2px 24px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.4);
+      font-size: 28px;
     }
     .tools {
       position: absolute;
@@ -532,19 +547,26 @@
       top: 100%;
       display: flex;
       align-items: center;
-      margin-top: 20px;
-      height: 60px;
+      margin-top: 32px;
+      height: 56px;
       > div {
-        margin-right: 30px;
-        width: 60px;
-        height: 60px;
+        margin-right: 24px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
+        color: #fff;
         background-color: rgba(0, 0, 0, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 9;
+        &:nth-last-child(1) {
+          margin-right: 32px;
+        }
+      }
+      .vh-iconfont {
+        font-size: 30px;
       }
       .btn-doc-fullscreen {
       }
@@ -561,14 +583,17 @@
       top: 50%;
       transform: translateY(-50%);
       background-color: rgba(0, 0, 0, 0.4);
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10;
 
+      .vh-iconfont {
+        font-size: 30px;
+      }
       &--prev {
         left: 32px;
       }
@@ -603,8 +628,11 @@
 
       .tools {
         right: 0;
-        bottom: 30px;
+        bottom: 32px;
         top: auto;
+        > div:nth-last-child(2) {
+          margin-right: 32px;
+        }
         .btn-doc-fullscreen {
         }
         .btn-doc-restore {
@@ -613,48 +641,58 @@
         }
       }
       .pageGroup {
-        right: 50%;
-        bottom: 30px;
+        bottom: 32px;
         top: auto;
       }
       &.doc-landscape {
         .tools {
           right: 0;
-          bottom: 10px;
+          bottom: 16px;
           top: auto;
           margin-top: 0;
-          height: 30px;
+          height: 28px;
           > div {
-            margin-right: 15px;
-            width: 30px;
-            height: 30px;
+            margin-right: 12px;
+            width: 28px;
+            height: 28px;
+            &:nth-last-child(1) {
+              margin-right: 16px;
+            }
           }
-          .btn-doc-fullscreen {
-          }
-          .btn-doc-restore {
-          }
-          .btn-doc-rotate {
+          .vh-iconfont {
+            font-size: 15px;
           }
         }
         .pageGroup {
           right: 50%;
-          bottom: 30px;
+          bottom: 16px;
           top: auto;
+          font-size: 14px;
+          height: 20px;
+          min-width: 45px;
+        }
+        .btn-pager {
+          width: 28px;
+          height: 28px;
+          .vh-iconfont {
+            font-size: 15px;
+          }
         }
       }
       &.rotate90 {
         .tools {
-          left: -60px;
-          bottom: 100px;
+          left: 32px;
+          bottom: 248px;
           top: auto;
           right: auto;
           margin-top: 0;
-          height: 60px;
+          height: 56px;
+          transform-origin: left bottom;
           transform: rotate(90deg) !important;
           > div {
-            margin-right: 30px;
-            width: 60px;
-            height: 60px;
+            margin-right: 24px;
+            width: 56px;
+            height: 56px;
           }
           .btn-doc-fullscreen {
           }
@@ -664,33 +702,26 @@
           }
         }
         .btn-pager {
-          position: absolute;
           transform: rotate(90deg) !important ;
-          background-color: rgba(0, 0, 0, 0.4);
-          width: 64px;
-          height: 64px;
-          border-radius: 100px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 10;
           left: calc(50% - 32px);
           right: auto;
           &--prev {
-            top: 60px;
+            top: 32px;
             bottom: auto;
           }
           &--next {
             top: auto;
-            bottom: 60px;
+            bottom: 32px;
           }
         }
         .pageGroup {
-          transform: rotate(90deg) !important;
-          bottom: calc(50% - 32px);
-          top: auto;
-          left: 30px;
+          transform-origin: center;
+          transform: translateY(-50%) rotate(90deg) !important;
+          bottom: auto;
+          top: 50%;
+          left: 10px;
           right: auto;
+          margin-top: 0;
         }
       }
     }
