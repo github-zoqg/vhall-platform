@@ -14,7 +14,7 @@
     @mouseleave="wrapLeave"
   >
     <div
-      :id="isLiving ? 'vmp-player' : `vmp-player-vod_${subscribeWarmList[initIndex]}`"
+      :id="isLiving ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`"
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -297,10 +297,9 @@
     components: {
       controlEventPoint
     },
-    props: ['warmId'],
     data() {
-      const initIndex = this.playerServer.state.initIndex;
-      console.log('-----------initIndex--------=========', initIndex);
+      const initIndex = this.subscribeServer.state.initIndex;
+      // console.log('-----------initIndex--------=========', initIndex);
       return {
         loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
@@ -372,15 +371,19 @@
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
+      // 初始化了第几个
+      initPlayerIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
       // 播放第几个
       playIndex() {
-        return this.$domainStore.state.playerServer.playIndex;
+        return this.$domainStore.state.subscribeServer.playIndex;
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
       },
       subscribeWarmList() {
-        return this.$domainStore.state.playerServer.subscribeWarmList;
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
       },
       // 背景图片
       webinarsBgImg() {
@@ -442,6 +445,11 @@
         if (!this.isEmbedVideo) {
           this.displayMode = newval === 'player' ? 'mini' : 'normal';
         }
+      },
+      playIndex() {
+        if (this.playIndex == 0 && this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1)
+          return;
+        this.playerServer.play();
       }
     },
     created() {
@@ -469,7 +477,7 @@
           videoNode:
             this.warmUpVideoList.length <= 1 || this.isLiving
               ? 'vmp-player'
-              : `vmp-player-vod_${this.subscribeWarmList[this.initIndex]}`
+              : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -549,6 +557,7 @@
         return this.playerServer.init(params).then(() => {
           console.log(params, '播放器初始化成功123');
           this.playerServer.openControls(false);
+          this.playerServer.openUI(false);
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents();
           this.getListenPlayer();
@@ -776,7 +785,7 @@
             if (this.warmUpVideoList.length) {
               this.vodType = 'warm';
               this.isWarnPreview = true;
-              this.optionTypeInfo('vod', this.subscribeWarmList[this.initIndex]);
+              this.optionTypeInfo('vod', this.warmUpVideoList[this.initIndex]);
             }
           }
           // let _id = warmup.warmup_paas_record_id
@@ -850,6 +859,7 @@
             }
             console.log(this.isTryPreview, '???1323');
           } else {
+            if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
             this.getDuanxuPreview(); //断点续播逻辑
           }
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
@@ -872,7 +882,9 @@
             this.setVideoCurrentTime(seekTime);
           }
         } else {
-          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          endTime = this.isWarnPreview
+            ? sessionStorage.getItem(sessionStorage.getItem('warm_recordId'))
+            : sessionStorage.getItem(this.vodOption.recordId);
           const parsedEndTime = parseInt(endTime);
           if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
             const seekTime = endTime < 6 ? 0 : endTime - 5;
@@ -915,9 +927,6 @@
         height: 100% !important;
         object-fit: scale-down !important;
       }
-    }
-    .vhallPlayer-container {
-      z-index: -10 !important;
     }
     #vhy-danmaku-wrapbox {
       z-index: 1;
