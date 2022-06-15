@@ -212,7 +212,8 @@
        * 获取视频列表
        */
       async getVideoDeviceInfo() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const { getUserMediaWithSelectedDevices } = this.mediaCheckServer;
+        const stream = await getUserMediaWithSelectedDevices();
         stream.getTracks().forEach(trackInput => {
           console.log('[interactiveServer]  look stop -1');
           trackInput.stop();
