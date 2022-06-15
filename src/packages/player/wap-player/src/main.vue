@@ -61,28 +61,43 @@
             <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
           </div>
         </div>
-        <!-- 观看次数  -->
+        <!-- 观看次数 :class="[iconShow ? 'opcity-flase' : 'opcity-true']" -->
         <div
           class="vmp-wap-player-header"
           v-show="
             roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
           "
-          :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
-          <span @click="changePlayerSize(true)" v-if="isAudio">
-            <i class="vh-iconfont vh-line-arrow-left"></i>
-          </span>
-          <span v-else></span>
-          <span>
+          <template v-if="isAudio">
+            <span @click="changePlayerSize(true)">
+              <i class="vh-iconfont vh-line-arrow-left"></i>
+            </span>
+            <span>
+              <span class="hot_num">
+                <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+                {{ hotNum | formatHotNum }}
+              </span>
+              <span
+                @click="openLanguage"
+                v-if="languageList.length > 1"
+                class="hot_num language_btn"
+              >
+                {{ lang.key == 1 ? 'CN' : 'EN' }}
+                <i class="vh-iconfont vh-line-arrow-down"></i>
+              </span>
+            </span>
+          </template>
+          <template v-else>
             <span class="hot_num">
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
-            <span @click="openLanguage" v-if="languageList.length > 1" class="hot_num">
-              {{ lang.key == 1 ? '中文' : 'EN' }}
+            <span @click="openLanguage" v-if="languageList.length > 1" class="hot_num language_btn">
+              {{ lang.key == 1 ? 'CN' : 'EN' }}
+              <i class="vh-iconfont vh-line-arrow-down"></i>
             </span>
-          </span>
+          </template>
         </div>
         <!-- 倍速、清晰度切换 -->
         <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
@@ -104,19 +119,6 @@
           v-show="isPlayering && !isSmallPlayer"
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
-          <!-- 倍速和画质合并 -->
-          <div class="vmp-wap-player-speed">
-            <span @click="openLanguage" v-if="languageList.length > 1">
-              {{ lang.key == 1 ? 'CN' : 'EN' }}
-              <i class="vh-iconfont vh-line-arrow-down"></i>
-            </span>
-            <!-- <span @click="openSpeed" v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview">
-              {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
-            </span>
-            <span @click="openQuality" v-if="!isWarnPreview">
-              {{ formatQualityText(currentQualitys.def) }}
-            </span> -->
-          </div>
           <div class="vmp-wap-player-control">
             <!-- 试看逻辑不加 按照线上 -->
             <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
@@ -187,7 +189,7 @@
                     {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
                   </span>
                 </span>
-                <!-- 右侧icon集合 -->
+                <!-- 右侧icon集合 倍速和画质 -->
                 <div class="vmp-wap-player-control-icons-right">
                   <span
                     class="icons-quality icons-speed"
@@ -260,7 +262,12 @@
           </div>
         </div>
 
-        <van-popup v-model="isOpenSpeed" position="bottom" round class="vmp-wap-player-popup">
+        <van-popup
+          v-model="isOpenSpeed"
+          position="right"
+          :overlay="false"
+          class="vmp-wap-player-popup_other"
+        >
           <ul>
             <li
               v-for="item in UsableSpeed"
@@ -272,7 +279,12 @@
             </li>
           </ul>
         </van-popup>
-        <van-popup v-model="isOpenQuality" position="bottom" round class="vmp-wap-player-popup">
+        <van-popup
+          v-model="isOpenQuality"
+          :overlay="false"
+          position="right"
+          class="vmp-wap-player-popup_other"
+        >
           <ul>
             <li
               v-for="item in qualitysList"
@@ -1079,6 +1091,12 @@
           margin-right: 4px;
         }
       }
+      .language_btn {
+        padding: 0 14px;
+        i {
+          font-size: 24px;
+        }
+      }
       &.opcity-flase {
         // opacity: 0;
         display: none;
@@ -1129,33 +1147,6 @@
         color: #fff;
         margin-top: 40%;
         text-align: center;
-      }
-    }
-    &-speed {
-      position: absolute;
-      right: 32px;
-      top: 24px;
-      width: 80px;
-      z-index: 6;
-
-      span {
-        width: 100%;
-        display: block;
-        height: 36px;
-        padding: 0 16px;
-        border-radius: 24px;
-        background: rgba(0, 0, 0, 0.5);
-        text-align: center;
-        line-height: 36px;
-        font-size: 24px;
-        font-family: PingFangSC-Medium, PingFang SC;
-        color: #fff;
-        i {
-          font-size: 18px;
-        }
-        // &:nth-child(2) {
-        //   margin: 40px 0;
-        // }
       }
     }
     &-control {
@@ -1281,6 +1272,36 @@
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
           color: #262626;
+          text-align: center;
+          &.popup-active {
+            color: #fb2626;
+          }
+        }
+      }
+    }
+    &-popup_other {
+      width: 200px;
+      position: absolute !important;
+      // transform: none;
+      height: 422px;
+      top: 0;
+      background: rgba(0, 0, 0, 0.7) !important;
+      ul {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 30px 0;
+        li {
+          width: 100%;
+          height: 60px;
+          line-height: 60px;
+          font-size: 28px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 1);
           text-align: center;
           &.popup-active {
             color: #fb2626;
