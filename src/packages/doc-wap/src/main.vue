@@ -2,10 +2,17 @@
   <div
     id="docWrapper"
     class="vmp-doc-wap"
-    :class="[`vmp-doc-wap--${displayMode}`, wapDocClass]"
+    :class="[
+      `vmp-doc-wap--${displayMode}`,
+      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `${rotateNum ? 'rotate' + rotateNum : ''}`,
+      wapDocClass
+    ]"
     :style="{
       height:
-        docViewRect.height > 0 && displayMode !== 'fullscreen ' ? docViewRect.height + 'px' : '100%'
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%',
+      minHeight:
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%'
     }"
     v-show="switchStatus"
     ref="docWrapper"
@@ -51,18 +58,34 @@
       </div>
     </div>
 
-    <!-- 全屏切换 -->
-    <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
-      <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
-      <i v-else class="vh-iconfont vh-line-amplification"></i>
-    </div>
-    <!-- 文档拖动后还原 -->
-    <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
-      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
-    </div>
-    <!-- 文档播放器位置互换 -->
-    <div v-show="!!currentCid" @click="transposition" class="btn-doc-transposition">
-      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+    <div class="pageGroup">{{ pageNum }}/{{ pageTotal }}</div>
+    <div class="tools">
+      <!-- 文档横屏 -->
+      <div
+        v-show="!!currentCid && displayMode == 'fullscreen'"
+        @click="doRotate"
+        class="btn-doc-rotate"
+      >
+        <i class="vh-iconfont vh-line-send"></i>
+      </div>
+      <!-- 全屏切换 -->
+      <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
+        <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-a-line-exitfullscreen"></i>
+        <i v-else class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <!-- 文档拖动后还原 -->
+      <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
+        <i class="vh-iconfont vh-line-c-scale-to-original"></i>
+      </div>
+
+      <!-- 文档播放器位置互换 -->
+      <div
+        v-show="!!currentCid && displayMode != 'fullscreen'"
+        @click="transposition"
+        class="btn-doc-transposition"
+      >
+        <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -90,7 +113,8 @@
           height: 0
         },
         rebroadcastStartTimer: null,
-        rebroadcastStopTimer: null
+        rebroadcastStopTimer: null,
+        rotateNum: 0 //旋转角度
       };
     },
     computed: {
@@ -149,6 +173,10 @@
       pageTotal() {
         return this.docServer.state.pageTotal;
       },
+      // 是否是竖屏
+      isPortrait() {
+        return this.docServer.state.isPortrait;
+      },
       // 当前资料类型是文档还是白板
       currentType() {
         return this.docServer.state.currentCid.split('-')[0];
@@ -175,6 +203,14 @@
             this.recoverLastDocs();
           }
         }
+      },
+      rotateNum() {
+        // this.docServer.zoomReset();
+        this.resize();
+        this.docServer.rotate(this.rotateNum);
+        // this.docServer.zoomReset();
+        // const { width, height } = this.getDocViewRect();
+        // this.docServer.recover({ width, height });
       }
     },
     beforeCreate() {
@@ -199,6 +235,8 @@
           this.recoverLastDocs();
         });
       }
+      this.resizeDoc();
+      window.addEventListener('resize', this.resizeDoc);
     },
     methods: {
       /**
@@ -209,6 +247,8 @@
         this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
         // 切换后还原位置
         this.docServer.zoomReset();
+        this.resize();
+        this.rotateNum = 0;
       },
 
       // 文档移动后还原
@@ -299,17 +339,26 @@
        * 获取文档白板容器大小
        */
       getDocViewRect() {
-        let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
         let h = 0;
-        if (!rect || rect.width <= 0 || rect.height <= 0) {
-          // 竖屏
-          w =
-            window.screen.height < window.screen.width ? window.screen.height : window.screen.width;
+        //是否竖屏
+        if (this.isPortrait) {
+          if (this.rotateNum == 90) {
+            h = window.innerWidth;
+            w = (16 * h) / 9;
+          } else {
+            if (this.displayMode !== 'fullscreen') {
+              w = window.innerWidth;
+              h = (9 * w) / 16;
+            } else {
+              w = window.innerWidth;
+              h = window.innerHeight;
+            }
+          }
         } else {
-          w = rect.width;
+          h = window.innerHeight;
+          w = (16 * h) / 9;
         }
-        h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
         console.log('[doc] ', this.docViewRect);
         return { width: w, height: h };
@@ -372,6 +421,28 @@
             boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
           );
         }
+      },
+      //监听系统横竖屏
+      resizeDoc(e) {
+        const newOir = window.innerWidth < window.innerHeight;
+        console.log(
+          '【resizeDoc】:',
+          'window.innerHeight: ' + window.innerHeight,
+          'window.innerWidth: ' + window.innerWidth,
+          'isPortrait:' + this.docServer.state.isPortrait
+        );
+        if (newOir != this.docServer.state.isPortrait) {
+          //方向发生了变化就重新计算文档大小
+          this.docServer.state.isPortrait = newOir;
+          this.rotateNum = 0;
+          this.getDocViewRect();
+        }
+      },
+      //自定义横竖屏
+      doRotate() {
+        this.rotateNum = this.rotateNum === 0 ? 90 : 0;
+        this.getDocViewRect();
+        console.log('screen.orientation-> ', window.screen.orientation);
       }
     },
     beforeDestroy() {
@@ -389,7 +460,7 @@
     flex-direction: column;
     background-color: #f2f2f2;
     color: #fff;
-
+    position: relative;
     &__top {
       position: fixed;
       top: 71px;
@@ -453,49 +524,58 @@
       }
     }
 
-    .btn-doc-fullscreen {
+    .pageGroup {
       position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 0.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
+      left: 50%;
+      transform: translateX(-50%);
+      top: 100%;
+      margin-top: 48px;
+      color: #fff;
+      min-width: 90px;
+      height: 40px;
+      padding: 2px 24px;
+      border-radius: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9;
+      background-color: rgba(0, 0, 0, 0.4);
+      font-size: 28px;
     }
-
-    .btn-doc-restore {
+    .tools {
       position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 1.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
+      right: 0;
+      top: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9;
-    }
+      margin-top: 32px;
+      height: 56px;
+      > div {
+        margin-right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9;
+        &:nth-last-child(1) {
+          margin-right: 32px;
+        }
+      }
+      .vh-iconfont {
+        font-size: 30px;
+      }
+      .btn-doc-fullscreen {
+      }
 
-    .btn-doc-transposition {
-      position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 2.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9;
+      .btn-doc-restore {
+      }
+
+      .btn-doc-rotate {
+      }
     }
 
     .btn-pager {
@@ -503,14 +583,17 @@
       top: 50%;
       transform: translateY(-50%);
       background-color: rgba(0, 0, 0, 0.4);
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10;
 
+      .vh-iconfont {
+        font-size: 30px;
+      }
       &--prev {
         left: 32px;
       }
@@ -540,6 +623,105 @@
             transform: translate(-50%, -50%);
             overflow: visible !important;
           }
+        }
+      }
+
+      .tools {
+        right: 0;
+        bottom: 32px;
+        top: auto;
+        > div:nth-last-child(2) {
+          margin-right: 32px;
+        }
+        .btn-doc-fullscreen {
+        }
+        .btn-doc-restore {
+        }
+        .btn-doc-rotate {
+        }
+      }
+      .pageGroup {
+        bottom: 32px;
+        top: auto;
+      }
+      &.doc-landscape {
+        .tools {
+          right: 0;
+          bottom: 16px;
+          top: auto;
+          margin-top: 0;
+          height: 28px;
+          > div {
+            margin-right: 12px;
+            width: 28px;
+            height: 28px;
+            &:nth-last-child(1) {
+              margin-right: 16px;
+            }
+          }
+          .vh-iconfont {
+            font-size: 15px;
+          }
+        }
+        .pageGroup {
+          right: 50%;
+          bottom: 16px;
+          top: auto;
+          font-size: 14px;
+          height: 20px;
+          min-width: 45px;
+        }
+        .btn-pager {
+          width: 28px;
+          height: 28px;
+          .vh-iconfont {
+            font-size: 15px;
+          }
+        }
+      }
+      &.rotate90 {
+        .tools {
+          left: 32px;
+          bottom: 248px;
+          top: auto;
+          right: auto;
+          margin-top: 0;
+          height: 56px;
+          transform-origin: left bottom;
+          transform: rotate(90deg) !important;
+          > div {
+            margin-right: 24px;
+            width: 56px;
+            height: 56px;
+          }
+          .btn-doc-fullscreen {
+          }
+          .btn-doc-restore {
+          }
+          .btn-doc-rotate {
+          }
+        }
+        .btn-pager {
+          transform: rotate(90deg) !important ;
+          left: calc(50% - 32px);
+          right: auto;
+          &--prev {
+            top: 32px;
+            bottom: auto;
+          }
+          &--next {
+            top: auto;
+            bottom: 32px;
+          }
+        }
+        .pageGroup {
+          transform-origin: center;
+          transform: translateY(-50%) rotate(90deg) !important;
+          bottom: auto;
+          top: 50%;
+          left: 10px;
+          right: auto;
+          margin-top: 0;
         }
       }
     }
