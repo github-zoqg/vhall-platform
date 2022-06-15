@@ -115,10 +115,17 @@
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
       }
     },
     watch: {
       isSmallPlayer() {
+        this.changeChatHeight();
+      },
+      isWapBodyDocSwitch() {
         this.changeChatHeight();
       }
     },
@@ -304,7 +311,7 @@
       changeChatHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
         let baseHeight = playerHeight + 71 + 94 + 90;
         if (this.isEmbed) {
           baseHeight = playerHeight + 94 + 90;
