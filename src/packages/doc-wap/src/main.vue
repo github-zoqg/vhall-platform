@@ -347,13 +347,8 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            if (this.displayMode !== 'fullscreen') {
-              w = window.innerWidth;
-              h = (9 * w) / 16;
-            } else {
-              w = window.innerWidth;
-              h = window.innerHeight;
-            }
+            w = window.innerWidth;
+            h = (9 * w) / 16;
           }
         } else {
           h = window.innerHeight;
@@ -436,6 +431,7 @@
           this.docServer.state.isPortrait = newOir;
           this.rotateNum = 0;
           this.getDocViewRect();
+          this.docServer.zoomReset();
         }
       },
       //自定义横竖屏
@@ -465,12 +461,24 @@
       position: fixed;
       top: 71px;
       left: 0;
+      .pageGroup {
+        margin-top: -72px !important;
+      }
+      .tools {
+        margin-top: -88px !important;
+      }
     }
 
     &__top-noheader {
       position: fixed;
       top: 0;
       left: 0;
+      .pageGroup {
+        margin-top: -72px !important;
+      }
+      .tools {
+        margin-top: -88px !important;
+      }
     }
 
     .vmp-doc-une__content {
