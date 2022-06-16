@@ -206,7 +206,7 @@
               (this.webinar.mode == 6 &&
                 interactToolStatus.auto_speak == 1 &&
                 !groupInitData.isInGroup) ||
-              groupInitData.join_role == 2,
+              (groupInitData.join_role == 2 && groupInitData.isInGroup),
             video: false
           };
         }

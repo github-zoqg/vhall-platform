@@ -294,10 +294,21 @@
         //     this.subscribeStream();
         //   }
         // });
-
+        // 主持人进入小组（开始讨论/继续讨论）如果正在演示桌面共享，需要停止共享
+        this.groupServer.$on(this.groupServer.EVENT_TYPE.ENTER_GROUP_FROM_MAIN, () => {
+          if (
+            this.roleName == 1 &&
+            this.isShareScreen &&
+            this.accountId == this.desktopShareInfo.accountId
+          ) {
+            this.stopShare();
+          }
+        });
         useMsgServer().$onMsg('ROOM_MSG', msg => {
           // 主讲人变更
           if (msg.data.type === 'vrtc_speaker_switch') {
+            // 小组中，组长变更不会停止桌面共享
+            if (this.isInGroup) return;
             // 自己正在发起桌面共享
             if (
               this.isShareScreen &&
@@ -318,12 +329,28 @@
               this.stopShare();
             }
           }
-          // 主持人进出小组如果正在演示桌面共享，需要停止共享
-
-          if (msg.data.type === 'group_manager_enter' && msg.data.role == 1) {
-            // 自己正在发起桌面共享
+          if (
+            [
+              'group_manager_enter',
+              'group_switch_proceed',
+              'group_switch_end',
+              'group_switch_stop'
+            ].includes(msg.data.type)
+          ) {
+            console.table({
+              name: '桌面共享-分组讨论',
+              type: msg.data.type,
+              data: JSON.stringify(msg.data),
+              role: this.roleName,
+              isInGroup: this.isInGroup,
+              isShareScreen: this.isShareScreen,
+              accountId: this.accountId == this.desktopShareInfo.accountId
+            });
+          }
+          // 暂停 + 结束 讨论,需要停止共享
+          if (msg.data.type === 'group_switch_end' || msg.data.type === 'group_switch_stop') {
             if (
-              this.roleName == 1 &&
+              this.isInGroup &&
               this.isShareScreen &&
               this.accountId == this.desktopShareInfo.accountId
             ) {

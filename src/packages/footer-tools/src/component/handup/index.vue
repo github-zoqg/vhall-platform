@@ -8,7 +8,7 @@
         size="medium"
         round
         :disabled="loading"
-        v-if="isInGroup ? +this.groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
+        v-if="isInGroup ? +groupRole !== 20 && !isSpeakOn : isAllowhandup && !isSpeakOn"
       >
         {{ btnText }}
       </el-button>
@@ -19,7 +19,7 @@
         type="primary"
         size="medium"
         :disabled="loading"
-        v-if="isInGroup ? +this.groupRole !== 20 && isSpeakOn : isSpeakOn"
+        v-if="isInGroup ? +groupRole !== 20 && isSpeakOn : isSpeakOn"
         round
       >
         {{ $t('interact.interact_1007') }}
@@ -118,7 +118,6 @@
           temp.data = JSON.parse(temp.data);
         }
         const { type = '' } = temp.data || {};
-        console.log('aaa--1', this.joinInfo.third_party_user_id, temp);
         if (type === 'vrtc_connect_refused') {
           if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
           this.loading = false;
