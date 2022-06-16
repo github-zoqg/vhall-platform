@@ -33,6 +33,7 @@
     data() {
       const groupData = this.$domainStore.state.groupServer.groupInitData;
       const interactStatus = this.$domainStore.state.roomBaseServer.interactToolStatus;
+      console.log('禁言状态-----11111', groupData.isInGroup, groupData, interactStatus);
       return {
         btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
