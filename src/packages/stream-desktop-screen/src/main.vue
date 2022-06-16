@@ -66,6 +66,7 @@
     <!-- access-denied弹窗 -->
     <saas-alert
       :visible="isShowAccessDeniedAlert"
+      :knowText="'知道了'"
       @onClose="isShowAccessDeniedAlert = false"
       @onCancel="isShowAccessDeniedAlert = false"
     >
