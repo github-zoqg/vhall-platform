@@ -2,14 +2,23 @@
   <div class="vmp-subscribe-body">
     <div :class="isEmbed ? 'vmp-subscribe-body-embed' : 'vmp-subscribe-body-intro'">
       <div class="subscribe-img">
-        <div class="subscribe-img-box" v-if="!showVideo">
-          <!-- 背景图片 未完成验证-->
-          <img :src="webinarsBgImg" />
-        </div>
-        <div class="subscribe-img-box" v-else>
-          <!-- 完成验证、并且有暖场视频 加载播放器 -->
-          <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
-        </div>
+        <template v-if="!showVideo">
+          <div class="subscribe-img-box">
+            <img :src="webinarsBgImg" />
+          </div>
+        </template>
+        <template v-else>
+          <div
+            class="subscribe-img-box"
+            v-for="item in subscribeWarmList"
+            :key="item"
+            :style="{ zIndex: item == warmUpVideoList[playIndex] ? 1 : 0 }"
+            v-show="item == warmUpVideoList[playIndex]"
+          >
+            <!-- 完成验证、并且有暖场视频 加载播放器 第一个播放器-->
+            <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
+          </div>
+        </template>
       </div>
       <div class="subscribe-language" v-if="isEmbed && languageList.length > 1 && showBottom">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
@@ -37,17 +46,17 @@
           @agreement="popupAgreement"
         ></EmbedTime>
       </div>
-      <!--活动时间信息-->
-      <div class="subscribe-img-bottom" v-if="!isEmbed">
-        <bottom-tab
-          v-if="showBottom"
-          ref="bottomTab"
-          :sub-option="subOption"
-          @payMore="feeAuth"
-          @authFetch="handleAuthCheck"
-          @agreement="popupAgreement"
-        ></bottom-tab>
-      </div>
+    </div>
+    <!--活动时间信息-->
+    <div class="subscribe-img-bottom vmp-subscribe-body-tab" v-if="!isEmbed">
+      <bottom-tab
+        v-if="showBottom"
+        ref="bottomTab"
+        :sub-option="subOption"
+        @payMore="feeAuth"
+        @authFetch="handleAuthCheck"
+        @agreement="popupAgreement"
+      ></bottom-tab>
     </div>
     <div class="vmp-subscribe-body-tab" v-if="!isEmbed">
       <vmp-air-container cuid="comSubscribeTabMenu" :oneself="true"></vmp-air-container>
@@ -62,7 +71,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
@@ -76,6 +85,7 @@
         wxQr: '',
         zfQr: '',
         lang: {},
+        isLoaderTwoPlayer: false,
         languageList: [],
         subOption: {
           startTime: '',
@@ -108,6 +118,18 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
+      initIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;
       },
@@ -119,7 +141,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
-      this.playerServer = usePlayerServer();
+      // this.playerServer = usePlayerServer();
     },
     created() {
       this.handlerInitInfo();
@@ -158,12 +180,12 @@
           this.subOption.type = 3;
           console.log(data);
         });
-        this.playerServer.$on(VhallPlayer.PLAY, () => {
-          this.showBottom = false;
-        });
-        this.playerServer.$on(VhallPlayer.ENDED, () => {
-          this.showBottom = true;
-        });
+        // this.playerServer.$on(VhallPlayer.PLAY, () => {
+        //   this.showBottom = false;
+        // });
+        // this.playerServer.$on(VhallPlayer.ENDED, () => {
+        //   this.showBottom = true;
+        // });
       },
       handlerInitInfo() {
         const { webinar, subscribe, join_info, warmup, agreement } =
@@ -184,15 +206,42 @@
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
-        if (this.isEmbed) {
-          // 嵌入的暖场视频只有免费的时候显示
-          if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
-            this.showVideo = true;
+        if (!this.warmUpVideoList.length) return;
+        this.showVideo = true;
+        if (this.warmUpVideoList.length > 1) {
+          this.getWarmupVideoInfo();
+        } else {
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+        }
+        // if (this.isEmbed) {
+        //   // 嵌入的暖场视频只有免费的时候显示
+        //   if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
+        //     this.showVideo = true;
+        //   }
+        // } else {
+        //   if (warmup.warmup_paas_record_id && webinar.type == 2) {
+        //     this.showVideo = true;
+        //   }
+        // }
+      },
+      getWarmupVideoInfo() {
+        if (window.sessionStorage.getItem('recordIds')) {
+          let newRecordIds = this.warmUpVideoList.join(',');
+          if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
+            this.subscribeServer.state.isChangeOrder = true;
+            window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          } else {
+            this.subscribeServer.state.isChangeOrder = false;
+            let recordId = window.sessionStorage.getItem('warm_recordId');
+            let index = this.warmUpVideoList.findIndex(item => item == recordId);
+            this.subscribeServer.state.playIndex = index;
+            this.subscribeServer.state.initIndex = index;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
           }
         } else {
-          if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
-            this.showVideo = true;
-          }
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
         }
       },
       feeAuth(params) {
@@ -443,6 +492,10 @@
           outline: none;
         }
       }
+    }
+    .subscribe-img-bottom {
+      height: 70px;
+      position: relative;
     }
     &-tab {
       background: #2a2a2a;
