@@ -72,26 +72,37 @@ const playerMixins = {
         // 如果是暖场视频和试看不显示回放结束的标识
         if (this.isTryPreview) return;
         if (this.isWarnPreview) {
-          window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
-          if (this.warmUpVideoList.length <= 1) return;
-          if (this.warmUpVideoList.length > 1) {
-            this.playerServer.destroy();
+          if (this.warmUpVideoList.length == 1) {
+            if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
+              this.playerServer.play();
+            }
+          } else {
+            if (
+              this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
+              this.warmUpVideoList.length > 2
+            ) {
+              this.playerServer.destroy();
+            }
+            window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
+            if (this.playIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.playIndex++;
+            } else {
+              this.subscribeServer.state.playIndex = 0;
+              if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
+                this.playerServer.play();
+              }
+            }
             this.subscribeServer.setWarmVideoList('', false);
-          }
-          if (this.playIndex < this.warmUpVideoList.length - 1) {
-            this.subscribeServer.state.playIndex++;
-          } else {
-            this.subscribeServer.state.playIndex = 0;
-          }
-          if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
-            this.subscribeServer.state.initIndex++;
-            this.subscribeServer.setWarmVideoList(
-              this.warmUpVideoList[this.subscribeServer.state.initIndex],
-              true
-            );
-          } else {
-            this.subscribeServer.state.initIndex = 0;
-            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
+            if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.initIndex++;
+              this.subscribeServer.setWarmVideoList(
+                this.warmUpVideoList[this.subscribeServer.state.initIndex],
+                true
+              );
+            } else {
+              this.subscribeServer.state.initIndex = 0;
+              this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
+            }
           }
         } else {
           this.isVodEnd = true;
@@ -112,8 +123,7 @@ const playerMixins = {
           this.totalTime = this.playerServer.getDuration(() => {
             console.log('获取视频总时长失败');
           });
-          if (this.isWarnPreview && this.warmUpVideoList.length > 1) {
-            console.log(this.endTime);
+          if (this.isWarnPreview) {
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
             }

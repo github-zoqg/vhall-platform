@@ -39,7 +39,15 @@
           </div>
         </template>
         <template v-if="showVideo">
-          <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+          <div
+            class="subscribe_warm"
+            v-for="item in subscribeWarmList"
+            :key="item"
+            :style="{ zIndex: item == warmUpVideoList[playIndex] ? 1 : 0 }"
+            v-show="item == warmUpVideoList[playIndex]"
+          >
+            <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+          </div>
         </template>
       </template>
     </div>
@@ -393,13 +401,6 @@
         }
         // 如果是嵌入页并且没有开播，预约按钮不显示
         if (webinar.type == 2) {
-          if (
-            (join_info.is_subscribe == 1 || webinar.hide_subscribe == 0) &&
-            warmup.warmup_paas_record_id &&
-            webinar.type == 2
-          ) {
-            this.showVideo = true;
-          }
           if (this.isEmbed) {
             this.showBottomBtn = false;
             return;
@@ -421,6 +422,31 @@
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
+        }
+        if (!this.warmUpVideoList.length) return;
+        this.showVideo = true;
+        if (this.warmUpVideoList.length > 1) {
+          this.getWarmupVideoInfo();
+        } else {
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+        }
+      },
+      getWarmupVideoInfo() {
+        if (window.sessionStorage.getItem('recordIds')) {
+          let newRecordIds = this.warmUpVideoList.join(',');
+          if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
+            this.subscribeServer.state.isChangeOrder = true;
+            window.sessionStorage.removeItem('warm_recordId');
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          } else {
+            let recordId = window.sessionStorage.getItem('warm_recordId');
+            let index = this.warmUpVideoList.findIndex(item => item == recordId);
+            this.subscribeServer.state.playIndex = index;
+            this.subscribeServer.state.initIndex = index;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          }
+        } else {
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
         }
       },
       playerAuthCheck(info) {
@@ -821,6 +847,10 @@
             line-height: 28px;
           }
         }
+      }
+      .subscribe_warm {
+        height: 100%;
+        width: 100%;
       }
     }
     &-info {

@@ -14,7 +14,9 @@
     @mouseleave="wrapLeave"
   >
     <div
-      :id="warmUpVideoList.length ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`"
+      :id="
+        warmUpVideoList.length < 2 ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`
+      "
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -353,7 +355,6 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
-      this.playerServer = usePlayerServer({ extra: true });
     },
     beforeDestroy() {
       this.playerServer.destroy();
@@ -446,33 +447,29 @@
           this.displayMode = newval === 'player' ? 'mini' : 'normal';
         }
       },
+      initPlayerIndex() {
+        console.log(
+          this.initPlayerIndex,
+          this.subscribeServer.state.isFirstEnterPlayer,
+          '???jianting舰艇监听'
+        );
+        // this.subscribeServer.state.isFirstEnterPlayer && this.getWebinerStatus();
+      },
       playIndex() {
-        // 是否是循环播放并且不是初始化进入页面(循环一圈)
-        if (
-          this.playIndex == 0 &&
-          this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1 &&
-          this.isFirstEnterPlayer
-        )
-          return;
-        // 刚进入页面是否要自动播放
-        if (
-          this.playerOtherOptions.autoplay == 1 &&
-          !this.isFirstEnterPlayer &&
-          this.playIndex == this.initPlayerIndex
-        ) {
-          this.playerServer.play();
-          return;
-        }
         // 多个视频持续播放
-        this.playerServer.play();
+        if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
+          this.playerServer.play();
+        }
       }
     },
     created() {
       if (this.isShowContainer) return;
-
+      this.playerServer = usePlayerServer({
+        extra: this.warmUpVideoList.length > 1 ? true : false
+      });
+      this.getWebinerStatus();
       const { agreement } = this.roomBaseServer.state.watchInitData;
       this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
-      this.getWebinerStatus();
       if (this.isEmbedVideo) {
         this.languageList = this.roomBaseServer.state.languages.langList;
         this.lang = this.roomBaseServer.state.languages.lang;
@@ -489,9 +486,10 @@
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
         let params = {
-          videoNode: this.warmUpVideoList.length
-            ? 'vmp-player'
-            : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
+          videoNode:
+            this.warmUpVideoList.length < 2
+              ? 'vmp-player'
+              : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -580,8 +578,8 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
-            if (this.playerOtherOptions.autoplay == 1 && !this.isWarnPreview) {
-              this.play();
+            if (!this.isWarnPreview && this.playerOtherOptions.autoplay == 1) {
+              this.playerServer.play();
             }
           } else {
             if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
@@ -944,6 +942,9 @@
     }
     #vhy-danmaku-wrapbox {
       z-index: 1;
+    }
+    .vhallPlayer-container {
+      display: none !important;
     }
     .el-loading-spinner .el-loading-text {
       color: #fff;

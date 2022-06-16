@@ -19,7 +19,7 @@
         </div>
         <div
           :id="
-            warmUpVideoList.length
+            warmUpVideoList.length < 2
               ? 'vmp-wap-player'
               : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
           "
@@ -451,35 +451,24 @@
         this.circleSliderVal = val;
       },
       playIndex() {
-        // 是否是循环播放并且不是初始化进入页面(循环一圈)
-        if (
-          this.playIndex == 0 &&
-          this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1 &&
-          this.isFirstEnterPlayer
-        )
-          return;
-        // 刚进入页面是否要自动播放
-        if (
-          this.playerOtherOptions.autoplay == 1 &&
-          !this.isFirstEnterPlayer &&
-          this.playIndex == this.initPlayerIndex
-        ) {
-          this.playerServer.play();
-          return;
-        }
         // 多个视频持续播放
-        this.playerServer.play();
+        if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
+          this.playerServer.play();
+        }
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.playerServer = usePlayerServer({ extra: true });
+      // this.playerServer = usePlayerServer({ extra: true });
       this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
       this.playerServer.destroy();
     },
     async created() {
+      this.playerServer = usePlayerServer({
+        extra: this.warmUpVideoList.length > 1 ? true : false
+      });
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
@@ -615,9 +604,10 @@
       // 初始化播放器配置项
       initConfig() {
         let params = {
-          videoNode: this.warmUpVideoList.length
-            ? 'vmp-wap-player'
-            : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
+          videoNode:
+            this.warmUpVideoList.length < 2
+              ? 'vmp-wap-player'
+              : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerState.type == 'live') {
           params = Object.assign(params, {
@@ -646,6 +636,7 @@
         }
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
+          console.log(params, '播放器wap初始化成功123');
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);
           this.getQualitys(); // 获取清晰度列表和当前清晰度
@@ -665,7 +656,7 @@
             }
           }
           this.$nextTick(() => {
-            if (this.water && this.water.watermark_open == 1) {
+            if (this.water && this.water.watermark_open == 1 && !this.isWarnPreview) {
               const watermarkContainer = document.getElementById('vh-watermark-container');
               watermarkContainer && (watermarkContainer.style.width = '80px');
               const waterMark = document.getElementById('vh-watermark');
@@ -952,6 +943,10 @@
       display: none;
       transition: all 1s;
       -webkit-transition: all 1s;
+    }
+    .vhallPlayerh5-shadow,
+    .vh-playBtnContainer {
+      display: none !important;
     }
     &-opcity-true {
       opacity: 1;

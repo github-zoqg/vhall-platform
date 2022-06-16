@@ -230,8 +230,10 @@
           if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
             this.subscribeServer.state.isChangeOrder = true;
             window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
           } else {
+            this.subscribeServer.state.isChangeOrder = false;
             let recordId = window.sessionStorage.getItem('warm_recordId');
             let index = this.warmUpVideoList.findIndex(item => item == recordId);
             this.subscribeServer.state.playIndex = index;
