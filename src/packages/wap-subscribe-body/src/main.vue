@@ -179,7 +179,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import {
     boxEventOpitons,
     isWechat,
@@ -292,12 +292,23 @@
        */
       showInvite() {
         return this.$domainStore.state.roomBaseServer.inviteCard.status == 1;
+      },
+      initIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
-      this.playerServer = usePlayerServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;

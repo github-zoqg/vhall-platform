@@ -14,7 +14,7 @@
     @mouseleave="wrapLeave"
   >
     <div
-      id="vmp-player"
+      :id="warmUpVideoList.length ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`"
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -298,6 +298,8 @@
       controlEventPoint
     },
     data() {
+      const initIndex = this.subscribeServer.state.initIndex;
+      // console.log('-----------initIndex--------=========', initIndex);
       return {
         loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
@@ -344,13 +346,14 @@
           progress_bar: 0,
           speed: 0,
           autoplay: false
-        } //播放器配置
+        }, //播放器配置
+        initIndex
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.playerServer = usePlayerServer();
       this.subscribeServer = useSubscribeServer();
+      this.playerServer = usePlayerServer({ extra: true });
     },
     beforeDestroy() {
       this.playerServer.destroy();
@@ -367,6 +370,20 @@
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 初始化了第几个
+      initPlayerIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      // 播放第几个
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
       },
       // 背景图片
       webinarsBgImg() {
@@ -428,10 +445,31 @@
         if (!this.isEmbedVideo) {
           this.displayMode = newval === 'player' ? 'mini' : 'normal';
         }
+      },
+      playIndex() {
+        // 是否是循环播放并且不是初始化进入页面(循环一圈)
+        if (
+          this.playIndex == 0 &&
+          this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1 &&
+          this.isFirstEnterPlayer
+        )
+          return;
+        // 刚进入页面是否要自动播放
+        if (
+          this.playerOtherOptions.autoplay == 1 &&
+          !this.isFirstEnterPlayer &&
+          this.playIndex == this.initPlayerIndex
+        ) {
+          this.playerServer.play();
+          return;
+        }
+        // 多个视频持续播放
+        this.playerServer.play();
       }
     },
     created() {
       if (this.isShowContainer) return;
+
       const { agreement } = this.roomBaseServer.state.watchInitData;
       this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
       this.getWebinerStatus();
@@ -451,7 +489,9 @@
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
         let params = {
-          videoNode: 'vmp-player'
+          videoNode: this.warmUpVideoList.length
+            ? 'vmp-player'
+            : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -529,6 +569,9 @@
         }
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
+          console.log(params, '播放器初始化成功123');
+          this.playerServer.openControls(false);
+          this.playerServer.openUI(false);
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents();
           this.getListenPlayer();
@@ -537,8 +580,11 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+            if (this.playerOtherOptions.autoplay == 1 && !this.isWarnPreview) {
+              this.play();
+            }
           } else {
-            if (this.isAutoPlay) {
+            if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
               this.play();
             }
           }
@@ -743,18 +789,31 @@
           }
         } else {
           if (webinar.type === 3) return; //结束状态
-          let _id = warmup.warmup_paas_record_id
-            ? warmup.warmup_paas_record_id
-            : record.preview_paas_record_id;
-          this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
-          if (this.vodType === 'shikan') {
+          if (webinar.type === 5) {
+            // 试看
+            this.vodType = 'shikan';
             this.isTryPreview = true;
             this.getShiPreview();
-          } else if (this.vodType === 'warm') {
-            this.isWarnPreview = true;
+            this.optionTypeInfo('vod', record.preview_paas_record_id);
+          } else {
+            if (this.warmUpVideoList.length) {
+              this.vodType = 'warm';
+              this.isWarnPreview = true;
+              this.optionTypeInfo('vod', this.warmUpVideoList[this.initIndex]);
+            }
           }
-          // 暖场视频或者试看
-          this.optionTypeInfo('vod', _id);
+          // let _id = warmup.warmup_paas_record_id
+          //   ? warmup.warmup_paas_record_id
+          //   : record.preview_paas_record_id;
+          // this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
+          // if (this.vodType === 'shikan') {
+          //   this.isTryPreview = true;
+          //   this.getShiPreview();
+          // } else if (this.vodType === 'warm') {
+          //   this.isWarnPreview = true;
+          // }
+          // // 暖场视频或者试看
+          // this.optionTypeInfo('vod', _id);
         }
       },
       optionTypeInfo(type, id) {
@@ -814,6 +873,7 @@
             }
             console.log(this.isTryPreview, '???1323');
           } else {
+            if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
             this.getDuanxuPreview(); //断点续播逻辑
           }
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
@@ -836,7 +896,9 @@
             this.setVideoCurrentTime(seekTime);
           }
         } else {
-          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          endTime = this.isWarnPreview
+            ? sessionStorage.getItem(sessionStorage.getItem('warm_recordId'))
+            : sessionStorage.getItem(this.vodOption.recordId);
           const parsedEndTime = parseInt(endTime);
           if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
             const seekTime = endTime < 6 ? 0 : endTime - 5;
