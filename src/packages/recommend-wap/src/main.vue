@@ -84,7 +84,6 @@
           this.finished = true;
           return false;
         }
-        this.loading = true;
         this.num++;
         this.pos = parseInt((this.num - 1) * this.limit);
         this.queryAdsList();
@@ -93,9 +92,6 @@
        * 查询更多推荐项
        */
       async queryAdsList() {
-        if (this.loading) {
-          return;
-        }
         try {
           const res = await this.recommendServer.queryAdsList({
             webinar_id: this.$route.params.id,
