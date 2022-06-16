@@ -2,12 +2,12 @@
   <div class="vmp-subscribe-body">
     <div :class="isEmbed ? 'vmp-subscribe-body-embed' : 'vmp-subscribe-body-intro'">
       <div class="subscribe-img">
-        <!-- <template v-if="!showVideo">
+        <template v-if="!showVideo">
           <div class="subscribe-img-box">
             <img :src="webinarsBgImg" />
           </div>
-        </template> -->
-        <template>
+        </template>
+        <template v-else>
           <div
             class="subscribe-img-box"
             v-for="item in subscribeWarmList"
@@ -206,6 +206,8 @@
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
+        if (!this.warmUpVideoList.length) return;
+        this.showVideo = true;
         if (this.warmUpVideoList.length > 1) {
           this.getWarmupVideoInfo();
         } else {

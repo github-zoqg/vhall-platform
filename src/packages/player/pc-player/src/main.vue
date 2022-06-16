@@ -14,7 +14,7 @@
     @mouseleave="wrapLeave"
   >
     <div
-      :id="isLiving ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`"
+      :id="warmUpVideoList.length ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`"
       class="vmp-player-watch"
       ref="playerWatch"
       v-loading="loading"
@@ -447,8 +447,23 @@
         }
       },
       playIndex() {
-        if (this.playIndex == 0 && this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1)
+        // 是否是循环播放并且不是初始化进入页面(循环一圈)
+        if (
+          this.playIndex == 0 &&
+          this.roomBaseServer.state.warmUpVideo.warmup_player_type == 1 &&
+          this.isFirstEnterPlayer
+        )
           return;
+        // 刚进入页面是否要自动播放
+        if (
+          this.playerOtherOptions.autoplay == 1 &&
+          !this.isFirstEnterPlayer &&
+          this.playIndex == this.initPlayerIndex
+        ) {
+          this.playerServer.play();
+          return;
+        }
+        // 多个视频持续播放
         this.playerServer.play();
       }
     },
@@ -474,10 +489,9 @@
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
         let params = {
-          videoNode:
-            this.warmUpVideoList.length <= 1 || this.isLiving
-              ? 'vmp-player'
-              : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
+          videoNode: this.warmUpVideoList.length
+            ? 'vmp-player'
+            : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -566,13 +580,13 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
-          } else {
-            if (this.isAutoPlay) {
+            if (this.playerOtherOptions.autoplay == 1 && !this.isWarnPreview) {
               this.play();
             }
-          }
-          if (this.playerOtherOptions.autoplay == 1) {
-            this.play();
+          } else {
+            if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
+              this.play();
+            }
           }
         });
       },
