@@ -1,6 +1,5 @@
 <template>
   <div class="vmp-handup" v-if="isInteractLive && !isBanned && !allBanned">
-    <!-- // 分组内 20 不展示举手、下麦按钮； roleMap: { 1: '主持人', 2: '观众', 3: '助理', 4: '嘉宾', 20: '组长' } -->
     <div>
       <el-button
         @click="handleHandClick"
@@ -32,14 +31,22 @@
   export default {
     name: 'VmpHandup',
     data() {
+      const groupData = this.$domainStore.state.groupServer.groupInitData;
+      const interactStatus = this.$domainStore.state.roomBaseServer.interactToolStatus;
       return {
         btnText: this.$t('interact.interact_1001'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
         waitInterval: null,
         loading: false,
-        isBanned: useChatServer().state.banned, //true禁言，false未禁言
-        allBanned: useChatServer().state.allBanned //true全体禁言，false未禁言
+        isBanned: groupData.isInGroup
+          ? groupData.is_banned == 1
+            ? true
+            : false
+          : interactStatus.is_banned == 1
+          ? true
+          : false, //true禁言，false未禁言
+        allBanned: groupData.isInGroup ? false : interactStatus.all_banned == 1 ? true : false //true全体禁言，false未禁言
       };
     },
     computed: {
@@ -109,6 +116,7 @@
       });
       //监听全体禁言通知
       useChatServer().$on('allBanned', res => {
+        console.log('监听禁言通知-all', res);
         this.allBanned = res;
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
