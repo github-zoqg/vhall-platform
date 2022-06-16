@@ -192,7 +192,8 @@ const sharedConfig = {
       moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant'
+      vant: 'vant',
+      lodash: '_'
     },
     // 插件
     plugins: getPlugins()
@@ -205,7 +206,7 @@ const sharedConfig = {
 
     if (!isDev) {
       config.optimization.minimize(true);
-      config.plugin('loadshReplace').use(new LodashModuleReplacementPlugin());
+      // config.plugin('loadshReplace').use(new LodashModuleReplacementPlugin());
       config.devtool(false); // 这个是把本地的productionSourceMap给关掉了，用下面的，不关的话，会造成，编译好的js有两个sourceMap的指向（需要注意的地方）
       config
         .plugin('SourceMapDevToolPlugin')
