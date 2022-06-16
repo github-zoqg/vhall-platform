@@ -169,6 +169,7 @@
         height: 136px;
         background: #1a1a1a;
         border-radius: 16px;
+        flex-shrink: 0;
         img {
           width: 100%;
           height: 100%;
@@ -185,6 +186,11 @@
           color: #262626;
           font-size: 28px;
           line-height: 38px;
+          display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+          /* autoprefixer: ignore next */
+          -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+          -webkit-line-clamp: 2; /** 显示的行数 **/
+          overflow: hidden; /** 隐藏超出的内容 **/
         }
         &-link {
           display: inline-block;

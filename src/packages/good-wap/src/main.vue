@@ -331,12 +331,12 @@
             color: #262626;
             font-size: 28px;
             line-height: 38px;
-            overflow: hidden;
+            display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+            /* autoprefixer: ignore next */
+            -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+            -webkit-line-clamp: 2; /** 显示的行数 **/
+            overflow: hidden; /** 隐藏超出的内容 **/
             text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
             text-align: left;
           }
           .describe {
