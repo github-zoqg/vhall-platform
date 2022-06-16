@@ -447,14 +447,6 @@
           this.displayMode = newval === 'player' ? 'mini' : 'normal';
         }
       },
-      initPlayerIndex() {
-        console.log(
-          this.initPlayerIndex,
-          this.subscribeServer.state.isFirstEnterPlayer,
-          '???jianting舰艇监听'
-        );
-        // this.subscribeServer.state.isFirstEnterPlayer && this.getWebinerStatus();
-      },
       playIndex() {
         // 多个视频持续播放
         if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
