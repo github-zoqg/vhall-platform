@@ -67,7 +67,7 @@
     },
     mounted() {
       const { watchInitData, isThirdStream } = this.roomBaseServer.state;
-      const hasRebroadCast = watchInitData.rebroadcast.id;
+      const hasRebroadCast = watchInitData.rebroadcast?.id;
 
       if (
         watchInitData.webinar.type == 1 &&

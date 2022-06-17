@@ -53,7 +53,7 @@
         </template>
         <div
           class="subscribe_into_container"
-          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType == 1)"
+          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType != 2)"
         >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -860,6 +860,14 @@
             .vmp-tab-container {
               height: auto;
             }
+          }
+          .vh-goods-wrapper {
+            overflow: hidden;
+            height: auto;
+          }
+          .vmp-recommend {
+            overflow: hidden;
+            height: auto;
           }
         }
       }
