@@ -43,17 +43,19 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
-        if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
-          this.subscribeServer.state.isFirstEnterPlayer = true;
-          if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
-            this.subscribeServer.state.initIndex++;
-          } else {
-            this.subscribeServer.state.initIndex = 0;
+        if (this.isWarnPreview) {
+          if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
+            this.subscribeServer.state.isFirstEnterPlayer = true;
+            if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.initIndex++;
+            } else {
+              this.subscribeServer.state.initIndex = 0;
+            }
+            this.subscribeServer.setWarmVideoList(
+              this.warmUpVideoList[this.subscribeServer.state.initIndex],
+              true
+            );
           }
-          this.subscribeServer.setWarmVideoList(
-            this.warmUpVideoList[this.subscribeServer.state.initIndex],
-            true
-          );
         }
       });
 
@@ -77,10 +79,7 @@ const playerMixins = {
               this.playerServer.play();
             }
           } else {
-            if (
-              this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
-              this.warmUpVideoList.length > 2
-            ) {
+            if (this.warmUpVideoList.length > 2) {
               this.playerServer.destroy();
             }
             window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
@@ -88,9 +87,6 @@ const playerMixins = {
               this.subscribeServer.state.playIndex++;
             } else {
               this.subscribeServer.state.playIndex = 0;
-              if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
-                this.playerServer.play();
-              }
             }
             this.subscribeServer.setWarmVideoList('', false);
             if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {

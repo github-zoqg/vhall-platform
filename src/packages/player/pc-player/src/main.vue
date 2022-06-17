@@ -386,6 +386,10 @@
       subscribeWarmList() {
         return this.$domainStore.state.subscribeServer.subscribeWarmList;
       },
+      // 暖场视频播放模式
+      warmPlayMode() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_player_type;
+      },
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
@@ -448,9 +452,21 @@
         }
       },
       playIndex() {
-        // 多个视频持续播放
-        if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
-          this.playerServer.play();
+        // 多个视频持续播放 暖场视频播放模式
+        if (this.warmUpVideoList.length > 1) {
+          if (
+            this.warmPlayMode == 2 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
+          ) {
+            this.playerServer.play();
+          }
+          if (
+            this.warmPlayMode == 1 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
+            this.playIndex > 0
+          ) {
+            this.playerServer.play();
+          }
         }
       }
     },
@@ -477,6 +493,7 @@
       // 初始化播放器配置项
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
+
         let params = {
           videoNode:
             this.warmUpVideoList.length < 2
@@ -573,6 +590,13 @@
             if (!this.isWarnPreview && this.playerOtherOptions.autoplay == 1) {
               this.playerServer.play();
             }
+            // if (
+            //   this.isWarnPreview &&
+            //   !this.subscribeServer.state.isFirstEnterPlayer &&
+            //   this.playerOtherOptions.autoplay == 1
+            // ) {
+            //   this.playerServer.play();
+            // }
           } else {
             if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
               this.play();

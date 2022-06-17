@@ -236,6 +236,7 @@
             this.subscribeServer.state.isChangeOrder = false;
             let recordId = window.sessionStorage.getItem('warm_recordId');
             let index = this.warmUpVideoList.findIndex(item => item == recordId);
+            console.log(index, '???woshi当前index');
             this.subscribeServer.state.playIndex = index;
             this.subscribeServer.state.initIndex = index;
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
