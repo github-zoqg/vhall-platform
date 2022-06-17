@@ -122,7 +122,7 @@
         <!-- 进度条 -->
         <div
           class="controller_slider"
-          v-if="!isLiving && (playerOtherOptions.progress_bar || isWarnPreview)"
+          v-if="!isLiving && playerOtherOptions.progress_bar && !isWarnPreview"
         >
           <el-slider
             ref="controllerRef"
@@ -157,7 +157,7 @@
                 }`"
               ></i>
             </div>
-            <div class="controller-tools-left-time" v-if="!isLiving">
+            <div class="controller-tools-left-time" v-if="!isLiving && !isWarnPreview">
               <span class="controller-tools-left-time-current">
                 {{ currentTime | secondToDate }}
               </span>

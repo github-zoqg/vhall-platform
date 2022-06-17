@@ -164,7 +164,7 @@
                 ></controlEventPoint>
               </div>
               <van-slider
-                v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
+                v-if="!isLiving && playerOtherOptions.progress_bar && !isWarnPreview"
                 v-model="sliderVal"
                 active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
@@ -189,7 +189,10 @@
                     @click.stop="refresh"
                     v-if="isLiving"
                   ></i>
-                  <span class="vmp-wap-player-control-icons-left-time" v-if="!isLiving">
+                  <span
+                    class="vmp-wap-player-control-icons-left-time"
+                    v-if="!isLiving && !isWarnPreview"
+                  >
                     {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
                   </span>
                 </span>
