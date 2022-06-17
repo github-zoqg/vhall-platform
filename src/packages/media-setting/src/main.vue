@@ -184,6 +184,7 @@
       this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
+      window.mediaSetting = this;
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
       const role = watchInitData.join_info?.role_name;
@@ -194,8 +195,8 @@
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        if (+msg.data.streamType !== 3) {
-          // 非桌面共享
+        if (![3, 4].includes(+msg.data.streamType)) {
+          // 非桌面共享 ｜ 非插播
           if (role == 1) {
             this.hostAlertVisible ? null : (this.hostAlertVisible = true);
           } else {
@@ -204,8 +205,8 @@
         }
       });
       useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
-        if (+msg.data.streamType !== 3) {
-          // 非桌面共享
+        if (![3, 4].includes(+msg.data.streamType)) {
+          // 非桌面共享 ｜ 非插播
           if (!this.alertStatus) {
             if (role == 1) {
               this.hostAlertVisible ? null : (this.hostAlertVisible = true);

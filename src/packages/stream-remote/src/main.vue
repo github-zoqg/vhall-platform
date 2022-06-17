@@ -64,7 +64,7 @@
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-first-line"
       >
         <span
@@ -150,7 +150,7 @@
 
     <section v-else class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-first-line"
       >
         <el-tooltip
@@ -206,7 +206,7 @@
       </p>
 
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-second-line"
       >
         <el-tooltip content="设为主讲人" placement="bottom">
@@ -376,7 +376,7 @@
       isShowDownMicBtn() {
         return (
           (this.joinInfo.role_name == 1 && this.stream.accountId != this.groupLeaderId) ||
-          (this.groupRole == 20 && this.stream.roleName != 1)
+          (this.isInGroup && this.groupRole == 20 && this.stream.roleName != 1)
         );
       },
       isShowSetMainScreenBtn() {
@@ -683,7 +683,7 @@
                 reject();
               }
             }
-          }, 100);
+          }, 130);
         });
       }
     }

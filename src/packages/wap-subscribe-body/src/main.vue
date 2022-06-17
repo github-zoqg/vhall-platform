@@ -902,6 +902,14 @@
               height: auto;
             }
           }
+          .vh-goods-wrapper {
+            overflow: hidden;
+            height: auto;
+          }
+          .vmp-recommend {
+            overflow: hidden;
+            height: auto;
+          }
         }
       }
     }

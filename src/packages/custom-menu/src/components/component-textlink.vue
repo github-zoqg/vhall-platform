@@ -8,6 +8,7 @@
   </div>
 </template>
 <script>
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   /**
    * 文字连接自定义菜单
    */
@@ -21,7 +22,14 @@
     methods: {
       jump() {
         if (!this.info || !this.info.src) return;
-        window.open(this.info.src);
+        const { system } = getBrowserType();
+        if ('ios' === system) {
+          console.log('当前是手机端打开-ios');
+          window.location.href = this.info.src;
+        } else {
+          console.log('当前是手机端打开-其它');
+          window.open(this.info.src);
+        }
       }
     }
   };

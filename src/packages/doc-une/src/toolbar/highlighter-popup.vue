@@ -12,7 +12,7 @@
       >
         <i
           class="vh-iconfont vh-full-brush-l"
-          :style="`font-size:12px;transform:scale(${item.value / 6})`"
+          :style="`font-size:12px;line-height:1;transform:scale(${item.value / 6})`"
         ></i>
       </div>
     </template>
