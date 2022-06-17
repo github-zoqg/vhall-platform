@@ -178,19 +178,11 @@
          *    高度不为 0,但是为无延迟旁路布局，返回true,否则返回 false
          * 6. 没有互动实例的时候高度为0
          */
-        console.log(
-          '1-1-1-1-1-1-11--1',
-          !this.$domainStore.state.interactiveServer.isInstanceInit,
-          this.isNoDelay,
-          this.isPolling
-        );
         if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
           return true;
         } else if (this.isNoDelay != 1 && this.isPolling) {
-          console.log('1-1-1-1-12-2-2--2-2-2-');
           return true;
         }
-        console.log('1-1-1-1-1-33-3-3-');
         if (!this.remoteSpeakers.length) {
           if (this.localSpeaker.accountId && this.joinInfo.third_party_user_id != this.mainScreen) {
             return false;

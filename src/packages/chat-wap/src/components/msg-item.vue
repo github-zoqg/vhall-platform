@@ -187,7 +187,7 @@
                 </p>
                 <div class="imgs">
                   <div
-                    @click="$emit('preview', img)"
+                    @click="previewImg(img, index, source.content.image_urls)"
                     class="msg-content_chat-img"
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
@@ -205,7 +205,7 @@
               <div class="msg-content_body">
                 <span v-html="msgContent" class="chat-text"></span>
                 <div
-                  @click="previewImg(img)"
+                  @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
                   v-for="(img, index) in source.content.image_urls"
                   :key="index"

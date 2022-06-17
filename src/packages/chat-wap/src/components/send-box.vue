@@ -25,7 +25,15 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
-            <span v-if="isBanned || isAllBanned || isMuted" class="span__speak__disable">
+            <span
+              v-if="
+                isBanned ||
+                isAllBanned ||
+                isMuted ||
+                (groupInitData.isInGroup && groupInitData.is_banned == 1)
+              "
+              class="span__speak__disable"
+            >
               {{ $t('chat.chat_1079') }}
             </span>
             <!-- 你已被禁言  /  全体禁言中  -->
@@ -352,7 +360,7 @@
         if (
           (this.isBanned && !this.groupInitData.isInGroup) ||
           this.isAllBanned ||
-          (this.groupInitData.isBanned && this.groupInitData.isInGroup) ||
+          (this.groupInitData.is_banned == 1 && this.groupInitData.isInGroup) ||
           this.isMuted
         ) {
           return;

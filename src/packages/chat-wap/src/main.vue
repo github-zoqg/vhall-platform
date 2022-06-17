@@ -79,7 +79,7 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-  // import { ImagePreview } from 'vh5-ui';
+  import { ImagePreview } from 'vh5-ui';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
@@ -206,7 +206,7 @@
               (this.webinar.mode == 6 &&
                 interactToolStatus.auto_speak == 1 &&
                 !groupInitData.isInGroup) ||
-              groupInitData.join_role == 2,
+              (groupInitData.join_role == 2 && groupInitData.isInGroup),
             video: false
           };
         }
@@ -430,7 +430,7 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
-        this.$imagePreview({
+        ImagePreview({
           images: list,
           startPosition: index,
           lazyLoad: true

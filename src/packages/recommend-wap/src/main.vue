@@ -84,7 +84,6 @@
           this.finished = true;
           return false;
         }
-        this.loading = true;
         this.num++;
         this.pos = parseInt((this.num - 1) * this.limit);
         this.queryAdsList();
@@ -94,16 +93,16 @@
        */
       async queryAdsList() {
         try {
-          this.loading = false;
           const res = await this.recommendServer.queryAdsList({
             webinar_id: this.$route.params.id,
             pos: this.pos,
             limit: 10
           });
-
+          this.loading = false;
           const data = this.advs;
           this.advs = data.concat(res.data.adv_list);
         } catch (error) {
+          this.loading = false;
           console.log(error);
         }
       },
