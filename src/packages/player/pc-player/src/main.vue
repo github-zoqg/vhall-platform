@@ -588,15 +588,8 @@
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
             if (!this.isWarnPreview && this.playerOtherOptions.autoplay == 1) {
-              this.playerServer.play();
+              this.playerServer && this.play();
             }
-            // if (
-            //   this.isWarnPreview &&
-            //   !this.subscribeServer.state.isFirstEnterPlayer &&
-            //   this.playerOtherOptions.autoplay == 1
-            // ) {
-            //   this.playerServer.play();
-            // }
           } else {
             if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
               this.play();
