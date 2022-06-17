@@ -155,7 +155,8 @@
             nickname: msg.context.nick_name || msg.context.nickname,
             role_name: msg.context.role_name,
             is_speak: Number(isSpeak),
-            isPolling: Number(isPolling)
+            isPolling: Number(isPolling),
+            platform: msg.context.platform || ''
           };
 
           this.memberServer.state.onlineUsers.push(user);
