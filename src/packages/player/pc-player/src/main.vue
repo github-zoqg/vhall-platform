@@ -497,7 +497,7 @@
               position: this.marquee.position // 跑马灯位置 , 1 随机 2上,3中 4下
             };
           }
-          // 水印
+          // 水印  播放器
           if (this.water && this.water.watermark_open == 1) {
             const alianMap = new Map([
               [1, 'tl'],
