@@ -20,7 +20,7 @@
 <script>
   import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
+
   export default {
     name: 'VmpQuestionnaireWap',
     data() {
@@ -50,6 +50,15 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
+        if (!window.VHall_Questionnaire_Service) {
+          this.$message({
+            type: 'warning',
+            message: '问卷SDK未加载，功能暂不支持'
+          });
+          return;
+        }
+        // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        this.questionnaireServer.init();
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1087'));
@@ -65,40 +74,49 @@
         this.popupVisible = false;
       },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          useChatServer().addChatToList({
-            nickname: msg.nick_name,
-            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-            content: {
-              text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
-              questionnaire_id: msg.questionnaire_id
-            },
-            roleName: msg.room_role,
-            type: msg.type,
-            interactStatus: true,
-            isCheck: true
-          });
-          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
-            msg.questionnaire_id
-          );
-          if (canAnswer !== true) {
-            this.questionnaireServer.setDotVisible(false);
-            return false;
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
+          async msg => {
+            useChatServer().addChatToList({
+              nickname: msg.nick_name,
+              avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+              content: {
+                text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
+                questionnaire_id: msg.questionnaire_id
+              },
+              roleName: msg.room_role,
+              type: msg.type,
+              interactStatus: true,
+              isCheck: true
+            });
+            const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+              msg.questionnaire_id
+            );
+            if (canAnswer !== true) {
+              this.questionnaireServer.setDotVisible(false);
+              return false;
+            }
+            this.questionnaireServer.setDotVisible(true);
+            this.popupVisible = true;
+            await this.$nextTick();
+            this.questionnaireServer.renderQuestionnaire4Wap(
+              '#qs-content-box',
+              msg.questionnaire_id
+            );
           }
-          this.questionnaireServer.setDotVisible(true);
-          this.popupVisible = true;
-          await this.$nextTick();
-          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);
-        });
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-          if (res.code === 200) {
-            this.$toast(this.$t('form.form_1088'));
-            this.popupVisible = false;
-          } else {
-            this.$toast(this.$t('form.form_1087'));
-            this.popupVisible = false;
+        );
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+          res => {
+            if (res.code === 200) {
+              this.$toast(this.$t('form.form_1088'));
+              this.popupVisible = false;
+            } else {
+              this.$toast(this.$t('form.form_1087'));
+              this.popupVisible = false;
+            }
           }
-        });
+        );
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
           this.popupVisible = false;
