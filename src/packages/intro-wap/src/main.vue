@@ -235,7 +235,7 @@
       }
 
       &__content-main {
-        // padding-bottom: 30px;
+        padding-bottom: 24px;
         color: #595959;
         word-break: break-all;
         line-height: 1.4;
