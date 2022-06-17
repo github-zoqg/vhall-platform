@@ -1293,7 +1293,7 @@
         flex-direction: column;
         justify-content: center;
         flex-wrap: wrap;
-        padding: 30px 0;
+        /* padding: 30px 0; */
         li {
           width: 100%;
           height: 60px;

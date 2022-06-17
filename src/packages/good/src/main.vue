@@ -99,7 +99,7 @@
         if (this.isSubscribe) {
           window.addEventListener('scroll', this.scrollLoadGoodsList, true);
         } else {
-          wrap.addEventListener('scroll', this.scrollLoadGoodsList);
+          wrap.addEventListener('scroll', this.scrollLoadGoodsList, true);
         }
       },
       scrollLoadGoodsList: debounce(function (e) {

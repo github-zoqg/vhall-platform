@@ -315,20 +315,24 @@
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
         const offsetTop = menuDom.offsetTop;
-        dom.addEventListener('scroll', e => {
-          let scrollTop = e.target.scrollTop;
-          if (scrollTop > offsetTop) {
-            this.isScorllTab = true;
-            if (this.webinarType == 2 && this.isEmbed) {
-              this.showBottomBtn = false;
+        dom.addEventListener(
+          'scroll',
+          e => {
+            let scrollTop = e.target.scrollTop;
+            if (scrollTop > offsetTop) {
+              this.isScorllTab = true;
+              if (this.webinarType == 2 && this.isEmbed) {
+                this.showBottomBtn = false;
+              } else {
+                this.showBottomBtn = true;
+              }
             } else {
-              this.showBottomBtn = true;
+              this.isScorllTab = false;
+              this.showBottomBtn = false;
             }
-          } else {
-            this.isScorllTab = false;
-            this.showBottomBtn = false;
-          }
-        });
+          },
+          true
+        );
       },
       listenEvents() {
         this.subscribeServer.$on('live_start', () => {
