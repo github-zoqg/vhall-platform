@@ -280,6 +280,13 @@
         }
 
         this.domain = await this.initSendLive(_data);
+        const { watchInitData } = this.roomBaseServer.state;
+
+        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
+        document.title = watchInitData.webinar.subject;
+
+        const mockResult = (this.rootActive = watchInitData);
+        this.getTools(mockResult.interact.room_id);
         await useMsgServer().init();
         console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
@@ -291,12 +298,7 @@
         //     ..._data
         //   })
         //   .then(async res => {
-        const { watchInitData } = this.roomBaseServer.state;
 
-        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
-        document.title = watchInitData.webinar.subject;
-
-        const mockResult = (this.rootActive = watchInitData);
         console.warn(
           '*************this.rootActive*************',
           this.roomBaseServer.state.watchInitData,
@@ -316,7 +318,7 @@
         sessionStorage.setItem('defaultMainscreenDefinition', mockResult.push_definition || '');
         sessionStorage.setItem('defaultSmallscreenDefinition', mockResult.hd_definition || '');
         sessionStorage.setItem('interact_token', mockResult.interact.interact_token);
-        this.getTools(mockResult.interact.room_id);
+
         // // 初始化数据上报
         this.initVHallReport();
 
