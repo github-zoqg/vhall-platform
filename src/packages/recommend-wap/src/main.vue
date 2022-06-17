@@ -3,7 +3,7 @@
     <van-list
       v-model="loading"
       :finished="finished"
-      finished-text="没有更多了"
+      :finished-text="$t('nav.nav_1043')"
       @load="onLoad"
       class="vmp-recommend-list"
     >
@@ -19,7 +19,7 @@
           </div>
           <div class="recommend-item__content__info">
             <span class="recommend-item__content__info-title">{{ item.subject }}</span>
-            <span class="recommend-item__content__info-link">查看</span>
+            <span class="recommend-item__content__info-link">{{ $t('menu.menu_1010') }}</span>
           </div>
         </div>
       </van-cell>
