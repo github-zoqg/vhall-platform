@@ -82,7 +82,7 @@
                     >
                       <el-input
                         v-if="question.type == 0 && question.default_type == 2"
-                        v-model.number="form[question.id]"
+                        v-model="form[question.id]"
                         :maxlength="question.type == 0 ? '' : 60"
                         :show-word-limit="question.type != 0"
                         autocomplete="off"
@@ -295,8 +295,7 @@
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
-                      v-model.number.trim="verifyForm.phone"
-                      type="number"
+                      v-model.trim="verifyForm.phone"
                       auto-complete="off"
                       :placeholder="$t('account.account_1025')"
                     ></el-input>
@@ -775,6 +774,8 @@
         counties: {},
         //是否手机验证
         isPhoneValidate: false,
+        //是否支持国外手机号
+        isAbroadPhoneValide: false,
         // 云盾key
         captchaKey: 'b7982ef659d64141b7120a6af27e19a0',
         // 云盾值
@@ -820,26 +821,40 @@
         handler(newVal) {
           const _this = this;
           // 根据是否开启短信验证，生成相应的手机号验证规则
-          if (newVal) {
-            _this.verifyRules.phone = {
-              required: true,
-              validator: _this.validPhone,
-              trigger: 'blur'
-            };
-          } else {
-            _this.verifyRules.phone = {
-              type: 'number',
-              required: true,
-              message: _this.$t('account.account_1069'),
-              trigger: 'blur'
-            };
-          }
+          // if (newVal) {
+          // _this.verifyRules.phone = {
+          //   required: true,
+          //   validator: _this.validPhone,
+          //   trigger: 'blur'
+          // };
+          // } else {
+          //   _this.verifyRules.phone = {
+          //     type: 'number',
+          //     required: true,
+          //     message: _this.$t('account.account_1069'),
+          //     trigger: 'blur'
+          //   };
+          // }
           // 云盾实例
           if (newVal) {
             _this.$nextTick(() => {
               _this.callCaptcha('#setCaptcha');
               _this.callCaptcha('#setCaptcha1');
             });
+          }
+        }
+      },
+      isAbroadPhoneValide: {
+        // immediate: true,
+        handler(newVal) {
+          const _this = this;
+          // 是否支持国外手机号
+          if (newVal) {
+            _this.verifyRules.phone = {
+              required: true,
+              validator: _this.checkAbroadPhone,
+              trigger: 'blur'
+            };
           }
         }
       },
@@ -881,20 +896,28 @@
                 };
               } else if (item.type === 0 && item.default_type === 2) {
                 // 手机号
-                if (this.isPhoneValidate) {
+                // if (this.isPhoneValidate) {
+                rules[item.id] = {
+                  required: !!item.is_must,
+                  validator: this.validPhone,
+                  trigger: 'blur'
+                };
+                // }
+                // 是否支持国外手机号
+                if (this.isAbroadPhoneValide) {
                   rules[item.id] = {
                     required: !!item.is_must,
-                    validator: this.validPhone,
+                    validator: this.checkAbroadPhone,
                     trigger: 'blur'
                   };
-                } else {
-                  // TODO待翻译
-                  rules[item.id] = {
-                    type: 'number',
-                    required: !!item.is_must,
-                    message: this.$t('account.account_1069'),
-                    trigger: 'blur'
-                  };
+                  // }else {
+                  // // TODO待翻译
+                  // rules[item.id] = {
+                  //   type: 'number',
+                  //   required: !!item.is_must,
+                  //   message: this.$t('account.account_1069'),
+                  //   trigger: 'blur'
+                  // };
                 }
               } else if (item.type === 0 && item.default_type === 4) {
                 // 性别
@@ -1044,10 +1067,15 @@
       //已报名的表单
       verifyRules() {
         return {
+          // phone: {
+          //   type: 'number',
+          //   required: true,
+          //   message: this.$t('account.account_1069'),
+          //   trigger: 'blur'
+          // },
           phone: {
-            type: 'number',
             required: true,
-            message: this.$t('account.account_1069'),
+            validator: this.validPhone,
             trigger: 'blur'
           },
           code: {
@@ -1125,6 +1153,16 @@
           } else {
             return true;
           }
+        }
+      },
+      // 校验国外手机号
+      checkAbroadPhone(rule, value, callback) {
+        let reg = /^\d{15}$/;
+        if (!value) {
+          return callback(this.$t('account.account_1025'));
+        }
+        if (!reg.test(value)) {
+          return callback(this.$t('account.account_1069'));
         }
       },
       //隐私协议勾选验证
@@ -1236,6 +1274,9 @@
           const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
           this.isPhoneValidate =
             phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+          // 是否支持国外手机号
+          this.isAbroadPhoneValide =
+            phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
           // 默认填写手机号
           !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
           if (!_this.isPreview) {
@@ -1247,6 +1288,9 @@
               }
             });
           }
+          // 更改需要rule后须清空校验一次！！！
+          this.$refs['verifyForm'].resetFields();
+
           this.list = list;
           //地域 options 格式化处理
           this.list.some(item => {
@@ -1578,6 +1622,7 @@
               webinar_id: this.webinarId,
               form: JSON.stringify(form)
             };
+            console.log(params);
             this.isPhoneValidate && (params.verify_code = this.form.code);
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
