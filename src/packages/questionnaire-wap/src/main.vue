@@ -58,7 +58,7 @@
           return;
         }
         // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-        this.questionnaireServer.init();
+        this.questionnaireServer.init({ mode: 'watch' });
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1087'));
