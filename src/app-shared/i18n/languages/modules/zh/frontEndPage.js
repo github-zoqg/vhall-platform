@@ -449,7 +449,9 @@ export default {
     menu_1010: '查看',
     menu_1011: '暂无图片',
     menu_1012: '默认图文',
-    menu_1013: '章节'
+    menu_1013: '章节',
+    menu_1014: '视频',
+    menu_1015: '音频'
   },
   interact_tools: {
     interact_tools_1001: '请输入抽奖标题',
@@ -599,7 +601,8 @@ export default {
     message_1031: '创建本地预览流失败,请检查设备',
     message_1032: '请输入必填信息：',
     message_1033: '邀请发送成功',
-    message_1034: '邀请演示发送成功'
+    message_1034: '邀请演示发送成功',
+    message_1035: '为了保证更好的观看体验，请您竖屏观看'
   },
   cash: {
     cash_1001: '管理余额',

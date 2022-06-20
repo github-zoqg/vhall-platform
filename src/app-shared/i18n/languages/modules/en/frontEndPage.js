@@ -453,7 +453,9 @@ export default {
     menu_1010: 'Check',
     menu_1011: 'No data',
     menu_1012: 'The default graphic',
-    menu_1013: 'Chapter'
+    menu_1013: 'Chapter',
+    menu_1014: 'Video',
+    menu_1015: 'Audio'
   },
   interact_tools: {
     interact_tools_1001: 'Please enter the lottery title',
@@ -607,7 +609,8 @@ export default {
     message_1031: 'Check whether the device is disabled or occupied',
     message_1032: 'This item is required',
     message_1033: 'Invitation sent successfully',
-    message_1034: 'Invitation sent successfully'
+    message_1034: 'Invitation sent successfully',
+    message_1035: 'For better watching experience, please use landscape mode'
   },
   cash: {
     cash_1001: 'Manage balance',

@@ -459,7 +459,9 @@ export default {
     menu_1010: 'Chequear',
     menu_1011: 'Sin imagen',
     menu_1012: 'Gráfico por defecto',
-    menu_1013: 'Capítulos'
+    menu_1013: 'Capítulos',
+    menu_1014: '',
+    menu_1015: ''
   },
   interact_tools: {
     interact_tools_1001: 'Por favor, ingrese el título del sorteo',
@@ -621,7 +623,8 @@ export default {
     message_1031: '',
     message_1032: '',
     message_1033: '',
-    message_1034: ''
+    message_1034: '',
+    message_1035: ''
   },
   cash: {
     cash_1001: 'Gestionar saldo',
