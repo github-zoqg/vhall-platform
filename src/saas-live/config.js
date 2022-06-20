@@ -921,7 +921,7 @@ export const serverConfig = {
   // 客户端嵌入页组件
   embedClientRoot: {
     component: 'VmpEmbedClient',
-    children: ['comDocUne', 'dlgDocList'],
+    children: ['comDocUne', 'dlgDocList', 'comChat'],
     emiSwitchTo: {
       cuid: ['comDocUne'],
       method: 'switchTo',
