@@ -1,5 +1,5 @@
 import Vue from 'vue';
-
+import Vh5Ui from 'vh5-ui';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -36,6 +36,7 @@ import VmpChatWap from '@/packages/chat-wap';
 import VmpGoodsDetail from '@/packages/wap-goods-detail';
 
 import 'overlayscrollbars/css/OverlayScrollbars.css';
+import 'vh5-ui/lib/index.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 
 //wap互动工具box
@@ -60,7 +61,9 @@ import VmpCashWap from '@/packages/cash-wap';
 import VmpLotteryWap from '@/packages/lottery-wap';
 
 // 送礼物飘屏动画
-// import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+import VmpWapRewardEffect from '@/packages/wap-reward-effect';
+// 送礼物飘屏动画svga
+import VmpWapRewardEffectFullScreen from '@/packages/wap-reward-effect-full-screen';
 
 // 章节
 import VmpChapterWap from '@/packages/watch-chapter-wap';
@@ -114,7 +117,8 @@ Vue.use(VmpCustomMenuWap);
 Vue.use(VmpSignWap);
 Vue.use(VmpMemberListWap);
 Vue.use(VmpWapBody);
-// Vue.use(VmpWapRewardEffect);
+Vue.use(VmpWapRewardEffect);
+Vue.use(VmpWapRewardEffectFullScreen);
 Vue.use(VmpScreenPostWap);
 Vue.use(VmpUserCenterWap);
 Vue.use(VmpUserAccountWap);
@@ -124,7 +128,7 @@ Vue.use(VmpChapterWap);
 Vue.use(VmpQaWap);
 Vue.use(VmpQuestionnaireWap);
 Vue.use(VmpRedPacketWap);
-
+Vue.use(Vh5Ui);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpWapSignUpForm);
 Vue.use(VmpWapDesktopScreen);

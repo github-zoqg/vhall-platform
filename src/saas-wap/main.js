@@ -11,6 +11,7 @@ import './init-global/prototype';
 import App from './App.vue';
 // 导入路由
 import router from './router';
+
 // 引入国际化组件
 import i18n from '@/app-shared/i18n/index';
 // domain store

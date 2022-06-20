@@ -26,7 +26,10 @@
           v-for="item of visibleMenu"
           :ref="item.id"
           class="vmp-tab-menu-item"
-          :class="{ 'vmp-tab-menu-item__active': selectedId === item.id }"
+          :class="{
+            'vmp-tab-menu-item__active': selectedId === item.id,
+            'vmp-tab-menu-item_subscrbe': !isToggleBtnVisible
+          }"
           :key="item.id"
           @click="select({ type: item.type, id: item.id })"
         >
@@ -40,7 +43,7 @@
       <span
         v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
-        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
         @click="next"
       >
         <i class="vh-iconfont vh-line-arrow-right" />
@@ -86,7 +89,7 @@
         },
         themeClass: {
           bgColor: '',
-          pageBg: '#fb3a32'
+          pageBg: '#fb2626'
         }
       };
     },
@@ -155,6 +158,7 @@
       async 'visibleMenu.length'() {
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
+        this.computedWidth();
       },
       ['roomBaseServer.state.configList']: {
         deep: true,
@@ -181,6 +185,7 @@
       this.setSkinInfo();
       this.selectDefault();
       this.setSetingHeight();
+      this.computedWidth();
     },
 
     methods: {
@@ -188,10 +193,11 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
+        if (this.isSubscribe) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100 + 90;
+        let baseHeight = playerHeight + 71 + 94;
         let calssname = '.tab-content';
         if (this.isEmbed) {
           baseHeight = playerHeight;
@@ -201,6 +207,21 @@
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
         document.querySelector(calssname).style.height = popHeight;
       },
+      computedWidth() {
+        let childNodes = document.querySelector('.vmp-tab-menu-scroll-container').childNodes;
+        let childWidth = 0;
+        childNodes.forEach(e => {
+          childWidth += e.clientWidth; //每个item的padding
+        });
+        childWidth += 24; //tab的padding
+        console.log(childWidth, '------------', screen.width);
+        if (screen.width > childWidth) {
+          this.isToggleBtnVisible = false;
+        } else {
+          this.isToggleBtnVisible = true;
+        }
+      },
+
       async setSkinInfo() {
         const { skinInfo } = this.$domainStore.state.roomBaseServer;
 
@@ -244,6 +265,7 @@
                   : this.$t('chat.chat_1026', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
+            nickname: msg.data.nick_name,
             type: msg.data.type,
             interactStatus: true
           });
@@ -259,6 +281,7 @@
                   : this.$t('chat.chat_1081', { n: msg.data.name })
             },
             roleName: msg.data.role_name,
+            nickname: msg.data.nick_name,
             type: msg.data.type,
             interactStatus: true
           });
@@ -610,11 +633,11 @@
       position: relative;
       padding: 0 24px;
       width: 100%;
-      height: 90px;
+      height: 80px;
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
-      border-bottom: 1px solid #d4d4d4;
+      border-bottom: 1px solid #f0f0f0;
 
       /*  &::before {
         content: '';
@@ -630,23 +653,24 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        width: 24px;
-        height: 100%;
+        min-width: 24px;
         text-align: center;
         font-size: 14px;
-        color: #444;
+        color: #8c8c8c;
         height: 100%;
         cursor: pointer;
 
-        &.disabledClick:hover {
-          cursor: auto;
+        &.disabledClick {
           i {
-            color: @font-light-low;
+            color: rgba(140, 140, 140, 0.4);
           }
         }
 
         &:hover {
           color: #666;
+        }
+        .vh-iconfont {
+          font-weight: 600;
         }
       }
     }
@@ -664,7 +688,6 @@
       overflow-x: auto;
       display: flex;
       flex-wrap: nowrap;
-      overflow-x: auto;
 
       &::-webkit-scrollbar {
         display: none;
@@ -677,15 +700,21 @@
         height: 100%;
         justify-content: center;
         align-items: center;
-        padding: 0 34px;
+        padding: 0 32px;
         color: #595959;
         cursor: pointer;
         user-select: none;
+        &_subscrbe {
+          &:first-child {
+            padding-left: 0;
+          }
+        }
 
         .item-text {
           display: flex;
           align-items: center;
           line-height: 1.2;
+          font-size: 30px;
         }
 
         .tips {

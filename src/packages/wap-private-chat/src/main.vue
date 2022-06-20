@@ -206,7 +206,7 @@
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.chatContent.offsetHeight;
+            this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
             this.virtual.showlist = data.cuid == this.cuid;
             this.chatlistHeight = this.virtual.contentHeight;
             this.scrollBottom();
@@ -272,9 +272,9 @@
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px 120为聊天区域高度
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100 + 120 + 90;
+        let baseHeight = playerHeight + 71 + 94 + 90;
         if (this.isEmbed) {
-          baseHeight = playerHeight + 120 + 90;
+          baseHeight = playerHeight + 94 + 90;
         }
         this.chatlistHeight = this.virtual.contentHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize);

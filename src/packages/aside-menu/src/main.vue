@@ -155,7 +155,7 @@
             }
 
             // 转播中
-            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+            if (this.roomBaseServer.state.watchInitData.rebroadcast?.isRebroadcasting) {
               vn.setHiddenState(true);
               continue;
             } else {
@@ -181,7 +181,7 @@
             }
           } else if (vn.kind === 'board') {
             // 转播中
-            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+            if (this.roomBaseServer.state.watchInitData.rebroadcast?.isRebroadcasting) {
               vn.setHiddenState(true);
               continue;
             } else {
@@ -215,7 +215,7 @@
               continue;
             }
             // 转播中
-            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+            if (this.roomBaseServer.state.watchInitData.rebroadcast?.isRebroadcasting) {
               vn.setDisableState(true);
               continue;
             } else {
@@ -290,7 +290,7 @@
               continue;
             }
             // 转播中
-            if (this.roomBaseServer.state.watchInitData.rebroadcast.isRebroadcasting) {
+            if (this.roomBaseServer.state.watchInitData.rebroadcast?.isRebroadcasting) {
               vn.setDisableState(true);
               continue;
             } else {

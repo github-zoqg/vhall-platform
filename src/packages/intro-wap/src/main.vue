@@ -10,13 +10,14 @@
         </header>
         <main class="vmp-intro-block__detail">
           <p>
-            <i class="vh-iconfont vh-line-time" />
-            {{ $t('common.common_1012') }}:{{ startTime }}
+            <!-- <i class="vh-iconfont vh-line-time" /> -->
+            {{ startTime }}
           </p>
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
             <p v-if="watchInitData.subscribe.show">
-              <i class="vh-iconfont vh-line-user"></i>
-              {{ $t('common.common_1031') }}:{{ watchInitData.subscribe.num }}
+              <i18n path="appointment.appointment_1018">
+                <span place="n">{{ watchInitData.subscribe.num }}</span>
+              </i18n>
             </p>
           </template>
           <template v-if="watchInitData.status != 'subscribe'">
@@ -27,8 +28,7 @@
             </p>
           </template>
         </main>
-        <!-- 7.0.6迭代删除
-        <div
+        <!-- <div
           class="vmp-intro-block__auth"
           v-if="
             !isEmbed &&
@@ -61,7 +61,7 @@
         </div> -->
       </section>
       <section class="vmp-intro-block vmp-intro-block-content">
-        <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header>
+        <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
         <main class="vmp-intro-block__content-main" v-html="content"></main>
       </section>
       <aside>
@@ -152,16 +152,17 @@
     flex-direction: column;
 
     .vmp-intro-block {
-      padding: 0.4rem;
+      padding: 32px 24px 0 24px;
       background-color: #fff;
       position: relative;
 
-      &:not(:first-child) {
-        margin-top: 20px;
-      }
+      // &:not(:first-child) {
+      //   margin-top: 20px;
+      // }
 
       &-content {
         flex: 1 1 auto;
+        padding-top: 32px;
       }
 
       &__headtitle {
@@ -174,9 +175,9 @@
         line-clamp: 2;
         -webkit-box-orient: vertical;
         word-break: break-all;
-        font-weight: bold;
+        font-weight: 500;
         line-height: 48px;
-        color: @font-hover-low;
+        color: #262626;
         .delay-icon {
           display: inline-block;
           width: 116px;
@@ -212,6 +213,10 @@
       }
 
       &__detail {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
         p {
           i {
             margin-right: 8px;
@@ -219,21 +224,21 @@
 
           height: 40px;
           font-size: 28px;
-          font-family: PingFangSC;
+          font-family: Arial;
           font-weight: 400;
-          color: @bg-end-normal;
+          color: #595959;
           line-height: 40px;
-          margin-top: 15px;
+          // margin-top: 15px;
           display: flex;
           align-items: center;
         }
       }
 
       &__content-main {
-        padding-bottom: 30px;
-        color: #666;
+        padding-bottom: 24px;
+        color: #595959;
         word-break: break-all;
-        line-height: 1.2;
+        line-height: 1.4;
         p {
           word-break: break-all;
         }

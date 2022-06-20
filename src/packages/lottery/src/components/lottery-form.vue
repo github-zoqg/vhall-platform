@@ -111,6 +111,7 @@
       </ul>
       <el-form-item size="mini" label="重复中奖" class="repeat-winning">
         <el-switch
+          class="lottery-form-switch"
           v-model="repeatWinning"
           active-color="#FB3A32"
           inactive-color="#CECECE"
@@ -119,8 +120,28 @@
           {{ repeatWinning ? '已开启，已中奖者可再次参与抽奖' : '开启后，已中奖者可再次参与抽奖' }}
         </span>
       </el-form-item>
-      <el-form-item label="中奖名单" class="repeat-winning">
-        <el-switch v-model="showWinner" active-color="#FB3A32" inactive-color="#CECECE"></el-switch>
+      <el-form-item size="mini" label="领奖信息" class="repeat-winning">
+        <el-switch
+          class="lottery-form-switch"
+          v-model="needTakeAward"
+          active-color="#FB3A32"
+          inactive-color="#CECECE"
+        ></el-switch>
+        <span>
+          {{
+            needTakeAward
+              ? '关闭后，中奖用户不需要填写领奖信息'
+              : '开启后，中奖用户需要填写领奖信息'
+          }}
+        </span>
+      </el-form-item>
+      <el-form-item size="mini" label="中奖名单" class="repeat-winning">
+        <el-switch
+          class="lottery-form-switch"
+          v-model="showWinner"
+          active-color="#FB3A32"
+          inactive-color="#CECECE"
+        ></el-switch>
         <span>
           {{ showWinner ? '已开启，抽奖结束后显示中奖名单' : '开启后，抽奖结束后显示中奖名单' }}
         </span>
@@ -178,6 +199,7 @@
         userKeywords: '',
         userListShow: false,
         showWinner: false, // 中奖名单
+        needTakeAward: true, // 是否需要填写中奖信息
         startButtonDisabled: false
       };
     },
@@ -201,6 +223,7 @@
        */
       resetForm() {
         this.joinLotteryType = '1';
+        this.needTakeAward = true;
         this.prize = {};
         this.updateLotteryUser().then(() => {
           this.getLotteryCount();
@@ -324,7 +347,8 @@
           lottery_user_ids: chooseUserArr.join(',') || '', // 设置中奖用户ID
           is_repetition: this.repeatWinning ? 1 : 0, // 是否允许重复中奖1:允许0:不允许
           is_publish: this.showWinner ? 1 : 0, // 是否公布中奖名单1:公布0:不公布
-          prize_id: this.prize?.prize_id || '' // 奖品ID
+          prize_id: this.prize?.prize_id || '', // 奖品ID
+          need_take_award: this.needTakeAward ? 1 : 0
         };
         if (this.joinLotteryType == 8) {
           //  口令 <=15个字符, lottery_type=8时不能为空
@@ -444,6 +468,8 @@
     font-size: 12px;
     color: #999;
     margin-bottom: 0;
+    height: 24px;
+    line-height: 24px;
     span {
       color: #fb3a32;
     }
@@ -527,12 +553,10 @@
       border-radius: 4px;
       float: left;
       padding: 0 8px;
-      // width: 115px;
       height: 32px;
       line-height: 32px;
       color: #666;
       margin-right: 8px;
-      // text-indent: 6px;
       background: #f7f7f7;
       span {
         cursor: pointer;
@@ -562,6 +586,10 @@
         color: #fb3a32;
       }
     }
+  }
+  .lottery-form-switch {
+    position: relative;
+    top: -1px;
   }
 </style>
 <style lang="less">

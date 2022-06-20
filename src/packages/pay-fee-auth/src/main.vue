@@ -89,7 +89,7 @@
           .then(res => {
             if (res.code == 200 && res.data) {
               const link = encodeURIComponent(res.data.link);
-              const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
+              const img = `https://aliqr.e.vhall.com/qr.png?s=7&t=${link}`;
               if (type == 'wx') {
                 this.wxQr = img;
               } else {

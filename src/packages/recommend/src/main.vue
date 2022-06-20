@@ -124,7 +124,7 @@
       listenEvents() {
         if (!this.isSubscribe) return;
         this.onScrollStopForSubscribePage = this.onScrollStopForSubscribePage.bind(this);
-        window.addEventListener('scroll', this.onScrollStopForSubscribePage);
+        window.addEventListener('scroll', this.onScrollStopForSubscribePage, true);
       },
       removeEvents() {
         window.removeEventListener('scroll', this.onScrollStopForSubscribePage);

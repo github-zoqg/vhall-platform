@@ -1,6 +1,30 @@
 <template>
   <div class="vmp-recommend" ref="recommendWrapper">
-    <ul class="vmp-recommend-list">
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+      class="vmp-recommend-list"
+    >
+      <van-cell
+        v-for="item in advs"
+        :key="item.adv_id"
+        class="recommend-item"
+        @click="handleJump(item.url)"
+      >
+        <div class="recommend-item__content">
+          <div class="recommend-item__content__cover">
+            <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
+          </div>
+          <div class="recommend-item__content__info">
+            <span class="recommend-item__content__info-title">{{ item.subject }}</span>
+            <span class="recommend-item__content__info-link">查看</span>
+          </div>
+        </div>
+      </van-cell>
+    </van-list>
+    <!-- <ul class="vmp-recommend-list">
       <li
         class="recommend-item"
         v-for="item in advs"
@@ -11,15 +35,11 @@
         <h4 class="title ellipsis">{{ item.subject }}</h4>
       </li>
       <li class="vmp-recommend-loading" v-if="loading">{{ $t('common.common_1001') }}</li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 <script>
   import { useRoomBaseServer, useMenuServer, useRecommendServer } from 'middle-domain';
-  import BScroll from '@better-scroll/core';
-  import Pullup from '@better-scroll/pull-up';
-
-  BScroll.use(Pullup);
 
   export default {
     name: 'VmpRecommendWap',
@@ -29,8 +49,11 @@
         total: 0,
         pos: 0,
         limit: 10,
+        num: 1,
+        totalPages: 0,
         wrapWidth: 0,
         selectIndex: 0,
+        finished: false,
         loading: false
       };
     },
@@ -39,15 +62,13 @@
       this.menuServer = useMenuServer();
       this.recommendServer = useRecommendServer();
     },
+    computed: {
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
+      }
+    },
     mounted() {
       this.setDefaultAdvs();
-      this.initScroll();
-      this.menuServer.$on('tab-switched', async data => {
-        if (this.cuid === data.cuid) {
-          await this.$nextTick();
-          this.scroll && this.scroll.refresh();
-        }
-      });
     },
     methods: {
       /**
@@ -56,67 +77,33 @@
       setDefaultAdvs() {
         this.advs = [...this.roomBaseServer.state.advDefault.adv_list];
         this.total = this.roomBaseServer.state.advDefault.total;
+        this.totalPages = Math.ceil(this.total / this.limit);
       },
-      /**
-       * 初始化scroll
-       */
-      async initScroll() {
-        const wrapper = this.$refs['recommendWrapper'];
-        if (!wrapper) return;
-
-        this.scroll = new BScroll(wrapper, {
-          pullUpLoad: true, // 下滑到底读取更多
-          bindToWrapper: true,
-          scrollX: false,
-          scrollY: true,
-          bounce: true,
-          click: true,
-          tap: 'tap'
-        });
-
-        if (!this.scroll) return;
-        await this.$nextTick();
-        this.bindScrollEvent();
-        this.scroll.refresh();
-      },
-      /**
-       * 绑定滚动事件
-       */
-      bindScrollEvent() {
-        window.addEventListener('resize', () => {
-          this.scroll.refresh();
-        });
-
-        this.scroll.on('pullingUp', async () => {
-          console.log('pullingUp', this.pos, this.total, this.loading);
-          if (this.pos > this.total) return;
-          if (this.loading === true) return;
-          await this.queryAdsList();
-        });
+      onLoad() {
+        if (this.num >= this.totalPages) {
+          this.finished = true;
+          return false;
+        }
+        this.num++;
+        this.pos = parseInt((this.num - 1) * this.limit);
+        this.queryAdsList();
       },
       /**
        * 查询更多推荐项
        */
       async queryAdsList() {
         try {
-          this.loading = true;
           const res = await this.recommendServer.queryAdsList({
             webinar_id: this.$route.params.id,
-            pos: this.pos + this.limit,
+            pos: this.pos,
             limit: 10
           });
-
+          this.loading = false;
           const data = this.advs;
           this.advs = data.concat(res.data.adv_list);
-          this.total = res.data.total;
-          this.limit = 10;
-          this.pos = res.data.pos;
         } catch (error) {
-          console.log(error);
-        } finally {
-          this.scroll && this.scroll.finishPullUp();
-          this.scroll && this.scroll.refresh();
           this.loading = false;
+          console.log(error);
         }
       },
       /**
@@ -124,7 +111,7 @@
        * @param {String} url
        */
       handleJump(url) {
-        location.href = url;
+        window.open(url, '_blank');
       }
     }
   };
@@ -132,41 +119,92 @@
 <style lang="less">
   .vmp-recommend {
     background: #fff;
-    padding: 0px 15px;
+    padding: 0px 32px;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
-    overflow: auto;
+    overflow-y: auto;
     .vmp-recommend-list {
       display: block;
       width: 100%;
-      overflow-y: hidden;
+      // height: 100%;
+      margin-bottom: 100px;
+      overflow: hidden;
     }
-    .recommend-item {
-      width: 330px;
-      height: 230px;
-      margin: 15px;
-      float: left;
-      a {
-        display: inline-block;
+    /* .recommend-item {
         width: 330px;
-        height: 230px;
-        margin-bottom: 30px;
+        // height: 230px;
+        margin: 15px;
+        float: left;
+        a {
+          display: inline-block;
+          width: 330px;
+          height: 230px;
+          margin-bottom: 30px;
+        }
+        .banner {
+          width: 100%;
+          height: 186px;
+          border-radius: 8px;
+          object-fit: scale-down;
+          border: 1px solid #e6e6e6;
+        }
+        .title {
+          margin-top: 15px;
+          font-size: 28px;
+          font-weight: bold;
+          color: rgba(51, 51, 51, 1);
+          line-height: 30px;
+          height: 34px;
+        }
       }
-      .banner {
-        width: 100%;
-        height: 186px;
-        border-radius: 8px;
-        object-fit: scale-down;
-        border: 1px solid #e6e6e6;
+      */
+    .recommend-item__content {
+      display: flex;
+      padding: 24px 0;
+      border-bottom: 1px solid #f0f0f0;
+      &__cover {
+        width: 240px;
+        height: 136px;
+        background: #1a1a1a;
+        border-radius: 16px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+          border-radius: 12px;
+        }
       }
-      .title {
-        margin-top: 15px;
-        font-size: 28px;
-        font-weight: bold;
-        color: rgba(51, 51, 51, 1);
-        line-height: 30px;
-        height: 34px;
+      &__info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-left: 24px;
+        &-title {
+          color: #262626;
+          font-size: 28px;
+          line-height: 38px;
+        }
+        &-link {
+          display: inline-block;
+          width: 120px;
+          height: 54px;
+          line-height: 54px;
+          border-radius: 32px;
+          border: 1px solid #8c8c8c;
+          color: #595959;
+          font-size: 24px;
+          text-align: center;
+        }
+      }
+    }
+    .van-cell {
+      position: relative;
+      line-height: 30px;
+      padding: 0;
+      &::after {
+        content: '';
+        display: none;
       }
     }
     .vmp-recommend-loading {
