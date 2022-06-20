@@ -229,7 +229,13 @@
                 <span
                   v-html="msgContent"
                   class="chat-text"
-                  :class="!!msgContent && source.content.image_urls.length != 0 ? 'existImg' : ''"
+                  :class="
+                    !!msgContent &&
+                    source.content.image_urls &&
+                    source.content.image_urls.length != 0
+                      ? 'existImg'
+                      : ''
+                  "
                 ></span>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
@@ -357,6 +363,7 @@
       },
       //处理@消息
       handleAt() {
+        debugger;
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
         this.msgContent = this.urlToLink(this.source.content.text_content);
