@@ -66,7 +66,7 @@
         @click="doRotate"
         class="btn-doc-rotate"
       >
-        <i class="vh-iconfont vh-line-send"></i>
+        <i class="vh-iconfont vh-line-sponsor"></i>
       </div>
       <!-- 全屏切换 -->
       <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
@@ -249,7 +249,7 @@
 
         if (!this.isPortrait) {
           // this.$toast(this.$t('cash.cash_1035'));
-          this.$toast('为了保证更好的观看体验，请您竖屏观看');
+          this.$toast(this.$t('message.message_1035'));
           // For better watching experience, please use landscape mode
         }
       },
@@ -422,20 +422,24 @@
       },
       //监听系统横竖屏
       resizeDoc(e) {
-        const newOir = window.innerWidth < window.innerHeight;
-        console.log(
-          '【resizeDoc】:',
-          'window.innerHeight: ' + window.innerHeight,
-          'window.innerWidth: ' + window.innerWidth,
-          'isPortrait:' + this.isPortrait
-        );
-        if (newOir != this.isPortrait) {
-          //方向发生了变化就重新计算文档大小
-          this.isPortrait = newOir;
-          this.rotateNum = 0;
-          this.getDocViewRect();
-          this.docServer.zoomReset();
-        }
+        window.setTimeout(() => {
+          const newOir = window.innerWidth < window.innerHeight;
+          console.log(
+            '【resizeDoc】:',
+            'window.innerHeight: ' + window.innerHeight,
+            'window.innerWidth: ' + window.innerWidth,
+            'isPortrait:' + this.isPortrait,
+            '当前屏幕竖屏:' + newOir
+          );
+          if (newOir != this.isPortrait && this.displayMode === 'fullscreen') {
+            //方向发生了变化就重新计算文档大小
+            this.isPortrait = newOir;
+            this.rotateNum = 0;
+            this.getDocViewRect();
+            this.resize();
+            this.docServer.zoomReset();
+          }
+        }, 50);
       },
       //自定义横竖屏
       doRotate() {
