@@ -363,7 +363,6 @@
       },
       //处理@消息
       handleAt() {
-        debugger;
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
         this.msgContent = this.urlToLink(this.source.content.text_content);
