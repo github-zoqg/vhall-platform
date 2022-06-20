@@ -314,7 +314,10 @@
         let dom = document.querySelector('.vmp-subscribe-body-info');
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
-        const offsetTop = menuDom.offsetTop;
+        let offsetTop;
+        this.$nextTick(() => {
+          offsetTop = menuDom.offsetTop;
+        });
         dom.addEventListener(
           'scroll',
           e => {
