@@ -82,9 +82,10 @@
                       "
                     >
                       <el-input
-                        v-if="question.type == 0 && question.default_type == 2"
-                        v-model="form[question.id]"
-                        :type="isAbroadPhoneValide ? 'text' : 'number'"
+                        v-if="
+                          question.type == 0 && question.default_type == 2 && !isAbroadPhoneValide
+                        "
+                        v-model.number="form[question.id]"
                         :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                         :show-word-limit="question.type != 0"
                         autocomplete="off"
@@ -297,8 +298,15 @@
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
+                      v-if="!isAbroadPhoneValide"
+                      v-model.number.trim="verifyForm.phone"
+                      maxlength="15"
+                      auto-complete="off"
+                      :placeholder="$t('account.account_1025')"
+                    ></el-input>
+                    <el-input
+                      v-else
                       v-model.trim="verifyForm.phone"
-                      :type="isAbroadPhoneValide ? 'text' : 'number'"
                       maxlength="15"
                       auto-complete="off"
                       :placeholder="$t('account.account_1025')"
@@ -428,9 +436,10 @@
                     "
                   >
                     <el-input
-                      v-if="question.type == 0 && question.default_type == 2"
-                      v-model="form[question.id]"
-                      :type="isAbroadPhoneValide ? 'text' : 'number'"
+                      v-if="
+                        question.type == 0 && question.default_type == 2 && !isAbroadPhoneValide
+                      "
+                      v-model.number="form[question.id]"
                       :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                       :show-word-limit="question.type != 0"
                       autocomplete="off"
@@ -637,8 +646,15 @@
               <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
+                    v-if="!isAbroadPhoneValide"
+                    v-model.number.trim="verifyForm.phone"
+                    maxlength="15"
+                    auto-complete="off"
+                    :placeholder="$t('account.account_1025')"
+                  ></el-input>
+                  <el-input
+                    v-else
                     v-model.trim="verifyForm.phone"
-                    :type="isAbroadPhoneValide ? 'text' : 'number'"
                     maxlength="15"
                     auto-complete="off"
                     :placeholder="$t('account.account_1025')"
@@ -921,16 +937,7 @@
                   // TODO待翻译
                   rules[item.id] = {
                     required: !!item.is_must,
-                    validator: (rule, val, callback) => {
-                      if (!val) {
-                        return callback(this.$t('account.account_1025'));
-                      } else if (!/^[1-9]\d{10}$/.test(val)) {
-                        return callback(this.$t('account.account_1069'));
-                      } else {
-                        return callback();
-                      }
-                    },
-                    message: this.$t('account.account_1069'),
+                    validator: this.checkNum,
                     trigger: 'blur'
                   };
                 }
@@ -1082,15 +1089,11 @@
       //已报名的表单
       verifyRules() {
         return {
-          // phone: {
-          //   type: 'number',
-          //   required: true,
-          //   message: this.$t('account.account_1069'),
-          //   trigger: 'blur'
-          // },
           phone: {
+            type: 'number',
             required: true,
-            validator: this.validPhone,
+            validator: this.checkNum,
+            message: this.$t('account.account_1069'),
             trigger: 'blur'
           },
           code: {
@@ -1627,7 +1630,6 @@
       },
       //提交报名表单
       submitForm() {
-        console.log('submitForm', this.$refs.form);
         this.$refs.form.validate((valid, object) => {
           console.log(object);
           if (valid) {
@@ -1636,7 +1638,6 @@
               webinar_id: this.webinarId,
               form: JSON.stringify(form)
             };
-            console.log(params);
             this.isPhoneValidate && (params.verify_code = this.form.code);
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
@@ -1789,6 +1790,16 @@
       //关闭当前视图
       closePreview() {
         this.handleClose();
+      },
+      // 校验非0开头11位数字
+      checkNum(rule, val, callback) {
+        if (!val) {
+          return callback(this.$t('account.account_1025'));
+        } else if (!/^[1-9]\d{10}$/.test(val)) {
+          return callback(this.$t('account.account_1069'));
+        } else {
+          return callback();
+        }
       }
     }
   };
