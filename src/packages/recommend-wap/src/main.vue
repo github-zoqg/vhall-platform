@@ -3,7 +3,7 @@
     <van-list
       v-model="loading"
       :finished="finished"
-      finished-text="没有更多了"
+      :finished-text="$t('nav.nav_1043')"
       @load="onLoad"
       class="vmp-recommend-list"
     >
@@ -19,7 +19,7 @@
           </div>
           <div class="recommend-item__content__info">
             <span class="recommend-item__content__info-title">{{ item.subject }}</span>
-            <span class="recommend-item__content__info-link">查看</span>
+            <span class="recommend-item__content__info-link">{{ $t('menu.menu_1010') }}</span>
           </div>
         </div>
       </van-cell>
@@ -168,6 +168,7 @@
         height: 136px;
         background: #1a1a1a;
         border-radius: 16px;
+        flex-shrink: 0;
         img {
           width: 100%;
           height: 100%;
@@ -184,6 +185,11 @@
           color: #262626;
           font-size: 28px;
           line-height: 38px;
+          display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+          /* autoprefixer: ignore next */
+          -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+          -webkit-line-clamp: 2; /** 显示的行数 **/
+          overflow: hidden; /** 隐藏超出的内容 **/
         }
         &-link {
           display: inline-block;

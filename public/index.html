@@ -49,6 +49,19 @@
     <% for (const js of Object.values(htmlWebpackPlugin.options.cdnJs)) { %> <%if(js){%>
     <link rel="preload" href="<%= js %>" as="script" />
     <% } }%>
+
+    <!-- 引入腾讯页面性能监控---开始 -->
+    <% if( htmlWebpackPlugin.options && htmlWebpackPlugin.options.env == 'production'){ %>
+    <script src="https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js"></script>
+    <script>
+      window.saas_aegis = new Aegis({
+        id: 'kw0QbfKrJLLbyL9Yj0', // 上报 id
+        reportApiSpeed: true, // 接口测速
+        reportAssetSpeed: true // 静态资源测速
+      });
+    </script>
+     <% } %>
+    <!-- 引入腾讯页面性能监控---结束 -->
   </head>
 
   <body>
