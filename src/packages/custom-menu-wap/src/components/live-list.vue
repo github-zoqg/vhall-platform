@@ -17,7 +17,9 @@
               </label>
               <div>
                 <span>{{ getLiveTag(item) }}</span>
-                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">
+                <span
+                  v-if="hasDelayPermission && item.no_delay_webinar == 1 && item.webinar_type !== 6"
+                >
                   | {{ $t('common.common_1023') }}
                 </span>
               </div>
@@ -272,7 +274,7 @@
     .liveTag {
       color: #fff;
       font-size: 20px;
-      padding: 2px 9px;
+      padding: 2px 0 2px 0; /* 外层 active-item__cover-status 有设定左右边距 */
       border-radius: 20px;
       position: relative;
       z-index: 2;

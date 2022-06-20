@@ -17,7 +17,9 @@
               </label>
               <div class="scale8">
                 <span>{{ getLiveTag(item) }}</span>
-                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">
+                <span
+                  v-if="hasDelayPermission && item.no_delay_webinar == 1 && item.webinar_type !== 6"
+                >
                   | {{ $t('common.common_1023') }}
                 </span>
               </div>
