@@ -83,7 +83,7 @@
                     "
                     class="delay-icon"
                   >
-                    | 无延迟
+                    | {{ $t('common.common_1023') }}
                   </span>
                 </span>
                 <img
@@ -115,7 +115,7 @@
         <div class="null-page" v-if="!(dataList && dataList.length > 0)">
           <div class="search">
             <img src="./img/no-search@2x.png" class="no-search" />
-            <p class="null-info">暂无数据</p>
+            <p class="null-info">{{ $t('webinar.webinar_1006') }}~</p>
           </div>
         </div>
       </div>
