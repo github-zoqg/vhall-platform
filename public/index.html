@@ -57,10 +57,17 @@
       window.saas_aegis = new Aegis({
         id: 'kw0QbfKrJLLbyL9Yj0', // 上报 id
         reportApiSpeed: true, // 接口测速
-        reportAssetSpeed: true // 静态资源测速
+        reportAssetSpeed: true, // 静态资源测速
+        beforeRequest: function (msg) {
+          // 屏蔽.ts后缀的请求
+          if (msg.logType == 'speed' && msg.logs.url && msg.logs.url.indexOf('.ts') != -1) {
+            return false;
+          }
+          return msg;
+        }
       });
     </script>
-     <% } %>
+    <% } %>
     <!-- 引入腾讯页面性能监控---结束 -->
   </head>
 
