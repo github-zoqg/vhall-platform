@@ -114,7 +114,8 @@
         },
         rebroadcastStartTimer: null,
         rebroadcastStopTimer: null,
-        rotateNum: 0 //旋转角度
+        rotateNum: 0, //旋转角度
+        isPortrait: true // 是否是竖屏
       };
     },
     computed: {
@@ -172,10 +173,6 @@
       // 总页数
       pageTotal() {
         return this.docServer.state.pageTotal;
-      },
-      // 是否是竖屏
-      isPortrait() {
-        return this.docServer.state.isPortrait;
       },
       // 当前资料类型是文档还是白板
       currentType() {
@@ -249,6 +246,12 @@
         this.docServer.zoomReset();
         this.resize();
         this.rotateNum = 0;
+
+        if (!this.isPortrait) {
+          // this.$toast(this.$t('cash.cash_1035'));
+          this.$toast('为了保证更好的观看体验，请您竖屏观看');
+          // For better watching experience, please use landscape mode
+        }
       },
 
       // 文档移动后还原
@@ -424,11 +427,11 @@
           '【resizeDoc】:',
           'window.innerHeight: ' + window.innerHeight,
           'window.innerWidth: ' + window.innerWidth,
-          'isPortrait:' + this.docServer.state.isPortrait
+          'isPortrait:' + this.isPortrait
         );
-        if (newOir != this.docServer.state.isPortrait) {
+        if (newOir != this.isPortrait) {
           //方向发生了变化就重新计算文档大小
-          this.docServer.state.isPortrait = newOir;
+          this.isPortrait = newOir;
           this.rotateNum = 0;
           this.getDocViewRect();
           this.docServer.zoomReset();
@@ -436,9 +439,13 @@
       },
       //自定义横竖屏
       doRotate() {
-        this.rotateNum = this.rotateNum === 0 ? 90 : 0;
-        this.getDocViewRect();
-        console.log('screen.orientation-> ', window.screen.orientation);
+        if (this.isPortrait) {
+          this.rotateNum = this.rotateNum === 0 ? 90 : 0;
+          this.getDocViewRect();
+          console.log('screen.orientation-> ', window.screen.orientation);
+        } else {
+          this.fullscreen();
+        }
       }
     },
     beforeDestroy() {
