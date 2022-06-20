@@ -66,7 +66,7 @@
         @click="doRotate"
         class="btn-doc-rotate"
       >
-        <i class="vh-iconfont vh-line-send"></i>
+        <i class="vh-iconfont vh-line-sponsor"></i>
       </div>
       <!-- 全屏切换 -->
       <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
@@ -115,7 +115,7 @@
         rebroadcastStartTimer: null,
         rebroadcastStopTimer: null,
         rotateNum: 0, //旋转角度
-        isPortrait: true // 是否是竖屏
+        isPortrait: true // 是否是竖屏  设备
       };
     },
     computed: {
@@ -248,8 +248,7 @@
         this.rotateNum = 0;
 
         if (!this.isPortrait) {
-          // this.$toast(this.$t('cash.cash_1035'));
-          this.$toast('为了保证更好的观看体验，请您竖屏观看');
+          this.$toast(this.$t('message.message_1035'));
           // For better watching experience, please use landscape mode
         }
       },
@@ -346,14 +345,17 @@
         let h = 0;
         //是否竖屏
         if (this.isPortrait) {
+          //竖屏 90°  即 锁屏下旋转按钮触发
           if (this.rotateNum == 90) {
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
+            //竖屏的 正常显示
             w = window.innerWidth;
             h = (9 * w) / 16;
           }
         } else {
+          // 未锁屏，设备横向
           h = window.innerHeight;
           w = (16 * h) / 9;
         }
@@ -422,20 +424,24 @@
       },
       //监听系统横竖屏
       resizeDoc(e) {
-        const newOir = window.innerWidth < window.innerHeight;
-        console.log(
-          '【resizeDoc】:',
-          'window.innerHeight: ' + window.innerHeight,
-          'window.innerWidth: ' + window.innerWidth,
-          'isPortrait:' + this.isPortrait
-        );
-        if (newOir != this.isPortrait) {
-          //方向发生了变化就重新计算文档大小
-          this.isPortrait = newOir;
-          this.rotateNum = 0;
-          this.getDocViewRect();
-          this.docServer.zoomReset();
-        }
+        window.setTimeout(() => {
+          const newOir = window.innerWidth < window.innerHeight;
+          console.log(
+            '【resizeDoc】:',
+            'window.innerHeight: ' + window.innerHeight,
+            'window.innerWidth: ' + window.innerWidth,
+            'isPortrait:' + this.isPortrait,
+            '当前屏幕竖屏:' + newOir
+          );
+          if (newOir != this.isPortrait && this.displayMode === 'fullscreen') {
+            //方向发生了变化就重新计算文档大小
+            this.isPortrait = newOir;
+            this.rotateNum = 0;
+            this.getDocViewRect();
+            this.resize();
+            this.docServer.zoomReset();
+          }
+        }, 50);
       },
       //自定义横竖屏
       doRotate() {
@@ -444,6 +450,7 @@
           this.getDocViewRect();
           console.log('screen.orientation-> ', window.screen.orientation);
         } else {
+          //设备横向 旋转即退出全屏
           this.fullscreen();
         }
       }
