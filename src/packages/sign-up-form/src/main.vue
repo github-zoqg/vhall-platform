@@ -58,6 +58,7 @@
                   :model="form"
                   class="entryForm"
                   :rules="rules"
+                  :validate-on-rule-change="false"
                   label-position="top"
                 >
                   <el-form-item
@@ -400,6 +401,7 @@
                 :model="form"
                 class="entryForm"
                 :rules="rules"
+                :validate-on-rule-change="false"
                 label-position="top"
               >
                 <el-form-item
@@ -631,8 +633,7 @@
               <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
-                    v-model.number.trim="verifyForm.phone"
-                    type="number"
+                    v-model.trim="verifyForm.phone"
                     auto-complete="off"
                     :placeholder="$t('account.account_1025')"
                   ></el-input>
@@ -1160,9 +1161,10 @@
         let reg = /^\d{15}$/;
         if (!value) {
           return callback(this.$t('account.account_1025'));
-        }
-        if (!reg.test(value)) {
+        } else if (!reg.test(value)) {
           return callback(this.$t('account.account_1069'));
+        } else {
+          callback();
         }
       },
       //隐私协议勾选验证
@@ -1288,9 +1290,6 @@
               }
             });
           }
-          // 更改需要rule后须清空校验一次！！！
-          this.$refs['verifyForm'].resetFields();
-
           this.list = list;
           //地域 options 格式化处理
           this.list.some(item => {
@@ -1614,6 +1613,7 @@
       },
       //提交报名表单
       submitForm() {
+        console.log('submitForm', this.$refs.form);
         this.$refs.form.validate((valid, object) => {
           console.log(object);
           if (valid) {
