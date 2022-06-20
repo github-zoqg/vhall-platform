@@ -301,7 +301,6 @@
     },
     data() {
       const initIndex = this.subscribeServer.state.initIndex;
-      // console.log('-----------initIndex--------=========', initIndex);
       return {
         loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
@@ -394,7 +393,7 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        if (warmup && warmup.warmup_paas_record_id.length) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -452,6 +451,15 @@
         }
       },
       playIndex() {
+        // 暖场视频才监听播放的顺序
+        if (!this.isWarnPreview) return;
+        this.voice = this.subscribeServer.state.warmVideo;
+        this.playerServer.setVolume(this.voice, () => {
+          console.log('设置音量失败');
+        });
+        if (this.subscribeServer.state.warmFullScreen) {
+          this.enterFullscreen();
+        }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
           if (
@@ -852,7 +860,11 @@
             this.liveOption.useSWF = true;
           }
         }
-        this.initPlayerOtherInfo();
+        if (this.isWarnPreview) {
+          this.initPlayer();
+        } else {
+          this.initPlayerOtherInfo();
+        }
       },
       exchangeVideoDocs() {
         if (this.displayMode == 'mini') {
