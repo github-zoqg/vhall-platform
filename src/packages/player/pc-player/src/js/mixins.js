@@ -55,8 +55,11 @@ const playerMixins = {
         });
       }
       screenfull.onchange(ev => {
-        if (ev.target.id !== 'vmp-player') return;
+        // if (ev.target.id !== 'vmp-player') return;
         this.isFullscreen = !this.isFullscreen;
+        if (this.isWarnPreview) {
+          this.subscribeServer.state.warmFullScreen = this.isFullscreen;
+        }
       });
       clearTimeout(this.hoverVideoTimer);
       this.hoverVideoTimer = setTimeout(() => {
@@ -363,6 +366,9 @@ const playerMixins = {
       } else {
         this.defaultVoice = this.voice;
         this.voice = 0;
+      }
+      if (this.isWarnPreview) {
+        this.subscribeServer.state.warmVideo = this.voice;
       }
     },
     // 开启/关闭弹幕

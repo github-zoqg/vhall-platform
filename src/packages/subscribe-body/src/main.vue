@@ -231,7 +231,9 @@
             this.subscribeServer.state.isChangeOrder = true;
             window.sessionStorage.removeItem('warm_recordId');
             window.sessionStorage.removeItem('recordIds');
-            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+            this.subscribeServer.state.playIndex = 0;
+            this.subscribeServer.state.initIndex = 0;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0]);
           } else {
             this.subscribeServer.state.isChangeOrder = false;
             let recordId = window.sessionStorage.getItem('warm_recordId');
@@ -239,10 +241,12 @@
             console.log(index, '???woshi当前index');
             this.subscribeServer.state.playIndex = index;
             this.subscribeServer.state.initIndex = index;
-            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex], true);
           }
         } else {
-          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          this.subscribeServer.state.playIndex = 0;
+          this.subscribeServer.state.initIndex = 0;
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
         }
       },
       feeAuth(params) {
