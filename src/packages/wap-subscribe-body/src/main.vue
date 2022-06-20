@@ -318,21 +318,24 @@
         this.$nextTick(() => {
           offsetTop = menuDom.offsetTop;
         });
-        dom.addEventListener('scroll', e => {
-          console.log(menuDom.offsetTop);
-          let scrollTop = e.target.scrollTop;
-          if (scrollTop > offsetTop) {
-            this.isScorllTab = true;
-            if (this.webinarType == 2 && this.isEmbed) {
-              this.showBottomBtn = false;
+        dom.addEventListener(
+          'scroll',
+          e => {
+            let scrollTop = e.target.scrollTop;
+            if (scrollTop > offsetTop) {
+              this.isScorllTab = true;
+              if (this.webinarType == 2 && this.isEmbed) {
+                this.showBottomBtn = false;
+              } else {
+                this.showBottomBtn = true;
+              }
             } else {
-              this.showBottomBtn = true;
+              this.isScorllTab = false;
+              this.showBottomBtn = false;
             }
-          } else {
-            this.isScorllTab = false;
-            this.showBottomBtn = false;
-          }
-        });
+          },
+          true
+        );
       },
       listenEvents() {
         this.subscribeServer.$on('live_start', () => {
@@ -864,6 +867,14 @@
             .vmp-tab-container {
               height: auto;
             }
+          }
+          .vh-goods-wrapper {
+            overflow: hidden;
+            height: auto;
+          }
+          .vmp-recommend {
+            overflow: hidden;
+            height: auto;
           }
         }
       }

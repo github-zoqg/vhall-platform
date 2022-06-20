@@ -78,6 +78,7 @@
       return {
         mediaState: this.mediaSettingServer.state,
         videoLoadingImg: videoSwitchImg,
+        isVideoCreating: false, // 正在创建video流
         isVideoSwitching: false, // video正在切换
         isVideoError: false, // video读取错误
         videoTipsText: this.$t('setting.setting_1008')
@@ -144,8 +145,11 @@
        * 创建视频预览流
        */
       async createPreview() {
+        if (this.isVideoCreating) return; // 创建中则不重复创建，以免多次调用
         if (this.mediaState.videoType !== 'camera') return;
         if (this.mediaState.video === '') return;
+
+        this.isVideoCreating = true;
 
         await this.destroyStream();
 
@@ -166,10 +170,12 @@
           this.videoLoadingImg = videoSwitchImg;
           await this.mediaSettingServer.startVideoPreview(options);
           this.isVideoSwitching = false;
+          this.isVideoCreating = false;
         } catch (err) {
           this.isVideoSwitching = false;
           this.videoLoadingImg = videoFailImg;
           this.isVideoError = true;
+          this.isVideoCreating = false;
           this.videoTipsText = this.$t('setting.setting_1010');
           this.$message.error(this.$t('message.message_1031'));
           console.error(this.$t('message.message_1028'), err);
@@ -180,7 +186,9 @@
        */
       async destroyStream() {
         try {
-          return this.mediaSettingServer.stopVideoPreview();
+          return this.mediaSettingServer.stopVideoPreview().catch(err => {
+            console.error(`啊？`, err);
+          });
         } catch (err) {
           console.error(`销毁流异常`, err);
         }

@@ -106,6 +106,7 @@
         font-weight: 400;
         color: #e6e6e6;
         word-break: break-word;
+        overflow: hidden;
 
         p {
           margin-bottom: 8px;

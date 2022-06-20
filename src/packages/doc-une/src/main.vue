@@ -741,7 +741,12 @@
             await this.docServer.activeContainer(this.docServer.state.boardCid);
             this.resize();
           } else {
-            // 白板不存在自动新建一个
+            // 白板不存在
+            if (this.isInGroup) {
+              // 小组中演示白板，需要调一下设置观众可见，否则生成的小组回放视频看不见白板
+              this.docServer.setSwitchStatus(true);
+            }
+            // 自动新建一个
             this.docServer.addNewFile({ fileType: 'board' });
           }
         }
@@ -941,7 +946,7 @@
                 : this.roomBaseServer.state.interactToolStatus.presentation_screen
             });
             if (result && result.code == 200) {
-              if (this.groupServer.state.groupInitData.join_role == 20) {
+              if (this.groupServer.state.groupInitData.join_role == 20 && this.isInGroup) {
                 // 如果是组长结束了观众的演示
                 this.$message({
                   message: '结束演示',

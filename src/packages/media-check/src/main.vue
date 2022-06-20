@@ -208,15 +208,25 @@
           this.isShow = false;
         }
       },
+      async stopTrack() {
+        try {
+          const { getUserMediaWithSelectedDevices } = this.mediaCheckServer;
+          const stream = await getUserMediaWithSelectedDevices();
+          stream.getTracks().forEach(trackInput => {
+            console.log('[interactiveServer]  look stop -1');
+            trackInput.stop();
+          });
+          return true;
+        } catch (err) {
+          console.error('stream获取失败，无法停止轨道播放', err);
+          return false;
+        }
+      },
       /**
        * 获取视频列表
        */
       async getVideoDeviceInfo() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach(trackInput => {
-          console.log('[interactiveServer]  look stop -1');
-          trackInput.stop();
-        });
+        await this.stopTrack();
         await this.getDevices();
         this.setDefaultSelected();
       },
