@@ -21,6 +21,7 @@ const htmlConfig = {
     // 通过s3域名加载
     // Vant: '//s3.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
     loadLazyWap: '//s3.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
+    aegis: '//cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js',
 
     // 可以延迟加载的
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
