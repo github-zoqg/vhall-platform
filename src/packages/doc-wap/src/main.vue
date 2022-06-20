@@ -115,7 +115,7 @@
         rebroadcastStartTimer: null,
         rebroadcastStopTimer: null,
         rotateNum: 0, //旋转角度
-        isPortrait: true // 是否是竖屏
+        isPortrait: true // 是否是竖屏  设备
       };
     },
     computed: {
@@ -248,7 +248,6 @@
         this.rotateNum = 0;
 
         if (!this.isPortrait) {
-          // this.$toast(this.$t('cash.cash_1035'));
           this.$toast(this.$t('message.message_1035'));
           // For better watching experience, please use landscape mode
         }
@@ -346,14 +345,17 @@
         let h = 0;
         //是否竖屏
         if (this.isPortrait) {
+          //竖屏 90°  即 锁屏下旋转按钮触发
           if (this.rotateNum == 90) {
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
+            //竖屏的 正常显示
             w = window.innerWidth;
             h = (9 * w) / 16;
           }
         } else {
+          // 未锁屏，设备横向
           h = window.innerHeight;
           w = (16 * h) / 9;
         }
@@ -448,6 +450,7 @@
           this.getDocViewRect();
           console.log('screen.orientation-> ', window.screen.orientation);
         } else {
+          //设备横向 旋转即退出全屏
           this.fullscreen();
         }
       }
