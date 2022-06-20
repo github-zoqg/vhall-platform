@@ -27,8 +27,6 @@ import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
-// 引入ageis腾讯性能监控
-import './init-global/aegis';
 
 Vue.config.productionTip = false;
 if (process.env.NODE_ENV !== 'production') {
