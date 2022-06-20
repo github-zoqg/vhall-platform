@@ -164,7 +164,9 @@
         if (val) {
           // 备份一下，还原时候用
           this._docTabNameCopy = this.menu[docTabIndex].name;
-          this.$set(this.menu, docTabIndex, { ...this.menu[docTabIndex], name: '视频' });
+          const tabName =
+            this.webinarInfo.mode == 1 ? this.$t('menu.menu_1015') : this.$t('menu.menu_1014');
+          this.$set(this.menu, docTabIndex, { ...this.menu[docTabIndex], name: tabName });
         } else {
           this.$set(this.menu, docTabIndex, {
             ...this.menu[docTabIndex],
