@@ -84,7 +84,8 @@
                       <el-input
                         v-if="question.type == 0 && question.default_type == 2"
                         v-model="form[question.id]"
-                        :maxlength="question.type == 0 ? '' : 60"
+                        :type="isAbroadPhoneValide ? 'text' : 'number'"
+                        :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                         :show-word-limit="question.type != 0"
                         autocomplete="off"
                         :placeholder="findPlaceHolder(question.default_type)"
@@ -297,6 +298,8 @@
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
                       v-model.trim="verifyForm.phone"
+                      :type="isAbroadPhoneValide ? 'text' : 'number'"
+                      maxlength="15"
                       auto-complete="off"
                       :placeholder="$t('account.account_1025')"
                     ></el-input>
@@ -426,8 +429,9 @@
                   >
                     <el-input
                       v-if="question.type == 0 && question.default_type == 2"
-                      v-model.number="form[question.id]"
-                      :maxlength="question.type == 0 ? '' : 60"
+                      v-model="form[question.id]"
+                      :type="isAbroadPhoneValide ? 'text' : 'number'"
+                      :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                       :show-word-limit="question.type != 0"
                       autocomplete="off"
                       :placeholder="findPlaceHolder(question.default_type)"
@@ -634,6 +638,8 @@
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
                     v-model.trim="verifyForm.phone"
+                    :type="isAbroadPhoneValide ? 'text' : 'number'"
+                    maxlength="15"
                     auto-complete="off"
                     :placeholder="$t('account.account_1025')"
                   ></el-input>
@@ -897,28 +903,36 @@
                 };
               } else if (item.type === 0 && item.default_type === 2) {
                 // 手机号
-                // if (this.isPhoneValidate) {
-                rules[item.id] = {
-                  required: !!item.is_must,
-                  validator: this.validPhone,
-                  trigger: 'blur'
-                };
-                // }
+                if (this.isPhoneValidate) {
+                  rules[item.id] = {
+                    required: !!item.is_must,
+                    validator: this.validPhone,
+                    trigger: 'blur'
+                  };
+                }
                 // 是否支持国外手机号
-                if (this.isAbroadPhoneValide) {
+                else if (this.isAbroadPhoneValide) {
                   rules[item.id] = {
                     required: !!item.is_must,
                     validator: this.checkAbroadPhone,
                     trigger: 'blur'
                   };
-                  // }else {
-                  // // TODO待翻译
-                  // rules[item.id] = {
-                  //   type: 'number',
-                  //   required: !!item.is_must,
-                  //   message: this.$t('account.account_1069'),
-                  //   trigger: 'blur'
-                  // };
+                } else {
+                  // TODO待翻译
+                  rules[item.id] = {
+                    required: !!item.is_must,
+                    validator: (rule, val, callback) => {
+                      if (!val) {
+                        return callback(this.$t('account.account_1025'));
+                      } else if (!/^[1-9]\d{10}$/.test(val)) {
+                        return callback(this.$t('account.account_1069'));
+                      } else {
+                        return callback();
+                      }
+                    },
+                    message: this.$t('account.account_1069'),
+                    trigger: 'blur'
+                  };
                 }
               } else if (item.type === 0 && item.default_type === 4) {
                 // 性别
@@ -1158,7 +1172,7 @@
       },
       // 校验国外手机号
       checkAbroadPhone(rule, value, callback) {
-        let reg = /^\d{15}$/;
+        let reg = /^\d{1,15}$/;
         if (!value) {
           return callback(this.$t('account.account_1025'));
         } else if (!reg.test(value)) {

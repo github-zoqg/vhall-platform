@@ -1275,25 +1275,30 @@
         } else if (question.type === 0 && question.default_type === 2) {
           // 手机号
           if (this.isPhoneValidate) {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
             this.errMsgMap[question.id] =
               validPhone('', this.form[question.id], this) === true
                 ? ''
                 : validPhone('', this.form[question.id], this);
-          } else {
-            this.errMsgMap[question.id] =
-              this.form[question.id] && isNaN(this.form[question.id]) === false
-                ? ''
-                : this.$t('account.account_1069');
           }
           // 支持国外手机号
-          if (this.isAbroadPhoneValide) {
+          else if (this.isAbroadPhoneValide) {
             if (this.form[question.id]) {
-              this.errMsgMap[question.id] = /^\d{15}$/.test(this.form[question.id])
+              this.errMsgMap[question.id] = /^\d{1,15}$/.test(this.form[question.id])
                 ? ''
                 : this.$t('account.account_1069');
             } else {
               this.errMsgMap[question.id] = this.$t('account.account_1025');
             }
+          } else {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
+            this.errMsgMap[question.id] = /^[1-9]\d{10}$/.test(this.form[question.id])
+              ? ''
+              : this.$t('account.account_1069');
           }
         } else if (question.type === 0 && question.default_type === 3) {
           // 邮箱
@@ -1431,7 +1436,7 @@
         // 支持国外手机号
         if (this.isAbroadPhoneValide) {
           if (this.verifyForm.phone) {
-            if (!/^\d{15}$/.test(this.verifyForm.phone)) {
+            if (!/^\d{1,15}$/.test(this.verifyForm.phone)) {
               this.errPhone = true;
               this.errPhoneMsg = this.$t('account.account_1069');
             }
