@@ -65,6 +65,7 @@
     },
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
+      console.log('当前客户端嵌入进入');
       if (!browserSupport()) return;
       await this.getGrayConfig();
       if (location.search.includes('assistant_token=')) {
@@ -72,6 +73,7 @@
       }
       this.assistantToken = getQueryString('assistant_token');
       this.assistantType = getQueryString('assistantType');
+      // 客户端中嵌入的一个第三方采用的是cef框架，用view_type=cef地址栏传递
       this.webviewType = getQueryString('view_type');
       if (this.assistantType == 'doc') {
         this.componentName = 'Doc';
@@ -92,7 +94,7 @@
       } else if (this.assistantType == 'tools') {
         this.componentName = 'Tools';
       }
-      await this.getUserinfo();
+      await this.getUserInfo();
       setTimeout(() => {
         // 给一些时间去初始化  要不不存在dom对象
         this.initAssistantMsg();
@@ -137,17 +139,26 @@
             console.log(`房间-灰度ID-获取活动by用户信息失败~${e}`);
           });
       },
-      // 给予 客户端嵌入使用方法
-      assistantMsg(type, msg) {
-        console.log('接受上下线消息', { type, msg });
+      /*
+       * assistantMsg 给予 客户端嵌入使用方法 【注意错误提示也是这个】
+       * type 消息类型
+       * msg 消息内容
+       * error_type 异常提示类型，参数有：info、warning、error （注意： error_type此参数在 type=‘notice_msg'时生效）
+       */
+      assistantMsg(type, msg, error_type = null) {
+        console.log('接受客户上下线消息、前端异常提示等', { type, msg, error_type });
+        let messageObj = { type, msg };
+        if (type === 'notice_msg' && error_type) {
+          messageObj.error_type = error_type;
+        }
         if (this.webviewType != 'cef') {
           if (window.bridge) {
-            window.bridge.JsCallQtMsg(JSON.stringify({ type, msg }));
+            window.bridge.JsCallQtMsg(JSON.stringify(messageObj));
           } else {
             console.error('此方法不存在');
           }
         } else {
-          window.JsCallQtMsg(JSON.stringify({ type, msg })); // Join,Leave
+          window.JsCallQtMsg(JSON.stringify(messageObj)); // Join,Leave
         }
       },
       initAssistantMsg() {
@@ -240,7 +251,7 @@
         this.$refs.signLive.signVisible = false;
       },
       // 初始化房间
-      async getUserinfo() {
+      async getUserInfo() {
         const _data = {
           webinar_id: this.il_id,
           check_online: 0,
@@ -353,7 +364,7 @@
           localStorage.setItem('token', assistant_token);
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
