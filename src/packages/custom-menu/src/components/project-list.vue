@@ -18,7 +18,7 @@
             </div>
           </div>
         </div>
-        <div class="vh-project-list-active-item__titleInfo">
+        <div class="vh-chose-active-item__titleInfo">
           <div class="vh-chose-active-item__title">
             {{ item.title }}
           </div>
@@ -126,6 +126,7 @@
       width: 142px;
       height: 80px;
       margin-right: 12px;
+      border-radius: 4px;
       img {
         display: inline-block;
         width: 142px;
@@ -290,25 +291,21 @@
       }
     }
     &__title {
-      margin: 10px 0 4px 0;
-      font-size: 14px;
-      font-weight: 400;
-      color: #e6e6e6;
-      line-height: 20px;
+      font-size: 16px !important;
+      color: @font-light-normal;
+      line-height: 24px;
+      margin: 12px 16px 7px 16px;
+      -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
       -webkit-box-orient: vertical;
-      text-align: left;
     }
     &__info {
       font-size: 14px;
       font-weight: 400;
       color: @font-dark-second;
       line-height: 17px;
-      // margin-left: 16px;
+      margin-left: 16px;
     }
     .liveTag {
       height: 20px;
