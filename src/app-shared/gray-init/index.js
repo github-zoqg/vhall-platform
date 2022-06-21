@@ -102,4 +102,13 @@ function setGrayUserId(grayUserId) {
   setRequestHeaders({
     'gray-id': grayUserId
   });
+
+  //添加性能监控判断
+  if (window.saas_aegis) {
+    if (Object.prototype.toString.call(grayUserId) != '[object Null]') {
+      window.saas_aegis.setConfig({
+        uin: `${grayUserId}`
+      });
+    }
+  }
 }
