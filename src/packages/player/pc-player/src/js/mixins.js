@@ -57,9 +57,9 @@ const playerMixins = {
       screenfull.onchange(ev => {
         // if (ev.target.id !== 'vmp-player') return;
         this.isFullscreen = !this.isFullscreen;
-        if (this.isWarnPreview) {
-          this.subscribeServer.state.warmFullScreen = this.isFullscreen;
-        }
+        // if (this.isWarnPreview) {
+        //   this.subscribeServer.state.warmFullScreen = this.isFullscreen;
+        // }
       });
       clearTimeout(this.hoverVideoTimer);
       this.hoverVideoTimer = setTimeout(() => {

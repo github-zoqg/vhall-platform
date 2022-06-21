@@ -457,9 +457,9 @@
         this.playerServer.setVolume(this.voice, () => {
           console.log('设置音量失败');
         });
-        if (this.subscribeServer.state.warmFullScreen) {
-          this.enterFullscreen();
-        }
+        // if (this.subscribeServer.state.warmFullScreen) {
+        //   this.enterFullscreen();
+        // }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
           if (
