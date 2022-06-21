@@ -1,5 +1,6 @@
 <template>
   <div
+    id="vmp-desktop-screen"
     class="vmp-desktop-screen"
     v-show="isShowWrapper"
     :class="[
@@ -7,7 +8,8 @@
       { 'is-watch': isWatch },
       { 'is-embed': isEmbed && isWatch },
       { 'has-stream-list': hasStreamList },
-      { 'share-screen': isShareScreen }
+      { 'share-screen': isShareScreen },
+      { 'vmp-desktop-screen__full': isFullscreen }
     ]"
   >
     <!-- 结束演示按钮 -->
@@ -38,13 +40,41 @@
     </div>
 
     <div
-      class="vmp-desktop-screen-exchange"
-      @click="exchangeVideoDocs"
-      v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
+      class="vmp-desktop-screen-mask"
+      v-if="
+        (miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)) ||
+        accountId != desktopShareInfo.accountId
+      "
     >
       <p>
-        <el-tooltip :content="$t('player.player_1008')" placement="top">
-          <i class="vh-saas-iconfont vh-saas-line-switch"></i>
+        <el-tooltip
+          :content="$t('player.player_1008')"
+          placement="top"
+          v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
+        >
+          <a
+            href="javascript:void(0);"
+            class="vh-iconfont vh-line-copy-document"
+            @click="exchangeVideoDocs"
+          ></a>
+        </el-tooltip>
+        <el-tooltip
+          :content="isFullscreen ? $t('doc.doc_1009') : $t('doc.doc_1010')"
+          placement="top"
+          v-if="accountId != desktopShareInfo.accountId"
+        >
+          <a
+            v-if="!isFullscreen"
+            href="javascript:void(0);"
+            class="vh-iconfont vh-line-amplification"
+            @click="fullscreen"
+          ></a>
+          <a
+            v-if="isFullscreen"
+            href="javascript:void(0);"
+            class="vh-iconfont vh-line-narrow"
+            @click="fullscreen"
+          ></a>
         </el-tooltip>
       </p>
     </div>
@@ -100,7 +130,8 @@
           confirm: true
         },
         isShowAccessDeniedAlert: false, // 是否显示没有权限桌面共享的弹窗
-        hasStreamList: false
+        hasStreamList: false,
+        isFullscreen: false // 桌面共享是否全屏
       };
     },
     computed: {
@@ -271,6 +302,15 @@
     },
     methods: {
       addEvents() {
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              this.isFullscreen = false;
+            }
+          },
+          true
+        );
         this.desktopShareServer.$on('screen_stream_add', () => {
           this.subscribeStream().then(() => {
             // 重置布局
@@ -387,6 +427,28 @@
             useRoomBaseServer().setInavToolStatus('is_desktop', 1);
           }
         });
+      },
+      // 桌面共享切换全屏
+      fullscreen() {
+        if (!this.isFullscreen) {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.isShareScreen,
+              vNode: 'vmp-desktop-screen'
+            })
+            .then(() => {
+              this.isFullscreen = true;
+            });
+        } else {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.isShareScreen,
+              vNode: 'vmp-desktop-screen'
+            })
+            .then(() => {
+              this.isFullscreen = false;
+            });
+        }
       },
       // 订阅流
       subscribeStream() {
@@ -553,6 +615,56 @@
         }
       }
     }
+
+    &__full {
+      .vmp-desktop-screen-mask {
+        height: 25px;
+        bottom: 16px;
+        top: auto;
+        opacity: 1;
+        background: none;
+      }
+    }
+
+    &-mask {
+      opacity: 0;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover {
+        opacity: 1;
+      }
+      p {
+        width: 100%;
+        color: #fff;
+        text-align: center;
+      }
+      a {
+        display: inline-block;
+        color: #fff;
+        font-size: 16px;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 100%;
+        margin-right: 10px;
+        &:hover {
+          background: #fb3a32;
+        }
+        &.iconsheweizhujiangren {
+          font-size: 14px;
+        }
+      }
+    }
+
     // 发起端结束演示按钮
     .end-demonstrate {
       position: absolute;
