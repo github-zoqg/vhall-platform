@@ -393,7 +393,7 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id.length) {
+        if (this.warmUpVideoList.length) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -453,6 +453,7 @@
       playIndex() {
         // 暖场视频才监听播放的顺序
         if (!this.isWarnPreview) return;
+        // 如果上一个视频音量进行修改，下一个视频，音量不变
         this.voice = this.subscribeServer.state.warmVideo;
         this.playerServer.setVolume(this.voice, () => {
           console.log('设置音量失败');
@@ -462,12 +463,14 @@
         // }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
+          // 如果是循环播放，播完最后一个，自动播第一个
           if (
             this.warmPlayMode == 2 &&
             this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
           ) {
             this.playerServer.play();
           }
+          // 如果是单次播放，播完第一个，自动播放第二个
           if (
             this.warmPlayMode == 1 &&
             this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
@@ -480,8 +483,9 @@
     },
     created() {
       if (this.isShowContainer) return;
+      // 如果暖场视频的长度大于1，就用多例。否则就用单例
       this.playerServer = usePlayerServer({
-        extra: this.warmUpVideoList.length > 1 ? true : false
+        extra: this.warmUpVideoList.length > 1
       });
       this.getWebinerStatus();
       const { agreement } = this.roomBaseServer.state.watchInitData;

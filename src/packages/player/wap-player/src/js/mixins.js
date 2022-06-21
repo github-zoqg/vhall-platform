@@ -75,21 +75,27 @@ const playerMixins = {
         if (this.isTryPreview) return;
         if (this.isWarnPreview) {
           if (this.warmUpVideoList.length == 1) {
+            // 如果只有一个暖场视频，并且开启了循环播放，就自动调用播放方法
             if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
               this.playerServer.play();
             }
           } else {
             this.exitFullScreen();
+            // 多个暖场视频的逻辑，如果大于2，才播放完毕一个销毁一个，初始化下一个
             if (this.warmUpVideoList.length > 2) {
               this.playerServer.destroy();
             }
+            // 将当前存的断点续播时间清除
             window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
+            // 如果播放完的playIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
             if (this.playIndex < this.warmUpVideoList.length - 1) {
               this.subscribeServer.state.playIndex++;
             } else {
               this.subscribeServer.state.playIndex = 0;
             }
+            // 暖场视频循环的列表，只存2个值，播放完第一个，移除第一个，并往上增加第三个的值
             this.subscribeServer.setWarmVideoList('', false);
+            // 如果初始化完的initPlayerIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
             if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
               this.subscribeServer.state.initIndex++;
               this.subscribeServer.setWarmVideoList(

@@ -476,12 +476,14 @@
         // }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
+          // 如果是循环播放，播完最后一个，自动播第一个
           if (
             this.warmPlayMode == 2 &&
             this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
           ) {
             this.playerServer.play();
           }
+          // 如果是单次播放，播完第一个，自动播放第二个
           if (
             this.warmPlayMode == 1 &&
             this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
@@ -502,7 +504,7 @@
     },
     async created() {
       this.playerServer = usePlayerServer({
-        extra: this.warmUpVideoList.length > 1 ? true : false
+        extra: this.warmUpVideoList.length > 1
       });
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
