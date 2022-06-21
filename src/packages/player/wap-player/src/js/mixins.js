@@ -79,6 +79,7 @@ const playerMixins = {
               this.playerServer.play();
             }
           } else {
+            this.exitFullScreen();
             if (this.warmUpVideoList.length > 2) {
               this.playerServer.destroy();
             }
@@ -214,9 +215,9 @@ const playerMixins = {
     // 全屏
     enterFullscreen() {
       this.isFullscreen ? this.exitFullScreen() : this.setFullscreen();
-      if (this.isWarnPreview) {
-        this.subscribeServer.state.warmFullScreen = this.isFullscreen;
-      }
+      // if (this.isWarnPreview) {
+      //   this.subscribeServer.state.warmFullScreen = this.isFullscreen;
+      // }
     },
     // 设置默认视频清晰度
     setDefaultQuality() {
