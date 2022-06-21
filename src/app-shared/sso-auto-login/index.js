@@ -9,7 +9,7 @@ export default () => {
       .ssoAutoLogin()
       .then(res => {
         if (res.code === 200 && res.data.token) {
-          localStorage.setItem('token', res.data.toke);
+          localStorage.setItem('token', res.data.token);
         }
       })
       .finally(() => {
