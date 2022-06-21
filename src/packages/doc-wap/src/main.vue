@@ -632,7 +632,8 @@
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
       // 播放器的层级是1-12
-      z-index: 15;
+      //聊天框层级22,
+      z-index: 23;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {
