@@ -157,7 +157,7 @@
         line-height: 20px;
         z-index: 3; */
 
-        background: linear-gradient(180deg, rgba(0, 0, 0, 6e-5) 0%, rgba(0, 0, 0, 0.6) 100%);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
         border-radius: 0px 0px 16px 16px;
         height: 60px;
         width: 100%;
