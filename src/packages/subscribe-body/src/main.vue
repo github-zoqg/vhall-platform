@@ -225,25 +225,30 @@
         // }
       },
       getWarmupVideoInfo() {
+        // 如果存在recordIds
         if (window.sessionStorage.getItem('recordIds')) {
           let newRecordIds = this.warmUpVideoList.join(',');
+          // 刷新页面 newRecordIds和之前的数据不一致
           if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
             this.subscribeServer.state.isChangeOrder = true;
+            // 清除缓存，并且从第一个播放
             window.sessionStorage.removeItem('warm_recordId');
             window.sessionStorage.removeItem('recordIds');
             this.subscribeServer.state.playIndex = 0;
             this.subscribeServer.state.initIndex = 0;
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0]);
           } else {
+            // 刷新页面 newRecordIds和之前的数据一致，拿到当前播放的id,并查询下标，重新赋值
             this.subscribeServer.state.isChangeOrder = false;
             let recordId = window.sessionStorage.getItem('warm_recordId');
             let index = this.warmUpVideoList.findIndex(item => item == recordId);
-            console.log(index, '???woshi当前index');
+            console.log(index, '???pc当前index');
             this.subscribeServer.state.playIndex = index;
             this.subscribeServer.state.initIndex = index;
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex], true);
           }
         } else {
+          // 不存在recordIds，从0初始化
           this.subscribeServer.state.playIndex = 0;
           this.subscribeServer.state.initIndex = 0;
           this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
