@@ -3,7 +3,7 @@
     <van-list
       v-model="loading"
       :finished="finished"
-      finished-text="没有更多了"
+      :finished-text="$t('nav.nav_1043')"
       @load="onLoad"
       class="vh-goods_list"
     >
@@ -46,7 +46,7 @@
             </div>
             <div class="other-info">
               <div v-if="good.showDiscountPrice" class="discount">
-                <span class="price-tip">优惠价</span>
+                <span class="price-tip">{{ $t('menu.menu_1006') }}</span>
                 <i>￥</i>
                 <span class="price" v-html="good.discountText"></span>
               </div>
@@ -55,7 +55,9 @@
                 <span class="price" v-html="good.priceText"></span>
               </div>
               <div>
-                <button class="buy" @click.stop="handleBuy(good.goods_url)">购买</button>
+                <button class="buy" @click.stop="handleBuy(good.goods_url)">
+                  {{ $t('menu.menu_1007') }}
+                </button>
               </div>
             </div>
           </div>
@@ -331,12 +333,12 @@
             color: #262626;
             font-size: 28px;
             line-height: 38px;
-            overflow: hidden;
+            display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+            /* autoprefixer: ignore next */
+            -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+            -webkit-line-clamp: 2; /** 显示的行数 **/
+            overflow: hidden; /** 隐藏超出的内容 **/
             text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
             text-align: left;
           }
           .describe {
