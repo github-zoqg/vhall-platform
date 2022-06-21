@@ -1436,7 +1436,7 @@
         // 支持国外手机号
         if (this.isAbroadPhoneValide) {
           if (this.verifyForm.phone) {
-            if (!/^\d{1,15}$/.test(this.verifyForm.phone)) {
+            if (this.verifyForm.phone == 0 || !/^\d{1,15}$/.test(this.verifyForm.phone)) {
               this.errPhone = true;
               this.errPhoneMsg = this.$t('account.account_1069');
             }

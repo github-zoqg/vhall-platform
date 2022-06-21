@@ -1178,7 +1178,7 @@
         let reg = /^\d{1,15}$/;
         if (!value) {
           return callback(this.$t('account.account_1025'));
-        } else if (!reg.test(value)) {
+        } else if (value == 0 || !reg.test(value)) {
           return callback(this.$t('account.account_1069'));
         } else {
           callback();
