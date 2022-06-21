@@ -9,46 +9,48 @@
       </div>
     </template> -->
     <!-- <template v-else> -->
-    <section class="vmp-tab-menu__header">
-      <!-- prev-btn -->
-      <span
-        class="vmp-tab-menu-page-btn prev-btn"
-        v-if="isToggleBtnVisible"
-        :class="{ disabledClick: selectedIndex === 0 }"
-        @click="prev"
-      >
-        <i class="vh-iconfont vh-line-arrow-left" />
-      </span>
-
-      <!-- 菜单区域 -->
-      <ul class="vmp-tab-menu-scroll-container" ref="menu">
-        <li
-          v-for="item of visibleMenu"
-          :ref="item.id"
-          class="vmp-tab-menu-item"
-          :class="{
-            'vmp-tab-menu-item__active': selectedId === item.id,
-            'vmp-tab-menu-item_subscrbe': !isToggleBtnVisible
-          }"
-          :key="item.id"
-          @click="select({ type: item.type, id: item.id })"
+    <div class="tab_box">
+      <section class="vmp-tab-menu__header">
+        <!-- prev-btn -->
+        <span
+          class="vmp-tab-menu-page-btn prev-btn"
+          v-if="isToggleBtnVisible"
+          :class="{ disabledClick: selectedIndex === 0 }"
+          @click="prev"
         >
-          <span class="item-text">{{ $tdefault(item.name) }}</span>
-          <i class="tips" v-show="item.tipsVisible"></i>
-          <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
-        </li>
-      </ul>
+          <i class="vh-iconfont vh-line-arrow-left" />
+        </span>
 
-      <!-- next btn -->
-      <span
-        v-if="isToggleBtnVisible"
-        class="vmp-tab-menu-page-btn next-btn"
-        :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
-        @click="next"
-      >
-        <i class="vh-iconfont vh-line-arrow-right" />
-      </span>
-    </section>
+        <!-- 菜单区域 -->
+        <ul class="vmp-tab-menu-scroll-container" ref="menu">
+          <li
+            v-for="item of visibleMenu"
+            :ref="item.id"
+            class="vmp-tab-menu-item"
+            :class="{
+              'vmp-tab-menu-item__active': selectedId === item.id,
+              'vmp-tab-menu-item_subscrbe': !isToggleBtnVisible
+            }"
+            :key="item.id"
+            @click="select({ type: item.type, id: item.id })"
+          >
+            <span class="item-text">{{ $tdefault(item.name) }}</span>
+            <i class="tips" v-show="item.tipsVisible"></i>
+            <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
+          </li>
+        </ul>
+
+        <!-- next btn -->
+        <span
+          v-if="isToggleBtnVisible"
+          class="vmp-tab-menu-page-btn next-btn"
+          :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
+          @click="next"
+        >
+          <i class="vh-iconfont vh-line-arrow-right" />
+        </span>
+      </section>
+    </div>
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
@@ -648,7 +650,9 @@
         text-indent: -20px;
       }
     }
-
+    .tab_box {
+      height: 80px;
+    }
     &__header {
       position: relative;
       padding: 0 24px;

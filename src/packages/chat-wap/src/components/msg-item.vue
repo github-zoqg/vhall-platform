@@ -229,7 +229,13 @@
                 <span
                   v-html="msgContent"
                   class="chat-text"
-                  :class="!!msgContent && source.content.image_urls.length != 0 ? 'existImg' : ''"
+                  :class="
+                    !!msgContent &&
+                    source.content.image_urls &&
+                    source.content.image_urls.length != 0
+                      ? 'existImg'
+                      : ''
+                  "
                 ></span>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
