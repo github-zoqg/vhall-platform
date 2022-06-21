@@ -59,8 +59,12 @@
         reportApiSpeed: true, // 接口测速
         reportAssetSpeed: true, // 静态资源测速
         beforeRequest: function (msg) {
-          // 屏蔽.ts后缀的请求
-          if (msg.logType == 'speed' && msg.logs.url && msg.logs.url.indexOf('.ts') != -1) {
+          // 屏蔽.ts后缀的请求, 和微吼数据上报接口api请求
+          if (
+            msg.logType == 'speed' &&
+            msg.logs.url &&
+            (msg.logs.url.indexOf('.ts') != -1 || msg.logs.url.indexOf('dc.e.vhall.com') != -1)
+          ) {
             return false;
           }
           return msg;
