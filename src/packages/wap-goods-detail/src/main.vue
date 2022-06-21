@@ -17,7 +17,7 @@
         </div>
         <div class="vh-goods-wrapper-detail-info">
           <div class="vh-goods-wrapper-detail-info-price">
-            <span class="price-tip">优惠价</span>
+            <span class="price-tip">{{ $t('menu.menu_1006') }}</span>
             <i>￥</i>
             <span class="price" v-html="info.discountText"></span>
             <span class="price-through">
@@ -30,8 +30,10 @@
         </div>
       </div>
       <div class="vh-goods-wrapper-detail-btn">
-        <span v-if="info.shop_url" @click.stop="handleBuy(info.shop_url)">访问店铺</span>
-        <span @click.stop="handleBuy(info.goods_url)">立即购买</span>
+        <span v-if="info.shop_url" @click.stop="handleBuy(info.shop_url)">
+          {{ $t('menu.menu_1009') }}
+        </span>
+        <span @click.stop="handleBuy(info.goods_url)">{{ $t('menu.menu_1007') }}</span>
       </div>
     </div>
     <van-popup v-model="showTaoTip" class="tao-wrap">
