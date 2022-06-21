@@ -1,6 +1,23 @@
 <template>
-  <div id="vmp-wap-desktop-screen" v-show="isShareScreen" :class="'vmp-wap-destop-screen__hide'">
+  <div
+    id="vmp-wap-desktop-screen-wrap"
+    class="vmp-wap-desktop-screen"
+    v-show="isShareScreen"
+    @click.stop="showMask"
+  >
     <!-- 订阅桌面共享容器 -->
+    <div id="vmp-wap-desktop-screen"></div>
+    <!-- 全屏切换按钮 -->
+    <div
+      class="vmp-wap-desktop-screen__full"
+      :class="{ 'vmp-wap-desktop-screen__full-show': isShowMask }"
+      @click.stop="fullscreen"
+    >
+      <i
+        class="vh-iconfont"
+        :class="isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'"
+      ></i>
+    </div>
   </div>
 </template>
 
@@ -15,7 +32,12 @@
 
   export default {
     name: 'VmpWapDesktopScreen',
-
+    data() {
+      return {
+        isFullscreen: false, // 桌面共享是否全屏
+        isShowMask: false // 是否显示遮罩层按钮
+      };
+    },
     computed: {
       isShareScreen() {
         return this.desktopShareServer.state.localDesktopStreamId;
@@ -37,6 +59,14 @@
       }
     },
     methods: {
+      // 更改遮罩层是否显示
+      showMask() {
+        this.isShowMask = !this.isShowMask;
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.isShowMask = false;
+        }, 5000);
+      },
       // 订阅桌面共享流
       subscribeDesktopScreen() {
         let videoNode = 'vmp-wap-desktop-screen';
@@ -47,7 +77,43 @@
         };
         this.desktopShareServer.subscribeDesktopShareStream(opt);
       },
+      // 全屏切换按钮
+      fullscreen() {
+        this.isShowMask = false;
+        if (this.isFullscreen) {
+          this.interactiveServer
+            .exitStreamFullscreen({
+              streamId: this.isShareScreen,
+              vNode: 'vmp-wap-desktop-screen-wrap'
+            })
+            .then(() => {
+              this.isFullscreen = false;
+            });
+        } else {
+          this.interactiveServer
+            .setStreamFullscreen({
+              streamId: this.isShareScreen,
+              vNode: 'vmp-wap-desktop-screen-wrap'
+            })
+            .then(() => {
+              if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+                this.isFullscreen = true;
+              }
+            });
+        }
+      },
       addEvents() {
+        // 监听全屏变化
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              this.isFullscreen = false;
+              this.isShowMask = false;
+            }
+          },
+          true
+        );
         // 监听桌面共享或者插播流加入
         this.desktopShareServer.$on('screen_stream_add', () => {
           this.subscribeDesktopScreen();
@@ -69,13 +135,35 @@
 </script>
 
 <style lang="less">
-  #vmp-wap-desktop-screen {
+  .vmp-wap-desktop-screen {
     width: 100%;
     height: 100%;
     background: #2d2d2d;
     position: absolute;
     top: 0;
     left: 0;
+    #vmp-wap-desktop-screen {
+      width: 100%;
+      height: 100%;
+    }
+    &__full {
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      text-align: center;
+      transform: translate(-32px, -32px);
+      border-radius: 50%;
+      color: #ffffff;
+      display: none;
+      &-show {
+        display: block;
+      }
+    }
     &__tip {
       text-align: center;
       position: absolute;
