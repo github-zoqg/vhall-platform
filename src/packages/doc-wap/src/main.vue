@@ -66,7 +66,8 @@
         @click="doRotate"
         class="btn-doc-rotate"
       >
-        <i class="vh-iconfont vh-line-sponsor"></i>
+        <i class="vh-iconfont vh-line-sponsor" v-if="isPortrait && !!!rotateNum"></i>
+        <i class="vh-iconfont vh-line-send" v-else></i>
       </div>
       <!-- 全屏切换 -->
       <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
@@ -205,9 +206,7 @@
         // this.docServer.zoomReset();
         this.resize();
         this.docServer.rotate(this.rotateNum);
-        // this.docServer.zoomReset();
-        // const { width, height } = this.getDocViewRect();
-        // this.docServer.recover({ width, height });
+        this.docServer.zoomReset();
       }
     },
     beforeCreate() {
@@ -232,7 +231,7 @@
           this.recoverLastDocs();
         });
       }
-      this.resizeDoc();
+      //this.resizeDoc();
       window.addEventListener('resize', this.resizeDoc);
     },
     methods: {
@@ -430,14 +429,13 @@
             '【resizeDoc】:',
             'window.innerHeight: ' + window.innerHeight,
             'window.innerWidth: ' + window.innerWidth,
-            'isPortrait:' + this.isPortrait,
-            '当前屏幕竖屏:' + newOir
+            '变化前---设备竖屏 isPortrait:' + this.isPortrait,
+            '变化后---当前设备竖屏:' + newOir
           );
-          if (newOir != this.isPortrait && this.displayMode === 'fullscreen') {
+          if (newOir != this.isPortrait) {
             //方向发生了变化就重新计算文档大小
             this.isPortrait = newOir;
             this.rotateNum = 0;
-            this.getDocViewRect();
             this.resize();
             this.docServer.zoomReset();
           }
@@ -447,8 +445,7 @@
       doRotate() {
         if (this.isPortrait) {
           this.rotateNum = this.rotateNum === 0 ? 90 : 0;
-          this.getDocViewRect();
-          console.log('screen.orientation-> ', window.screen.orientation);
+          //  console.log('screen.orientation-> ', window.screen.orientation);
         } else {
           //设备横向 旋转即退出全屏
           this.fullscreen();
@@ -458,6 +455,7 @@
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
+      window.removeEventListener('resize', this.resizeDoc);
     }
   };
 </script>
