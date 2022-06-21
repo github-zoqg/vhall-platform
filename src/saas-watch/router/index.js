@@ -91,7 +91,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
-  await ssoAutoLogin() // sso自动登录置换token
+  await ssoAutoLogin(); // sso自动登录置换token
   console.log('---grayInit---', res);
   if (res) {
     //处理限流逻辑
