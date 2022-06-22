@@ -406,6 +406,14 @@
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
+        if (this.warmUpVideoList.length) {
+          this.showVideo = true;
+          if (this.warmUpVideoList.length > 1) {
+            this.getWarmupVideoInfo();
+          } else {
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          }
+        }
         // 如果是嵌入页并且没有开播，预约按钮不显示
         if (webinar.type == 2) {
           if (this.isEmbed) {
@@ -429,13 +437,6 @@
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
-        }
-        if (!this.warmUpVideoList.length) return;
-        this.showVideo = true;
-        if (this.warmUpVideoList.length > 1) {
-          this.getWarmupVideoInfo();
-        } else {
-          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
         }
       },
       getWarmupVideoInfo() {

@@ -54,14 +54,15 @@ const playerMixins = {
           }
         });
       }
-      screenfull.onchange(ev => {
-        // if (ev.target.id !== 'vmp-player') return;
-        this.isFullscreen = !this.isFullscreen;
-        // if (this.subscribeServer.state.warmFullScreen) {
-        //   this.isFullscreen = true;
-        // } else {
+      screenfull.on('error', event => {
+        console.log(event, this.playIndex, this.initIndex, '???我是全屏错误');
+      });
+      screenfull.on('change', ev => {
+        // if (ev.target.id === `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`) {
         //   this.isFullscreen = !this.isFullscreen;
+        //   console.log(ev, this.playIndex, this.initIndex, '??quan全屏');
         // }
+        this.isFullscreen = !this.isFullscreen;
       });
       clearTimeout(this.hoverVideoTimer);
       this.hoverVideoTimer = setTimeout(() => {
@@ -99,6 +100,9 @@ const playerMixins = {
         // 监听播放状态
         this.isPlayering = true;
         this.isShowPoster = false;
+        if (this.isWarnPreview) {
+          this.subscribeServer.state.isPlaying = true;
+        }
         console.warn('PLAY', this.isPlayering, this.isVodEnd);
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
@@ -164,6 +168,7 @@ const playerMixins = {
               this.playerServer.play();
             }
           } else {
+            this.subscribeServer.state.warmFullScreen = this.isFullscreen;
             // 多个暖场视频的逻辑，如果大于2，才播放完毕一个销毁一个，初始化下一个
             if (this.warmUpVideoList.length > 2) {
               this.playerServer.destroy();
@@ -391,9 +396,9 @@ const playerMixins = {
         : this.playerServer && this.playerServer.closeBarrage();
     },
     enterFullscreen() {
-      if (this.isWarnPreview) {
-        this.subscribeServer.state.warmFullScreen = !this.subscribeServer.state.warmFullScreen;
-      }
+      // let domFull = document.getElementById(
+      //   `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
+      // );
       screenfull.toggle(this.$refs.playerWatch);
     },
     setChange() {
