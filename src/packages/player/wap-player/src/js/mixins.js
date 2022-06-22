@@ -87,6 +87,7 @@ const playerMixins = {
             }
             // 将当前存的断点续播时间清除
             window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
+            window.sessionStorage.removeItem('warm_recordId');
             // 如果播放完的playIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
             if (this.playIndex < this.warmUpVideoList.length - 1) {
               this.subscribeServer.state.playIndex++;
@@ -129,8 +130,8 @@ const playerMixins = {
           if (this.isWarnPreview) {
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
-              window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             }
+            window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
           } else {
             const curLocalHistoryTime = window.sessionStorage.getItem(
@@ -240,11 +241,15 @@ const playerMixins = {
       let getRecordTotalTimer = null;
       // 回放时间异步获取 需要通过定时器获取
       getRecordTotalTimer = setInterval(() => {
-        this.totalTime =
-          this.playerServer &&
-          this.playerServer.getDuration(() => {
-            console.log('获取视频总时长失败');
-          });
+        try {
+          this.totalTime =
+            this.playerServer &&
+            this.playerServer.getDuration(() => {
+              console.log('获取视频总时长失败');
+            });
+        } catch (error) {
+          console.log(error);
+        }
         if (this.isTryPreview && this.totalTime > 0) {
           this.recordTime = computeRecordTime(this.totalTime);
           if (this.recordTime === 0) {
