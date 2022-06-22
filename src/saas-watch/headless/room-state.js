@@ -77,7 +77,8 @@ export default async function () {
           });
         }
       }),
-    roomBaseServer.getCustomRoleName()
+    roomBaseServer.getCustomRoleName(),
+    roomBaseServer.getUnionConfig()
   ];
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   // 1-音频 2-视频 3-互动 6-分组
