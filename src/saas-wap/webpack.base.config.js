@@ -36,8 +36,8 @@ const htmlConfig = {
     Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/css/vh5-ui.min.css',
 
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
+      '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
+    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
   }
 };
 
