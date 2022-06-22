@@ -58,7 +58,9 @@
       </div>
     </div>
 
-    <div class="pageGroup">{{ pageNum }}/{{ pageTotal }}</div>
+    <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
+      {{ pageNum }}/{{ pageTotal }}
+    </div>
     <div class="tools">
       <!-- 文档横屏 -->
       <div
@@ -328,6 +330,29 @@
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.roomBaseServer.state.isWapBodyDocSwitch = false;
         });
+
+        // 所有文档加载完成
+        this.docServer.$on('dispatch_doc_all_complete', val => {
+          console.log('dispatch_doc_all_complete', val);
+          this.setRight();
+        });
+        // 文档切换
+        this.docServer.$on('dispatch_doc_select_container', val => {
+          console.log('dispatch_doc_select_container', val);
+          this.setRight();
+        });
+      },
+
+      setRight() {
+        //如果是更换文档，判断是否需要旋转90°
+        if (this.isPortrait && this.displayMode === 'fullscreen' && this.rotateNum == 90) {
+          this.resize();
+          this.docServer.rotate(this.rotateNum);
+
+          this.$nextTick(() => {
+            this.docServer.zoomReset();
+          });
+        }
       },
 
       /**
