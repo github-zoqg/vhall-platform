@@ -1,6 +1,6 @@
 import { useChatServer, useMsgServer, useGroupServer } from 'middle-domain';
 
-export const assitantMixin = {
+export const clientMixin = {
   mounted() {
     // EventBus.$on('Join', msg => {
     //   this.$emit('assistantMsg', msg.data.type, msg);

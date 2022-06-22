@@ -44,8 +44,10 @@
   import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';
+  import { clientMixin } from '../mixins/clientMixin';
   export default {
     name: 'VmpEmbedClient',
+    mixins: [clientMixin],
     data() {
       return {
         rootActive: {}, // 活动信息
@@ -114,6 +116,10 @@
     },
 
     methods: {
+      //预览图片
+      preivewImage(params) {
+        this.assistantMsg('imgPreview', params);
+      },
       // 灰度
       getGrayConfig() {
         return this.roomBaseServer

@@ -469,7 +469,8 @@ export const serverConfig = {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    emitPreviewImage: [{ cuid: 'embedClientRoot', method: 'preivewImage', args: ['$0'] }]
   },
   // 礼物动画组件
   comPcRewardEffect: {

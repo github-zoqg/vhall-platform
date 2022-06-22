@@ -497,6 +497,12 @@
       previewImg(index, images) {
         //处理掉图片携带的查询参数，只保留主要链接
         this.previewImgList = images.map(item => item.split('?')[0]);
+        if (this.$route.query.assistantType) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPreviewImage', { list: this.previewImgList, index })
+          );
+          return;
+        }
         this.imgPreviewVisible = true;
         this.$nextTick(() => {
           this.$refs.imgPreview.jumpToTargetImg(index);
