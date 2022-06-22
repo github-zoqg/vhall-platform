@@ -397,6 +397,8 @@
         activeTab: 1,
         // 手机短信验证是都开启
         isPhoneValidate: false,
+        // 是否支持国外手机号
+        isAbroadPhoneValide: false,
         //表单的问题列表
         list: [],
         //题目的类型中文翻译
@@ -738,6 +740,9 @@
             const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
             this.isPhoneValidate =
               phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+            // 是否支持国外手机号
+            this.isAbroadPhoneValide =
+              phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
             // 默认填写手机号
             res.data.phone && (this.verifyForm.phone = res.data.phone);
 
@@ -1270,15 +1275,30 @@
         } else if (question.type === 0 && question.default_type === 2) {
           // 手机号
           if (this.isPhoneValidate) {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
             this.errMsgMap[question.id] =
               validPhone('', this.form[question.id], this) === true
                 ? ''
                 : validPhone('', this.form[question.id], this);
-          } else {
-            this.errMsgMap[question.id] =
-              this.form[question.id] && isNaN(this.form[question.id]) === false
+          }
+          // 支持国外手机号
+          else if (this.isAbroadPhoneValide) {
+            if (this.form[question.id]) {
+              this.errMsgMap[question.id] = /^\d{1,15}$/.test(this.form[question.id])
                 ? ''
                 : this.$t('account.account_1069');
+            } else {
+              this.errMsgMap[question.id] = this.$t('account.account_1025');
+            }
+          } else {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
+            this.errMsgMap[question.id] = /^[1-9]\d{10}$/.test(this.form[question.id])
+              ? ''
+              : this.$t('account.account_1069');
           }
         } else if (question.type === 0 && question.default_type === 3) {
           // 邮箱
@@ -1412,6 +1432,18 @@
           }
         } else {
           this.errCode = this.verifyForm.code == '' ? this.$t('cash.cash_1039') : '';
+        }
+        // 支持国外手机号
+        if (this.isAbroadPhoneValide) {
+          if (this.verifyForm.phone) {
+            if (this.verifyForm.phone == 0 || !/^\d{1,15}$/.test(this.verifyForm.phone)) {
+              this.errPhone = true;
+              this.errPhoneMsg = this.$t('account.account_1069');
+            }
+          } else {
+            this.errPhone = true;
+            this.errPhoneMsg = this.$t('account.account_1025');
+          }
         }
       },
       //取得可用的查询参数
