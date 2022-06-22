@@ -149,7 +149,7 @@
       },
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
-        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
@@ -259,10 +259,7 @@
 
       // 文档播放器互换位置
       transposition() {
-        this.roomBaseServer.setTranspositionInfo(
-          'isWapBodyDocSwitch',
-          !this.roomBaseServer.state.transpositionInfo.isWapBodyDocSwitch
-        );
+        this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
       },
 
       // 初始化事件
@@ -319,6 +316,10 @@
             this.docServer.setPlayMode(VHDocSDK.PlayMode.INTERACT);
             this.recoverLastDocs();
           }, 1000);
+        });
+
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          this.roomBaseServer.state.isWapBodyDocSwitch = false;
         });
       },
 

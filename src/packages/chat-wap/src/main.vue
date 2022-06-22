@@ -250,7 +250,7 @@
       },
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
-        return this.$domainStore.state.roomBaseServer.transpositionInfo.isWapBodyDocSwitch;
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       }
     },
     beforeCreate() {
