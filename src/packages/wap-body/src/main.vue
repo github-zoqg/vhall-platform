@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-body" :class="wapBodyClass" v-show="isShowWapBody">
+  <div class="vmp-wap-body" :class="[wapBodyClass, isShowWapBody ? '' : 'vmp-wap-body__hide']">
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd"
@@ -333,6 +333,9 @@
       &__small {
         height: 130px;
       }
+    }
+    &__hide {
+      z-index: -1;
     }
     &__bottom-noheader {
       position: fixed;
