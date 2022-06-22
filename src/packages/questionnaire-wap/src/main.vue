@@ -50,7 +50,6 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
-        console.log('---------------initEvent 初始化');
         if (!window.VHall_Questionnaire_Service) {
           this.$message({
             type: 'warning',
