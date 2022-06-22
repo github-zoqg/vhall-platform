@@ -74,6 +74,7 @@
     height: 100%;
     background: #2d2d2d;
     position: absolute;
+    z-index: 1;
     top: 0;
     left: 0;
     &__tip {
