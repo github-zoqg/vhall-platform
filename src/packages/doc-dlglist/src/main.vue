@@ -89,7 +89,7 @@
                   <div class="doc-help-tips">
                     <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
                     <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
-                    <p>2.单份文档不能超过200页,不超过100M</p>
+                    <p>2.单份文档不能超过500页,不超过300M</p>
                     <p>3.如果ppt格式转换失败或文档打开失败请尝试</p>
                     <p>用office转为pdf后上传</p>
                     <p>4.直播过程中发现PPT自动翻页，请检查源文件</p>
@@ -585,8 +585,8 @@
         this.mode = 1;
       },
       beforeUpload(file) {
-        if (file.size / 1024 / 1024 > 100) {
-          this.$message.warning('上传文件不可大于100M');
+        if (file.size / 1024 / 1024 > 300) {
+          this.$message.warning('上传文件不可大于300M');
           return false;
         }
         const acceptFileTypes = /(jpe?g|png|pptx?|xlsx?|docx?|pdf|bmp)$/i;
