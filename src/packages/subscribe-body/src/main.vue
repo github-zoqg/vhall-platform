@@ -20,7 +20,7 @@
           </div>
         </template>
       </div>
-      <div class="subscribe-language" v-if="isEmbed && languageList.length > 1 && showBottom">
+      <div class="subscribe-language" v-if="isEmbed && languageList.length > 1">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -38,7 +38,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
-      <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
+      <div class="subscribe-img-box-embed" v-if="isEmbed && !isPlaying">
         <EmbedTime
           ref="embedTime"
           :sub-option="subOption"
@@ -50,7 +50,6 @@
     <!--活动时间信息-->
     <div class="subscribe-img-bottom vmp-subscribe-body-tab" v-if="!isEmbed">
       <bottom-tab
-        v-if="showBottom"
         ref="bottomTab"
         :sub-option="subOption"
         @payMore="feeAuth"
@@ -129,6 +128,9 @@
       },
       subscribeWarmList() {
         return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      isPlaying() {
+        return this.$domainStore.state.subscribeServer.isPlaying;
       },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;
@@ -213,16 +215,6 @@
         } else {
           this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
         }
-        // if (this.isEmbed) {
-        //   // 嵌入的暖场视频只有免费的时候显示
-        //   if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
-        //     this.showVideo = true;
-        //   }
-        // } else {
-        //   if (warmup.warmup_paas_record_id && webinar.type == 2) {
-        //     this.showVideo = true;
-        //   }
-        // }
       },
       getWarmupVideoInfo() {
         // 如果存在recordIds
