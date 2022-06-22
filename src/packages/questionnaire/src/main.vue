@@ -291,7 +291,7 @@
           return;
         }
         // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-        this.questionnaireServer.init();
+        this.questionnaireServer.init({ mode: 'live' });
 
         this.initPage();
         this.dialogVisible = true;
@@ -330,6 +330,10 @@
         this.questionnaireServer.$on(
           this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
           msg => {
+            if (window.VHall_Questionnaire_Service) {
+              // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+              this.questionnaireServer.init({ mode: 'live' });
+            }
             const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
             let text = this.$getRoleName(msg.room_role);
             if (msg.room_role != 1) {

@@ -50,6 +50,7 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
+        console.log('---------------initEvent 初始化');
         if (!window.VHall_Questionnaire_Service) {
           this.$message({
             type: 'warning',
@@ -77,6 +78,10 @@
         this.questionnaireServer.$on(
           this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
           async msg => {
+            if (window.VHall_Questionnaire_Service) {
+              // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+              this.questionnaireServer.init({ mode: 'watch' });
+            }
             useChatServer().addChatToList({
               nickname: msg.nick_name,
               avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
