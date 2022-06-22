@@ -40,8 +40,8 @@ const playerMixins = {
             console.log(this.endTime);
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
-              window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             }
+            window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
           } else {
             const curLocalHistoryTime = window.sessionStorage.getItem(
@@ -57,8 +57,10 @@ const playerMixins = {
       screenfull.onchange(ev => {
         // if (ev.target.id !== 'vmp-player') return;
         this.isFullscreen = !this.isFullscreen;
-        // if (this.isWarnPreview) {
-        //   this.subscribeServer.state.warmFullScreen = this.isFullscreen;
+        // if (this.subscribeServer.state.warmFullScreen) {
+        //   this.isFullscreen = true;
+        // } else {
+        //   this.isFullscreen = !this.isFullscreen;
         // }
       });
       clearTimeout(this.hoverVideoTimer);
@@ -168,6 +170,7 @@ const playerMixins = {
             }
             // 将当前存的断点续播时间清除
             window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
+            window.sessionStorage.removeItem('warm_recordId');
             // 如果播放完的playIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
             if (this.playIndex < this.warmUpVideoList.length - 1) {
               this.subscribeServer.state.playIndex++;
@@ -388,6 +391,9 @@ const playerMixins = {
         : this.playerServer && this.playerServer.closeBarrage();
     },
     enterFullscreen() {
+      if (this.isWarnPreview) {
+        this.subscribeServer.state.warmFullScreen = !this.subscribeServer.state.warmFullScreen;
+      }
       screenfull.toggle(this.$refs.playerWatch);
     },
     setChange() {

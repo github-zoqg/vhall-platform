@@ -243,6 +243,8 @@
             let recordId = window.sessionStorage.getItem('warm_recordId');
             let index = this.warmUpVideoList.findIndex(item => item == recordId);
             console.log(index, '???pc当前index');
+            // 如果当前没有找到对应下标，从0开始初始化
+            index = index < 0 ? 0 : index;
             this.subscribeServer.state.playIndex = index;
             this.subscribeServer.state.initIndex = index;
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex], true);

@@ -458,7 +458,10 @@
         this.playerServer.setVolume(this.voice, () => {
           console.log('设置音量失败');
         });
-        // if (this.subscribeServer.state.warmFullScreen) {
+        // if (
+        //   this.subscribeServer.state.warmFullScreen &&
+        //   this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
+        // ) {
         //   this.enterFullscreen();
         // }
         // 多个视频持续播放 暖场视频播放模式
@@ -884,11 +887,16 @@
         let getRecordTotalTimer = null;
         // 回放时间异步获取 需要通过定时器获取
         getRecordTotalTimer = setInterval(() => {
-          this.totalTime =
-            this.playerServer &&
-            this.playerServer.getDuration(() => {
-              console.log('获取视频总时长失败');
-            });
+          try {
+            this.totalTime =
+              this.playerServer &&
+              this.playerServer.getDuration(() => {
+                console.log('获取视频总时长失败');
+              });
+          } catch (error) {
+            console.log(error);
+          }
+
           if (this.isTryPreview && this.totalTime) {
             this.recordTime = computeRecordTime(this.totalTime);
             if (this.recordTime === 0) {
