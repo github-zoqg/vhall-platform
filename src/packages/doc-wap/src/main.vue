@@ -318,6 +318,13 @@
           }, 1000);
         });
 
+        // 设置观看端文档是否可见
+        // this.docServer.$on('dispatch_doc_switch_change', val => {
+        //   if (!val && this.displayMode === 'fullscreen') {
+        //     this.fullscreen();
+        //   }
+        // });
+
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.roomBaseServer.state.isWapBodyDocSwitch = false;
         });
@@ -633,8 +640,8 @@
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
       // 播放器的层级是1-12
-      //聊天框层级22,
-      z-index: 23;
+      //聊天框层级22, 礼物飘窗100 礼物全屏特效300
+      z-index: 301;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {
