@@ -8,8 +8,10 @@ export default () => {
     user
       .ssoAutoLogin()
       .then(res => {
-        if (res.code === 200 && res.data.token) {
-          localStorage.setItem('token', res.data.token);
+        if (res.code === 200) {
+          const data = res.data
+          if (data.login_status === 0) return localStorage.removeItem('token')  // 登出操作
+          data.token && localStorage.setItem('token', data.token);
         }
       })
       .finally(() => {
