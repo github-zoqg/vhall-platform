@@ -34,7 +34,11 @@
         const id = this.$route.params.id;
         const invite = this.invite;
 
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}?invite=${invite}`;
+        location.replace(
+          `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}?invite=${invite}`
+        );
+        // 避免产生历史路径
+        // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}?invite=${invite}`;
       },
       changeInvite(val) {
         this.invite = val;
