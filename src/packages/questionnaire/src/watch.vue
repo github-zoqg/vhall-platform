@@ -19,7 +19,7 @@
     useZIndexServer,
     useMsgServer
   } from 'middle-domain';
-  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
+
   export default {
     name: 'VmpQuestionnaireWatch',
     data() {
@@ -44,7 +44,15 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
-        console.log('open', questionnaireId);
+        if (!window.VHall_Questionnaire_Service) {
+          this.$message({
+            type: 'warning',
+            message: '问卷SDK未加载，功能暂不支持'
+          });
+          return;
+        }
+        // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        this.questionnaireServer.init({ mode: 'watch' });
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$message({
@@ -67,47 +75,53 @@
         });
       },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          useChatServer().addChatToList({
-            nickname: msg.nick_name,
-            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-            content: {
-              text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
-              questionnaire_id: msg.questionnaire_id
-            },
-            roleName: msg.room_role,
-            type: msg.type,
-            interactStatus: true,
-            isCheck: true
-          });
-          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
-            msg.questionnaire_id
-          );
-          if (canAnswer !== true) {
-            this.questionnaireServer.setDotVisible(false);
-            return false;
-          }
-          this.dialogVisible = true;
-          this.zIndexServer.setDialogZIndex('questionnaire');
-          this.questionnaireServer.setDotVisible(true);
-          await this.$nextTick(); // 等dom渲染
-          this.questionnaireServer.renderQuestionnaire4Watch(
-            '#qs-preview-box-content',
-            msg.questionnaire_id
-          );
-        });
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-          if (res.code === 200) {
-            this.dialogVisible = false;
-          } else {
-            this.$message({
-              message: this.$t('register.register_1004'),
-              showClose: true,
-              type: 'error',
-              customClass: 'zdy-info-box'
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
+          async msg => {
+            useChatServer().addChatToList({
+              nickname: msg.nick_name,
+              avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+              content: {
+                text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
+                questionnaire_id: msg.questionnaire_id
+              },
+              roleName: msg.room_role,
+              type: msg.type,
+              interactStatus: true,
+              isCheck: true
             });
+            const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+              msg.questionnaire_id
+            );
+            if (canAnswer !== true) {
+              this.questionnaireServer.setDotVisible(false);
+              return false;
+            }
+            this.dialogVisible = true;
+            this.zIndexServer.setDialogZIndex('questionnaire');
+            this.questionnaireServer.setDotVisible(true);
+            await this.$nextTick(); // 等dom渲染
+            this.questionnaireServer.renderQuestionnaire4Watch(
+              '#qs-preview-box-content',
+              msg.questionnaire_id
+            );
           }
-        });
+        );
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+          res => {
+            if (res.code === 200) {
+              this.dialogVisible = false;
+            } else {
+              this.$message({
+                message: this.$t('register.register_1004'),
+                showClose: true,
+                type: 'error',
+                customClass: 'zdy-info-box'
+              });
+            }
+          }
+        );
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
           this.dialogVisible = false;

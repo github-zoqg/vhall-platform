@@ -91,14 +91,17 @@
     created() {
       this.questionnaireServer.checkIconStatus();
       this.setSetingHeight();
-      this.questionnaireServer.$on('questionnaire_push', msg => {
+      this.questionnaireServer.$on(this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH, msg => {
         this.closeQuestionList();
       });
-      this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-        if (res.code === 200) {
-          this.questionnaireServer.getSurveyList();
+      this.questionnaireServer.$on(
+        this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+        res => {
+          if (res.code === 200) {
+            this.questionnaireServer.getSurveyList();
+          }
         }
-      });
+      );
     },
     methods: {
       setSetingHeight() {

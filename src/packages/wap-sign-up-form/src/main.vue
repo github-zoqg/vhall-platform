@@ -923,11 +923,18 @@
       },
       signStartConfirm() {
         this.isSubmitSuccess = false;
-        window.location.href =
+        location.replace(
           window.location.protocol +
-          process.env.VUE_APP_WAP_WATCH +
-          process.env.VUE_APP_WEB_KEY +
-          `/lives/watch/${this.webinar_id}${this.queryString}`;
+            process.env.VUE_APP_WAP_WATCH +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinar_id}${this.queryString}`
+        );
+        // 避免产生历史路径
+        // window.location.href =
+        //   window.location.protocol +
+        //   process.env.VUE_APP_WAP_WATCH +
+        //   process.env.VUE_APP_WEB_KEY +
+        //   `/lives/watch/${this.webinar_id}${this.queryString}`;
       },
       //提交表单到服务器
       submitSignUpForm() {
@@ -993,12 +1000,19 @@
               } else if (queryString.indexOf('?') == -1 && shareId) {
                 queryString += shareId ? `?shareId=${shareId}` : '';
               }
-              // 出错后异常跳转
-              window.location.href =
+              location.replace(
                 window.location.protocol +
-                process.env.VUE_APP_WAP_WATCH +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/watch/${this.webinar_id}${queryString}`
+              );
+              // 避免产生历史路径
+              // // 出错后异常跳转
+              // window.location.href =
+              //   window.location.protocol +
+              //   process.env.VUE_APP_WAP_WATCH +
+              //   process.env.VUE_APP_WEB_KEY +
+              //   `/lives/watch/${this.webinar_id}${queryString}`;
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
@@ -1047,11 +1061,18 @@
               //       `/lives/watch/${this.webinar_id}${queryString}`;
               //   });
             } else {
-              window.location.href =
+              location.replace(
                 window.location.protocol +
-                process.env.VUE_APP_WAP_WATCH +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/watch/${this.webinar_id}${queryString}`
+              );
+              // 避免产生历史路径
+              // window.location.href =
+              //   window.location.protocol +
+              //   process.env.VUE_APP_WAP_WATCH +
+              //   process.env.VUE_APP_WEB_KEY +
+              //   `/lives/watch/${this.webinar_id}${queryString}`;
             }
           })
           .catch(e => {
@@ -1511,11 +1532,18 @@
                 } else if (queryString.indexOf('?') == -1 && shareId) {
                   queryString += shareId ? `?shareId=${shareId}` : '';
                 }
-                window.location.href =
+                location.replace(
                   window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinar_id}${queryString}`;
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinar_id}${queryString}`
+                );
+                // 避免产生历史路径
+                // window.location.href =
+                //   window.location.protocol +
+                //   process.env.VUE_APP_WAP_WATCH +
+                //   process.env.VUE_APP_WEB_KEY +
+                //   `/lives/watch/${this.webinar_id}${queryString}`;
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
