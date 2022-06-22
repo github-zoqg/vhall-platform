@@ -382,6 +382,8 @@
         if (val) {
           const obj = this.getItem({ type: 2 });
           this.select({ type: obj.type, id: obj.id });
+        } else {
+          this.roomBaseServer.state.isWapBodyDocSwitch = false;
         }
       },
       /**
