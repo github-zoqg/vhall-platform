@@ -74,6 +74,8 @@
         return this.$domainStore.state.menuServer.selectedType;
       },
       isShowWapBody() {
+        // 如果播放器储与mini状态，必显示
+        if (this.mini) return true;
         // 如果文档和播放器切换并且自定义菜单选中的不是文档
         if (this.isWapBodyDocSwitch) {
           return this.menuSelectedType == 2;
@@ -88,6 +90,8 @@
         // showHeader: 是否展示顶部header组件，控制台配置
         // isWapBodyDocSwitch: wapBody 和 文档组件是否切换位置
         // isSmallPlayer: 音频播放器是否缩小
+        // mini: 播放器是否是mini状态（打开问卷）
+        if (this.mini) return '';
         if (this.showHeader && this.isWapBodyDocSwitch) {
           className = 'vmp-wap-body__bottom';
           if (this.isSmallPlayer) {
