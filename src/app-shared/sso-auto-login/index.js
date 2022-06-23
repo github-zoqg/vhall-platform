@@ -12,8 +12,8 @@ function verifyCookie() {
   const ssoLoginStatus = getCookie('sso_login_status'); // 用户在用户中心的状态(1为登录)
   const ssoTokenOrigin = getCookie('sso_token_origin'); // 用户登录的业务线
   const ssoTokenAfterLogin = getCookie('sso_token_after_login'); // 用户登录后给予的token(验证防止多次请求)
-  console.log('------------verifyCookie-------------') //FIXME: 测试用,上线前删除!!
-  console.log(ssoToken, ssoLoginStatus, ssoTokenOrigin, ssoTokenAfterLogin)
+  console.log('------------verifyCookie-------------'); //FIXME: 测试用,上线前删除!!
+  console.log(ssoToken, ssoLoginStatus, ssoTokenOrigin, ssoTokenAfterLogin);
   if (ssoLoginStatus != 1) {
     localStorage.removeItem('token');
     return false;
