@@ -80,7 +80,10 @@ const playerMixins = {
               this.playerServer.play();
             }
           } else {
-            this.exitFullScreen();
+            this.subscribeServer.state.warmFullScreen = this.isFullscreen;
+            if (this.subscribeServer.state.warmFullScreen) {
+              this.exitFullScreen();
+            }
             // 多个暖场视频的逻辑，如果大于2，才播放完毕一个销毁一个，初始化下一个
             if (this.warmUpVideoList.length > 2) {
               this.playerServer.destroy();
@@ -222,9 +225,6 @@ const playerMixins = {
     // 全屏
     enterFullscreen() {
       this.isFullscreen ? this.exitFullScreen() : this.setFullscreen();
-      // if (this.isWarnPreview) {
-      //   this.subscribeServer.state.warmFullScreen = this.isFullscreen;
-      // }
     },
     // 设置默认视频清晰度
     setDefaultQuality() {

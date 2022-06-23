@@ -15,11 +15,12 @@
                 <img src="./img/livingEnd@2x.png" alt="" />
               </div>
               <h1 class="living_end_text">{{ $t('player.player_1017') }}</h1>
-              <div class="living_end_people" v-if="webinarType != 3">
-                <i18n path="appointment.appointment_1018">
-                  <span place="n">{{ subOption.num }}</span>
-                </i18n>
-              </div>
+              <!-- <div class="living_end_people" v-if="isEmbed">
+                <span>
+                  <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+                  {{ hotNum | formatHotNum }}
+                </span>
+              </div> -->
             </div>
             <span class="subscribe-type" v-if="webinarType != 3">
               {{
@@ -374,6 +375,7 @@
         this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
           this.showBottomBtn = false;
+          this.showVideo = false;
           this.isLiveEnd = true;
           this.$refs.timeDowner.clearTimer();
           this.subscribeText = this.$t('player.player_1017');
@@ -867,6 +869,7 @@
           &_people {
             font-size: 22px;
             line-height: 28px;
+            padding-top: 10px;
           }
         }
       }
