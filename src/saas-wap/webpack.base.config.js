@@ -50,7 +50,7 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: process.env.VUE_APP_BUILD_VERSION,
-      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
+      gitlabHash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       isWap: true,
       env: process.env.NODE_ENV, // 环境标识
       ...htmlConfig
