@@ -544,6 +544,9 @@
           position: absolute;
           transform: translateX(-50%);
           overflow: visible !important;
+          > div {
+            overflow: visible !important;
+          }
         }
       }
     }
