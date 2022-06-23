@@ -343,8 +343,8 @@
       },
 
       setRight() {
-        //如果是更换文档，判断是否需要旋转90°
-        if (this.isPortrait && this.displayMode === 'fullscreen' && this.rotateNum == 90) {
+        //如果是更换文档，判断是否需要纠正旋转
+        if (this.displayMode === 'fullscreen') {
           //  this.docServer.zoomReset();
           this.resize();
           this.docServer.rotate(this.rotateNum);
