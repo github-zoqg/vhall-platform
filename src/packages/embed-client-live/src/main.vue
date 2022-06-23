@@ -26,7 +26,7 @@
         <!-- 签到 -->
         <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
         <!-- 红包 -->
-        <VmpRedPacketLive ref="redPacket" v-show="tool_component_name == 'redPacket'" />
+        <VmpRedPacketLive ref="redPacketLive" v-show="tool_component_name == 'redPacketLive'" />
       </div>
     </div>
   </div>
@@ -226,8 +226,8 @@
               this.exitFullscreen('#vhall-document-container');
               break;
             case 11: // 打开红包
-              this.closeAssistantTools('redPacket');
-              this.$refs.redPacket.openSign();
+              this.closeAssistantTools('redPacketLive');
+              this.$refs.redPacketLive.open();
               break;
             case 12: // 打开红包
               // this.closeAssistantTools()
