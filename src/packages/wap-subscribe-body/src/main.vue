@@ -15,15 +15,12 @@
                 <img src="./img/livingEnd@2x.png" alt="" />
               </div>
               <h1 class="living_end_text">{{ $t('player.player_1017') }}</h1>
-              <div class="living_end_people" v-if="isEmbed">
+              <!-- <div class="living_end_people" v-if="isEmbed">
                 <span>
                   <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                   {{ hotNum | formatHotNum }}
                 </span>
-                <!-- <i18n path="appointment.appointment_1018">
-                  <span place="n">{{ subOption.num }}</span>
-                </i18n> -->
-              </div>
+              </div> -->
             </div>
             <span class="subscribe-type" v-if="webinarType != 3">
               {{
@@ -316,13 +313,6 @@
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
-      },
-      hotNum() {
-        return (
-          Number(this.$domainStore.state.virtualAudienceServer.uvHot) +
-          Number(this.$domainStore.state.virtualAudienceServer.virtualHot) +
-          1
-        );
       }
     },
     beforeCreate() {
