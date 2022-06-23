@@ -154,7 +154,7 @@
         /** 消息提示结束 */
         //是否正在执行动画
         animationRunning: false,
-        //是否是助理
+        //是否是客户端嵌入
         assistantType: this.$route.query.assistantType,
         //@用户
         atList: [],

@@ -20,9 +20,18 @@
           v-show="tool_component_name == 'questionnaire'"
         ></vmp-questionnaire>
         <!-- 抽奖 -->
-        <VmpLotteryLive ref="lottery" v-show="tool_component_name == 'lottery'" />
+        <vmp-air-container
+          cref="lottery"
+          :cuid="childrenCom[4]"
+          v-show="tool_component_name == 'lottery'"
+        />
         <!-- 问答 -->
-        <vmp-qa ref="qa" v-show="tool_component_name == 'qa'"></vmp-qa>
+        <vmp-air-container
+          cref="qa"
+          :cuid="childrenCom[3]"
+          v-show="tool_component_name == 'qa'"
+          :oneself="true"
+        ></vmp-air-container>
         <!-- 签到 -->
         <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
         <!-- 红包 -->
@@ -39,7 +48,6 @@
     useMsgServer,
     useDocServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
   import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
   import { getQueryString } from '@/packages/app-shared/utils/tool';
@@ -116,10 +124,6 @@
     },
 
     methods: {
-      //预览图片
-      preivewImage(params) {
-        this.assistantMsg('imgPreview', params);
-      },
       // 灰度
       getGrayConfig() {
         return this.roomBaseServer
@@ -168,7 +172,7 @@
         }
       },
       initAssistantMsg() {
-        window.vhallClientEmbed = this.$refs.vhallClient;
+        // window.vhallClientEmbed = this.$refs.vhallClient;
         console.warn('this.$refs.vhallClient', this.$refs.vhallClient, this.$refs);
         if (this.webviewType != 'cef') {
           /* eslint-disable no-new */
@@ -181,60 +185,8 @@
         window.QtCallFunctionPage = _msg => {
           const msg = Number(_msg);
           console.error('展示当前点击的消息转换-------', _msg);
-          // 获取文档dom
-          let container = '';
-          try {
-            container = document.querySelector('.vhall-document-container');
-          } catch (error) {
-            console.log(error);
-          }
           // 判断执行对应方法
-          switch (msg) {
-            case 1: // 文档
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emiSwitchTo', ['document'])
-              );
-              break;
-            case 2: // 白板
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emiSwitchTo', ['board'])
-              );
-              break;
-            case 3: // 问卷
-              this.closeAssistantTools('questionnaire');
-              this.$refs.questionnaire.open();
-              break;
-            case 4: // 抽奖
-              this.closeAssistantTools('lottery');
-              this.$refs.lottery.open();
-              break;
-            case 5: // 签到
-              this.closeAssistantTools('signLive');
-              this.$refs.signLive.openSign();
-              break;
-            case 6: // 答题
-              this.closeAssistantTools('qa');
-              // this.$refs.qa.open();
-              break;
-            case 7: // 隐藏文档
-              container && (container.style.opacity = 0);
-              break;
-            case 8: // 显示文档
-              container && (container.style.opacity = 1);
-              break;
-            case 9: // 文档最小化
-              this.exitFullscreen('#vhall-document-container');
-              break;
-            case 11: // 打开红包
-              this.closeAssistantTools('redPacketLive');
-              this.$refs.redPacketLive.open();
-              break;
-            case 12: // 打开红包
-              // this.closeAssistantTools()
-              // this.openRedPacketPopup()
-              // EventBus.$emit('live_start');
-              break;
-          }
+          this.handleAssitant(msg);
         };
         // 显示/隐藏文档工具栏
         window.QtCallJsChangeDocTool = _msg => {
@@ -250,11 +202,9 @@
           this.$refs.vhallClient.handleAssitantDocFocus(msg);
         };
       },
-      // 关闭其他互动工具
-      closeAssistantTools(name) {
+      // 展示当前互动工具
+      showAssistantTools(name) {
         this.tool_component_name = name;
-        // 关闭签到弹框
-        this.$refs.signLive.signVisible = false;
       },
       // 初始化房间
       async getUserInfo() {

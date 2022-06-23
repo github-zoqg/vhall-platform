@@ -226,11 +226,10 @@
       min-height: 310px;
       position: fixed;
       left: 50%;
-      margin-left: -300px;
       top: 50%;
       max-height: 80%;
+      transform: translate(-50%, -50%);
       overflow: auto;
-      margin-top: -200px;
       background: #fff;
       border-radius: 6px;
       z-index: 777;

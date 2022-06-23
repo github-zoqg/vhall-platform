@@ -470,6 +470,7 @@ export const serverConfig = {
         method: 'openModal'
       }
     ],
+    //客户端嵌入-通知客户端打开图片语言
     emitPreviewImage: [{ cuid: 'embedClientRoot', method: 'preivewImage', args: ['$0'] }]
   },
   // 礼物动画组件
@@ -501,7 +502,9 @@ export const serverConfig = {
     }
   },
   comQa: {
-    component: 'VmpQa'
+    component: 'VmpQa',
+    //客户端嵌入-通知客户端开启问答管理页面
+    emitOpenQAAdmin: [{ cuid: 'embedClientRoot', method: 'openQAAdmin', args: ['$0'] }]
   },
   // 文档白板组件
   comDocUne: {
@@ -921,7 +924,7 @@ export const serverConfig = {
   // 客户端嵌入页组件
   embedClientRoot: {
     component: 'VmpEmbedClient',
-    children: ['comDocUne', 'dlgDocList', 'comChat'],
+    children: ['comDocUne', 'dlgDocList', 'comChat', 'comQa', 'comLottery'],
     emiSwitchTo: {
       cuid: ['comDocUne'],
       method: 'switchTo',

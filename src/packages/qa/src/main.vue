@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div ref="chat" class="vhsaas-chat">
+  <div ref="chat" class="vhsaas-chat">
+    <template v-if="!assistantType">
       <div
         class="vhsaas-chat__body-wrapper"
         :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
@@ -45,7 +45,8 @@
         @onInputStatus="onInputStatus"
         @needLogin="handleLogin"
       ></chat-operator>
-    </div>
+    </template>
+
     <!-- 问答 -->
     <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal" append-to-body>
       <div class="qa_content" v-if="qaVisible">
@@ -128,7 +129,7 @@
     data() {
       return {
         MsgItem,
-        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status,
+        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status ? true : false,
         qaVisible: false,
         qaCount: 0,
         QAName: '问答',
@@ -162,7 +163,9 @@
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         qa_allBanned_status: useChatServer().state.allBannedModuleList.qa_status, //全体禁言对问答是否生效
-        watchInitData: useRoomBaseServer().state.watchInitData
+        watchInitData: useRoomBaseServer().state.watchInitData,
+        //客户端嵌入参数
+        assistantType: this.$route.query.assistantType
       };
     },
     computed: {
@@ -331,11 +334,16 @@
         this.isOnlyMine = status;
       },
       openQa() {
-        const base = process.env.NODE_ENV === 'development' ? '/' : '/v3/';
-        if (location.search == '') {
-          window.open(`${base}lives/qa/${this.webinarId}`);
+        const base = process.env.NODE_ENV === 'development' ? '/v3/' : '/v3/';
+        const url = location.search
+          ? `${base}lives/qa/${this.webinarId}`
+          : `${base}lives/qa/${this.webinarId}`;
+        if (!this.$route.query.assistantType) {
+          window.open(url);
         } else {
-          window.open(`${base}lives/qa/${this.webinarId}${location.search}`);
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitOpenQAAdmin', process.env.VUE_APP_WAP_WATCH + url)
+          );
         }
       },
       //滚动到底部
@@ -407,6 +415,9 @@
               window.vhallReportForProduct?.report(110052);
               this.isQAEnabled = true;
               this.qaVisible = false;
+              if (this.$route.query.assistantType) {
+                this.openQa();
+              }
               this.$message({
                 message: '开启问答成功',
                 type: 'success'
