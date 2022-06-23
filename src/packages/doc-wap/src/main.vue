@@ -321,11 +321,10 @@
         });
 
         // 设置观看端文档是否可见
-        // this.docServer.$on('dispatch_doc_switch_change', val => {
-        //   if (!val && this.displayMode === 'fullscreen') {
-        //     this.fullscreen();
-        //   }
-        // });
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          console.log('dispatch_doc_switch_change', val);
+          this.setRight();
+        });
 
         this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
           this.roomBaseServer.state.isWapBodyDocSwitch = false;
@@ -346,12 +345,13 @@
       setRight() {
         //如果是更换文档，判断是否需要旋转90°
         if (this.isPortrait && this.displayMode === 'fullscreen' && this.rotateNum == 90) {
+          //  this.docServer.zoomReset();
           this.resize();
           this.docServer.rotate(this.rotateNum);
 
-          this.$nextTick(() => {
+          setTimeout(() => {
             this.docServer.zoomReset();
-          });
+          }, 50);
         }
       },
 
