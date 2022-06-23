@@ -4,7 +4,10 @@
       <div class="subscribe-img">
         <template v-if="!showVideo">
           <div class="subscribe-img-box">
-            <img :src="webinarsBgImg" />
+            <img class="subscribe-bg" :src="webinarsBgImg" />
+          </div>
+          <div v-if="isLivingEnd && !isEmbed" class="subscribe-img-box subscribe-img_end">
+            <img src="./img/live_start.png" alt="" />
           </div>
         </template>
         <template v-else>
@@ -81,6 +84,7 @@
         showBottom: true,
         showVideo: false, // 显示暖场视频
         isLiving: false,
+        isLivingEnd: false,
         wxQr: '',
         zfQr: '',
         lang: {},
@@ -180,6 +184,9 @@
 
         this.subscribeServer.$on('live_over', data => {
           this.subOption.type = 3;
+          this.subscribeServer.state.isPlaying = false;
+          this.showVideo = false;
+          this.isLivingEnd = true;
           console.log(data);
         });
         // this.playerServer.$on(VhallPlayer.PLAY, () => {
@@ -204,6 +211,11 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (webinar.type == 3) {
+          this.showVideo = false;
+          this.isLivingEnd = true;
+          return;
+        }
         if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
@@ -387,11 +399,17 @@
           height: 100%;
           border-radius: 4px;
         }
-        img {
+        .subscribe-bg {
           width: 100%;
           height: 100%;
           object-fit: fill;
           border-radius: 4px 4px 0 0;
+        }
+        .subscribe-img_end {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.6);
         }
       }
       .subscribe-language {

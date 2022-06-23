@@ -378,6 +378,10 @@
       warmPlayMode() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_player_type;
       },
+      // 是否是预约页
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status === 'subscribe';
+      },
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
