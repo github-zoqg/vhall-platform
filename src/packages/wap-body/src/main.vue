@@ -334,9 +334,6 @@
         height: 130px;
       }
     }
-    &__hide {
-      z-index: -1;
-    }
     &__bottom-noheader {
       position: fixed;
       left: 0;
@@ -348,6 +345,9 @@
       &__small {
         height: 130px;
       }
+    }
+    &__hide {
+      z-index: -1;
     }
     &-ending {
       background-repeat: no-repeat;
