@@ -17,15 +17,19 @@
               </label>
               <div class="scale8">
                 <span>{{ getLiveTag(item) }}</span>
-                <span v-if="hasDelayPermission && item.no_delay_webinar == 1">
+                <span
+                  v-if="hasDelayPermission && item.no_delay_webinar == 1 && item.webinar_type !== 6"
+                >
                   | {{ $t('common.common_1023') }}
                 </span>
               </div>
             </span>
           </div>
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
-            <i>{{ item.pv }}</i>
+            <div class="vh-chose-active-item__cover-hots__content">
+              <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
+              <i>{{ item.pv }}</i>
+            </div>
           </div>
         </div>
         <div class="vh-chose-active-item__titleInfo">
@@ -197,13 +201,23 @@
       }
       &-hots {
         position: absolute;
-        left: 12px;
-        bottom: 4px;
-        font-size: 12px;
-        font-weight: 400;
-        color: #ffffff;
-        line-height: 20px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+        border-radius: 0px 0px 4px 4px;
+        height: 32px;
+        width: 100%;
+        left: 0;
+        bottom: 0;
         z-index: 3;
+        &__content {
+          position: absolute;
+          left: 10px;
+          bottom: 4px;
+          font-size: 12px;
+          font-weight: 400;
+          color: #ffffff;
+          line-height: 20px;
+          z-index: 4;
+        }
         .saasicon_redu {
           &:before {
             display: inline-block;
@@ -318,10 +332,16 @@
         padding: 0px 12px;
       }
       &-hots {
-        font-size: 14px;
-        left: 12px;
-        bottom: 6px;
+        left: 0;
+        bottom: 0;
         z-index: 3;
+        border-radius: 0 0;
+        &__content {
+          left: 12px;
+          bottom: 6px;
+          font-size: 14px;
+          z-index: 4;
+        }
       }
     }
     &__titleInfo {
