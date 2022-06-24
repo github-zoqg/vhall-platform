@@ -130,8 +130,8 @@ export const clientMixin = {
         // case 14: // 全屏
         //   break;
         case 15: // 计时器
-          this.showAssistantTools('lottery');
-          this.$refs.lottery.open();
+          this.showAssistantTools('timerSetLive');
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
           break;
       }
     },
