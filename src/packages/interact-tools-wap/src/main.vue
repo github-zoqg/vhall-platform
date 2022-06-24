@@ -1,7 +1,8 @@
 <template>
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
+      <!-- TODO:支付牌照问题 -->
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && false">
         <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
           ref="gifts"
@@ -13,7 +14,12 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward" class="redpacket-box">
+      <!-- TODO:支付牌照问题 -->
+      <div
+        v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward"
+        class="redpacket-box"
+        v-if="false"
+      >
         <img class="tool redpacket-img" src="./img/icon_reward.png" @click="openReward" />
         <RewardCard
           ref="reward"

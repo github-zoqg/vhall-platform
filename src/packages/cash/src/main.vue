@@ -20,7 +20,9 @@
           </div>
           <div>
             <!-- 提现按钮 -->
+            <!-- TODO:支付牌照问题 -->
             <el-button
+              v-if="false"
               class="vmp-cash-red-button vmp-cash-length-middle"
               round
               :disabled="
