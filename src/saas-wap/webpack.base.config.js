@@ -19,7 +19,7 @@ const htmlConfig = {
     ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
     // 通过s3域名加载
-    // Vant: '//s3.e.vhall.com/common-static/middle/vant/2.12.34/dist/vant.min.js',
+    Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/js/vh5-ui.min.js',
     loadLazyWap: '//s3.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
 
     // 可以延迟加载的
@@ -33,10 +33,11 @@ const htmlConfig = {
   // cdn css
   cdnCss: {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    // Vant: '//s2.e.vhall.com/common-static/middle/vant/2.12.34/dist/index.css',
+    Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/css/vh5-ui.min.css',
+
     iconfontCommon:
-      '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//cnstatic01.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
+      '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
+    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
   }
 };
 
@@ -49,7 +50,7 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: process.env.VUE_APP_BUILD_VERSION,
-      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
+      gitlabHash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
       isWap: true,
       env: process.env.NODE_ENV, // 环境标识
       ...htmlConfig

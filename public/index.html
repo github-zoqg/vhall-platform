@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="version" content="<%= htmlWebpackPlugin.options.version %>" />
-    <meta name="gitlab-hash" content="<%= htmlWebpackPlugin.options.hash %>" />
+    <meta name="gitlab-hash" content="<%= htmlWebpackPlugin.options.gitlabHash %>" />
     <% if( htmlWebpackPlugin.options && htmlWebpackPlugin.options.isWap){ %>
     <meta
       name="viewport"
@@ -57,10 +57,25 @@
       window.saas_aegis = new Aegis({
         id: 'kw0QbfKrJLLbyL9Yj0', // 上报 id
         reportApiSpeed: true, // 接口测速
-        reportAssetSpeed: true // 静态资源测速
+        reportAssetSpeed: true, // 静态资源测速
+        beforeRequest: function (msg) {
+          // 屏蔽.ts后缀的请求, 和微吼数据上报接口api请求
+          if (
+            msg.logType == 'speed' &&
+            msg.logs.url &&
+            (msg.logs.url.indexOf('.ts') != -1 ||
+              msg.logs.url.indexOf('.flv') != -1 ||
+              msg.logs.url.indexOf('.msg') != -1 ||
+              msg.logs.url.indexOf('c.dun.163yun.com') != -1 ||
+              msg.logs.url.indexOf('dc.e.vhall.com') != -1)
+          ) {
+            return false;
+          }
+          return msg;
+        }
       });
     </script>
-     <% } %>
+    <% } %>
     <!-- 引入腾讯页面性能监控---结束 -->
   </head>
 

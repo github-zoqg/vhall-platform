@@ -117,6 +117,7 @@
 
   import mediaSettingConfirm from './js/showConfirm';
   import { RATE_REPORT_MAP, SCREEN_RATE_REPORT_MAP, LAYOUT_REPORT_MAP } from './js/reportMap';
+  import { diff } from 'semver';
 
   /**
    * 获取差异obj
@@ -178,6 +179,7 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
@@ -315,6 +317,7 @@
 
         if (action === 'not-living' || action === 'confirm') {
           await this.updateDeviceSetting();
+          await this.updateDeviceStatus();
           this.closeMediaSetting();
           this.sendChangeEvent();
           this.setReport();
@@ -399,6 +402,22 @@
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
       },
+      async updateDeviceStatus() {
+        const diffOptions = this._diffOptions;
+        if (Object.keys(diffOptions) === 0) return;
+
+        const { rate } = diffOptions;
+        if (rate) {
+          const streamId = this.interactiveServer.state.localStream.streamId;
+          await this.interactiveServer.setVideoProfile({
+            streamId,
+            profile: VhallRTC[rate]
+          });
+        }
+
+        return true;
+      },
+
       /**
        * 更新设置并缓存字段
        */
