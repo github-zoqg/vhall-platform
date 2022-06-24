@@ -33,14 +33,26 @@
           :oneself="true"
         ></vmp-air-container>
         <!-- 签到 -->
-        <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
+        <vmp-air-container
+          cref="signLive"
+          :cuid="childrenCom[5]"
+          v-show="tool_component_name == 'signLive'"
+          :oneself="true"
+        />
         <!-- 红包 -->
-        <VmpRedPacketLive ref="redPacketLive" v-show="tool_component_name == 'redPacketLive'" />
+        <vmp-air-container
+          cref="redPacketLive"
+          :cuid="childrenCom[6]"
+          v-show="tool_component_name == 'redPacketLive'"
+          :oneself="true"
+        />
         <!-- 计时器 -->
-        <div v-if="tool_component_name == 'timerSetLive'">
-          <!-- <VmpLiveTimerSet ref="timerSetLive"></VmpLiveTimerSet> -->
-          <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
-        </div>
+        <vmp-air-container
+          cref="timerSetLive"
+          :cuid="childrenCom[7]"
+          v-show="tool_component_name == 'timerSetLive'"
+          :oneself="true"
+        />
       </div>
     </div>
   </div>

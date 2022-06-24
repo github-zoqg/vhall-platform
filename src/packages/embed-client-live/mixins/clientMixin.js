@@ -122,10 +122,16 @@ export const clientMixin = {
           this.showAssistantTools('redPacketLive');
           this.$refs.redPacketLive.open();
           break;
-        case 12:
-          // this.closeAssistantTools()
-          // this.openRedPacketPopup()
+        case 12: // 通知文档调用doc.sdk.start
           // EventBus.$emit('live_start');
+          break;
+        // case 13: // 退出全屏
+        //   break;
+        // case 14: // 全屏
+        //   break;
+        case 15: // 计时器
+          this.showAssistantTools('lottery');
+          this.$refs.lottery.open();
           break;
       }
     },

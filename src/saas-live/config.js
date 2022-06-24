@@ -961,6 +961,8 @@ export const serverConfig = {
       'comChat',
       'comQa',
       'comLottery',
+      'comSignLive',
+      'comRedPacket',
       'comLiveTimerSet',
       'comLiveTimer'
     ],
