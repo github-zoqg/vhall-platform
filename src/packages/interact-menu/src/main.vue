@@ -75,60 +75,6 @@
         </div>
       </div>
     </div>
-    <!-- 问答 -->
-    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal">
-      <div class="qa_content" v-if="qaVisible">
-        <template v-if="!assistantType">
-          <div v-if="!isQAEnabled">
-            <p class="qa_content_txt">
-              1、开启后，右侧互动区会增加“问答”模块，可进入右下角「问答管理」处理提问。
-            </p>
-            <p class="qa_content_txt">
-              2、支持修改「问答」的显示名称，如改成「提问」「投票」等，修改后的名称在用户观看时生效。
-            </p>
-            <el-form class="qa_content_form" inline>
-              <el-form-item label="显示名称" class="qa_name_item">
-                <el-input
-                  class="form-input qa_name"
-                  maxlength="8"
-                  placeholder="请输入名称"
-                  show-word-limit
-                  v-model="QAName"
-                ></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <p class="qa_content_txt" v-if="isQAEnabled">
-            该功能已开启，是否关闭？ 当前已收集问题：{{ qaCount }} 个
-          </p>
-          <el-form inline class="qa_content_form" v-if="isQAEnabled">
-            <el-form-item label="显示名称" class="qa_name_item">
-              <el-input
-                class="form-input qa_name"
-                maxlength="8"
-                show-word-limit
-                v-model="QAName"
-                :disabled="isQAEnabled"
-              ></el-input>
-            </el-form-item>
-          </el-form>
-        </template>
-        <template v-else>
-          <p class="qa_content_txt" v-if="!isQAEnabled">
-            点击后打开“问答管理”页面，观众端显示“问答”。
-          </p>
-          <p class="qa_content_txt" v-if="isQAEnabled">
-            问答关闭后，观众端将不能提问。 当前已收集问题：{{ qaCount }}
-            个
-          </p>
-        </template>
-      </div>
-      <div class="enable_qa_btn" slot="footer">
-        <el-button type="primary" round @click="handleQASubmit" v-if="qaVisible">
-          {{ !isQAEnabled ? '开启' : '关闭' }}
-        </el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -140,16 +86,11 @@
     data() {
       return {
         living: false,
-        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status,
-        qaVisible: false,
-        qaCount: 0,
         className: '', // 自定义样式
         kind: '', // 类型
         disable: false, // 是否禁用
         hidden: false, // 是否隐藏
-        disTimer: false,
-        assistantType: false, // TODO: 客户端嵌入字段，后续客户端嵌入做的时候，直接从domain中取
-        QAName: '问答'
+        disTimer: false
       };
     },
     computed: {
@@ -194,83 +135,6 @@
           this.QAName = msg.name;
         });
       },
-      handleQAPopup() {
-        window.vhallReportForProduct && window.vhallReportForProduct.report(110061);
-        if (!this.qaVisible && this.isQAEnabled) {
-          useQaServer()
-            .getCurrentPlayQuestionNum()
-            .then(res => {
-              if (res.code == 200) {
-                this.qaCount = res.data.num;
-              } else {
-                this.$message.error(res.msg);
-              }
-            });
-        }
-        this.qaVisible = !this.qaVisible;
-        // 点开问答的时候，获取qaName数据
-        useQaServer()
-          .getQaName()
-          .then(res => {
-            this.QAName = res.code == 200 ? res.data.name || '问答' : '问答';
-          })
-          .catch(res => {
-            this.QAName = '问答';
-          });
-      },
-      handleQASubmit() {
-        if (this.isQAEnabled) {
-          this.closeQA();
-        } else {
-          this.enableQA();
-        }
-      },
-      enableQA: debounce(function (flag) {
-        useQaServer()
-          .qaEnable({ name: this.QAName })
-          .then(res => {
-            if (res.code == 200) {
-              window.vhallReportForProduct?.report(110052);
-              this.isQAEnabled = true;
-              this.qaVisible = false;
-              this.$message({
-                message: '开启问答成功',
-                type: 'success'
-              });
-            } else {
-              this.$message({
-                message: '开启问答失败',
-                type: 'error'
-              });
-            }
-            // window.$middleEventSdk?.event?.send(
-            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: true, type: 'v5' }])
-            // );
-          });
-      }, 500),
-      closeQA: debounce(function (flag) {
-        useQaServer()
-          .qaDisable()
-          .then(res => {
-            if (res.code == 200) {
-              this.qaVisible = false;
-              this.isQAEnabled = true;
-              window.vhallReportForProduct?.report(110053);
-              this.$message({
-                message: '关闭问答成功',
-                type: 'success'
-              });
-            } else {
-              this.$message({
-                message: '关闭问答失败',
-                type: 'error'
-              });
-            }
-            // window.$middleEventSdk?.event?.send(
-            //   boxEventOpitons(this.cuid, 'emitHandleQa', [{ visible: false, type: 'v5' }])
-            // );
-          });
-      }, 500),
       // 设置可用状态
       setDisableState(val) {
         this.disable = val;
@@ -312,6 +176,10 @@
       openRedPacket() {
         if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
+      },
+      handleQAPopup() {
+        if (!this.isLiving) return false;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHandleQA'));
       }
     }
   };
