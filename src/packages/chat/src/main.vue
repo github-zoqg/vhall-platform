@@ -154,7 +154,7 @@
         /** 消息提示结束 */
         //是否正在执行动画
         animationRunning: false,
-        //是否是助理
+        //是否是客户端嵌入
         assistantType: this.$route.query.assistantType,
         //@用户
         atList: [],
@@ -497,6 +497,12 @@
       previewImg(index, images) {
         //处理掉图片携带的查询参数，只保留主要链接
         this.previewImgList = images.map(item => item.split('?')[0]);
+        if (this.$route.query.assistantType) {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPreviewImage', { list: this.previewImgList, index })
+          );
+          return;
+        }
         this.imgPreviewVisible = true;
         this.$nextTick(() => {
           this.$refs.imgPreview.jumpToTargetImg(index);

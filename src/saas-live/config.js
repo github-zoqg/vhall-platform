@@ -342,11 +342,10 @@ export const serverConfig = {
         method: 'open'
       }
     ],
-    emitHandleQa: [
+    emitHandleQA: [
       {
-        cuid: ['comTabMenu'],
-        method: 'setVisible',
-        args: ['$0']
+        cuid: ['comQa'],
+        method: 'handleQAPopup'
       }
     ]
   },
@@ -472,7 +471,9 @@ export const serverConfig = {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    //客户端嵌入-通知客户端打开图片语言
+    emitPreviewImage: [{ cuid: 'embedClientRoot', method: 'preivewImage', args: ['$0'] }]
   },
   // 礼物动画组件
   comPcRewardEffect: {
@@ -503,7 +504,9 @@ export const serverConfig = {
     }
   },
   comQa: {
-    component: 'VmpQa'
+    component: 'VmpQa',
+    //客户端嵌入-通知客户端开启问答管理页面
+    emitOpenQAAdmin: [{ cuid: 'embedClientRoot', method: 'openQAAdmin', args: ['$0'] }]
   },
   // 文档白板组件
   comDocUne: {
@@ -952,7 +955,15 @@ export const serverConfig = {
   // 客户端嵌入页组件
   embedClientRoot: {
     component: 'VmpEmbedClient',
-    children: ['comDocUne', 'dlgDocList', 'comChat', 'comLiveTimerSet', 'comLiveTimer'],
+    children: [
+      'comDocUne',
+      'dlgDocList',
+      'comChat',
+      'comQa',
+      'comLottery',
+      'comLiveTimerSet',
+      'comLiveTimer'
+    ],
     emiSwitchTo: {
       cuid: ['comDocUne'],
       method: 'switchTo',

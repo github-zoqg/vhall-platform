@@ -1,6 +1,6 @@
 import { useChatServer, useMsgServer, useGroupServer } from 'middle-domain';
-
-export const assitantMixin = {
+import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+export const clientMixin = {
   mounted() {
     // EventBus.$on('Join', msg => {
     //   this.$emit('assistantMsg', msg.data.type, msg);
@@ -60,10 +60,24 @@ export const assitantMixin = {
         this.assistantMsg('kickout', msg);
       });
     },
-
+    //预览图片
+    preivewImage(params) {
+      this.assistantMsg('imgPreview', params);
+    },
+    //打开问答管理页面
+    openQAAdmin(url) {
+      this.assistantMsg('qa', url);
+    },
+    //打开聊天审核管理页面
+    openChatFilterUrl(url) {
+      this.assistantMsg('filterUrl', url);
+    },
+    // 支付宝红包打开支付页面
+    openAlipayCashier(url) {
+      this.assistantMsg('red_url', url);
+    },
     handleAssitant(type) {
-      // 助手相关
-      console.log('assitant', type);
+      // 获取文档dom
       let container = '';
       try {
         container = document.querySelector('.vhall-document-container');
@@ -72,26 +86,28 @@ export const assitantMixin = {
       }
       switch (type) {
         case 1: // 文档
-          this.showDoc();
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emiSwitchTo', ['document'])
+          );
           break;
         case 2: // 白板
-          this.showWhiteBoard();
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emiSwitchTo', ['board']));
           break;
         case 3: // 问卷
-          this.closeAssistantTools();
-          this.openQuestionarie();
+          this.showAssistantTools('questionnaire');
+          this.$refs.questionnaire.open();
           break;
         case 4: // 抽奖
-          this.closeAssistantTools();
-          this.openLettery();
+          this.showAssistantTools('lottery');
+          this.$refs.lottery.open();
           break;
         case 5: // 签到
-          this.closeAssistantTools();
-          this.openSignIn();
+          this.showAssistantTools('signLive');
+          this.$refs.signLive.openSign();
           break;
         case 6: // 答题
-          this.closeAssistantTools();
-          this.openQAPopup();
+          this.showAssistantTools('qa');
+          this.$refs.qa.handleQAPopup();
           break;
         case 7: // 隐藏文档
           container && (container.style.opacity = 0);
@@ -103,10 +119,12 @@ export const assitantMixin = {
           this.exitFullscreen('#vhall-document-container');
           break;
         case 11: // 打开红包
-          this.closeAssistantTools();
-          this.openRedPacketPopup();
+          this.showAssistantTools('redPacketLive');
+          this.$refs.redPacketLive.open();
           break;
-        case 12: // 打开红包
+        case 12:
+          // this.closeAssistantTools()
+          // this.openRedPacketPopup()
           // EventBus.$emit('live_start');
           break;
       }
