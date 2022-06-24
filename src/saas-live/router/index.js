@@ -66,7 +66,7 @@ const routes = [
     meta: { keepAlive: false, grayType: '' }
   },
   {
-    path: '/lives/client/:il_id', // 客户端嵌入
+    path: '/lives/clientembed/:il_id', // 客户端嵌入
     name: 'Client',
     component: () => import('@/saas-live/views/clientEmbed/index'),
     meta: { page: 'client-embed' }
