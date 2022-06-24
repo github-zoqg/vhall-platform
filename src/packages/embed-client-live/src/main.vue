@@ -53,6 +53,12 @@
           v-show="tool_component_name == 'timerSetLive'"
           :oneself="true"
         />
+        <vmp-air-container
+          cref="timerLive"
+          :cuid="childrenCom[8]"
+          v-show="tool_component_name == 'timerSetLive'"
+          :oneself="true"
+        />
       </div>
     </div>
   </div>
@@ -370,7 +376,6 @@
       },
       // 更改禁用状态
       changeStatus(data, status) {
-        debugger;
         console.log(data, status, 'data, status');
         // 举例： disTimer
         this[data] = status;
