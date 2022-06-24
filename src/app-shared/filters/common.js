@@ -104,6 +104,9 @@ Vue.filter('fmtTimeByExp', (time, exp) => {
     case 'yy-MM-dd hh:mm':
       relt = `${yy}-${MM}-${dd} ${hh}:${mm}`;
       break;
+    case 'MM-dd hh:mm':
+      relt = `${MM}-${dd} ${hh}:${mm}`;
+      break;
     case '年月日时分':
       relt = `${yy}年${MM}月${dd}日 ${hh}:${mm}`;
       break;
