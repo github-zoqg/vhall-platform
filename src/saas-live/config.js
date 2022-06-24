@@ -835,6 +835,14 @@ export const serverConfig = {
         args: ['$0'] // 获取动态参数的第一个
       }
     ],
+    emitClickEndLive: [
+      // 不再派发结束推流事件, 结束推流是监听直播结束消息
+      {
+        cuid: 'recordComStreamLocal',
+        method: 'stopPush',
+        args: ['$0']
+      }
+    ],
     emitClickStartLive: [
       {
         cuid: 'recordComStreamLocal',

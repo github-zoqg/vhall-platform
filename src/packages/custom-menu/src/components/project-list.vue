@@ -11,12 +11,14 @@
         <div class="vh-chose-active-item__cover">
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <!-- <i class="saasicon_redu"></i> -->
-            <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
-            <i>{{ item.pv }}</i>
+            <div class="vh-chose-active-item__cover-hots__content">
+              <!-- <i class="saasicon_redu"></i> -->
+              <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
+              <i>{{ item.pv }}</i>
+            </div>
           </div>
         </div>
-        <div class="vh-project-list-active-item__titleInfo">
+        <div class="vh-chose-active-item__titleInfo">
           <div class="vh-chose-active-item__title">
             {{ item.title }}
           </div>
@@ -124,6 +126,7 @@
       width: 142px;
       height: 80px;
       margin-right: 12px;
+      border-radius: 4px;
       img {
         display: inline-block;
         width: 142px;
@@ -149,13 +152,23 @@
       }
       &-hots {
         position: absolute;
-        left: 10px;
-        bottom: 4px;
-        font-size: 12px;
-        font-weight: 400;
-        color: #ffffff;
-        line-height: 20px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+        border-radius: 0px 0px 4px 4px;
+        height: 32px;
+        width: 100%;
+        left: 0;
+        bottom: 0;
         z-index: 3;
+        &__content {
+          position: absolute;
+          left: 10px;
+          bottom: 4px;
+          font-size: 12px;
+          font-weight: 400;
+          color: #ffffff;
+          line-height: 20px;
+          z-index: 4;
+        }
         .saasicon_redu {
           &:before {
             display: inline-block;
@@ -256,9 +269,16 @@
         }
       }
       &-hots {
-        font-size: 14px;
-        left: 12px;
-        bottom: 6px;
+        left: 0;
+        bottom: 0;
+        z-index: 3;
+        border-radius: 0 0;
+        &__content {
+          left: 12px;
+          bottom: 6px;
+          font-size: 14px;
+          z-index: 4;
+        }
       }
     }
     &__titleInfo {
@@ -271,11 +291,11 @@
       }
     }
     &__title {
-      margin: 10px 0 4px 0;
-      font-size: 14px;
-      font-weight: 400;
-      color: #e6e6e6;
-      line-height: 20px;
+      font-size: 16px !important;
+      color: @font-light-normal;
+      line-height: 24px;
+      margin: 12px 16px 7px 16px;
+      -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
@@ -283,14 +303,13 @@
       line-clamp: 2;
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
-      text-align: left;
     }
     &__info {
       font-size: 14px;
       font-weight: 400;
       color: @font-dark-second;
       line-height: 17px;
-      // margin-left: 16px;
+      margin-left: 16px;
     }
     .liveTag {
       height: 20px;

@@ -19,17 +19,47 @@
     {
       "type": "shell",
       "label": "live",
-      "command": "node scripts/cli-service.js serve --project=saas-live --mode=development658 --port=8080"
+      "command": "node scripts/cli-service.js serve --project=saas-live --mode=dev_test --port=8080"
     },
     {
       "type": "shell",
       "label": "watch",
-      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=development658 --port=8081"
+      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=dev_test --port=8081"
     },
     {
       "type": "shell",
       "label": "wap",
-      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=development658 --port=8082"
+      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=dev_test --port=8082"
+    },
+    {
+      "type": "shell",
+      "label": "platform:test4",
+      "command": "node -v",
+      "dependsOn": [
+        "live:test4",
+        "watch:test4",
+        "wap:test4"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "live:test4",
+      "command": "node scripts/cli-service.js serve --project=saas-live --mode=dev_test4 --port=8080"
+    },
+    {
+      "type": "shell",
+      "label": "watch:test4",
+      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=dev_test4 --port=8081"
+    },
+    {
+      "type": "shell",
+      "label": "wap:test4",
+      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=dev_test4 --port=8082"
     }
   ]
 }

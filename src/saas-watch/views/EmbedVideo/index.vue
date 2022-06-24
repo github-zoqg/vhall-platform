@@ -169,13 +169,14 @@
       },
       //主持人、嘉宾等离开房间的提示处理
       handleLeaveRoom(msg) {
-        if (msg.context.role_name == 1) {
+        // 兼容客户端字段
+        if (msg.context?.role_name == 1 || msg.context?.role == 1) {
           this.$message.warning({ message: this.$t('message.message_1027') });
         }
-        if (msg.context.role_name == 4) {
+        if (msg.context?.role_name == 4 || msg.context?.role == 4) {
           this.$message.warning({
             message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
+              n: msg.context?.nickname || msg.context?.nick_name || msg.context?.nickName
             })
           });
         }

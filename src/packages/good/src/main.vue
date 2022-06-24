@@ -97,9 +97,9 @@
         if (!wrap) return;
         console.log('商品.....');
         if (this.isSubscribe) {
-          window.addEventListener('scroll', this.scrollLoadGoodsList);
+          window.addEventListener('scroll', this.scrollLoadGoodsList, true);
         } else {
-          wrap.addEventListener('scroll', this.scrollLoadGoodsList);
+          wrap.addEventListener('scroll', this.scrollLoadGoodsList, true);
         }
       },
       scrollLoadGoodsList: debounce(function (e) {
@@ -562,9 +562,12 @@
           .vh-goods_item-info {
             width: 250px;
           }
-          &:nth-child(3n + 2) {
-            margin: 0px 16px;
+          &:nth-child(2n) {
+            margin-left: 16px;
           }
+          /* &:nth-child(3n + 2) {
+            margin: 0px 16px;
+          } */
         }
       }
     }
