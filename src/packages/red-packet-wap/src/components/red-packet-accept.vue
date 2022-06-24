@@ -198,7 +198,7 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
-      /**autoprefixer: ignore next */
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       width: 100%;
       font-size: 44px;

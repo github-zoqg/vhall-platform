@@ -115,7 +115,7 @@
         <div class="null-page" v-if="!(dataList && dataList.length > 0)">
           <div class="search">
             <img src="./img/no-search@2x.png" class="no-search" />
-            <p class="null-info">暂无数据</p>
+            <p class="null-info">暂无数据~</p>
           </div>
         </div>
       </div>
@@ -164,27 +164,12 @@
     },
     methods: {
       liveTag(val) {
-        /**
+        /** 个人主页没有多语言翻译
          * webinar_state  1直播 2预约 3结束 4点播 5回放
          * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
          */
-        const liveTypeStr = [
-          '',
-          this.$t('common.common_1018'),
-          this.$t('common.common_1019'),
-          this.$t('common.common_1020'),
-          this.$t('common.common_1024'),
-          this.$t('common.common_1021')
-        ];
-        const liveStatusStr = [
-          '',
-          this.$t('common.common_1026'),
-          this.$t('common.common_1027'),
-          this.$t('common.common_1028'),
-          '',
-          '',
-          this.$t('common.common_1029')
-        ];
+        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
+        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播', '', '', '分组直播'];
         let str = liveTypeStr[val.webinar_state];
         if (val.webinar_state != 4 && val.webinar_type != 5) {
           str += ` | ${liveStatusStr[val.webinar_type]}`;

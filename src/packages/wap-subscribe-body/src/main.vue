@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-subscribe-body">
+  <div class="vmp-subscribe-body" :class="showHeader ? 'vmp-subscribe-body_embed' : ''">
     <div class="vmp-subscribe-body-container">
       <template v-if="isTryVideo">
         <div class="subscribe-bg">
@@ -43,17 +43,17 @@
         </template>
       </template>
     </div>
-    <div class="vmp-subscribe-body-info" :class="isEmbed ? 'vmp-subscribe-body-info_embed' : ''">
+    <div class="vmp-subscribe-body-info">
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
         </template>
         <template v-else>
-          <p class="vod_title">直播回放中</p>
+          <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
         <div
           class="subscribe_into_container"
-          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType == 1)"
+          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType != 2)"
         >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -87,7 +87,7 @@
       <div
         :class="[
           'subscribe_tabs',
-          { top_menu: isScorllTab && !isEmbed, embed_menu: isEmbed && isScorllTab }
+          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
         ]"
       >
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
@@ -241,6 +241,17 @@
           return false;
         }
       },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      showHeader() {
+        if (this.isEmbed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       showSubscribeBtn() {
         if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
           return true;
@@ -303,21 +314,28 @@
         let dom = document.querySelector('.vmp-subscribe-body-info');
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
-        const offsetTop = menuDom.offsetTop;
-        dom.addEventListener('scroll', e => {
-          let scrollTop = e.target.scrollTop;
-          if (scrollTop > offsetTop) {
-            this.isScorllTab = true;
-            if (this.webinarType == 2 && this.isEmbed) {
-              this.showBottomBtn = false;
-            } else {
-              this.showBottomBtn = true;
-            }
-          } else {
-            this.isScorllTab = false;
-            this.showBottomBtn = false;
-          }
+        let offsetTop;
+        this.$nextTick(() => {
+          offsetTop = menuDom.offsetTop;
         });
+        dom.addEventListener(
+          'scroll',
+          e => {
+            let scrollTop = e.target.scrollTop;
+            if (scrollTop > offsetTop) {
+              this.isScorllTab = true;
+              if (this.webinarType == 2 && this.isEmbed) {
+                this.showBottomBtn = false;
+              } else {
+                this.showBottomBtn = true;
+              }
+            } else {
+              this.isScorllTab = false;
+              this.showBottomBtn = false;
+            }
+          },
+          true
+        );
       },
       listenEvents() {
         this.subscribeServer.$on('live_start', () => {
@@ -424,10 +442,16 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
-              window.location.href =
+              location.replace(
                 window.location.origin +
-                process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
+                  process.env.VUE_APP_ROUTER_BASE_URL +
+                  `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
+              );
+              // 避免产生历史路径
+              // window.location.href =
+              //   window.location.origin +
+              //   process.env.VUE_APP_ROUTER_BASE_URL +
+              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -610,10 +634,16 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
-              window.location.href =
+              location.replace(
                 window.location.origin +
-                process.env.VUE_APP_ROUTER_BASE_URL +
-                `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
+                  process.env.VUE_APP_ROUTER_BASE_URL +
+                  `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
+              );
+              // 避免产生历史路径
+              // window.location.href =
+              //   window.location.origin +
+              //   process.env.VUE_APP_ROUTER_BASE_URL +
+              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -715,10 +745,13 @@
 </script>
 <style lang="less">
   .vmp-subscribe-body {
-    height: 100%;
+    height: calc(100% - 71px);
     width: 100%;
     position: relative;
     z-index: 2;
+    &.vmp-subscribe-body_embed {
+      height: 100%;
+    }
     &-container {
       height: 422px;
       width: 100%;
@@ -799,14 +832,11 @@
       }
     }
     &-info {
-      height: calc(100% - 493px);
+      height: calc(100% - 422px);
       overflow-y: auto;
       width: 100%;
       position: relative;
       background: #f2f2f2;
-      &_embed {
-        height: calc(100% - 422px);
-      }
       .subscribe_into {
         background: #fff;
         padding: 40px 0;
@@ -849,6 +879,14 @@
             .vmp-tab-container {
               height: auto;
             }
+          }
+          .vh-goods-wrapper {
+            overflow: hidden;
+            height: auto;
+          }
+          .vmp-recommend {
+            overflow: hidden;
+            height: auto;
           }
         }
       }

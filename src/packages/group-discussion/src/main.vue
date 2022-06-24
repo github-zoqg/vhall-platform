@@ -14,7 +14,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="!(verify == 2 && isOpenSwitch != 1 && presetWay)"
+              :disabled="!(verify == 2 && [0, 2].includes(Number(groupSwitchStatus)) && presetWay)"
               @click="groupPresetImport"
             >
               重新导入
@@ -24,7 +24,7 @@
               size="small"
               :round="true"
               class="btn-group-op"
-              :disabled="isOpenSwitch != 1"
+              :disabled="groupSwitchStatus != 1"
               @click="handleNotice"
             >
               小组公告
@@ -39,7 +39,27 @@
               新增分组
             </el-button>
             <el-button
-              v-if="isOpenSwitch == 1"
+              v-if="groupSwitchStatus == 1"
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
+              @click="handlePauseDiscussion"
+            >
+              暂停讨论
+            </el-button>
+            <el-button
+              v-if="groupSwitchStatus == 3"
+              type="default"
+              size="small"
+              :round="true"
+              class="btn-group-op"
+              @click="handleProceedDiscussion"
+            >
+              继续讨论
+            </el-button>
+            <el-button
+              v-if="groupSwitchStatus == 1 || groupSwitchStatus == 3"
               type="default"
               size="small"
               :round="true"
@@ -151,7 +171,7 @@
                 <div class="split-card__menus">
                   <template v-if="!item.isChange">
                     <el-button
-                      v-if="isOpenSwitch == 1"
+                      v-if="groupSwitchStatus == 1"
                       class="btn-menu"
                       type="text"
                       @click="handleEnterGroup(item.id)"
@@ -314,9 +334,9 @@
       panelShow() {
         return this.groupServer.state.panelShow;
       },
-      // 0 未分组 1开始讨论 2已存在分组
-      isOpenSwitch() {
-        return this.roomBaseServer.state.interactToolStatus.is_open_switch;
+      // 0 未分组 1开始讨论 2已存在分组 3暂停讨论
+      groupSwitchStatus() {
+        return this.groupServer.state.groupInitData.switch_status;
       },
       isInGroup() {
         // 在小组中
@@ -427,7 +447,7 @@
         this.addDialogVisible = false;
         this.noticeDialogVisible = false;
         this.chooseDialogVisible = false;
-        if (this.isOpenSwitch === 0) {
+        if (this.groupSwitchStatus == 0) {
           // 显示设置对话框
           this.groupServer.state.panelShow = false;
           this.settingDialogVisible = true;
@@ -622,7 +642,15 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(async () => {
-            await this.groupServer.groupDisband(id);
+            const res = await this.groupServer.groupDisband(id);
+            if (this.groupServer.state.groupInitData.switch_status != 2) {
+              // 回放生成成功
+              if (res.data.record_id > 0) {
+                this.$message.success('小组回放视频生成成功');
+              } else {
+                this.$message.error('小组讨论视频生成失败');
+              }
+            }
             await this.roomBaseServer.getInavToolStatus();
           })
           .catch(() => {});
@@ -654,8 +682,67 @@
           // 结束讨论
           this.groupServer.endDiscussion().then(() => {
             // 设置开始为未讨论状态
-            useRoomBaseServer().setInavToolStatus('is_open_switch', 0);
+            this.groupServer.setGroupInitData('switch_status', 0);
             console.warn('结束讨论成功');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+          });
+        });
+      },
+      // 暂停讨论
+      handlePauseDiscussion() {
+        if (this._isNotAllowPauseOrProceed) {
+          this.$message({
+            message: '请勿频繁操作',
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return;
+        }
+        this.$confirm('暂停讨论，全部组员将返回到主直播间，确定暂停讨论？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          // 暂停讨论
+          this.groupServer.pauseDiscussion().then(() => {
+            this._isNotAllowPauseOrProceed = true;
+            setTimeout(() => {
+              this._isNotAllowPauseOrProceed = false;
+            }, 10000);
+            // 设置groupServer中的分组状态
+            this.groupServer.setGroupInitData('switch_status', 3);
+            console.warn('暂停讨论成功');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
+          });
+        });
+      },
+      // 继续讨论
+      handleProceedDiscussion() {
+        if (this._isNotAllowPauseOrProceed) {
+          this.$message({
+            message: '请勿频繁操作',
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return;
+        }
+        this.$confirm('确定是否继续讨论？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {
+          // 继续讨论
+          this.groupServer.proceedDiscussion().then(() => {
+            this._isNotAllowPauseOrProceed = true;
+            setTimeout(() => {
+              this._isNotAllowPauseOrProceed = false;
+            }, 10000);
+            // 设置groupServer中的分组状态
+            this.groupServer.setGroupInitData('switch_status', 1);
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitToggle', [false]));
           });
         });

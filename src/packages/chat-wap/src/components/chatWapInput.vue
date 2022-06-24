@@ -134,7 +134,9 @@
         // 键盘弹出事件处理
         // alert('iphone 键盘弹出事件处理');
         // this.scrollBottom();
-        document.querySelector('body').classList.add('fixIphoneX');
+        if (this.visible) {
+          document.querySelector('body').classList.add('fixIphoneX');
+        }
       },
       //显示模态窗
       openModal(text = '') {
@@ -157,15 +159,15 @@
         EventBus.$emit('showSendBox', false);
         this.$emit('sendMsg', inputValue);
         this.cancel();
-        this.$nextTick(() => {
-          this.$refs.textareaChat.blur();
-        });
       },
       //取消
       cancel() {
         this.inputValue = '';
         this.showEmoji = false;
         this.visible = false;
+        this.$nextTick(() => {
+          this.$refs.textareaChat.blur();
+        });
       },
       //处理失去焦点
       handleOnBlur() {
@@ -197,11 +199,12 @@
       }, */
       //选中表情
       inputEmoji(item = {}) {
-        this.inputValue += item.name;
-        // if (this.inputValue.length > 140) {
-        //   this.inputValue = this.inputValue.substring(0, 140);
-        // }
-        // this.showEmoji = false;
+        // 添加表情之后如果会超出 140 ，就不输入了
+        const resultVal = this.inputValue + item.name;
+        if (resultVal.length > 140) {
+          return;
+        }
+        this.inputValue = resultVal;
       },
       closeSendBox() {
         this.visible = false;

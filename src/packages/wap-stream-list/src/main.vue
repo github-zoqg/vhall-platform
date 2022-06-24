@@ -679,6 +679,7 @@
     &__main-screen {
       position: absolute;
       top: 83px;
+      left: calc((100vw - 597px) / 2);
       width: 597px;
       height: 337px;
       display: inline-block;
