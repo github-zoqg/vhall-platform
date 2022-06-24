@@ -102,6 +102,7 @@
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
 
   export default {
     name: 'VmpDocWap',
@@ -342,7 +343,7 @@
         });
       },
 
-      setRight() {
+      setRight: debounce(function (e) {
         //如果是更换文档，判断是否需要纠正旋转
         if (this.displayMode === 'fullscreen') {
           //  this.docServer.zoomReset();
@@ -353,7 +354,7 @@
             this.docServer.zoomReset();
           }, 50);
         }
-      },
+      }, 300),
 
       /**
        * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
