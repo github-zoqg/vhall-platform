@@ -121,7 +121,13 @@
               </el-input>
             </div>
             <div class="vmp-doc-cur__bd">
-              <el-table :data="dataList" style="width: 100%" height="370px">
+              <el-table
+                :data="dataList"
+                style="width: 100%"
+                height="370px"
+                @cell-mouse-enter="handleCellMouseEnter"
+                @cell-mouse-leave="handleCellMouseLeave"
+              >
                 <!-- 未搜索到数据展示 -->
                 <template slot="empty">
                   <img src="../../app-shared/assets/img/no-search.png" />
@@ -136,7 +142,13 @@
                         :class="scope.row.ext | fileIconCss(false)"
                         :style="scope.row.ext | fileIconCss(true)"
                       ></span>
-                      <span class="file-name__text">{{ scope.row.file_name }}</span>
+                      <el-tooltip
+                        placement="top"
+                        :disabled="!isTextOverflow"
+                        :content="scope.row.file_name"
+                      >
+                        <span class="file-name__text">{{ scope.row.file_name }}</span>
+                      </el-tooltip>
                     </p>
                   </template>
                 </el-table-column>
@@ -221,6 +233,8 @@
               class="vmp-doc-lib__table"
               @selection-change="handleChangeSelection"
               @select-all="handleChangeSelectall"
+              @cell-mouse-enter="handleCellMouseEnter"
+              @cell-mouse-leave="handleCellMouseLeave"
             >
               <!-- 未搜索到数据展示 -->
               <template slot="empty">
@@ -236,7 +250,13 @@
                       :class="scope.row.ext | fileIconCss(false)"
                       :style="scope.row.ext | fileIconCss(true)"
                     ></span>
-                    {{ scope.row.file_name }}
+                    <el-tooltip
+                      placement="top"
+                      :disabled="!isTextOverflow"
+                      :content="scope.row.file_name"
+                    >
+                      {{ scope.row.file_name }}
+                    </el-tooltip>
                   </p>
                 </template>
               </el-table-column>
@@ -275,6 +295,7 @@
   import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
+  import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
   import _ from 'lodash';
 
   export default {
@@ -282,6 +303,7 @@
     components: {
       DocProgressStatus
     },
+    mixins: [tableCellTooltip],
     data() {
       return {
         dialogVisible: false,
