@@ -50,7 +50,7 @@
         <el-tooltip
           :content="$t('player.player_1008')"
           placement="top"
-          v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)"
+          v-if="miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3) && !isFullscreen"
         >
           <a
             href="javascript:void(0);"
