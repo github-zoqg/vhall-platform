@@ -298,6 +298,14 @@
             this.showConfirm();
           }
         }
+      },
+      isShareScreen(val, oldVal) {
+        if (oldVal && !val && this.isFullscreen) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
       }
     },
     methods: {
