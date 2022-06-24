@@ -27,6 +27,11 @@
         <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
         <!-- 红包 -->
         <VmpRedPacketLive ref="redPacketLive" v-show="tool_component_name == 'redPacketLive'" />
+        <!-- 计时器 -->
+        <div v-if="tool_component_name == 'timerSetLive'">
+          <!-- <VmpLiveTimerSet ref="timerSetLive"></VmpLiveTimerSet> -->
+          <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
+        </div>
       </div>
     </div>
   </div>
@@ -56,7 +61,8 @@
         componentName: '',
         domain: null,
         tool_component_name: '',
-        childrenCom: []
+        childrenCom: [],
+        disTimer: false
       };
     },
     beforeCreate() {
@@ -65,7 +71,7 @@
     },
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
-      console.log('当前客户端嵌入进入');
+      console.log('当前客户端嵌入进入', this.childrenCom);
       if (!browserSupport()) return;
       await this.getGrayConfig();
       if (location.search.includes('assistant_token=')) {
@@ -143,7 +149,7 @@
        * assistantMsg 给予 客户端嵌入使用方法 【注意错误提示也是这个】
        * type 消息类型
        * msg 消息内容
-       * error_type 异常提示类型，参数有：info、warning、error （注意： error_type此参数在 type=‘notice_msg'时生效）
+       * error_type 异常提示类型，参数有：success、error、info、warning （注意： error_type此参数在 type=‘notice_msg'时生效）
        */
       assistantMsg(type, msg, error_type = null) {
         console.log('接受客户上下线消息、前端异常提示等', { type, msg, error_type });
@@ -173,7 +179,7 @@
           });
         }
         window.QtCallFunctionPage = _msg => {
-          const msg = Number(_msg);
+          let msg = Number(_msg);
           console.error('展示当前点击的消息转换-------', _msg);
           // 获取文档dom
           let container = '';
@@ -220,13 +226,23 @@
               this.exitFullscreen('#vhall-document-container');
               break;
             case 11: // 打开红包
-              this.closeAssistantTools('redPacketLive');
-              this.$refs.redPacketLive.open();
-              break;
-            case 12: // 打开红包
-              // this.closeAssistantTools()
-              // this.openRedPacketPopup()
+              // this.closeAssistantTools('redPacketLive');
+              // this.$refs.redPacketLive.open();
+              // break;
+              this.closeAssistantTools('timerSetLive');
+              debugger;
+              if (this.disTimer) {
+                break;
+              } else {
+                window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+                break;
+              }
+            case 12: // 直播开始
               // EventBus.$emit('live_start');
+              break;
+            case 13: // 计时器开启
+              this.closeAssistantTools('timerSetLive');
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
               break;
           }
         };
@@ -393,6 +409,13 @@
           }
         );
         window.vhallReport && window.vhallReport.report('ENTER_WATCH');
+      },
+      // 更改禁用状态
+      changeStatus(data, status) {
+        debugger;
+        console.log(data, status, 'data, status');
+        // 举例： disTimer
+        this[data] = status;
       }
     }
   };

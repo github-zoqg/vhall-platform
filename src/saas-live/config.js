@@ -104,7 +104,9 @@ export const serverConfig = {
       'comRebroadcast',
       'comRebroadcastList',
       'comMicInvited',
-      'comVideoPollingSetting'
+      'comVideoPollingSetting',
+      'liveEmbedTimerSet',
+      'liveEmbedTimer'
     ]
   },
 
@@ -701,7 +703,6 @@ export const serverConfig = {
   comRedPacket: {
     component: 'VmpRedPacketLive'
   },
-
   // *******录制页面****开始
   recordVideoRoot: {
     component: 'VmpAirContainer',
@@ -917,17 +918,6 @@ export const serverConfig = {
     component: 'VmpPollingSetting'
   },
   // *******分屏页面****结束
-
-  // 客户端嵌入页组件
-  embedClientRoot: {
-    component: 'VmpEmbedClient',
-    children: ['comDocUne', 'dlgDocList', 'comChat'],
-    emiSwitchTo: {
-      cuid: ['comDocUne'],
-      method: 'switchTo',
-      args: ['$0']
-    }
-  },
   // 邀请上麦弹窗
   comMicInvited: {
     component: 'VmpMicInvited'
@@ -936,5 +926,44 @@ export const serverConfig = {
   liveStreamYunRoot: {
     component: 'VmpAirContainer',
     children: ['comPcPlayerLiveYun', 'comMediaSetting', 'comPcMediaCheck']
+  },
+  // *******客户端嵌入页面****开始
+  // 互动工具-计时器设置
+  comLiveTimerSet: {
+    component: 'VmpLiveTimerSet',
+    emitDisTimerIcon: [
+      {
+        cuid: ['embedClientRoot'],
+        method: 'changeStatus',
+        args: ['$0', '$1']
+      }
+    ]
+  },
+  // 互动工具-计时器
+  comLiveTimer: {
+    component: 'VmpLiveTimer',
+    emitOpenTimerSet: [
+      {
+        cuid: ['comLiveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
+  },
+  // 客户端嵌入页组件
+  embedClientRoot: {
+    component: 'VmpEmbedClient',
+    children: ['comDocUne', 'dlgDocList', 'comChat', 'comLiveTimerSet', 'comLiveTimer'],
+    emiSwitchTo: {
+      cuid: ['comDocUne'],
+      method: 'switchTo',
+      args: ['$0']
+    },
+    emitOpenTimerSet: [
+      {
+        cuid: ['comLiveTimerSet'],
+        method: 'openTimerSet'
+      }
+    ]
   }
+  // *******客户端嵌入页面****结束
 };
