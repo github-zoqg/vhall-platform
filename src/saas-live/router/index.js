@@ -56,7 +56,7 @@ const routes = [
     path: '/lives/video-polling/:id',
     name: 'VideoPolling',
     component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
-    meta: { title: '视频轮询', grayType: 'webinar' }
+    meta: { title: '视频轮询', grayType: 'webinar', page: 'video-polling' }
   },
   {
     // 其它没有匹配到的路由都会跳至此模块(404）
@@ -76,7 +76,7 @@ const routes = [
     path: '/lives/yun/:id', // 云导播
     name: 'yun',
     component: () => import('@/saas-live/views/yun'),
-    meta: { keepAlive: false, grayType: 'webinar' }
+    meta: { keepAlive: false, grayType: 'webinar', page: 'yun' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
@@ -102,12 +102,12 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  // if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
-  //   // 根据不同的页面，动态加载不同的配置
-  //   const pageConfig = await import(`../page-config/${to.meta.page}.js`);
-  //   window.$serverConfig = pageConfig.default;
-  //   window.$serverConfig._page = to.meta.page;
-  // }
+  if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+    // 根据不同的页面，动态加载不同的配置
+    const pageConfig = await import(`../page-config/${to.meta.page}.js`);
+    window.$serverConfig = pageConfig.default;
+    window.$serverConfig._page = to.meta.page;
+  }
 
   const res = await grayInit(to);
   console.log('---grayInit---', res);
