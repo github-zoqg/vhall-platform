@@ -12,15 +12,19 @@ function verifyCookie() {
   const ssoLoginStatus = getCookie('sso_login_status'); // 用户在用户中心的状态(1为登录)
   const ssoTokenOrigin = getCookie('sso_token_origin'); // 用户登录的业务线
   console.log('------------verifyCookie-------------'); //FIXME: 测试用,上线前删除!!
-  console.log('ssoToken:' + ssoToken, 'ssoLoginStatus' + ssoLoginStatus, 'ssoTokenOrigin' + ssoTokenOrigin)
+  console.log(
+    'ssoToken:' + ssoToken,
+    'ssoLoginStatus' + ssoLoginStatus,
+    'ssoTokenOrigin' + ssoTokenOrigin
+  );
   if (ssoLoginStatus != 1) {
     localStorage.removeItem('token');
     return false;
   }
   if (!ssoToken) return false;
   const currentOrigin = `${bizId}_${platform}`;
-  const isSameOrigin = (ssoTokenOrigin === currentOrigin) // 是否同业务线
-  return !isSameOrigin
+  const isSameOrigin = ssoTokenOrigin === currentOrigin; // 是否同业务线
+  return !isSameOrigin;
 }
 
 export default () => {
