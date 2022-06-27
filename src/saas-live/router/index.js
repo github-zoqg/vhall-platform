@@ -5,7 +5,6 @@ import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
-// import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
 
 Vue.use(VueRouter);
 
@@ -43,7 +42,7 @@ const routes = [
   {
     path: '/lives/qa/:id',
     name: 'qa',
-    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa-admin/main.vue'),
+    component: () => import('@/packages/qa-admin/main.vue'),
     meta: { title: '问答', grayType: 'webinar' }
   },
   {
@@ -55,16 +54,8 @@ const routes = [
   {
     path: '/lives/video-polling/:id',
     name: 'VideoPolling',
-    component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
+    component: () => import('../views/VideoPolling'),
     meta: { title: '视频轮询', grayType: 'webinar', page: 'video-polling' }
-  },
-  {
-    // 其它没有匹配到的路由都会跳至此模块(404）
-    // 该路由为必须路由，不需要权限，必须放在最后
-    path: '*',
-    name: 'notfound',
-    component: NotFound,
-    meta: { keepAlive: false, grayType: '' }
   },
   {
     path: '/lives/client/:il_id', // 客户端嵌入
@@ -76,7 +67,7 @@ const routes = [
     path: '/lives/yun/:id', // 云导播
     name: 'yun',
     component: () => import('@/saas-live/views/yun'),
-    meta: { keepAlive: false, grayType: 'webinar', page: 'yun' }
+    meta: { keepAlive: false, grayType: 'webinar', page: 'live-yun' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
@@ -84,7 +75,6 @@ const routes = [
     meta: { title: '系统异常' },
     component: () => import('../views/ErrorPage/error.vue')
   },
-
   {
     // 其它没有匹配到的路由都会跳至此模块(404）
     // 该路由为必须路由，不需要权限，必须放在最后
@@ -110,7 +100,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const res = await grayInit(to);
-  console.log('---grayInit---', res);
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
