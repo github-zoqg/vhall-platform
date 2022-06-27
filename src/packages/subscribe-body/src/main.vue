@@ -410,6 +410,11 @@
           justify-content: center;
           align-items: center;
           background: rgba(0, 0, 0, 0.6);
+          img {
+            width: 120px;
+            height: 120px;
+            object-fit: scale-down;
+          }
         }
       }
       .subscribe-language {
