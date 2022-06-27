@@ -13,13 +13,13 @@ const routes = [
     path: '/lives/watch/:id',
     component: Home,
     name: 'LiveRoom',
-    meta: { title: '直播间', grayType: 'webinar' }
+    meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclient/watch/:id', //嵌入观看页
     component: Home,
     name: 'LiveEmbedRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' },
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' },
     redirect: to => {
       if (to.query.embed === 'video') {
         // 单视频嵌入
@@ -42,25 +42,25 @@ const routes = [
     path: '/lives/embedclientfull/watch/:id', //完全嵌入观看页
     component: Home,
     name: 'LiveEmbedFullRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' }
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclientvideo/watch/:id', //单视频嵌入观看页
     component: () => import('../views/EmbedVideo/index.vue'),
     name: 'LiveEmbedVideoRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' }
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'embed-video' }
   },
   {
     path: '/lives/subscribe/:id',
     component: Subscribe,
     name: 'Subscribe',
-    meta: { title: '预约', grayType: 'webinar' }
+    meta: { title: '预约', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/embedclient/subscribe/:id', //嵌入预约页
     component: Subscribe,
     name: 'SubscribeEmbed',
-    meta: { title: '预约嵌入', grayType: 'webinar' }
+    meta: { title: '预约嵌入', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/entryform/:id',
@@ -89,6 +89,13 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+    // 根据不同的页面，动态加载不同的配置
+    const pageConfig = await import(`../page-config/${to.meta.page}.js`);
+    window.$serverConfig = pageConfig.default;
+    window.$serverConfig._page = to.meta.page;
+  }
+
   const res = await grayInit(to);
   console.log('---grayInit---', res);
   if (res) {

@@ -35,7 +35,11 @@ export default {
       {
         cuid: 'comVirtualPeople',
         method: 'openVirtualDialog',
-        args: [{ type: 1 }]
+        args: [
+          {
+            type: 1
+          }
+        ]
       }
     ],
     emitClickStartLive: [
@@ -67,7 +71,9 @@ export default {
   // 中间主区域容器
   layerBody: {
     component: 'VmpContainer',
-    options: { className: 'vmp-basic-bd' },
+    options: {
+      className: 'vmp-basic-bd'
+    },
     children: ['layerBodyLeft', 'layerBodyCenter', 'layerBodyRight']
   },
   layerBodyLeft: {
@@ -130,9 +136,19 @@ export default {
       auth: true
     },
     handleClick: [
-      { cuid: ['comAsideMenu', 'comDocUne'], method: 'switchTo', args: 'board' },
-      { cuid: 'comGroupDiscussion', method: 'hiddenAll' },
-      { cuid: 'comThirdStream', method: 'closeThirdStream' }
+      {
+        cuid: ['comAsideMenu', 'comDocUne'],
+        method: 'switchTo',
+        args: 'board'
+      },
+      {
+        cuid: 'comGroupDiscussion',
+        method: 'hiddenAll'
+      },
+      {
+        cuid: 'comThirdStream',
+        method: 'closeThirdStream'
+      }
     ]
   },
   // 桌面共享菜单
@@ -144,7 +160,13 @@ export default {
       kind: 'desktopShare',
       auth: true
     },
-    handleClick: [{ cuid: 'comDesktopScreen', method: 'showConfirm', args: [] }]
+    handleClick: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'showConfirm',
+        args: []
+      }
+    ]
   },
   // 插播菜单
   comMediaPlayMenu: {
@@ -457,6 +479,7 @@ export default {
   comTabMenu: {
     component: 'VmpTabMenu',
     options: {
+      // 发起端不支持配置文档、商品
       menuConfig: [
         { type: 1, cuid: 'comCustomMenu', text: '' },
         { type: 2, cuid: 'comDoc', text: 'menu.menu_1001', visible: false },
@@ -469,6 +492,58 @@ export default {
         { type: 'v5', cuid: 'comQa', text: 'common.common_1004' }
       ]
     }
+  },
+  // 自定义菜单
+  comCustomMenu: {
+    component: 'VmpCustomMenu'
+  },
+  // 聊天组件
+  comChat: {
+    component: 'VmpChat',
+    options: {
+      //是否有图片上传按钮【聊天区域底部操作栏--上传图片】
+      hasImgUpload: true,
+      //是否有聊天过滤按钮【聊天区域底部操作栏--屏蔽特效,只看主办方】
+      hasChatFilterBtn: false,
+      //是否开启聊天设置功能
+      enableChatSetting: true,
+      //操作用户消息的弹窗配置【消息区域--左键单击用户头像，可以回复，@，禁言，删除消息，踢出人员等】
+      userControlOptions: {
+        enable: true
+      }
+    },
+    //打开私聊弹窗
+    emitOpenLivePrivateChatModal: [
+      {
+        cuid: 'comLivePrivateChat',
+        method: 'openModal'
+      }
+    ]
+  },
+  // 通知组件
+  comNotice: {
+    component: 'VmpNoticeList'
+  },
+  // 广告、推荐
+  comRecommend: {
+    component: 'VmpRecommend'
+  },
+  //成员列表组件
+  comMemberList: {
+    component: 'VmpMemberList',
+    options: {
+      //平台类型，pc发起:live,pc观看：watch,手机端观看：wap
+      platformType: 'live'
+    },
+    emitTabTips: {
+      cuid: ['comTabMenu'],
+      method: 'setTipsVisible',
+      args: ['$0']
+    }
+  },
+  // 问答
+  comQa: {
+    component: 'VmpQa'
   },
   // 所有弹窗集合
   comAllDialog: {
@@ -533,6 +608,7 @@ export default {
       }
     ]
   },
+  // 媒体检查
   comPcMediaCheck: {
     component: 'VmpPcMediaCheck'
   },
