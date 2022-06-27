@@ -85,7 +85,7 @@
         <!-- 红包 -->
       </li>
       <!-- TODO:支付牌照问题 -->
-      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0' && false">
+      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" alt="" class="show_img" />

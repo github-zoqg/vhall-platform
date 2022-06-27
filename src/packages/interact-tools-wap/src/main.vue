@@ -2,7 +2,7 @@
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- TODO:支付牌照问题 -->
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && false">
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
           ref="gifts"
