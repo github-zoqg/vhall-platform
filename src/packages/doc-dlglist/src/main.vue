@@ -136,20 +136,23 @@
                 <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
-                    <p class="file-name">
-                      <span
-                        class="vh-iconfont doc-icon"
-                        :class="scope.row.ext | fileIconCss(false)"
-                        :style="scope.row.ext | fileIconCss(true)"
-                      ></span>
-                      <el-tooltip
-                        placement="top"
-                        :disabled="!isTextOverflow"
-                        :content="scope.row.file_name"
-                      >
-                        <span class="file-name__text">{{ scope.row.file_name }}</span>
-                      </el-tooltip>
-                    </p>
+                    <el-tooltip
+                      placement="top"
+                      :disabled="!isTextOverflow"
+                      :content="scope.row.file_name"
+                    >
+                      <p class="file-name custom-tooltip-content">
+                        <span
+                          class="vh-iconfont doc-icon"
+                          :class="scope.row.ext | fileIconCss(false)"
+                          :style="scope.row.ext | fileIconCss(true)"
+                        ></span>
+
+                        <span class="file-name__text">
+                          {{ scope.row.file_name }}
+                        </span>
+                      </p>
+                    </el-tooltip>
                   </template>
                 </el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
@@ -244,20 +247,21 @@
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
-                  <p class="file-name">
-                    <span
-                      class="vh-iconfont"
-                      :class="scope.row.ext | fileIconCss(false)"
-                      :style="scope.row.ext | fileIconCss(true)"
-                    ></span>
-                    <el-tooltip
-                      placement="top"
-                      :disabled="!isTextOverflow"
-                      :content="scope.row.file_name"
-                    >
-                      {{ scope.row.file_name }}
-                    </el-tooltip>
-                  </p>
+                  <el-tooltip
+                    placement="top"
+                    :disabled="!isTextOverflow"
+                    :content="scope.row.file_name"
+                  >
+                    <p class="file-name custom-tooltip-content">
+                      <span
+                        class="vh-iconfont"
+                        :class="scope.row.ext | fileIconCss(false)"
+                        :style="scope.row.ext | fileIconCss(true)"
+                      ></span>
+
+                      <span>{{ scope.row.file_name }}</span>
+                    </p>
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
