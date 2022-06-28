@@ -5,6 +5,7 @@ import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
+import pageConfig from '../page-config/index';
 
 Vue.use(VueRouter);
 
@@ -94,8 +95,7 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
     // 根据不同的页面，动态加载不同的配置
-    const pageConfig = await import(`../page-config/${to.meta.page}.js`);
-    window.$serverConfig = pageConfig.default;
+    window.$serverConfig = pageConfig[to.meta.page];
     window.$serverConfig._page = to.meta.page;
   }
 
