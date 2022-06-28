@@ -453,7 +453,9 @@ export default {
     menu_1010: 'Check',
     menu_1011: 'No data',
     menu_1012: 'The default graphic',
-    menu_1013: 'Chapter'
+    menu_1013: 'Chapter',
+    menu_1014: 'Video',
+    menu_1015: 'Audio'
   },
   interact_tools: {
     interact_tools_1001: 'Please enter the lottery title',
@@ -536,7 +538,13 @@ export default {
     interact_tools_1076: 'Records',
     interact_tools_1077: 'To get',
     interact_tools_1078: 'Got',
-    interact_tools_1079: 'Winning'
+    interact_tools_1079: 'Winning',
+    interact_tools_1080: 'red envvelope with password',
+    interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
+    interact_tools_1082: 'one-tap copy password',
+    interact_tools_1083: 'View the detail',
+    interact_tools_1084: 'better luck next time!',
+    interact_tools_1085: 'TOP 10 list'
   },
   setting: {
     setting_1002: 'View settings',
@@ -607,7 +615,8 @@ export default {
     message_1031: 'Check whether the device is disabled or occupied',
     message_1032: 'This item is required',
     message_1033: 'Invitation sent successfully',
-    message_1034: 'Invitation sent successfully'
+    message_1034: 'Invitation sent successfully',
+    message_1035: 'For better watching experience, please use landscape mode'
   },
   cash: {
     cash_1001: 'Manage balance',
