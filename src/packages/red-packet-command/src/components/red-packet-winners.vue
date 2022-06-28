@@ -3,7 +3,7 @@
     <div class="vhsaas-dialog__other">
       <i class="vhsaas-other-return vh-iconfont vh-line-arrow-left" @click="back" />
       <div class="vhsaas-interact-content">
-        <div class="title">领取Top10名单</div>
+        <div class="title">{{ $t('interact_tools.interact_tools_1085') }}</div>
         <ul
           ref="packetList"
           class="vhsaas-other__item"
