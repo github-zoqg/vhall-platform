@@ -18,9 +18,7 @@
           <div class="money-num">
             ¥{{ useCashServer.state.cashInfo.red_packet_balance || '0.00' }}
           </div>
-          <!-- TODO:支付牌照问题 -->
           <van-button
-            v-if="false"
             class="vmp-cash-draw-button"
             round
             :disabled="

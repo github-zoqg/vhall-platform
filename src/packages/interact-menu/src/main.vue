@@ -315,7 +315,7 @@
       openRedPacket() {
         console.log('点击红包');
         if (!this.isLiving) return false;
-        this.$message.warning('功能维护中，暂不支持使用');
+        this.$message.warning('合规自查中，该功能暂不支持使用');
         // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }
