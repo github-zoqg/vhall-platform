@@ -33,7 +33,7 @@
         >
           {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
         </a>
-        <span>{{ webinarInfo.start_time }}</span>
+        <span>{{ webinarInfo.start_time && webinarInfo.start_time.slice(0, -3) }}</span>
       </div>
     </div>
     <div class="vmp-header-watch_right">
