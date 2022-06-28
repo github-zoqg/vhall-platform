@@ -42,7 +42,7 @@
     },
     data() {
       return {
-        copyText: '123'
+        copyText: ''
       };
     },
     methods: {
@@ -145,21 +145,6 @@
       border: none;
     }
   }
-  .vhsaas-red-packet-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin: 36px auto 4px auto;
-    display: block;
-  }
-  .vhsaas-red-packet__name {
-    font-size: 14px;
-    font-weight: 400;
-    color: #fee4b3;
-    line-height: 20px;
-    margin-bottom: 12px;
-    text-align: center;
-  }
   .vhsaas-red-packet__btn {
     cursor: pointer;
     font-size: 14px;
@@ -168,21 +153,5 @@
     line-height: 20px;
     text-align: center;
     margin-top: 12px;
-  }
-  /* 看看大家的手气 */
-  .vhsaas-other-unit {
-    font-size: 34px;
-    font-weight: bold;
-    color: #fee4b3;
-    line-height: 34px;
-    text-align: center;
-    margin-bottom: 8px;
-    margin-top: -8px;
-    i {
-      font-size: 20px;
-      font-weight: 400;
-      color: #fee4b3;
-      line-height: 20px;
-    }
   }
 </style>
