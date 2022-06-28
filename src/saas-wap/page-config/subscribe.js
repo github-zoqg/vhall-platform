@@ -1,17 +1,23 @@
+/**
+ * 预约页面配置
+ */
 export default {
+  // 根节点
   subcribeRoot: {
     component: 'VmpAirContainer',
     children: ['subcribeHeader', 'subcribeBody', 'comAllDialog', 'comGoodsDetail']
   },
+  // 顶部容器
   subcribeHeader: {
     component: 'VmpAirContainer',
     className: 'vmp-basic-hd',
     children: ['comHeaderWatch']
   },
+  // 顶部组件
   comHeaderWatch: {
     component: 'VmpHeaderWatchWap',
-    children: [],
     emitClickLogin: [
+      // 登录弹窗
       {
         cuid: 'compRegLoginWap',
         method: 'open'
@@ -39,8 +45,10 @@ export default {
       }
     ]
   },
+  // 播放器
   comWapPlayer: {
     component: 'VmpWapPlayer',
+    // 权限验证
     emitCheckAuth: [
       {
         cuid: 'comSubcribeWapBody',
@@ -65,29 +73,14 @@ export default {
     component: 'VmpTabMenuWap',
     options: {
       menuConfig: [
-        {
-          type: 1,
-          cuid: 'comCustomMenuWap',
-          text: ''
-        },
-        {
-          type: 4,
-          cuid: 'comIntroWap',
-          text: 'menu.menu_1003'
-        },
-        {
-          type: 5,
-          cuid: 'comGoodSaasWap',
-          text: 'menu.menu_1004'
-        },
-        {
-          type: 6,
-          cuid: 'comRecommendWap',
-          text: 'menu.menu_1005'
-        }
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, // 自定义菜单
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' } // 推荐
       ]
     }
   },
+  // 自定义菜单组件
   comCustomMenuWap: {
     component: 'VmpCustomMenuWap',
     emitDeleteMenu: [
@@ -103,6 +96,7 @@ export default {
       }
     ]
   },
+  // 简介组件
   comIntroWap: {
     component: 'VmpIntroWap',
     addTab: [
@@ -112,6 +106,7 @@ export default {
       }
     ]
   },
+  // 商品组件
   comGoodSaasWap: {
     component: 'VmpGoodListWap',
     emitShowDetail: {
@@ -120,9 +115,11 @@ export default {
       args: ['$0']
     }
   },
+  // 推荐组件
   comRecommendWap: {
     component: 'VmpRecommendWap'
   },
+  // 所有弹窗集合
   comAllDialog: {
     component: 'VmpAirContainer',
     children: [
@@ -137,9 +134,11 @@ export default {
       'comViewRestrictionWap'
     ]
   },
+  // 登录弹窗
   compRegLoginWap: {
     component: 'VmpRegLoginWap'
   },
+  // 二维码弹框
   comOfficial: {
     component: 'VmpWapQrCode'
   },

@@ -1,4 +1,8 @@
+/**
+ * wap观看端主直播页面配置
+ */
 export default {
+  // 根节点
   layerRoot: {
     component: 'VmpAirContainer',
     children: [
@@ -10,6 +14,7 @@ export default {
       'comUserAccountWap'
     ]
   },
+  // 顶部组件
   comHeaderWatch: {
     component: 'VmpHeaderWatchWap',
     children: [],
@@ -26,18 +31,22 @@ export default {
       }
     ]
   },
+  // 中间主区域容器
   layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['comWapBody']
   },
+  // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
     children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
+  // 播放器
   comWapPlayer: {
     component: 'VmpWapPlayer',
     emitCheckAuth: [
+      //权限验证
       {
         cuid: 'comSubcribeWapBody',
         method: 'playerAuthCheck',
@@ -72,61 +81,25 @@ export default {
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
     options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
       menuConfig: [
-        {
-          type: 1,
-          cuid: 'comCustomMenuWap',
-          text: ''
-        },
-        {
-          type: 2,
-          cuid: 'comDocWap',
-          text: 'menu.menu_1001',
-          visible: false
-        },
-        {
-          type: 3,
-          cuid: 'comChatWap',
-          text: 'menu.menu_1002'
-        },
-        {
-          type: 'private',
-          cuid: 'comPrivateChatWap',
-          text: 'common.common_1008'
-        },
-        {
-          type: 4,
-          cuid: 'comIntroWap',
-          text: 'menu.menu_1003'
-        },
-        {
-          type: 5,
-          cuid: 'comGoodSaasWap',
-          text: 'menu.menu_1004'
-        },
-        {
-          type: 6,
-          cuid: 'comRecommendWap',
-          text: 'menu.menu_1005'
-        },
-        {
-          type: 7,
-          cuid: 'comChapterWap',
-          text: 'menu.menu_1013'
-        },
-        {
-          type: 8,
-          cuid: 'comMemberListWap',
-          text: ''
-        },
-        {
-          type: 'v5',
-          cuid: 'comQa',
-          text: 'common.common_1004'
-        }
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, //文档
+        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
+        { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员列表
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } // 问答
       ]
     }
   },
+  // 自定义菜单组件
   comCustomMenuWap: {
     component: 'VmpCustomMenuWap',
     emitDeleteMenu: [
@@ -142,6 +115,7 @@ export default {
       }
     ]
   },
+  // 文档组件
   comDocWap: {
     component: 'VmpDocWap',
     emitShowMenuTab: {
@@ -152,6 +126,7 @@ export default {
     children: ['comInteractToolsWap'],
     options: {}
   },
+  // 简介
   comInteractToolsWap: {
     component: 'VmpInteractToolsWap',
     emitNeedLogin: {
@@ -159,6 +134,7 @@ export default {
       method: 'open'
     }
   },
+  // 聊天
   comChatWap: {
     component: 'VmpChatWap',
     addTab: [
@@ -194,12 +170,15 @@ export default {
     children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
     options: {}
   },
+  // 礼物动画组件
   comWapRewardEffect: {
     component: 'VmpWapRewardEffect'
   },
+  // 礼物动画组件-SVGA
   comWapRewardEffectSVGA: {
     component: 'VmpWapRewardEffectFullScreen'
   },
+  // 私聊组件
   comPrivateChatWap: {
     component: 'VmpWapPrivateChat',
     options: {},
@@ -215,6 +194,7 @@ export default {
       }
     ]
   },
+  // 简介组件
   comIntroWap: {
     component: 'VmpIntroWap',
     addTab: [
@@ -224,6 +204,7 @@ export default {
       }
     ]
   },
+  // 商品组件
   comGoodSaasWap: {
     component: 'VmpGoodListWap',
     emitShowDetail: {
@@ -232,15 +213,19 @@ export default {
       args: ['$0']
     }
   },
+  // 推荐组件
   comRecommendWap: {
     component: 'VmpRecommendWap'
   },
+  // 章节组件
   comChapterWap: {
     component: 'VmpChapterWap'
   },
+  // 成员列表组件
   comMemberListWap: {
     component: 'VmpMemberListWap'
   },
+  // 问答组件
   comQa: {
     component: 'VmpQaWap',
     emitClickLogin: [
@@ -250,6 +235,7 @@ export default {
       }
     ]
   },
+  // 右侧浮动容器
   comContainerRight: {
     component: 'VmpContainerRightWap',
     children: [
@@ -259,26 +245,32 @@ export default {
       'comRedPacketWap',
       'comQuestionnaireWap'
     ],
+    // 打开计时器
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
     },
+    // 计时器
     emitOpenSign: {
       cuid: ['comSignWap'],
       method: 'openSign'
     },
+    // 打开红包
     emitOpenRedPacket: {
       cuid: ['comRedPacketWap'],
       method: 'openRedPacket'
     },
+    // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
       method: 'handleClickIcon'
     },
+    // 红包弹窗
     emitClickRedPacketIcon: {
       cuid: ['comRedPacketWap'],
       method: 'open'
     },
+    // 问卷弹窗
     emitClickQuestionnaireIcon: {
       cuid: ['comQuestionnaireWap'],
       method: 'open',
@@ -329,9 +321,11 @@ export default {
       }
     ]
   },
+  // 公告横幅
   comNoticeWap: {
     component: 'VmpNoticeWap'
   },
+  // 弹窗集合
   comAllDialog: {
     component: 'VmpAirContainer',
     children: [
@@ -352,9 +346,11 @@ export default {
   comOfficial: {
     component: 'VmpWapQrCode'
   },
+  // 开屏页
   comScreenPostWap: {
     component: 'VmpScreenPostWap'
   },
+  // 个人中心
   comUserCenterWap: {
     component: 'VmpUserCenterWap',
     emitOpenUserAccountWap: [
@@ -371,6 +367,7 @@ export default {
       }
     ]
   },
+  // 提现管理
   comCashWap: {
     component: 'VmpCashWap',
     emitCloseUserCenterWap: [
@@ -402,6 +399,7 @@ export default {
   comGoodsDetail: {
     component: 'VmpGoodsDetail'
   },
+  // 个人资料
   comUserAccountWap: {
     component: 'VmpUserAccountWap',
     emitCloseUserCenterWap: [
