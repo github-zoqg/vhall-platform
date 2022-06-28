@@ -102,8 +102,8 @@
 </script>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
-    width: 460px;
-    height: 440px;
+    width: 453px;
+    height: 407px;
     background-size: 100% auto;
     margin-top: 15vh;
     margin-left: 50%;
@@ -119,26 +119,26 @@
     }
   }
   .vhsaas-close-open {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 80px;
     cursor: pointer;
     &.scale {
-      -webkit-animation: scaleDraw 1s ease-in-out infinite;
-      -ms-animation: scaleDraw 1s ease-in-out infinite;
-      animation: scaleDraw 1s ease-in-out infinite;
+      -webkit-animation: scaleDraw 1.3s ease-in-out infinite;
+      -ms-animation: scaleDraw 1.3s ease-in-out infinite;
+      animation: scaleDraw 1.3s ease-in-out infinite;
     }
     @keyframes scaleDraw {
       0% {
         transform: scale(1); /*开始为原始大小*/
       }
       25% {
-        transform: scale(0.75); /*缩小为0.75倍*/
+        transform: scale(0.7); /*缩小为0.75倍*/
       }
       50% {
         transform: scale(1);
       }
       75% {
-        transform: scale(0.75);
+        transform: scale(0.7);
       }
     }
     &.open {
@@ -174,33 +174,10 @@
   .vhsaas-red-packet-body {
     position: absolute;
     z-index: 22;
-    top: 120px;
+    top: 130px;
     text-align: center;
     width: 100%;
     left: 0;
-    .vhsaas-red-packet-desc {
-      &__wrap {
-        width: 220px;
-        height: 60px; // 最多2行的高度
-        margin: 22px auto 0;
-        position: relative;
-        text-align: center;
-      }
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /**autoprefixer: ignore next */
-      -webkit-box-orient: vertical;
-      width: 100%;
-      font-size: 22px;
-      font-weight: 500;
-      color: #fee4b3;
-      line-height: 30px;
-    }
     .vhsaas-red-packet-sender {
       font-size: 14px;
       font-weight: 400;
@@ -213,7 +190,7 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      margin: 22px auto 0 auto;
+      margin: 78px auto 0 auto;
     }
   }
 </style>

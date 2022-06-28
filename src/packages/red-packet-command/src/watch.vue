@@ -128,7 +128,7 @@
   }
   .vhsaas-red-packet-close-btn {
     position: absolute;
-    bottom: -18px;
+    bottom: -46px;
     font-size: 30px;
     color: #ffffff;
     cursor: pointer;

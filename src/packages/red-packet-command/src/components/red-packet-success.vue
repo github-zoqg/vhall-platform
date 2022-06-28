@@ -1,45 +1,24 @@
 <template>
   <div class="vhsaas-interact-dialog open">
-    <!-- 第二层金币层 z-index: 3；z-index: 4 -->
-    <div class="vhsaas-left-gold left-animate"></div>
-    <div class="vhsaas-max-gold max-animate">
+    <div class="title">口令红包</div>
+    <div class="vhsaas-command">
       <!-- 抢到金额 -->
       <div v-if="amount > 0">
-        <p class="vhsaas-gold-title">{{ $t('interact_tools.interact_tools_1033') }}</p>
-        <p class="vhsaas-gold-unit">
-          <i>￥</i>
-          {{ amount }}
-        </p>
+        <p class="vhsaas-gold-title">支付宝搜“红包”，输入口令</p>
+        <p class="vhsaas-gold-unit">Password3a2red1envelope</p>
       </div>
       <!-- 未抢到金额  -->
-      <p v-else class="vhsaas-gold-null">
+      <div v-else class="vhsaas-gold-null">
         {{ $t('interact_tools.interact_tools_1034') }}
         <br />
         {{ $t('interact_tools.interact_tools_1035') }}
-      </p>
+      </div>
     </div>
     <!-- 第四层 内容层-->
     <div class="vhsaas-red-packet-content">
-      <img
-        v-if="redPacketInfo.avatar"
-        :src="redPacketInfo.avatar"
-        alt=""
-        class="vhsaas-red-packet-avatar"
-      />
-      <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
-      <p class="vhsaas-red-packet__name">
-        {{ (redPacketInfo.nickname || '') | overHidden(8) }}
-      </p>
-      <p class="vhsaas-red-packet__btn" @click="navToList">
-        {{ $t('interact_tools.interact_tools_1036') }}
-      </p>
-      <input
-        type="text"
-        ref="shareLink"
-        style="width: 1px; height: 0; position: absolute"
-        v-model="copyText"
-      />
-      <div class="btn btn-copy" @click="copy">一键复制</div>
+      <input type="text" ref="shareLink" class="copyText" v-model="copyText" />
+      <div class="btn btn-copy" v-if="amount > 0" @click="copy">一键复制口令</div>
+      <p class="vhsaas-red-packet__btn" @click="navToList">查看领取名单</p>
     </div>
     <slot />
   </div>
@@ -85,8 +64,8 @@
 </script>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
-    width: 460px;
-    height: 440px;
+    width: 342px;
+    height: 402px;
     background-size: 100% auto;
     margin-top: 15vh;
     margin-left: 50%;
@@ -99,201 +78,71 @@
     &.open {
       background: url(../images/open-bg@2x.png);
       background-size: 100% 100%;
-      width: 460px;
     }
-  }
-  .vhsaas-left-gold {
-    width: 200px;
-    height: 200px;
-    background: url(../images/open-left-money@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    top: 48px;
-    left: 62px;
-    z-index: 23;
-    &.left-animate {
-      animation-delay: 1s;
-      -webkit-animation: leftAnimate 1s;
-      -ms-animation: leftAnimate 1s;
-      animation: leftAnimate 1s;
-    }
-    @-webkit-keyframes leftAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
-    @-ms-keyframes leftAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
-    @keyframes leftAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
-  }
-  .vhsaas-max-gold {
-    width: 300px;
-    height: 300px;
-    background: url(../images/open-money@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    top: -32px;
-    left: 80px;
-    z-index: 24;
-    &.max-animate {
-      -webkit-animation: maxAnimate 0.35s;
-      -ms-animation: maxAnimate 0.35s;
-      animation: maxAnimate 0.35s;
-    }
-    @-webkit-keyframes maxAnimate {
-      from {
-        top: 0;
-      }
-      to {
-        top: -32px;
-      }
-    }
-    @-ms-keyframes maxAnimate {
-      from {
-        top: 0;
-      }
-      to {
-        top: -32px;
-      }
-    }
-    @keyframes maxAnimate {
-      from {
-        top: 0;
-      }
-      to {
-        top: -32px;
-      }
+    > .title {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 20px;
+      color: #87000e;
+      margin-top: 68px;
     }
   }
   .vhsaas-gold-title {
-    font-size: 12px;
     font-weight: 400;
-    color: #ba5003;
+    font-size: 12px;
     line-height: 17px;
-    margin-top: 120px;
+    color: #ba5003;
+    margin-top: 38px;
     text-align: center;
   }
   .vhsaas-gold-unit {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    width: 180px;
+    height: 56px;
     text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-    color: #ed0b25;
-    line-height: 40px;
-    i {
-      width: 20px;
-      height: 20px;
-      font-size: 20px;
-      font-weight: 400;
-      color: #ed0b25;
-      line-height: 20px;
-    }
+    color: #ad0914;
+    margin-top: 8px;
+    word-break: break-all;
   }
   .vhsaas-gold-null {
-    text-align: center;
-    height: 50px;
-    font-size: 18px;
     font-weight: 600;
-    color: #ba5003;
+    font-size: 18px;
     line-height: 25px;
-    margin-top: 114px;
-    padding-left: 15px;
-  }
-  .vhsaas-right-gold {
-    width: 200px;
-    height: 200px;
-    background: url(../images/open-right-money@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    top: 48px;
-    right: 55px;
-    z-index: 23;
-    &.right-animate {
-      animation-delay: 0.5s;
-      -webkit-animation: rightAnimate 0.75s;
-      -ms-animation: rightAnimate 0.75s;
-      animation: rightAnimate 0.75s;
-    }
-    @-webkit-keyframes rightAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
-    @-ms-keyframes rightAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
-    @keyframes rightAnimate {
-      from {
-        top: 78px;
-      }
-      to {
-        top: 48px;
-      }
-    }
+    text-align: center;
+    color: #ba5003;
+    height: 76px;
+    margin-top: 40px;
   }
 
-  .vhsaas-red-packet-cover {
-    width: 294px;
-    height: 331px;
-    background: url(../images/open-bg-cover@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    bottom: 12px;
-    left: 83px;
-    z-index: 25;
-  }
-  .vhsaas-red-packet-line {
-    width: 460px;
-    height: 440px;
-    background: url(../images/open-cover-caidai@2x.png);
-    background-size: 100% 100%;
-    position: absolute;
-    top: 0;
-    z-index: 26;
-  }
   /* 红包信息面板 */
   .vhsaas-red-packet-content {
-    position: absolute;
     z-index: 27;
-    bottom: 32px;
-    height: 243px;
     width: 100%;
-    left: 0;
+    margin-top: 90px;
     .btn {
-      width: 200px;
+      background: linear-gradient(180deg, #f9eb8a 0%, #f5b72f 100%);
+      box-shadow: 0px 4px 4px rgba(201, 0, 32, 0.2), inset 0px 1px 0px #fff3ab,
+        inset 0px -2px 0px #f38817;
+      border-radius: 50px;
+      width: 160px;
       height: 40px;
-      margin: 20px auto;
-      background-color: #fee4b3;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 400;
       font-size: 16px;
-      color: red;
-      border-radius: 40px;
+      line-height: 22px;
+      color: #61000d;
       cursor: pointer;
+    }
+    .copyText {
+      width: 1px;
+      height: 0;
+      position: absolute;
+      border: none;
     }
   }
   .vhsaas-red-packet-avatar {
@@ -318,42 +167,7 @@
     color: #fee4b3;
     line-height: 20px;
     text-align: center;
-  }
-  .vhsaas-red-packet__remark {
-    font-size: 12px;
-    font-weight: 400;
-    color: rgba(254, 228, 179, 0.8);
-    line-height: 12px;
-    text-align: center;
-    margin-top: 68px;
-    padding: 2px 0 3px 0;
-  }
-  .vhsaas-red-packet__help {
-    display: inline-block;
-    cursor: pointer;
-    margin-left: 5px;
-    font-size: 12px;
-  }
-  .vhsaas-red-packet_notice {
-    width: 200px;
-    min-height: 85px;
-    background: #1a1a1a;
-    border-radius: 4px;
-    opacity: 0.8;
-    position: absolute;
-    z-index: 28;
-    bottom: 103px;
-    left: 115px;
-    padding: 8px 10px 7px 20px;
-    p {
-      font-size: 12px;
-      font-weight: 400;
-      color: #ffffff;
-      line-height: 17px;
-      span {
-        margin-left: -9px;
-      }
-    }
+    margin-top: 12px;
   }
   /* 看看大家的手气 */
   .vhsaas-other-unit {
