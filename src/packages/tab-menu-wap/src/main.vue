@@ -134,6 +134,10 @@
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
       },
+      // 是否为单视频嵌入页
+      isEmbedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
       // 是否是试看
       isTryVideo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id;
@@ -158,6 +162,7 @@
     },
     watch: {
       async 'visibleMenu.length'() {
+        if (this.isEmbedVideo) return;
         await this.$nextTick();
         this.scrollToItem({ id: this.selectedId });
         this.computedWidth();
@@ -196,12 +201,13 @@
        */
       setSetingHeight() {
         if (this.isSubscribe) return;
+        if (this.isEmbedVideo) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
         let baseHeight = playerHeight + 71 + 94;
         let classname = '.tab-content';
-        if (this.embedObj) {
+        if (this.embedObj.embed) {
           baseHeight = playerHeight;
           classname = '.tab-content-embed';
         }
@@ -210,6 +216,7 @@
         document.querySelector(classname).style.height = popHeight;
       },
       computedWidth() {
+        if (this.isEmbedVideo) return;
         let childNodes = document.querySelector('.vmp-tab-menu-scroll-container').childNodes;
         let childWidth = 0;
         childNodes.forEach(e => {
@@ -446,6 +453,7 @@
        *
        */
       selectDefault() {
+        if (this.isEmbedVideo) return;
         if (this.visibleMenu.length === 0) return;
 
         const item = this.visibleMenu[0];

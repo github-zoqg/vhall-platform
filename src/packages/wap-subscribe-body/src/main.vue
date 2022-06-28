@@ -277,9 +277,13 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
-      // 是否为完全嵌入页
+      // 是否为嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否为单视频嵌入页
+      isEmbedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       isTryVideo() {
         return (
@@ -311,6 +315,7 @@
     },
     methods: {
       handleScroll() {
+        if (this.isEmbedVideo) return;
         let dom = document.querySelector('.vmp-subscribe-body-info');
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
