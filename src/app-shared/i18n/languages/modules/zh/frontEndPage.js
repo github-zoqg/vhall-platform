@@ -449,7 +449,9 @@ export default {
     menu_1010: '查看',
     menu_1011: '暂无图片',
     menu_1012: '默认图文',
-    menu_1013: '章节'
+    menu_1013: '章节',
+    menu_1014: '视频',
+    menu_1015: '音频'
   },
   interact_tools: {
     interact_tools_1001: '请输入抽奖标题',
@@ -531,7 +533,13 @@ export default {
     interact_tools_1076: '中奖记录',
     interact_tools_1077: '领取',
     interact_tools_1078: '已领取',
-    interact_tools_1079: '已中奖'
+    interact_tools_1079: '已中奖',
+    interact_tools_1080: '口令红包',
+    interact_tools_1081: '支付宝搜“红包”，输入口令',
+    interact_tools_1082: '一键复制口令',
+    interact_tools_1083: '查看领取名单',
+    interact_tools_1084: '手慢了，口令红包抢光啦',
+    interact_tools_1085: '领取top10名单'
   },
   setting: {
     setting_1002: '观看设置',
@@ -599,7 +607,8 @@ export default {
     message_1031: '创建本地预览流失败,请检查设备',
     message_1032: '请输入必填信息：',
     message_1033: '邀请发送成功',
-    message_1034: '邀请演示发送成功'
+    message_1034: '邀请演示发送成功',
+    message_1035: '为了保证更好的观看体验，请您竖屏观看'
   },
   cash: {
     cash_1001: '管理余额',
