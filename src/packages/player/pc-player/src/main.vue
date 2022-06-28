@@ -1265,6 +1265,7 @@
         }
         &-right {
           display: flex;
+          z-index: 1002;
           > div {
             padding-right: 20px;
             position: relative;
@@ -1445,6 +1446,7 @@
         }
         &-right {
           display: flex;
+          z-index: 1002;
           > div {
             padding-right: 12px;
             position: relative;
