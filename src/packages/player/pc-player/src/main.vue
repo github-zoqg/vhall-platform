@@ -233,7 +233,7 @@
                 @click="openBarrage"
               ></i>
             </div>
-            <div class="controller-tools-right-fullscroll">
+            <div class="controller-tools-right-fullscroll" v-if="!isWarnPreview">
               <i
                 :class="`vh-iconfont ${
                   isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -458,12 +458,6 @@
         this.playerServer.setVolume(this.voice, () => {
           console.log('设置音量失败');
         });
-        // if (
-        //   this.subscribeServer.state.warmFullScreen &&
-        //   this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
-        // ) {
-        //   this.enterFullscreen();
-        // }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
           // 如果是循环播放，播完最后一个，自动播第一个

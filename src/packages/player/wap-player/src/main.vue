@@ -220,7 +220,7 @@
                       }`"
                     ></i>
                   </span>
-                  <span v-if="!isAudio" @click="enterFullscreen">
+                  <span v-if="!isAudio && !isWarnPreview" @click="enterFullscreen">
                     <i
                       :class="`vh-iconfont ${
                         isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -475,9 +475,6 @@
       },
       playIndex() {
         if (!this.isWarnPreview) return;
-        // if (this.subscribeServer.state.warmFullScreen) {
-        //   this.enterFullscreen();
-        // }
         // 多个视频持续播放 暖场视频播放模式
         if (this.warmUpVideoList.length > 1) {
           // 如果是循环播放，播完最后一个，自动播第一个
