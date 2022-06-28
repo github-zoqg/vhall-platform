@@ -18,7 +18,9 @@
                 {{ item.nickname | overHidden(8) }}
               </span>
             </div>
-            <span class="vhsaas-red-packet__time">{{ item.created_at }}</span>
+            <span class="vhsaas-red-packet__time">
+              {{ item.created_at | fmtTimeByExp('hh:mm:ss') }}
+            </span>
           </li>
         </ul>
       </div>
@@ -36,12 +38,6 @@
         default() {
           return {};
         }
-      },
-      amount: {
-        type: Number,
-        default() {
-          return 0;
-        }
       }
     },
     created() {
@@ -52,7 +48,7 @@
         winners: [],
         queryParams: {
           page: 1,
-          size: 50 // 分页为50
+          size: 10 // 分页为50
         },
         loading: false,
         finished: false // 滚动加载锁定(分页加载)
@@ -63,7 +59,7 @@
       getRedPacketWinners() {
         this.loading = true;
         this.redPacketServer
-          .getRedPacketWinners({
+          .getCodeRedPacketWinners({
             pos: this.queryParams.page, // pos 参数不是偏移量,就是页码
             limit: this.queryParams.size
           })

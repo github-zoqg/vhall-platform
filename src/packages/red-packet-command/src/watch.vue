@@ -4,7 +4,7 @@
     <div class="vhsaas-interact-mask" :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }">
       <components
         :is="componentsView"
-        :amount="redPacketServerState.amount * 1"
+        :red_code="redPacketServerState.red_code"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
         @needLogin="handleGoLogin"
@@ -16,9 +16,14 @@
   </div>
 </template>
 <script>
-  import { useRedPacketServer, useZIndexServer, useChatServer, useMsgServer } from 'middle-domain';
+  import {
+    useCodeRedPacketServer,
+    useZIndexServer,
+    useChatServer,
+    useMsgServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
+  const PWD_RED_ENVELOPE_OK = 'pwd_red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketCommandWatch',
     components: {
@@ -47,7 +52,7 @@
       }
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer({
+      this.redPacketServer = useCodeRedPacketServer({
         mode: 'watch'
       });
       this.zIndexServer = useZIndexServer();
@@ -60,7 +65,7 @@
       // 开启红包弹窗
       open(uuid) {
         if (!uuid) uuid = this.redPacketServer.getLastUUid();
-        this.redPacketServer.getRedPacketInfo(uuid).then(res => {
+        this.redPacketServer.getCodeRedPacketInfo(uuid).then(res => {
           const data = res.data;
           if (data.status == 1 || data.red_packet.number == data.red_packet.get_user_count) {
             // 本人已经抢到, 或者被强光
@@ -81,7 +86,7 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },
       initEvent() {
-        this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
+        this.redPacketServer.$on(PWD_RED_ENVELOPE_OK, data => {
           if (this.isEmbed) {
             console.log('嵌入页不支持口令红包');
             return;

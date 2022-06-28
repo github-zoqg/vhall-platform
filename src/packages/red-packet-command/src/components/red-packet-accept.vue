@@ -61,7 +61,7 @@
         console.log('available', available);
         // 获取当前红包状态..抢领取失败, 不可领取, 请求异常调用
         const getStatus = () => {
-          this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
+          this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
             const st = setTimeout(() => {
               clearTimeout(st);
@@ -72,7 +72,7 @@
         if (available && !this.opened) {
           this.opening = true; // 打开中
           this.redPacketServer
-            .openRedPacket()
+            .openCodeRedPacket()
             .then(res => {
               if (res.code === 200) {
                 this.opened = true;

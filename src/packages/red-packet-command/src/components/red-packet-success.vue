@@ -3,9 +3,9 @@
     <div class="title">口令红包</div>
     <div class="vhsaas-command">
       <!-- 抢到金额 -->
-      <div v-if="amount > 0">
+      <div v-if="!!red_code">
         <p class="vhsaas-gold-title">支付宝搜“红包”，输入口令</p>
-        <p class="vhsaas-gold-unit">Password3a2red1envelope</p>
+        <p class="vhsaas-gold-unit">{{ red_code }}</p>
       </div>
       <!-- 未抢到金额  -->
       <div v-else class="vhsaas-gold-null">
@@ -16,8 +16,8 @@
     </div>
     <!-- 第四层 内容层-->
     <div class="vhsaas-red-packet-content">
-      <input type="text" ref="shareLink" class="copyText" v-model="copyText" />
-      <div class="btn btn-copy" v-if="amount > 0" @click="copy">一键复制口令</div>
+      <input type="text" ref="shareLink" class="copyText" v-model="red_code" />
+      <div class="btn btn-copy" v-if="!!red_code" @click="copy">一键复制口令</div>
       <p class="vhsaas-red-packet__btn" @click="navToList">查看领取名单</p>
     </div>
     <slot />
@@ -33,10 +33,10 @@
           return {};
         }
       },
-      amount: {
-        type: Number,
+      red_code: {
+        type: String,
         default() {
-          return 0;
+          return '';
         }
       }
     },
@@ -112,7 +112,7 @@
     line-height: 25px;
     text-align: center;
     color: #ba5003;
-    height: 76px;
+    height: 86px;
     margin-top: 40px;
   }
 
