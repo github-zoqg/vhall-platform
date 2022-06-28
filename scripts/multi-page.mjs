@@ -28,7 +28,7 @@ async function run(project, roots) {
   fs.copyFileSync(oriConfigPath, copyConfigPath);
   // 读取文件的配置信息
   const { serverConfig } = await import(copyConfigPath);
-  console.log('serverConfig:', serverConfig);
+  // console.log('serverConfig:', serverConfig);
   // listify
   roots = roots.push ? roots : roots.split(',');
   for (const root of roots) {

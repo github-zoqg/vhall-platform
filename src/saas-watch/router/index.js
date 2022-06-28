@@ -5,6 +5,7 @@ import Subscribe from '../views/Subscribe/index.vue';
 import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
+import pageConfig from '../page-config/index';
 
 Vue.use(VueRouter);
 
@@ -23,18 +24,10 @@ const routes = [
     redirect: to => {
       if (to.query.embed === 'video') {
         // 单视频嵌入
-        return {
-          name: 'LiveEmbedVideoRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientvideo'));
       } else {
         // 完全嵌入
-        return {
-          name: 'LiveEmbedFullRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientfull'));
       }
     }
   },
@@ -91,8 +84,7 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
     // 根据不同的页面，动态加载不同的配置
-    const pageConfig = await import(`../page-config/${to.meta.page}.js`);
-    window.$serverConfig = pageConfig.default;
+    window.$serverConfig = pageConfig[to.meta.page];
     window.$serverConfig._page = to.meta.page;
   }
 
