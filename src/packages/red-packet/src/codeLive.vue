@@ -151,32 +151,22 @@
         //   window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       checkNum() {
-        this.isCheckSuccess = true;
-        if (this.packetForm.num === '') {
+        if (this.packetForm.num === '' || this.packetForm.num > this.onlineAmount) {
           this.$message.warning('需大于0小于当前在线人数');
           this.isCheckSuccess = false;
           return;
         } else {
-          if (this.packetForm.num > this.onlineAmount) {
-            this.$message.warning('需大于0小于当前在线人数');
-            this.isCheckSuccess = false;
-            return;
-          }
+          this.isCheckSuccess = true;
         }
       },
       checkCode() {
-        this.isCheckCode = true;
-        if (this.packetForm.code === '') {
-          this.$message.warning('请输入口令');
+        let regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]{6,18}/;
+        if (this.packetForm.code === '' || !regex.test(this.packetForm.code)) {
+          this.$message.warning('请输入6~18位汉字、数字或字母');
           this.isCheckCode = false;
           return;
         } else {
-          let regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]{6,18}/;
-          if (!regex.test(this.packetForm.code)) {
-            this.$message.warning('请输入6~18位汉字、数字或字母');
-            this.isCheckCode = false;
-            return;
-          }
+          this.isCheckCode = true;
         }
       },
       changePacketType() {
@@ -193,7 +183,6 @@
     .el-form-item {
       margin-right: 0;
       width: 100%;
-      margin-bottom: 10px;
       .el-form-item__label {
         width: 76px;
         color: #1a1a1a;
@@ -242,7 +231,7 @@
     &_header {
       width: 100%;
       text-align: center;
-      padding-bottom: 20px;
+      padding-bottom: 24px;
       .header_tip {
         font-size: 16px;
         color: #000;
@@ -261,7 +250,7 @@
       }
     }
     &_btnsbox {
-      padding: 16px 0 14px 0;
+      padding: 12px 0 16px 0;
       text-align: center;
       .start-btn {
         width: 200px;
