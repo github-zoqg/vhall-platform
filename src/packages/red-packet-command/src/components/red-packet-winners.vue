@@ -131,7 +131,7 @@
     margin-top: 14px;
     width: 100%;
     height: 320px;
-    background: #ffffff;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 4px;
     overflow-y: auto;
     li {
@@ -141,13 +141,10 @@
       justify-content: space-between;
       padding: 0 16px 0 16px;
     }
-    .nodata {
-      margin-top: 100px;
-      color: #595959;
-      text-align: center;
-    }
 
     .winner-info {
+      display: flex;
+      align-items: center;
       img {
         width: 28px;
         height: 28px;
@@ -166,10 +163,10 @@
       line-height: 14px;
     }
     .vhsaas-red-packet__time {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 400;
       color: #666666;
-      line-height: 12px;
+      line-height: 14px;
     }
   }
 </style>

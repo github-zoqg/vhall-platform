@@ -123,10 +123,13 @@
   }
   .vhsaas-red-packet-close-btn {
     position: absolute;
-    bottom: -76x;
+    bottom: -76px;
     font-size: 54px;
     color: #ffffff;
     cursor: pointer;
     z-index: 28;
+  }
+  .van-overlay {
+    background-color: rgba(0, 0, 0, 0.85);
   }
 </style>

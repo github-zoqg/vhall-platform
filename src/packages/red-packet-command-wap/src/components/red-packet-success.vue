@@ -52,24 +52,18 @@
       copy() {
         this.$refs.shareLink.select(); // 选择对象
         document.execCommand('Copy'); // 执行浏览器复制命令
-        this.$message({
-          message: this.$t('nav.nav_1024'),
-          showClose: true,
-          type: 'success',
-          customClass: 'zdy-info-box'
-        });
+        this.$toast(this.$t('nav.nav_1024'));
       }
     }
   };
 </script>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
-    width: 342px;
-    height: 402px;
+    width: 730px;
+    height: 877px;
     background-size: 100% auto;
-    margin-top: 15vh;
     margin-left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, -10%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -81,60 +75,61 @@
     }
     > .title {
       font-weight: 600;
-      font-size: 14px;
-      line-height: 20px;
       color: #87000e;
-      margin-top: 68px;
+      margin-top: 150px;
+      font-style: normal;
+      font-size: 28px;
+      line-height: 39px;
     }
   }
   .vhsaas-gold-title {
     font-weight: 400;
-    font-size: 12px;
-    line-height: 17px;
+    font-size: 30px;
+    line-height: 42px;
     color: #ba5003;
-    margin-top: 38px;
+    margin-top: 70px;
     text-align: center;
   }
   .vhsaas-gold-unit {
     font-weight: 600;
-    font-size: 20px;
-    line-height: 28px;
-    width: 180px;
-    height: 56px;
+    font-size: 48px;
+    line-height: 67px;
+    width: 432px;
+    height: 134px;
     text-align: center;
     color: #ad0914;
-    margin-top: 8px;
+    margin-top: 22px;
     word-break: break-all;
   }
   .vhsaas-gold-null {
     font-weight: 600;
-    font-size: 18px;
-    line-height: 25px;
+    font-size: 48px;
+    line-height: 67px;
     text-align: center;
     color: #ba5003;
-    height: 86px;
-    margin-top: 40px;
+    height: 194px;
+    margin-top: 80px;
   }
 
   /* 红包信息面板 */
   .vhsaas-red-packet-content {
     z-index: 27;
     width: 100%;
-    margin-top: 90px;
+    margin-top: 200px;
     .btn {
       background: linear-gradient(180deg, #f9eb8a 0%, #f5b72f 100%);
       box-shadow: 0px 4px 4px rgba(201, 0, 32, 0.2), inset 0px 1px 0px #fff3ab,
         inset 0px -2px 0px #f38817;
       border-radius: 50px;
-      width: 160px;
-      height: 40px;
+      width: 320px;
+      height: 80px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 400;
-      font-size: 16px;
-      line-height: 22px;
+      font-size: 32px;
+      line-height: 45px;
       color: #61000d;
       cursor: pointer;
     }
@@ -145,28 +140,13 @@
       border: none;
     }
   }
-  .vhsaas-red-packet-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin: 36px auto 4px auto;
-    display: block;
-  }
-  .vhsaas-red-packet__name {
-    font-size: 14px;
-    font-weight: 400;
-    color: #fee4b3;
-    line-height: 20px;
-    margin-bottom: 12px;
-    text-align: center;
-  }
   .vhsaas-red-packet__btn {
     cursor: pointer;
-    font-size: 14px;
     font-weight: 400;
     color: #fee4b3;
-    line-height: 20px;
+    font-size: 28px;
+    line-height: 39px;
     text-align: center;
-    margin-top: 12px;
+    margin-top: 40px;
   }
 </style>

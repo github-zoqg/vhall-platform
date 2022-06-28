@@ -64,7 +64,18 @@
             this.queryParams.page++;
             const list = res.data?.list;
             if (list.length) {
-              this.winners = this.winners.concat(list);
+              this.winners = this.winners
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list)
+                .concat(list);
             }
             if (!list.length || this.winners.length >= res.data.count) {
               this.finished = true;
@@ -84,9 +95,8 @@
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
     background-size: 100% auto;
-    margin-top: 15vh;
     margin-left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, -10%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -98,76 +108,73 @@
     .title {
       text-align: center;
       font-weight: 600;
-      font-size: 18px;
-      line-height: 34px;
+      font-size: 44px;
+      line-height: 62px;
       color: #fee4b3;
     }
   }
 
   .vhsaas-dialog__other {
     background: #ee2121;
-    border-radius: 16px;
+    border-radius: 24px;
     position: relative;
-    width: 300px;
-    max-width: 300px;
-    height: 400px;
+    width: 640px;
+    max-width: 640px;
+    height: 900px;
     .vhsaas-interact-content {
-      padding: 20px 12px 12px;
+      padding: 64px 24px 24px 24px;
     }
   }
   .vhsaas-other-return {
-    font-size: 11px;
+    font-size: 32px;
     color: #ffffff;
     display: inline-block;
-    top: 20px;
-    left: 22px;
-    line-height: 11px;
+    top: 34px;
+    left: 36px;
     cursor: pointer;
     position: absolute;
   }
   .vhsaas-other__item {
-    margin-top: 14px;
+    margin-top: 30px;
     width: 100%;
-    height: 320px;
-    background: #ffffff;
-    border-radius: 4px;
+    height: 714px;
+    border-radius: 12px;
     overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.9);
     li {
-      height: 44px;
+      height: 100px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px 0 16px;
-    }
-    .nodata {
-      margin-top: 100px;
-      color: #595959;
-      text-align: center;
+      padding: 0 24px 0 24px;
     }
 
     .winner-info {
+      display: flex;
+      align-items: center;
+
       img {
-        width: 28px;
-        height: 28px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         display: inline-block;
         vertical-align: middle;
-        margin-right: 8px;
+        margin-right: 24px;
         margin-left: 0;
         border: 0;
       }
     }
     .vhsaas-red-packet__item__name {
-      font-size: 14px;
       font-weight: 400;
       color: #1a1a1a;
-      line-height: 14px;
+      font-size: 28px;
+      line-height: 28px;
     }
     .vhsaas-red-packet__time {
-      font-size: 12px;
+      font-size: 28px;
+      line-height: 28px;
       font-weight: 400;
       color: #666666;
-      line-height: 12px;
     }
   }
 </style>

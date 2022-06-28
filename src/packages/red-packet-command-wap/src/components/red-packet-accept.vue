@@ -99,12 +99,11 @@
 </script>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
-    width: 453px;
-    height: 407px;
+    width: 804px;
+    height: 885px;
     background-size: 100% auto;
-    margin-top: 15vh;
     margin-left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, -10%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -116,8 +115,8 @@
     }
   }
   .vhsaas-close-open {
-    width: 72px;
-    height: 80px;
+    width: 160px;
+    height: 172px;
     cursor: pointer;
     &.scale {
       -webkit-animation: scaleDraw 1.3s ease-in-out infinite;
@@ -171,23 +170,23 @@
   .vhsaas-red-packet-body {
     position: absolute;
     z-index: 22;
-    top: 130px;
+    top: 350px;
     text-align: center;
     width: 100%;
     left: 0;
     .vhsaas-red-packet-sender {
-      font-size: 14px;
       font-weight: 400;
       color: #fee4b3;
-      line-height: 20px;
-      margin-top: 4px;
+      font-size: 28px;
+      line-height: 39px;
+      margin-top: 16px;
     }
     .vhsaas-red-packet-avatar {
       display: block;
-      width: 24px;
-      height: 24px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      margin: 78px auto 0 auto;
+      margin: 114px auto 0 auto;
     }
   }
 </style>
