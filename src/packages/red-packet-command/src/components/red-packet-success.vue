@@ -1,10 +1,10 @@
 <template>
   <div class="vhsaas-interact-dialog open">
-    <div class="title">口令红包</div>
+    <div class="title">{{ $t('interact_tools.interact_tools_1080') }}</div>
     <div class="vhsaas-command">
       <!-- 抢到金额 -->
       <div v-if="!!red_code">
-        <p class="vhsaas-gold-title">支付宝搜“红包”，输入口令</p>
+        <p class="vhsaas-gold-title">{{ $t('interact_tools.interact_tools_1081') }}</p>
         <p class="vhsaas-gold-unit">{{ red_code }}</p>
       </div>
       <!-- 未抢到金额  -->
@@ -17,8 +17,12 @@
     <!-- 第四层 内容层-->
     <div class="vhsaas-red-packet-content">
       <input type="text" ref="shareLink" class="copyText" v-model="red_code" />
-      <div class="btn btn-copy" v-if="!!red_code" @click="copy">一键复制口令</div>
-      <p class="vhsaas-red-packet__btn" @click="navToList">查看领取名单</p>
+      <div class="btn btn-copy" v-if="!!red_code" @click="copy">
+        {{ $t('interact_tools.interact_tools_1082') }}
+      </div>
+      <p class="vhsaas-red-packet__btn" @click="navToList">
+        {{ $t('interact_tools.interact_tools_1083') }}
+      </p>
     </div>
     <slot />
   </div>
@@ -42,7 +46,7 @@
     },
     data() {
       return {
-        copyText: '123'
+        copyText: ''
       };
     },
     methods: {
@@ -145,21 +149,6 @@
       border: none;
     }
   }
-  .vhsaas-red-packet-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin: 36px auto 4px auto;
-    display: block;
-  }
-  .vhsaas-red-packet__name {
-    font-size: 14px;
-    font-weight: 400;
-    color: #fee4b3;
-    line-height: 20px;
-    margin-bottom: 12px;
-    text-align: center;
-  }
   .vhsaas-red-packet__btn {
     cursor: pointer;
     font-size: 14px;
@@ -168,21 +157,5 @@
     line-height: 20px;
     text-align: center;
     margin-top: 12px;
-  }
-  /* 看看大家的手气 */
-  .vhsaas-other-unit {
-    font-size: 34px;
-    font-weight: bold;
-    color: #fee4b3;
-    line-height: 34px;
-    text-align: center;
-    margin-bottom: 8px;
-    margin-top: -8px;
-    i {
-      font-size: 20px;
-      font-weight: 400;
-      color: #fee4b3;
-      line-height: 20px;
-    }
   }
 </style>

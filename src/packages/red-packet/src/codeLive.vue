@@ -54,7 +54,7 @@
         <el-button
           type="primary"
           round
-          :disabled="!packetForm.code"
+          :disabled="!isCheckCode"
           class="start-btn"
           @click="redpacketSend('packetForms')"
         >
@@ -171,7 +171,7 @@
           this.isCheckCode = false;
           return;
         } else {
-          let regex = /^[a-z0-9A-Z\u4E00-\u9FA5a]{6,18}/;
+          let regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]{6,18}/;
           if (!regex.test(this.packetForm.code)) {
             this.$message.warning('请输入6~18位汉字、数字或字母');
             this.isCheckCode = false;
@@ -221,7 +221,7 @@
     }
     .el-radio__input {
       &.is-checked + .el-radio__label {
-        color: #fb3a32;
+        color: #222;
       }
     }
     .form-num {

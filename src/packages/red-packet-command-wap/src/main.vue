@@ -5,7 +5,7 @@
     <div class="vmp-red-packet-wap__container">
       <components
         :is="componentsView"
-        :amount="redPacketServerState.amount * 1"
+        :red_code="redPacketServerState.red_code"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
         @needLogin="handleGoLogin"
@@ -18,9 +18,9 @@
   </van-popup>
 </template>
 <script>
-  import { useRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
+  import { useCodeRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
+  const PWD_RED_ENVELOPE_OK = 'pwd_red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketCommandWap',
     components: {
@@ -47,7 +47,7 @@
       }
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer({
+      this.redPacketServer = useCodeRedPacketServer({
         mode: 'watch'
       });
       this.msgServer = useMsgServer();
@@ -59,7 +59,7 @@
       // 开启红包弹窗
       open(uuid) {
         if (!uuid) uuid = this.redPacketServer.getLastUUid();
-        this.redPacketServer.getRedPacketInfo(uuid).then(res => {
+        this.redPacketServer.getCodeRedPacketInfo(uuid).then(res => {
           const data = res.data;
           if (data.status == 1 || data.red_packet.number == data.red_packet.get_user_count) {
             // 本人已经抢到, 或者被强光
@@ -71,9 +71,9 @@
         });
       },
       initEvent() {
-        this.redPacketServer.$on(RED_ENVELOPE_OK, data => {
+        this.redPacketServer.$on(PWD_RED_ENVELOPE_OK, data => {
           if (this.isEmbed) {
-            console.log('嵌入页不支持红包');
+            console.log('嵌入页不支持口令红包');
             return;
           }
           useChatServer().addChatToList({
@@ -123,10 +123,13 @@
   }
   .vhsaas-red-packet-close-btn {
     position: absolute;
-    bottom: -18px;
-    font-size: 60px;
+    bottom: -76px;
+    font-size: 54px;
     color: #ffffff;
     cursor: pointer;
     z-index: 28;
+  }
+  .van-overlay {
+    background-color: rgba(0, 0, 0, 0.85);
   }
 </style>
