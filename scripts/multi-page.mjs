@@ -6,6 +6,8 @@
  *
  * nvm run 16.15.1 scripts/multi-page.mjs saas-watch 'layerRoot,layerSubscribeRoot,embedVideoLayerRoot'
  *
+ * nvm run 16.15.1 scripts/multi-page.mjs saas-wap 'layerRoot,subcribeRoot,embedVideoLayerRoot'
+ *
  */
 import url from 'url';
 import path from 'path';
@@ -26,6 +28,7 @@ async function run(project, roots) {
   fs.copyFileSync(oriConfigPath, copyConfigPath);
   // 读取文件的配置信息
   const { serverConfig } = await import(copyConfigPath);
+  console.log('serverConfig:', serverConfig);
   // listify
   roots = roots.push ? roots : roots.split(',');
   for (const root of roots) {
