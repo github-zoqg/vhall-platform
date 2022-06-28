@@ -201,14 +201,14 @@
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
         let baseHeight = playerHeight + 71 + 94;
-        let calssname = '.tab-content';
+        let classname = '.tab-content';
         if (this.embedObj.embed) {
           baseHeight = playerHeight;
-          calssname = '.tab-content-embed';
+          classname = '.tab-content-embed';
         }
         let popHeight =
           document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-        document.querySelector(calssname).style.height = popHeight;
+        document.querySelector(classname).style.height = popHeight;
       },
       computedWidth() {
         let childNodes = document.querySelector('.vmp-tab-menu-scroll-container').childNodes;
