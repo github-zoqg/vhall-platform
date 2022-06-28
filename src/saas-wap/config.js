@@ -37,10 +37,7 @@ export const serverConfig = {
   //   // comWapPlayer 编写互动功能，暂时注释
   // },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: function () {
-      return /embed/.test(location.pathname) ? 'tab-content-embed' : 'tab-content';
-    },
+    component: 'VmpWapBodyCenter',
     children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   /*** 布局定义end */

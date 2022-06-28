@@ -47,6 +47,9 @@ import VmpWapQrCode from '@/packages/official-module/official-wap';
 
 // 用来判断显示播放器还是流
 import VmpWapBody from '@/packages/wap-body';
+
+import VmpWapBodyCenter from '@/packages/wap-body-center';
+
 // 开屏页
 import VmpScreenPostWap from '@/packages/screen-post-wap';
 // 个人中心
@@ -115,6 +118,7 @@ Vue.use(VmpCustomMenuWap);
 Vue.use(VmpSignWap);
 Vue.use(VmpMemberListWap);
 Vue.use(VmpWapBody);
+Vue.use(VmpWapBodyCenter);
 Vue.use(VmpWapRewardEffect);
 Vue.use(VmpWapRewardEffectFullScreen);
 Vue.use(VmpScreenPostWap);
