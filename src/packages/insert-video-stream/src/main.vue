@@ -16,7 +16,7 @@
   >
     <div class="vmp-insert-stream-mask">
       <p>
-        <span class="vmp-insert-stream-mask__label">视图</span>
+        <span v-show="!isWatch" class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
           content="切换"
           placement="top"
