@@ -48,7 +48,7 @@
         winners: [],
         queryParams: {
           page: 1,
-          size: 10 // 分页为50
+          size: 10 // 分页为10
         },
         loading: false,
         finished: false // 滚动加载锁定(分页加载)

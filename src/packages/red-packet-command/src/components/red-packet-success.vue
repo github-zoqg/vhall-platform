@@ -42,7 +42,7 @@
     },
     data() {
       return {
-        copyText: '123'
+        copyText: ''
       };
     },
     methods: {
@@ -168,21 +168,5 @@
     line-height: 20px;
     text-align: center;
     margin-top: 12px;
-  }
-  /* 看看大家的手气 */
-  .vhsaas-other-unit {
-    font-size: 34px;
-    font-weight: bold;
-    color: #fee4b3;
-    line-height: 34px;
-    text-align: center;
-    margin-bottom: 8px;
-    margin-top: -8px;
-    i {
-      font-size: 20px;
-      font-weight: 400;
-      color: #fee4b3;
-      line-height: 20px;
-    }
   }
 </style>

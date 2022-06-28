@@ -3,13 +3,12 @@
   <div class="vhsaas-interact-dialog close">
     <div class="vhsaas-red-packet-body">
       <!-- 开 - 小金币按钮 -->
-      <div @click="openRedPacket">
-        <img
-          :class="['vhsaas-close-open', opened ? 'open' : 'scale']"
-          src="../images/close-open@2x.png"
-          alt=""
-        />
-      </div>
+      <img
+        :class="['vhsaas-close-open', opened ? 'open' : 'scale']"
+        src="../images/close-open@2x.png"
+        alt=""
+        @click="openRedPacket"
+      />
       <img
         v-if="redPacketInfo && redPacketInfo.avatar"
         :src="redPacketInfo.avatar || ''"
@@ -59,7 +58,7 @@
         }
         const available = this.redPacketServer.state.available;
         const getStatus = () => {
-          this.redPacketServer.getRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
+          this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
             const st = setTimeout(() => {
               clearTimeout(st);
@@ -70,7 +69,7 @@
         if (available) {
           this.opening = true; // 打开中
           this.redPacketServer
-            .openRedPacket()
+            .openCodeRedPacket()
             .then(res => {
               if (res.code === 200) {
                 this.opened = true;
@@ -100,10 +99,10 @@
 </script>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
-    width: 920px;
-    height: 880px;
+    width: 453px;
+    height: 407px;
     background-size: 100% auto;
-    // margin-top: 15vh;
+    margin-top: 15vh;
     margin-left: 50%;
     transform: translate(-50%, 0);
     display: flex;
@@ -111,33 +110,32 @@
     align-items: center;
     position: relative;
     z-index: 21;
-    overflow: visible;
     &.close {
       background: url(../images/close-bg@2x.png);
       background-size: 100% 100%;
     }
   }
   .vhsaas-close-open {
-    width: 128px;
-    height: 128px;
+    width: 72px;
+    height: 80px;
     cursor: pointer;
     &.scale {
-      -webkit-animation: scaleDraw 1s ease-in-out infinite;
-      -ms-animation: scaleDraw 1s ease-in-out infinite;
-      animation: scaleDraw 1s ease-in-out infinite;
+      -webkit-animation: scaleDraw 1.3s ease-in-out infinite;
+      -ms-animation: scaleDraw 1.3s ease-in-out infinite;
+      animation: scaleDraw 1.3s ease-in-out infinite;
     }
     @keyframes scaleDraw {
       0% {
         transform: scale(1); /*开始为原始大小*/
       }
       25% {
-        transform: scale(0.75); /*缩小为0.75倍*/
+        transform: scale(0.7); /*缩小为0.75倍*/
       }
       50% {
         transform: scale(1);
       }
       75% {
-        transform: scale(0.75);
+        transform: scale(0.7);
       }
     }
     &.open {
@@ -173,35 +171,12 @@
   .vhsaas-red-packet-body {
     position: absolute;
     z-index: 22;
-    top: 240px;
+    top: 130px;
     text-align: center;
     width: 100%;
     left: 0;
-    .vhsaas-red-packet-desc {
-      &__wrap {
-        width: 440px;
-        height: 120px; // 最多2行的高度
-        margin: 44px auto 0;
-        position: relative;
-        text-align: center;
-      }
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* autoprefixer: ignore next */
-      -webkit-box-orient: vertical;
-      width: 100%;
-      font-size: 44px;
-      font-weight: 500;
-      color: #fee4b3;
-      line-height: 60px;
-    }
     .vhsaas-red-packet-sender {
-      font-size: 28px;
+      font-size: 14px;
       font-weight: 400;
       color: #fee4b3;
       line-height: 20px;
@@ -209,10 +184,10 @@
     }
     .vhsaas-red-packet-avatar {
       display: block;
-      width: 48px;
-      height: 48px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
-      margin: 44px auto 20px;
+      margin: 78px auto 0 auto;
     }
   }
 </style>
