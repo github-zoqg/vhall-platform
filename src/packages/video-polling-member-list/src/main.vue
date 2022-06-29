@@ -189,6 +189,9 @@
               ...user,
               is_speak: 1
             });
+            this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+              this.memberServer.state.onlineUsers
+            );
           }
         };
         const handleVrtcDisconnectSuccess = msg => {
@@ -199,6 +202,9 @@
               ...user,
               is_speak: 0
             });
+            this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+              this.memberServer.state.onlineUsers
+            );
           }
         };
         this._handleRoomMsg = msg => {
