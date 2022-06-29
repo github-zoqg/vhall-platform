@@ -170,7 +170,7 @@
         }
       },
       checkCode() {
-        let regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]+$/g;
+        const regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]+$/g;
         if (this.packetForm.code === '' || !regex.test(this.packetForm.code)) {
           this.$message.warning('请输入6~18位汉字、数字或字母');
           this.isCheckCode = true;
