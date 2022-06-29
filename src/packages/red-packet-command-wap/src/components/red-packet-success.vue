@@ -16,7 +16,7 @@
     </div>
     <!-- 第四层 内容层-->
     <div class="vhsaas-red-packet-content">
-      <input type="text" ref="shareLink" class="copyText" v-model="red_code" />
+      <input type="text" ref="shareLink" class="copyText" readonly v-model="red_code" />
       <div class="btn btn-copy" v-if="!!red_code" @click="copy">
         {{ $t('interact_tools.interact_tools_1082') }}
       </div>
