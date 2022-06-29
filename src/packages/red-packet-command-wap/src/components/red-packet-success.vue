@@ -102,7 +102,7 @@
     height: 134px;
     text-align: center;
     color: #ad0914;
-    margin-top: 22px;
+    margin: 22px auto 0;
     word-break: break-all;
   }
   .vhsaas-gold-null {
@@ -119,7 +119,7 @@
   .vhsaas-red-packet-content {
     z-index: 27;
     width: 100%;
-    margin-top: 200px;
+    margin-top: 180px;
     .btn {
       background: linear-gradient(180deg, #f9eb8a 0%, #f5b72f 100%);
       box-shadow: 0px 4px 4px rgba(201, 0, 32, 0.2), inset 0px 1px 0px #fff3ab,

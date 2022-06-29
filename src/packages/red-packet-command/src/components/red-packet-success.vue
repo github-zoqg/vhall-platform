@@ -107,7 +107,7 @@
     height: 56px;
     text-align: center;
     color: #ad0914;
-    margin-top: 8px;
+    margin: 8px auto 0;
     word-break: break-all;
   }
   .vhsaas-gold-null {
