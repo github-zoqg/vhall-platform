@@ -61,7 +61,12 @@
         if (!uuid) uuid = this.redPacketServer.getLastUUid();
         this.redPacketServer.getCodeRedPacketInfo(uuid).then(res => {
           const data = res.data;
-          if (data.status == 1 || data.red_packet.number == data.red_packet.get_user_count) {
+          //join_type  口令红包数量：1-不限，2-固定数量
+          if (
+            data.status == 1 ||
+            (data.red_packet.join_type == 2 &&
+              data.red_packet.number == data.red_packet.get_user_count)
+          ) {
             // 本人已经抢到, 或者被强光
             this.componentsView = 'RedPacketSuccess';
           } else {
