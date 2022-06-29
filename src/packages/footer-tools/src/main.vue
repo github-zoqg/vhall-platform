@@ -84,6 +84,7 @@
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
       </li>
+      <!-- TODO:支付牌照问题 -->
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
@@ -99,7 +100,8 @@
           />
         </div>
       </li>
-      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
+      <!-- TODO:支付牌照问题 -->
+      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed && false">
         <!-- 打赏 -->
         <div class="vh-icon-box">
           <div class="vmp-reward-icon">
