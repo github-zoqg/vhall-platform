@@ -11,8 +11,10 @@
         <div class="vh-chose-active-item__cover">
           <img class="cover_pic" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
-            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-            <i>{{ item.pv }}</i>
+            <div class="vh-chose-active-item__cover-hots__content">
+              <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+              <i>{{ item.pv }}</i>
+            </div>
           </div>
         </div>
         <div class="vh-chose-active-item__titleInfo">
@@ -110,7 +112,7 @@
     flex-direction: column;
     overflow: hidden;
     width: 300px;
-    height: 266px;
+    height: 306px;
     margin: 20px 14px;
     border-radius: 6px;
     background: #f7f7f7;
@@ -147,13 +149,32 @@
       }
       &-hots {
         position: absolute;
-        left: 12px;
+        /* left: 12px;
         bottom: 10px;
         font-size: 12px;
         font-weight: 400;
         color: #ffffff;
         line-height: 20px;
+        z-index: 3; */
+
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+        border-radius: 0px 0px 16px 16px;
+        height: 60px;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        opacity: 0.6;
         z-index: 3;
+        &__content {
+          position: absolute;
+          left: 18px;
+          bottom: 15px;
+          line-height: 20px;
+          font-size: 12px;
+          font-weight: 400;
+          color: #ffffff;
+          z-index: 4;
+        }
         .vh-saas-line-heat {
           font-size: 12px;
           margin-right: 16px;
@@ -186,11 +207,12 @@
       }
     }
     &__titleInfo {
-      height: 55px;
+      height: 95px;
     }
     &__title {
       width: 100%;
-      height: 36px;
+      min-height: 36px;
+      max-height: 76px;
       font-size: 28px;
       font-weight: 400;
       color: #1a1a1a;
@@ -224,6 +246,14 @@
         margin-top: 4px;
         border-radius: 0px;
       }
+    }
+    .ellipsis {
+      display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
+      /* autoprefixer: ignore next */
+      -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+      -webkit-line-clamp: 2; /** 显示的行数 **/
+      overflow: hidden; /** 隐藏超出的内容 **/
+      text-overflow: ellipsis;
     }
   }
 </style>

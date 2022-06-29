@@ -56,7 +56,7 @@
           >
             {{ liveTag(item) }}
             <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
-              | {{ $t('common.common_1023') }}
+              | 无延迟
             </span>
           </span>
           <!-- <span class="item-type">付费</span> -->
@@ -103,23 +103,23 @@
         },
         stateArr: [
           {
-            value: this.$t('common.common_1018'),
+            value: '直播',
             bgcolor: '#fb3a32'
           },
           {
-            value: this.$t('common.common_1019'),
+            value: '预告',
             bgcolor: '#5ea6ec'
           },
           {
-            value: this.$t('common.common_1020'),
+            value: '结束',
             bgcolor: '#999999'
           },
           {
-            value: this.$t('common.common_1024'),
+            value: '点播',
             bgcolor: '#ff8834'
           },
           {
-            value: this.$t('common.common_1021'),
+            value: '回放',
             bgcolor: '#2ab804'
           }
         ]
@@ -138,23 +138,8 @@
          * webinar_state  1直播 2预约 3结束 4点播 5回放
          * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
          */
-        const liveTypeStr = [
-          '',
-          this.$t('common.common_1018'),
-          this.$t('common.common_1019'),
-          this.$t('common.common_1020'),
-          this.$t('common.common_1024'),
-          this.$t('common.common_1021')
-        ];
-        const liveStatusStr = [
-          '',
-          this.$t('common.common_1026'),
-          this.$t('common.common_1027'),
-          this.$t('common.common_1028'),
-          '',
-          '',
-          this.$t('common.common_1029')
-        ];
+        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
+        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播', '', '', '分组直播'];
         let str = liveTypeStr[val.webinar_state];
         if (val.webinar_state != 4 && val.webinar_type != 5) {
           str += ` | ${liveStatusStr[val.webinar_type]}`;
@@ -219,16 +204,17 @@
             imgUrl: info.cover
           }
         );
-        const shareSuccessStr = this.$t('webinar.webinar_1038');
+        const shareSuccessStr = '分享成功';
         wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       handleOpenHide() {
         this.open_hide = !this.open_hide;
       },
       toWatch(id) {
-        this.$router.push({
-          path: `/lives/watch/${id}`
-        });
+        // this.$router.push({
+        //   path: `/lives/watch/${id}`
+        // });
+        window.location.href = `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}`;
       }
     }
   };
