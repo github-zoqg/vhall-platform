@@ -15,13 +15,15 @@
       </div>
       <el-form class="packet-form-wrap" :model="packetForm" inline>
         <el-form-item label="红包口令">
+          <!--  onkeyup="this.value=this.value.replace(/[^a-z0-9_A-Z\u4E00-\u9FA5a]/g,'')" -->
           <el-input
             class="form-input"
+            :class="isCheckCode ? 'el-form-item_error' : ''"
             maxlength="18"
             @blur="checkCode"
             placeholder="6-18位汉字、数字，不支持符号"
             show-word-limit
-            v-model="packetForm.code"
+            v-model.trim="packetForm.code"
           ></el-input>
           <br />
           <p class="envelope-tips">请确保与您在【支付宝-口令红包】中发出的口令一致</p>
@@ -42,11 +44,12 @@
           <el-input
             type="number"
             class="form-num"
+            :class="isCheckSuccess ? 'el-form-item_error' : ''"
             @blur="checkNum"
             placeholder="输入人数"
             :disabled="packetForm.packetType == 1"
             show-word-limit
-            v-model="packetForm.num"
+            v-model.trim="packetForm.num"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -54,7 +57,7 @@
         <el-button
           type="primary"
           round
-          :disabled="!isCheckCode"
+          :disabled="packetForm.code.length < 6"
           class="start-btn"
           @click="redpacketSend('packetForms')"
         >
@@ -102,22 +105,24 @@
       async open() {
         this.sendDialogVisible = true;
         this.restForm();
+        this.redPacketServer.getRedpacketTotal();
       },
       // 发起红包页面表单参数重置
       restForm() {
+        this.isCheckCode = false;
+        this.isCheckSuccess = false;
         this.packetForm = {
           code: '',
           packetType: 1,
           num: ''
         };
-        this.redPacketServer.getRedpacketTotal();
       },
       redpacketSend() {
-        if (!this.isCheckCode) {
+        if (this.isCheckCode) {
           this.$message.warning('请输入6~18位汉字、数字或字母');
           return;
         }
-        if (this.packetForm.packetType == 2 && !this.isCheckSuccess) {
+        if (this.packetForm.packetType == 2 && this.isCheckSuccess) {
           this.$message.warning('需大于0小于当前在线人数');
           return;
         }
@@ -133,6 +138,7 @@
           .then(res => {
             if (res.code === 200) {
               this.sendDialogVisible = false;
+              this.restForm();
               this.reportRedPacket();
               this.$message.success('口令红包发送成功');
             } else {
@@ -151,22 +157,26 @@
         //   window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       checkNum() {
-        if (this.packetForm.num === '' || this.packetForm.num > this.onlineAmount) {
+        if (
+          this.packetForm.num == '' ||
+          this.packetForm.num == 0 ||
+          this.packetForm.num > this.onlineAmount
+        ) {
           this.$message.warning('需大于0小于当前在线人数');
-          this.isCheckSuccess = false;
+          this.isCheckSuccess = true;
           return;
         } else {
-          this.isCheckSuccess = true;
+          this.isCheckSuccess = false;
         }
       },
       checkCode() {
-        let regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]{6,18}/;
+        const regex = /^[a-z0-9_A-Z\u4E00-\u9FA5a]+$/g;
         if (this.packetForm.code === '' || !regex.test(this.packetForm.code)) {
           this.$message.warning('请输入6~18位汉字、数字或字母');
-          this.isCheckCode = false;
+          this.isCheckCode = true;
           return;
         } else {
-          this.isCheckCode = true;
+          this.isCheckCode = false;
         }
       },
       changePacketType() {
@@ -195,6 +205,11 @@
             position: absolute;
             left: 100%;
           }
+          &.el-form-item_error {
+            .el-input__inner {
+              border-color: #fb3a32;
+            }
+          }
         }
       }
     }
@@ -219,6 +234,11 @@
         .el-input__inner {
           height: 36px;
           line-height: 36px;
+        }
+      }
+      &.el-form-item_error {
+        .el-input__inner {
+          border-color: #fb3a32;
         }
       }
     }
