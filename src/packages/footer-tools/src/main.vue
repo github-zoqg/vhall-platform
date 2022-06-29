@@ -101,15 +101,15 @@
         </div>
       </li>
       <!-- TODO:支付牌照问题 -->
-      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed && false">
-        <!-- 打赏 -->
+      <!-- 打赏 -->
+      <!-- <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <div class="vh-icon-box">
           <div class="vmp-reward-icon">
             <img src="./img/reward-icon.png" alt="" @click="onClickReward" class="show_img" />
           </div>
           <reward ref="reward" />
         </div>
-      </li>
+      </li> -->
       <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
         <!-- 点赞 -->
         <praise></praise>
@@ -158,7 +158,7 @@
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
-  import reward from './component/reward/index.vue';
+  // import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
@@ -170,7 +170,7 @@
     name: 'VmpFooterTools',
     components: {
       handup,
-      reward,
+      // reward,
       vhGifts,
       notice,
       praise,
