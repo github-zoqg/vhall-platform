@@ -38,11 +38,12 @@
                 </div>
                 <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
-                  {{
+                  <!-- TODO:支付牌照问题 -->
+                  <!-- {{
                     secItem.price == 0
                       ? $t('interact_tools.interact_tools_1058')
                       : `￥${secItem.price}`
-                  }}
+                  }} -->
                 </p>
               </div>
               <div v-show="secItem.active" @click="giveGiftSubmit" class="btn">
