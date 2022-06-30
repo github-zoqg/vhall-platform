@@ -123,6 +123,9 @@
       background-size: 100% 100%;
     }
     &.en {
+      .vhsaas-gold-title {
+        margin-top: 60px;
+      }
       .vhsaas-red-packet-content {
         margin-top: 150px;
         .btn {
