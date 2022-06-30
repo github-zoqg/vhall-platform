@@ -5,6 +5,7 @@
       <components
         :is="componentsView"
         :red_code="redPacketServerState.red_code"
+        :is_luck="redPacketServerState.is_luck"
         :red-packet-info="redPacketServerState.info"
         @navTo="navTo"
         @needLogin="handleGoLogin"
@@ -43,7 +44,7 @@
         zIndexServerState,
         redPacketServerState,
         dialogVisible: false, // 组件显示
-        componentsView: 'RedPacketAccept'
+        componentsView: ''
       };
     },
     computed: {
@@ -67,14 +68,8 @@
         if (!uuid) uuid = this.redPacketServer.getLastUUid();
         this.redPacketServer.getCodeRedPacketInfo(uuid).then(res => {
           const data = res.data;
-          //join_type  口令红包数量：1-不限，2-固定数量
-          //status  抢过了且抢到了
-          if (
-            data.status == 1 ||
-            (data.red_packet.join_type == 2 &&
-              data.red_packet.number == data.red_packet.get_user_count)
-          ) {
-            // 本人已经抢到, 或者被强光
+          //is_luck  0：打开没抢到     1:抢到了     2：没打开红包
+          if (data.is_luck != 2) {
             this.componentsView = 'RedPacketSuccess';
           } else {
             this.componentsView = 'RedPacketAccept';
