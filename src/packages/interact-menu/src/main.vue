@@ -45,9 +45,11 @@
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
+        <!-- TODO:支付牌照问题 -->
         <div
           class="vmp-interact-menu-list-item"
-          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving || true }"
+          style="pointer-events: auto; cursor: default"
           @click="openRedPacket"
           v-if="configList['ui.show_redpacket']"
         >
@@ -172,10 +174,12 @@
         if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
-      // 打开红包弹窗
+      // TODO: 支付拍照问题（暂时不能打开），打开红包弹窗
       openRedPacket() {
+        console.log('点击红包');
         if (!this.isLiving) return false;
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
+        this.$message.warning('合规自查中，该功能暂不支持使用');
+        // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       },
       handleQAPopup() {
         if (!this.isLiving) return false;
