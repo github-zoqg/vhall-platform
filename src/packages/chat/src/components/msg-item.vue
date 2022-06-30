@@ -202,7 +202,7 @@
 
         <!-- 抽奖、问答、签到、问卷、红包 -->
         <div
-          v-if="source.interactStatus && !(source.type == 'red_envelope_ok' && isEmbed)"
+          v-if="source.interactStatus && !(source.type == 'pwd_red_envelope_ok' && isEmbed)"
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">
@@ -220,7 +220,7 @@
               {{ source.roleName | roleFilter }}
             </span>
             <img
-              v-if="source.type == 'red_envelope_ok'"
+              v-if="source.type == 'pwd_red_envelope_ok'"
               class="interact-content__redpackage-img"
               src="../img/red-package-1.png"
               alt=""
