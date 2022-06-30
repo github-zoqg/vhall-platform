@@ -128,9 +128,6 @@
       }
       .vhsaas-red-packet-content {
         margin-top: 150px;
-        .btn {
-          width: 360px;
-        }
       }
     }
     > .title {
