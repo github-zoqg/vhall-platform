@@ -44,6 +44,9 @@
         }
       };
     },
+    created() {
+      this.getRedPacketWinners();
+    },
     methods: {
       // 获取红包列表
       getRedPacketWinners() {
