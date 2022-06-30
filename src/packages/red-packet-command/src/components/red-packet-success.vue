@@ -156,6 +156,9 @@
       line-height: 22px;
       color: #61000d;
       cursor: pointer;
+      &:hover {
+        background: linear-gradient(180deg, #faee9f 0%, #f8c85d 100%);
+      }
     }
     .copyText {
       width: 1px;

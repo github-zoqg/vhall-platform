@@ -4,12 +4,7 @@
       <i class="vhsaas-other-return vh-iconfont vh-line-arrow-left" @click="back" />
       <div class="vhsaas-interact-content">
         <div class="title">{{ $t('interact_tools.interact_tools_1085') }}</div>
-        <ul
-          ref="packetList"
-          class="vhsaas-other__item"
-          v-infinite-scroll="getRedPacketWinners"
-          :infinite-scroll-disabled="finished || loading"
-        >
+        <ul ref="packetList" class="vhsaas-other__item">
           <li v-for="(item, index) in winners" :key="index">
             <div class="winner-info">
               <img v-if="item.avatar" :src="item.avatar" alt="" />
@@ -46,32 +41,22 @@
         queryParams: {
           page: 1,
           size: 10 // 翻页为10
-        },
-        loading: false,
-        finished: false // 滚动加载锁定(分页加载)
+        }
       };
     },
     methods: {
       // 获取红包列表
       getRedPacketWinners() {
-        this.loading = true;
         this.redPacketServer
           .getCodeRedPacketWinners({
             pos: this.queryParams.page, // pos 参数不是偏移量,就是页码
             limit: this.queryParams.size
           })
           .then(res => {
-            this.queryParams.page++;
             const list = res.data?.list;
             if (list.length) {
-              this.winners = this.winners.concat(list);
+              this.winners = [].concat(list);
             }
-            if (!list.length || this.winners.length >= res.data.count) {
-              this.finished = true;
-            }
-          })
-          .finally(() => {
-            this.loading = false;
           });
       },
       back() {
@@ -80,7 +65,6 @@
     }
   };
 </script>
-<style lang="less" scoped></style>
 <style lang="less" scoped>
   .vhsaas-interact-dialog {
     background-size: 100% auto;
@@ -100,6 +84,12 @@
       font-size: 44px;
       line-height: 62px;
       color: #fee4b3;
+    }
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #ccc;
     }
   }
 
