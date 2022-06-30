@@ -3,7 +3,7 @@
     <div class="title">{{ $t('interact_tools.interact_tools_1080') }}</div>
     <div class="vhsaas-command">
       <!-- 抢到金额 -->
-      <div v-if="!!red_code">
+      <div v-if="is_luck == 1">
         <p class="vhsaas-gold-title">{{ $t('interact_tools.interact_tools_1081') }}</p>
         <p class="vhsaas-gold-unit">{{ red_code }}</p>
       </div>
@@ -41,6 +41,13 @@
         type: String,
         default() {
           return '';
+        }
+      },
+      //is_luck  0：打开没抢到     1:抢到了     2：没打开红包
+      is_luck: {
+        type: Number,
+        default() {
+          return 0;
         }
       }
     },

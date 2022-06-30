@@ -69,30 +69,26 @@
             }, 1000);
           });
         };
-        if (available && !this.opened) {
-          this.opening = true; // 打开中
-          this.redPacketServer
-            .openCodeRedPacket()
-            .then(res => {
-              if (res.code === 200) {
-                this.opened = true;
-                const st = setTimeout(() => {
-                  clearTimeout(st);
-                  this.$emit('navTo', 'RedPacketSuccess');
-                }, 1000);
-              } else {
-                getStatus();
-              }
-            })
-            .catch(() => {
+        this.opening = true; // 打开中
+        this.redPacketServer
+          .openCodeRedPacket()
+          .then(res => {
+            if (res.code === 200) {
+              this.opened = true;
+              const st = setTimeout(() => {
+                clearTimeout(st);
+                this.$emit('navTo', 'RedPacketSuccess');
+              }, 1000);
+            } else {
               getStatus();
-            })
-            .finally(() => {
-              this.opening = false;
-            });
-        } else {
-          getStatus();
-        }
+            }
+          })
+          .catch(() => {
+            getStatus();
+          })
+          .finally(() => {
+            this.opening = false;
+          });
         // 更新领取后的状态
         this.redPacketServer.setAvailable(false);
         this.redPacketServer.setDotVisible(false);
