@@ -473,7 +473,9 @@ export const serverConfig = {
       }
     ],
     //客户端嵌入-通知客户端打开图片语言
-    emitPreviewImage: [{ cuid: 'embedClientRoot', method: 'preivewImage', args: ['$0'] }]
+    emitPreviewImage: [{ cuid: 'embedClientRoot', method: 'preivewImage', args: ['$0'] }],
+    //客户端嵌入-通知客户端开启聊天审核
+    emitOpenChatFilterUrl: [{ cuid: 'embedClientRoot', method: 'openChatFilterUrl', args: ['$0'] }]
   },
   // 礼物动画组件
   comPcRewardEffect: {

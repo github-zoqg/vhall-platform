@@ -142,6 +142,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { useGroupServer, useChatServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
@@ -321,7 +322,14 @@
             ''
           );
         }
-        window.open(url, '_blank');
+        if (this.$route.query.assistantType) {
+          //客户端嵌入通知客户端打开聊天审核页面
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons('comChat', 'emitOpenChatFilterUrl', url)
+          );
+        } else {
+          window.open(url, '_blank');
+        }
       },
       //唤起登录
       handleLogin() {
