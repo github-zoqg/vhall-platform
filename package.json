@@ -1,6 +1,6 @@
 {
   "name": "middle-platform",
-  "version": "6.2.7-test.2",
+  "version": "6.2.7-test.3",
   "domainVersion": "6.2.7-test.3",
   "private": true,
   "scripts": {
