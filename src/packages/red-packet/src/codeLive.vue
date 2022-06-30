@@ -47,6 +47,7 @@
             :class="isCheckSuccess ? 'el-form-item_error' : ''"
             @blur="checkNum"
             placeholder="输入人数"
+            onkeyup="this.value=this.value.replace(/^[0]{1}\d+/g,'')"
             :disabled="packetForm.packetType == 1"
             show-word-limit
             v-model.trim="packetForm.num"
@@ -120,10 +121,12 @@
       redpacketSend() {
         if (this.isCheckCode) {
           this.$message.warning('请输入6~18位汉字、数字或字母');
+          this.isCheckCode = true;
           return;
         }
-        if (this.packetForm.packetType == 2 && this.isCheckSuccess) {
+        if (this.packetForm.packetType == 2 && (this.isCheckSuccess || this.packetForm.num == '')) {
           this.$message.warning('需大于0小于当前在线人数');
+          this.isCheckSuccess = true;
           return;
         }
         let params = {
@@ -157,11 +160,7 @@
         //   window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       checkNum() {
-        if (
-          this.packetForm.num == '' ||
-          this.packetForm.num == 0 ||
-          this.packetForm.num > this.onlineAmount
-        ) {
+        if (Number(this.packetForm.num) == 0 || this.packetForm.num > this.onlineAmount) {
           this.$message.warning('需大于0小于当前在线人数');
           this.isCheckSuccess = true;
           return;
@@ -212,20 +211,31 @@
           }
         }
       }
+      .el-input__count {
+        font-size: 14px;
+      }
     }
     .el-radio {
-      margin-right: 23px;
+      margin-right: 20px;
       &.radio_last {
         margin-right: 5px;
       }
     }
     .el-radio__label {
       color: #222;
-      padding-left: 2px;
+      padding-left: 0;
     }
     .el-radio__input {
       &.is-checked + .el-radio__label {
         color: #222;
+      }
+      .el-radio__inner {
+        width: 16px;
+        height: 16px;
+        &::after {
+          width: 8px;
+          height: 8px;
+        }
       }
     }
     .form-num {
