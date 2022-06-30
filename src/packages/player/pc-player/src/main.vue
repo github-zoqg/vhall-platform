@@ -13,14 +13,7 @@
     @mousemove="wrapEnter"
     @mouseleave="wrapLeave"
   >
-    <div
-      id="vmp-player"
-      class="vmp-player-watch"
-      ref="playerWatch"
-      v-loading="loading"
-      element-loading-background="#1a1a1a"
-      :element-loading-text="$t('common.common_1001')"
-    >
+    <div id="vmp-player" class="vmp-player-watch" ref="playerWatch">
       <template class="vmp-player-living">
         <!-- 背景图片 -->
         <div
@@ -299,7 +292,6 @@
     },
     data() {
       return {
-        loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
@@ -883,15 +875,15 @@
     #vhy-danmaku-wrapbox {
       z-index: 1;
     }
-    .el-loading-spinner .el-loading-text {
-      color: #fff;
-    }
-    .el-loading-spinner .path {
-      stroke: #fb3a32;
-    }
-    .el-loading-mask {
-      z-index: 7;
-    }
+    // .el-loading-spinner .el-loading-text {
+    //   color: #fff;
+    // }
+    // .el-loading-spinner .path {
+    //   stroke: #fb3a32;
+    // }
+    // .el-loading-mask {
+    //   z-index: 7;
+    // }
     &-living {
       &-background {
         height: 100%;
