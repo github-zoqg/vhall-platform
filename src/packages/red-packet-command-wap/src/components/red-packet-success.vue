@@ -1,5 +1,5 @@
 <template>
-  <div class="vhsaas-interact-dialog open">
+  <div class="vhsaas-interact-dialog open" :class="languagesInfo.language_type == 1 ? 'zh' : 'en'">
     <div class="title">{{ $t('interact_tools.interact_tools_1080') }}</div>
     <div class="vhsaas-command">
       <!-- 抢到金额 -->
@@ -47,6 +47,12 @@
       return {
         copyText: ''
       };
+    },
+    computed: {
+      // 当前语言
+      languagesInfo() {
+        return this.$domainStore.state.roomBaseServer.languages.curLang;
+      }
     },
     methods: {
       navToList() {
@@ -116,6 +122,14 @@
       background: url(../images/open-bg@2x.png);
       background-size: 100% 100%;
     }
+    &.en {
+      .vhsaas-red-packet-content {
+        margin-top: 150px;
+        .btn {
+          width: 360px;
+        }
+      }
+    }
     > .title {
       font-weight: 600;
       color: #87000e;
@@ -132,6 +146,7 @@
     color: #ba5003;
     margin-top: 70px;
     text-align: center;
+    width: 460px;
   }
   .vhsaas-gold-unit {
     font-weight: 600;
