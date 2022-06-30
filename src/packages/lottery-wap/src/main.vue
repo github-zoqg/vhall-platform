@@ -59,7 +59,8 @@
         needTakeAward: true, // 是否需要领奖
         lotteryId: '', // 抽奖的信息id(接口返回)
         lotteryInfo: {}, // 抽奖信息
-        winLotteryHistory: [] // 中奖历史
+        winLotteryHistory: [], // 中奖历史
+        winnerListData: []
       };
     },
     computed: {
@@ -182,7 +183,12 @@
         this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
         const winnerList = msgData.lottery_winners.split(',');
-        const lotteryResult = winnerList.some(userId => {
+
+        this.winnerListData = this.winnerListData.concat(winnerList);
+        // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据
+        if (this.winnerListData.length < msg.data.lottery_number) return false;
+
+        const lotteryResult = this.winnerListData.some(userId => {
           return this.isSelf(userId);
         });
         this.showWinnerList = !!msgData.publish_winner;
@@ -208,6 +214,8 @@
             : this.lotteryServer.Events.LOTTERY_MISS
         );
         await this.changeView(lotteryResult ? 'LotteryWin' : 'LotteryMiss');
+        // 清空已发送的中奖id
+        this.winnerListData = [];
       },
       close() {
         this.popupVisible = false;
