@@ -1,7 +1,7 @@
 {
   "name": "middle-platform",
-  "version": "1.3.48",
-  "domainVersion": "1.3.48",
+  "version": "1.4.3",
+  "domainVersion": "1.4.3",
   "private": true,
   "scripts": {
     "/---/": "-------------saas业务线相关命令----------------",
@@ -34,8 +34,6 @@
     "lint:fix": "node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
-    "@sentry/tracing": "^6.16.1",
-    "@sentry/vue": "^6.16.1",
     "clipboard": "^2.0.8",
     "core-js": "^3.6.5",
     "element-resize-detector": "^1.2.4",
@@ -48,7 +46,9 @@
     "qrcode": "^1.5.0",
     "screenfull": "^5.2.0",
     "semver": "^6.3.0",
+    "svgaplayerweb": "^2.3.2",
     "ua-parser-js": "^0.7.22",
+    "vh5-ui": "^1.0.4",
     "vue": "^2.6.14",
     "vue-highlightjs": "^1.3.3",
     "vue-i18n": "^8.26.7",
@@ -58,7 +58,6 @@
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
-    "@sentry/webpack-plugin": "^1.18.4",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
@@ -67,6 +66,7 @@
     "autoprefixer": "^8.6.5",
     "axios": "^0.27.0",
     "babel-eslint": "^10.1.0",
+    "babel-plugin-lodash": "^3.3.4",
     "better-scroll": "^2.4.2",
     "chalk": "4.1.2",
     "eslint": "^6.7.2",
@@ -78,6 +78,7 @@
     "less": "3.9.0",
     "less-loader": "^5.0.0",
     "lint-staged": "^9.5.0",
+    "lodash-webpack-plugin": "^0.11.6",
     "n-readlines": "^1.0.1",
     "ora": "4.1.1",
     "postcss": "^8.4.5",

@@ -58,6 +58,7 @@
                   :model="form"
                   class="entryForm"
                   :rules="rules"
+                  :validate-on-rule-change="false"
                   label-position="top"
                 >
                   <el-form-item
@@ -81,9 +82,11 @@
                       "
                     >
                       <el-input
-                        v-if="question.type == 0 && question.default_type == 2"
+                        v-if="
+                          question.type == 0 && question.default_type == 2 && !isAbroadPhoneValide
+                        "
                         v-model.number="form[question.id]"
-                        :maxlength="question.type == 0 ? '' : 60"
+                        :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                         :show-word-limit="question.type != 0"
                         autocomplete="off"
                         :placeholder="findPlaceHolder(question.default_type)"
@@ -295,8 +298,16 @@
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
+                      v-if="!isAbroadPhoneValide"
                       v-model.number.trim="verifyForm.phone"
-                      type="number"
+                      maxlength="15"
+                      auto-complete="off"
+                      :placeholder="$t('account.account_1025')"
+                    ></el-input>
+                    <el-input
+                      v-else
+                      v-model.trim="verifyForm.phone"
+                      maxlength="15"
                       auto-complete="off"
                       :placeholder="$t('account.account_1025')"
                     ></el-input>
@@ -401,6 +412,7 @@
                 :model="form"
                 class="entryForm"
                 :rules="rules"
+                :validate-on-rule-change="false"
                 label-position="top"
               >
                 <el-form-item
@@ -424,9 +436,11 @@
                     "
                   >
                     <el-input
-                      v-if="question.type == 0 && question.default_type == 2"
+                      v-if="
+                        question.type == 0 && question.default_type == 2 && !isAbroadPhoneValide
+                      "
                       v-model.number="form[question.id]"
-                      :maxlength="question.type == 0 ? '' : 60"
+                      :maxlength="question.default_type == 2 ? 15 : question.type == 0 ? '' : 60"
                       :show-word-limit="question.type != 0"
                       autocomplete="off"
                       :placeholder="findPlaceHolder(question.default_type)"
@@ -632,8 +646,16 @@
               <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
+                    v-if="!isAbroadPhoneValide"
                     v-model.number.trim="verifyForm.phone"
-                    type="number"
+                    maxlength="15"
+                    auto-complete="off"
+                    :placeholder="$t('account.account_1025')"
+                  ></el-input>
+                  <el-input
+                    v-else
+                    v-model.trim="verifyForm.phone"
+                    maxlength="15"
                     auto-complete="off"
                     :placeholder="$t('account.account_1025')"
                   ></el-input>
@@ -775,6 +797,8 @@
         counties: {},
         //是否手机验证
         isPhoneValidate: false,
+        //是否支持国外手机号
+        isAbroadPhoneValide: false,
         // 云盾key
         captchaKey: 'b7982ef659d64141b7120a6af27e19a0',
         // 云盾值
@@ -820,26 +844,40 @@
         handler(newVal) {
           const _this = this;
           // 根据是否开启短信验证，生成相应的手机号验证规则
-          if (newVal) {
-            _this.verifyRules.phone = {
-              required: true,
-              validator: _this.validPhone,
-              trigger: 'blur'
-            };
-          } else {
-            _this.verifyRules.phone = {
-              type: 'number',
-              required: true,
-              message: _this.$t('account.account_1069'),
-              trigger: 'blur'
-            };
-          }
+          // if (newVal) {
+          // _this.verifyRules.phone = {
+          //   required: true,
+          //   validator: _this.validPhone,
+          //   trigger: 'blur'
+          // };
+          // } else {
+          //   _this.verifyRules.phone = {
+          //     type: 'number',
+          //     required: true,
+          //     message: _this.$t('account.account_1069'),
+          //     trigger: 'blur'
+          //   };
+          // }
           // 云盾实例
           if (newVal) {
             _this.$nextTick(() => {
               _this.callCaptcha('#setCaptcha');
               _this.callCaptcha('#setCaptcha1');
             });
+          }
+        }
+      },
+      isAbroadPhoneValide: {
+        // immediate: true,
+        handler(newVal) {
+          const _this = this;
+          // 是否支持国外手机号
+          if (newVal) {
+            _this.verifyRules.phone = {
+              required: true,
+              validator: _this.checkAbroadPhone,
+              trigger: 'blur'
+            };
           }
         }
       },
@@ -887,12 +925,19 @@
                     validator: this.validPhone,
                     trigger: 'blur'
                   };
+                }
+                // 是否支持国外手机号
+                else if (this.isAbroadPhoneValide) {
+                  rules[item.id] = {
+                    required: !!item.is_must,
+                    validator: this.checkAbroadPhone,
+                    trigger: 'blur'
+                  };
                 } else {
                   // TODO待翻译
                   rules[item.id] = {
-                    type: 'number',
                     required: !!item.is_must,
-                    message: this.$t('account.account_1069'),
+                    validator: this.checkNum,
                     trigger: 'blur'
                   };
                 }
@@ -1047,6 +1092,7 @@
           phone: {
             type: 'number',
             required: true,
+            validator: this.checkNum,
             message: this.$t('account.account_1069'),
             trigger: 'blur'
           },
@@ -1125,6 +1171,17 @@
           } else {
             return true;
           }
+        }
+      },
+      // 校验国外手机号
+      checkAbroadPhone(rule, value, callback) {
+        let reg = /^\d{1,15}$/;
+        if (!value) {
+          return callback(this.$t('account.account_1025'));
+        } else if (value == 0 || !reg.test(value)) {
+          return callback(this.$t('account.account_1069'));
+        } else {
+          callback();
         }
       },
       //隐私协议勾选验证
@@ -1236,6 +1293,9 @@
           const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
           this.isPhoneValidate =
             phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+          // 是否支持国外手机号
+          this.isAbroadPhoneValide =
+            phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
           // 默认填写手机号
           !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
           if (!_this.isPreview) {
@@ -1730,6 +1790,16 @@
       //关闭当前视图
       closePreview() {
         this.handleClose();
+      },
+      // 校验非0开头11位数字
+      checkNum(rule, val, callback) {
+        if (!val) {
+          return callback(this.$t('account.account_1025'));
+        } else if (!/^[1-9]\d{10}$/.test(val)) {
+          return callback(this.$t('account.account_1069'));
+        } else {
+          return callback();
+        }
       }
     }
   };

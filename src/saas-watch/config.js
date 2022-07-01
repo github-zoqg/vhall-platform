@@ -51,7 +51,7 @@ export const serverConfig = {
   },
   layerBodyRight: {
     component: 'VmpBasicRightContainer',
-    children: ['comPcRewardEffect', 'comTabMenu']
+    children: ['comPcRewardEffect', 'comTabMenu', 'comPcRewardEffectFullScreen']
   },
   /*** 布局定义end */
 
@@ -350,7 +350,12 @@ export const serverConfig = {
     // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLottery'],
-      method: 'open'
+      method: 'handleClickIcon'
+    },
+    emitTakeAward: {
+      cuid: ['comLottery'],
+      method: 'handleTakeAward',
+      args: ['$0']
     },
     //红包弹窗
     emitClickRedPacketIcon: {
@@ -416,6 +421,11 @@ export const serverConfig = {
     },
     emitHideEffect: {
       cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
+    },
+    emitHideEffectFullScreen: {
+      cuid: 'comPcRewardEffectFullScreen',
       method: 'setHideEffect',
       args: ['$0']
     }
@@ -498,6 +508,10 @@ export const serverConfig = {
   // 礼物动画组件
   comPcRewardEffect: {
     component: 'VmpPcRewardEffect'
+  },
+  // 全屏礼物动画组件
+  comPcRewardEffectFullScreen: {
+    component: 'VmpPcRewardEffectFullScreen'
   },
   // 推荐
   comRecommend: {

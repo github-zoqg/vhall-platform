@@ -43,7 +43,9 @@ export default {
     common_1030: 'Haga clic',
     common_1031: 'Número de reservas',
     common_1032: 'Número de espectadores',
-    common_1033: '我知道了'
+    common_1033: '我知道了',
+    common_1034: '',
+    common_1035: ''
   },
   player: {
     player_1001: 'Grado de calor',
@@ -69,7 +71,9 @@ export default {
     player_1021: 'Pausa',
     player_1022: 'Reproducir',
     player_1023: 'Ajustar el tiempo de reproducción falló',
-    player_1024: 'El tiempo de configuración falló, inténtelo de nuevo más tarde'
+    player_1024: 'El tiempo de configuración falló, inténtelo de nuevo más tarde',
+    player_1025: '',
+    player_1026: 'replaying'
   },
   appointment: {
     appointment_1001: 'Verificación de lista blanca',
@@ -157,7 +161,9 @@ export default {
     nav_1047: 'Presione largo para guardar la imagen para compartir',
     nav_1048: 'Tiempo',
     nav_1049: 'Ubicación',
-    nav_1050: 'Anchor aún no ha activado la invitación'
+    nav_1050: 'Anchor aún no ha activado la invitación',
+    nav_1051: '',
+    nav_1052: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',
@@ -191,9 +197,37 @@ export default {
     login_1028: 's',
     login_1029: 'La verificación del número de teléfono móvil falló, no se puede operar',
     login_1030: 'Consentimiento y cumplimiento',
-    login_1031: 'Condiciones de servicio'
+    login_1031: 'Condiciones de servicio',
+    login_1032: '',
+    login_1033: '',
+    login_1034: '',
+    login_1035: '',
+    login_1036: '',
+    login_1037: '',
+    login_1038: '',
+    login_1039: '',
+    login_1040: '',
+    login_1041: '',
+    login_1042: '',
+    login_1043: '',
+    login_1044: '',
+    login_1045: '',
+    login_1046: '',
+    login_1047: '',
+    login_1048: '',
+    login_1049: '',
+    login_1050: '',
+    login_1051: '',
+    login_1052: '',
+    login_1053: '',
+    login_1054: '',
+    login_1055: '',
+    login_1056: '',
+    login_1057: '',
+    login_1058: '',
+    login_1059: '',
+    login_1060: ''
   },
-  undefined: {},
   register: {
     register_1001: 'Bienvenida a registrarse Vhall en vivo',
     register_1002: 'Registrar un nuevo usuario',
@@ -299,8 +333,25 @@ export default {
     chat_1072: '主持人开启了分组讨论，您将进入{n}组参与讨论',
     chat_1073: '主持人结束了分组讨论，您将返回主直播间',
     chat_1074: '主持人解散了分组，您将返回主直播间',
+    chat_1075: '',
+    chat_1076: '',
     chat_1077: 'En silencio te contesta',
-    chat_1078: 'Hay un nuevo mensaje'
+    chat_1078: 'Hay un nuevo mensaje',
+    chat_1079: '',
+    chat_1080: '',
+    chat_1081: '',
+    chat_1082: '',
+    chat_1083: '',
+    chat_1084: '',
+    chat_1085: '',
+    chat_1086: '',
+    chat_1087: '',
+    chat_1088: '',
+    chat_1089: '',
+    chat_1090: '',
+    chat_1091: '',
+    chat_1092: '',
+    chat_1093: ''
   },
   form: {
     form_1001: 'Nombre',
@@ -388,6 +439,10 @@ export default {
     form_1080: 'El contenido no puede ser mayor de 60 caracteres',
     form_1081: 'El contenido no puede ser mayor de 60 caracteres',
     form_1082: 'Verificación',
+    form_1083: '',
+    form_1084: '',
+    form_1085: '',
+    form_1086: '',
     form_1087: 'Enviar con éxito, gracias por su participación',
     form_1088: 'Enviar con éxito'
   },
@@ -482,7 +537,13 @@ export default {
     interact_tools_1070: 'El monto admite hasta dos decimales',
     interact_tools_1071: 'Envía tu clave xxx y participa en el sorteo',
     interact_tools_1072: 'QR en la imagen',
-    interact_tools_1075: 'Aplaudir'
+    interact_tools_1073: '',
+    interact_tools_1074: '',
+    interact_tools_1075: 'Aplaudir',
+    interact_tools_1076: '',
+    interact_tools_1077: '',
+    interact_tools_1078: '',
+    interact_tools_1079: ''
   },
   setting: {
     setting_1002: 'Configuración de la vista',
@@ -513,11 +574,13 @@ export default {
     setting_1026: 'Por favor, permita que el navegador use la autoridad del sonido',
     setting_1027: 'Por favor, aumente el volumen del altavoz del dispositivo',
     setting_1028: 'Seleccione un altavoz externo o reemplace la computadora',
-    setting_1029: 'Ayuda y apoyo'
+    setting_1029: 'Ayuda y apoyo',
+    setting_1030: '',
+    setting_1031: ''
   },
   message: {
     message_1001:
-      'El patrocinador ha configurado una función de encriptación de video,\r\nSe recomienda utilizar la última versión del navegador Chrome para ver',
+      'El patrocinador ha configurado una función de encriptación de video,Se recomienda utilizar la última versión del navegador Chrome para ver',
     message_1002: 'No se admite la indicación de encriptación de video',
     message_1003: 'La cuenta ha visto esta actividad en otros dispositivos',
     message_1004: '¡Este video está fuera de línea!',
@@ -527,12 +590,12 @@ export default {
     message_1008:
       '¡El sitio de la actividad está demasiado animado y el número de personas ha excedido el límite superior!',
     message_1009:
-      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.\r\nSe recomienda borrar las cookies del navegador antes de visitar ~',
+      'Está participando en la actividad  con la identidad de anfitrión y no puede verla.Se recomienda borrar las cookies del navegador antes de visitar ~',
     message_1010: 'La red se está agotando',
     message_1011:
-      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superior\r\nversión, se recomienda utilizar el navegador Chrome para ver ~',
+      'La versión actual del navegador IE es inferior, por favor, actualice a IE10 y superiorversión, se recomienda utilizar el navegador Chrome para ver ~',
     message_1012:
-      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,\r\nValor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
+      '¡La página incrustada sólo admite 3 métodos de verificación: predeterminado, contraseña,Valor K de terceros! Por favor, póngase en contacto con el patrocinador de la actividad',
     message_1013: 'Falta la página, el ingeniero está en camino ...',
     message_1014: 'Transcodificación de video',
     message_1015: 'Falló la validación del valor K, a punto de saltar',
@@ -549,7 +612,16 @@ export default {
     message_1023:
       'El sistema se está actualizando de 00: 00 a 07: 00, lo que puede causarle inconvenientes, ¡por favor, comprenda!',
     message_1024: 'La cuenta ha visto esta actividad en otros dispositivos',
-    message_1025: 'Si tiene cualquier problema, consulte al proveedor del enlace'
+    message_1025: 'Si tiene cualquier problema, consulte al proveedor del enlace',
+    message_1026: '',
+    message_1027: '',
+    message_1028: '',
+    message_1029: '',
+    message_1030: '',
+    message_1031: '',
+    message_1032: '',
+    message_1033: '',
+    message_1034: ''
   },
   cash: {
     cash_1001: 'Gestionar saldo',
@@ -583,7 +655,7 @@ export default {
     cash_1022: 'Configurar y continuar retirando',
     cash_1023: 'Por favor, utilice WeChat para escanear el código y vincular su cuenta por cobrar',
     cash_1024: 'Una vez que la vinculación sea exitosa, el retiro continuará automáticamente',
-    cash_1025: 'Por favor, ingrese el monto del retiro (máximo 800 para una sola transacción)',
+    cash_1025: 'Por favor, ingrese el monto del retiro',
     cash_1026: 'A la cuenta de WeChat',
     cash_1027: 'Retirar en seguida',
     cash_1028: 'Presentar significa que estoy de acuerdo',
@@ -679,7 +751,10 @@ export default {
     account_1073: '¡Ingrese la contraseña de nuevo!',
     account_1074: 'Las dos contraseñas ingresadas son inconsistentes!',
     account_1075: 'Modificar mi perfil',
-    account_1076: 'Borrar'
+    account_1076: 'Borrar',
+    account_1077: '',
+    account_1078: '',
+    account_1079: ''
   },
   interact: {
     interact_1001: 'Levantar la mano para encender el micrófono',
@@ -712,8 +787,20 @@ export default {
     interact_1024: 'Encender la cámara',
     interact_1025: 'Falta de respuesta prolongada que conduce al fracaso del upper MCT',
     interact_1026: 'El micrófono está apagado, la otra persona no podrá oírte',
+    interact_1027: '',
+    interact_1028: '',
+    interact_1029: '',
+    interact_1030: '',
+    interact_1031: '',
+    interact_1032: '',
     interact_1033: '主画面',
-    interact_1034: 'presentador principal'
+    interact_1034: 'presentador principal',
+    interact_1035: '',
+    interact_1036: '',
+    interact_1037: '',
+    interact_1038: '',
+    interact_1039: '',
+    interact_1040: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',
@@ -725,7 +812,25 @@ export default {
     doc_1007: 'móvil',
     doc_1008: 'restauración',
     doc_1009: 'Para salir del modo de pantalla completa',
-    doc_1010: 'Salir del modo de pantalla completa'
+    doc_1010: 'Salir del modo de pantalla completa',
+    doc_1011: '',
+    doc_1012: '',
+    doc_1013: '',
+    doc_1014: '',
+    doc_1015: '',
+    doc_1016: '',
+    doc_1017: '',
+    doc_1018: '',
+    doc_1019: '',
+    doc_1020: '',
+    doc_1021: '',
+    doc_1022: '',
+    doc_1023: '',
+    doc_1024: '',
+    doc_1025: '',
+    doc_1026: '',
+    doc_1027: '',
+    doc_1028: ''
   },
   webinar: {
     webinar_1001: 'Apagar',
@@ -770,8 +875,45 @@ export default {
     webinar_1036: 'Actividad con contraseña',
     webinar_1037: 'Visitantes',
     webinar_1038: 'Compartir el éxito',
-    webinar_1039: 'Reserva'
+    webinar_1039: 'Reserva',
+    webinar_1040: '',
+    webinar_1041: '',
+    webinar_1042: ''
   },
-  color: {},
-  other: {}
+  color: {
+    color_1001: '',
+    color_1002: '',
+    color_1003: '',
+    color_1004: '',
+    color_1005: '',
+    color_1006: '',
+    color_1007: '',
+    color_1008: '',
+    color_1009: '',
+    color_1010: '',
+    color_1011: '',
+    color_1012: ''
+  },
+  other: {
+    other_1001: '',
+    other_1002: '',
+    other_1003: '',
+    other_1004: '',
+    other_1005: '',
+    other_1006: '',
+    other_1007: '',
+    other_1008: '',
+    other_1009: '',
+    other_1010: '',
+    other_1011: '',
+    other_1012: '',
+    other_1013: '',
+    other_1014: '',
+    other_1015: '',
+    other_1016: '',
+    other_1017: '',
+    other_1018: '',
+    other_1019: '',
+    other_1020: ''
+  }
 };

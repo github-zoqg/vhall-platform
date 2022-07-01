@@ -41,6 +41,7 @@ import VmpWatchTimer from '@/packages/watch-timer'; // 观看端计时器
 import VmpChapter from '@/packages/watch-chapter-pc'; // 观看端章节
 import VmpLotteryWatch from '@/packages/lottery/watch'; // 观看端计时器
 import VmpPcRewardEffect from '@/packages/pc-reward-effect'; // 观看端计时器
+import VmpPcRewardEffectFullScreen from '@/packages/pc-reward-effect-full-screen'; // 观看端计时器
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpQa from '@/packages/qa';
 import VmpCustomMenu from '@/packages/custom-menu';
@@ -115,6 +116,7 @@ Vue.use(VmpLotteryWatch);
 Vue.use(VmpChapter);
 Vue.use(VmpScreenPost);
 Vue.use(VmpPcRewardEffect);
+Vue.use(VmpPcRewardEffectFullScreen);
 Vue.use(VmpTabMenu);
 Vue.use(VmpCustomMenu);
 Vue.use(VmpRecommend);

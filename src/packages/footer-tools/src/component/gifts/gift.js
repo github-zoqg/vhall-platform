@@ -224,7 +224,7 @@ export default {
     noFreeGiftCallback(payType, res) {
       this.$emit('changeShowGift', 'showGift', false);
       const link = encodeURIComponent(res.data.data.pay_data.qr_code);
-      const img = `https://aliqr.e.vhall.com/qr.png?t=${link}`;
+      const img = `https://aliqr.e.vhall.com/qr.png?s=7&t=${link}`;
       if (payType == 'ALIPAY') {
         this.$emit('acceptPay', 'zfQr', img);
       } else {

@@ -12,6 +12,8 @@ const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
+//按需加载lodash
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // 是否开发环境
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -51,13 +53,16 @@ function getPlugins() {
         //化蝶观看端(pc、wap)域名
         VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS),
         //化蝶发起端域名
-        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS)
+        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS),
+
+        // 是否wap端
+        VUE_APP_IS_WAP: argv.project === 'saas-wap'
       }
     })
   ];
 
   if (!isDev) {
-    // TODO: 同时修改中台项目路由base为项目名: xxxx/saas-live/xxx
+    // 修改中台项目路由base为项目名: xxxx/saas-live/xxx
     if (argv.middle) {
       process.env.VUE_APP_ROUTER_BASE_URL = `/${argv.project}`;
     }
@@ -154,7 +159,11 @@ function getPlugins() {
         }
       }),
       // 修改文件内容替换路由标记
-      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData)
+      new ReplaceInFileWebpackPlugin(replaceInFileWebpackPluginData),
+      // 限制构建的chunk数量
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 5
+      })
     );
   }
   return plugins;
@@ -197,6 +206,7 @@ const sharedConfig = {
 
     if (!isDev) {
       config.optimization.minimize(true);
+      // config.plugin('loadshReplace').use(new LodashModuleReplacementPlugin());
       config.devtool(false); // 这个是把本地的productionSourceMap给关掉了，用下面的，不关的话，会造成，编译好的js有两个sourceMap的指向（需要注意的地方）
       config
         .plugin('SourceMapDevToolPlugin')

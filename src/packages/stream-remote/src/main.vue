@@ -64,7 +64,7 @@
     <!-- 鼠标 hover 遮罩层 -->
     <section v-if="mainScreen == stream.accountId" class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-first-line"
       >
         <span
@@ -150,7 +150,7 @@
 
     <section v-else class="vmp-stream-remote__shadow-box">
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-first-line"
       >
         <el-tooltip
@@ -206,7 +206,7 @@
       </p>
 
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (isInGroup && groupRole == 20)"
         class="vmp-stream-remote__shadow-second-line"
       >
         <el-tooltip content="设为主讲人" placement="bottom">
@@ -242,12 +242,12 @@
     </section>
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
-    <!-- <section class="vmp-stream-remote__pause" v-show="showInterIsPlay">
+    <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
       <img :src="coverImgUrl" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section> -->
+    </section>
   </div>
 </template>
 
@@ -266,7 +266,9 @@
         audioLevel: 1,
         networkStatus: 0,
         isFullScreen: false,
-        isShowNetError: false
+        isShowNetError: false,
+        timmer: null,
+        isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/)
       };
     },
     props: {
@@ -349,13 +351,16 @@
       coverImgUrl() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
-      // 主屏 + 自动播放失败 + 观众 + 文档开启 => 此时，主屏画面在右上角
+      // 主屏 + 播放按钮状态 + 观众 + （无延迟直播 || 未开启自动上麦的分组直播）
       showInterIsPlay() {
         return (
           this.mainScreen == this.stream.accountId &&
           this.interactiveServer.state.showPlayIcon &&
           this.joinInfo.role_name == 2 &&
-          this.liveMode === 6
+          ((this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 &&
+            this.liveMode != 6) ||
+            (this.liveMode == 6 &&
+              this.$domainStore.state.roomBaseServer.interactToolStatus.auto_speak == 0))
         );
       },
       isShowSplitScreenPlaceholder() {
@@ -371,7 +376,7 @@
       isShowDownMicBtn() {
         return (
           (this.joinInfo.role_name == 1 && this.stream.accountId != this.groupLeaderId) ||
-          (this.groupRole == 20 && this.stream.roleName != 1)
+          (this.isInGroup && this.groupRole == 20 && this.stream.roleName != 1)
         );
       },
       isShowSetMainScreenBtn() {
@@ -470,12 +475,25 @@
       },
       // 恢复播放
       replayPlay() {
-        const videos = document.querySelectorAll('.vmp-stream-remote video');
+        clearTimeout(this.timmer);
+        let videos = document.querySelectorAll('.vmp-stream-remote video');
         videos.length > 0 &&
           videos.forEach(video => {
-            video.play();
+            video
+              .play()
+              .then(res => {
+                console.log('play-res-', res, this.interactiveServer.state.showPlayIcon);
+                if (this.interactiveServer.state.showPlayIcon) {
+                  this.interactiveServer.state.showPlayIcon = false;
+                }
+              })
+              .catch(err => {
+                console.log('play-err-', err);
+                if (err.name == 'NotAllowedError' || err.name == 'NotSupportedError') {
+                  this.interactiveServer.state.showPlayIcon = true;
+                }
+              });
           });
-        this.interactiveServer.state.showPlayIcon = false;
       },
       async subscribeRemoteStream() {
         await this.checkVRTCInstance();
@@ -496,9 +514,8 @@
             if (this.joinInfo.role_name === 1) {
               this.interactiveServer.resetLayout();
             }
-            setTimeout(() => {
+            this.timmer = setTimeout(() => {
               this.replayPlay();
-
               // 开始测试100ms，刷新页面还是有订阅流不播放的情况。所以改为和原线上代码一致2s
             }, 2000);
             this.getLevel();
@@ -666,7 +683,7 @@
                 reject();
               }
             }
-          }, 100);
+          }, 130);
         });
       }
     }

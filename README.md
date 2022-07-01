@@ -211,7 +211,9 @@ git config --global core.autocrlf input
 
 ##### 问题 2：日志查询地址？
 
-解决方案：sentry: https://sentry.vhall.com/
+解决方案：
+腾讯性能监控: https://console.cloud.tencent.com/rum/web
+日志上报: http://wiki.vhallops.com/pages/viewpage.action?pageId=279019559
 
 ##### 问题 3：编译的时控制台报警告：Second Autoprefixer control comment was ignored. Autoprefixer applies control comment to whole block, not to next rules.
 
@@ -245,3 +247,11 @@ git config --global core.autocrlf input
 ```
 
 该文件不纳入 git 管理，开发人员可修改文件中的端口号，以满足自己的开发习惯。
+
+## 本地安装不成功问题
+
+feature_v7.1.0 安装包不上的，问题最快的解决办法。
+node_modules 删掉了之后，
+从 test5 拷贝一下 yarn.lock 放入。
+在执行 yarn install 的时候，就能安装上了。
+问题 2：

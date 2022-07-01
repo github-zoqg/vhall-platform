@@ -113,7 +113,12 @@
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useMediaSettingServer,
+    useMediaCheckServer,
+    useInteractiveServer,
+    useRoomBaseServer
+  } from 'middle-domain';
 
   import mediaSettingConfirm from './js/showConfirm';
   import { RATE_REPORT_MAP, SCREEN_RATE_REPORT_MAP, LAYOUT_REPORT_MAP } from './js/reportMap';
@@ -178,12 +183,15 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      this.mediaCheckServer = useMediaCheckServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
       this._diffOptions = {}; // 差异数据（更改的数据）
     },
     async mounted() {
+      window.mediaSetting = this;
       const { watchInitData } = useRoomBaseServer().state;
       this.webinar = watchInitData.webinar;
       const role = watchInitData.join_info?.role_name;
@@ -194,8 +202,8 @@
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        if (+msg.data.streamType !== 3) {
-          // 非桌面共享
+        if (![3, 4].includes(+msg.data.streamType)) {
+          // 非桌面共享 ｜ 非插播
           if (role == 1) {
             this.hostAlertVisible ? null : (this.hostAlertVisible = true);
           } else {
@@ -204,8 +212,8 @@
         }
       });
       useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
-        if (+msg.data.streamType !== 3) {
-          // 非桌面共享
+        if (![3, 4].includes(+msg.data.streamType)) {
+          // 非桌面共享 ｜ 非插播
           if (!this.alertStatus) {
             if (role == 1) {
               this.hostAlertVisible ? null : (this.hostAlertVisible = true);
@@ -314,6 +322,7 @@
 
         if (action === 'not-living' || action === 'confirm') {
           await this.updateDeviceSetting();
+          await this.updateDeviceStatus();
           this.closeMediaSetting();
           this.sendChangeEvent();
           this.setReport();
@@ -397,6 +406,26 @@
         }
 
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
+      },
+      async updateDeviceStatus() {
+        const diffOptions = this._diffOptions;
+
+        this.updateVideoProfile();
+      },
+      async updateVideoProfile() {
+        const diffOptions = this._diffOptions;
+        if (Object.keys(diffOptions) === 0) return;
+
+        const { rate } = diffOptions;
+        if (rate) {
+          const streamId = this.interactiveServer.state.localStream.streamId;
+          await this.interactiveServer.setVideoProfile({
+            streamId,
+            profile: VhallRTC[rate]
+          });
+        }
+
+        return true;
       },
       /**
        * 更新设置并缓存字段
