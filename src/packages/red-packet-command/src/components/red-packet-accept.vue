@@ -87,6 +87,7 @@
             getStatus();
           })
           .finally(() => {
+            getStatus();
             this.opening = false;
           });
         // 更新领取后的状态
