@@ -15,12 +15,10 @@
       </div>
       <el-form class="packet-form-wrap" :model="packetForm" inline>
         <el-form-item label="红包口令">
-          <!--  onkeyup="this.value=this.value.replace(/[^a-z0-9_A-Z\u4E00-\u9FA5a]/g,'')" -->
           <el-input
             class="form-input"
             :class="isCheckCode ? 'el-form-item_error' : ''"
             maxlength="18"
-            @blur="checkCode"
             placeholder="6-18位汉字、数字，不支持符号"
             show-word-limit
             v-model.trim="packetForm.code"
@@ -119,11 +117,11 @@
         };
       },
       redpacketSend() {
-        if (this.isCheckCode) {
-          this.$message.warning('请输入6~18位汉字、数字或字母');
-          this.isCheckCode = true;
-          return;
-        }
+        // if (this.isCheckCode) {
+        //   this.$message.warning('请输入6~18位汉字、数字或字母');
+        //   this.isCheckCode = true;
+        //   return;
+        // }
         if (this.packetForm.packetType == 2 && (this.isCheckSuccess || this.packetForm.num == '')) {
           this.$message.warning('需大于0小于当前在线人数');
           this.isCheckSuccess = true;
@@ -154,10 +152,6 @@
       },
       reportRedPacket() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110054);
-        // window.vhallReportForProduct &&
-        //   window.vhallReportForProduct.report(this.redcouponType === 1 ? 110055 : 110056);
-        // window.vhallReportForProduct &&
-        //   window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       checkNum() {
         if (Number(this.packetForm.num) == 0 || this.packetForm.num > this.onlineAmount) {
