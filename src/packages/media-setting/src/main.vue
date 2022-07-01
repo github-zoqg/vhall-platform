@@ -113,11 +113,15 @@
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
 
-  import { useMediaSettingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useMediaSettingServer,
+    useMediaCheckServer,
+    useInteractiveServer,
+    useRoomBaseServer
+  } from 'middle-domain';
 
   import mediaSettingConfirm from './js/showConfirm';
   import { RATE_REPORT_MAP, SCREEN_RATE_REPORT_MAP, LAYOUT_REPORT_MAP } from './js/reportMap';
-  import { diff } from 'semver';
 
   /**
    * 获取差异obj
@@ -179,6 +183,7 @@
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
+      this.mediaCheckServer = useMediaCheckServer();
       this.interactiveServer = useInteractiveServer();
     },
     created() {
@@ -404,6 +409,11 @@
       },
       async updateDeviceStatus() {
         const diffOptions = this._diffOptions;
+
+        this.updateVideoProfile();
+      },
+      async updateVideoProfile() {
+        const diffOptions = this._diffOptions;
         if (Object.keys(diffOptions) === 0) return;
 
         const { rate } = diffOptions;
@@ -417,7 +427,6 @@
 
         return true;
       },
-
       /**
        * 更新设置并缓存字段
        */
