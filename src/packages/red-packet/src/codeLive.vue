@@ -47,7 +47,7 @@
             :class="isCheckSuccess ? 'el-form-item_error' : ''"
             @blur="checkNum"
             placeholder="输入人数"
-            onkeyup="this.value=this.value.replace(/^[0]{1}\d+/g,'')"
+            onkeyup="this.value=this.value.replace(/^((?!^[1-9]([0-9]+)?$).)*/g,'')"
             :disabled="packetForm.packetType == 1"
             show-word-limit
             v-model.trim="packetForm.num"
@@ -60,7 +60,7 @@
           round
           :disabled="packetForm.code.length < 6"
           class="start-btn"
-          @click="redpacketSend('packetForms')"
+          @click="redpacketSend()"
         >
           发红包
         </el-button>
