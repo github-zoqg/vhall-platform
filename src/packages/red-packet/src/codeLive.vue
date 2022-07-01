@@ -101,7 +101,7 @@
       }
     },
     methods: {
-      async open() {
+      open() {
         this.sendDialogVisible = true;
         this.restForm();
         this.redPacketServer.getRedpacketTotal();
@@ -129,11 +129,9 @@
         }
         let params = {
           red_code: this.packetForm.code,
-          join_type: this.packetForm.packetType
+          join_type: this.packetForm.packetType,
+          number: this.packetForm.packetType == 2 ? this.packetForm.num : undefined
         };
-        if (this.packetForm.packetType == 2) {
-          params.number = this.packetForm.num;
-        }
         this.redPacketServer
           .createCodeRedPacket(params)
           .then(res => {
@@ -154,7 +152,7 @@
         window.vhallReportForProduct && window.vhallReportForProduct.report(110054);
       },
       checkNum() {
-        if (Number(this.packetForm.num) == 0 || this.packetForm.num > this.onlineAmount) {
+        if (this.packetForm.num == '' || this.packetForm.num > this.onlineAmount) {
           this.$message.warning('需大于0小于当前在线人数');
           this.isCheckSuccess = true;
           return;

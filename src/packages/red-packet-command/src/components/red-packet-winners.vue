@@ -48,7 +48,7 @@
       };
     },
     methods: {
-      // 获取红包列表
+      // 获取红包列表  只展示 top10 数据
       getRedPacketWinners() {
         this.redPacketServer
           .getCodeRedPacketWinners({
