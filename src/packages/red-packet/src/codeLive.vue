@@ -19,7 +19,7 @@
             class="form-input"
             :class="isCheckCode ? 'el-form-item_error' : ''"
             maxlength="18"
-            placeholder="6-18位汉字、数字，不支持符号"
+            placeholder="6-18位汉字、数字"
             show-word-limit
             v-model.trim="packetForm.code"
           ></el-input>
@@ -253,7 +253,10 @@
     &_header {
       width: 100%;
       text-align: center;
-      padding-bottom: 24px;
+      padding: 14px 0;
+      background: #f2f2f2;
+      border-radius: 4px;
+      margin-bottom: 16px;
       .header_tip {
         font-size: 16px;
         color: #000;
