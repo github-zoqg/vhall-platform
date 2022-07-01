@@ -340,6 +340,19 @@
       <br />
       &nbsp;
     </p>
+    <alertBox
+      v-if="isSubmitSuccess"
+      :title="$t('account.account_1061')"
+      :titleBtn="$t('common.common_1033')"
+      @authClose="signStartConfirm"
+      @authSubmit="signStartConfirm"
+    >
+      <div slot="content">
+        <i18n path="form.form_1032">
+          <span place="n">{{ startTime }}</span>
+        </i18n>
+      </div>
+    </alertBox>
   </div>
 </template>
 
@@ -350,11 +363,13 @@
   import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
+  import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
       customSelectPicker,
-      customCascade
+      customCascade,
+      alertBox
     },
     data() {
       return {
@@ -382,6 +397,8 @@
         activeTab: 1,
         // 手机短信验证是都开启
         isPhoneValidate: false,
+        // 是否支持国外手机号
+        isAbroadPhoneValide: false,
         //表单的问题列表
         list: [],
         //题目的类型中文翻译
@@ -471,7 +488,10 @@
         captcha1: null, // 云盾实例
         captcha2: null, // 云盾实例
         //是第一次验证
-        isFirstChange: true
+        isFirstChange: true,
+        startTime: '',
+        queryString: '',
+        isSubmitSuccess: false
       };
     },
     computed: {
@@ -720,6 +740,9 @@
             const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
             this.isPhoneValidate =
               phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+            // 是否支持国外手机号
+            this.isAbroadPhoneValide =
+              phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
             // 默认填写手机号
             res.data.phone && (this.verifyForm.phone = res.data.phone);
 
@@ -898,6 +921,21 @@
           }
         }
       },
+      signStartConfirm() {
+        this.isSubmitSuccess = false;
+        location.replace(
+          window.location.protocol +
+            process.env.VUE_APP_WAP_WATCH +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinar_id}${this.queryString}`
+        );
+        // 避免产生历史路径
+        // window.location.href =
+        //   window.location.protocol +
+        //   process.env.VUE_APP_WAP_WATCH +
+        //   process.env.VUE_APP_WEB_KEY +
+        //   `/lives/watch/${this.webinar_id}${this.queryString}`;
+      },
       //提交表单到服务器
       submitSignUpForm() {
         const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
@@ -962,12 +1000,19 @@
               } else if (queryString.indexOf('?') == -1 && shareId) {
                 queryString += shareId ? `?shareId=${shareId}` : '';
               }
-              // 出错后异常跳转
-              window.location.href =
+              location.replace(
                 window.location.protocol +
-                process.env.VUE_APP_WAP_WATCH +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/watch/${this.webinar_id}${queryString}`
+              );
+              // 避免产生历史路径
+              // // 出错后异常跳转
+              // window.location.href =
+              //   window.location.protocol +
+              //   process.env.VUE_APP_WAP_WATCH +
+              //   process.env.VUE_APP_WEB_KEY +
+              //   `/lives/watch/${this.webinar_id}${queryString}`;
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
@@ -999,23 +1044,35 @@
               queryString += shareId ? `?shareId=${shareId}` : '';
             }
             if (res.data.webinar.type == 2) {
-              this.$dialog
-                .alert({
-                  message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
-                })
-                .then(() => {
-                  window.location.href =
-                    window.location.protocol +
-                    process.env.VUE_APP_WAP_WATCH +
-                    process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinar_id}${queryString}`;
-                });
+              this.startTime = res.data.webinar.start_time;
+              this.queryString = queryString;
+              this.isSubmitSuccess = true;
+              // this.$dialog
+              //   .alert({
+              //     title: '提示',
+              //     theme: 'round-button',
+              //     message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
+              //   })
+              //   .then(() => {
+              //     window.location.href =
+              //       window.location.protocol +
+              //       process.env.VUE_APP_WAP_WATCH +
+              //       process.env.VUE_APP_WEB_KEY +
+              //       `/lives/watch/${this.webinar_id}${queryString}`;
+              //   });
             } else {
-              window.location.href =
+              location.replace(
                 window.location.protocol +
-                process.env.VUE_APP_WAP_WATCH +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinar_id}${queryString}`;
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/watch/${this.webinar_id}${queryString}`
+              );
+              // 避免产生历史路径
+              // window.location.href =
+              //   window.location.protocol +
+              //   process.env.VUE_APP_WAP_WATCH +
+              //   process.env.VUE_APP_WEB_KEY +
+              //   `/lives/watch/${this.webinar_id}${queryString}`;
             }
           })
           .catch(e => {
@@ -1239,15 +1296,30 @@
         } else if (question.type === 0 && question.default_type === 2) {
           // 手机号
           if (this.isPhoneValidate) {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
             this.errMsgMap[question.id] =
               validPhone('', this.form[question.id], this) === true
                 ? ''
                 : validPhone('', this.form[question.id], this);
-          } else {
-            this.errMsgMap[question.id] =
-              this.form[question.id] && isNaN(this.form[question.id]) === false
+          }
+          // 支持国外手机号
+          else if (this.isAbroadPhoneValide) {
+            if (this.form[question.id]) {
+              this.errMsgMap[question.id] = /^\d{1,15}$/.test(this.form[question.id])
                 ? ''
                 : this.$t('account.account_1069');
+            } else {
+              this.errMsgMap[question.id] = this.$t('account.account_1025');
+            }
+          } else {
+            if (this.form[question.id] == 0) {
+              this.form[question.id] = '';
+            }
+            this.errMsgMap[question.id] = /^[1-9]\d{10}$/.test(this.form[question.id])
+              ? ''
+              : this.$t('account.account_1069');
           }
         } else if (question.type === 0 && question.default_type === 3) {
           // 邮箱
@@ -1382,6 +1454,18 @@
         } else {
           this.errCode = this.verifyForm.code == '' ? this.$t('cash.cash_1039') : '';
         }
+        // 支持国外手机号
+        if (this.isAbroadPhoneValide) {
+          if (this.verifyForm.phone) {
+            if (this.verifyForm.phone == 0 || !/^\d{1,15}$/.test(this.verifyForm.phone)) {
+              this.errPhone = true;
+              this.errPhoneMsg = this.$t('account.account_1069');
+            }
+          } else {
+            this.errPhone = true;
+            this.errPhoneMsg = this.$t('account.account_1025');
+          }
+        }
       },
       //取得可用的查询参数
       getQueryVariable(variable) {
@@ -1448,11 +1532,18 @@
                 } else if (queryString.indexOf('?') == -1 && shareId) {
                   queryString += shareId ? `?shareId=${shareId}` : '';
                 }
-                window.location.href =
+                location.replace(
                   window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinar_id}${queryString}`;
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinar_id}${queryString}`
+                );
+                // 避免产生历史路径
+                // window.location.href =
+                //   window.location.protocol +
+                //   process.env.VUE_APP_WAP_WATCH +
+                //   process.env.VUE_APP_WEB_KEY +
+                //   `/lives/watch/${this.webinar_id}${queryString}`;
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
@@ -1845,8 +1936,8 @@
       color: #fff;
       outline: none;
       width: 9.07rem;
-      height: 1.25rem;
-      border-radius: 0.12rem;
+      height: 80px;
+      border-radius: 50px;
       &.red {
         border-color: #fb3a32;
         background-color: #fb3a32;

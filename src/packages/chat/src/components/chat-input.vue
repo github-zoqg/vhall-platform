@@ -12,10 +12,12 @@
         rows="1"
         class="textarea-box__textarea"
         @input="inputHandle"
+        @paste="inputHandle"
         @keydown.stop="onkeydownHandle($event)"
         @keyup.stop="onKeyUpHandle($event)"
         @keyup.delete="onDeleteHandle"
       ></textarea>
+      <!--  //粘贴事件       @paste="inputHandle" -->
       <span v-show="showWordLimit" class="textarea-box__textarea-show-limit">
         <i
           class="textarea-show-limit__current-count"
@@ -58,7 +60,7 @@
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   export default {
     name: 'VmpChatInput',
     mixins: [emitter],
@@ -152,13 +154,13 @@
       //观察输入的值，调整输入框高度
       inputValue(newValue) {
         // 注意事项：输入了三行文字，直接Backspace 退格，重置输入框高度
-        if (!newValue) {
-          // 输入框内容发生变化，更新滚动条
-          this.$nextTick(() => {
-            this.overlayScrollbar.update();
-            this.inputHandle();
-          });
-        }
+        // if (!newValue) {
+        // 输入框内容发生变化，更新滚动条
+        this.$nextTick(() => {
+          this.overlayScrollbar.update();
+          this.inputHandle();
+        });
+        // }
       }
     },
     beforeCreate() {},
@@ -361,7 +363,12 @@
         if (this.inputStatus.disable) {
           return;
         }
-        this.inputValue += val;
+        const resultVal = this.inputValue + val;
+        // 选择表情，判断添加后是否会超出 140 ，如果超出不能输入
+        if (resultVal.length > 140) {
+          return;
+        }
+        this.inputValue = resultVal;
       },
       //获取输入上传的图片
       getUploadImg() {

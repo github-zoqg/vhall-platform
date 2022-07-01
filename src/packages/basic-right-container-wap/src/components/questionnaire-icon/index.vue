@@ -91,21 +91,24 @@
     created() {
       this.questionnaireServer.checkIconStatus();
       this.setSetingHeight();
-      this.questionnaireServer.$on('questionnaire_push', msg => {
+      this.questionnaireServer.$on(this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH, msg => {
         this.closeQuestionList();
       });
-      this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-        if (res.code === 200) {
-          this.questionnaireServer.getSurveyList();
+      this.questionnaireServer.$on(
+        this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+        res => {
+          if (res.code === 200) {
+            this.questionnaireServer.getSurveyList();
+          }
         }
-      });
+      );
     },
     methods: {
       setSetingHeight() {
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px 80px为顶部图片一般高度
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 100 - 80;
+        let baseHeight = playerHeight + 71 - 80;
         if (this.isEmbed) {
           baseHeight = playerHeight - 80;
         }
@@ -273,7 +276,7 @@
             font-size: 28px;
             .ellipsis_title {
               display: -webkit-box;
-              /**autoprefixer: ignore next */
+              /* autoprefixer: ignore next */
               -webkit-box-orient: vertical;
               -webkit-line-clamp: 2;
               overflow: hidden;

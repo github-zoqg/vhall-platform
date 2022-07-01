@@ -89,14 +89,17 @@
     created() {
       this.questionnaireServer.checkIconStatus();
       this.questionnaireServer.getSurveyList();
-      this.questionnaireServer.$on('questionnaire_push', msg => {
+      this.questionnaireServer.$on(this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH, msg => {
         this.isShowQuestionList = false;
       });
-      this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-        if (res.code === 200) {
-          this.questionnaireServer.getSurveyList();
+      this.questionnaireServer.$on(
+        this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+        res => {
+          if (res.code === 200) {
+            this.questionnaireServer.getSurveyList();
+          }
         }
-      });
+      );
     },
     methods: {
       async checkQuestionnaireIcon() {
@@ -268,7 +271,7 @@
             border-radius: 2px;
             .ellipsis {
               display: -webkit-box;
-              /**autoprefixer: ignore next */
+              /* autoprefixer: ignore next */
               -webkit-box-orient: vertical;
               -webkit-line-clamp: 2;
               overflow: hidden;

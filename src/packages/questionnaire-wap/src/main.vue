@@ -8,7 +8,10 @@
     class="qa_popup"
     get-container="body"
   > -->
-    <i class="vh-iconfont vh-full-error close-btn" @click="close"></i>
+    <span class="close-btn" @click="close">
+      <i class="vh-iconfont vh-line-close"></i>
+    </span>
+
     <!-- 问卷标题 -->
     <div id="qs-content-box"></div>
   </div>
@@ -17,7 +20,7 @@
 <script>
   import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
+
   export default {
     name: 'VmpQuestionnaireWap',
     data() {
@@ -47,6 +50,15 @@
        * @description 聊天/按钮打开文件
        */
       open(questionnaireId) {
+        if (!window.VHall_Questionnaire_Service) {
+          this.$message({
+            type: 'warning',
+            message: '问卷SDK未加载，功能暂不支持'
+          });
+          return;
+        }
+        // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        this.questionnaireServer.init({ mode: 'watch' });
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1087'));
@@ -62,40 +74,53 @@
         this.popupVisible = false;
       },
       initEvent() {
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, async msg => {
-          useChatServer().addChatToList({
-            nickname: msg.nick_name,
-            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-            content: {
-              text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
-              questionnaire_id: msg.questionnaire_id
-            },
-            roleName: msg.room_role,
-            type: msg.type,
-            interactStatus: true,
-            isCheck: true
-          });
-          const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
-            msg.questionnaire_id
-          );
-          if (canAnswer !== true) {
-            this.questionnaireServer.setDotVisible(false);
-            return false;
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
+          async msg => {
+            if (window.VHall_Questionnaire_Service) {
+              // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+              this.questionnaireServer.init({ mode: 'watch' });
+            }
+            useChatServer().addChatToList({
+              nickname: msg.nick_name,
+              avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+              content: {
+                text_content: msg.alias ? `推送了${msg.alias}` : this.$t('chat.chat_1030'),
+                questionnaire_id: msg.questionnaire_id
+              },
+              roleName: msg.room_role,
+              type: msg.type,
+              interactStatus: true,
+              isCheck: true
+            });
+            const { data: canAnswer } = await this.questionnaireServer.checkAnswerStatus(
+              msg.questionnaire_id
+            );
+            if (canAnswer !== true) {
+              this.questionnaireServer.setDotVisible(false);
+              return false;
+            }
+            this.questionnaireServer.setDotVisible(true);
+            this.popupVisible = true;
+            await this.$nextTick();
+            this.questionnaireServer.renderQuestionnaire4Wap(
+              '#qs-content-box',
+              msg.questionnaire_id
+            );
           }
-          this.questionnaireServer.setDotVisible(true);
-          this.popupVisible = true;
-          await this.$nextTick();
-          this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', msg.questionnaire_id);
-        });
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.SUBMIT, res => {
-          if (res.code === 200) {
-            this.$toast(this.$t('form.form_1088'));
-            this.popupVisible = false;
-          } else {
-            this.$toast(this.$t('form.form_1087'));
-            this.popupVisible = false;
+        );
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
+          res => {
+            if (res.code === 200) {
+              this.$toast(this.$t('form.form_1088'));
+              this.popupVisible = false;
+            } else {
+              this.$toast(this.$t('form.form_1087'));
+              this.popupVisible = false;
+            }
           }
-        });
+        );
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
           this.popupVisible = false;
@@ -171,13 +196,21 @@
   }
   .close-btn {
     position: fixed;
-    color: black;
-    font-size: 60px;
-    width: 50px;
-    height: 50px;
-    top: 50px;
-    right: 50px;
+    width: 48px;
+    height: 48px;
+    top: 16px;
+    right: 16px;
     z-index: 30;
+    border-radius: 28px;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .vh-iconfont {
+      margin-top: 2px;
+      color: #fff;
+      font-size: 25px;
+    }
   }
   .title-bar {
     position: relative;
@@ -233,6 +266,10 @@
     background: #fff;
     height: 100%;
     overflow: auto;
+    .vhall-question-title {
+      max-height: 2.3rem;
+      height: auto;
+    }
   }
   .quest-header {
     z-index: 99;

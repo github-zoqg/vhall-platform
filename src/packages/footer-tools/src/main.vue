@@ -76,7 +76,7 @@
       </li>
       <li v-if="isLiving || isEnding">
         <!-- 抽奖 -->
-        <lottery-icon @clickIcon="checkLotteryIcon" />
+        <lottery-icon @clickIcon="checkLotteryIcon" @takeAward="takeAward" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="!isEmbed">
@@ -84,6 +84,7 @@
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
       </li>
+      <!-- TODO:支付牌照问题 -->
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
@@ -99,15 +100,16 @@
           />
         </div>
       </li>
-      <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
-        <!-- 打赏 -->
+      <!-- TODO:支付牌照问题 -->
+      <!-- 打赏 -->
+      <!-- <li v-if="roomBaseState.configList['ui.hide_reward'] == '0' && !isEmbed">
         <div class="vh-icon-box">
           <div class="vmp-reward-icon">
             <img src="./img/reward-icon.png" alt="" @click="onClickReward" class="show_img" />
           </div>
           <reward ref="reward" />
         </div>
-      </li>
+      </li> -->
       <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
         <!-- 点赞 -->
         <praise></praise>
@@ -156,7 +158,7 @@
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
-  import reward from './component/reward/index.vue';
+  // import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
@@ -168,7 +170,7 @@
     name: 'VmpFooterTools',
     components: {
       handup,
-      reward,
+      // reward,
       vhGifts,
       notice,
       praise,
@@ -382,6 +384,9 @@
       },
       checkLotteryIcon() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLotteryIcon'));
+      },
+      takeAward(lottery) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitTakeAward', [lottery]));
       },
       checkredPacketIcon(redPacketId) {
         window.$middleEventSdk?.event?.send(

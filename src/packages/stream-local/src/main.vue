@@ -2,7 +2,10 @@
   <div
     :id="`vmp-stream-local__${joinInfo.third_party_user_id}`"
     class="vmp-stream-local"
-    :class="{ 'vmp-stream-local__publish': localSpeaker.streamId, fullscreen: isFullScreen }"
+    :class="{
+      'vmp-stream-local__publish': localSpeaker.streamId || isRecording,
+      fullscreen: isFullScreen
+    }"
   >
     <!-- 流容器 -->
     <section
@@ -122,7 +125,7 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && groupRole != 20"
+            v-if="isInGroup ? groupRole != 20 : joinInfo.role_name != 1"
           ></span>
         </el-tooltip>
       </p>
@@ -188,12 +191,12 @@
           <span
             class="vmp-stream-local__shadow-icon vh-iconfont vh-a-line-handsdown"
             @click="speakOff"
-            v-if="joinInfo.role_name != 1 && groupRole != 20"
+            v-if="isInGroup ? groupRole != 20 : joinInfo.role_name != 1"
           ></span>
         </el-tooltip>
       </p>
       <p
-        v-if="joinInfo.role_name == 1 || groupRole == 20"
+        v-if="joinInfo.role_name == 1 || (groupRole == 20 && isInGroup)"
         class="vmp-stream-local__shadow-second-line"
       >
         <!-- 设为主讲人 -->
@@ -284,6 +287,11 @@
       SaasAlert
     },
     computed: {
+      // 是否是正在录制录制
+      isRecording() {
+        // 录制中，也会将liveStatus置为1
+        return this.$domainStore.state.roomBaseServer.watchInitData?.record?.is_recording;
+      },
       // 主讲人权限
       doc_permission() {
         if (this.isInGroup) {
@@ -394,7 +402,7 @@
       },
       autoSpeak() {
         // 观众自动禁音上麦 =   自动上麦开启 + 分组活动 + 观众 + 不在麦上 + 非同意主持人的邀请上麦 + 非自己申请上麦
-        if (this.groupRole == 20) {
+        if (this.groupRole == 20 && this.isInGroup) {
           return false;
         } else {
           return (
@@ -550,13 +558,19 @@
         } else {
           if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
             await this.stopPush();
-            if (this.$domainStore.state.interactiveServer.isInstanceInit) {
+            const obj = this.$domainStore.state.interactiveServer;
+            console.log('销毁1-1-1-1-1', obj);
+            // 优化代码逻辑，如果是ROLE_HOST角色，需要销毁实例
+            if (obj.isInstanceInit && obj.initRole === 'administrator') {
               await this.interactiveServer.destroy();
-            }
-            if (this.isNoDelay == 1) {
-              await sleep(200);
-              console.log('无延迟---销毁--互动实例');
-              await this.interactiveServer.init();
+              if (this.isNoDelay == 1) {
+                // 优化代码逻辑，如果是ROLE_HOST角色并且是无延迟直播，需要重新初始化为ROLE_AUDIENCE角色
+                await sleep(200);
+                if (!this.$domainStore.state.interactiveServer.isInstanceInit) {
+                  console.log('无延迟---初始化互动-1');
+                  await this.interactiveServer.init();
+                }
+              }
             }
           }
         }
@@ -571,16 +585,16 @@
       // 检查推流
       async checkStartPush() {
         console.log('本地流组件mounted钩子函数,是否在麦上', this.micServer.getSpeakerStatus());
-        if (this.roomBaseServer.state.watchInitData.webinar.type != 1) {
+        if (this.roomBaseServer.state.watchInitData.webinar.type != 1 && !this.isRecording) {
           return;
         }
 
-        // 实例化后是否是上麦状态
-        const isSpeakOn = this.micServer.getSpeakerStatus();
+        // 实例化后是否是上麦状态,如果是录制中，默认在麦上
+        const isSpeakOn = this.micServer.getSpeakerStatus() || this.isRecording;
         // 如果是没有开启分屏并且在麦上，推流
         // 如果是开启分屏  在麦上 是分屏页面  推流
         // 如果在转播，不推流
-        const hasRebroadcast = this.roomBaseServer.state.watchInitData.rebroadcast.id;
+        const hasRebroadcast = this.roomBaseServer.state.watchInitData.rebroadcast?.id;
 
         if (
           useMediaCheckServer().state.deviceInfo.device_status != 2 &&
@@ -742,7 +756,10 @@
 
           this.micServer.setSpeakerList([]);
         });
-        // 结束直播
+        // 分组继续讨论，初始化互动实例完成后，开始推流
+        this.interactiveServer.$on('PROCEED_DISCUSSION', msg => {
+          this.startPush();
+        });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           if (msg.data.type === 'vrtc_definition_set') {
             // 设备断开重连，重新检查device_status状态（主持人）
@@ -750,7 +767,11 @@
               await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: true });
             }
           }
-          if (msg.data.event_type === 'group_switch_end') {
+          // 分组结束讨论 || 分组暂停讨论
+          if (
+            msg.data.event_type === 'group_switch_end' ||
+            msg.data.event_type === 'group_switch_stop'
+          ) {
             // 如果开启分屏并且是主页面，不需要停止推流
             if (
               this.splitScreenServer.state.isOpenSplitScreen &&
@@ -761,7 +782,10 @@
 
             // 由于结束直播导致的结束讨论
             if (msg.data.over_live == 1) {
-              await this.stopPush();
+              // 此处仅处理非主持人的角色
+              if (this.joinInfo.role_name != 1) {
+                await this.stopPush();
+              }
               if (this.isWatch) {
                 this.roomBaseServer.setChangeElement('');
               } else {
@@ -848,53 +872,73 @@
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 音视频/图片推流 方式变更
-        if (param.videoType || param.canvasImgUrl || param.isRepublishMode) {
-          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-            await this.$refs.imgPushStream.updateCanvasImg();
-          }
-
-          if (param.isRepublishMode) {
-            if (this.videoPollingServer.state.isPolling) {
-              await this.videoStartPush();
-            } else {
-              await this.startPush();
+        const { videoType, canvasImgUrl, isRepublishMode } = param;
+        const { isPolling } = this.videoPollingServer.state;
+        try {
+          if (videoType || canvasImgUrl || isRepublishMode) {
+            if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+              await this.$refs.imgPushStream.updateCanvasImg();
             }
-          } else if (this.localSpeaker.streamId) {
-            await this.interactiveServer.unpublishStream(this.localSpeaker);
-            if (this.videoPollingServer.state.isPolling) {
-              await this.videoStartPush();
-            } else {
-              await this.startPush();
-            }
-          }
-        } else {
-          // (不在麦上 || 非视频轮巡状态中)  直接return
-          if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
-            return;
-          }
-          // 无缝切换音视频
-          if (param.audioInput) {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'audio'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
-            return;
-          }
 
-          if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'video'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
+            // 重新推流
+            if (param.isRepublishMode) {
+              if (isPolling) {
+                await this.videoStartPush();
+              } else {
+                this.isSpeakOn && (await this.startPush());
+              }
+            } else if (this.localSpeaker.streamId) {
+              await this.interactiveServer.unpublishStream(this.localSpeaker);
+
+              if (isPolling) {
+                await this.videoStartPush();
+              } else {
+                await this.startPush();
+              }
+            }
+          } else {
+            // (不在麦上 || 非视频轮巡状态中)  直接return
+            if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
+              return;
+            }
+            this.silenceSwitchStream(param);
           }
+        } finally {
+          // 检查设备状态
+          if (useMediaCheckServer().state.deviceInfo.device_status === 2) {
+            useMediaCheckServer().setDevice({ status: 1 });
+          }
+        }
+      },
+      /**
+       * 静默无缝切换流
+       * @param {*} param
+       */
+      silenceSwitchStream(param) {
+        // 无缝切换音频
+        if (param.audioInput) {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'audio'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
+        }
+
+        // 无缝切换视频
+        if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'video'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
         }
       },
       sleep(time = 1000) {
@@ -1278,7 +1322,7 @@
                 reject();
               }
             }
-          }, 100);
+          }, 130);
         });
       },
       PopAlertOfflineClose() {

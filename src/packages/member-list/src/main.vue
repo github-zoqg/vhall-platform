@@ -655,11 +655,12 @@
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
+            // 如果是发起端
             if (isLive) {
-              const groupUsersNumber = _this.groupServer.state.groupedUserList.length || 0;
+              const groupUsersNumber = _this.getGroupedUserLength();
               _this.totalNum = _this.isInGroup
                 ? msg.uv
-                : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUsersNumber : 0);
+                : msg.uv - (_this.groupInitData.switch_status == 1 ? groupUsersNumber : 0);
               _this.memberServer.updateState('totalNum', _this.totalNum);
             }
 
@@ -788,6 +789,10 @@
                   _this.memberServer.updateState('onlineUsers', _this.onlineUsers);
                 }
               } else {
+                //在主房间，但是是分组内成员上线
+                if (context?.groupInitData?.isInGroup) {
+                  return;
+                }
                 const user = {
                   account_id: msg.sender_id,
                   avatar: context.avatar,
@@ -826,16 +831,14 @@
         function handleUserLeaveRoom(msg) {
           const isLive = _this.isLive;
           const isWatch = _this.isWatch;
-          if (msg.context.isAuthChat) return; // 如果是聊天审核页面不做任何操作
+          if (msg?.context?.isAuthChat) return; // 如果是聊天审核页面不做任何操作
           const groupUserNum =
-            _this.groupServer.state.groupedUserList.length >= 1
-              ? _this.groupServer.state.groupedUserList.length - 1
-              : 0;
+            _this.getGroupedUserLength() >= 1 ? _this.getGroupedUserLength() - 1 : 0;
 
           if (isLive) {
             _this.totalNum = _this.isInGroup
               ? msg.uv
-              : msg.uv - (_this.interactToolStatus.is_open_switch == 1 ? groupUserNum : 0);
+              : msg.uv - (_this.groupInitData.switch_status == 1 ? groupUserNum : 0);
             _this.memberServer.updateState('totalNum', _this.totalNum);
           }
 
@@ -1058,7 +1061,7 @@
           if (_this.isInGroup) return;
 
           if (isLive) {
-            _this.totalNum = msg.uv - _this.groupServer.state.groupedUserList.length;
+            _this.totalNum = msg.uv - _this.getGroupedUserLength();
             _this.totalNum = _this.totalNum >= 0 ? _this.totalNum : 0;
             // 如果sender_id==自己
             if (msg.sender_id == _this.userId) {
@@ -1122,6 +1125,10 @@
               _this.updateOnlineUserList();
               break;
             case 'group_disband':
+              _this.updateOnlineUserList();
+              break;
+            case 'group_switch_proceed':
+              //groupServer并不会给在主房间的观众发开始讨论的消息，所以这里需要监听房间事件
               _this.updateOnlineUserList();
               break;
             default:
@@ -1825,6 +1832,14 @@
         if (this.$refs && this.$refs.scroll) {
           this.$refs.scroll.refresh();
         }
+      },
+      getGroupedUserLength() {
+        if (!this.groupServer.state.groupedUserList) return 0;
+        if (!this.groupServer.state.groupedUserList.length) return 0;
+        return this.groupServer.state.groupedUserList.reduce(
+          (preVal, curVal) => preVal + curVal.group_joins.length,
+          0
+        );
       }
     }
   };

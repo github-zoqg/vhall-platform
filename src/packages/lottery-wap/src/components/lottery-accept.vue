@@ -1,65 +1,32 @@
 <template>
-  <div class="lottery">
-    <p class="tips" style="text-align: left; padding: 30px 0px">
-      {{ $t('interact_tools.interact_tools_1018') }}
-    </p>
-    <ul v-if="winForm.length > 0">
-      <li v-for="(item, index) in winForm" :key="index">
-        <span class="must" style="color: red">
-          {{ item.is_required == 1 ? '*' : '' }}
-        </span>
-        <div class="form-item">
-          <input
-            type="text"
-            :placeholder="$tdefault(item.placeholder)"
-            style="line-height: normal"
-            autocomplete="off"
-            v-model="item.field_value"
-            @input="handleInput(index)"
-            @blur="textBlur"
-          />
-          <span class="word-length">
-            <i
-              :style="{
-                color: item.field_value.length >= item.maxLength ? '#fc5459' : '#333'
-              }"
-            >
-              {{ item.field_value.length }}
-            </i>
-            /{{ item.maxLength }}
-          </span>
-        </div>
-      </li>
-    </ul>
-    <ul v-else>
-      <li>
-        <div>
-          <input
-            type="text"
-            :placeholder="$t('interact_tools.interact_tools_1005')"
-            style="line-height: normal"
-            autocomplete="off"
-            v-model="name"
-            @blur="textBlur"
-          />
-        </div>
-      </li>
-      <li>
-        <div>
-          <input
-            type="tel"
-            :placeholder="$t('account.account_1049')"
-            style="line-height: normal"
-            autocomplete="off"
-            v-model.trim="phone"
-            @blur="textBlur"
-          />
-        </div>
-      </li>
-    </ul>
-    <button @click="submit" class="get-award">
-      {{ $t('interact_tools.interact_tools_1019') }}
-    </button>
+  <div class="lottery-accept">
+    <header class="title">{{ title }}</header>
+    <div class="form-wrap">
+      <ul class="form">
+        <li class="form-item" v-for="(item, index) in winForm" :key="index">
+          <div :class="[item.is_required === 1 ? 'required' : '', 'form-item__input']">
+            <div class="input-warp">
+              <input
+                class="form-inpput"
+                v-model="item.field_value"
+                type="text"
+                :maxlength="item.maxLength"
+                :placeholder="$tdefault(item.placeholder)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="form-item__error">
+            <span v-if="item.error">
+              {{ item.field_key | errorMsg }}
+            </span>
+          </div>
+        </li>
+      </ul>
+      <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
+        {{ $t('interact_tools.interact_tools_1019') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -71,27 +38,42 @@
     inject: ['lotteryServer'],
     data() {
       return {
-        name: '',
-        phone: '',
-        remarks: '',
-        winForm: [] // 中奖信息表单
+        winForm: [], // 中奖信息表单
+        verified: false
       };
     },
-    async created() {
-      await this.winFromInfo();
+    computed: {
+      title() {
+        return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
+      }
+    },
+    filters: {
+      errorMsg(fieldKey = '') {
+        const map = {
+          name: '姓名',
+          address: '地址',
+          phone: '手机号'
+        };
+        const field = map[fieldKey] || '';
+        return `请输入正确的信息${field}`;
+      }
+    },
+    watch: {
+      winForm: {
+        deep: true,
+        handler(forms) {
+          this.verified = forms.every(form => {
+            return form.is_required !== 1 || form.field_value.trim() !== '';
+          });
+        }
+      }
+    },
+    created() {
+      this.initFromInfo();
     },
     methods: {
-      handleInput(e) {
-        const formItem = this.winForm[e];
-        if (formItem.field_value.length > formItem.maxLength) {
-          this.winForm[e].field_value = formItem.field_value.substr(0, formItem.maxLength);
-        }
-      },
-      textBlur() {
-        // window.scroll(0, 0)
-      },
-      async winFromInfo() {
-        await this.lotteryServer.getDrawPrizeInfo().then(res => {
+      initFromInfo() {
+        this.lotteryServer.getDrawPrizeInfo().then(res => {
           if (res.data && res.data.length > 0) {
             res.data.map(item => {
               if (item.field_key == 'phone') {
@@ -100,28 +82,38 @@
                 item.maxLength = 200;
               }
               item.field_value = '';
-              return item;
+              item.error = false;
             });
             this.winForm = res.data;
           }
         });
       },
-      submit() {
-        if (this.winForm.length > 0) {
-          const unCheck = this.winForm.find(item => {
-            if ((item.is_required == 1) == 1 && item.field_value == '') {
-              this.$toast(
-                `${this.$t('interact_tools.interact_tools_1066')} ${
-                  !item.field.includes('自定义') ? this.$t(item.field) : ''
-                }`
-              );
-              return true;
-            } else {
-              return false;
+      /**
+       * @description 验证数据
+       */
+      verify() {
+        let relt = true;
+        this.winForm.map(item => {
+          if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
+            // 当手机号为必填,或者有输入手机号才正则校验
+            const phone = item.field_value.replace(/\s/g, '');
+            const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
+            if (!regs.test(phone)) {
+              item.error = true;
+              relt = false;
             }
-          });
-          if (unCheck) return;
-        }
+          } else if (item.is_required === 1 && item.field_value == '') {
+            item.error = true;
+            relt = false;
+          } else {
+            item.error = false;
+          }
+        });
+        return relt;
+      },
+      submit() {
+        if (!this.verify()) return false;
+
         const failure = err => {
           this.$toast(this.$t(err.msg));
         };
@@ -135,10 +127,13 @@
           .then(res => {
             if (res.code === 200) {
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
-              this.$toast(this.$t('interact_tools.interact_tools_1067'));
-              this.$nextTick(() => {
+              this.lotteryServer.initIconStatus();
+              if (this.showWinnerList) {
                 this.$emit('navTo', 'LotterySuccess');
-              });
+              } else {
+                this.$toast(this.$t('interact_tools.interact_tools_1013'));
+                this.$emit('close');
+              }
             } else {
               failure(res);
             }
@@ -150,134 +145,88 @@
     }
   };
 </script>
-<style lang="less" scoped>
-  .lottery {
-    p {
-      padding: 0px !important;
-      margin: 0px !important;
-      text-indent: 30px;
+<style lang="less">
+  .lottery-accept {
+    .title {
+      height: 100px;
+      font-weight: 500;
+      font-size: 32px;
+      color: #262626;
+      text-align: center;
+      line-height: 100px;
     }
-    ul > li {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      margin-bottom: 32px;
+    .form-wrap {
+      padding: 0 8px; // 给滚动条样式留空间
+      margin: 50px 0 60px;
     }
-    .must {
-      display: inline-block;
-      width: 8px;
-      height: 100%;
+    .form {
+      padding: 0 24px;
+      max-height: 498px;
+      overflow: auto;
     }
     .form-item {
-      width: 94%;
-      margin-left: 16px;
-      position: relative;
-      img {
-        width: 100%;
+      &__input {
+        position: relative;
+        padding-left: 37px;
+        border-bottom: 1px solid rgba(#f0f0f0);
+        &.required:before {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          position: absolute;
+          top: 10px;
+          left: 12px;
+          content: '*';
+          font-size: 24px;
+          color: #fb2626;
+          display: inline-block;
+        }
       }
-      input {
-        display: inline-block;
-        width: 75%;
-      }
-      .word-length {
-        display: inline-block;
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        font-size: 14px;
-        color: #333;
-        padding-right: 10px;
+      &__error {
+        height: 40px;
+        padding-top: 6px;
+        padding-left: 37px;
+        font-size: 28px;
+        color: #fb2626;
       }
     }
-    .get-award {
+    .input-warp {
+      height: 32px;
+      margin: 12px 0 25px;
+    }
+    .form-inpput {
+      width: 100%;
+      outline: 0;
+      font-size: 28px;
+      color: #262626;
+      &::-webkit-input-placeholder {
+        color: #bfbfbf;
+      }
+    }
+    .submit-btn {
       display: block;
-      width: 364px !important;
+      width: 686px;
       height: 90px;
-      background: #fb3a32;
-      border-radius: 14px;
+      margin: 0 auto;
+      background: #fb2626;
+      border-radius: 45px;
+      line-height: 90px;
+      text-align: center;
+      font-size: 32px;
       color: #fff;
-      margin: 56px auto 0px auto;
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.4;
+      }
     }
-  }
-  .tips {
-    font-size: 28px;
-    font-family: PingFangSC;
-    font-weight: 400;
-    color: rgba(68, 68, 68, 1);
-    margin: 20px 0;
-    text-align: center;
-  }
-  ul {
-    padding: 0 30px;
-    li {
-      margin-top: 30px;
-      height: 86px;
-      line-height: 86px;
-      color: #444444;
-      font-size: 36px;
-      > div {
-        width: 100%;
-        // border: 1px solid #979797;
-        position: relative;
-        border-width: 0;
-        input {
-          background-color: transparent;
-          position: relative;
-          z-index: 1;
-        }
-        &::after {
-          content: ' ';
-          width: 200%;
-          height: 200%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          /* prettier-ignore */
-          border: 1px solid #979797;
-          transform: scale(0.5);
-          transform-origin: 0 0;
-          box-sizing: border-box;
-          border-radius: 16px;
-        }
-
-        padding-left: 20px;
-        height: 100%;
-        display: block;
-        input {
-          font-size: 30px;
-          display: block;
-          width: 100%;
-          font-weight: 400;
-          color: #333;
-          height: 100%;
-          transform: translate3d(0, 0, 0);
-        }
-      }
-      &.active {
-        color: white;
-        background-color: #fc5459;
-        position: relative;
-        border-width: 0;
-        input {
-          background-color: transparent;
-          position: relative;
-          z-index: 1;
-        }
-        &::after {
-          content: ' ';
-          width: 200%;
-          height: 200%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          /* prettier-ignore */
-          border: 1px solid #fc5459;
-          transform: scale(0.5);
-          transform-origin: 0 0;
-          box-sizing: border-box;
-          border-radius: 16px;
-        }
-      }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      //滚动条的设置
+      background-color: #ccc;
+      background-clip: padding-box;
+      border-radius: 4px;
     }
   }
 </style>

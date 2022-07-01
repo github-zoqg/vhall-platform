@@ -21,7 +21,10 @@ module.exports = {
     WeixinJSBridge: true,
     Vlog: true,
     moment: true,
-    Cookies: true
+    Cookies: true,
+    loadjs: true,
+    Aegis: true,
+    saas_aegis: true
   },
   extends: [
     'plugin:vue/essential', // vue2核心的lint的规则

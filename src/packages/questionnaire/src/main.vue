@@ -216,7 +216,7 @@
 </template>
 <script>
   import { useQuestionnaireServer, useChatServer } from 'middle-domain';
-  const QUESTIONNAIRE_PUSH = 'questionnaire_push'; // 推送消息
+
   export default {
     name: 'VmpQuestionnaire',
     provide() {
@@ -283,9 +283,16 @@
     },
     methods: {
       open() {
-        // if (!this.questionnaireServer) {
-        //   this.initSDK();
-        // }
+        if (!window.VHall_Questionnaire_Service) {
+          this.$message({
+            type: 'warning',
+            message: '问卷SDK未加载，功能暂不支持'
+          });
+          return;
+        }
+        // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        this.questionnaireServer.init({ mode: 'live' });
+
         this.initPage();
         this.dialogVisible = true;
       },
@@ -297,40 +304,53 @@
         this.queryQuestionnaireList(true);
       },
       initEvent() {
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.CREATE, data => {
-          this.questionnaireCreateInfo = data;
-          this.setReportData(data);
-          window.vhallReportForProduct &&
-            window.vhallReportForProduct.report(110062, {
-              report_extra: { id: data.id }
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_CREATE,
+          data => {
+            this.questionnaireCreateInfo = data;
+            this.setReportData(data);
+            window.vhallReportForProduct &&
+              window.vhallReportForProduct.report(110062, {
+                report_extra: { id: data.id }
+              });
+            this.saveDialogVisible = true;
+            this.shareQuestionnaire = true;
+            this.saving = false;
+          }
+        );
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_UPDATE,
+          (res, data) => {
+            this.setReportData(data);
+            if (res.code === 200) {
+              this.initPage();
+            }
+          }
+        );
+        this.questionnaireServer.$on(
+          this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH,
+          msg => {
+            if (window.VHall_Questionnaire_Service) {
+              // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+              this.questionnaireServer.init({ mode: 'live' });
+            }
+            const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
+            let text = this.$getRoleName(msg.room_role);
+            if (msg.room_role != 1) {
+              text = `${text}${msg.nick_name}`;
+            }
+            useChatServer().addChatToList({
+              nickname: '问卷',
+              avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+              content: {
+                text_content: `${text}发起了问卷`,
+                questionnaire_id: msg.questionnaire_id
+              },
+              roleName: join_info.role_name,
+              type: msg.type
             });
-          this.saveDialogVisible = true;
-          this.shareQuestionnaire = true;
-          this.saving = false;
-        });
-        this.questionnaireServer.$on(VHall_Questionnaire_Const.EVENT.UPDATE, (res, data) => {
-          this.setReportData(data);
-          if (res.code === 200) {
-            this.initPage();
           }
-        });
-        this.questionnaireServer.$on(QUESTIONNAIRE_PUSH, msg => {
-          const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
-          let text = this.$getRoleName(msg.room_role);
-          if (msg.room_role != 1) {
-            text = `${text}${msg.nick_name}`;
-          }
-          useChatServer().addChatToList({
-            nickname: '问卷',
-            avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
-            content: {
-              text_content: `${text}发起了问卷`,
-              questionnaire_id: msg.questionnaire_id
-            },
-            roleName: join_info.role_name,
-            type: msg.type
-          });
-        });
+        );
       },
       /**
        * @description 条件搜索列表

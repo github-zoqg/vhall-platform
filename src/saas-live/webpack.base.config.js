@@ -16,7 +16,7 @@ const htmlConfig = {
     Moment: '//s1.e.vhall.com/common-static/middle/moment/2.29.1/dist/moment.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
-    ElementUi: '//cnstatic01.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
@@ -27,8 +27,9 @@ const htmlConfig = {
   // cdn css
   cdnCss: {
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
-    iconfontCommon: '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.4/iconfont.css',
-    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.4/iconfont.css'
+    iconfontCommon:
+      '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
+    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
   }
 };
 
@@ -41,7 +42,8 @@ module.exports = {
       template: path.join(pathConfig.PUBLIC, 'index.html'),
       title: pkg.title,
       version: process.env.VUE_APP_BUILD_VERSION,
-      hash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
+      gitlabHash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
+      env: process.env.NODE_ENV, // 环境标识
       ...htmlConfig
     }
   }

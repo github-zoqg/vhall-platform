@@ -109,7 +109,7 @@
   import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
-  import emitter from '@/packages/app-shared/mixins/emitter';
+  import emitter from '@/app-shared/mixins/emitter';
   //消息提示定时器
   let tipMsgTimer;
   export default {
@@ -189,7 +189,7 @@
         //聊天配置
         chatOptions: {},
         //底部操作栏高度
-        operatorHeight: 90,
+        operatorHeight: 89,
         //是否展示礼物特效
         showSpecialEffects: true,
         //礼物特效数组
@@ -216,7 +216,9 @@
         pageSize: 50,
         isLoading: false,
         //隐藏拉取历史聊天按钮
-        hideChatHistory: false
+        hideChatHistory: false,
+        //回复或@消息id
+        targetId: ''
       };
     },
     computed: {
@@ -341,8 +343,11 @@
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
             if (!this.isOnlyShowSponsor || (this.isOnlyShowSponsor && msg.context.role_name != 2)) {
+              this.targetId = '';
               tipMsgTimer && clearTimeout(tipMsgTimer);
-              this.isHasUnreadAtMeMsg = true;
+              this.isHasUnreadNormalMsg = true;
+              this.isHasUnreadAtMeMsg = false;
+              this.isHasUnreadReplyMsg = false;
               this.unReadMessageCount++;
               this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
             }
@@ -350,8 +355,11 @@
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
         });
         //监听@我的消息
-        chatServer.$on('atMe', () => {
+        chatServer.$on('atMe', msg => {
           if (!this.isBottom()) {
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadReplyMsg = false;
             this.isHasUnreadAtMeMsg = true;
             this.tipMsg = this.$t('chat.chat_1075');
             tipMsgTimer && clearTimeout(tipMsgTimer);
@@ -361,13 +369,16 @@
           }
         });
         //监听回复我的消息
-        chatServer.$on('replyMe', () => {
+        chatServer.$on('replyMe', msg => {
           if (!this.isBottom()) {
-            this.isHasUnreadAtMeMsg = true;
+            this.targetId = msg.msg_id;
+            this.isHasUnreadNormalMsg = false;
+            this.isHasUnreadAtMeMsg = false;
+            this.isHasUnreadReplyMsg = true;
             this.tipMsg = this.$t('chat.chat_1076');
             tipMsgTimer && clearTimeout(tipMsgTimer);
             tipMsgTimer = setTimeout(() => {
-              this.isHasUnreadAtMeMsg = false;
+              this.isHasUnreadReplyMsg = false;
             }, 10000);
           }
         });
@@ -581,6 +592,9 @@
       onSwitchShowSpecialEffects(status) {
         this.showSpecialEffects = !status;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitHideEffect', [status]));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitHideEffectFullScreen', [status])
+        );
       },
       //处理只看主办方
       async onSwitchShowSponsor(status) {
@@ -618,20 +632,39 @@
           boxEventOpitons(this.cuid, 'emitOpenLivePrivateChatModal')
         );
       },
+      //获取目标消息索引
+      getTargetIndex(id) {
+        return this.chatList.findIndex(item => {
+          return item.msgId == id;
+        });
+      },
       //滚动到底部
       scrollBottom() {
         this.$nextTick(() => {
           this.$refs.chatlist.scrollToBottom();
+          this.isHasUnreadNormalMsg = false;
+          this.isHasUnreadAtMeMsg = false;
+          this.isHasUnreadReplyMsg = false;
           this.unReadMessageCount = 0;
         });
       },
       //滚动到目标处
       scrollToTarget() {
-        const index = this.chatList.length - this.unReadMessageCount;
-        this.$refs.chatlist.scrollToIndex(index);
+        const index = this.getTargetIndex(this.targetId);
+        if (index > -1) {
+          this.$refs.chatlist.scrollToIndex(index);
+        } else {
+          this.scrollBottom();
+        }
+        this.isHasUnreadNormalMsg = false;
+        this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
         this.unReadMessageCount = 0;
       },
       toBottom() {
+        this.isHasUnreadNormalMsg = false;
+        this.isHasUnreadAtMeMsg = false;
+        this.isHasUnreadReplyMsg = false;
         this.unReadMessageCount = 0;
       },
       //滚动条是否在最底部
@@ -772,7 +805,7 @@
       }
       &__tip-box {
         position: absolute;
-        z-index: 1;
+        z-index: 0;
         bottom: 5px;
         left: 50%;
         transform: translate(-50%, 0);

@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="vmp-basic-layout"
-    :class="{
+  <!-- :class="{
       'vmp-basic-layout__noHeader': !showHeader,
       'vmp-basic-layout__hasBottom': showBottom
-    }"
-  >
+    }" -->
+  <div class="vmp-basic-layout" style="position: fixed; top: 0; bottom: 0; left: 0; right: 0">
     <div class="vmp-basic-container" v-if="state === 1">
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
@@ -112,7 +110,7 @@
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
-          this.setBottom();
+          // this.setBottom();
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
@@ -201,7 +199,11 @@
         if (clientType === 'embed') {
           pageUrl = '/embedclient';
         }
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
+        location.replace(
+          `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`
+        );
+        // 避免产生历史路径
+        // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       setBottom() {
         /**
