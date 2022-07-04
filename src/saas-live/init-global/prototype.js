@@ -17,7 +17,7 @@ Object.defineProperty(window.$globalConfig, 'currentLang', {
     localStorage.setItem('lang', value);
   },
   get: function () {
-    return localStorage.getItem('lang') || window.$globalConfig?.lang || 'zh';
+    return window.$globalConfig?.lang || 'zh';
   }
 });
 

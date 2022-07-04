@@ -15,13 +15,11 @@
       </div>
       <el-form class="packet-form-wrap" :model="packetForm" inline>
         <el-form-item label="红包口令">
-          <!--  onkeyup="this.value=this.value.replace(/[^a-z0-9_A-Z\u4E00-\u9FA5a]/g,'')" -->
           <el-input
             class="form-input"
             :class="isCheckCode ? 'el-form-item_error' : ''"
             maxlength="18"
-            @blur="checkCode"
-            placeholder="6-18位汉字、数字，不支持符号"
+            placeholder="6-18位汉字、数字"
             show-word-limit
             v-model.trim="packetForm.code"
           ></el-input>
@@ -47,6 +45,7 @@
             :class="isCheckSuccess ? 'el-form-item_error' : ''"
             @blur="checkNum"
             placeholder="输入人数"
+            onkeyup="this.value=this.value.replace(/^((?!^[1-9]([0-9]+)?$).)*/g,'')"
             :disabled="packetForm.packetType == 1"
             show-word-limit
             v-model.trim="packetForm.num"
@@ -59,7 +58,7 @@
           round
           :disabled="packetForm.code.length < 6"
           class="start-btn"
-          @click="redpacketSend('packetForms')"
+          @click="redpacketSend()"
         >
           发红包
         </el-button>
@@ -102,7 +101,7 @@
       }
     },
     methods: {
-      async open() {
+      open() {
         this.sendDialogVisible = true;
         this.restForm();
         this.redPacketServer.getRedpacketTotal();
@@ -118,21 +117,21 @@
         };
       },
       redpacketSend() {
-        if (this.isCheckCode) {
-          this.$message.warning('请输入6~18位汉字、数字或字母');
-          return;
-        }
-        if (this.packetForm.packetType == 2 && this.isCheckSuccess) {
+        // if (this.isCheckCode) {
+        //   this.$message.warning('请输入6~18位汉字、数字或字母');
+        //   this.isCheckCode = true;
+        //   return;
+        // }
+        if (this.packetForm.packetType == 2 && (this.isCheckSuccess || this.packetForm.num == '')) {
           this.$message.warning('需大于0小于当前在线人数');
+          this.isCheckSuccess = true;
           return;
         }
         let params = {
           red_code: this.packetForm.code,
-          join_type: this.packetForm.packetType
+          join_type: this.packetForm.packetType,
+          number: this.packetForm.packetType == 2 ? this.packetForm.num : undefined
         };
-        if (this.packetForm.packetType == 2) {
-          params.number = this.packetForm.num;
-        }
         this.redPacketServer
           .createCodeRedPacket(params)
           .then(res => {
@@ -151,17 +150,9 @@
       },
       reportRedPacket() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110054);
-        // window.vhallReportForProduct &&
-        //   window.vhallReportForProduct.report(this.redcouponType === 1 ? 110055 : 110056);
-        // window.vhallReportForProduct &&
-        //   window.vhallReportForProduct.report(this.channel === 'ALIPAY' ? 110058 : 110059);
       },
       checkNum() {
-        if (
-          this.packetForm.num == '' ||
-          this.packetForm.num == 0 ||
-          this.packetForm.num > this.onlineAmount
-        ) {
+        if (this.packetForm.num == '' || this.packetForm.num > this.onlineAmount) {
           this.$message.warning('需大于0小于当前在线人数');
           this.isCheckSuccess = true;
           return;
@@ -212,20 +203,31 @@
           }
         }
       }
+      .el-input__count {
+        font-size: 14px;
+      }
     }
     .el-radio {
-      margin-right: 23px;
+      margin-right: 20px;
       &.radio_last {
         margin-right: 5px;
       }
     }
     .el-radio__label {
       color: #222;
-      padding-left: 2px;
+      padding-left: 0;
     }
     .el-radio__input {
       &.is-checked + .el-radio__label {
         color: #222;
+      }
+      .el-radio__inner {
+        width: 16px;
+        height: 16px;
+        &::after {
+          width: 8px;
+          height: 8px;
+        }
       }
     }
     .form-num {
@@ -251,7 +253,10 @@
     &_header {
       width: 100%;
       text-align: center;
-      padding-bottom: 24px;
+      padding: 14px 0;
+      background: #f2f2f2;
+      border-radius: 4px;
+      margin-bottom: 16px;
       .header_tip {
         font-size: 16px;
         color: #000;

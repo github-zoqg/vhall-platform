@@ -48,8 +48,7 @@
         <!-- TODO:支付牌照问题 -->
         <div
           class="vmp-interact-menu-list-item"
-          :class="{ 'vmp-interact-menu-list-disable': !isLiving || true }"
-          style="pointer-events: auto; cursor: default"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
           @click="openRedPacket"
           v-if="configList['ui.show_redpacket']"
         >

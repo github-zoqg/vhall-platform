@@ -8,7 +8,7 @@
           'question_answer_open',
           'question_answer_close',
           'sign_in_push',
-          'red_envelope_ok'
+          'pwd_red_envelope_ok'
         ].includes(source.type)
       "
     >
@@ -26,7 +26,7 @@
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
           </template>
-          <template v-if="source.type == 'red_envelope_ok'">
+          <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
               class="new-award-img"
               :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
@@ -646,7 +646,7 @@
         border-width: 0;
         height: 48px;
         line-height: 40px;
-        &.red_envelope_ok {
+        &.pwd_red_envelope_ok {
           display: flex;
           align-items: center;
           padding-left: 84px;
