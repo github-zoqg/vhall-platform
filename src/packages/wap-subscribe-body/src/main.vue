@@ -447,11 +447,6 @@
                   process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
               );
-              // 避免产生历史路径
-              // window.location.href =
-              //   window.location.origin +
-              //   process.env.VUE_APP_ROUTER_BASE_URL +
-              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -639,11 +634,6 @@
                   process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
               );
-              // 避免产生历史路径
-              // window.location.href =
-              //   window.location.origin +
-              //   process.env.VUE_APP_ROUTER_BASE_URL +
-              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
