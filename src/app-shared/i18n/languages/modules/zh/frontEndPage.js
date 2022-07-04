@@ -533,7 +533,12 @@ export default {
     interact_tools_1076: '中奖记录',
     interact_tools_1077: '领取',
     interact_tools_1078: '已领取',
-    interact_tools_1079: '已中奖'
+    interact_tools_1079: '已中奖',
+    interact_tools_1080: '口令红包',
+    interact_tools_1081: '支付宝搜“红包”，输入口令',
+    interact_tools_1082: '一键复制口令',
+    interact_tools_1083: '查看领取名单',
+    interact_tools_1085: '领取Top10名单'
   },
   setting: {
     setting_1002: '观看设置',

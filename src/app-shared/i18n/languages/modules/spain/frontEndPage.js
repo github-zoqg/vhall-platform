@@ -545,7 +545,12 @@ export default {
     interact_tools_1076: '',
     interact_tools_1077: '',
     interact_tools_1078: '',
-    interact_tools_1079: ''
+    interact_tools_1079: '',
+    interact_tools_1080: '',
+    interact_tools_1081: '',
+    interact_tools_1082: '',
+    interact_tools_1083: '',
+    interact_tools_1085: ''
   },
   setting: {
     setting_1002: 'Configuración de la vista',

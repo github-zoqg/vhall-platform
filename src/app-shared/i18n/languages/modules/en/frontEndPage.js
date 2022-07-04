@@ -538,7 +538,12 @@ export default {
     interact_tools_1076: 'Records',
     interact_tools_1077: 'To get',
     interact_tools_1078: 'Got',
-    interact_tools_1079: 'Winning'
+    interact_tools_1079: 'Winning',
+    interact_tools_1080: 'Red envelope',
+    interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
+    interact_tools_1082: 'Copy password',
+    interact_tools_1083: 'View the detail',
+    interact_tools_1085: 'TOP 10 list'
   },
   setting: {
     setting_1002: 'View settings',
