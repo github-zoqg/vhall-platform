@@ -67,9 +67,7 @@
         console.error(err);
         if (err.code == 510008) {
           // 未登录
-          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
-            location.search
-          }`;
+          location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
         }
         this.state = 2;
         this.errMsg = err.msg;
