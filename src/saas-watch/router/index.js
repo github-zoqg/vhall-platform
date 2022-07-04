@@ -94,7 +94,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
-  if (isDev) {
+  if (!isDev) {
     await ssoAutoLogin(); // sso自动登录置换token
   }
   console.log('---grayInit---', res);
