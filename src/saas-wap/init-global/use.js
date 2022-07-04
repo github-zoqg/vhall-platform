@@ -76,6 +76,8 @@ import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
 import VmpSubscribeBody from '@/packages/wap-subscribe-body';
 // 红包
 import VmpRedPacketWap from '@/packages/red-packet-wap/index';
+// 口令红包
+import VmpRedPacketCommandWap from '@/packages/red-packet-command-wap/index';
 
 import VmpWapDesktopScreen from '@/packages/stream-desktop-screen-wap';
 
@@ -126,6 +128,7 @@ Vue.use(VmpChapterWap);
 Vue.use(VmpQaWap);
 Vue.use(VmpQuestionnaireWap);
 Vue.use(VmpRedPacketWap);
+Vue.use(VmpRedPacketCommandWap);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpWapSignUpForm);
 Vue.use(VmpWapDesktopScreen);

@@ -1,4 +1,4 @@
-import VmpRedPacketLive from './src/live';
+import VmpRedPacketLive from './src/codeLive';
 
 /* istanbul ignore next */
 VmpRedPacketLive.install = function (Vue) {

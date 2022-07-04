@@ -65,6 +65,7 @@ export default async function () {
         'adv-default',
         'invite-card',
         'red-packet',
+        'pwd-red-packet',
         'room-tool',
         'goods-default',
         'announcement',

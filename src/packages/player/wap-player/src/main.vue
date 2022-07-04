@@ -1,12 +1,11 @@
 <template>
   <div class="vmp-wap-player">
     <template v-if="encrypt">
-      <div v-show="isNoBuffer" class="vmp-wap-player-prompt">
+      <!-- <div class="vmp-wap-player-prompt">
         <van-loading color="#fb2626" />
-        <!-- <img class="vmp-wap-player-prompt-load" src="./img/load.gif" /> -->
         <span class="vmp-wap-player-prompt-text">{{ prompt }}</span>
-      </div>
-      <div v-show="!isNoBuffer" id="videoWapBox" class="vmp-wap-player-video">
+      </div> -->
+      <div id="videoWapBox" class="vmp-wap-player-video">
         <!-- 播放器背景图片 -->
         <div class="vmp-wap-player-prompt" v-if="isShowPoster && !isSmallPlayer">
           <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
@@ -402,7 +401,7 @@
       const initIndex = this.subscribeServer.state.initIndex;
       return {
         asd: 1,
-        isNoBuffer: false,
+        // isNoBuffer: false,
         // promptFlag: false,
         isOpenSpeed: false,
         isOpenQuality: false,
@@ -1017,9 +1016,9 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      &-text {
-        margin-top: 20px;
-      }
+      // &-text {
+      //   margin-top: 20px;
+      // }
       &-poster {
         width: 100%;
         height: 100%;
