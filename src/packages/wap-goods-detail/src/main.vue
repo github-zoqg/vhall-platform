@@ -87,7 +87,6 @@
             });
           }
           window.open(url);
-          // window.location.href = this.info.goods_url;
         }
       },
       handleClose() {
