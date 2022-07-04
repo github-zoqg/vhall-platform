@@ -101,32 +101,24 @@
       }
       this.assistantToken = getQueryString('assistant_token');
       this.assistantType = getQueryString('assistantType');
+      //初始化房间信息
+      await this.initRoomInfo();
       // 客户端中嵌入的一个第三方采用的是cef框架，用view_type=cef地址栏传递
       this.webviewType = getQueryString('view_type');
       if (this.assistantType == 'doc') {
         this.componentName = 'Doc';
-        // TODO: 待优化 dom按时无法获取
-        // let dom = document.getElementsByClassName('embed-doc-box')[0];
-        // if (!dom) {
-        //   let timer = setInterval(() => {
-        //     this.$nextTick(() => {
-        //       console.log(document.getElementsByClassName('embed-doc-box')[0], 'embed-doc-box');
-        //     });
-        //     document.getElementsByClassName('embed-doc-box')[0].style.height =
-        //       window.innerHeight + 'px';
-        //     clearInterval(timer);
-        //   }, 500);
-        // }
       } else if (this.assistantType == 'chat') {
         this.componentName = 'Chat';
       } else if (this.assistantType == 'tools') {
         this.componentName = 'Tools';
       }
-      await this.getUserInfo();
-      setTimeout(() => {
-        // 给一些时间去初始化  要不不存在dom对象
+      // setTimeout(() => {
+      //   // 给一些时间去初始化  要不不存在dom对象
+
+      // }, 500);
+      this.$nextTick(() => {
         this.initAssistantMsg();
-      }, 500);
+      });
     },
 
     mounted() {
@@ -225,7 +217,7 @@
         this.tool_component_name = name;
       },
       // 初始化房间
-      async getUserInfo() {
+      async initRoomInfo() {
         const _data = {
           webinar_id: this.il_id,
           check_online: 0,
@@ -331,14 +323,20 @@
             });
         });
       },
-      // 初始化直播房间
+      // 初始化直domain
       initSendLive(params) {
         const { assistant_token } = this.$route.query;
         if (assistant_token) {
           localStorage.setItem('token', assistant_token);
         }
+        const plugins = ['chat'];
+        if (this.assistantType == 'doc') {
+          plugins.push('doc');
+        } else if (this.assistantType == 'tools') {
+          plugins.push('interaction', 'questionnaire');
+        }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
+          plugins,
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
