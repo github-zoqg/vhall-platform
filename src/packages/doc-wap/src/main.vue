@@ -68,8 +68,8 @@
         @click="doRotate"
         class="btn-doc-rotate"
       >
-        <i class="vh-iconfont vh-line-sponsor" v-if="isPortrait && !!!rotateNum"></i>
-        <i class="vh-iconfont vh-line-send" v-else></i>
+        <i class="vh-iconfont vh-line-landscape" v-if="isPortrait && !!!rotateNum"></i>
+        <i class="vh-iconfont vh-line-vertical-screen" v-else></i>
       </div>
       <!-- 全屏切换 -->
       <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
