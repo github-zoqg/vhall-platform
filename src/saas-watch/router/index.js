@@ -90,7 +90,7 @@ const router = new VueRouter({
 });
 
 // 当前是否为开发环境
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development';
 
 router.beforeEach(async (to, from, next) => {
   const res = await grayInit(to);
