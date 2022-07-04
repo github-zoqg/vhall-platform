@@ -12,7 +12,7 @@
   /**
    * @description 红包的图标 + 小红点
    */
-  import { useRedPacketServer } from 'middle-domain';
+  import { useCodeRedPacketServer } from 'middle-domain';
   export default {
     name: 'RedPacketIcon',
     data() {
@@ -22,13 +22,13 @@
       };
     },
     beforeCreate() {
-      this.redPacketServer = useRedPacketServer({
+      this.redPacketServer = useCodeRedPacketServer({
         mode: 'watch'
       });
     },
     created() {
-      console.log('initIconStatus created');
-      this.redPacketServer.initIconStatus();
+      console.log('initIconStatus created-口令红包');
+      this.redPacketServer.initIconStatus(); //口令红包暂时代替红包
     },
     methods: {
       checkRedPacketIcon() {
