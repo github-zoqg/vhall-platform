@@ -14,9 +14,10 @@
           <span class="name">{{ $tdefault(giftInfo.name) }}</span>
           <div class="price">
             <span>
-              ￥{{
+              <!-- TODO:支付牌照问题 -->
+              <!-- ￥{{
                 giftInfo.price == '0' ? $t('interact_tools.interact_tools_1058') : giftInfo.price
-              }}
+              }} -->
             </span>
             <span class="send-btn" :class="{ disable: btnDisabled }" @click="sendGift('WEIXIN')">
               {{ $t('interact_tools.interact_tools_1030') }}{{ btnDisabled ? `(${counter})` : '' }}
