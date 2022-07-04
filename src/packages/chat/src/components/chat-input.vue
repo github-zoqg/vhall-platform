@@ -275,6 +275,10 @@
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
+          if (this.$route.query.assistantType) {
+            //如果是客户端嵌入直接return
+            return;
+          }
           return this.$message.warning(this.$t('chat.chat_1009'));
         }
         const curmsg = useChatServer().createCurMsg();
