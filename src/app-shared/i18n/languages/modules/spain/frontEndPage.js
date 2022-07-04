@@ -459,7 +459,9 @@ export default {
     menu_1010: 'Chequear',
     menu_1011: 'Sin imagen',
     menu_1012: 'Gráfico por defecto',
-    menu_1013: 'Capítulos'
+    menu_1013: 'Capítulos',
+    menu_1014: '',
+    menu_1015: ''
   },
   interact_tools: {
     interact_tools_1001: 'Por favor, ingrese el título del sorteo',
@@ -543,7 +545,12 @@ export default {
     interact_tools_1076: '',
     interact_tools_1077: '',
     interact_tools_1078: '',
-    interact_tools_1079: ''
+    interact_tools_1079: '',
+    interact_tools_1080: '',
+    interact_tools_1081: '',
+    interact_tools_1082: '',
+    interact_tools_1083: '',
+    interact_tools_1085: ''
   },
   setting: {
     setting_1002: 'Configuración de la vista',
@@ -621,7 +628,8 @@ export default {
     message_1031: '',
     message_1032: '',
     message_1033: '',
-    message_1034: ''
+    message_1034: '',
+    message_1035: ''
   },
   cash: {
     cash_1001: 'Gestionar saldo',
