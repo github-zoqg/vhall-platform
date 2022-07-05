@@ -117,7 +117,8 @@
     useMediaSettingServer,
     useMediaCheckServer,
     useInteractiveServer,
-    useRoomBaseServer
+    useRoomBaseServer,
+    useVideoPollingServer
   } from 'middle-domain';
 
   import mediaSettingConfirm from './js/showConfirm';
@@ -179,12 +180,17 @@
       // 是否为云导播活动
       streamYun() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+      },
+      // 当前人是否在视频轮巡
+      isPolling() {
+        return this.videoPollingServer.state.isPolling;
       }
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
       this.mediaCheckServer = useMediaCheckServer();
       this.interactiveServer = useInteractiveServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
@@ -202,7 +208,7 @@
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        if (![3, 4].includes(+msg.data.streamType)) {
+        if (![3, 4].includes(+msg.data.streamType) && !this.isPolling) {
           // 非桌面共享 ｜ 非插播
           if (role == 1) {
             this.hostAlertVisible ? null : (this.hostAlertVisible = true);
@@ -212,7 +218,7 @@
         }
       });
       useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
-        if (![3, 4].includes(+msg.data.streamType)) {
+        if (![3, 4].includes(+msg.data.streamType) && !this.isPolling) {
           // 非桌面共享 ｜ 非插播
           if (!this.alertStatus) {
             if (role == 1) {
