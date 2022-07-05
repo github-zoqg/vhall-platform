@@ -30,9 +30,7 @@
                   />
                   <img
                     v-else
-                    :src="
-                      require('@/packages/app-shared/assets/img/wap/gift/' + secItem.name + '.png')
-                    "
+                    :src="require('@/app-shared/assets/img/wap/gift/' + secItem.name + '.png')"
                     alt
                   />
                 </div>

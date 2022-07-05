@@ -106,7 +106,7 @@
   import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
   import { useRoomBaseServer, useRebroadcastServer, useInteractiveServer } from 'middle-domain';
   import { sleep } from '@/app-shared/utils/tool';
-  import VideoPreview from '@/packages/app-shared/components/video-preview';
+  import VideoPreview from '@/app-shared/components/video-preview';
 
   import NoCreateImg from './img/no-create@2x.png';
   import NoSearchImg from './img/no-search@2x.png';

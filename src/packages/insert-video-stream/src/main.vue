@@ -166,7 +166,7 @@
   </div>
 </template>
 <script>
-  import videoPreview from '@/packages/app-shared/components/video-preview';
+  import videoPreview from '@/app-shared/components/video-preview';
   import {
     useInsertFileServer,
     useRoomBaseServer,

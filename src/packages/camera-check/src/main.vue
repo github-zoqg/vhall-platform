@@ -79,8 +79,8 @@
 
 <script>
   import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
-  import videoSwitchImg from '@/packages/app-shared/assets/img/video.gif';
-  import videoFailImg from '@/packages/app-shared/assets/img/videoFailed.png';
+  import videoSwitchImg from '@/app-shared/assets/img/video.gif';
+  import videoFailImg from '@/app-shared/assets/img/videoFailed.png';
   import { useMediaSettingServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
 
