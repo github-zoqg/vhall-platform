@@ -38,11 +38,11 @@ const playerMixins = {
           });
           if (this.isWarnPreview) {
             console.log(this.endTime);
+            window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
+              window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             }
-            window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
-            window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
           } else {
             const curLocalHistoryTime = window.sessionStorage.getItem(
               this.roomBaseServer.state.watchInitData.paas_record_id
