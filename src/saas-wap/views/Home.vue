@@ -139,6 +139,10 @@
           document.title = roomBaseState.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
+
+          // 如果往观看页跳转，需要清除暖场视频缓存
+          window.sessionStorage.removeItem('warm_recordId');
+          window.sessionStorage.removeItem('recordIds');
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
