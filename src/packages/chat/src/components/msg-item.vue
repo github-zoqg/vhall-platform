@@ -266,9 +266,8 @@
                 'interact-tools-content__img-reward': !source.content.gift_url
               }"
               :src="
-                require('@/packages/app-shared/assets/img/wap/chat/' +
-                  source.content.gift_name +
-                  '.png') || require('@/packages/app-shared/assets/img/wap/chat/reward.png')
+                require('@/app-shared/assets/img/wap/chat/' + source.content.gift_name + '.png') ||
+                require('@/app-shared/assets/img/wap/chat/reward.png')
               "
               :alt="$t('interact_tools.interact_tools_1029')"
             />
@@ -284,8 +283,8 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
-  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
+  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',
