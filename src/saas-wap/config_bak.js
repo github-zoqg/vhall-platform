@@ -132,9 +132,9 @@ export const serverConfig = {
       'comSignWap',
       'comWatchTimer',
       'comLotteryWap',
-      'comRedPacketWap',
+      'comRedPacketCommandWap',
       'comQuestionnaireWap'
-    ],
+    ], //支付问题暂时屏蔽红包，口令红包替代
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
       method: 'handleTimer'
@@ -144,9 +144,9 @@ export const serverConfig = {
       method: 'openSign'
     },
     emitOpenRedPacket: {
-      cuid: ['comRedPacketWap'],
+      cuid: ['comRedPacketCommandWap'],
       method: 'openRedPacket'
-    },
+    }, //支付问题暂时屏蔽红包，口令红包替代
     // 抽奖弹窗
     emitClickLotteryIcon: {
       cuid: ['comLotteryWap'],
@@ -514,6 +514,17 @@ export const serverConfig = {
   // 红包
   comRedPacketWap: {
     component: 'VmpRedPacketWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
+  //口令 红包
+  comRedPacketCommandWap: {
+    component: 'VmpRedPacketCommandWap',
     emitClickLogin: [
       //登录弹窗
       {

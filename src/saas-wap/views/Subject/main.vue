@@ -211,9 +211,7 @@
         this.open_hide = !this.open_hide;
       },
       toWatch(id) {
-        this.$router.push({
-          path: `/lives/watch/${id}`
-        });
+        window.location.href = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}`;
       }
     }
   };
