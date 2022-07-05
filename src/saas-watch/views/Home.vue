@@ -118,6 +118,10 @@
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
+          // 如果往观看页跳转，需要清除暖场视频缓存
+          window.sessionStorage.removeItem('warm_recordId');
+          window.sessionStorage.removeItem('recordIds');
+
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,

@@ -276,6 +276,9 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
+              // 如果往观看页跳转，需要清除暖场视频缓存
+              window.sessionStorage.removeItem('warm_recordId');
+              window.sessionStorage.removeItem('recordIds');
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
