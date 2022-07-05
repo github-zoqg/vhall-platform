@@ -508,7 +508,7 @@
       top: 71px;
       left: 0;
       .pageGroup {
-        margin-top: -72px !important;
+        margin-top: -80px !important;
       }
       .tools {
         margin-top: -88px !important;
@@ -520,7 +520,7 @@
       top: 0;
       left: 0;
       .pageGroup {
-        margin-top: -72px !important;
+        margin-top: -80px !important;
       }
       .tools {
         margin-top: -88px !important;
@@ -586,11 +586,11 @@
       left: 50%;
       transform: translateX(-50%);
       top: 100%;
-      margin-top: 48px;
+      margin-top: 40px;
       color: #fff;
       min-width: 90px;
       height: 40px;
-      padding: 2px 24px;
+      padding: 0 24px;
       border-radius: 100px;
       display: flex;
       align-items: center;
@@ -626,6 +626,9 @@
         font-size: 30px;
       }
       .btn-doc-fullscreen {
+        .vh-iconfont {
+          margin-top: 2px;
+        }
       }
 
       .btn-doc-restore {
@@ -642,7 +645,7 @@
       background-color: rgba(0, 0, 0, 0.4);
       width: 56px;
       height: 56px;
-      border-radius: 100px;
+      border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -653,9 +656,15 @@
       }
       &--prev {
         left: 32px;
+        .vh-iconfont {
+          margin-right: 6px;
+        }
       }
       &--next {
         right: 32px;
+        .vh-iconfont {
+          margin-left: 6px;
+        }
       }
     }
 
@@ -699,7 +708,7 @@
         }
       }
       .pageGroup {
-        bottom: 32px;
+        bottom: 40px;
         top: auto;
       }
       &.doc-landscape {
@@ -723,7 +732,7 @@
         }
         .pageGroup {
           right: 50%;
-          bottom: 16px;
+          bottom: 20px;
           top: auto;
           font-size: 14px;
           height: 20px;
@@ -734,6 +743,16 @@
           height: 28px;
           .vh-iconfont {
             font-size: 15px;
+          }
+          &--prev {
+            .vh-iconfont {
+              margin-right: 2px;
+            }
+          }
+          &--next {
+            .vh-iconfont {
+              margin-left: 2px;
+            }
           }
         }
       }
@@ -777,7 +796,7 @@
           transform: translateY(-50%) rotate(90deg) !important;
           bottom: auto;
           top: 50%;
-          left: 10px;
+          left: 12px;
           right: auto;
           margin-top: 0;
         }
