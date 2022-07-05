@@ -5,6 +5,7 @@
       'vmp-basic-layout__noHeader': !showHeader
     }"
   >
+    <div style="display: none">{{ browserInfo }}</div>
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -44,7 +45,8 @@
     data() {
       return {
         state: 0,
-        liveErrorTip: ''
+        liveErrorTip: '',
+        browserInfo: getBrowserType()
       };
     },
     computed: {
