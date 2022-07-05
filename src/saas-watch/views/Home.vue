@@ -28,8 +28,8 @@
 <script>
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { getQueryString } from '@/app-shared/utils/tool';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   export default {

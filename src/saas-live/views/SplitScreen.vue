@@ -16,7 +16,7 @@
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     data() {
       return {

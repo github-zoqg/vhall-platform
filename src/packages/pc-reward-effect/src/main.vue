@@ -73,7 +73,7 @@
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffect',

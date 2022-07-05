@@ -48,7 +48,7 @@
 </template>
 
 <script>
-  import { formatDate } from '@/packages/app-shared/utils/date';
+  import { formatDate } from '@/app-shared/utils/date';
   export default {
     name: 'VmpGoodsDetail',
     data() {

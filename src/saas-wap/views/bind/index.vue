@@ -5,7 +5,7 @@
 </template>
 <script>
   import { useUserServer } from 'middle-domain';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { getQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'bind',
     data() {

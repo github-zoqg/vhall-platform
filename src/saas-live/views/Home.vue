@@ -17,9 +17,9 @@
   import roomState from '../headless/room-state.js';
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import {
     Domain,
     useRoomBaseServer,

@@ -31,9 +31,9 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
-  import { getQueryString, getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
-  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
 
   export default {

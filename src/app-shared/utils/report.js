@@ -1,7 +1,7 @@
 // 本文件用于封装发起端、观看端通用的日志上报方法
 // 所有封装的上报的方法,全部添加 try catch 避免数据上报出错影响业务流程
 
-import { _toString } from '@/packages/app-shared/utils/toString';
+import { _toString } from '@/app-shared/utils/toString';
 
 // 观看端通用数据
 export function getReceiveCommonLogData() {

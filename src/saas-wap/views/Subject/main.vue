@@ -81,7 +81,7 @@
 
 <script>
   import { useSubjectServer } from 'middle-domain';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { urlToLink, padStringWhenTooLang } from './js/utils.js';
   export default {
     data() {

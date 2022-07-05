@@ -111,7 +111,7 @@
   import VideoSetting from './components/pages/video-setting.vue';
   import AudioInSetting from './components/pages/audio-in-setting.vue';
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   import {
     useMediaSettingServer,

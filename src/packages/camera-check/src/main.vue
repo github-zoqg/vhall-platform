@@ -82,7 +82,7 @@
   import videoSwitchImg from '@/packages/app-shared/assets/img/video.gif';
   import videoFailImg from '@/packages/app-shared/assets/img/videoFailed.png';
   import { useMediaSettingServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   /**
    * 获取差异obj

@@ -26,7 +26,7 @@
 
 <script>
   import { useAttentionServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
 
   export default {
