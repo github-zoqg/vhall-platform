@@ -109,7 +109,7 @@
   import TaskQueue from './taskQueue';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
   import Sources from './source/index.js';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',

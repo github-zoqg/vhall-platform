@@ -358,7 +358,7 @@ export const serverConfig = {
     },
     //红包弹窗
     emitClickRedPacketIcon: {
-      cuid: ['comRedPacket'],
+      cuid: ['comRedPacketCommand'], //先替换成口令红包 comRedPacket
       method: 'openRedPacket',
       args: ['$0']
     },
@@ -368,7 +368,13 @@ export const serverConfig = {
       method: 'open',
       args: ['$0']
     },
-    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket']
+    children: [
+      'comSignWatch',
+      'comWatchTimer',
+      'comQuestionnaire',
+      'comLottery',
+      'comRedPacketCommand'
+    ]
   },
   comSignWatch: {
     component: 'VmpSignWatch'
@@ -646,6 +652,17 @@ export const serverConfig = {
   // 红包
   comRedPacket: {
     component: 'VmpRedPacketWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
+  },
+  // 红包-口令
+  comRedPacketCommand: {
+    component: 'VmpRedPacketCommandWatch',
     emitClickLogin: [
       //登录弹窗
       {

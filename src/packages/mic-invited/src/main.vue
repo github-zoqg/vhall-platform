@@ -24,7 +24,7 @@
     useMediaCheckServer
   } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpMicInvited',
     components: {

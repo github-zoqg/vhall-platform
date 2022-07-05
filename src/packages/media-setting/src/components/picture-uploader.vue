@@ -44,7 +44,7 @@
 
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { sleep } from '@/packages/app-shared/utils/tool.js';
+  import { sleep } from '@/app-shared/utils/tool.js';
   import canvasDefaultImg from '../assets/img/canvasDefault.png';
   export default {
     props: {

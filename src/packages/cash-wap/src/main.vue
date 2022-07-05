@@ -143,6 +143,7 @@
             :placeholder="$t('account.account_1029')"
             autocomplete="off"
             @blur="validtorCode"
+            :formatter="codeFomatter"
           >
             <template #button>
               <van-button
@@ -185,8 +186,8 @@
 
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat } from '@/app-shared/utils/tool';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import NECaptcha from './components/NECaptcha';
   const defaltCashForm = {
     phone: '',
@@ -238,6 +239,13 @@
       }
     },
     methods: {
+      // 解决ios自动填充验证码会重复输入的问题
+      codeFomatter(value) {
+        if (value.length > 6) {
+          return value.slice(0, 6);
+        }
+        return value;
+      },
       // 打开组件
       openCashWap() {
         this.visible = true;

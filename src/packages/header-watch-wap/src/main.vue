@@ -26,7 +26,7 @@
 
 <script>
   import { useAttentionServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
 
   export default {
@@ -151,7 +151,7 @@
           });
       },
       goUser() {
-        this.$router.push({ path: `/user/home/${this.watchInitData.webinar.userinfo.user_id}` });
+        window.location.href = `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
       },
       showPublic() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));

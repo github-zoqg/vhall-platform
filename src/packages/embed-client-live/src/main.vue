@@ -35,10 +35,10 @@
     useMsgServer,
     useDocServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
-  import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
+  import { QWebChannel } from '@/app-shared/utils/qwebchannel';
+  import { getQueryString } from '@/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';
   export default {
     name: 'VmpEmbedClient',

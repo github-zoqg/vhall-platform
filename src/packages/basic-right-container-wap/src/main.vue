@@ -1,22 +1,14 @@
 <template>
   <div class="vmp-container-right-wap" v-if="!isInGroup">
     <div class="base-box" v-show="!showDoc">
-      <div class="icon-wrap">
-        <questionnaire-icon @clickIcon="checkQuestionnaireIcon" />
-      </div>
+      <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <div class="icon-wrap" @click="handleSign" v-show="showSign">
         <div class="have"></div>
         <img src="./image/icon.png" />
       </div>
-      <div class="icon-wrap" v-if="!isVod">
-        <lottery-icon @clickIcon="checkLotteryIcon" />
-      </div>
+      <lottery-icon v-if="!isVod" class="icon-wrap" @clickIcon="checkLotteryIcon" />
       <!-- 红包 -->
-      <template v-if="!isEmbed">
-        <div class="icon-wrap">
-          <red-packet-icon @clickIcon="handleRedPacket" />
-        </div>
-      </template>
+      <red-packet-icon class="icon-wrap" v-if="!isEmbed" @clickIcon="handleRedPacket" />
       <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
         <div :class="!timerVisible ? 'have' : ''"></div>
         <img src="./image/timer.png" />
@@ -28,7 +20,7 @@
 
 <script>
   import { useMenuServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
   import questionnaireIcon from './components/questionnaire-icon/index.vue';

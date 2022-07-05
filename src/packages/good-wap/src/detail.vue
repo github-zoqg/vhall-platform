@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import { formatDate } from '@/packages/app-shared/utils/date';
+  import { formatDate } from '@/app-shared/utils/date';
   export default {
     name: 'VmpGoodDetail',
     data() {
@@ -68,7 +68,6 @@
             });
           }
           window.open(this.info.goods_url);
-          // window.location.href = this.info.goods_url;
         }
       },
       goBack() {

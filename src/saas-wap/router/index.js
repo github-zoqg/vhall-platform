@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import grayInit from '@/app-shared/gray-init';
 import Subscribe from '../views/subscribe/index.vue';
-import { wxAuthCheck } from '../../packages/app-shared/utils/wechat';
+import { wxAuthCheck } from '@/app-shared/utils/wechat';
 import pageConfig from '../page-config/index';
 
 Vue.use(VueRouter);

@@ -273,7 +273,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
   import _ from 'lodash';
 

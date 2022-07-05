@@ -262,8 +262,8 @@
     useMsgServer,
     useVideoPollingServer
   } from 'middle-domain';
-  import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
+  import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
+  import { boxEventOpitons, sleep } from '@/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -872,53 +872,73 @@
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
         // 音视频/图片推流 方式变更
-        if (param.videoType || param.canvasImgUrl || param.isRepublishMode) {
-          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
-            await this.$refs.imgPushStream.updateCanvasImg();
-          }
-
-          if (param.isRepublishMode) {
-            if (this.videoPollingServer.state.isPolling) {
-              await this.videoStartPush();
-            } else {
-              await this.startPush();
+        const { videoType, canvasImgUrl, isRepublishMode } = param;
+        const { isPolling } = this.videoPollingServer.state;
+        try {
+          if (videoType || canvasImgUrl || isRepublishMode) {
+            if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+              await this.$refs.imgPushStream.updateCanvasImg();
             }
-          } else if (this.localSpeaker.streamId) {
-            await this.interactiveServer.unpublishStream(this.localSpeaker);
-            if (this.videoPollingServer.state.isPolling) {
-              await this.videoStartPush();
-            } else {
-              await this.startPush();
-            }
-          }
-        } else {
-          // (不在麦上 || 非视频轮巡状态中)  直接return
-          if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
-            return;
-          }
-          // 无缝切换音视频
-          if (param.audioInput) {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'audio'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
-            return;
-          }
 
-          if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
-            this.interactiveServer
-              .switchStream({
-                streamId: this.localSpeaker.streamId,
-                type: 'video'
-              })
-              .catch(err => {
-                console.error('切换失败', err);
-              });
+            // 重新推流
+            if (param.isRepublishMode) {
+              if (isPolling) {
+                await this.videoStartPush();
+              } else {
+                this.isSpeakOn && (await this.startPush());
+              }
+            } else if (this.localSpeaker.streamId) {
+              await this.interactiveServer.unpublishStream(this.localSpeaker);
+
+              if (isPolling) {
+                await this.videoStartPush();
+              } else {
+                await this.startPush();
+              }
+            }
+          } else {
+            // (不在麦上 || 非视频轮巡状态中)  直接return
+            if (!this.micServer.getSpeakerStatus() && !this.videoPollingServer.state.isPolling) {
+              return;
+            }
+            this.silenceSwitchStream(param);
           }
+        } finally {
+          // 检查设备状态
+          if (useMediaCheckServer().state.deviceInfo.device_status === 2) {
+            useMediaCheckServer().setDevice({ status: 1 });
+          }
+        }
+      },
+      /**
+       * 静默无缝切换流
+       * @param {*} param
+       */
+      silenceSwitchStream(param) {
+        // 无缝切换音频
+        if (param.audioInput) {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'audio'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
+        }
+
+        // 无缝切换视频
+        if (param.video && this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          this.interactiveServer
+            .switchStream({
+              streamId: this.localSpeaker.streamId,
+              type: 'video'
+            })
+            .catch(err => {
+              console.error('切换失败', err);
+            });
+          return;
         }
       },
       sleep(time = 1000) {

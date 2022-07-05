@@ -38,11 +38,12 @@
                 </div>
                 <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
-                  {{
+                  <!-- TODO:支付牌照问题 -->
+                  <!-- {{
                     secItem.price == 0
                       ? $t('interact_tools.interact_tools_1058')
                       : `￥${secItem.price}`
-                  }}
+                  }} -->
                 </p>
               </div>
               <div v-show="secItem.active" @click="giveGiftSubmit" class="btn">
@@ -60,8 +61,8 @@
 
 <script>
   // import { debounce } from 'lodash';
-  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',

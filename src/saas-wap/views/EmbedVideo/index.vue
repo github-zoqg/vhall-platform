@@ -25,8 +25,8 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
-  import { getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -199,8 +199,6 @@
         location.replace(
           `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`
         );
-        // 避免产生历史路径
-        // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`;
       }
     }
   };

@@ -102,10 +102,10 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import SaasDialog from '@/packages/pc-alert/src/dialog.vue';
   import { useRoomBaseServer, useRebroadcastServer, useInteractiveServer } from 'middle-domain';
-  import { sleep } from '@/packages/app-shared/utils/tool';
+  import { sleep } from '@/app-shared/utils/tool';
   import VideoPreview from '@/packages/app-shared/components/video-preview';
 
   import NoCreateImg from './img/no-create@2x.png';

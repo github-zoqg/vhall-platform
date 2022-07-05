@@ -20,7 +20,7 @@
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../../headless/embed-video-state.js';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Home',
     components: {

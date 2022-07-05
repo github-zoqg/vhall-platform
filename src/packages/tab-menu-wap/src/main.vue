@@ -200,8 +200,7 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe) return;
-        if (this.isEmbedVideo) return;
+        if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
