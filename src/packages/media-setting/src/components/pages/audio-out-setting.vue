@@ -2,7 +2,7 @@
   <section>
     <aside>
       <audio ref="outputAudioPlayer" id="outputAudioPlayer" loop>
-        <source src="@/packages/app-shared/assets/audio/audio.mp3" type="audio/mp3" />
+        <source src="@/app-shared/assets/audio/audio.mp3" type="audio/mp3" />
         This browser does not support the audio element.
       </audio>
     </aside>
