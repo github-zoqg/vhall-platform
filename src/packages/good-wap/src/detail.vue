@@ -68,7 +68,6 @@
             });
           }
           window.open(this.info.goods_url);
-          // window.location.href = this.info.goods_url;
         }
       },
       goBack() {
