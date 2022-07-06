@@ -18,7 +18,6 @@
 
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     name: 'VmpScreenPostWap',
     data() {
@@ -43,14 +42,7 @@
       // 链接跳转
       handleLink() {
         const url = this.useRoomBaseServer.state.screenPosterInfo.url;
-        const { system } = getBrowserType();
-        if ('ios' === system) {
-          console.log('当前是手机端打开-ios');
-          window.location.href = url;
-        } else {
-          console.log('当前是手机端打开-其它');
-          url && window.open(url);
-        }
+        url && window.open(url);
       },
 
       // 自动关闭
