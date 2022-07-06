@@ -887,7 +887,7 @@
               } else {
                 this.isSpeakOn && (await this.startPush());
               }
-            } else if (this.localSpeaker.streamId) {
+            } else if (this.localSpeaker.streamId || this.isRecording) {
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {
