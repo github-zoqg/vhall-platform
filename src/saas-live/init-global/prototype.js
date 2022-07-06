@@ -4,10 +4,6 @@ import moment from 'moment';
 
 // 初始化全局变量挂载到 window 上
 window.$globalConfig = globalConfig;
-
-// 初始化全局变量挂载的 vue 实例上
-Vue.prototype.$moment = moment;
-
 Object.defineProperty(window.$globalConfig, 'currentLang', {
   enumerable: true,
   configurable: true,

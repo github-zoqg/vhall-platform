@@ -882,7 +882,7 @@
       },
       filterTime() {
         return function (time) {
-          return this.$moment(time).format('HH:mm');
+          return moment(time).format('HH:mm');
         };
       },
       isAllChecked() {
