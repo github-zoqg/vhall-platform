@@ -189,7 +189,6 @@
   import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool';
   import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
   import NECaptcha from './components/NECaptcha';
-  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   const defaltCashForm = {
     phone: '',
     money: '',
@@ -426,14 +425,7 @@
 
       // 打开协议
       toCashProtol() {
-        const { system } = getBrowserType();
-        if ('ios' === system) {
-          console.log('当前是手机端打开-ios');
-          window.location.href = 'https://e.vhall.com/home/vhallapi/exchangeagreement';
-        } else {
-          console.log('当前是手机端打开-其它');
-          window.open('https://e.vhall.com/home/vhallapi/exchangeagreement', '_blank');
-        }
+        window.open('https://e.vhall.com/home/vhallapi/exchangeagreement', '_blank');
       },
 
       // 初始化定时器
