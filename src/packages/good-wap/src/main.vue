@@ -96,6 +96,7 @@
   import { useRoomBaseServer, useGoodServer, useMenuServer } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 
   export default {
     name: 'VmpGoodListWap',
@@ -232,8 +233,15 @@
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
         );
       },
-      handleBuy(val) {
-        window.open(val);
+      handleBuy(url) {
+        const { system } = getBrowserType();
+        if ('ios' === system) {
+          console.log('当前是手机端打开-ios');
+          window.location.href = url;
+        } else {
+          console.log('当前是手机端打开-其它');
+          window.open(url, '_blank');
+        }
       }
     }
   };
