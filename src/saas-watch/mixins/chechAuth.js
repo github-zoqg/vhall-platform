@@ -45,9 +45,12 @@ export default {
             }
           }
         }
-        const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
-        console.log('initCheckAuth, url', url);
-        window.location.href = url; // 去除参数上的user_auth_key
+        const st = setTimeout(() => {
+          clearTimeout(st)
+          const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
+          console.log('initCheckAuth, url', url);
+          window.location.href = url; // 去除参数上的user_auth_key
+        }, 3000)
       };
       await useUserServer()
         .oauthCallback({
