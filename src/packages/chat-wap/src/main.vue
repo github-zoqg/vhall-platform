@@ -430,6 +430,12 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
+        const clientW = document.body.clientWidth;
+        const clientH = document.body.clientHeight;
+        const ratio = window.devicePixelRatio || 1;
+        for (let i = 0; i < list.length; i++) {
+          list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${clientH * ratio},m_lfit`;
+        }
         ImagePreview({
           images: list,
           startPosition: index,
