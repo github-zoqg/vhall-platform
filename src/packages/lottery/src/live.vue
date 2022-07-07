@@ -229,10 +229,12 @@
       top: 50%;
       left: 50%;
       max-height: 80%;
-      transform: translate(-50%, -50%);
       overflow: auto;
+      background: #fff;
+      border-radius: 6px;
+      z-index: 777;
+      padding: 10px 0;
       transform: translate(-50%, -50%);
-
       .payment-title {
         font-weight: 500;
         background: #f4f4f4;
