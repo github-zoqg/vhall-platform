@@ -2,10 +2,9 @@
   <section class="vmp-media-setting-container">
     <saas-dialog
       :visible="isShow"
-      :title="$t('account.account_1005')"
+      :title="$t('setting.setting_1030')"
       width="480px"
       style="min-width: 480px"
-      :showDefault="false"
       @onReturn="cancelMediaSetting"
       @onClose="cancelMediaSetting"
     >
@@ -607,6 +606,14 @@
 </script>
 
 <style lang="less">
+  .vmp-media-setting-container {
+    .vmp-popup-dialog {
+      height: 500px;
+    }
+    .header {
+      height: 64px;
+    }
+  }
   .vmp-media-setting-dialog-body {
     .el-radio__input.is-checked + .el-radio__label {
       color: #606266;
@@ -614,7 +621,7 @@
 
     background: #fff;
     display: flex;
-    height: 500px;
+    height: 436px;
     box-sizing: border-box;
 
     // 左侧菜单
@@ -633,10 +640,10 @@
       display: flex;
       flex-direction: column;
       width: 360px;
-      padding: 64px 32px 24px;
-      overflow: auto;
       &-main {
         flex: 1;
+        overflow: auto;
+        padding: 14px 32px 0px;
 
         // 复用元素
         .vmp-media-setting-item {
@@ -684,7 +691,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
+        padding: 0 32px 16px;
+        box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.1);
         & > * {
           margin-top: 8px;
         }

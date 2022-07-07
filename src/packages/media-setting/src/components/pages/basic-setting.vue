@@ -1,7 +1,7 @@
 <template>
   <section>
     <main>
-      <section class="vmp-media-setting-item">
+      <section class="vmp-media-setting-item" v-if="roleName == 1">
         <label class="vmp-media-setting-item__label">画质选择</label>
         <el-select
           class="vmp-media-setting-item__content"
@@ -45,7 +45,10 @@
         </el-select>
       </section>
 
-      <section class="vmp-media-setting-item" v-if="liveMode != LIVE_MODE_MAP['VIDEO']">
+      <section
+        class="vmp-media-setting-item"
+        v-if="liveMode != LIVE_MODE_MAP['VIDEO'] && roleName == 1"
+      >
         <label class="vmp-media-setting-item__label">观看端布局(视频)</label>
         <section class="vmp-media-setting-item__content">
           <div
@@ -125,6 +128,10 @@
     computed: {
       webinar() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+      },
+      // 直播类型：1-音频 2-视频 3-互动 6-互动
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
       },
       // 直播状态： 直播中、已结束....
       liveStatus() {
