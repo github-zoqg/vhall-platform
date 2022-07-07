@@ -489,7 +489,7 @@
       }
     },
     mounted() {
-      if (this.isEmbedVideo) {
+      if (this.isEmbedVideo && !this.isWarnPreview) {
         const centerDom = document.querySelector('.vmp-basic-center');
         centerDom.style.width = '100%';
       }
@@ -837,7 +837,7 @@
           this.vodOption = {};
           this.liveOption = {
             type:
-              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1' ||
+              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] == 1 ||
               isIE()
                 ? 'hls'
                 : 'flv',
