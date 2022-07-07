@@ -83,7 +83,7 @@
 
       <!-- 文档播放器位置互换 -->
       <div
-        v-show="!!currentCid && displayMode != 'fullscreen'"
+        v-show="!!currentCid && displayMode != 'fullscreen' && !isNotSupportTrans"
         @click="transposition"
         class="btn-doc-transposition"
       >
@@ -103,6 +103,7 @@
   } from 'middle-domain';
   import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
+  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
   export default {
     name: 'VmpDocWap',
@@ -119,7 +120,8 @@
         rebroadcastStartTimer: null,
         rebroadcastStopTimer: null,
         rotateNum: 0, //旋转角度
-        isPortrait: true // 是否是竖屏  设备
+        isPortrait: true, // 是否是竖屏  设备
+        isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell)
       };
     },
     computed: {
