@@ -116,7 +116,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
-  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
+  import { streamInfo } from '@/app-shared/utils/stream-utils';
   export default {
     name: 'VmpWapStreamList',
 

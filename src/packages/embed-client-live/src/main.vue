@@ -35,10 +35,10 @@
     useMsgServer,
     useDocServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
-  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
-  import { QWebChannel } from '@/packages/app-shared/utils/qwebchannel';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
+  import { QWebChannel } from '@/app-shared/utils/qwebchannel';
+  import { getQueryString } from '@/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';
   export default {
     name: 'VmpEmbedClient',
@@ -360,10 +360,10 @@
           {
             user_id: this.rootActive.join_info.join_id,
             webinar_id: this.rootActive.webinar.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
             type: 4,
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
             env: ['production', 'pre'].includes(process.env.VUE_APP_NODE_ENV)
               ? 'production'

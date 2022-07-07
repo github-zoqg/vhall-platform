@@ -16,7 +16,7 @@
   </a>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpIconText',
     data() {
