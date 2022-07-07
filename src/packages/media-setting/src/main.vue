@@ -179,7 +179,10 @@
       },
       // 是否为云导播活动
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$route.name == 'yun'
+        );
       },
       // 当前人是否在视频轮巡
       isPolling() {
