@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { globalConfig } from '../page-config/global';
-import moment from 'moment';
 
 // 初始化全局变量挂载到 window 上
 window.$globalConfig = globalConfig;
