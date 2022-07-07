@@ -184,6 +184,14 @@
       // 当前人是否在视频轮巡
       isPolling() {
         return this.videoPollingServer.state.isPolling;
+      },
+      // 插播流详情
+      insertStreamInfo() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo;
+      },
+      // 桌面共享流
+      localDesktopStreamId() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     beforeCreate() {
@@ -333,6 +341,22 @@
           this.sendChangeEvent();
           this.setReport();
           this.getStateCapture(); // 更新快照
+        }
+        // 如果插播流为真
+        if (this.insertStreamInfo.streamId) {
+          // 推流过程中动态切换视频清晰或流畅模式
+          this.mediaSettingServer.setVideoContentHint({
+            streamId: this.insertStreamInfo.streamId,
+            hint: this.mediaState.videoHint
+          });
+        }
+        // 如果桌面共享流为真
+        if (this.localDesktopStreamId) {
+          // 推流过程中动态切换视频清晰或流畅模式
+          this.mediaSettingServer.setVideoContentHint({
+            streamId: this.localDesktopStreamId,
+            hint: this.mediaState.screenRate
+          });
         }
       },
       setReport() {
@@ -501,7 +525,8 @@
           ['selectedAudioOutputDeviceId', this.mediaState.audioInput || ''],
           ['selectedRate', this.mediaState.rate || ''],
           ['selectedScreenRate', this.mediaState.screenRate || ''],
-          ['layout', this.mediaState.layout || '']
+          ['layout', this.mediaState.layout || ''],
+          ['videoHint', this.mediaState.videoHint || '']
         ]);
 
         // 记录
@@ -609,7 +634,7 @@
       flex-direction: column;
       width: 360px;
       padding: 64px 32px 24px;
-
+      overflow: auto;
       &-main {
         flex: 1;
 

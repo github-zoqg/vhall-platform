@@ -21,7 +21,6 @@
         <label class="vmp-media-setting-item__label">桌面共享</label>
         <el-select
           class="vmp-media-setting-item__content"
-          :disabled="liveStatus === 1"
           v-model="mediaState.screenRate"
           placeholder="请选择桌面共享模式"
         >
@@ -30,6 +29,18 @@
             :key="rate.label"
             :value="rate.value"
             :label="rate.label"
+          ></el-option>
+        </el-select>
+      </section>
+
+      <section class="vmp-media-setting-item">
+        <label class="vmp-media-setting-item__label">插播文件</label>
+        <el-select class="vmp-media-setting-item__content" v-model="mediaState.videoHint">
+          <el-option
+            v-for="item in videoContentHint"
+            :key="item.label"
+            :value="item.value"
+            :label="item.label"
           ></el-option>
         </el-select>
       </section>
@@ -57,10 +68,17 @@
     <footer>
       <section class="vmp-media-setting-tips">
         <section class="vmp-media-setting-tips__title">{{ $t('account.account_1061') }}：</section>
+        <section class="vmp-media-setting-tips__title">桌面共享</section>
         <section class="vmp-media-setting-tips__content">
           <p>1.PPT静态演示：适用于桌面共享时演示文档、图片等静态内容</p>
           <p>2.视频动态演示：适用于演示视频等多动画内容</p>
-          <p>3. 直播中不可更改桌面共享类型</p>
+          <p>3.直播中不可更改桌面共享类型</p>
+        </section>
+        <section class="vmp-media-setting-tips__title">插播文件</section>
+        <section class="vmp-media-setting-tips__content">
+          <p>1.流畅度优先：适用于插播文件时演示视频等多动画内容</p>
+          <p>2.清晰度优先：适用于插播文件时演示文档、图片等静态内容</p>
+          <p>3.直播中可更改插播文件类型</p>
         </section>
       </section>
     </footer>
@@ -91,6 +109,10 @@
         screenRatesConfig: Object.freeze([
           { value: 'RTC_SCREEN_PROFILE_1080P_16x9_H', label: '视频动态演示模式' },
           { value: 'RTC_SCREEN_PROFILE_1080P_16x9_M', label: 'PPT静态演示模式' }
+        ]),
+        videoContentHint: Object.freeze([
+          { value: 'detail', label: '清晰度优先' },
+          { value: 'motion', label: '流畅度优先' }
         ]),
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
@@ -183,11 +205,13 @@
         const saveRate = sessionStorage.getItem('selectedRate') || this.ratesConfig[2]; // 默认标清
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
+        const videoHint = sessionStorage.getItem('videoHint') || this.videoContentHint[0].value; // 插播文件默认清晰度
 
         const savedLayout = sessionStorage.getItem('layout') || 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;
+        this.mediaState.videoHint = videoHint;
         this.mediaState.layout = savedLayout;
       },
       /**
@@ -259,5 +283,9 @@
         text-align: center;
       }
     }
+  }
+
+  .vmp-media-setting-tips__content {
+    margin-bottom: 8px;
   }
 </style>
