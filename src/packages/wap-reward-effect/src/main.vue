@@ -50,7 +50,7 @@
             <template v-if="!!Sources[rewardEffectInfo.data.gift_name]">
               <img
                 :src="
-                  require('@/packages/app-shared/assets/img/wap/gift/' +
+                  require('@/app-shared/assets/img/wap/gift/' +
                     rewardEffectInfo.data.gift_name +
                     '.png')
                 "
@@ -88,7 +88,7 @@
           </div>
           <div v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'" class="gift-img">
             <img
-              :src="require('@/packages/app-shared/assets/img/wap/gift/reward.png')"
+              :src="require('@/app-shared/assets/img/wap/gift/reward.png')"
               alt=""
               class="red-package"
             />
@@ -107,9 +107,9 @@
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import Sources from './source/index.js';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpWapRewardEffect',

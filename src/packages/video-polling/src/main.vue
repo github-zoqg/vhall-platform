@@ -89,7 +89,7 @@
   import { useVideoPollingServer, useInteractiveServer, useRoomBaseServer } from 'middle-domain';
   import screenfull from 'screenfull';
   import VmpVideoPollingMemberList from '@/packages/video-polling-member-list/src/main';
-  import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
+  import clientMsgApi from '@/app-shared/utils/clientMsgApi';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpVideoPolling',

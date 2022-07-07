@@ -218,7 +218,7 @@
   import memberItem from './components/member-item';
   import scroll from './components/scroll';
   import { throttle } from 'lodash';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import {
     useMicServer,
     useRoomBaseServer,

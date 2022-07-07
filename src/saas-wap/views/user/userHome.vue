@@ -125,7 +125,7 @@
 </template>
 
 <script>
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useHomepageServer } from 'middle-domain';
   export default {
     name: 'userHome',

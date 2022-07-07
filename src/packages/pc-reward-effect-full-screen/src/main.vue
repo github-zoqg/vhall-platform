@@ -15,7 +15,7 @@
   import SvgaPlayer from './svga-player';
   import ImgPlayer from './img-player';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffectFullScreen',

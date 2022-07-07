@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import { browserSupport } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
   import chrome from '../Chrome.vue';
   import tip from '../MsgTip.vue';
   export default {

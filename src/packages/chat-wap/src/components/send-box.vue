@@ -110,7 +110,7 @@
     useMicServer
   } from 'middle-domain';
   import Handup from './handup.vue';
-  import { isWechat } from '@/packages/app-shared/utils/tool';
+  import { isWechat } from '@/app-shared/utils/tool';
 
   export default {
     props: {

@@ -48,7 +48,6 @@
 </template>
 
 <script>
-  import { formatDate } from '@/packages/app-shared/utils/date';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     name: 'VmpGoodsDetail',
@@ -82,7 +81,7 @@
         } else {
           if (window.vhallReport) {
             window.vhallReport.report('GOOD_RECOMMEND', {
-              event: formatDate(new Date(), 'yyyy-MM-dd hh:mm'),
+              event: moment(new Date()).format('YYYY-MM-DD hh:mm'),
               market_tools_id: this.info.goods_id,
               market_tools_status: 1 // 购买
             });
