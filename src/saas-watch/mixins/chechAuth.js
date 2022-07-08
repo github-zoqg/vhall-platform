@@ -3,7 +3,6 @@ import { useUserServer } from 'middle-domain';
 export default {
   methods: {
     async initCheckAuth(watchPageType = 'watch') {
-      console.log('initCheckAuth');
       const userAuthKey = this.$route.query.user_auth_key; // url上带的三方授权回调信息
       if (!userAuthKey) return false;
       const authTag = localStorage.getItem('vmp_auth_tag') || '';
@@ -16,7 +15,6 @@ export default {
       }
       // const sceneId = authTag === 'withdraw' ? 2 : (authTag && authTag.indexOf('bind') > -1 ? 3 : 1);  // scene_id 场景id说明： 1登录 2提现绑定 3账户信息-账号绑定
       const failure = res => {
-        console.log('initCheckAuth, failure');
         if (!authTag) {
           this.$message({
             message: `${this.$t(res.code) || res.msg} || ${sceneId == 1 ? '登录失败' : '绑定失败'}`,
