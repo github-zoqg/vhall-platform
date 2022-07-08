@@ -43,7 +43,7 @@
 
 <script>
   import { useRoomBaseServer, useGoodServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
 
   export default {

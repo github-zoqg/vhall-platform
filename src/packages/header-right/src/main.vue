@@ -93,7 +93,7 @@
     useRebroadcastServer,
     useMsgServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpHeaderRight',
@@ -122,9 +122,9 @@
     computed: {
       formatDuration() {
         const temp = this.liveDuration * 1000;
-        const hours = this.$moment.duration(temp).hours();
-        const minutes = this.$moment.duration(temp).minutes();
-        const seconds = this.$moment.duration(temp).seconds();
+        const hours = moment.duration(temp).hours();
+        const minutes = moment.duration(temp).minutes();
+        const seconds = moment.duration(temp).seconds();
         return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;

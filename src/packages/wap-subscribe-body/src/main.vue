@@ -195,8 +195,8 @@
     isWechat,
     isWechatCom,
     getQueryString
-  } from '@/packages/app-shared/utils/tool.js';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
+  } from '@/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
   import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
@@ -287,9 +287,13 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
-      // 是否为完全嵌入页
+      // 是否为嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否为单视频嵌入页
+      isEmbedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       isTryVideo() {
         return (
@@ -332,6 +336,7 @@
     },
     methods: {
       handleScroll() {
+        if (this.isEmbedVideo) return;
         let dom = document.querySelector('.vmp-subscribe-body-info');
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
@@ -505,11 +510,6 @@
                   process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
               );
-              // 避免产生历史路径
-              // window.location.href =
-              //   window.location.origin +
-              //   process.env.VUE_APP_ROUTER_BASE_URL +
-              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();
@@ -700,11 +700,6 @@
                   process.env.VUE_APP_ROUTER_BASE_URL +
                   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`
               );
-              // 避免产生历史路径
-              // window.location.href =
-              //   window.location.origin +
-              //   process.env.VUE_APP_ROUTER_BASE_URL +
-              //   `/lives${pageUrl}/watch/${this.webinarId}${window.location.search}`;
             } else {
               setTimeout(() => {
                 window.location.reload();

@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="right-section">
-      <img src="../../packages/app-shared/assets/img/404.svg" alt="" class="svgImg" />
+      <img src="@/app-shared/assets/img/404.svg" alt="" class="svgImg" />
     </div>
   </div>
 </template>

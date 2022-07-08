@@ -28,8 +28,8 @@
 <script>
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { getQueryString } from '@/app-shared/utils/tool';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   export default {
@@ -126,10 +126,10 @@
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
             type: 4,
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });

@@ -53,7 +53,6 @@
     },
     created() {
       // this.acceptChapterData();
-      this.moment = this.$moment;
       if (
         this.webinarData.record &&
         this.webinarData.record.encrypt_status == 2 &&

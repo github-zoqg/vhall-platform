@@ -149,8 +149,8 @@
 </template>
 <script>
   import { useInsertFileServer, useMsgServer, useRoomBaseServer } from 'middle-domain';
-  import videoPreview from '@/packages/app-shared/components/video-preview';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import videoPreview from '@/app-shared/components/video-preview';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
   export default {
     name: 'VmpInsertVideoList',
