@@ -2,7 +2,17 @@
   <div class="vmp-third-stream" v-show="isShowThirdStream">
     <!-- 第三方推流 -->
     <div class="vmp-third-stream-box">
-      <div class="vmp-third-stream-title">推流设置</div>
+      <div class="vmp-third-stream-title">第三方发起</div>
+      <div class="vmp-third-stream-subTitle">第三方发起模式</div>
+      <div class="vmp-third-stream-tab">
+        <el-radio-group v-model="streamModal">
+          <el-radio :label="1">拉流设置1</el-radio>
+          <el-radio :label="2">拉流设置2</el-radio>
+        </el-radio-group>
+      </div>
+      <div class="vmp-third-stream-alert">
+        *当直播下有多个正在进行的拉流，观众只能看到拉取的第一路流
+      </div>
       <div class="vmp-third-stream-wrap">
         <div class="vmp-third-stream-wrap-left">
           <div class="vmp-third-stream-wrap-left-step">
@@ -37,6 +47,13 @@
               <div class="vmp-third-stream-wrap-right-top-input">
                 <el-input id="vmp-third-play" v-model="thirdPlayUrl" readOnly></el-input>
                 <span @click="doCopy(2)">复制</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px">
+              <label>拉流状态</label>
+              <div class="vmp-third-stream-wrap-right-top-input">
+                <el-input readOnly></el-input>
+                <span @click="doCopy(2)">刷新</span>
               </div>
             </div>
           </div>
@@ -81,7 +98,8 @@
       return {
         thirdWatchWebUrl: '',
         thirdPlayUrl: '',
-        isShowThirdStream: false
+        isShowThirdStream: false,
+        streamModal: 1
       };
     },
     beforeCreate() {
