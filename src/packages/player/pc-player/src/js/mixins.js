@@ -126,6 +126,7 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.loading = false;
+        console.log('加载完毕第一次进入');
         if (this.isWarnPreview) {
           // 如果暖场视频长度大于1，才初始化二个播放器。将isFirstEnterPlayer在初始化第一个之后置为true
           if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
@@ -156,6 +157,8 @@ const playerMixins = {
         console.log('-----------initPlayerIndex--------=========', this.initPlayerIndex);
         // 如果是暖场视频
         if (this.isWarnPreview) {
+          // 如果是第一次进入页面，刷新页面导致，就不走下面的逻辑
+          if (!this.subscribeServer.state.isFirstEnterPlayer) return;
           this.isShowPoster = true;
           this.isPlayering = false;
           if (this.warmUpVideoList.length == 1) {
