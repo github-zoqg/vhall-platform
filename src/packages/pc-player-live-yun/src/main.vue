@@ -115,9 +115,9 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useRoomBaseServer, usePlayerServer, useInteractiveServer } from 'middle-domain';
-  import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpPcPlayerLiveYun',

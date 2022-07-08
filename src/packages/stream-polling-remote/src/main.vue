@@ -48,8 +48,8 @@
 
 <script>
   import { useInteractiveServer, useMicServer, useMsgServer } from 'middle-domain';
-  import { calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import clientMsgApi from '@/packages/app-shared/utils/clientMsgApi';
+  import { calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
+  import clientMsgApi from '@/app-shared/utils/clientMsgApi';
   export default {
     name: 'VmpStreamPollingRemote',
     data() {

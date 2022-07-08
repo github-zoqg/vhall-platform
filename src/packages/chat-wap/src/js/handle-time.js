@@ -1,4 +1,3 @@
-import moment from 'moment';
 const handleTime = date => {
   if (!date) {
     return '';

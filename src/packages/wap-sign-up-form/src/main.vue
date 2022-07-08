@@ -1,12 +1,8 @@
 <template>
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
-      <header>
-        <img
-          v-show="formInfo.cover !== 1"
-          :src="formInfo.cover ? `${defaultImgUrl}${formInfo.cover}` : defaultHeader"
-          alt=""
-        />
+      <header class="cover-pic">
+        <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
@@ -358,9 +354,9 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString } from '@/packages/app-shared/utils/tool';
+  import { validEmail, validPhone, getQueryString } from '@/app-shared/utils/tool';
   import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/saas-wap/views/components/confirm.vue';
@@ -495,6 +491,10 @@
       };
     },
     computed: {
+      // 广告头图
+      coverPic() {
+        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_lfit,w_750`;
+      },
       //当前的城市列表
       currentCityList() {
         return this.cityList[this.province];
@@ -1542,20 +1542,13 @@
     position: relative;
     background: #fff;
     &__wrap {
-      header {
+      .cover-pic {
         width: 100%;
-        max-height: 2.3rem;
+        height: 125px;
         overflow: hidden;
-        display: -webkit-box;
         display: flex;
-        -webkit-box-pack: center;
         justify-content: center;
-        -webkit-box-align: center;
         align-items: center;
-        img {
-          height: 100%;
-          width: 100%;
-        }
       }
     }
     &__content {
@@ -1704,8 +1697,6 @@
           }
         }
       }
-    }
-    .vmp-wap-sign-up-form__content__tab-box {
     }
     .title-text {
       position: relative;
