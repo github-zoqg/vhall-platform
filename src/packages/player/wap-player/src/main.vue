@@ -792,7 +792,6 @@
         return playerParams;
       },
       getDuanxuPreview() {
-        if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
         let endTime;
         const parsedTotalTime = parseInt(this.totalTime);
         if (this.recordHistoryTime != '') {

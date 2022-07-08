@@ -3,7 +3,6 @@ const playerMixins = {
   data() {
     return {
       changeTime: null, // 记录时间
-      _loading: true,
       defaultVoice: 0 // 记录静音之前的声音
     };
   },
@@ -75,7 +74,6 @@ const playerMixins = {
         // 如果是暖场视频和试看不显示回放结束的标识
         if (this.isTryPreview) return;
         if (this.isWarnPreview) {
-          if (!this._loading) return;
           if (this.warmUpVideoList.length == 1) {
             // 如果只有一个暖场视频，并且开启了循环播放，就自动调用播放方法
             if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
@@ -129,7 +127,6 @@ const playerMixins = {
             console.log('获取视频总时长失败');
           });
           if (this.isWarnPreview) {
-            this._loading = false;
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
@@ -256,7 +253,15 @@ const playerMixins = {
           }
           this.authText = this.getShiPreview();
         }
-        this.getDuanxuPreview(); //断点续播逻辑
+        if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
+        if (this.isWarnPreview) {
+          if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
+            this.getDuanxuPreview(); //断点续播逻辑
+          }
+        } else {
+          this.getDuanxuPreview(); //断点续播逻辑
+        }
+
         this.totalTime > 0 && clearInterval(getRecordTotalTimer);
       }, 50);
     },
