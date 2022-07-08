@@ -75,13 +75,11 @@
         <section class="vmp-media-setting-tips__content">
           <p>1.PPT静态演示：适用于桌面共享时演示文档、图片等静态内容</p>
           <p>2.视频动态演示：适用于演示视频等多动画内容</p>
-          <p>3.直播中不可更改桌面共享类型</p>
         </section>
         <section class="vmp-media-setting-tips__title">插播文件</section>
         <section class="vmp-media-setting-tips__content">
           <p>1.流畅度优先：适用于插播文件时演示视频等多动画内容</p>
           <p>2.清晰度优先：适用于插播文件时演示文档、图片等静态内容</p>
-          <p>3.直播中可更改插播文件类型</p>
         </section>
       </section>
     </footer>
