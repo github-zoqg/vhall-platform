@@ -325,11 +325,7 @@
             document.webkitFullscreenElement ||
             document.mozFullscreenElement ||
             document.msFullscreenElement;
-          if (
-            fullscreenElement &&
-            fullscreenElement.className &&
-            fullscreenElement.className.indexOf('vmp-basic-container') != -1
-          ) {
+          if (fullscreenElement && fullscreenElement.tagName === 'BODY') {
             this.isFullscreen = true;
           } else {
             this.isFullscreen = false;
@@ -635,7 +631,7 @@
         }
       },
       enterFullscreen() {
-        const element = document.querySelector('.vmp-basic-container');
+        const element = document.querySelector('body');
         if (!this.assistantType) {
           if (element.requestFullscreen) element.requestFullscreen();
           else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
