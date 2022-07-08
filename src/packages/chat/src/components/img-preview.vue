@@ -4,7 +4,7 @@
       <swiper ref="mySwiper" :options="swiperOptions">
         <swiper-slide v-for="(img, index) in images" :key="index">
           <div class="preview-img__box">
-            <img :src="img" alt="" />
+            <img :src="img + '?x-oss-process=image/resize,w_1600,h_900,m_lfit'" alt="" />
           </div>
         </swiper-slide>
         <div slot="pagination" class="preview-img__pagination"></div>

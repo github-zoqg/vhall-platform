@@ -242,9 +242,9 @@ export default {
       'comSignWap',
       'comWatchTimer',
       'comLotteryWap',
-      'comRedPacketWap',
+      'comRedPacketCommandWap',
       'comQuestionnaireWap'
-    ],
+    ], //支付问题暂时屏蔽红包，口令红包替代
     // 打开计时器
     emitOpenTimer: {
       cuid: ['comWatchTimer'],
@@ -257,7 +257,7 @@ export default {
     },
     // 打开红包
     emitOpenRedPacket: {
-      cuid: ['comRedPacketWap'],
+      cuid: ['comRedPacketCommandWap'],
       method: 'openRedPacket'
     },
     // 抽奖弹窗
@@ -302,6 +302,7 @@ export default {
       }
     ]
   },
+  //旧版红包
   comRedPacketWap: {
     component: 'VmpRedPacketWap',
     emitClickLogin: [
@@ -407,6 +408,17 @@ export default {
         cuid: 'comUserCenterWap',
         method: 'closeUserCenterWap',
         args: ['$0']
+      }
+    ]
+  },
+  //口令 红包
+  comRedPacketCommandWap: {
+    component: 'VmpRedPacketCommandWap',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
       }
     ]
   }
