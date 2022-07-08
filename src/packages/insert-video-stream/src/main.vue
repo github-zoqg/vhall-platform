@@ -16,7 +16,7 @@
   >
     <div class="vmp-insert-stream-mask">
       <p>
-        <span class="vmp-insert-stream-mask__label">视图</span>
+        <span v-show="!isWatch" class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
           content="切换"
           placement="top"
@@ -280,6 +280,14 @@
           ) {
             this.closeInsertvideoHandler();
           }
+        }
+      },
+      insertFileStreamVisible(val, oldVal) {
+        if (oldVal && !val && this.isFullScreen) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
         }
       }
     },

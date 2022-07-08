@@ -91,6 +91,9 @@
             (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
               this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id)
           ) {
+            // 如果往观看页跳转，需要清除暖场视频缓存
+            window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(this.clientType);
           }
           //上报日志
