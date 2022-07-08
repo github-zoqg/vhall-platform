@@ -103,17 +103,24 @@ router.beforeEach(async (to, from, next) => {
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度
-      // const VUE_MIDDLE_SAAS_LIVE_PC_PROJECT = process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT;
-      // const VUE_APP_WEB_BASE_MIDDLE = process.env.VUE_APP_WEB_BASE_MIDDLE;
-      // let protocol = window.location.protocol;
-      // // 如果是中台用户, 跳转到中台
-      // if (res.data.is_csd_user == 1) {
-      //   if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_MIDDLE}`) {
-      //     window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
-      //   }
-      // }
-      next();
+      const VUE_APP_ROUTER_BASE_URL = process.env.VUE_APP_ROUTER_BASE_URL;
+      const VUE_APP_BUILD_VERSION = process.env.VUE_APP_BUILD_VERSION;
+      const VUE_APP_WEB_BASE_SAAS = process.env.VUE_APP_WEB_BASE_SAAS; //发起端项目名
+
+      // test
+      res.data.version = '1.2.1';
+
+      // 如果是B用户配置单独版本
+      if (
+        process.env.NODE_ENV != 'development' &&
+        res.data.version &&
+        res.data.version != VUE_APP_BUILD_VERSION
+      ) {
+        window.location.href = `${VUE_APP_WEB_BASE_SAAS}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}/${to.fullPath}`;
+      } else {
+        // 版本一致或者没有配置版本
+        next();
+      }
     } else {
       next({
         name: 'PageError',
