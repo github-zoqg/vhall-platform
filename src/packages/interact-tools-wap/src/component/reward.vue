@@ -60,8 +60,8 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer, useChatServer } from 'middle-domain';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {

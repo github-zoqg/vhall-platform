@@ -55,8 +55,8 @@
 </template>
 
 <script>
-  import videoSwitchImg from '@/packages/app-shared/assets/img/video.gif';
-  import videoFailImg from '@/packages/app-shared/assets/img/videoFailed.png';
+  import videoSwitchImg from '@/app-shared/assets/img/video.gif';
+  import videoFailImg from '@/app-shared/assets/img/videoFailed.png';
   import PictureUploader from '../picture-uploader.vue';
   import { useMediaSettingServer, useRoomBaseServer } from 'middle-domain';
 

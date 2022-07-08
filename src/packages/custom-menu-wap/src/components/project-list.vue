@@ -31,6 +31,7 @@
 </template>
 <script>
   import { useCustomMenuServer } from 'middle-domain';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 
   export default {
     props: ['checkedList'],
@@ -59,12 +60,19 @@
     },
     methods: {
       linkSubject(id) {
-        window.open(
+        const url =
           window.location.protocol +
-            process.env.VUE_APP_WAP_WATCH +
-            process.env.VUE_APP_WEB_KEY +
-            `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`
-        );
+          process.env.VUE_APP_WAP_WATCH +
+          process.env.VUE_APP_WEB_KEY +
+          `/special/detail?id=${id}&delay=${this.hasDelayPermission ? 1 : 0}`;
+        const { system } = getBrowserType();
+        if ('ios' === system) {
+          console.log('当前是手机端打开-ios');
+          window.location.href = url;
+        } else {
+          console.log('当前是手机端打开-其它');
+          window.open(url);
+        }
       },
       async getActiveList() {
         if (this.checkedList.length === 0) {

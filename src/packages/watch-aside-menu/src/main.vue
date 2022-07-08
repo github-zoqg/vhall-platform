@@ -72,7 +72,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useDocServer, useChatServer, useGroupServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import GroupInvitaion from './group-invitation.vue';
 
   export default {

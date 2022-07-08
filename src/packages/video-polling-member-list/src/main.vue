@@ -155,7 +155,8 @@
             nickname: msg.context.nick_name || msg.context.nickname,
             role_name: msg.context.role_name,
             is_speak: Number(isSpeak),
-            isPolling: Number(isPolling)
+            isPolling: Number(isPolling),
+            platform: msg.context.platform || ''
           };
 
           this.memberServer.state.onlineUsers.push(user);
@@ -188,6 +189,9 @@
               ...user,
               is_speak: 1
             });
+            this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+              this.memberServer.state.onlineUsers
+            );
           }
         };
         const handleVrtcDisconnectSuccess = msg => {
@@ -198,6 +202,9 @@
               ...user,
               is_speak: 0
             });
+            this.memberServer.state.onlineUsers = this.memberServer._sortUsers(
+              this.memberServer.state.onlineUsers
+            );
           }
         };
         this._handleRoomMsg = msg => {

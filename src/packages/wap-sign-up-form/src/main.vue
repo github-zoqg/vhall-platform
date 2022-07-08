@@ -358,9 +358,9 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString } from '@/packages/app-shared/utils/tool';
+  import { validEmail, validPhone, getQueryString } from '@/app-shared/utils/tool';
   import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/saas-wap/views/components/confirm.vue';

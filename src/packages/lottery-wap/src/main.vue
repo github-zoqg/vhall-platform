@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
 
   export default {

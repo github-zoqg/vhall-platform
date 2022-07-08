@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import { isWechat } from '@/packages/app-shared/utils/tool.js';
+  import { isWechat } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapQrCode',
     data() {
