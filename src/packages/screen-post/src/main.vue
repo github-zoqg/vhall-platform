@@ -4,7 +4,7 @@
     v-if="screenShow && useRoomBaseServer.state.screenPosterInfo.img"
     @click="handleLink"
   >
-    <img :src="useRoomBaseServer.state.screenPosterInfo.img" alt="" class="vmp-screen-post-img" />
+    <el-image class="vmp-screen-post-img" :src="screenPosterInfo_img" fit="cover" lazy></el-image>
     <div
       class="vmp-screen-post-close-tip"
       :class="{ time: useRoomBaseServer.state.screenPosterInfo.shutdown_type }"
@@ -25,12 +25,17 @@
         useRoomBaseServer: {},
         timer: null,
         time: 5,
-        screenShow: false
+        screenShow: false,
+        screenWidth: 1920, //默认是pc设计稿
+        screenHeight: 1080
       };
     },
     computed: {
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      screenPosterInfo_img() {
+        return `${this.useRoomBaseServer.state.screenPosterInfo.img}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
       }
     },
     created() {
@@ -42,6 +47,11 @@
       } else {
         this.useRoomBaseServer.state.screenPosterInfo.status === 0 && this.screenPostOpen();
       }
+    },
+    mounted() {
+      //获取页面的宽度
+      this.screenWidth = 2 * window.screen.width;
+      this.screenHeight = 2 * window.screen.height;
     },
     methods: {
       // 链接跳转
@@ -90,7 +100,6 @@
     background: #333;
 
     .vmp-screen-post-img {
-      display: block;
       width: 100%;
       height: 100%;
     }

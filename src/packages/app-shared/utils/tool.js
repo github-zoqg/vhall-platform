@@ -1,4 +1,4 @@
-import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
+import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 /**
  * Created by yangxy on 2022/01/13.
