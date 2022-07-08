@@ -5,6 +5,7 @@ import Subscribe from '../views/Subscribe/index.vue';
 import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
+import pageConfig from '../page-config/index';
 import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
@@ -14,28 +15,20 @@ const routes = [
     path: '/lives/watch/:id',
     component: Home,
     name: 'LiveRoom',
-    meta: { title: '直播间', grayType: 'webinar' }
+    meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclient/watch/:id', //嵌入观看页
     component: Home,
     name: 'LiveEmbedRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' },
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' },
     redirect: to => {
       if (to.query.embed === 'video') {
         // 单视频嵌入
-        return {
-          name: 'LiveEmbedVideoRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientvideo'));
       } else {
         // 完全嵌入
-        return {
-          name: 'LiveEmbedFullRoom',
-          query: to.query,
-          params: to.params
-        };
+        location.replace(location.href.replace('embedclient', 'embedclientfull'));
       }
     }
   },
@@ -43,25 +36,25 @@ const routes = [
     path: '/lives/embedclientfull/watch/:id', //完全嵌入观看页
     component: Home,
     name: 'LiveEmbedFullRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' }
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclientvideo/watch/:id', //单视频嵌入观看页
     component: () => import('../views/EmbedVideo/index.vue'),
     name: 'LiveEmbedVideoRoom',
-    meta: { title: '直播间嵌入', grayType: 'webinar' }
+    meta: { title: '直播间嵌入', grayType: 'webinar', page: 'embed-video' }
   },
   {
     path: '/lives/subscribe/:id',
     component: Subscribe,
     name: 'Subscribe',
-    meta: { title: '预约', grayType: 'webinar' }
+    meta: { title: '预约', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/embedclient/subscribe/:id', //嵌入预约页
     component: Subscribe,
     name: 'SubscribeEmbed',
-    meta: { title: '预约嵌入', grayType: 'webinar' }
+    meta: { title: '预约嵌入', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/entryform/:id',
@@ -93,6 +86,12 @@ const router = new VueRouter({
 const isDev = process.env.NODE_ENV === 'development';
 
 router.beforeEach(async (to, from, next) => {
+  if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+    // 根据不同的页面，动态加载不同的配置
+    window.$serverConfig = pageConfig[to.meta.page];
+    window.$serverConfig._page = to.meta.page;
+  }
+
   const res = await grayInit(to);
   if (!isDev) {
     await ssoAutoLogin(); // sso自动登录置换token

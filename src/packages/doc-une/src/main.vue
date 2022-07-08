@@ -155,7 +155,7 @@
     useMicServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
-  import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { throttle, boxEventOpitons } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',

@@ -26,7 +26,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons, replaceWithRules } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons, replaceWithRules } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpViewRestrictionWap',

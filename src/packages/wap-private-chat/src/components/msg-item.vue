@@ -48,7 +48,7 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   export default {
     name: 'VmpWapPrivateChatMsgItem',
     props: {

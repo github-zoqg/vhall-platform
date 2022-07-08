@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import moment from 'moment';
 /**
  * 原知客用到
  */
@@ -17,7 +16,7 @@ Vue.filter('fmtTime', value => {
 
 Vue.filter('chatTime', value => {
   if (value < 15) return value;
-  if (value.substring(0, 10) === new Date(value).format('yyyy-MM-dd')) {
+  if (value.substring(0, 10) === moment(value).format('YYYY-MM-DD')) {
     return value.substring(11, 16);
   }
   return value.substring(0, 16);
