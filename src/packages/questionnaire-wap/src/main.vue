@@ -19,7 +19,7 @@
 </template>
 <script>
   import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpQuestionnaireWap',

@@ -326,7 +326,7 @@
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -516,14 +516,17 @@
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
         let baseHeight = playerHeight + 71 + 90;
-        let calssname = '.tab-content';
+        let classname = '.tab-content';
         if (this.isEmbed) {
           baseHeight = playerHeight;
-          calssname = '.tab-content-embed';
+          classname = '.tab-content-embed';
         }
-        let popHeight =
-          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-        document.querySelector(calssname).style.height = popHeight;
+        const tabDom = document.querySelector(classname);
+        if (tabDom) {
+          const popHeight =
+            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+          tabDom.style.height = popHeight;
+        }
       },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();

@@ -5,7 +5,7 @@ import NotFound from '../views/NotFound.vue';
 import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
-// import { grayInitByMiddle } from '@/packages/app-shared/gray-init';
+import pageConfig from '../page-config/index';
 
 Vue.use(VueRouter);
 
@@ -43,7 +43,7 @@ const routes = [
   {
     path: '/lives/qa/:id',
     name: 'qa',
-    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa-admin/main.vue'),
+    component: () => import('@/packages/qa-admin/main.vue'),
     meta: { title: '问答', grayType: 'webinar' }
   },
   {
@@ -55,16 +55,8 @@ const routes = [
   {
     path: '/lives/video-polling/:id',
     name: 'VideoPolling',
-    component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
-    meta: { title: '视频轮询', grayType: 'webinar' }
-  },
-  {
-    // 其它没有匹配到的路由都会跳至此模块(404）
-    // 该路由为必须路由，不需要权限，必须放在最后
-    path: '*',
-    name: 'notfound',
-    component: NotFound,
-    meta: { keepAlive: false, grayType: '' }
+    component: () => import('../views/VideoPolling'),
+    meta: { title: '视频轮询', grayType: 'webinar', page: 'video-polling' }
   },
   {
     path: '/lives/client/:il_id', // 客户端嵌入
@@ -76,7 +68,7 @@ const routes = [
     path: '/lives/yun/:id', // 云导播
     name: 'yun',
     component: () => import('@/saas-live/views/yun'),
-    meta: { keepAlive: false, grayType: 'webinar' }
+    meta: { keepAlive: false, grayType: 'webinar', page: 'live-yun' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
@@ -84,7 +76,6 @@ const routes = [
     meta: { title: '系统异常' },
     component: () => import('../views/ErrorPage/error.vue')
   },
-
   {
     // 其它没有匹配到的路由都会跳至此模块(404）
     // 该路由为必须路由，不需要权限，必须放在最后
@@ -102,15 +93,13 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  // if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
-  //   // 根据不同的页面，动态加载不同的配置
-  //   const pageConfig = await import(`../page-config/${to.meta.page}.js`);
-  //   window.$serverConfig = pageConfig.default;
-  //   window.$serverConfig._page = to.meta.page;
-  // }
+  if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
+    // 根据不同的页面，动态加载不同的配置
+    window.$serverConfig = pageConfig[to.meta.page];
+    window.$serverConfig._page = to.meta.page;
+  }
 
   const res = await grayInit(to);
-  console.log('---grayInit---', res);
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {

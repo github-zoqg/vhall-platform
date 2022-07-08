@@ -103,7 +103,7 @@
     useMsgServer,
     useGroupServer
   } from 'middle-domain';
-  import { streamInfo } from '@/packages/app-shared/utils/stream-utils';
+  import { streamInfo } from '@/app-shared/utils/stream-utils';
 
   export default {
     name: 'VmpStreamListLive',

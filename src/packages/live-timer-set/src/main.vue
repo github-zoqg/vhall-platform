@@ -173,7 +173,7 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useTimerServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpLiveTimerSet',

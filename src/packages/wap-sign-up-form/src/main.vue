@@ -358,9 +358,9 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString } from '@/packages/app-shared/utils/tool';
+  import { validEmail, validPhone, getQueryString } from '@/app-shared/utils/tool';
   import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/saas-wap/views/components/confirm.vue';
@@ -929,12 +929,6 @@
             process.env.VUE_APP_WEB_KEY +
             `/lives/watch/${this.webinar_id}${this.queryString}`
         );
-        // 避免产生历史路径
-        // window.location.href =
-        //   window.location.protocol +
-        //   process.env.VUE_APP_WAP_WATCH +
-        //   process.env.VUE_APP_WEB_KEY +
-        //   `/lives/watch/${this.webinar_id}${this.queryString}`;
       },
       //提交表单到服务器
       submitSignUpForm() {
@@ -1006,13 +1000,6 @@
                   process.env.VUE_APP_WEB_KEY +
                   `/lives/watch/${this.webinar_id}${queryString}`
               );
-              // 避免产生历史路径
-              // // 出错后异常跳转
-              // window.location.href =
-              //   window.location.protocol +
-              //   process.env.VUE_APP_WAP_WATCH +
-              //   process.env.VUE_APP_WEB_KEY +
-              //   `/lives/watch/${this.webinar_id}${queryString}`;
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
@@ -1047,19 +1034,6 @@
               this.startTime = res.data.webinar.start_time;
               this.queryString = queryString;
               this.isSubmitSuccess = true;
-              // this.$dialog
-              //   .alert({
-              //     title: '提示',
-              //     theme: 'round-button',
-              //     message: this.$t('form.form_1032', { n: res.data.webinar.start_time })
-              //   })
-              //   .then(() => {
-              //     window.location.href =
-              //       window.location.protocol +
-              //       process.env.VUE_APP_WAP_WATCH +
-              //       process.env.VUE_APP_WEB_KEY +
-              //       `/lives/watch/${this.webinar_id}${queryString}`;
-              //   });
             } else {
               location.replace(
                 window.location.protocol +
@@ -1067,12 +1041,6 @@
                   process.env.VUE_APP_WEB_KEY +
                   `/lives/watch/${this.webinar_id}${queryString}`
               );
-              // 避免产生历史路径
-              // window.location.href =
-              //   window.location.protocol +
-              //   process.env.VUE_APP_WAP_WATCH +
-              //   process.env.VUE_APP_WEB_KEY +
-              //   `/lives/watch/${this.webinar_id}${queryString}`;
             }
           })
           .catch(e => {
@@ -1538,12 +1506,6 @@
                     process.env.VUE_APP_WEB_KEY +
                     `/lives/watch/${this.webinar_id}${queryString}`
                 );
-                // 避免产生历史路径
-                // window.location.href =
-                //   window.location.protocol +
-                //   process.env.VUE_APP_WAP_WATCH +
-                //   process.env.VUE_APP_WEB_KEY +
-                //   `/lives/watch/${this.webinar_id}${queryString}`;
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;

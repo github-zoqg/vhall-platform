@@ -101,9 +101,9 @@
     useRebroadcastServer,
     useGroupServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
-  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 
   export default {
     name: 'VmpDocWap',

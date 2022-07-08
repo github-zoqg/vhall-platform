@@ -80,8 +80,8 @@
     useMsgServer
   } from 'middle-domain';
   import { ImagePreview } from 'vh5-ui';
-  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
   import EventBus from './js/Events.js';
   import { isMse } from './js/utils.js';

@@ -48,7 +48,7 @@
 </template>
 
 <script>
-  import { formatDate } from '@/packages/app-shared/utils/date';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     name: 'VmpGoodsDetail',
     data() {
@@ -81,13 +81,19 @@
         } else {
           if (window.vhallReport) {
             window.vhallReport.report('GOOD_RECOMMEND', {
-              event: formatDate(new Date(), 'yyyy-MM-dd hh:mm'),
+              event: moment(new Date()).format('YYYY-MM-DD hh:mm'),
               market_tools_id: this.info.goods_id,
               market_tools_status: 1 // 购买
             });
           }
-          window.open(url);
-          // window.location.href = this.info.goods_url;
+          const { system } = getBrowserType();
+          if ('ios' === system) {
+            console.log('当前是手机端打开-ios');
+            window.location.href = url;
+          } else {
+            console.log('当前是手机端打开-其它');
+            window.open(url);
+          }
         }
       },
       handleClose() {
