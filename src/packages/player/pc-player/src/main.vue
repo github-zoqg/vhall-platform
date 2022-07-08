@@ -584,6 +584,7 @@
           console.log(params, '播放器初始化成功123');
           this.playerServer.openControls(false);
           this.playerServer.openUI(false);
+          window[`player${this.initIndex}`] = this.playerServer;
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents();
           this.getListenPlayer();
@@ -895,7 +896,13 @@
             console.log(this.isTryPreview, '???1323');
           } else {
             if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
-            this.getDuanxuPreview(); //断点续播逻辑
+            if (this.isWarnPreview) {
+              if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
+                this.getDuanxuPreview(); //断点续播逻辑
+              }
+            } else {
+              this.getDuanxuPreview(); //断点续播逻辑
+            }
           }
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         }, 50);

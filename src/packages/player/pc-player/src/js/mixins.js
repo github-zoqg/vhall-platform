@@ -3,7 +3,6 @@ const playerMixins = {
   data() {
     return {
       changeTime: null, // 记录时间
-      _loading: true,
       defaultVoice: 0 // 记录静音之前的声音
     };
   },
@@ -39,7 +38,6 @@ const playerMixins = {
           });
           if (this.isWarnPreview) {
             console.log(this.endTime);
-            this._loading = false;
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
@@ -154,18 +152,23 @@ const playerMixins = {
       // 视频播放完毕
       this.playerServer.$on(VhallPlayer.ENDED, () => {
         // 监听播放完毕状态
-        debugger;
         console.log('pc-播放完毕', this.warmUpVideoList.length);
         console.log('-----------playIndex--------=========', this.playIndex);
+        console.log('-----------initIndex--------=========', this.initIndex);
         console.log(
           '-----------initPlayerIndex--------=========',
           this.initPlayerIndex,
-          this._loading
+          this.playerServer.getCurrentTime(() => {
+            console.log('获取当前视频播放时间失败----------');
+          }),
+          this.playerServer.getDuration(() => {
+            console.log('获取视频总时长失败');
+          })
         );
         // 如果是暖场视频
         if (this.isWarnPreview) {
           // 如果是第一次进入页面，刷新页面导致，就不走下面的逻辑
-          if (!this._loading) return;
+
           this.isShowPoster = true;
           this.isPlayering = false;
           if (this.warmUpVideoList.length == 1) {
