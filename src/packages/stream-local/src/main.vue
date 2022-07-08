@@ -1018,6 +1018,11 @@
           );
           return;
         }
+        if (this.localStreamId) {
+          // 防止重复推流
+          console.log('防止重复推流-销毁本地流', this.localStreamId);
+          await this.interactiveServer.destroyStream();
+        }
         try {
           // 创建本地流
           await this.createLocalStream();
