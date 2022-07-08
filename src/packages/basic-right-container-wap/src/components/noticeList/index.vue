@@ -1,16 +1,15 @@
 <template>
-  <div
-    class="icon-wrap"
-    v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
-  >
+  <div class="icon-wrap-notice" v-if="noticeNum && isShowIcon">
     <img src="./images/questionnaire.png" alt="" @click="getNoticeList" />
-    <i class="dot" v-if="questionnaireServerState.dotVisible" />
+    <span class="dot" v-if="showNoticeNum">
+      <div align="center">{{ noticeNum }}</div>
+    </span>
     <!-- 问卷列表弹框 -->
-    <div class="popup_base" v-if="showQuestionList"></div>
+    <div class="popup_base" v-if="isShowNotice"></div>
     <van-popup
       get-container="#otherPopupContainer"
       class="questionnaire_base"
-      v-model="showQuestionList"
+      v-model="isShowNotice"
       position="bottom"
       :overlay="false"
       :style="{ maxHeight: popHeight, zIndex: 31 }"
@@ -18,8 +17,8 @@
       <div class="vmp-questionnaire-list_container">
         <img class="q_header" src="./images/header.png" alt="" />
         <div class="container-data">
-          <ul v-if="QuestionList && QuestionList.length">
-            <li v-for="(item, index) in QuestionList" :key="index">
+          <ul v-show="noticeNum" v-infinite-scroll="moreLoadData">
+            <li v-for="(item, index) in noticeList" :key="index">
               <div class="data-time">
                 {{ item.created_at.substr(11, 5) }}
               </div>
@@ -29,83 +28,96 @@
                 <span class="data-text_circle">
                   <i class="num"></i>
                 </span>
-                <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
-                  <span class="ellipsis_title">{{ item.title }}</span>
+                <p class="data-text_title">
+                  <span>{{ item.content.content }}</span>
                 </p>
-                <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
-                <span v-else class="write write_over">已填</span>
               </div>
             </li>
           </ul>
         </div>
-        <i class="vh-iconfont vh-line-close" @click="closeQuestionList"></i>
+        <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
       </div>
     </van-popup>
   </div>
 </template>
 <script>
-  import {
-    useQuestionnaireServer,
-    useNoticeServer,
-    useRoomBaseServer,
-    useGroupServer
-  } from 'middle-domain';
+  import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'QuestionnaireIcon',
     data() {
-      const questionnaireServerState = this.questionnaireServer.state;
       return {
-        questionnaireServerState,
-        popHeight: '50vh',
-        showQuestionList: false
+        noticeNum: 0,
+        isShowIcon: false,
+        showNoticeNum: true,
+        isShowNotice: false, //是否显示公告列表
+        noticeList: [],
+        popHeight: '50vh'
       };
     },
     computed: {
-      QuestionList() {
-        return this.questionnaireServer.state.QuestionList;
-      },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      noticeLatestInfo() {
+        // 最新公告信息
+        return this.roomBaseServer.state.noticeInfo;
       }
     },
-    watch: {
-      QuestionList: {
-        handler: function (val) {
-          if (val) {
-            let arr = val.filter(item => item.is_answered == 0);
-            if (arr.length > 0) {
-              this.questionnaireServer.setDotVisible(true);
-            } else {
-              this.questionnaireServer.setDotVisible(false);
-            }
-          }
-        }
-      }
-    },
+    watch: {},
     beforeCreate() {
       this.noticeServer = useNoticeServer();
       this.roomBaseServer = useRoomBaseServer();
       this.groupServer = useGroupServer();
-      this.questionnaireServer = useQuestionnaireServer({
-        mode: 'watch'
-      });
     },
     created() {
-      this.questionnaireServer.checkIconStatus();
-      this.questionnaireServer.$on(this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH, msg => {
-        this.closeQuestionList();
-      });
-      this.questionnaireServer.$on(
-        this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_SUBMIT,
-        res => {
-          if (res.code === 200) {
-            this.questionnaireServer.getSurveyList();
-          }
-        }
-      );
+      console.log(13132132);
+      this.getNoticeInfo();
+    },
+    mounted() {
+      this.initNotice();
     },
     methods: {
+      // 初始化消息
+      initNotice() {
+        const { groupInitData } = this.groupServer.state;
+        this.noticeServer.$on('live_over', () => {
+          this.isShowIcon = false;
+        });
+        // 结束讨论
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          if (!groupInitData.isInGroup) {
+            this.getNoticeInfo();
+          }
+        });
+        if (groupInitData.isInGroup) return;
+        // 公告消息
+        this.noticeServer.$on('room_announcement', msg => {
+          this.isShowIcon = true;
+          this.noticeNum = this.noticeNum + 1;
+          this.noticeList.unshift({
+            created_at: msg.push_time,
+            content: {
+              content: msg.room_announcement_text
+            }
+          });
+        });
+      },
+      // 聚合接口检测是否有历史公告
+      getNoticeInfo() {
+        this.noticeNum = this.noticeLatestInfo.total || 0;
+        if (this.noticeNum && this.noticeLatestInfo.list[0].created_at) {
+          this.isShowIcon = true;
+          this.pageInfo = {
+            pos: 0,
+            limit: 10,
+            pageNum: 1
+          };
+        }
+      },
+      // 获取公告列表
       async getNoticeList(flag) {
+        this.isShowNotice = true;
+        this.showNoticeNum = false;
         const { watchInitData } = this.roomBaseServer.state;
         const params = {
           room_id: watchInitData.interact.room_id,
@@ -122,22 +134,24 @@
           }
         });
       },
-      // 问卷填写
-      writeQ(data) {
-        // console.log(data);
-        this.closeQuestionList();
-        this.$emit('clickIcon', data.question_id);
+      // 滚动加载
+      moreLoadData() {
+        if (this.pageInfo.pageNum >= this.totalPages) {
+          return false;
+        }
+        this.pageInfo.pageNum++;
+        this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
+        this.getNoticeList(true);
       },
-      // 关闭问卷面板
-      closeQuestionList() {
-        this.showQuestionList = false;
+      closeNotice() {
+        this.isShowNotice = false;
       }
     }
   };
 </script>
 
 <style lang="less" scoped>
-  .icon-wrap {
+  .icon-wrap-notice {
     margin-bottom: 10px;
     width: 84px;
     height: 84px;
@@ -152,10 +166,13 @@
       position: absolute;
       top: 2px;
       right: 2px;
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      font-size: 18px;
       border-radius: 50%;
       background-color: #ff0005;
+      color: white;
       content: '';
     }
     .popup_base {
@@ -224,18 +241,6 @@
             top: 0px;
             left: -5px;
           }
-          .write {
-            line-height: 1.6;
-            font-size: 28px;
-            position: absolute;
-            color: #3562fa;
-            right: 0;
-            cursor: pointer;
-          }
-          .write_over {
-            color: #666;
-            cursor: default;
-          }
           &_circle {
             display: inline-block;
             width: 24px;
@@ -266,13 +271,6 @@
             border-left: 1px dashed #3562fa;
             border-radius: 2px;
             font-size: 28px;
-            .ellipsis_title {
-              display: -webkit-box;
-              /* autoprefixer: ignore next */
-              -webkit-box-orient: vertical;
-              -webkit-line-clamp: 2;
-              overflow: hidden;
-            }
           }
         }
       }

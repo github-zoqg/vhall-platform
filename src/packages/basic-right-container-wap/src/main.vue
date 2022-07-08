@@ -18,6 +18,7 @@
         <img src="./image/timer.png" />
       </div>
       <!-- 公告列表 -->
+      <noticeList></noticeList>
     </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
   </div>
@@ -35,8 +36,8 @@
     components: {
       lotteryIcon,
       redPacketIcon,
-      questionnaireIcon
-      // noticeList
+      questionnaireIcon,
+      noticeList
     },
     data() {
       return {
