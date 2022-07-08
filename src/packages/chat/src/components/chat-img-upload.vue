@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import { uuid } from '@/packages/app-shared/utils/tool';
+  import { uuid } from '@/app-shared/utils/tool';
   import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpChatImgUpload',

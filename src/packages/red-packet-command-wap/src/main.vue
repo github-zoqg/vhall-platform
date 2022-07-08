@@ -20,7 +20,7 @@
 </template>
 <script>
   import { useCodeRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   const PWD_RED_ENVELOPE_OK = 'pwd_red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketCommandWap',

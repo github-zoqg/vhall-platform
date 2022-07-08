@@ -39,7 +39,7 @@
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   export default {

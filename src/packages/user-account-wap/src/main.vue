@@ -104,7 +104,7 @@
 
 <script>
   import { useUserServer, useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import BindPhone from './components/bind-phone';
   import BindPassword from './components/bind-password';
   export default {

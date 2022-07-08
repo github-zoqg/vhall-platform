@@ -186,8 +186,8 @@
 </template>
 
 <script>
-  import { uuid } from '@/packages/app-shared/utils/tool';
-  const defaultAvatar = require('@/packages/app-shared/assets/img/my-dark@2x.png');
+  import { uuid } from '@/app-shared/utils/tool';
+  const defaultAvatar = require('@/app-shared/assets/img/my-dark@2x.png');
   import { useRoomBaseServer, useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',
@@ -240,7 +240,7 @@
       },
       //图片保存的路径
       pathUrl() {
-        return `webinars/join-avatar/${this.$moment().format('YYYYMM')}`;
+        return `webinars/join-avatar/${moment().format('YYYYMM')}`;
       }
     },
     beforeCreate() {
