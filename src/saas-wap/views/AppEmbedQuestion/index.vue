@@ -19,7 +19,7 @@
 
 <script>
   import { Domain, questionnaireApi } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
   export default {

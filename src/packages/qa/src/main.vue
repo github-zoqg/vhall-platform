@@ -116,7 +116,7 @@
     useGroupServer,
     useMsgServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   export default {
