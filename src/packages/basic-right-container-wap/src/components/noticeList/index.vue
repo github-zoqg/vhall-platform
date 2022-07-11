@@ -1,41 +1,43 @@
 <template>
   <div class="icon-wrap-notice" v-if="noticeNum && isShowIcon">
-    <img src="./images/questionnaire.png" alt="" @click="getNoticeList" />
+    <img src="./images/notice-icon.png" alt="" @click="getNoticeList" />
     <span class="dot" v-if="showNoticeNum">
       <div align="center">{{ noticeNum }}</div>
     </span>
     <!-- 问卷列表弹框 -->
-    <div class="popup_base" v-if="isShowNotice"></div>
     <van-popup
       get-container="#otherPopupContainer"
-      class="questionnaire_base"
+      class="notice_base"
       v-model="isShowNotice"
       position="bottom"
-      :overlay="false"
-      :style="{ maxHeight: popHeight, zIndex: 31 }"
     >
-      <div class="vmp-questionnaire-list_container">
-        <img class="q_header" src="./images/header.png" alt="" />
+      <div class="vmp-notice-list_container">
+        <div class="container-title">
+          <img src="./images/star1.png" alt="" class="star1" />
+          <span class="container-title-text">公告</span>
+          <div class="container-title-text-line"></div>
+          <img src="./images/star2.png" alt="" class="star2" />
+          <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
+        </div>
         <div class="container-data">
           <ul v-show="noticeNum" v-infinite-scroll="moreLoadData">
             <li v-for="(item, index) in noticeList" :key="index">
-              <div class="data-time">
-                {{ item.created_at.substr(11, 5) }}
-              </div>
-
               <div class="data-text">
-                <span v-if="index == 0" class="_block"></span>
                 <span class="data-text_circle">
                   <i class="num"></i>
                 </span>
-                <p class="data-text_title">
-                  <span>{{ item.content.content }}</span>
-                </p>
+                <div class="data-text_title">
+                  <div class="data-text_title_basebg">
+                    <div>{{ item.content.content }}</div>
+                    <div class="data-time">
+                      {{ item.created_at.substr(5, 11) }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </li>
           </ul>
         </div>
-        <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
       </div>
     </van-popup>
   </div>
@@ -50,8 +52,7 @@
         isShowIcon: false,
         showNoticeNum: true,
         isShowNotice: false, //是否显示公告列表
-        noticeList: [],
-        popHeight: '50vh'
+        noticeList: []
       };
     },
     computed: {
@@ -150,17 +151,21 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .icon-wrap-notice {
     margin-bottom: 10px;
     width: 84px;
     height: 84px;
     position: relative;
     font-size: 28px;
-    background-color: transparent;
+    background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+    border-radius: 50%;
     img {
       width: 84px;
       height: 84px;
+    }
+    .van-overlay {
+      background-color: rgba(0, 0, 0, 0.7) !important;
     }
     .dot {
       position: absolute;
@@ -176,7 +181,6 @@
       content: '';
     }
     .popup_base {
-      height: 100vh;
       width: 100vw;
       background: rgba(0, 0, 0, 0.6);
       position: fixed;
@@ -184,37 +188,67 @@
       left: 0;
       z-index: 30;
     }
-    .questionnaire_base {
-      height: 100%;
+    .notice_base {
+      max-height: 680px;
       background: transparent;
-      z-index: 31 !important;
+      background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+      border-radius: 30px 30px 0 0;
     }
-    .vmp-questionnaire-list_container {
-      height: calc(100% - 80px);
-      .q_header {
-        width: 160px;
-        height: 160px;
-        position: absolute;
-        top: 0px;
-        left: 50%;
-        z-index: 1;
-        transform: translate(-50%);
+    .vmp-notice-list_container {
+      max-height: 680px;
+      overflow: auto;
+      .container-title {
+        height: 142px;
+        background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+        text-align: center;
+        position: relative;
+        .star1 {
+          position: relative;
+          top: 72px;
+          left: -54px;
+          width: 27px;
+          height: auto;
+        }
+        .container-title-text {
+          text-shadow: 0 0.05333rem 0 #fff;
+          font-weight: 600;
+          font-size: 40px;
+          line-height: 56px;
+          position: relative;
+          top: 47px;
+          z-index: 1;
+        }
+        .container-title-text-line {
+          display: inline-block;
+          width: 84px;
+          height: 18px;
+          position: absolute;
+          top: 95px;
+          left: 49%;
+          transform: translate(-51%);
+          background: rgba(255, 171, 166, 0.6);
+          border-radius: 36px;
+          content: '';
+        }
+        .star2 {
+          height: auto;
+          width: 45px;
+          position: relative;
+          top: 32px;
+          left: 43px;
+        }
       }
       .container-data {
-        height: 100%;
-        margin-top: 80px;
-        padding: 100px 40px 60px;
-        background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
+        max-height: calc(680px - 142px);
+        padding: 0 40px 60px;
         position: relative;
         overflow: auto;
         color: @font-light-normal;
-        border-radius: 30px 30px 0 0;
         ul {
           list-style: none;
           height: 100%;
           overflow: auto;
           li {
-            display: flex;
             color: @font-light-normal;
             font-size: 28px;
             line-height: 1.2;
@@ -224,39 +258,29 @@
           line-height: 1.6;
           font-size: 28px;
           display: inline-block;
-          width: 100px;
           text-align: left;
+          color: #8c8c8c;
+          padding-top: 10px;
         }
         .data-text {
-          display: flex;
           position: relative;
-          padding-right: 80px;
-          width: calc(100% - 100px);
-          ._block {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            position: absolute;
-            background: #f2faff;
-            top: 0px;
-            left: -5px;
-          }
+          padding-left: 10px;
           &_circle {
             display: inline-block;
             width: 24px;
             height: 24px;
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
-            border: 1px solid #3562fa;
-            top: 10px;
-            left: -11px;
+            border: 1px solid #fb2626;
+            top: 30px;
+            left: 0;
             position: absolute;
             .num {
               display: inline-block;
               width: 12px;
               height: 12px;
               border-radius: 50%;
-              background: #3562fa;
+              background: #fb2626;
               position: absolute;
               top: 50%;
               left: 50%;
@@ -264,20 +288,30 @@
             }
           }
           &_title {
-            padding: 0 0 60px 32px;
+            margin-bottom: 21px;
+            padding: 0 0 0 32px;
             color: #1a1a1a;
             line-height: 1.6;
             word-break: break-word;
-            border-left: 1px dashed #3562fa;
+            border-left: 1px dashed #bfbfbf;
             border-radius: 2px;
             font-size: 28px;
+            .data-text_title_basebg {
+              background: rgba(255, 255, 255, 0.6);
+              border-radius: 16px;
+              padding: 24px 31px 20px 24px;
+              & > :first-child {
+                line-height: 39px;
+                font-size: 28px;
+              }
+            }
           }
         }
       }
       .vh-line-close {
         position: absolute;
         color: #8c8c8c;
-        top: 110px;
+        top: 37px;
         right: 30px;
         cursor: pointer;
       }
