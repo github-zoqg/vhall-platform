@@ -237,7 +237,11 @@
         </div>
         <!-- 礼物、打赏 -->
         <div
-          v-if="source.interactToolsStatus && !(source.type === 'reward_pay_ok' && isEmbed)"
+          v-if="
+            !isOnlyShowSponsor &&
+            source.interactToolsStatus &&
+            !(source.type === 'reward_pay_ok' && isEmbed)
+          "
           class="msg-item-template__interact-tools"
         >
           <div class="interact-tools-content">
