@@ -31,7 +31,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWatchAuth',
     data() {
