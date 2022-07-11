@@ -884,6 +884,7 @@
               this.playerServer.getDuration(() => {
                 console.log('获取视频总时长失败');
               });
+            this.totalTime > 0 && clearInterval(getRecordTotalTimer);
           } catch (error) {
             console.log(error);
           }
@@ -904,7 +905,6 @@
               this.getDuanxuPreview(); //断点续播逻辑
             }
           }
-          this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         }, 50);
       },
       getDuanxuPreview() {
