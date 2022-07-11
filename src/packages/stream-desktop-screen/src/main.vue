@@ -142,7 +142,10 @@
       roleName() {
         return Number(this.roomBaseServer.state.watchInitData.join_info.role_name);
       },
-
+      // 互动是否初始化完成
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(this.roomBaseServer.state.clientType);
@@ -301,14 +304,22 @@
       },
       isShareScreen(val, oldVal) {
         if (oldVal && !val && this.isFullscreen) {
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          else if (document.msExitFullscreen) document.msExitFullscreen();
+          this.autpExitFullscreen();
+        }
+      },
+      isInstanceInit(val, oldVal) {
+        if (oldVal && !val && this.isFullscreen) {
+          this.autpExitFullscreen();
         }
       }
     },
     methods: {
+      autpExitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      },
       addEvents() {
         window.addEventListener(
           'fullscreenchange',
