@@ -108,7 +108,7 @@ router.beforeEach(async (to, from, next) => {
       const VUE_APP_WEB_BASE_SAAS = process.env.VUE_APP_WEB_BASE_SAAS; //发起端项目名
 
       // test
-      res.data.version = '1.2.1';
+      res.data.version = '1.4.8';
 
       // 如果是B用户配置单独版本
       if (
@@ -116,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
         res.data.version &&
         res.data.version != VUE_APP_BUILD_VERSION
       ) {
-        window.location.href = `${VUE_APP_WEB_BASE_SAAS}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}/${to.fullPath}`;
+        window.location.href = `${VUE_APP_WEB_BASE_SAAS}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`;
       } else {
         // 版本一致或者没有配置版本
         next();
