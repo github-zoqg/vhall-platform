@@ -58,7 +58,7 @@
         lotteryId: '', // 抽奖的信息id(接口返回)
         lotteryInfo: {},
         winLotteryHistory: [], // 中奖历史
-        winnerListData: []
+        winnerListData: Object
       };
     },
     beforeCreate() {
@@ -199,17 +199,33 @@
         });
       },
       // 抽奖结果消息推送
-      callBackResultNotice(msg) {
+      async callBackResultNotice(msg) {
         this.lotteryId = msg.data.lottery_id;
         this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);
         const winnerList = msg.data.lottery_winners.split(',');
 
-        this.winnerListData = this.winnerListData.concat(winnerList);
-        // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据
-        if (this.winnerListData.length < msg.data.lottery_number) return false;
+        // 遍历是否存在key
+        if (
+          !Object.prototype.hasOwnProperty.call(this.winnerListData.hasOwnProperty, this.lotteryId)
+        ) {
+          this.winnerListData[this.lotteryId] = msg.data;
+          this.winnerListData[this.lotteryId].list = [];
+        }
 
-        const lotteryResult = this.winnerListData.some(userId => {
+        this.winnerListData[this.lotteryId].list =
+          this.winnerListData[this.lotteryId].list.concat(winnerList);
+
+        // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据
+        if (
+          this.winnerListData[this.lotteryId].list.length <
+          this.winnerListData[this.lotteryId].lottery_number
+        ) {
+          clearTimeout(this.this.winnerListData[this.lotteryId].timer);
+          this.this.winnerListData[this.lotteryId].timer = await setTimeout(() => {}, 5000);
+        }
+
+        const lotteryResult = this.winnerListData[this.lotteryId].list.some(userId => {
           return this.isSelf(userId);
         });
         if (lotteryResult) {
@@ -242,7 +258,8 @@
             ? this.lotteryServer.Events.LOTTERY_WIN
             : this.lotteryServer.Events.LOTTERY_MISS
         );
-        this.winnerListData = [];
+        // 清空已发送的中奖数据
+        delete this.winnerListData[this.lotteryId];
       },
       close() {
         this.dialogVisible = false;
