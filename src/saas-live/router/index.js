@@ -108,7 +108,7 @@ router.beforeEach(async (to, from, next) => {
       const VUE_APP_WEB_BASE_SAAS = process.env.VUE_APP_WEB_BASE_SAAS; //发起端项目名
 
       // test
-      res.data.version = '1.2.1';
+      res.data.version = '1.4.8';
 
       // 如果是B用户配置单独版本
       if (
