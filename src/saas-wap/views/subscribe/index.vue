@@ -13,11 +13,11 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { getQueryString } from '@/app-shared/utils/tool';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Subcribe',
     components: {

@@ -8,6 +8,7 @@
    * 直播自定义菜单
    */
   import liveList from './live-list';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   // import { mapState } from 'vuex';
 
   export default {
@@ -32,10 +33,16 @@
     methods: {
       linkWatch(id) {
         const webKey = process.env.VUE_APP_WEB_KEY || '/v3';
-
-        window.open(
-          window.location.protocol + process.env.VUE_APP_WAP_WATCH + webKey + `/lives/watch/${id}`
-        );
+        const url =
+          window.location.protocol + process.env.VUE_APP_WAP_WATCH + webKey + `/lives/watch/${id}`;
+        const { system } = getBrowserType();
+        if ('ios' === system) {
+          console.log('当前是手机端打开-ios');
+          window.location.href = url;
+        } else {
+          console.log('当前是手机端打开-其它');
+          window.open(url);
+        }
       }
     }
   };

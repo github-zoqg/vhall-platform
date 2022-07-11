@@ -4,6 +4,7 @@ node_modules
 .history
 middle-event-sdk
 devport.json
+.page-config
 
 
 # local env files

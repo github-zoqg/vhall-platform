@@ -47,7 +47,7 @@
 </template>
 
 <script>
-  import { clamp } from '@/packages/app-shared/utils/math';
+  import { clamp } from '@/app-shared/utils/math';
   import { getItemEntity } from './js/getItemEntity';
   import TabContent from './components/tab-content.vue';
   import {

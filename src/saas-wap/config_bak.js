@@ -1,9 +1,9 @@
-const globalConfig = {
+export const globalConfig = {
   lang: 'zh'
 };
 
 // 服务配置
-const serverConfig = {
+export const serverConfig = {
   /*** 布局定义start */
   // 根节点
   layerRoot: {
@@ -37,8 +37,7 @@ const serverConfig = {
   //   // comWapPlayer 编写互动功能，暂时注释
   // },
   layerBodyCenter: {
-    component: 'VmpContainer',
-    className: /embed/.test(location.pathname) ? 'tab-content-embed' : 'tab-content',
+    component: 'VmpWapBodyCenter',
     children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
   },
   /*** 布局定义end */
