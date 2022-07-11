@@ -276,7 +276,7 @@
           }
         } else {
           if (this.isShareScreen) {
-            return this.roleName == 3;
+            return this.roleName == 3 && this.currentCid;
           } else {
             return true;
           }
