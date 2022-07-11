@@ -1,4 +1,5 @@
 import { computeRecordTime } from './utils';
+import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 const playerMixins = {
   data() {
     return {
@@ -43,7 +44,10 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
-        this.handleDuanXu();
+        const { system } = getBrowserType();
+        if (system == 'ios') {
+          this.handleDuanXu();
+        }
         if (this.isWarnPreview) {
           if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
             this.subscribeServer.state.isFirstEnterPlayer = true;
@@ -254,6 +258,10 @@ const playerMixins = {
             this.recordTime = 1;
           }
           this.authText = this.getShiPreview();
+        }
+        const { system } = getBrowserType();
+        if (system != 'ios') {
+          this.handleDuanXu();
         }
       }, 50);
     },
