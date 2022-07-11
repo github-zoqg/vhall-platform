@@ -35,21 +35,21 @@
         </div>
         <div class="vmp-third-stream-wrap-right">
           <div class="vmp-third-stream-wrap-right-top">
-            <div>
+            <div v-show="streamModal == 1">
               <label>RTMP URL</label>
               <div class="vmp-third-stream-wrap-right-top-input">
                 <el-input id="vmp-third-watch" v-model="thirdWatchWebUrl" readOnly></el-input>
                 <span @click="doCopy(1)">复制</span>
               </div>
             </div>
-            <div style="margin-top: 16px">
+            <div style="margin-top: 16px" v-show="streamModal == 1">
               <label>播放路径/串流码</label>
               <div class="vmp-third-stream-wrap-right-top-input">
                 <el-input id="vmp-third-play" v-model="thirdPlayUrl" readOnly></el-input>
                 <span @click="doCopy(2)">复制</span>
               </div>
             </div>
-            <div style="margin-top: 16px">
+            <div style="margin-top: 16px" v-show="streamModal == 1">
               <label>拉流状态</label>
               <div class="vmp-third-stream-wrap-right-top-input">
                 <el-input readOnly></el-input>
@@ -59,29 +59,55 @@
           </div>
           <div class="vmp-third-stream-wrap-right-bottom">
             <div style="padding-bottom: 20px; border-bottom: 1px solid #ddd">
-              <p>
-                <i></i>
-                使用第三方推流
-              </p>
-              <ul>
-                <li>1.在第三方工具中添加RTMP URL与串流码</li>
-                <li>2.使用第三方工具推流</li>
-                <li>3.点击右上方的“开始直播”按钮</li>
-                <li>4.播放路径/串流码的有效期为7天，建议定期更新</li>
-              </ul>
+              <template v-if="streamModal == 1">
+                <p>
+                  <i></i>
+                  使用第三方推流
+                </p>
+                <ul>
+                  <li>1.在第三方工具中添加RTMP URL与串流码</li>
+                  <li>2.使用第三方工具推流</li>
+                  <li>3.点击右上方的“开始直播”按钮</li>
+                  <li>4.播放路径/串流码的有效期为7天，建议定期更新</li>
+                </ul>
+              </template>
+              <template v-if="streamModal == 2">
+                <p>
+                  <i></i>
+                  使用第三方拉流
+                </p>
+                <ul>
+                  <li>1.在第三方工具中获取拉流地址，并填写到拉流地址中</li>
+                  <li>2.使用第三方工具推流</li>
+                  <li>3.点击右上方的“开始直播”按钮</li>
+                </ul>
+              </template>
             </div>
             <div style="margin-top: 20px">
-              <p>
-                <i></i>
-                使用设备推流
-              </p>
-              <ul>
-                <li>1.在设备中添加RTMP URL与串流码</li>
-                <li>2.使用设备推流</li>
-                <li>3.点击右上方的“开始直播”按钮</li>
-              </ul>
+              <template v-if="streamModal == 1">
+                <p>
+                  <i></i>
+                  使用设备推流
+                </p>
+                <ul>
+                  <li>1.在设备中添加RTMP URL与串流码</li>
+                  <li>2.使用设备推流</li>
+                  <li>3.点击右上方的“开始直播”按钮</li>
+                </ul>
+              </template>
+              <template v-if="streamModal == 2">
+                <p>
+                  <i></i>
+                  注意事项
+                </p>
+                <ul>
+                  <li>
+                    拉流开始前，请沟通视频流资源方，将我们的拉流服务器IP列入白名单，否则有可能造成拉流失败
+                  </li>
+                </ul>
+              </template>
             </div>
-            <p class="vmp-third-stream-wrap-right-bottom-detail">
+            <p class="vmp-third-stream-wrap-right-bottom-detail" v-show="streamModal == 1">
               <a href="https://www.vhall.com/saas/doc/1698.html" target="_blank">详细教程</a>
             </p>
           </div>
@@ -355,6 +381,12 @@
           }
         }
       }
+    }
+    &-subTitle,
+    &-tab,
+    &-alert {
+      width: 750px;
+      margin: 0 auto;
     }
   }
 </style>
