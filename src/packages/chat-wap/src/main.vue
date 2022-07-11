@@ -434,7 +434,7 @@
         const clientH = document.body.clientHeight;
         const ratio = window.devicePixelRatio || 1;
         for (let i = 0; i < list.length; i++) {
-          if (list[i].indexOf('?x-oss-process=image/resize') > -1) {
+          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
             list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
               clientH * ratio
             },m_lfit`;
