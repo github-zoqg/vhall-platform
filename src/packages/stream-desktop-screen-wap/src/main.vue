@@ -41,15 +41,21 @@
     computed: {
       isShareScreen() {
         return this.desktopShareServer.state.localDesktopStreamId;
+      },
+      // 互动是否初始化完成
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
       }
     },
     watch: {
       isShareScreen(val, oldVal) {
         if (oldVal && !val && this.isFullscreen) {
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          else if (document.msExitFullscreen) document.msExitFullscreen();
+          this.autpExitFullscreen();
+        }
+      },
+      isInstanceInit(val, oldVal) {
+        if (oldVal && !val && this.isFullscreen) {
+          this.autpExitFullscreen();
         }
       }
     },
@@ -69,6 +75,12 @@
       }
     },
     methods: {
+      autpExitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      },
       // 更改遮罩层是否显示
       showMask() {
         this.isShowMask = !this.isShowMask;

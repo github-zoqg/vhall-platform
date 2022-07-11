@@ -246,6 +246,10 @@
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
+      // 互动是否初始化完成
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       hasStreamList() {
         return this.$domainStore.state.interactiveServer.streamListHeightInWatch >= 1;
       }
@@ -284,10 +288,12 @@
       },
       insertFileStreamVisible(val, oldVal) {
         if (oldVal && !val && this.isFullScreen) {
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          else if (document.msExitFullscreen) document.msExitFullscreen();
+          this.autpExitFullscreen();
+        }
+      },
+      isInstanceInit(val, oldVal) {
+        if (oldVal && !val && this.isFullScreen) {
+          this.autpExitFullscreen();
         }
       }
     },
@@ -306,6 +312,13 @@
       this.initEventListener();
     },
     methods: {
+      // 自动退出全屏
+      autpExitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      },
       // 开始插播的入口
       async startInertFile() {
         const { watchInitData } = useRoomBaseServer().state;
