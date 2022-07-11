@@ -434,8 +434,13 @@
         const clientH = document.body.clientHeight;
         const ratio = window.devicePixelRatio || 1;
         for (let i = 0; i < list.length; i++) {
-          list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${clientH * ratio},m_lfit`;
+          if (list[i].indexOf('?x-oss-process=image/resize') > -1) {
+            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+              clientH * ratio
+            },m_lfit`;
+          }
         }
+        console.log('preview', list);
         ImagePreview({
           images: list,
           startPosition: index,
