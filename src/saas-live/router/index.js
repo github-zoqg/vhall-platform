@@ -105,7 +105,7 @@ router.beforeEach(async (to, from, next) => {
     if (res.code == 200) {
       const VUE_APP_ROUTER_BASE_URL = process.env.VUE_APP_ROUTER_BASE_URL;
       const VUE_APP_BUILD_VERSION = process.env.VUE_APP_BUILD_VERSION;
-      const VUE_APP_WEB_BASE_SAAS = process.env.VUE_APP_WEB_BASE_SAAS; //发起端项目名
+      const VUE_APP_WEB_BASE = process.env.VUE_APP_WEB_BASE; //发起端项目名
 
       // test
       res.data.version = '1.4.8';
@@ -116,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
         res.data.version &&
         res.data.version != VUE_APP_BUILD_VERSION
       ) {
-        window.location.href = `${VUE_APP_WEB_BASE_SAAS}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`;
+        window.location.href = `${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`;
       } else {
         // 版本一致或者没有配置版本
         next();
