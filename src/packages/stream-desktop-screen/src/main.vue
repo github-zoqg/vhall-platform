@@ -549,7 +549,11 @@
       },
       exchangeVideoDocs() {
         if (this.miniElement == 'screen') {
-          this.roomBaseServer.setChangeElement('doc');
+          if (this.currentCid) {
+            this.roomBaseServer.setChangeElement('doc');
+          } else {
+            this.roomBaseServer.setChangeElement('stream-list');
+          }
         } else {
           this.roomBaseServer.setChangeElement('screen');
         }
