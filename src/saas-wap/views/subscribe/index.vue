@@ -13,11 +13,11 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
-  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
+  import { getQueryString } from '@/app-shared/utils/tool';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Subcribe',
     components: {
@@ -202,8 +202,6 @@
         location.replace(
           `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`
         );
-        // 避免产生历史路径
-        // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       setBottom() {
         /**

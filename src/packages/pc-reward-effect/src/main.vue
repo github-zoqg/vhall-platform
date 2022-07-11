@@ -54,7 +54,7 @@
           }"
         ></span>
         <img
-          :src="require('@/packages/app-shared/assets/img/wap/gift/reward.png')"
+          :src="require('@/app-shared/assets/img/wap/gift/reward.png')"
           alt=""
           class="gift-img red-package"
           v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'"
@@ -73,7 +73,7 @@
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/packages/app-shared/utils/tool';
+  // import { uuid } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcRewardEffect',

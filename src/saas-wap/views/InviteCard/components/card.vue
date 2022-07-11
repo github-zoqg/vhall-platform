@@ -131,8 +131,8 @@
 
   import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
-  import { sleep } from '@/packages/app-shared/utils/tool';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { sleep } from '@/app-shared/utils/tool';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useInviteServer } from 'middle-domain';
 
   export default {

@@ -16,10 +16,10 @@
 <script>
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
-  import { getQueryString } from '@/packages/app-shared/utils/tool';
+  import { getQueryString } from '@/app-shared/utils/tool';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'vmpSubscribe',
     data() {

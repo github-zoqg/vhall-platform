@@ -54,7 +54,7 @@
     useMenuServer,
     useGroupServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
   import EventBus from '@/packages/chat-wap/src/js/Events.js';
   import { isMse } from './js/utils.js';

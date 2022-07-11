@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import VideoPreview from '@/packages/app-shared/components/video-preview';
+  import VideoPreview from '@/app-shared/components/video-preview';
   import {
     useRoomBaseServer,
     useInteractiveServer,

@@ -16,8 +16,8 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
-  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
+  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/app-shared/assets/img/phone.png';
   export default {
     name: 'VmpMemberItem',
     filters: {},
