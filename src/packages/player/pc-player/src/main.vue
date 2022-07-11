@@ -475,11 +475,11 @@
       }
     },
     created() {
-      if (this.isShowContainer) return;
       // 如果暖场视频的长度大于1，就用多例。否则就用单例
       this.playerServer = usePlayerServer({
         extra: this.warmUpVideoList.length > 1
       });
+      if (this.isShowContainer) return;
       this.getWebinerStatus();
       const { agreement } = this.roomBaseServer.state.watchInitData;
       this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
