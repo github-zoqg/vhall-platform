@@ -1,5 +1,5 @@
 import { useChatServer, useMsgServer, useGroupServer } from 'middle-domain';
-import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 export const clientMixin = {
   mounted() {
     // EventBus.$on('Join', msg => {

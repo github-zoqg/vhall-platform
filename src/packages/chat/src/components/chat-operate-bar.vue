@@ -142,7 +142,7 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useGroupServer, useChatServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
