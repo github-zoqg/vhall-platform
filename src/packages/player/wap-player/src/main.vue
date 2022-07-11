@@ -66,9 +66,7 @@
         </div>
         <div
           class="vmp-wap-player-header"
-          v-show="
-            roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
-          "
+          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer"
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
@@ -92,7 +90,8 @@
             </span>
           </template>
           <template v-else>
-            <span class="hot_num">
+            <span v-if="isWarnPreview"></span>
+            <span class="hot_num" v-else>
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
@@ -689,8 +688,10 @@
           if (this.playerState.type == 'vod') {
             this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
-            this.initSlider(); // 初始化播放进度条
-            this.getInitSpeed(); // 获取倍速列表和当前倍速
+            if (!this.isWarnPreview) {
+              this.initSlider(); // 初始化播放进度条
+              this.getInitSpeed(); // 获取倍速列表和当前倍速
+            }
             if (this.playerOtherOptions.autoplay == 1 && !this.isWarnPreview) {
               this.play();
             }
@@ -811,7 +812,9 @@
             this.setVideoCurrentTime(seekTime);
           }
         } else {
-          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          endTime = this.isWarnPreview
+            ? window.sessionStorage.getItem(sessionStorage.getItem('warm_recordId'))
+            : window.sessionStorage.getItem(this.vodOption.recordId);
           const parsedEndTime = parseInt(endTime);
           if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
             const seekTime = endTime < 6 ? 0 : endTime - 5;

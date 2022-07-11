@@ -43,6 +43,7 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
+        this.handleDuanXu();
         if (this.isWarnPreview) {
           if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
             this.subscribeServer.state.isFirstEnterPlayer = true;
@@ -117,8 +118,8 @@ const playerMixins = {
     listenEvents() {
       if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
       // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-      if (this.playerState.type === 'vod') {
-        window.addEventListener('beforeunload', () => {
+      if (this.playerServer.state.type == 'vod') {
+        window.addEventListener('pagehide', () => {
           this.endTime = this.playerServer.getCurrentTime(() => {
             console.log('获取当前视频播放时间失败----------');
           });
@@ -128,9 +129,9 @@ const playerMixins = {
           });
           if (this.isWarnPreview) {
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
+            window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
               window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
-              window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
             }
           } else {
             const curLocalHistoryTime = window.sessionStorage.getItem(
@@ -243,6 +244,7 @@ const playerMixins = {
             this.playerServer.getDuration(() => {
               console.log('获取视频总时长失败');
             });
+          this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         } catch (error) {
           console.log(error);
         }
@@ -253,17 +255,18 @@ const playerMixins = {
           }
           this.authText = this.getShiPreview();
         }
-        if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
-        if (this.isWarnPreview) {
-          if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
-            this.getDuanxuPreview(); //断点续播逻辑
-          }
-        } else {
+      }, 50);
+    },
+    //获取断点续播功能
+    handleDuanXu() {
+      if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
+      if (this.isWarnPreview) {
+        if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
           this.getDuanxuPreview(); //断点续播逻辑
         }
-
-        this.totalTime > 0 && clearInterval(getRecordTotalTimer);
-      }, 50);
+      } else {
+        this.getDuanxuPreview(); //断点续播逻辑
+      }
     },
     // 试看的权限
     getShiPreview() {
@@ -398,9 +401,7 @@ const playerMixins = {
     // 设置播放时间
     setVideoCurrentTime(val) {
       if (!this.playerServer) return;
-
-      console.log('video val', val);
-
+      console.log('video val', val, this.initIndex, this.playIndex);
       this.playerServer.setCurrentTime(val, () => {
         this.$message({
           type: 'error',
