@@ -14,7 +14,10 @@
       </div>
     </div>
     <div
-      :class="[mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl']"
+      :class="[
+        mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
+        isShareScreen ? 'vmp-wap-body-desktop__show' : ''
+      ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
     >
@@ -73,6 +76,9 @@
       // 选中的自定义菜单的 type
       menuSelectedType() {
         return this.$domainStore.state.menuServer.selectedType;
+      },
+      isShareScreen() {
+        return this.desktopShareServer.state.localDesktopStreamId;
       },
       isShowWapBody() {
         // 如果播放器储与mini状态，必显示
@@ -390,6 +396,11 @@
     &-nomarl {
       height: 100%;
       width: 100%;
+    }
+    &-desktop__show {
+      .vmp-wap-stream-wrap {
+        height: 0;
+      }
     }
     &-mini {
       position: fixed;
