@@ -118,6 +118,9 @@
         // 是否发起了签到
         this.getSignInfo();
       },
+      closeSign() {
+        this.signVisible = false;
+      },
       getSignInfo() {
         this.signServer
           .getSignInfo({ room_id: this.roomId })

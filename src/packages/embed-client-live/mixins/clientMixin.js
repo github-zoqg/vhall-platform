@@ -135,6 +135,15 @@ export const clientMixin = {
           break;
       }
     },
+    // 展示当前互动工具
+    showAssistantTools(name) {
+      this.$refs.questionnaire.close();
+      this.$refs.lottery.close();
+      this.$refs.signLive.closeSign();
+      this.$refs.qa.close();
+      // this.$refs.redPacketLive.close();
+      this.tool_component_name = name;
+    },
     handleAssitantDocTool(type) {
       switch (type) {
         case 0: // 隐藏工具栏
@@ -152,13 +161,6 @@ export const clientMixin = {
     handleAssitantDocFocus(msg) {
       this.$refs.doc && this.$refs.doc.$el.focus();
       this.$refs.doc && this.$refs.doc.$el.click();
-    },
-    closeAssistantTools() {
-      this.closeRedPacketPopup();
-      this.closeQuestionarie();
-      this.closeQAPopup();
-      this.$refs.lotterySon && this.$refs.lotterySon.close();
-      this.$refs.signin && this.$refs.signin.closeAutoSignin('client');
     }
   }
 };

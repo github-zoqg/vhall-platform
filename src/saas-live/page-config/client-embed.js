@@ -84,17 +84,6 @@ export default {
     //客户端嵌入-通知客户端开启问答管理页面
     emitOpenQAAdmin: [{ cuid: 'embedClientRoot', method: 'openQAAdmin', args: ['$0'] }]
   },
-  // 抽奖
-  comLotteryWap: {
-    component: 'VmpLotteryWap',
-    emitClickLogin: [
-      //登录弹窗
-      {
-        cuid: 'compRegLoginWap',
-        method: 'open'
-      }
-    ]
-  },
   // 红包
   comRedPacket: {
     component: 'VmpRedPacketLive'
