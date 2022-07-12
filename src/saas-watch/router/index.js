@@ -6,6 +6,7 @@ import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import Subject from '../views/Subject/index.vue';
 
 Vue.use(VueRouter);
 
@@ -66,6 +67,12 @@ const routes = [
     component: forgetPwd,
     name: 'forgetPwd',
     meta: { title: '忘记密码' }
+  },
+  {
+    path: '/special/detail/:id',
+    component: Subject,
+    name: 'Subject',
+    meta: { title: '专题详情', name: 'Subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
