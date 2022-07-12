@@ -78,7 +78,7 @@
         return this.$domainStore.state.menuServer.selectedType;
       },
       isShareScreen() {
-        return this.desktopShareServer.state.localDesktopStreamId;
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
       isShowWapBody() {
         // 如果播放器储与mini状态，必显示
@@ -399,7 +399,8 @@
     }
     &-desktop__show {
       .vmp-wap-stream-wrap {
-        height: 0;
+        height: 0px;
+        overflow: hidden;
       }
     }
     &-mini {
