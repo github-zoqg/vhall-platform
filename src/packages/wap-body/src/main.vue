@@ -401,7 +401,7 @@
       width: 100%;
     }
     &-special__show {
-      .vmp-wap-stream-wrap {
+      .vmp-stream-list {
         height: 0px;
         overflow: hidden;
       }
