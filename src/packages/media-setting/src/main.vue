@@ -323,8 +323,11 @@
 
         console.log('diffOptions:', this._diffOptions);
 
-        // 直播中
-        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
+        // 直播中或者录制中
+        if (
+          (watchInitData.webinar.type === 1 || watchInitData?.record?.is_recording == 1) &&
+          (videoTypeChanged || pictureUrlChanged)
+        ) {
           const text = this.$t('setting.setting_1031');
           action = await mediaSettingConfirm.show(text);
         }

@@ -432,10 +432,15 @@
         }
         const clientW = document.body.clientWidth;
         const clientH = document.body.clientHeight;
-        const ratio = window.devicePixelRatio || 1;
+        const ratio = 2;
         for (let i = 0; i < list.length; i++) {
-          list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${clientH * ratio},m_lfit`;
+          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
+            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+              clientH * ratio
+            },m_lfit`;
+          }
         }
+        console.log('preview', list);
         ImagePreview({
           images: list,
           startPosition: index,
