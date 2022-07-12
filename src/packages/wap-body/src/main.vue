@@ -16,7 +16,7 @@
     <div
       :class="[
         mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
-        isShareScreen ? 'vmp-wap-body-desktop__show' : ''
+        isShareScreen || isOpenInsertFile ? 'vmp-wap-body-special__show' : ''
       ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
@@ -76,6 +76,9 @@
       // 选中的自定义菜单的 type
       menuSelectedType() {
         return this.$domainStore.state.menuServer.selectedType;
+      },
+      isOpenInsertFile() {
+        return this.insertFileServer.state.insertStreamInfo.streamId;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
@@ -397,7 +400,7 @@
       height: 100%;
       width: 100%;
     }
-    &-desktop__show {
+    &-special__show {
       .vmp-wap-stream-wrap {
         height: 0px;
         overflow: hidden;
