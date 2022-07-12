@@ -21,8 +21,8 @@
           <img src="./images/star2.png" alt="" class="star2" />
           <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
         </div>
-        <div class="container-data">
-          <ul v-show="noticeNum" v-infinite-scroll="moreLoadData">
+        <van-list class="container-data" @load="moreLoadData" :immediate-check="false" offset="30">
+          <ul v-show="noticeNum">
             <li v-for="(item, index) in noticeList" :key="index">
               <div class="data-text">
                 <span class="data-text_circle" :class="index != 0 ? 'border_col_bfb' : ''">
@@ -39,7 +39,7 @@
               </div>
             </li>
           </ul>
-        </div>
+        </van-list>
       </div>
     </van-popup>
   </div>
