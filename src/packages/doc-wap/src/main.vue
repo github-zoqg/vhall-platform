@@ -212,7 +212,7 @@
         this.docServer.zoomReset();
       },
       currentCid(newval) {
-        if (newval && this.docLoadComplete) {
+        if (newval && this.docServer.singleLoadComplete()) {
           setTimeout(() => {
             this.docServer.zoomReset();
           }, 50);
