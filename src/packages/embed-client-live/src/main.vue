@@ -204,7 +204,7 @@
           this.$refs.vhallClient.handleAssitantDocFocus(msg);
         };
       },
-      
+
       // 初始化房间
       async initRoomInfo() {
         const _data = {
