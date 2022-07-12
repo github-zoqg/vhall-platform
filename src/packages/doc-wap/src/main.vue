@@ -210,6 +210,13 @@
         this.resize();
         this.docServer.rotate(this.rotateNum);
         this.docServer.zoomReset();
+      },
+      currentCid(newval) {
+        if (newval && this.docLoadComplete) {
+          setTimeout(() => {
+            this.docServer.zoomReset();
+          }, 50);
+        }
       }
     },
     beforeCreate() {
@@ -336,6 +343,13 @@
           console.log('dispatch_doc_all_complete', val);
           this.setRight();
         });
+
+        // 所有文档加载完成
+        this.docServer.$on('dispatch_doc_load_complete', val => {
+          console.log('dispatch_doc_load_complete', val);
+          this.setRight();
+        });
+
         // 文档切换
         this.docServer.$on('dispatch_doc_select_container', val => {
           console.log('dispatch_doc_select_container', val);
