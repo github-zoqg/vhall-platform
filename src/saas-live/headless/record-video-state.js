@@ -47,4 +47,5 @@ export default async function () {
   window.msgServer = msgServer;
   window.roomBaseServer = roomBaseServer;
   window.docServer = docServer;
+  window.interactiveServer = interactiveServer;
 }
