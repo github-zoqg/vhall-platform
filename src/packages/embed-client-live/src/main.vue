@@ -15,50 +15,36 @@
       </div>
       <div v-if="componentName == 'Tools'" class="h100">
         <!-- 问卷 -->
-        <vmp-questionnaire
-          ref="questionnaire"
-          v-show="tool_component_name == 'questionnaire'"
-        ></vmp-questionnaire>
+        <div v-show="tool_component_name == 'questionnaire'">
+          <vmp-questionnaire ref="questionnaire"></vmp-questionnaire>
+        </div>
+
         <!-- 抽奖 -->
-        <vmp-air-container
-          cref="lottery"
-          :cuid="childrenCom[4]"
-          v-show="tool_component_name == 'lottery'"
-        />
+        <div v-show="tool_component_name == 'lottery'">
+          <vmp-air-container cref="lottery" :cuid="childrenCom[4]" :oneself="true" />
+        </div>
+
         <!-- 问答 -->
-        <vmp-air-container
-          cref="qa"
-          :cuid="childrenCom[3]"
-          v-show="tool_component_name == 'qa'"
-          :oneself="true"
-        ></vmp-air-container>
+        <div v-show="tool_component_name == 'qa'">
+          <vmp-air-container cref="qa" :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
+        </div>
         <!-- 签到 -->
-        <vmp-air-container
-          cref="signLive"
-          :cuid="childrenCom[5]"
-          v-show="tool_component_name == 'signLive'"
-          :oneself="true"
-        />
+        <div v-show="tool_component_name == 'signLive'">
+          <vmp-air-container cref="signLive" :cuid="childrenCom[5]" :oneself="true" />
+        </div>
+
         <!-- 红包 -->
-        <vmp-air-container
-          cref="redPacketLive"
-          :cuid="childrenCom[6]"
-          v-show="tool_component_name == 'redPacketLive'"
-          :oneself="true"
-        />
+        <div v-show="tool_component_name == 'redPacketLive'">
+          <vmp-air-container cref="redPacketLive" :cuid="childrenCom[6]" :oneself="true" />
+        </div>
+
         <!-- 计时器 -->
-        <vmp-air-container
-          cref="timerSetLive"
-          :cuid="childrenCom[7]"
-          v-show="tool_component_name == 'timerSetLive'"
-          :oneself="true"
-        />
-        <vmp-air-container
-          cref="timerLive"
-          :cuid="childrenCom[8]"
-          v-show="tool_component_name == 'timerSetLive'"
-          :oneself="true"
-        />
+        <div v-show="tool_component_name == 'timerSetLive'">
+          <vmp-air-container cref="timerSetLive" :cuid="childrenCom[7]" :oneself="true" />
+        </div>
+        <div v-show="tool_component_name == 'timerSetLive'">
+          <vmp-air-container cref="timerLive" :cuid="childrenCom[8]" :oneself="true" />
+        </div>
       </div>
     </div>
   </div>
@@ -218,10 +204,7 @@
           this.$refs.vhallClient.handleAssitantDocFocus(msg);
         };
       },
-      // 展示当前互动工具
-      showAssistantTools(name) {
-        this.tool_component_name = name;
-      },
+
       // 初始化房间
       async initRoomInfo() {
         const _data = {

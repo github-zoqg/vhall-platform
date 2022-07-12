@@ -106,6 +106,9 @@
         this.restForm();
         this.redPacketServer.getRedpacketTotal();
       },
+      close() {
+        this.sendDialogVisible = false;
+      },
       // 发起红包页面表单参数重置
       restForm() {
         this.isCheckCode = false;

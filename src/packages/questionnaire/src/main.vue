@@ -296,6 +296,9 @@
         this.initPage();
         this.dialogVisible = true;
       },
+      close() {
+        this.dialogVisible = false;
+      },
       initPage() {
         this.firstLoad = false;
         this.showTip = false;

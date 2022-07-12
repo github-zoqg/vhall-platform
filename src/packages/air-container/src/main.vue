@@ -29,7 +29,7 @@
             props: {
               cuid: item.cuid,
             },
-            ref:props.oneself?props.cref:undefined
+            ref:props.cref?props.cref:undefined
           }
         )
       })

@@ -48,7 +48,7 @@
     </template>
 
     <!-- 问答 -->
-    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal" append-to-body>
+    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal">
       <div class="qa_content" v-if="qaVisible">
         <template>
           <div v-if="!isQAEnabled">
@@ -375,6 +375,9 @@
       //处理唤起登录
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      close() {
+        this.qaVisible = false;
       },
       handleQAPopup() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110061);
