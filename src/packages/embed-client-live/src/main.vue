@@ -252,7 +252,7 @@
         document.title = watchInitData.webinar.subject;
 
         const mockResult = (this.rootActive = watchInitData);
-        this.getTools(mockResult.interact.room_id);
+        await this.getTools(mockResult.interact.room_id);
         await useMsgServer().init();
         console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
         if (this.assistantType == 'doc') {
