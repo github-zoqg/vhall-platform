@@ -543,7 +543,8 @@ export default {
     interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
-    interact_tools_1085: 'TOP 10 list'
+    interact_tools_1085: 'TOP 10 list',
+    interact_tools_1086: 'Notice'
   },
   setting: {
     setting_1002: 'View settings',

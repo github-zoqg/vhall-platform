@@ -191,6 +191,13 @@
       // 桌面共享流
       localDesktopStreamId() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主讲人
+      isDoc_permission() {
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
+          this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
       }
     },
     beforeCreate() {
@@ -342,7 +349,7 @@
           this.getStateCapture(); // 更新快照
         }
         // 如果插播流为真
-        if (this.insertStreamInfo.streamId) {
+        if (this.insertStreamInfo.streamId && this.isDoc_permission) {
           // 推流过程中动态切换视频清晰或流畅模式
           this.mediaSettingServer.setVideoContentHint({
             streamId: this.insertStreamInfo.streamId,
@@ -350,7 +357,7 @@
           });
         }
         // 如果桌面共享流为真
-        if (this.localDesktopStreamId) {
+        if (this.localDesktopStreamId && this.isDoc_permission) {
           // 推流过程中动态切换视频清晰或流畅模式
           this.mediaSettingServer.setVideoContentHint({
             streamId: this.localDesktopStreamId,

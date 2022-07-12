@@ -98,6 +98,7 @@
       top: 80px;
       left: 0px;
       width: 100%;
+      background: linear-gradient(59.32deg, #ffebe9 0%, #edecff 107.06%) !important;
     }
     .van-notice-bar {
       box-sizing: border-box;

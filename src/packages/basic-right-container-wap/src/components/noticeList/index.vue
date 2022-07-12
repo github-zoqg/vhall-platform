@@ -16,7 +16,7 @@
       <div class="vmp-notice-list_container">
         <div class="container-title">
           <img src="./images/star1.png" alt="" class="star1" />
-          <span class="container-title-text">公告</span>
+          <span class="container-title-text">{{ $t('interact_tools.interact_tools_1086') }}</span>
           <div class="container-title-text-line"></div>
           <img src="./images/star2.png" alt="" class="star2" />
           <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
@@ -25,8 +25,8 @@
           <ul v-show="noticeNum" v-infinite-scroll="moreLoadData">
             <li v-for="(item, index) in noticeList" :key="index">
               <div class="data-text">
-                <span class="data-text_circle">
-                  <i class="num"></i>
+                <span class="data-text_circle" :class="index != 0 ? 'border_col_bfb' : ''">
+                  <i class="num" :class="index != 0 ? 'col_bfb' : ''"></i>
                 </span>
                 <div class="data-text_title">
                   <div class="data-text_title_basebg">
@@ -271,8 +271,8 @@
           padding-left: 10px;
           &_circle {
             display: inline-block;
-            width: 24px;
-            height: 24px;
+            width: 27px;
+            height: 27px;
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #fb2626;
@@ -281,15 +281,21 @@
             position: absolute;
             .num {
               display: inline-block;
-              width: 12px;
-              height: 12px;
+              width: 15px;
+              height: 15px;
               border-radius: 50%;
               background: #fb2626;
               position: absolute;
-              top: 50%;
-              left: 50%;
+              top: 49%;
+              left: 48%;
               transform: translate(-50%, -50%);
             }
+          }
+          .col_bfb {
+            background: #bfbfbf;
+          }
+          .border_col_bfb {
+            border-color: #bfbfbf;
           }
           &_title {
             margin-bottom: 21px;
