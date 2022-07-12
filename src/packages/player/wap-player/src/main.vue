@@ -728,21 +728,27 @@
         });
       },
       initPlayerOtherInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
-        this.playerServer
-          .getPlayerConfig({
-            webinar_id: webinar.id,
-            tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
-          })
-          .then(res => {
-            if (res.code == 200) {
-              this.definitionConfig = res.data.definition.data.default_definition;
-              this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
-              this.water = res.data['water-mark'] && res.data['water-mark'].data;
-              this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
-              this.initPlayer();
-            }
-          });
+        const unionConfig = this.roomBaseServer.state.unionConfig;
+        this.definitionConfig = unionConfig.definition.data.default_definition;
+        this.marquee = unionConfig['screen-config'] && unionConfig['screen-config'].data;
+        this.water = unionConfig['water-mark'] && unionConfig['water-mark'].data;
+        this.playerOtherOptions = unionConfig['basic-config'] && unionConfig['basic-config'].data;
+        this.initPlayer();
+        // const { webinar } = this.roomBaseState.watchInitData;
+        // this.playerServer
+        //   .getPlayerConfig({
+        //     webinar_id: webinar.id,
+        //     tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
+        //   })
+        //   .then(res => {
+        //     if (res.code == 200) {
+        //       this.definitionConfig = res.data.definition.data.default_definition;
+        //       this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
+        //       this.water = res.data['water-mark'] && res.data['water-mark'].data;
+        //       this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
+        //       this.initPlayer();
+        //     }
+        //   });
       },
       // 获取跑马灯、水印等播放器配置
       getPlayerInfo() {
