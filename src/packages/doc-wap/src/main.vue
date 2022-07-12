@@ -212,6 +212,7 @@
         this.docServer.zoomReset();
       },
       currentCid(newval) {
+        //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态
         if (newval && this.docServer.singleLoadComplete()) {
           setTimeout(() => {
             this.docServer.zoomReset();
@@ -364,6 +365,7 @@
           this.resize();
           this.docServer.rotate(this.rotateNum);
 
+          //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态
           setTimeout(() => {
             this.docServer.zoomReset();
           }, 50);
