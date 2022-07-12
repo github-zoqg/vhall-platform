@@ -86,7 +86,7 @@
     },
     watch: {
       isInGroup(val) {
-        this.announcement.isShow = true;
+        this.announcement.isShow = false;
         this.openAnnouncement();
       }
     },
@@ -108,23 +108,23 @@
           clearTimeout(this.timer);
         }
         this.timer = setTimeout(() => {
-          this.announcement.isShow = true;
+          this.announcement.isShow = false;
         }, 30000);
       });
       // 直播结束自动关闭公告
       this.noticeServer.$on('live_over', () => {
-        this.announcement.isShow = true;
+        this.announcement.isShow = false;
       });
       // 结束讨论
       this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
         if (!this.isInGroup) {
           this.openAnnouncement();
         } else {
-          this.announcement.isShow = true;
+          this.announcement.isShow = false;
         }
       });
       this.groupServer.$on('GROUP_SWITCH_START', () => {
-        this.announcement.isShow = true;
+        this.announcement.isShow = false;
       });
     },
     methods: {
@@ -132,7 +132,7 @@
         this.mini = flag;
       },
       closeAnnouncement() {
-        this.announcement.isShow = true;
+        this.announcement.isShow = false;
       },
       openAnnouncement() {
         // 刷新展示最新一条公告&&为直播状态
@@ -149,10 +149,10 @@
             clearTimeout(this.timer);
           }
           this.timer = setTimeout(() => {
-            this.announcement.isShow = true;
+            this.announcement.isShow = false;
           }, 30000);
         } else {
-          this.announcement.isShow = true;
+          this.announcement.isShow = false;
         }
       }
     }
