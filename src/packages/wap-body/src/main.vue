@@ -28,18 +28,18 @@
         v-if="!isShowContainer && !isLivingEnd"
       ></vmp-air-container>
 
-      <!-- wap端订阅桌面共享的容器 -->
-      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
-
-      <!-- wap端订阅插播的容器 -->
-      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
-
       <!-- 流列表 -->
       <vmp-air-container
         v-show="isShowContainer && !isLivingEnd"
         :cuid="childrenComp[1]"
         :oneself="true"
       ></vmp-air-container>
+
+      <!-- wap端订阅桌面共享的容器 -->
+      <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
+
+      <!-- wap端订阅插播的容器 -->
+      <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
 
       <!--
         注意：
