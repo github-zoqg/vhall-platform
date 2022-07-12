@@ -1,7 +1,9 @@
 <template>
   <div class="vmp-notice-list" v-show="isShowIcon && noticeNum">
     <div class="vmp-notice-list_icon">
-      <div class="icon-num" v-if="showNoticeNum">{{ noticeNum > 99 ? '99+' : noticeNum }}</div>
+      <div class="icon-num" v-if="noticeNum - noticeNumIsWatch">
+        {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
+      </div>
       <div class="icon-img" @click="getNoticeHistoryList">
         <img src="./img/notice-icon.png" alt="" class="show_img" />
       </div>
@@ -47,7 +49,7 @@
         },
         totalPages: 0,
         total: 0,
-        showNoticeNum: true
+        noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0
       };
     },
     computed: {
@@ -122,6 +124,8 @@
             this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
             this.noticeNum = result.data.total;
+            sessionStorage.setItem(this.$route.params.id, this.noticeNum);
+            this.noticeNumIsWatch = this.noticeNum;
           }
         });
       },

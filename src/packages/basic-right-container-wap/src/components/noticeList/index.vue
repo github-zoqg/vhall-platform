@@ -1,8 +1,10 @@
 <template>
   <div class="icon-wrap-notice" v-if="noticeNum && isShowIcon">
     <img src="./images/notice-icon.png" alt="" @click="getNoticeList" />
-    <span class="dot" v-if="showNoticeNum">
-      <div align="center">{{ noticeNum }}</div>
+    <span class="dot" v-if="noticeNum - noticeNumIsWatch">
+      <div align="center">
+        {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
+      </div>
     </span>
     <!-- 问卷列表弹框 -->
     <van-popup
@@ -50,9 +52,9 @@
       return {
         noticeNum: 0,
         isShowIcon: false,
-        showNoticeNum: true,
         isShowNotice: false, //是否显示公告列表
-        noticeList: []
+        noticeList: [],
+        noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0
       };
     },
     computed: {
@@ -118,7 +120,6 @@
       // 获取公告列表
       async getNoticeList(flag) {
         this.isShowNotice = true;
-        this.showNoticeNum = false;
         const { watchInitData } = this.roomBaseServer.state;
         const params = {
           room_id: watchInitData.interact.room_id,
@@ -132,6 +133,8 @@
             this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
             this.noticeNum = result.data.total;
+            sessionStorage.setItem(this.$route.params.id, this.noticeNum);
+            this.noticeNumIsWatch = this.noticeNum;
           }
         });
       },
@@ -169,16 +172,17 @@
     }
     .dot {
       position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
+      top: -5px;
+      right: -5px;
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
       font-size: 18px;
       border-radius: 50%;
       background-color: #ff0005;
       color: white;
       content: '';
+      border: 2px solid white;
     }
     .popup_base {
       width: 100vw;
