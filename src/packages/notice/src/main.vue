@@ -42,7 +42,7 @@
 </template>
 <script>
   import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
-  import { throttle } from '@/packages/app-shared/utils/tool';
+  import { throttle } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpNoticeList',
     data() {

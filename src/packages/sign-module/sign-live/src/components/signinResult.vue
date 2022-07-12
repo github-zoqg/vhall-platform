@@ -39,7 +39,7 @@
     computed: {
       signTime() {
         return function (val) {
-          return this.$moment(val).format('HH:mm');
+          return moment(val).format('HH:mm');
         };
       }
     },

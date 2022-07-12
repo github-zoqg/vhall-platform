@@ -2,7 +2,7 @@
   <section>
     <aside>
       <audio ref="outputAudioPlayer" id="outputAudioPlayer" loop>
-        <source src="@/packages/app-shared/assets/audio/audio.mp3" type="audio/mp3" />
+        <source src="@/app-shared/assets/audio/audio.mp3" type="audio/mp3" />
         This browser does not support the audio element.
       </audio>
     </aside>
@@ -26,8 +26,8 @@
       <section class="vmp-media-seting-item">
         <section class="vmp-media-setting-item__content vmp-media-setting-item__content--column">
           <div class="vmp-media-setting-playAudio-btn" @click="playAudio()">
-            <img v-if="isPaused" src="@/packages/app-shared/assets/img/media_play.gif" />
-            <img v-else src="@/packages/app-shared/assets/img/media_pause.gif" />
+            <img v-if="isPaused" src="@/app-shared/assets/img/media_play.gif" />
+            <img v-else src="@/app-shared/assets/img/media_pause.gif" />
           </div>
           <p class="vmp-media-setting-play-tips">{{ $t('setting.setting_1024') }}</p>
 

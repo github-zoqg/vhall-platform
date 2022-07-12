@@ -155,7 +155,7 @@
     useMicServer
   } from 'middle-domain';
   import elementResizeDetectorMaker from 'element-resize-detector';
-  import { throttle, boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { throttle, boxEventOpitons } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',
@@ -276,7 +276,7 @@
           }
         } else {
           if (this.isShareScreen) {
-            return this.roleName == 3;
+            return this.roleName == 3 && this.currentCid;
           } else {
             return true;
           }

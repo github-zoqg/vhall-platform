@@ -1,5 +1,5 @@
 import { useGiftsServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
-// import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+// import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 // import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'VhGifts',

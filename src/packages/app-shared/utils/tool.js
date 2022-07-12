@@ -92,11 +92,10 @@ export function uuid() {
  * @description 校验当前所在浏览器环境
  * @return Boolean {*}
  */
-const ua = navigator.userAgent.toLowerCase();
 
 // 是否微信
 export function isWechat() {
-  // return ua.indexOf('micromessenger') > -1 && !isWechatCom();
+  const ua = navigator.userAgent.toLowerCase();
   const isWechat = ua.indexOf('micromessenger') > -1 && !isWechatCom();
   console.log('isWechat 是否为微信', isWechat);
   return isWechat;
@@ -104,12 +103,13 @@ export function isWechat() {
 
 // 是否qq浏览器
 export function isQQ() {
+  const ua = navigator.userAgent.toLowerCase();
   return ua.indexOf('qq') > -1;
 }
 
 // 是否企业微信
 export function isWechatCom() {
-  // return ua.indexOf('wxwork') > -1;
+  const ua = navigator.userAgent.toLowerCase();
   const isWechatCom = ua.indexOf('wxwork') > -1;
   console.log('isWechatCom 是否为企业微信', isWechatCom);
   return isWechatCom;

@@ -1,13 +1,11 @@
 <template>
-  <div class="vhall-question" v-if="dialogVisible">
+  <div class="vmp-questionnaire-watch" v-if="dialogVisible">
     <div class="vhall-question-box" :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }">
       <div class="question-box">
         <div class="question-close" @click="dialogVisible = false">
           <i class="vh-iconfont vh-line-close"></i>
         </div>
-        <div id="qs-preview-box" class="vhall-list-dialog-content">
-          <div id="qs-preview-box-content" class="qs-preview-box-content cef-q-wrap"></div>
-        </div>
+        <div id="qs-preview-box-content" class="qs-preview-box-content cef-q-wrap"></div>
       </div>
     </div>
   </div>
@@ -135,58 +133,13 @@
   };
 </script>
 <style lang="less">
-  .vhall-question-box {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .question-box {
-      float: left;
-      left: 0;
-      width: 720px;
-      height: 540px;
-      border-radius: 4px;
-      background: #fff;
-      overflow: hidden;
-      // margin: 0 auto;
-      position: relative;
-      padding-bottom: 8px;
-      z-index: 100;
-    }
-    .question-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 24px;
-      height: 24px;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 28px;
-      color: #fff;
-      font-size: 12px;
-      text-align: center;
-      line-height: 24px;
-      cursor: pointer;
-    }
-    .vhall-list-dialog-content {
-      height: 100%;
-      ::-webkit-scrollbar {
-        width: 5px;
-        border-radius: 10px;
-      }
-    }
-  }
   .el-loading-spinner .path {
     stroke: #fb3a32;
   }
   .el-loading-spinner .el-loading-text {
     color: #1a1a1a;
   }
-  .vhall-question {
+  .vmp-questionnaire-watch {
     &-icon {
       width: 32px;
       height: 32px;
@@ -211,10 +164,54 @@
         object-fit: scale-down;
       }
     }
-  }
-  .qs-preview-box-content {
-    height: 100%;
-    overflow-y: scroll;
-    line-height: initial;
+    .vhall-question-box {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .question-box {
+        float: left;
+        left: 0;
+        width: 720px;
+        height: 540px;
+        border-radius: 4px;
+        background: #fff;
+        overflow: hidden;
+        position: relative;
+        z-index: 100;
+      }
+      .question-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 28px;
+        color: #fff;
+        font-size: 12px;
+        text-align: center;
+        line-height: 24px;
+        cursor: pointer;
+      }
+    }
+    .qs-preview-box-content {
+      height: 100%;
+      overflow: auto;
+      ::-webkit-scrollbar {
+        width: 5px;
+        border-radius: 10px;
+      }
+      .q-wrap {
+        .vhall-question-title {
+          overflow: hidden;
+        }
+      }
+    }
   }
 </style>

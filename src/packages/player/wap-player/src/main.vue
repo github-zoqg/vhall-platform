@@ -17,7 +17,11 @@
           </p>
         </div>
         <div
-          id="vmp-wap-player"
+          :id="
+            warmUpVideoList.length < 2
+              ? 'vmp-wap-player'
+              : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
+          "
           style="width: 100%; height: 100%"
           @click.stop.prevent="videoShowIcon"
         >
@@ -62,9 +66,7 @@
         </div>
         <div
           class="vmp-wap-player-header"
-          v-show="
-            roomBaseState.watchInitData.pv.show && isPlayering && !isWarnPreview && !isSmallPlayer
-          "
+          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer"
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
@@ -88,7 +90,8 @@
             </span>
           </template>
           <template v-else>
-            <span class="hot_num">
+            <span v-if="isWarnPreview"></span>
+            <span class="hot_num" v-else>
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
@@ -159,7 +162,7 @@
                 ></controlEventPoint>
               </div>
               <van-slider
-                v-if="(!isLiving && playerOtherOptions.progress_bar) || isWarnPreview"
+                v-if="!isLiving && playerOtherOptions.progress_bar && !isWarnPreview"
                 v-model="sliderVal"
                 active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
@@ -184,7 +187,10 @@
                     @click.stop="refresh"
                     v-if="isLiving"
                   ></i>
-                  <span class="vmp-wap-player-control-icons-left-time" v-if="!isLiving">
+                  <span
+                    class="vmp-wap-player-control-icons-left-time"
+                    v-if="!isLiving && !isWarnPreview"
+                  >
                     {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
                   </span>
                 </span>
@@ -212,7 +218,7 @@
                       }`"
                     ></i>
                   </span>
-                  <span v-if="!isAudio" @click="enterFullscreen">
+                  <span v-if="!isAudio && !isWarnPreview" @click="enterFullscreen">
                     <i
                       :class="`vh-iconfont ${
                         isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -324,9 +330,9 @@
 <script>
   import { isMse } from './js/utils';
   import controlEventPoint from './components/control-event-point.vue';
-  import { useRoomBaseServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -341,8 +347,8 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar, join_info } = this.roomBaseState.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id && join_info.is_subscribe == 1) {
+        const { warmup, webinar } = this.roomBaseState.watchInitData;
+        if (warmup && this.warmUpVideoList.length) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -351,6 +357,28 @@
         } else {
           return webinar.img_url || cover;
         }
+      },
+      // 初始化了第几个
+      initPlayerIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      // 播放第几个
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      // 暖场视频播放模式
+      warmPlayMode() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_player_type;
+      },
+      // 是否是预约页
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status === 'subscribe';
       },
       // 是否正在直播
       isLiving() {
@@ -373,6 +401,7 @@
       }
     },
     data() {
+      const initIndex = this.subscribeServer.state.initIndex;
       return {
         asd: 1,
         // isNoBuffer: false,
@@ -427,7 +456,8 @@
         lang: {},
         languageList: [],
         isSmallPlayer: false,
-        circleSliderVal: 0
+        circleSliderVal: 0,
+        initIndex
       };
     },
     watch: {
@@ -452,17 +482,41 @@
           document.querySelector('.vmp-basic-bd').classList.remove('small_player');
         }
         this.setSetingHeight();
+      },
+      playIndex() {
+        if (!this.isWarnPreview) return;
+        // 多个视频持续播放 暖场视频播放模式
+        if (this.warmUpVideoList.length > 1) {
+          // 如果是循环播放，播完最后一个，自动播第一个
+          if (
+            this.warmPlayMode == 2 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
+          ) {
+            this.playerServer.play();
+          }
+          // 如果是单次播放，播完第一个，自动播放第二个
+          if (
+            this.warmPlayMode == 1 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
+            this.playIndex > 0
+          ) {
+            this.playerServer.play();
+          }
+        }
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.playerServer = usePlayerServer();
-      // window.playerServer = this.playerServer;
+      // this.playerServer = usePlayerServer({ extra: true });
+      this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
       this.playerServer.destroy();
     },
     async created() {
+      this.playerServer = usePlayerServer({
+        extra: this.warmUpVideoList.length > 1
+      });
       this.roomBaseState = this.roomBaseServer.state;
       this.playerState = this.playerServer.state;
       this.embedObj = this.roomBaseState.embedObj;
@@ -516,14 +570,17 @@
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
         let baseHeight = playerHeight + 71 + 90;
-        let calssname = '.tab-content';
+        let classname = '.tab-content';
         if (this.isEmbed) {
           baseHeight = playerHeight;
-          calssname = '.tab-content-embed';
+          classname = '.tab-content-embed';
         }
-        let popHeight =
-          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-        document.querySelector(calssname).style.height = popHeight;
+        const tabDom = document.querySelector(classname);
+        if (tabDom) {
+          const popHeight =
+            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+          tabDom.style.height = popHeight;
+        }
       },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
@@ -565,16 +622,19 @@
           }
         } else {
           if (webinar.type === 3) return; //结束状态
-          let _id = warmup.warmup_paas_record_id
-            ? warmup.warmup_paas_record_id
-            : record.preview_paas_record_id;
-          this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
-          if (this.vodType === 'shikan') {
+          if (webinar.type === 5) {
+            // 试看
+            this.vodType = 'shikan';
             this.isTryPreview = true;
-          } else if (this.vodType === 'warm') {
-            this.isWarnPreview = true;
+            this.getShiPreview();
+            this.optionTypeInfo('vod', record.preview_paas_record_id);
+          } else {
+            if (this.warmUpVideoList.length) {
+              this.vodType = 'warm';
+              this.isWarnPreview = true;
+              this.optionTypeInfo('vod', this.warmUpVideoList[this.initIndex]);
+            }
           }
-          this.optionTypeInfo('vod', _id);
         }
       },
       optionTypeInfo(type, id) {
@@ -590,12 +650,19 @@
           this.vodOption.recordId = id;
           this.liveOption = {};
         }
-        this.initPlayerOtherInfo();
+        if (this.isWarnPreview) {
+          this.initPlayer();
+        } else {
+          this.initPlayerOtherInfo();
+        }
       },
       // 初始化播放器配置项
       initConfig() {
         let params = {
-          videoNode: 'vmp-wap-player'
+          videoNode:
+            this.warmUpVideoList.length < 2
+              ? 'vmp-wap-player'
+              : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerState.type == 'live') {
           params = Object.assign(params, {
@@ -624,29 +691,35 @@
         }
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
+          console.log(params, '播放器wap初始化成功123');
+          this.playerServer.openControls(false);
+          this.playerServer.openUI(false);
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents(); // 监听断点续播事件
           this.getListenPlayer(); // 监听播放器播放、暂停等事件
           if (this.playerState.type == 'vod') {
             this.eventPointList = this.playerServer.state.markPoints;
             this.getRecordTotalTime(); // 获取视频总时长
-            this.initSlider(); // 初始化播放进度条
-            this.getInitSpeed(); // 获取倍速列表和当前倍速
+            if (!this.isWarnPreview) {
+              this.initSlider(); // 初始化播放进度条
+              this.getInitSpeed(); // 获取倍速列表和当前倍速
+            }
+            if (this.playerOtherOptions.autoplay == 1 && !this.isWarnPreview) {
+              this.play();
+            }
           } else {
-            if (this.isAutoPlay) {
+            if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
               this.play();
             }
           }
-          this.playerServer.openControls(false);
-          this.playerServer.openUI(false);
-          this.$nextTick(() => {
-            if (this.water && this.water.watermark_open == 1) {
-              const watermarkContainer = document.getElementById('vh-watermark-container');
-              watermarkContainer && (watermarkContainer.style.width = '80px');
-              const waterMark = document.getElementById('vh-watermark');
-              waterMark && (waterMark.style.height = '35px');
-            }
-          });
+          // this.$nextTick(() => {
+          //   if (this.water && this.water.watermark_open == 1 && !this.isWarnPreview) {
+          //     const watermarkContainer = document.getElementById('vh-watermark-container');
+          //     watermarkContainer && (watermarkContainer.style.width = '80px');
+          //     const waterMark = document.getElementById('vh-watermark');
+          //     waterMark && (waterMark.style.height = '35px');
+          //   }
+          // });
           try {
             document.getElementsByTagName('video')[0].setAttribute('x5-video-player-type', 'h5');
           } catch (e) {
@@ -751,7 +824,9 @@
             this.setVideoCurrentTime(seekTime);
           }
         } else {
-          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          endTime = this.isWarnPreview
+            ? window.sessionStorage.getItem(sessionStorage.getItem('warm_recordId'))
+            : window.sessionStorage.getItem(this.vodOption.recordId);
           const parsedEndTime = parseInt(endTime);
           if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
             const seekTime = endTime < 6 ? 0 : endTime - 5;
@@ -926,6 +1001,16 @@
       display: none;
       transition: all 1s;
       -webkit-transition: all 1s;
+    }
+    .vhallPlayerh5-shadow,
+    .vh-playBtnContainer {
+      display: none !important;
+    }
+    #vh-watermark-container {
+      width: 80px !important;
+    }
+    #vh-watermark {
+      height: 35px !important;
     }
     &-opcity-true {
       opacity: 1;
