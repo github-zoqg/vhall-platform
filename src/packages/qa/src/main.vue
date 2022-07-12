@@ -48,7 +48,7 @@
     </template>
 
     <!-- 问答 -->
-    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal">
+    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal" append-to-body>
       <div class="qa_content" v-if="qaVisible">
         <template>
           <div v-if="!isQAEnabled">
