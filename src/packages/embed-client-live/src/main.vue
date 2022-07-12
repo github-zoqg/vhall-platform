@@ -24,6 +24,7 @@
           cref="lottery"
           :cuid="childrenCom[4]"
           v-show="tool_component_name == 'lottery'"
+          :oneself="true"
         />
         <!-- 问答 -->
         <vmp-air-container
