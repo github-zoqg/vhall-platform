@@ -847,7 +847,7 @@ export const serverConfig = {
     ],
     emitMediaSettingClick: [
       {
-        cuid: 'comMediaSetting',
+        cuid: 'recordComMediaSetting',
         method: 'showMediaSetting'
       }
     ]
@@ -882,7 +882,18 @@ export const serverConfig = {
   // 【录制页面】所有弹窗集合
   recordComAllDialog: {
     component: 'VmpAirContainer',
-    children: ['recordDlgDocList', 'comMediaSetting']
+    children: ['recordDlgDocList', 'recordComMediaSetting']
+  },
+  // 【录制页面】媒体设置
+  recordComMediaSetting: {
+    component: 'VmpPcMediaSetting',
+    saveOptions: [
+      {
+        cuid: 'recordComStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
   },
   // *******录制页面****结束
 

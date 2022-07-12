@@ -1,4 +1,4 @@
-import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
+import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
 
 /**
  * Created by yangxy on 2022/01/13.
@@ -219,17 +219,4 @@ export const replaceWithRules = (longText, rules = []) => {
     longText = longText.replace(rule.tempSign, rule.after);
   });
   return longText;
-};
-
-/**
- * @description 获取浏览器的cookie (当前域下,且非http-only)
- */
-export const getCookie = name => {
-  var reg = RegExp(name + '=([^;]+)');
-  var arr = document.cookie.match(reg);
-  if (arr) {
-    return arr[1];
-  } else {
-    return '';
-  }
 };

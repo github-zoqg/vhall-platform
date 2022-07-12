@@ -187,7 +187,13 @@ export default {
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    children: ['comSignWatch', 'comWatchTimer', 'comQuestionnaire', 'comLottery', 'comRedPacket'],
+    children: [
+      'comSignWatch',
+      'comWatchTimer',
+      'comQuestionnaire',
+      'comLottery',
+      'comRedPacketCommand'
+    ],
     // 打开媒体设置
     emitClickMediaSetting: {
       cuid: 'comMediaSetting',
@@ -226,7 +232,7 @@ export default {
     },
     // 红包弹窗
     emitClickRedPacketIcon: {
-      cuid: ['comRedPacket'],
+      cuid: ['comRedPacketCommand'], //先替换成口令红包 comRedPacket
       method: 'openRedPacket',
       args: ['$0']
     },
@@ -570,5 +576,16 @@ export default {
   // 商品详情
   comGoodsDetailPc: {
     component: 'VmpGoodDetailPc'
+  },
+  // 红包-口令
+  comRedPacketCommand: {
+    component: 'VmpRedPacketCommandWatch',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ]
   }
 };
