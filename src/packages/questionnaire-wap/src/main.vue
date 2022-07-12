@@ -13,7 +13,7 @@
     </span>
 
     <!-- 问卷标题 -->
-    <div id="qs-content-box"></div>
+    <div id="qs-content-box" class="qs-content-box"></div>
   </div>
   <!-- </van-popup> -->
 </template>
@@ -129,61 +129,7 @@
     }
   };
 </script>
-<style lang="less">
-  #qs-content-box {
-    .el-input__inner::placeholder {
-      font-size: 28px;
-      vertical-align: middle;
-    }
-    .el-checkbox__input.is-checked .el-checkbox__inner,
-    .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-      background-color: #fb3a32;
-      border-color: #fb3a32;
-    }
-    .el-checkbox__inner:hover {
-      border-color: #fb3a32;
-    }
-    .el-checkbox__input.is-checked + .el-checkbox__label {
-      color: #1a1a1a;
-    }
-    .el-checkbox__input.is-focus .el-checkbox__inner {
-      border-color: #fb3a32;
-    }
-    .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
-      background-color: #fb3a32;
-      border-color: #fb3a32;
-    }
-    /*单选选中效果重置*/
-    .el-radio__input.is-checked .el-radio__inner {
-      background-color: #fb3a32;
-      border-color: #fb3a32;
-    }
-    .el-radio__inner:hover {
-      border-color: #fb3a32;
-    }
-    .el-radio__input.is-focus .el-radio__inner {
-      border-color: #fb3a32;
-    }
-    .el-radio__input.is-checked + .el-radio__label {
-      color: #1a1a1a;
-    }
-    /* 日期选择效果重置*/
-    .el-date-table td.today span {
-      color: #fb3a32;
-      font-weight: normal;
-    }
-    .el-date-table td.available:hover {
-      color: #fb3a32;
-    }
-    .el-date-table td.current:not(.disabled) span {
-      color: #fff;
-      background-color: #fb3a32;
-    }
-    .q-wrap {
-      padding-bottom: 400px;
-    }
-  }
-</style>
+
 <style lang="less">
   .vmp-question-wap {
     width: 100%;
@@ -193,6 +139,69 @@
     top: 0;
     left: 0;
     z-index: 303;
+    .qs-content-box {
+      z-index: 23;
+      width: 100%;
+      position: relative;
+      background: #fff;
+      height: 100%;
+      overflow: auto;
+      .el-input__inner::placeholder {
+        font-size: 28px;
+        vertical-align: middle;
+      }
+      .el-checkbox__input.is-checked .el-checkbox__inner,
+      .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+        background-color: #fb3a32;
+        border-color: #fb3a32;
+      }
+      .el-checkbox__inner:hover {
+        border-color: #fb3a32;
+      }
+      .el-checkbox__input.is-checked + .el-checkbox__label {
+        color: #1a1a1a;
+      }
+      .el-checkbox__input.is-focus .el-checkbox__inner {
+        border-color: #fb3a32;
+      }
+      .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
+        background-color: #fb3a32;
+        border-color: #fb3a32;
+      }
+      /*单选选中效果重置*/
+      .el-radio__input.is-checked .el-radio__inner {
+        background-color: #fb3a32;
+        border-color: #fb3a32;
+      }
+      .el-radio__inner:hover {
+        border-color: #fb3a32;
+      }
+      .el-radio__input.is-focus .el-radio__inner {
+        border-color: #fb3a32;
+      }
+      .el-radio__input.is-checked + .el-radio__label {
+        color: #1a1a1a;
+      }
+      /* 日期选择效果重置*/
+      .el-date-table td.today span {
+        color: #fb3a32;
+        font-weight: normal;
+      }
+      .el-date-table td.available:hover {
+        color: #fb3a32;
+      }
+      .el-date-table td.current:not(.disabled) span {
+        color: #fff;
+        background-color: #fb3a32;
+      }
+      .q-wrap {
+        padding-bottom: 400px;
+        .vhall-question-title {
+          height: 125px;
+          overflow: hidden;
+        }
+      }
+    }
   }
   .close-btn {
     position: fixed;
@@ -259,18 +268,6 @@
     // 更多那个弹窗是慢慢增加的
   }
 
-  #qs-content-box {
-    z-index: 23;
-    width: 100%;
-    position: relative;
-    background: #fff;
-    height: 100%;
-    overflow: auto;
-    .vhall-question-title {
-      max-height: 2.3rem;
-      height: auto;
-    }
-  }
   .quest-header {
     z-index: 99;
     position: absolute;

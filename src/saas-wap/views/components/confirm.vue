@@ -5,7 +5,7 @@
         <p class="title">
           {{ title }}
         </p>
-        <i class="vh-iconfont vh-line-close" @click="close"></i>
+        <i class="vh-iconfont vh-line-close" v-if="isShowClose" @click="close"></i>
       </div>
       <div class="content">
         <slot name="content"></slot>
@@ -27,6 +27,10 @@
       titleBtn: {
         type: String,
         default: ''
+      },
+      isShowClose: {
+        type: Boolean,
+        default: true
       },
       width: {
         type: String,
