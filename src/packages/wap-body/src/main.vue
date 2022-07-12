@@ -78,7 +78,7 @@
         return this.$domainStore.state.menuServer.selectedType;
       },
       isOpenInsertFile() {
-        return this.insertFileServer.state.insertStreamInfo.streamId;
+        return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
