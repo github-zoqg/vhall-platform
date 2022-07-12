@@ -17,7 +17,7 @@
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Subcribe',
     components: {
@@ -118,8 +118,6 @@
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
           this.state = 1;
-          //上报日志
-          logRoomInitSuccess();
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });

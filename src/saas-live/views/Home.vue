@@ -19,7 +19,7 @@
   import Chrome from './Chrome';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import {
     Domain,
     useRoomBaseServer,
@@ -85,8 +85,6 @@
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
         this.addEventListener();
-        //上报日志
-        logRoomInitSuccess({ isSend: true });
       } catch (err) {
         //上报日志
         logRoomInitFailed({ isSend: true, error: err });

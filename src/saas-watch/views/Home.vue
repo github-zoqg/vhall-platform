@@ -29,7 +29,7 @@
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   export default {
@@ -154,8 +154,6 @@
           }
           this.state = 1;
           this.addEventListener();
-          //上报日志
-          logRoomInitSuccess();
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });
