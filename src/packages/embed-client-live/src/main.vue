@@ -259,7 +259,8 @@
           await useDocServer().init();
         }
         console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
-
+        //初始化嵌入监听
+        this.initListener();
         // this.roomBaseServer
         //   .initLive({
         //     ..._data
