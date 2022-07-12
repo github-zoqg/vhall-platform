@@ -486,7 +486,6 @@
     width: 100%;
     position: relative;
     background: #000;
-    z-index: 0;
     // 小组协作中
     &-group {
       position: absolute;
