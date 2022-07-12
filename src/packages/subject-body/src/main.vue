@@ -1,8 +1,332 @@
 <template>
-  <div class="vmp-subject-body">我是专题内容</div>
+  <div class="vmp-subject-body">
+    <div class="vmp-subject-body_info">
+      <div class="vmp-subject-body_main">
+        <div class="subject_left">
+          <div class="subject_left_main">
+            <img :src="subjectDetailInfo.cover" />
+          </div>
+          <div class="subject_left_detail">
+            <p>
+              <i class="vh-iconfont vh-line-video-camera"></i>
+              {{ subjectDetailInfo.webinar_num }}
+            </p>
+            <p v-if="subjectDetailInfo.hide_pv">
+              <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+              {{ subjectDetailInfo.pv }}
+            </p>
+            <p v-if="subjectDetailInfo.hide_appointment">
+              <i class="vh-iconfont vh-line-time"></i>
+              {{ subjectDetailInfo.order_num }}
+            </p>
+          </div>
+        </div>
+        <div class="subject_right">
+          <el-scrollbar>
+            <div class="subject_right_text" v-html="subjectIntroInfo"></div>
+          </el-scrollbar>
+        </div>
+      </div>
+    </div>
+    <div class="vmp-subject-body_list">
+      <el-row :gutter="24" class="subject_lives">
+        <el-col
+          class="subject_lives_liveItem"
+          :xs="24"
+          :sm="12"
+          :md="12"
+          :lg="6"
+          :xl="6"
+          v-for="(item, index) in subjectDetailInfo.webinar_list"
+          :key="index"
+          @click.prevent.stop="toDetail(item.webinar_id)"
+        >
+          <a class="living_inner" target="_blank">
+            <div class="living_top">
+              <span class="living_top_hot" v-if="item.hide_pv">
+                <i class="vh-saas-iconfont vh-saas-line-heat">{{ item.pv }}</i>
+              </span>
+              <span class="living_liveTag">
+                {{ liveTag(item) }}
+                <span v-if="item.webinar_type != 6 && item.no_delay_webinar == 1">| 无延迟</span>
+              </span>
+              <div class="living_box"><img :src="item.img_url" alt="" /></div>
+            </div>
+            <div class="living_bottom">
+              <div class="">
+                <p class="living_bottom_title" :title="item.subject">{{ item.subject }}</p>
+                <p class="living_bottom_time">{{ item.start_time }}</p>
+              </div>
+            </div>
+          </a>
+        </el-col>
+      </el-row>
+      <div class="subject_nomore">已经到底啦～</div>
+    </div>
+  </div>
 </template>
 <script>
+  import { useSubjectServer } from 'middle-domain';
   export default {
-    name: 'VmpSubjectBody'
+    name: 'VmpSubjectBody',
+    beforeCreate() {
+      this.subjectServer = useSubjectServer();
+    },
+    computed: {
+      subjectDetailInfo() {
+        return this.subjectServer.state.subjectDetailInfo;
+      },
+      subjectIntroInfo() {
+        return this.urlToLink(this.subjectDetailInfo.intro);
+      }
+    },
+    methods: {
+      liveTag(val) {
+        /**
+         * webinar_state  1直播 2预约 3结束 4点播 5回放
+         * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
+         */
+        const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
+        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播', '', '', '分组直播'];
+        let str = liveTypeStr[val.webinar_state];
+        if (val.webinar_state != 4 && val.webinar_type != 5) {
+          str += ` | ${liveStatusStr[val.webinar_type]}`;
+        }
+        return str;
+      },
+      urlToLink(str) {
+        if (!str) return '';
+
+        // 提取聊天内容中的 img 标签
+        const regImg = /<img.*?(?:>|\/>)/g;
+        const imgArr = str.match(regImg);
+
+        // 提取聊天内容中除去 img 标签以外的部分
+        const strArr = str.split(regImg);
+        const regUrl = /(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/g;
+
+        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
+        strArr.forEach((item, index) => {
+          const tempStr = item.replace(regUrl, function (match) {
+            return `<a class='show-link' href='${match}' target='_blank'>${match}</a>`;
+          });
+          strArr[index] = tempStr;
+        });
+
+        // // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
+        if (imgArr) {
+          const imgArrLength = imgArr.length;
+          let imgIndex = 0;
+          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+            imgIndex++;
+          }
+        }
+        console.log(strArr.join(''), '???123232432');
+        return strArr.join('');
+      },
+      toDetail() {}
+    }
   };
 </script>
+<style lang="less">
+  .vmp-subject-body {
+    &_info {
+      background: #f7f7f7;
+      border-radius: 4px;
+      .vmp-subject-body_main {
+        width: 100%;
+        height: 690px;
+        display: flex;
+        margin-top: 20px;
+      }
+      .subject_left {
+        width: calc(100% - 384px);
+        &_main {
+          width: 100%;
+          height: 632px;
+          border-radius: 4px;
+          background-color: #1a1a1a;
+          flex: 1;
+          img {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px 4px 0 0;
+          }
+        }
+        &_detail {
+          display: flex;
+          padding: 19px 24px;
+          background: #fff;
+          border-radius: 0 0 4px 4px;
+          p {
+            padding-right: 18px;
+            color: #666;
+            font-size: 14px;
+            i {
+              font-size: 18px;
+              vertical-align: text-bottom;
+            }
+          }
+        }
+      }
+      .subject_right {
+        margin-left: 20px;
+        background: #fff;
+        border-radius: 4px;
+        width: 360px;
+        // height: 100%;
+        overflow-y: auto;
+        padding: 8px 0;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+        }
+        &_text {
+          color: #1a1a1a;
+          height: calc(100% - 592px);
+          word-break: break-all;
+          line-height: 1.5;
+          padding: 0 24px;
+          strong {
+            font-weight: bold;
+          }
+          p {
+            font-style: normal;
+            padding: 5px 0;
+            font-size: 14px;
+            img {
+              margin: 5px 0;
+            }
+          }
+          .show-link {
+            color: #3562fa;
+          }
+        }
+      }
+    }
+    &_list {
+      margin-top: 24px;
+      background: #f7f7f7;
+      border-radius: 4px;
+      height: 100%;
+      .subject_lives {
+        &_liveItem {
+          margin-bottom: 24px;
+          border-radius: 4px;
+          .living_inner {
+            display: inline-block;
+            width: 100%;
+            transition: all 0.15s ease-in;
+            position: relative;
+          }
+          .living_inner:hover {
+            box-shadow: 0px 6px 12px 0px rgba(0, 0, 0, 0.15);
+          }
+          .living_top {
+            height: 150.4px;
+            /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); */
+            background: #1a1a1a;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 10px 10px;
+            box-sizing: border-box;
+            position: relative;
+            border-radius: 4px 4px 0 0;
+            &_hot {
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              color: #fff;
+              font-size: 14px;
+              z-index: 2;
+              height: 40px;
+              width: 100%;
+              background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.6));
+              i {
+                position: absolute;
+                left: 14px;
+                bottom: 10px;
+                font-size: 14px;
+              }
+            }
+          }
+          .living_liveTag {
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 9px;
+            border-radius: 20px;
+            position: relative;
+            z-index: 2;
+          }
+          .living_box {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            border-radius: 4px 4px 0 0;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: scale-down;
+              cursor: pointer;
+              border-radius: 4px 4px 0 0;
+            }
+          }
+          .living_bottom {
+            height: 84px;
+            background: #fff;
+            box-sizing: border-box;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            &_title {
+              color: #1a1a1a;
+              font-size: 16px;
+              margin-bottom: 6px;
+              text-overflow: -o-ellipsis-lastline;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              line-clamp: 2;
+              line-height: 22px;
+              -webkit-box-orient: vertical;
+            }
+            &_time {
+              font-size: 14px;
+              color: #666;
+              span {
+                float: right;
+                margin-top: -3px;
+              }
+            }
+          }
+        }
+      }
+      .subject_nomore {
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+      }
+    }
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #bbbbbb !important;
+  }
+  @media (min-width: 1920px) {
+    .vmp-subject-body {
+      width: 1510px;
+      margin: 0 auto;
+    }
+    .el-col-xl-6 {
+      width: 20%;
+    }
+  }
+</style>

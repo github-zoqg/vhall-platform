@@ -69,10 +69,10 @@ const routes = [
     meta: { title: '忘记密码' }
   },
   {
-    path: '/special/detail/:id',
+    path: '/special/detail',
     component: Subject,
     name: 'Subject',
-    meta: { title: '专题详情', name: 'Subject' }
+    meta: { title: '专题详情', page: 'subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
