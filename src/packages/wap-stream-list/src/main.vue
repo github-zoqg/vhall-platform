@@ -70,7 +70,6 @@
       </div>
       <!-- 进入全屏 -->
       <div
-        v-if="isShowFullscreen"
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
@@ -132,41 +131,10 @@
         isOpenlang: false,
         lang: {},
         languageList: [],
-        streamInfo,
-        isShowFullscreen: false
+        streamInfo
       };
     },
-    watch: {
-      isWapBodyDocSwitch(val, newVal) {
-        if (!val && newVal) {
-          this.isShowFullscreen = false;
-          if (this._showFullscreenTimer) {
-            clearTimeout(this._showFullscreenTimer);
-          }
-          this._showFullscreenTimer = setTimeout(() => {
-            this.isShowFullscreen = true;
-          }, 1000);
-        }
-      },
-      mainScreenStream: {
-        deep: true,
-        immediate: true,
-        handler() {
-          this.isShowFullscreen = false;
-          if (this._showFullscreenTimer) {
-            clearTimeout(this._showFullscreenTimer);
-          }
-          this._showFullscreenTimer = setTimeout(() => {
-            this.isShowFullscreen = true;
-          }, 1000);
-        }
-      }
-    },
     computed: {
-      // wap-body和文档是否切换位置
-      isWapBodyDocSwitch() {
-        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
-      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
