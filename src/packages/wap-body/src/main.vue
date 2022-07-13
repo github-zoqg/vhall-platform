@@ -16,7 +16,7 @@
     <div
       :class="[
         mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
-        isShareScreen || isOpenInsertFile ? 'vmp-wap-body-special__show' : ''
+        isShareScreen || (isOpenInsertFile && !isAudio) ? 'vmp-wap-body-special__show' : ''
       ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
@@ -79,6 +79,10 @@
       },
       isOpenInsertFile() {
         return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
+      },
+      // 是否是音频插播
+      isAudio() {
+        return !this.$domainStore.state.insertFileServer.insertStreamInfo.has_video;
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
