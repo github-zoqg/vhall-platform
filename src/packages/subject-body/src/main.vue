@@ -4,7 +4,7 @@
       <div class="vmp-subject-body_main">
         <div class="subject_left">
           <div class="subject_left_main">
-            <img :src="subjectDetailInfo.cover" />
+            <img :src="subjectDetailInfo.cover || defaultImages" />
           </div>
           <div class="subject_left_detail">
             <p>
@@ -39,9 +39,8 @@
           :xl="6"
           v-for="(item, index) in subjectDetailInfo.webinar_list"
           :key="index"
-          @click.prevent.stop="toDetail(item.webinar_id)"
         >
-          <a class="living_inner" target="_blank">
+          <div class="living_inner" @click="toDetail(item.webinar_id)">
             <div class="living_top">
               <span class="living_top_hot" v-if="item.hide_pv">
                 <i class="vh-saas-iconfont vh-saas-line-heat">{{ item.pv }}</i>
@@ -50,7 +49,7 @@
                 {{ liveTag(item) }}
                 <span v-if="item.webinar_type != 6 && item.no_delay_webinar == 1">| 无延迟</span>
               </span>
-              <div class="living_box"><img :src="item.img_url" alt="" /></div>
+              <div class="living_box"><img :src="item.img_url || defaultImages" alt="" /></div>
             </div>
             <div class="living_bottom">
               <div class="">
@@ -58,7 +57,7 @@
                 <p class="living_bottom_time">{{ item.start_time }}</p>
               </div>
             </div>
-          </a>
+          </div>
         </el-col>
       </el-row>
       <div class="subject_nomore">已经到底啦～</div>
@@ -69,6 +68,11 @@
   import { useSubjectServer } from 'middle-domain';
   export default {
     name: 'VmpSubjectBody',
+    data() {
+      return {
+        defaultImages: 'https://cnstatic01.e.vhall.com/static/img/v35-subject.png'
+      };
+    },
     beforeCreate() {
       this.subjectServer = useSubjectServer();
     },
@@ -125,7 +129,9 @@
         console.log(strArr.join(''), '???123232432');
         return strArr.join('');
       },
-      toDetail() {}
+      toDetail() {
+        console.log('123124235');
+      }
     }
   };
 </script>
