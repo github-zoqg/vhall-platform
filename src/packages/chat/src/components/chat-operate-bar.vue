@@ -54,6 +54,15 @@
                 {{ $t('chat.chat_1013') }}
               </el-checkbox>
             </li>
+            <li class="filter-item">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickChat"
+                v-model="filterStatus.isChat"
+              >
+                {{ $t('chat.chat_1094') }}
+              </el-checkbox>
+            </li>
           </ul>
         </i>
         <!-- 表情选择 -->
@@ -79,18 +88,33 @@
           >
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
-              <!--              <div class="chat-setting-box__item switch-box">-->
-              <!--                <span class="switch-title">屏蔽礼物/打赏消息</span>-->
-              <!--                <el-switch-->
-              <!--                  class="switch"-->
-              <!--                  v-model="filterStatus.isShieldingEffects"-->
-              <!--                  inactive-color="#E2E2E2"-->
-              <!--                  :width="32"-->
-              <!--                  active-color="#fc5659"-->
-              <!--                  @change="onClickShieldingEffects"-->
-              <!--                />-->
-              <!--              </div>-->
-              <div class="chat-setting-box__item switch-box" v-if="configList['disable_msg']">
+              <div class="chat-setting-box__item switch-box">
+                <span class="switch-title">屏蔽特效</span>
+                <el-switch
+                  class="switch"
+                  v-model="filterStatus.isShieldingEffects"
+                  inactive-color="#E2E2E2"
+                  :width="32"
+                  active-color="#fc5659"
+                  @change="onClickShieldingEffects"
+                />
+              </div>
+              <div class="chat-setting-box__item switch-box">
+                <span class="switch-title">仅查看聊天内容</span>
+                <el-switch
+                  class="switch"
+                  v-model="filterStatus.isChat"
+                  inactive-color="#E2E2E2"
+                  :width="32"
+                  active-color="#fc5659"
+                  @change="onClickChat"
+                />
+              </div>
+              <div class="tip_only">仅针对个人生效</div>
+              <div
+                class="chat-setting-box__item switch-box join-chat-btn"
+                v-if="configList['disable_msg']"
+              >
                 <span class="switch-title">全体禁言</span>
 
                 <el-switch
@@ -252,7 +276,10 @@
           //只看主办方
           onlyShowSponsor: false,
           //屏蔽特效
-          isShieldingEffects: false
+          isShieldingEffects:
+            sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true' ? true : false,
+          // 仅查看聊天内容
+          isChat: sessionStorage.getItem('filterStatus_isChat') == 'true' ? true : false
         },
         //聊天审核链接
         chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
@@ -363,7 +390,20 @@
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
         this.$message.success(message);
+
+        sessionStorage.setItem('filterStatus_isShieldingEffects', status);
+        this.filterStatus.isShieldingEffects = status;
+
         this.$emit('onSwitchShowSpecialEffects', status);
+      },
+      // 仅查看聊天内容
+      onClickChat(status) {
+        // TODO: 待翻译
+        let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
+        this.$message.success(message);
+
+        sessionStorage.setItem('filterStatus_isChat', status);
+        this.filterStatus.isChat = status;
       },
       //点击筛选
       onClickFilterSetting() {
@@ -500,6 +540,9 @@
           text-align: left;
           font-size: 14px;
           color: #555;
+          .tip_only {
+            line-height: 40px;
+          }
           &__item {
             height: 40px;
             line-height: 40px;
@@ -546,7 +589,7 @@
       }
       &__chat-filter-wrap {
         // width: 120px;
-        height: 80px;
+        // height: 80px;
         padding: 4px 0;
         background-color: #383838;
         box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);

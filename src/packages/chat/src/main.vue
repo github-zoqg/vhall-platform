@@ -231,11 +231,18 @@
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
-      //视图中渲染的消息,为了实现主看主办方效果
+      //视图中渲染的消息
       renderList() {
-        return this.isOnlyShowSponsor
-          ? this.chatList.filter(item => ![2, '2'].includes(item.roleName))
-          : this.chatList;
+        // 实现主看主办方效果
+        if (this.isOnlyShowSponsor) {
+          return this.chatList.filter(item => ![2, '2'].includes(item.roleName));
+        }
+        // 实现仅查看聊天消息
+        if (this.$refs.chatOperator?.filterStatus.isChat) {
+          // undefined为历史聊天消息
+          return this.chatList.filter(item => ['text', 'image', undefined].includes(item.type));
+        }
+        return this.chatList;
       },
       // 是否观看端
       isWatch() {
