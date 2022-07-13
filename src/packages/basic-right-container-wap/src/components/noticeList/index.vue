@@ -1,6 +1,6 @@
 <template>
   <div class="icon-wrap-notice" v-if="noticeNum && isShowIcon">
-    <img src="./images/notice-icon.png" alt="" @click="getNoticeList" />
+    <img src="./images/notice-icon.png" alt="" @click="getNoticeList()" />
     <span class="dot" v-if="noticeNum - noticeNumIsWatch">
       <div align="center">
         {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
