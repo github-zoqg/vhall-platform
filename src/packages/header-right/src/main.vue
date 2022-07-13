@@ -160,6 +160,14 @@
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
+      // 第三方发起拉流地址URL
+      thirdPullStreamUrl() {
+        return this.$domainStore.state.roomBaseServer.thirdPullStreamUrl;
+      },
+      // 第三方发起拉流模式
+      thirdPullStreamMode() {
+        return this.$domainStore.state.roomBaseServer.thirdPullStreamMode;
+      },
       // 云导播台是否有流
       director_stream() {
         return this.$domainStore.state.roomBaseServer.director_stream == 1;
@@ -403,6 +411,12 @@
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
       },
+      // 校验第三方拉流地址
+      checkValidatePullUrl() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickCheckValidatePullUrl')
+        );
+      },
       // 第三方推流和网页
       thirdPushStream(flag) {
         window.$middleEventSdk?.event?.send(
@@ -426,11 +440,22 @@
         }
         // 如果是发起端页面
         if (watchInitData.webinar.type != 1) {
-          const res = await this.postStartLive();
-          // 开始直播成功
-          if (res.code == 200) {
-            this.liveStep = 3;
-            this.calculateLiveDuration();
+          //mode2  需要校验url，调用单独接口
+          if (this.thirdPullStreamMode == 2) {
+            const res = await this.postStartLiveThird();
+            // 开始直播成功
+            if (res.code == 200) {
+              this.$message.success('正在使用第三方推流');
+              this.liveStep = 3;
+              this.calculateLiveDuration();
+            }
+          } else {
+            const res = await this.postStartLive();
+            // 开始直播成功
+            if (res.code == 200) {
+              this.liveStep = 3;
+              this.calculateLiveDuration();
+            }
           }
         } else {
           this.liveStep = 3;
@@ -462,17 +487,52 @@
           start_type: this.roomBaseServer.state.interactToolStatus.start_type
         });
       },
-      // 开始直播/录制事件
-      handleStartClick() {
+      // 调开始直播接口- 第三方
+      postStartLiveThird() {
+        return this.roomBaseServer.startLiveThird({
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+          dest_url: this.roomBaseServer.state.thirdPullStreamUrl
+        });
+      },
+      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验
+      async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
+
+        //mode2  需要校验url，调用单独接口
+        if (this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
+          this.checkValidatePullUrl();
+          return false;
+        }
+
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
           this.handlePublishComplate();
         } else {
-          // 派发推流事件
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+          //先检测房间内有无推流
+          await this.roomBaseServer.getLiveStreamStatus();
+          this.$confirm('<strong>这是 <i>HTML</i> 片段</strong>', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+            // type: 'info',
+            // center: true
+          }).then(() => {});
+          if (this.roomBaseServer.state.streamStatus == 1) {
+            this.$confirm('<strong>这是 <i>HTML</i> 片段</strong>', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+              // type: 'info',
+              // center: true
+            }).then(() => {});
+          } else {
+            // 派发推流事件
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+          }
         }
       },
       // 结束直播/录制

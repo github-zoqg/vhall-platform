@@ -8,60 +8,91 @@
           当直播下有多个正在进行的拉流，观众只能看到拉取的第一路流
         </span>
       </div>
-      <div class="vmp-third-stream-modal">
+      <div class="vmp-third-stream-modal" :class="'streamModal' + streamModal">
         <div class="title">发起模式</div>
         <el-radio-group v-model="streamModal">
           <el-radio :label="1">拉流设置1</el-radio>
           <el-radio :label="2">拉流设置2</el-radio>
         </el-radio-group>
-        <div class="item" v-show="streamModal == 1">
+        <div class="input-item" v-show="streamModal == 1">
           <label>RTMP/URL</label>
-          <div class="vmp-third-stream-wrap-right-top-input">
-            <el-input id="vmp-third-watch" v-model="thirdWatchWebUrl" readOnly></el-input>
-            <span @click="doCopy(1)">复制</span>
+          <div class="vmp-third-stream-modal-input readOnly">
+            <span class="input" :title="thirdWatchWebUrl">{{ thirdWatchWebUrl }}</span>
+            <span class="tool">
+              <span title="复制" @click="doCopy(1)" class="vh-iconfont vh-line-copy"></span>
+            </span>
           </div>
         </div>
-        <div class="item" v-show="streamModal == 1">
+        <div class="input-item" v-show="streamModal == 1">
           <label>播放路径/串流码</label>
-          <div class="vmp-third-stream-wrap-right-top-input">
-            <el-input id="vmp-third-play" v-model="thirdPlayUrl" readOnly></el-input>
-            <span @click="doCopy(2)">复制</span>
+          <div class="vmp-third-stream-modal-input readOnly">
+            <span class="input" :title="thirdPlayUrl">{{ thirdPlayUrl }}</span>
+            <span class="tool">
+              <span title="复制" @click="doCopy(2)" class="vh-iconfont vh-line-copy"></span>
+            </span>
           </div>
         </div>
-        <div class="item" v-show="streamModal == 2">
+        <div class="input-item" v-show="streamModal == 2">
           <label>
-            <span>*</span>
+            <span class="required">*</span>
             拉流地址
           </label>
-          <div class="vmp-third-stream-wrap-right-top-input">
+          <div
+            class="vmp-third-stream-modal-input"
+            :class="showRulePullUrl ? 'showRulePullUrl' : ''"
+          >
             <el-input v-model="pullUrl" placeholder="请输入拉流地址，支持rtmp、hls协议"></el-input>
+            <span class="alert" v-show="showRulePullUrl">
+              {{ pullUrl ? '无法访问指定频道，请仔细检查您的拉流地址' : '请输入拉流地址' }}
+            </span>
           </div>
         </div>
-        <div class="item">
+        <div class="input-item">
           <label>拉流状态</label>
-          <div class="vmp-third-stream-wrap-right-top-input">
-            <el-input readOnly></el-input>
-            <span @click="doCopy(2)">刷新</span>
+          <div class="vmp-third-stream-modal-input readOnly">
+            <span class="input" :class="!!streamStatus ? 'success' : 'fail'">
+              {{ !!streamStatus ? '正在拉流' : '未检测到拉流' }}
+            </span>
+            <span class="tool">
+              <span
+                title="刷新"
+                @click="getThirdPushStreamStatus"
+                class="vh-iconfont vh-line-refresh-right"
+              ></span>
+            </span>
           </div>
         </div>
-      </div>
-      <div class="vmp-third-stream-lession">
+        <div class="separator"></div>
         <template v-if="streamModal == 1">
           <div class="title">使用第三方推流</div>
           <div class="content">
-            <p>1.在第三方工具中添加RTMP URL与串流码</p>
-            <p>2.使用第三方工具推流</p>
-            <p>3.点击右上方的“开始直播”按钮</p>
-            <p>4.播放路径/串流码的有效期为7天，建议定期更新</p>
+            <p>1.在第三方工具中添加RTMP URL与串流码;</p>
+            <p>2.使用第三方工具推流;</p>
+            <p>3.点击右上方的“开始直播”按钮;</p>
+            <p>4.播放路径/串流码的有效期为7天，建议定期更新。</p>
           </div>
           <div class="title">
             使用设备推流
             <a href="https://www.vhall.com/saas/doc/1698.html" target="_blank">详细教程</a>
           </div>
           <div class="content">
-            <p>1.在设备中添加RTMP URL与串流码</p>
-            <p>2.使用设备推流</p>
-            <p>3.点击右上方的“开始直播”按钮</p>
+            <p>1.在设备中添加RTMP URL与串流码;</p>
+            <p>2.使用设备推流;</p>
+            <p>3.点击右上方的“开始直播”按钮。</p>
+          </div>
+        </template>
+        <template v-else>
+          <div class="title">使用第三方推流</div>
+          <div class="content">
+            <p>1.在第三方工具中获取拉流地址，并填写到拉流地址中;</p>
+            <p>2.使用第三方工具推流;</p>
+            <p>3.点击右上角的“开始直播”按钮。</p>
+          </div>
+          <div class="title">注意事项</div>
+          <div class="content">
+            <p>
+              拉流开始前，请沟通视频流资源方，将我们的拉流服务器IP列入白名单，否则有可能造成拉流失败。
+            </p>
           </div>
         </template>
       </div>
@@ -70,6 +101,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
   export default {
     name: 'VmpThirdStream',
     data() {
@@ -78,7 +110,8 @@
         thirdPlayUrl: '',
         isShowThirdStream: false,
         streamModal: 1,
-        pullUrl: ''
+        pullUrl: '',
+        showRulePullUrl: false
       };
     },
     beforeCreate() {
@@ -89,9 +122,24 @@
       isThirdStream() {
         return this.roomBaseServer.state.isThirdStream;
       },
+      //是否有流：0-无，1-有
+      streamStatus() {
+        return this.roomBaseServer.state.streamStatus;
+      },
       // 当前用户角色 1-主持人 2-观众(发起端没有观众) 3-助理；4-嘉宾（互动直播才有嘉宾）
       roleName() {
         return this.roomBaseServer.state.watchInitData.join_info.role_name;
+      }
+    },
+    watch: {
+      streamModal(val) {
+        this.roomBaseServer.setThirdPullStreamMode(val);
+      },
+      pullUrl(val) {
+        this.roomBaseServer.setThirdPullStreamUrl(val);
+        if (val) {
+          this.showRulePullUrl = false;
+        }
       }
     },
     created() {
@@ -99,6 +147,7 @@
       if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
         this.isShowThirdStream = true;
         this.getThirdPushStream();
+        this.getThirdPushStreamStatus();
         this.changePushImage(true);
       }
     },
@@ -116,6 +165,7 @@
         this.isShowThirdStream = info.status;
         this.roomBaseServer.setThirdPushStream(info.status);
         info.status && this.getThirdPushStream();
+        this.getThirdPushStreamStatus();
       },
       getThirdPushStream() {
         this.roomBaseServer.getThirdPushStreamAddress().then(res => {
@@ -124,6 +174,10 @@
             this.thirdWatchWebUrl = res.data.stream_address;
           }
         });
+      },
+      //刷新房间内流状态
+      getThirdPushStreamStatus() {
+        this.roomBaseServer.getLiveStreamStatus();
       },
       changePushImage(flag) {
         const thirdBackground = document.querySelector('.vmp-basic-right__hd');
@@ -154,6 +208,22 @@
           type: 'success',
           customClass: 'zdy-info-box'
         });
+      },
+      validatePullUrl() {
+        if (!this.pullUrl) {
+          this.showRulePullUrl = true;
+        } else {
+          const reg = /^(rtmp:\/\/)|(rtmps:\/\/)/g;
+          if (reg.test(this.pullUrl)) {
+            this.showRulePullUrl = false;
+            // 派发开始直播事件
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickStartClick', [null, true])
+            );
+          } else {
+            this.showRulePullUrl = true;
+          }
+        }
       }
     }
   };
@@ -167,179 +237,173 @@
     height: 100%;
     background: #f1f1f1;
     z-index: 3;
+    overflow-y: auto;
     &-box {
-      padding-top: 50px;
       margin: 0 auto;
       width: 100%;
       height: 100%;
     }
     &-title {
+      width: 720px;
+      margin: 0 auto;
+      padding-top: 32px;
       height: 40px;
-      line-height: 40px;
       padding-bottom: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #666;
-      width: 750px;
+      font-weight: 600;
       overflow: auto;
-      margin: 0 auto;
+      font-size: 20px;
+      line-height: 28px;
+      color: #1a1a1a;
     }
-    &-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      &-left {
-        width: 151px;
-        height: 100%;
-        margin-right: 25px;
+    &-subTitle {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: #999999;
+      margin-left: 8px;
+    }
+    &-modal {
+      width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 4px;
+      padding: 24px;
+      box-sizing: border-box;
+      &.streamModal2 {
+        .input-item label {
+          min-width: 68px;
+          width: 68px;
+        }
+        .required {
+          color: #fb3a32;
+        }
+        input {
+          border-color: #ccc;
+        }
+        .el-input__inner:focus,
+        .el-textarea__inner:focus,
+        .el-input__inner:hover,
+        .el-textarea__inner:hover {
+          border-color: #999;
+        }
+      }
+      .title {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+        color: #1a1a1a;
+        position: relative;
+        padding-left: 11px;
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 4px;
+          height: 14px;
+          width: 3px;
+          background-color: #fb3a32;
+        }
+        a {
+          color: #436dfa;
+          margin-left: 6px;
+          font-weight: 400;
+        }
+      }
+      .el-radio-group {
+        margin-top: 24px;
+        .el-radio {
+          margin-right: 35px;
+        }
+        .el-radio__label {
+          color: #666;
+        }
+        .el-radio__input.is-checked + .el-radio__label {
+          color: #1a1a1a;
+        }
+        .el-radio__inner {
+          width: 16px;
+          height: 16px;
+        }
+        .el-radio__inner::after {
+          width: 8px;
+          height: 8px;
+        }
+      }
+      .input-item {
+        margin-top: 24px;
         display: flex;
-        &-step {
-          display: flex;
-          flex-direction: column;
-          width: 30px;
-          align-items: center;
-          margin-right: 40px;
-          padding-bottom: 15px;
-          &-round {
-            width: 26px;
-            height: 26px;
-            background-color: #fff;
-            -webkit-box-shadow: 0 0 9px 0 #ccc;
-            box-shadow: 0 0 9px 0 #ccc;
-            border-radius: 50%;
-            span {
-              display: inline-block;
-              width: 12px;
-              height: 12px;
-              background-color: #ccc;
-              margin: 7px;
-              border-radius: 50%;
-            }
-          }
-          &-line {
-            height: 235px;
-            width: 1px;
-            background: #ccc;
-          }
-        }
-        &-text {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          align-items: center;
+        align-items: center;
+        color: #1a1a1a;
+        label {
+          min-width: 105px;
+          width: 105px;
+          text-align: right;
           font-size: 14px;
-          color: #333;
+          line-height: 20px;
+          margin-right: 12px;
         }
       }
-      &-right {
-        width: 608px;
-        &-top {
-          padding: 50px 36px;
-          background: #fff;
-          margin-bottom: 10px;
+      &-input {
+        width: 555px;
+        display: flex;
+        align-items: center;
+        height: 40px;
+        box-sizing: border-box;
+        position: relative;
+        &.readOnly {
+          border: 1px solid #cccccc;
+          padding: 0 0 0 12px;
+          background: #f7f7f7;
           border-radius: 4px;
-          > div {
-            display: flex;
-            width: 100%;
-            label {
-              display: inline-block;
-              width: 90px;
-              text-align: right;
-              font-size: 12px;
-              color: #333;
-              line-height: 36px;
-              margin-right: 10px;
-            }
-          }
-          &-input {
-            height: 36px;
-            width: 416px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            .el-input {
-              width: 336px;
-              border-radius: 4px 0 0 4px;
-              background: #f7f7f7;
-            }
-            .el-input__inner {
-              border: none;
-              height: 36px;
-              background: transparent;
-              font-size: 12px;
-              font-weight: 400;
-              color: #1a1a1a;
-              line-height: 20px;
-            }
-            span {
-              display: inline-block;
-              width: 80px;
-              height: 36px;
-              text-align: center;
-              line-height: 36px;
-              background: #e6e6e6;
-              color: #666;
-              vertical-align: top;
-              cursor: pointer;
-              font-size: 12px;
-              border-radius: 0 4px 4px 0;
-            }
-          }
         }
-        &-bottom {
-          padding: 40px;
-          background: #fff;
-          border-radius: 4px;
-          position: relative;
-          div {
-            display: flex;
-            p {
-              font-size: 12px;
-              color: #333;
-              // margin-right: 10px;
-              width: 140px;
-              font-weight: bold;
-              text-align: left;
-              i {
-                display: inline-block;
-                width: 28px;
-                height: 28px;
-                background: url(https://cnstatic01.e.vhall.com/static/images/vhall3.0/new_host_sprite.png?v=SGnm%2B%2FdyJ64oKrOI%2BJTU%2Fg%3D%3D)
-                  no-repeat -179px -127px;
-                border-radius: 50%;
-                vertical-align: middle;
-                padding-right: 10px;
-              }
-            }
-            ul {
-              font-size: 12px;
-              color: #333;
-              // padding-top: 4px;
-              li {
-                list-style: none;
-                font-weight: normal;
-                line-height: 25px;
-              }
-            }
+        &.showRulePullUrl {
+          input {
+            border: 1px solid #fb3a32;
           }
-          &-detail {
-            position: absolute;
+          .alert {
+            color: #fb3a32;
             font-size: 12px;
-            color: #4da1ff;
+            position: absolute;
+            bottom: -17px;
+          }
+        }
+        .input {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 100%;
+          &.success {
+            color: #436dfa;
+          }
+          &.fail {
+            color: #fb3a32;
+          }
+        }
+        .tool {
+          min-width: 29px;
+          padding-right: 12px;
+          text-align: right;
+          .vh-iconfont {
             cursor: pointer;
-            bottom: 20px;
-            right: 38px;
-            a {
-              color: #4da1ff;
-            }
           }
         }
       }
-    }
-    &-subTitle,
-    &-tab,
-    &-alert {
-      width: 750px;
-      margin: 0 auto;
+      .separator {
+        width: 100%;
+        height: 40px;
+      }
+      .content {
+        margin-top: 8px;
+        margin-bottom: 24px;
+        padding: 20px;
+        background: #f7f7f7;
+        border-radius: 4px;
+        line-height: 22px;
+        font-size: 14px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
   }
 </style>
