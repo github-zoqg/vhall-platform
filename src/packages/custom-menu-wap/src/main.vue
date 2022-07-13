@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   import ComponentDesimg from './components/component-desimg.vue';
   import ComponentQrcode from './components/component-qrcode.vue';

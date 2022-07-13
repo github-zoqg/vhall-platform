@@ -93,7 +93,7 @@
     useRebroadcastServer,
     useMsgServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpHeaderRight',
@@ -122,9 +122,9 @@
     computed: {
       formatDuration() {
         const temp = this.liveDuration * 1000;
-        const hours = this.$moment.duration(temp).hours();
-        const minutes = this.$moment.duration(temp).minutes();
-        const seconds = this.$moment.duration(temp).seconds();
+        const hours = moment.duration(temp).hours();
+        const minutes = moment.duration(temp).minutes();
+        const seconds = moment.duration(temp).seconds();
         return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;
@@ -333,11 +333,7 @@
             document.webkitFullscreenElement ||
             document.mozFullscreenElement ||
             document.msFullscreenElement;
-          if (
-            fullscreenElement &&
-            fullscreenElement.className &&
-            fullscreenElement.className.indexOf('vmp-basic-container') != -1
-          ) {
+          if (fullscreenElement && fullscreenElement.tagName === 'BODY') {
             this.isFullscreen = true;
           } else {
             this.isFullscreen = false;
@@ -695,7 +691,7 @@
         }
       },
       enterFullscreen() {
-        const element = document.querySelector('.vmp-basic-container');
+        const element = document.querySelector('body');
         if (!this.assistantType) {
           if (element.requestFullscreen) element.requestFullscreen();
           else if (element.mozRequestFullScreen) element.mozRequestFullScreen();

@@ -17,7 +17,7 @@
 </template>
 <script>
   import { useRedPacketServer, useZIndexServer, useChatServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   const RED_ENVELOPE_OK = 'red_envelope_ok'; // 支付成功消息
   export default {
     name: 'VmpRedPacketWatch',

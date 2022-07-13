@@ -189,7 +189,7 @@ const sharedConfig = {
       vue: 'Vue',
       'vue-router': 'VueRouter',
       'vue-i18n': 'VueI18n',
-      moment: 'moment',
+      // moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
       vant: 'vant',

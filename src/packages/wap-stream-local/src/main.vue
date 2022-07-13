@@ -53,7 +53,7 @@
     useMediaCheckServer,
     usePlayerServer
   } from 'middle-domain';
-  import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
+  import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
 
   export default {
     name: 'VmpWapStreamLocal',
