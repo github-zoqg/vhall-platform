@@ -195,13 +195,15 @@
         this.winnerListData[this.lotteryId].list =
           this.winnerListData[this.lotteryId].list.concat(winnerList);
 
+        clearTimeout(this.winnerListData[this.lotteryId].timer);
         // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据
         if (
           this.winnerListData[this.lotteryId].list.length <
           this.winnerListData[this.lotteryId].lottery_number
         ) {
-          clearTimeout(this.winnerListData[this.lotteryId].timer);
-          this.winnerListData[this.lotteryId].timer = await setTimeout(() => {}, 5000);
+          this.winnerListData[this.lotteryId].timer = await new Promise(
+            resolve => (this.winnerListData[this.lotteryId].timer = setTimeout(resolve, 5000))
+          );
         }
 
         const lotteryResult = this.winnerListData[this.lotteryId].list.some(userId => {

@@ -58,7 +58,7 @@
         lotteryId: '', // 抽奖的信息id(接口返回)
         lotteryInfo: {},
         winLotteryHistory: [], // 中奖历史
-        winnerListData: Object
+        winnerListData: {}
       };
     },
     beforeCreate() {
@@ -206,23 +206,25 @@
         const winnerList = msg.data.lottery_winners.split(',');
 
         // 遍历是否存在key
-        if (
-          !Object.prototype.hasOwnProperty.call(this.winnerListData.hasOwnProperty, this.lotteryId)
-        ) {
+        console.log(!Object.prototype.hasOwnProperty.call(this.winnerListData, this.lotteryId));
+        if (!Object.prototype.hasOwnProperty.call(this.winnerListData, this.lotteryId)) {
           this.winnerListData[this.lotteryId] = msg.data;
           this.winnerListData[this.lotteryId].list = [];
         }
 
         this.winnerListData[this.lotteryId].list =
           this.winnerListData[this.lotteryId].list.concat(winnerList);
+        console.log(this.winnerListData, 'this.winnerListData', msg.data);
 
+        clearTimeout(this.winnerListData[this.lotteryId].timer);
         // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据
         if (
           this.winnerListData[this.lotteryId].list.length <
           this.winnerListData[this.lotteryId].lottery_number
         ) {
-          clearTimeout(this.winnerListData[this.lotteryId].timer);
-          this.winnerListData[this.lotteryId].timer = await setTimeout(() => {}, 5000);
+          await new Promise(
+            resolve => (this.winnerListData[this.lotteryId].timer = setTimeout(resolve, 5000))
+          );
         }
 
         const lotteryResult = this.winnerListData[this.lotteryId].list.some(userId => {
