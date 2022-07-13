@@ -14,7 +14,10 @@
       </div>
     </div>
     <div
-      :class="[mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl']"
+      :class="[
+        mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
+        isShareScreen || (isOpenInsertFile && !isAudio) ? 'vmp-wap-body-special__show' : ''
+      ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
     >
@@ -35,8 +38,9 @@
       <!-- wap端订阅桌面共享的容器 -->
       <vmp-air-container :cuid="childrenComp[2]" :oneself="true" v-show="!isLivingEnd" />
 
-      <!-- wap端订阅桌面共享的容器 -->
+      <!-- wap端订阅插播的容器 -->
       <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
+
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -72,6 +76,16 @@
       // 选中的自定义菜单的 type
       menuSelectedType() {
         return this.$domainStore.state.menuServer.selectedType;
+      },
+      isOpenInsertFile() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
+      },
+      // 是否是音频插播
+      isAudio() {
+        return !this.$domainStore.state.insertFileServer.insertStreamInfo.has_video;
+      },
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
       isShowWapBody() {
         // 如果播放器储与mini状态，必显示
@@ -389,6 +403,12 @@
     &-nomarl {
       height: 100%;
       width: 100%;
+    }
+    &-special__show {
+      .vmp-stream-list {
+        height: 0px;
+        overflow: hidden;
+      }
     }
     &-mini {
       position: fixed;
