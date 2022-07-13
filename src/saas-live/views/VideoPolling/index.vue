@@ -13,7 +13,7 @@
 
 <script>
   import videoPollingState from '../../headless/video-polling-state';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
@@ -40,10 +40,10 @@
           bu: 0,
           user_id: watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });

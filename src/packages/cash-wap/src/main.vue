@@ -186,8 +186,8 @@
 
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
-  import { boxEventOpitons, isWechat } from '@/packages/app-shared/utils/tool';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat } from '@/app-shared/utils/tool';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import NECaptcha from './components/NECaptcha';
   const defaltCashForm = {
     phone: '',

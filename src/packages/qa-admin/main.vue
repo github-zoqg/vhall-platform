@@ -770,7 +770,7 @@
   } from 'middle-domain';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import { debounce, getQueryString } from '@/packages/app-shared/utils/tool';
+  import { debounce, getQueryString } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpQaAdmin',
@@ -882,7 +882,7 @@
       },
       filterTime() {
         return function (time) {
-          return this.$moment(time).format('HH:mm');
+          return moment(time).format('HH:mm');
         };
       },
       isAllChecked() {

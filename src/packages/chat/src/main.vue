@@ -107,7 +107,7 @@
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
   import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   //消息提示定时器
@@ -471,7 +471,7 @@
           room_id: this.roomId,
           msg_id: this.getFirstMsg()?.msgId,
           limit: this.pageSize,
-          is_role: this.isOnlyShowSponsor ? 1 : 0,
+          // is_role: this.isOnlyShowSponsor ? 1 : 0,
           anchor_path: this.chatList[0]?.msgId ? 'down' : undefined //up 拉新,down拉旧
         };
         const res = await useChatServer().getHistoryMsg(params);
@@ -599,11 +599,11 @@
       //处理只看主办方
       async onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
-        useChatServer().clearChatMsg();
-        await this.getHistoryMsg();
-        this.$nextTick(() => {
-          this.scrollBottom();
-        });
+        // useChatServer().clearChatMsg();
+        // await this.getHistoryMsg();
+        // this.$nextTick(() => {
+        //   this.scrollBottom();
+        // });
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {

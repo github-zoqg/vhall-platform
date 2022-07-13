@@ -20,7 +20,7 @@
 
 <script>
   import { useMenuServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import lotteryIcon from './components/lottery-icon/index.vue';
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
   import questionnaireIcon from './components/questionnaire-icon/index.vue';

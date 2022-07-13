@@ -81,17 +81,14 @@
           })
           .then(res => {
             if (res.data.status == 'live') {
-              this.$router.push({
-                path: `/lives/watch/${this.webinar_id}`
-              });
+              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinar_id}`;
             } else if (res.data.status == 'subscribe') {
               // 如果预约或结束，跳转到预约页
-              this.$router.push({
-                path: `/lives/subscribe/${this.webinar_id}`
-              });
+              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinar_id}`;
             }
           })
           .catch(e => {
+            //512502 不支持的活动类型(flash)、512503	不支持的活动类型(旧h5)
             if (e.code == 512503 || e.code == 512502) {
               window.location.href = `${window.location.origin}/${this.webinar_id}`;
             }

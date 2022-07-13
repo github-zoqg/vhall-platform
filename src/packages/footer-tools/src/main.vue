@@ -148,7 +148,7 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import {
     useRoomBaseServer,
     useZIndexServer,
