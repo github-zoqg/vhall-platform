@@ -441,6 +441,8 @@
             const res = await this.postStartLiveThird();
             // 开始直播成功
             if (res.code == 200) {
+              //数据埋点--第三方发起模式-拉流设置2
+              window.vhallReportForProduct?.report(120012);
               this.$message.success('正在使用第三方推流');
               this.liveStep = 3;
               this.calculateLiveDuration();
@@ -449,6 +451,13 @@
             const res = await this.postStartLive();
             // 开始直播成功
             if (res.code == 200) {
+              if (this.isThirdStream) {
+                //数据埋点--第三方发起模式-拉流设置1
+                window.vhallReportForProduct?.report(120011);
+              } else {
+                //数据埋点--网页直播
+                window.vhallReportForProduct?.report(120013);
+              }
               this.liveStep = 3;
               this.calculateLiveDuration();
             }
