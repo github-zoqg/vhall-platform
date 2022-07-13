@@ -185,9 +185,7 @@
         const winnerList = msgData.lottery_winners.split(',');
 
         // 遍历是否存在key
-        if (
-          !Object.prototype.hasOwnProperty.call(this.winnerListData.hasOwnProperty, this.lotteryId)
-        ) {
+        if (!Object.prototype.hasOwnProperty.call(this.winnerListData, this.lotteryId)) {
           this.winnerListData[this.lotteryId] = msg.data;
           this.winnerListData[this.lotteryId].list = [];
         }
