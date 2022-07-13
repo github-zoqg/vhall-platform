@@ -221,8 +221,8 @@
           this.winnerListData[this.lotteryId].list.length <
           this.winnerListData[this.lotteryId].lottery_number
         ) {
-          clearTimeout(this.this.winnerListData[this.lotteryId].timer);
-          this.this.winnerListData[this.lotteryId].timer = await setTimeout(() => {}, 5000);
+          clearTimeout(this.winnerListData[this.lotteryId].timer);
+          this.winnerListData[this.lotteryId].timer = await setTimeout(() => {}, 5000);
         }
 
         const lotteryResult = this.winnerListData[this.lotteryId].list.some(userId => {
