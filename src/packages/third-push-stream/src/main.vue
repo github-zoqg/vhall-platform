@@ -41,7 +41,11 @@
             class="vmp-third-stream-modal-input"
             :class="showRulePullUrl ? 'showRulePullUrl' : ''"
           >
-            <el-input v-model="pullUrl" placeholder="请输入拉流地址，支持rtmp、hls协议"></el-input>
+            <el-input
+              v-model="pullUrl"
+              @blur="validatePullUrl(true)"
+              placeholder="请输入拉流地址，支持rtmp、hls协议"
+            ></el-input>
             <span class="alert" v-show="showRulePullUrl">
               {{ pullUrl ? '无法访问指定频道，请仔细检查您的拉流地址' : '请输入拉流地址' }}
             </span>
@@ -209,17 +213,19 @@
           customClass: 'zdy-info-box'
         });
       },
-      validatePullUrl() {
+      validatePullUrl(cur = false) {
         if (!this.pullUrl) {
           this.showRulePullUrl = true;
         } else {
           const reg = /^(rtmp:\/\/)|(rtmps:\/\/)/g;
           if (reg.test(this.pullUrl)) {
             this.showRulePullUrl = false;
-            // 派发开始直播事件
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickStartClick', [null, true])
-            );
+            if (!cur) {
+              // 派发开始直播事件
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitClickStartClick', [null, true])
+              );
+            }
           } else {
             this.showRulePullUrl = true;
           }
