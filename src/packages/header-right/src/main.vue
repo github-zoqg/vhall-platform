@@ -512,26 +512,26 @@
         } else {
           //先检测房间内有无推流
           await this.roomBaseServer.getLiveStreamStatus();
-          this.$confirm('<strong>这是 <i>HTML</i> 片段</strong>', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel'
-            // type: 'info',
-            // center: true
-          }).then(() => {});
           if (this.roomBaseServer.state.streamStatus == 1) {
-            this.$confirm('<strong>这是 <i>HTML</i> 片段</strong>', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              customClass: 'zdy-message-box',
-              cancelButtonClass: 'zdy-confirm-cancel'
-              // type: 'info',
-              // center: true
-            }).then(() => {});
+            this.$confirm(
+              '<p>监测到您的直播间有正在进行的推流，确认是否开播？</p><p>注意：继续开播，观看端将看到正在进行的推流画面</p>',
+              '提示',
+              {
+                dangerouslyUseHTMLString: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                customClass: 'zdy-message-box',
+                cancelButtonClass: 'zdy-confirm-cancel'
+                // type: 'info',
+                // center: true
+              }
+            ).then(() => {
+              // 派发推流事件
+              this.emitClickStartLive();
+            });
           } else {
             // 派发推流事件
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+            this.emitClickStartLive();
           }
         }
       },
@@ -711,6 +711,10 @@
           else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
           else if (document.msExitFullscreen) document.msExitFullscreen();
         }
+      },
+      // 派发推流事件
+      emitClickStartLive() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       }
     }
   };
