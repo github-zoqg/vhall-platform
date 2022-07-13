@@ -147,6 +147,19 @@
             this.isShowFullscreen = true;
           }, 1000);
         }
+      },
+      mainScreenStream: {
+        deep: true,
+        immediate: true,
+        handler() {
+          this.isShowFullscreen = false;
+          if (this._showFullscreenTimer) {
+            clearTimeout(this._showFullscreenTimer);
+          }
+          this._showFullscreenTimer = setTimeout(() => {
+            this.isShowFullscreen = true;
+          }, 1000);
+        }
       }
     },
     computed: {
