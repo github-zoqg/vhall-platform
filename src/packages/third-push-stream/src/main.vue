@@ -181,7 +181,9 @@
       },
       //刷新房间内流状态
       getThirdPushStreamStatus() {
-        this.roomBaseServer.getLiveStreamStatus();
+        this.roomBaseServer.getLiveStreamStatus({
+          webinarId: this.$route.params.id
+        });
       },
       changePushImage(flag) {
         const thirdBackground = document.querySelector('.vmp-basic-right__hd');
