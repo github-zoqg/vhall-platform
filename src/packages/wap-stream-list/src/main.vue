@@ -72,6 +72,7 @@
       <div
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
+        style="transform: translate3d(0, 0, 100px)"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
