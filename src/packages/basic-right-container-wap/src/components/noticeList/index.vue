@@ -249,15 +249,14 @@
         }
       }
       .container-data {
-        max-height: calc(680px - 142px);
-        padding: 0 40px 60px;
+        max-height: calc(680px - 210px);
+        padding: 0 40px;
+        margin-bottom: 68px;
         position: relative;
         overflow: auto;
         color: @font-light-normal;
+        z-index: 2;
         ul {
-          list-style: none;
-          height: 100%;
-          overflow: auto;
           li {
             color: @font-light-normal;
             font-size: 28px;
