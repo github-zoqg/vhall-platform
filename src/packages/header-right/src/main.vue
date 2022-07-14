@@ -444,7 +444,6 @@
             if (res.code == 200) {
               //数据埋点--第三方发起模式-拉流设置2
               window.vhallReportForProduct?.report(120012);
-              this.$message.success('正在使用第三方推流');
               this.liveStep = 3;
               this.calculateLiveDuration();
             }
