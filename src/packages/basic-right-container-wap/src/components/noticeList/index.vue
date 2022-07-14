@@ -261,6 +261,12 @@
             color: @font-light-normal;
             font-size: 28px;
             line-height: 1.2;
+            position: relative;
+            &:last-child {
+              .data-text_title {
+                padding-bottom: 0;
+              }
+            }
           }
         }
         .data-time {
@@ -299,6 +305,7 @@
           }
           .border_col_bfb {
             border-color: #bfbfbf;
+            background: #fdf1ed;
           }
           &_title {
             padding: 0 0 21px 32px;
