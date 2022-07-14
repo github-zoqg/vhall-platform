@@ -37,7 +37,7 @@ const htmlConfig = {
 
     iconfontCommon:
       '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.5/iconfont.min.css'
+    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.8/iconfont.min.css'
   }
 };
 

@@ -6,14 +6,9 @@ export default (options = {}) => {
   if (options.el) {
     root = document.querySelectorAll(options.el)[0] || root;
   }
-  const chList = root.querySelectorAll('.com-zan');
-  if (chList.length >= 10) {
-    // 最多10个同时启动
-    return;
-  }
   const instance = new ComConstructor({
     propsData: {
-      showIdx: Math.round(Math.random() * 7)
+      imgType: Math.round(Math.random() * 7)
     }
   });
   instance.vm = instance.$mount();

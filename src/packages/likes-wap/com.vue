@@ -1,13 +1,6 @@
 <template>
   <div class="com-zan">
-    <span v-if="showIdx == 0" class="com-zan-icon com-zan-icon-01 zan-animation-01"></span>
-    <span v-if="showIdx == 1" class="com-zan-icon com-zan-icon-02 zan-animation-01"></span>
-    <span v-if="showIdx == 2" class="com-zan-icon com-zan-icon-03 zan-animation-01"></span>
-    <span v-if="showIdx == 3" class="com-zan-icon com-zan-icon-04 zan-animation-01"></span>
-    <span v-if="showIdx == 4" class="com-zan-icon com-zan-icon-05 zan-animation-01"></span>
-    <span v-if="showIdx == 5" class="com-zan-icon com-zan-icon-06 zan-animation-01"></span>
-    <span v-if="showIdx == 6" class="com-zan-icon com-zan-icon-07 zan-animation-01"></span>
-    <span v-if="showIdx == 7" class="com-zan-icon com-zan-icon-08 zan-animation-01"></span>
+    <span :class="['com-zan-icon', `com-zan-icon-0${imgType}`, 'zan-animation-01']"></span>
   </div>
 </template>
 
@@ -15,9 +8,9 @@
   export default {
     name: 'com-zan',
     props: {
-      showIdx: {
+      imgType: {
         type: Number,
-        default: 0
+        default: 1
       }
     }
   };
@@ -31,6 +24,7 @@
     display: block;
     width: 100px;
     height: 100px;
+    pointer-events: none; // 不可点击交互
     transform: translateY(-100%);
     z-index: 1000;
     .com-zan-icon {
@@ -82,11 +76,6 @@
       width: 60px;
       height: 60px;
       background-image: url('./img/zan-con07.png');
-    }
-    .com-zan-icon-08 {
-      width: 80px;
-      height: 80px;
-      background-image: url('./img/zan-con03.png');
     }
   }
   @keyframes topFrame1 {

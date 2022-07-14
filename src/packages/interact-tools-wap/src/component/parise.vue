@@ -1,7 +1,6 @@
 <template>
   <div class="vhall-praise">
-    <!-- <div ref="dianzan" class="v-praise-dom" @touchstart="support"> -->
-    <div ref="dianzan" class="v-praise-dom" @touchstart="giveLike">
+    <div ref="dianzan" class="v-praise-dom" @touchstart="support">
       <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
       <img class="tool givealike-img" v-else src="../img/icon_like.png" />
     </div>
@@ -75,24 +74,27 @@
       },
 
       support(e) {
-        const arr = ['praiseMove1', 'praiseMove3', 'praiseMove2', 'praiseMove4'];
-        const str = this.selectRandom(arr);
-        const doms = document.createElement('i');
-        doms.classList.add('xin');
-        doms.classList.add(str);
-        this.$refs.dianzan.appendChild(doms);
-        doms.addEventListener('animationend', function () {
-          this.outerHTML = '';
-        });
+        // const arr = ['praiseMove1', 'praiseMove3', 'praiseMove2', 'praiseMove4'];
+        // const str = this.selectRandom(arr);
+        // const doms = document.createElement('i');
+        // doms.classList.add('xin');
+        // doms.classList.add(str);
+        // this.$refs.dianzan.appendChild(doms);
+        // doms.addEventListener('animationend', function () {
+        //   this.outerHTML = '';
+        // });
+        this.$zan();
         this.timess++;
-        this.like = Number(this.like) + 1;
-        this.$forceUpdate();
+        this.like = this.like + 1;
+        // this.$forceUpdate();
         if (this.clearSet) {
           window.clearTimeout(this.clearSet);
         } else {
           this.clearSet = null;
         }
         this.clearSet = setTimeout(() => {
+          clearTimeout(this.clearSet);
+          this.clearSet = null;
           this.praise();
           this.timess = 0;
         }, 2000);
@@ -107,9 +109,6 @@
             num
           })
           .then(() => {});
-      },
-      giveLike() {
-        this.$zan();
       }
     }
   };
