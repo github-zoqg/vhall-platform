@@ -546,6 +546,7 @@
         justify-content: center;
         z-index: 7;
         background: transparent;
+        transform: translateZ(10px);
         img {
           width: 100%;
           height: 100%;
