@@ -93,7 +93,7 @@
     useRebroadcastServer,
     useMsgServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpHeaderRight',
@@ -122,9 +122,9 @@
     computed: {
       formatDuration() {
         const temp = this.liveDuration * 1000;
-        const hours = this.$moment.duration(temp).hours();
-        const minutes = this.$moment.duration(temp).minutes();
-        const seconds = this.$moment.duration(temp).seconds();
+        const hours = moment.duration(temp).hours();
+        const minutes = moment.duration(temp).minutes();
+        const seconds = moment.duration(temp).seconds();
         return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;
@@ -159,6 +159,14 @@
       // 是否为第三方发起
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      // 第三方发起拉流地址URL
+      thirdPullStreamUrl() {
+        return this.$domainStore.state.roomBaseServer.thirdPullStreamUrl;
+      },
+      // 第三方发起拉流模式
+      thirdPullStreamMode() {
+        return this.$domainStore.state.roomBaseServer.thirdPullStreamMode;
       },
       // 云导播台是否有流
       director_stream() {
@@ -325,11 +333,7 @@
             document.webkitFullscreenElement ||
             document.mozFullscreenElement ||
             document.msFullscreenElement;
-          if (
-            fullscreenElement &&
-            fullscreenElement.className &&
-            fullscreenElement.className.indexOf('vmp-basic-container') != -1
-          ) {
+          if (fullscreenElement && fullscreenElement.tagName === 'BODY') {
             this.isFullscreen = true;
           } else {
             this.isFullscreen = false;
@@ -403,6 +407,12 @@
       openVirtualProple() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitVirtualClick'));
       },
+      // 校验第三方拉流地址
+      checkValidatePullUrl() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickCheckValidatePullUrl')
+        );
+      },
       // 第三方推流和网页
       thirdPushStream(flag) {
         window.$middleEventSdk?.event?.send(
@@ -410,6 +420,7 @@
         );
       },
       // 推流成功事件
+      // TODO：第三方发起 请求了两次接口，第一次开播之后，收到vrtc_connect_success上麦的消息，又回调了handlePublishComplate
       async handlePublishComplate() {
         const { watchInitData } = this.roomBaseServer.state;
         // 如果是录制页面
@@ -426,11 +437,31 @@
         }
         // 如果是发起端页面
         if (watchInitData.webinar.type != 1) {
-          const res = await this.postStartLive();
-          // 开始直播成功
-          if (res.code == 200) {
-            this.liveStep = 3;
-            this.calculateLiveDuration();
+          //mode2  需要校验url，调用单独接口
+          if (this.thirdPullStreamMode == 2) {
+            const res = await this.postStartLiveThird();
+            // 开始直播成功
+            if (res.code == 200) {
+              //数据埋点--第三方发起模式-拉流设置2
+              window.vhallReportForProduct?.report(120012);
+              this.$message.success('正在使用第三方推流');
+              this.liveStep = 3;
+              this.calculateLiveDuration();
+            }
+          } else {
+            const res = await this.postStartLive();
+            // 开始直播成功
+            if (res.code == 200) {
+              if (this.isThirdStream) {
+                //数据埋点--第三方发起模式-拉流设置1
+                window.vhallReportForProduct?.report(120011);
+              } else {
+                //数据埋点--网页直播
+                window.vhallReportForProduct?.report(120013);
+              }
+              this.liveStep = 3;
+              this.calculateLiveDuration();
+            }
           }
         } else {
           this.liveStep = 3;
@@ -462,17 +493,50 @@
           start_type: this.roomBaseServer.state.interactToolStatus.start_type
         });
       },
-      // 开始直播/录制事件
-      handleStartClick() {
+      // 调开始直播接口- 第三方
+      postStartLiveThird() {
+        return this.roomBaseServer.startLiveThird({
+          webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
+          dest_url: this.roomBaseServer.state.thirdPullStreamUrl
+        });
+      },
+      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验
+      async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
+        //mode2  需要校验url，调用单独接口
+        if (this.isThirdStream && this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
+          this.checkValidatePullUrl();
+          return false;
+        }
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
           this.handlePublishComplate();
         } else {
-          // 派发推流事件
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+          //先检测房间内有无推流
+          await this.roomBaseServer.getLiveStreamStatus();
+          if (this.roomBaseServer.state.streamStatus == 1) {
+            this.$confirm(
+              '<p>监测到您的直播间有正在进行的推流，确认是否开播？</p><p>注意：继续开播，观看端将看到正在进行的推流画面</p>',
+              '提示',
+              {
+                dangerouslyUseHTMLString: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                customClass: 'zdy-message-box',
+                cancelButtonClass: 'zdy-confirm-cancel'
+                // type: 'info',
+                // center: true
+              }
+            ).then(() => {
+              // 派发推流事件
+              this.clickStartLive();
+            });
+          } else {
+            // 派发推流事件
+            this.clickStartLive();
+          }
         }
       },
       // 结束直播/录制
@@ -635,7 +699,7 @@
         }
       },
       enterFullscreen() {
-        const element = document.querySelector('.vmp-basic-container');
+        const element = document.querySelector('body');
         if (!this.assistantType) {
           if (element.requestFullscreen) element.requestFullscreen();
           else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
@@ -651,6 +715,10 @@
           else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
           else if (document.msExitFullscreen) document.msExitFullscreen();
         }
+      },
+      // 派发推流事件
+      clickStartLive() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       }
     }
   };

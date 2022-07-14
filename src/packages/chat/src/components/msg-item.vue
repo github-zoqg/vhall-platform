@@ -147,9 +147,9 @@
                 >
                   <img
                     class="img-box__content-img"
-                    width="34"
-                    height="34"
-                    :src="img"
+                    width="40"
+                    height="40"
+                    :src="img + '?x-oss-process=image/resize,m_lfit,h_80,w_80'"
                     :alt="$t('chat.chat_1065')"
                     @click="previewImg(index, source.replyMsg.content.image_urls)"
                   />
@@ -189,9 +189,9 @@
               >
                 <img
                   class="normal-msg__img-wrapper__img-box__content-img"
-                  width="34"
-                  height="34"
-                  :src="img"
+                  width="40"
+                  height="40"
+                  :src="img + '?x-oss-process=image/resize,m_fill,h_80,w_80'"
                   :alt="$t('chat.chat_1065')"
                   @click="previewImg(index, source.content.image_urls)"
                 />
@@ -237,7 +237,11 @@
         </div>
         <!-- 礼物、打赏 -->
         <div
-          v-if="source.interactToolsStatus && !(source.type === 'reward_pay_ok' && isEmbed)"
+          v-if="
+            !isOnlyShowSponsor &&
+            source.interactToolsStatus &&
+            !(source.type === 'reward_pay_ok' && isEmbed)
+          "
           class="msg-item-template__interact-tools"
         >
           <div class="interact-tools-content">
@@ -266,9 +270,8 @@
                 'interact-tools-content__img-reward': !source.content.gift_url
               }"
               :src="
-                require('@/packages/app-shared/assets/img/wap/chat/' +
-                  source.content.gift_name +
-                  '.png') || require('@/packages/app-shared/assets/img/wap/chat/reward.png')
+                require('@/app-shared/assets/img/wap/chat/' + source.content.gift_name + '.png') ||
+                require('@/app-shared/assets/img/wap/chat/reward.png')
               "
               :alt="$t('interact_tools.interact_tools_1029')"
             />
@@ -284,8 +287,8 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import defaultAvatar from '@/packages/app-shared/assets/img/my-dark@2x.png';
-  import phoneImg from '@/packages/app-shared/assets/img/phone.png';
+  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     name: 'msgItem',

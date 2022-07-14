@@ -262,8 +262,8 @@
     useMsgServer,
     useVideoPollingServer
   } from 'middle-domain';
-  import { calculateAudioLevel, calculateNetworkStatus } from '../../app-shared/utils/stream-utils';
-  import { boxEventOpitons, sleep } from '@/packages/app-shared/utils/tool';
+  import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
+  import { boxEventOpitons, sleep } from '@/app-shared/utils/tool';
   import ImgStream from './components/img-stream/index.vue';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -887,7 +887,7 @@
               } else {
                 this.isSpeakOn && (await this.startPush());
               }
-            } else if (this.localSpeaker.streamId) {
+            } else if (this.localSpeaker.streamId || this.isRecording) {
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {

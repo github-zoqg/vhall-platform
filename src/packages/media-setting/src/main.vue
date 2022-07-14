@@ -111,13 +111,14 @@
   import VideoSetting from './components/pages/video-setting.vue';
   import AudioInSetting from './components/pages/audio-in-setting.vue';
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   import {
     useMediaSettingServer,
     useMediaCheckServer,
     useInteractiveServer,
-    useRoomBaseServer
+    useRoomBaseServer,
+    useVideoPollingServer
   } from 'middle-domain';
 
   import mediaSettingConfirm from './js/showConfirm';
@@ -178,13 +179,21 @@
       },
       // 是否为云导播活动
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$route.name == 'yun'
+        );
+      },
+      // 当前人是否在视频轮巡
+      isPolling() {
+        return this.videoPollingServer.state.isPolling;
       }
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
       this.mediaCheckServer = useMediaCheckServer();
       this.interactiveServer = useInteractiveServer();
+      this.videoPollingServer = useVideoPollingServer();
     },
     created() {
       this._originCaptureState = {}; // 原始选中的数据
@@ -202,7 +211,7 @@
       });
       // 监听设备禁用
       useInteractiveServer().$on('EVENT_STREAM_END', msg => {
-        if (![3, 4].includes(+msg.data.streamType)) {
+        if (![3, 4].includes(+msg.data.streamType) && !this.isPolling) {
           // 非桌面共享 ｜ 非插播
           if (role == 1) {
             this.hostAlertVisible ? null : (this.hostAlertVisible = true);
@@ -212,7 +221,7 @@
         }
       });
       useInteractiveServer().$on('EVENT_STREAM_STUNK', msg => {
-        if (![3, 4].includes(+msg.data.streamType)) {
+        if (![3, 4].includes(+msg.data.streamType) && !this.isPolling) {
           // 非桌面共享 ｜ 非插播
           if (!this.alertStatus) {
             if (role == 1) {
@@ -314,8 +323,11 @@
 
         console.log('diffOptions:', this._diffOptions);
 
-        // 直播中
-        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
+        // 直播中或者录制中
+        if (
+          (watchInitData.webinar.type === 1 || watchInitData?.record?.is_recording == 1) &&
+          (videoTypeChanged || pictureUrlChanged)
+        ) {
           const text = this.$t('setting.setting_1031');
           action = await mediaSettingConfirm.show(text);
         }

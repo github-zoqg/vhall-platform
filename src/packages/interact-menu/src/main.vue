@@ -45,6 +45,7 @@
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
+        <!-- TODO:支付牌照问题 -->
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
@@ -134,7 +135,7 @@
 <script>
   import { debounce } from 'lodash';
   import { useQaServer, useRoomBaseServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpInteractMenu',
     data() {
@@ -309,8 +310,11 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
       // 打开红包弹窗
+      // TODO:支付牌照问题
       openRedPacket() {
+        console.log('点击红包');
         if (!this.isLiving) return false;
+        // this.$message.warning('合规自查中，该功能暂不支持使用');
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       }
     }

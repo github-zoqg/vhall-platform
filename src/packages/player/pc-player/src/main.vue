@@ -14,12 +14,11 @@
     @mouseleave="wrapLeave"
   >
     <div
-      id="vmp-player"
+      :id="
+        warmUpVideoList.length < 2 ? 'vmp-player' : `vmp-player-vod_${warmUpVideoList[initIndex]}`
+      "
       class="vmp-player-watch"
       ref="playerWatch"
-      v-loading="loading"
-      element-loading-background="#1a1a1a"
-      :element-loading-text="$t('common.common_1001')"
     >
       <template class="vmp-player-living">
         <!-- 背景图片 -->
@@ -120,7 +119,7 @@
         <!-- 进度条 -->
         <div
           class="controller_slider"
-          v-if="!isLiving && (playerOtherOptions.progress_bar || isWarnPreview)"
+          v-if="!isLiving && playerOtherOptions.progress_bar && !isWarnPreview"
         >
           <el-slider
             ref="controllerRef"
@@ -155,7 +154,7 @@
                 }`"
               ></i>
             </div>
-            <div class="controller-tools-left-time" v-if="!isLiving">
+            <div class="controller-tools-left-time" v-if="!isLiving && !isWarnPreview">
               <span class="controller-tools-left-time-current">
                 {{ currentTime | secondToDate }}
               </span>
@@ -231,7 +230,7 @@
                 @click="openBarrage"
               ></i>
             </div>
-            <div class="controller-tools-right-fullscroll">
+            <div class="controller-tools-right-fullscroll" v-if="!isWarnPreview">
               <i
                 :class="`vh-iconfont ${
                   isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -290,7 +289,7 @@
   import { computeRecordTime, isIE, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -298,8 +297,8 @@
       controlEventPoint
     },
     data() {
+      const initIndex = this.subscribeServer.state.initIndex;
       return {
-        loading: false,
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
         isPlayering: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
@@ -344,12 +343,12 @@
           progress_bar: 0,
           speed: 0,
           autoplay: false
-        } //播放器配置
+        }, //播放器配置
+        initIndex
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
-      this.playerServer = usePlayerServer();
       this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
@@ -368,11 +367,29 @@
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
+      // 初始化了第几个
+      initPlayerIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      // 播放第几个
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      // 暖场视频播放模式
+      warmPlayMode() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_player_type;
+      },
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
-        if (warmup && warmup.warmup_paas_record_id) {
+        if (this.warmUpVideoList.length) {
           return warmup.warmup_img_url
             ? warmup.warmup_img_url
             : webinar.img_url
@@ -428,20 +445,51 @@
         if (!this.isEmbedVideo) {
           this.displayMode = newval === 'player' ? 'mini' : 'normal';
         }
+      },
+      playIndex() {
+        // 暖场视频才监听播放的顺序
+        if (!this.isWarnPreview) return;
+        // 如果上一个视频音量进行修改，下一个视频，音量不变
+        this.voice = this.subscribeServer.state.warmVideo;
+        this.playerServer.setVolume(this.voice, () => {
+          console.log('设置音量失败');
+        });
+        // 多个视频持续播放 暖场视频播放模式
+        if (this.warmUpVideoList.length > 1) {
+          // 如果是循环播放，播完最后一个，自动播第一个
+          if (
+            this.warmPlayMode == 2 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]
+          ) {
+            this.playerServer.play();
+          }
+          // 如果是单次播放，播完第一个，自动播放第二个
+          if (
+            this.warmPlayMode == 1 &&
+            this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex] &&
+            this.playIndex > 0
+          ) {
+            this.playerServer.play();
+          }
+        }
       }
     },
     created() {
+      // 如果暖场视频的长度大于1，就用多例。否则就用单例
+      this.playerServer = usePlayerServer({
+        extra: this.warmUpVideoList.length > 1
+      });
       if (this.isShowContainer) return;
+      this.getWebinerStatus();
       const { agreement } = this.roomBaseServer.state.watchInitData;
       this.agreement = agreement.is_open && !agreement.is_agree ? true : false;
-      this.getWebinerStatus();
       if (this.isEmbedVideo) {
         this.languageList = this.roomBaseServer.state.languages.langList;
         this.lang = this.roomBaseServer.state.languages.lang;
       }
     },
     mounted() {
-      if (this.isEmbedVideo) {
+      if (this.isEmbedVideo && !this.isWarnPreview) {
         const centerDom = document.querySelector('.vmp-basic-center');
         centerDom.style.width = '100%';
       }
@@ -450,8 +498,12 @@
       // 初始化播放器配置项
       initConfig() {
         const { join_info } = this.roomBaseServer.state.watchInitData;
+
         let params = {
-          videoNode: 'vmp-player'
+          videoNode:
+            this.warmUpVideoList.length < 2
+              ? 'vmp-player'
+              : `vmp-player-vod_${this.warmUpVideoList[this.initIndex]}`
         };
         if (this.playerServer.state.type == 'live') {
           params = Object.assign(params, {
@@ -529,6 +581,10 @@
         }
         const params = await this.initConfig();
         return this.playerServer.init(params).then(() => {
+          console.log(params, '播放器初始化成功123');
+          this.playerServer.openControls(false);
+          this.playerServer.openUI(false);
+          window[`player${this.initIndex}`] = this.playerServer;
           this.getQualitys(); // 获取清晰度列表和当前清晰度
           this.listenEvents();
           this.getListenPlayer();
@@ -537,8 +593,11 @@
             this.getRecordTotalTime(); // 获取视频总时长
             this.initSlider(); // 初始化播放进度条
             this.getInitSpeed(); // 获取倍速列表和当前倍速
+            if (!this.isWarnPreview && this.playerOtherOptions.autoplay == 1) {
+              this.playerServer && this.play();
+            }
           } else {
-            if (this.isAutoPlay) {
+            if (this.isAutoPlay || this.playerOtherOptions.autoplay == 1) {
               this.play();
             }
           }
@@ -743,18 +802,31 @@
           }
         } else {
           if (webinar.type === 3) return; //结束状态
-          let _id = warmup.warmup_paas_record_id
-            ? warmup.warmup_paas_record_id
-            : record.preview_paas_record_id;
-          this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
-          if (this.vodType === 'shikan') {
+          if (webinar.type === 5) {
+            // 试看
+            this.vodType = 'shikan';
             this.isTryPreview = true;
             this.getShiPreview();
-          } else if (this.vodType === 'warm') {
-            this.isWarnPreview = true;
+            this.optionTypeInfo('vod', record.preview_paas_record_id);
+          } else {
+            if (this.warmUpVideoList.length) {
+              this.vodType = 'warm';
+              this.isWarnPreview = true;
+              this.optionTypeInfo('vod', this.warmUpVideoList[this.initIndex]);
+            }
           }
-          // 暖场视频或者试看
-          this.optionTypeInfo('vod', _id);
+          // let _id = warmup.warmup_paas_record_id
+          //   ? warmup.warmup_paas_record_id
+          //   : record.preview_paas_record_id;
+          // this.vodType = warmup.warmup_paas_record_id ? 'warm' : 'shikan';
+          // if (this.vodType === 'shikan') {
+          //   this.isTryPreview = true;
+          //   this.getShiPreview();
+          // } else if (this.vodType === 'warm') {
+          //   this.isWarnPreview = true;
+          // }
+          // // 暖场视频或者试看
+          // this.optionTypeInfo('vod', _id);
         }
       },
       optionTypeInfo(type, id) {
@@ -766,7 +838,7 @@
           this.vodOption = {};
           this.liveOption = {
             type:
-              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] === '1' ||
+              this.roomBaseServer.state.configList['media_server.watch.rtmp_pc_to_hls'] == 1 ||
               isIE()
                 ? 'hls'
                 : 'flv',
@@ -786,7 +858,11 @@
             this.liveOption.useSWF = true;
           }
         }
-        this.initPlayerOtherInfo();
+        if (this.isWarnPreview) {
+          this.initPlayer();
+        } else {
+          this.initPlayerOtherInfo();
+        }
       },
       exchangeVideoDocs() {
         if (this.displayMode == 'mini') {
@@ -802,11 +878,17 @@
         let getRecordTotalTimer = null;
         // 回放时间异步获取 需要通过定时器获取
         getRecordTotalTimer = setInterval(() => {
-          this.totalTime =
-            this.playerServer &&
-            this.playerServer.getDuration(() => {
-              console.log('获取视频总时长失败');
-            });
+          try {
+            this.totalTime =
+              this.playerServer &&
+              this.playerServer.getDuration(() => {
+                console.log('获取视频总时长失败');
+              });
+            this.totalTime > 0 && clearInterval(getRecordTotalTimer);
+          } catch (error) {
+            console.log(error);
+          }
+
           if (this.isTryPreview && this.totalTime) {
             this.recordTime = computeRecordTime(this.totalTime);
             if (this.recordTime === 0) {
@@ -814,9 +896,15 @@
             }
             console.log(this.isTryPreview, '???1323');
           } else {
-            this.getDuanxuPreview(); //断点续播逻辑
+            if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
+            if (this.isWarnPreview) {
+              if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
+                this.getDuanxuPreview(); //断点续播逻辑
+              }
+            } else {
+              this.getDuanxuPreview(); //断点续播逻辑
+            }
           }
-          this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         }, 50);
       },
       getDuanxuPreview() {
@@ -836,7 +924,9 @@
             this.setVideoCurrentTime(seekTime);
           }
         } else {
-          endTime = sessionStorage.getItem(this.vodOption.recordId);
+          endTime = this.isWarnPreview
+            ? sessionStorage.getItem(sessionStorage.getItem('warm_recordId'))
+            : sessionStorage.getItem(this.vodOption.recordId);
           const parsedEndTime = parseInt(endTime);
           if (endTime && endTime != 'undefined' && parsedTotalTime != parsedEndTime) {
             const seekTime = endTime < 6 ? 0 : endTime - 5;
@@ -883,15 +973,18 @@
     #vhy-danmaku-wrapbox {
       z-index: 1;
     }
-    .el-loading-spinner .el-loading-text {
-      color: #fff;
+    .vhallPlayer-container {
+      display: none !important;
     }
-    .el-loading-spinner .path {
-      stroke: #fb3a32;
-    }
-    .el-loading-mask {
-      z-index: 7;
-    }
+    // .el-loading-spinner .el-loading-text {
+    //   color: #fff;
+    // }
+    // .el-loading-spinner .path {
+    //   stroke: #fb3a32;
+    // }
+    // .el-loading-mask {
+    //   z-index: 7;
+    // }
     &-living {
       &-background {
         height: 100%;
@@ -1265,6 +1358,7 @@
         }
         &-right {
           display: flex;
+          z-index: 1002;
           > div {
             padding-right: 20px;
             position: relative;
@@ -1445,6 +1539,7 @@
         }
         &-right {
           display: flex;
+          z-index: 1002;
           > div {
             padding-right: 12px;
             position: relative;

@@ -322,7 +322,6 @@ export const serverConfig = {
   // 底部工具栏（如人数， 热度等）
   comFooterTools: {
     component: 'VmpFooterTools',
-    //TODO: 后续正式的需要调整或移除，此处仅为测试配置
     // 打开媒体设置
     emitClickMediaSetting: {
       cuid: 'comMediaSetting',

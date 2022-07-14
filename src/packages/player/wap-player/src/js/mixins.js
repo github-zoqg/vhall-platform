@@ -1,4 +1,5 @@
 import { computeRecordTime } from './utils';
+import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 const playerMixins = {
   data() {
     return {
@@ -43,6 +44,24 @@ const playerMixins = {
       // 视频加载完毕
       this.playerServer.$on(VhallPlayer.LOADED, () => {
         this.isNoBuffer = false;
+        const { system } = getBrowserType();
+        if (system == 'ios') {
+          this.handleDuanXu();
+        }
+        if (this.isWarnPreview) {
+          if (this.warmUpVideoList.length > 1 && !this.subscribeServer.state.isFirstEnterPlayer) {
+            this.subscribeServer.state.isFirstEnterPlayer = true;
+            if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.initIndex++;
+            } else {
+              this.subscribeServer.state.initIndex = 0;
+            }
+            this.subscribeServer.setWarmVideoList(
+              this.warmUpVideoList[this.subscribeServer.state.initIndex],
+              true
+            );
+          }
+        }
       });
 
       // 视频出错
@@ -58,16 +77,53 @@ const playerMixins = {
         this.isShowPoster = true;
         this.isPlayering = false;
         // 如果是暖场视频和试看不显示回放结束的标识
-        if (this.isWarnPreview || this.isTryPreview) return;
-        this.isVodEnd = true;
-        // 为了将打开的弹窗关闭
-        this.videoShowIcon();
+        if (this.isTryPreview) return;
+        if (this.isWarnPreview) {
+          if (this.warmUpVideoList.length == 1) {
+            // 如果只有一个暖场视频，并且开启了循环播放，就自动调用播放方法
+            if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
+              this.playerServer.play();
+            }
+          } else {
+            // 多个暖场视频的逻辑，如果大于2，才播放完毕一个销毁一个，初始化下一个
+            if (this.warmUpVideoList.length > 2) {
+              this.playerServer.destroy();
+            }
+            // 将当前存的断点续播时间清除
+            window.sessionStorage.removeItem(this.warmUpVideoList[this.playIndex]);
+            window.sessionStorage.removeItem('warm_recordId');
+            // 如果播放完的playIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
+            if (this.playIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.playIndex++;
+            } else {
+              this.subscribeServer.state.playIndex = 0;
+            }
+            // 暖场视频循环的列表，只存2个值，播放完第一个，移除第一个，并往上增加第三个的值
+            this.subscribeServer.setWarmVideoList('', false);
+            // 如果初始化完的initPlayerIndex 小于暖场视频长度-1，就+1，否则就从0开始播放
+            if (this.initPlayerIndex < this.warmUpVideoList.length - 1) {
+              this.subscribeServer.state.initIndex++;
+              this.subscribeServer.setWarmVideoList(
+                this.warmUpVideoList[this.subscribeServer.state.initIndex],
+                true
+              );
+            } else {
+              this.subscribeServer.state.initIndex = 0;
+              this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
+            }
+          }
+        } else {
+          this.isVodEnd = true;
+          // 为了将打开的弹窗关闭
+          this.videoShowIcon();
+        }
       });
     },
     listenEvents() {
+      if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
       // 退出页面时记录历史时间 TODO 配置是否支持断点续播的逻辑
-      if (this.playerState.type === 'vod') {
-        window.addEventListener('beforeunload', () => {
+      if (this.playerServer.state.type == 'vod') {
+        window.addEventListener('pagehide', () => {
           this.endTime = this.playerServer.getCurrentTime(() => {
             console.log('获取当前视频播放时间失败----------');
           });
@@ -75,13 +131,21 @@ const playerMixins = {
           this.totalTime = this.playerServer.getDuration(() => {
             console.log('获取视频总时长失败');
           });
-          const curLocalHistoryTime = window.sessionStorage.getItem(
-            this.roomBaseState.watchInitData.paas_record_id
-          );
-          if (!curLocalHistoryTime && this.recordHistoryTime) {
-            return;
+          if (this.isWarnPreview) {
+            window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
+            window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
+            if (this.warmUpVideoList[this.initIndex] === this.warmUpVideoList[this.playIndex]) {
+              window.sessionStorage.setItem(this.warmUpVideoList[this.playIndex], this.endTime);
+            }
+          } else {
+            const curLocalHistoryTime = window.sessionStorage.getItem(
+              this.roomBaseState.watchInitData.paas_record_id
+            );
+            if (!curLocalHistoryTime && this.recordHistoryTime) {
+              return;
+            }
+            window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
           }
-          window.sessionStorage.setItem(this.vodOption.recordId, this.endTime);
         });
       }
       // 横屏逻辑 和佳佳沟通暂时不加
@@ -178,11 +242,16 @@ const playerMixins = {
       let getRecordTotalTimer = null;
       // 回放时间异步获取 需要通过定时器获取
       getRecordTotalTimer = setInterval(() => {
-        this.totalTime =
-          this.playerServer &&
-          this.playerServer.getDuration(() => {
-            console.log('获取视频总时长失败');
-          });
+        try {
+          this.totalTime =
+            this.playerServer &&
+            this.playerServer.getDuration(() => {
+              console.log('获取视频总时长失败');
+            });
+          this.totalTime > 0 && clearInterval(getRecordTotalTimer);
+        } catch (error) {
+          console.log(error);
+        }
         if (this.isTryPreview && this.totalTime > 0) {
           this.recordTime = computeRecordTime(this.totalTime);
           if (this.recordTime === 0) {
@@ -190,9 +259,22 @@ const playerMixins = {
           }
           this.authText = this.getShiPreview();
         }
-        this.getDuanxuPreview(); //断点续播逻辑
-        this.totalTime > 0 && clearInterval(getRecordTotalTimer);
+        const { system } = getBrowserType();
+        if (system != 'ios') {
+          this.handleDuanXu();
+        }
       }, 50);
+    },
+    //获取断点续播功能
+    handleDuanXu() {
+      if (this.subscribeServer.state.isChangeOrder && this.isWarnPreview) return;
+      if (this.isWarnPreview) {
+        if (this.warmUpVideoList[this.initIndex] == sessionStorage.getItem('warm_recordId')) {
+          this.getDuanxuPreview(); //断点续播逻辑
+        }
+      } else {
+        this.getDuanxuPreview(); //断点续播逻辑
+      }
     },
     // 试看的权限
     getShiPreview() {
@@ -327,9 +409,7 @@ const playerMixins = {
     // 设置播放时间
     setVideoCurrentTime(val) {
       if (!this.playerServer) return;
-
-      console.log('video val', val);
-
+      console.log('video val', val, this.initIndex, this.playIndex);
       this.playerServer.setCurrentTime(val, () => {
         this.$message({
           type: 'error',

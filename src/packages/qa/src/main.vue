@@ -52,7 +52,7 @@
   import MsgItem from './components/msg-item';
   // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
   import { useRoomBaseServer, useQaServer, useChatServer, useGroupServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   export default {

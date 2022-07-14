@@ -2,16 +2,28 @@
   <div class="vmp-subscribe-body">
     <div :class="isEmbed ? 'vmp-subscribe-body-embed' : 'vmp-subscribe-body-intro'">
       <div class="subscribe-img">
-        <div class="subscribe-img-box" v-if="!showVideo">
-          <!-- 背景图片 未完成验证-->
-          <img :src="webinarsBgImg" />
-        </div>
-        <div class="subscribe-img-box" v-else>
-          <!-- 完成验证、并且有暖场视频 加载播放器 -->
-          <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
-        </div>
+        <template v-if="!showVideo">
+          <div class="subscribe-img-box">
+            <img class="subscribe-bg" :src="webinarsBgImg" />
+          </div>
+          <div v-if="isLivingEnd && !isEmbed" class="subscribe-img-box subscribe-img_end">
+            <img src="./img/live_start.png" alt="" />
+          </div>
+        </template>
+        <template v-else>
+          <div
+            class="subscribe-img-box"
+            v-for="item in subscribeWarmList"
+            :key="item"
+            :style="{ zIndex: item == warmUpVideoList[playIndex] ? 1 : 0 }"
+            v-show="item == warmUpVideoList[playIndex]"
+          >
+            <!-- 完成验证、并且有暖场视频 加载播放器 第一个播放器-->
+            <vmp-air-container cuid="comPcPlayer" :oneself="true"></vmp-air-container>
+          </div>
+        </template>
       </div>
-      <div class="subscribe-language" v-if="isEmbed && languageList.length > 1 && showBottom">
+      <div class="subscribe-language" v-if="isEmbed && languageList.length > 1">
         <el-dropdown @command="changeLang" trigger="click" placement="bottom">
           <span class="language__icon">
             <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
@@ -29,7 +41,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
-      <div class="subscribe-img-box-embed" v-if="isEmbed && showBottom">
+      <div class="subscribe-img-box-embed" v-if="isEmbed && !isPlaying">
         <EmbedTime
           ref="embedTime"
           :sub-option="subOption"
@@ -37,17 +49,16 @@
           @agreement="popupAgreement"
         ></EmbedTime>
       </div>
-      <!--活动时间信息-->
-      <div class="subscribe-img-bottom" v-if="!isEmbed">
-        <bottom-tab
-          v-if="showBottom"
-          ref="bottomTab"
-          :sub-option="subOption"
-          @payMore="feeAuth"
-          @authFetch="handleAuthCheck"
-          @agreement="popupAgreement"
-        ></bottom-tab>
-      </div>
+    </div>
+    <!--活动时间信息-->
+    <div class="subscribe-img-bottom vmp-subscribe-body-tab" v-if="!isEmbed">
+      <bottom-tab
+        ref="bottomTab"
+        :sub-option="subOption"
+        @payMore="feeAuth"
+        @authFetch="handleAuthCheck"
+        @agreement="popupAgreement"
+      ></bottom-tab>
     </div>
     <div class="vmp-subscribe-body-tab" v-if="!isEmbed">
       <vmp-air-container cuid="comSubscribeTabMenu" :oneself="true"></vmp-air-container>
@@ -62,10 +73,10 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -73,9 +84,11 @@
         showBottom: true,
         showVideo: false, // 显示暖场视频
         isLiving: false,
+        isLivingEnd: false,
         wxQr: '',
         zfQr: '',
         lang: {},
+        isLoaderTwoPlayer: false,
         languageList: [],
         subOption: {
           startTime: '',
@@ -108,6 +121,21 @@
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
       },
+      initIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      isPlaying() {
+        return this.$domainStore.state.subscribeServer.isPlaying;
+      },
       webinarId() {
         return this.roomBaseServer.state.watchInitData.webinar.id;
       },
@@ -119,7 +147,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
-      this.playerServer = usePlayerServer();
+      // this.playerServer = usePlayerServer();
     },
     created() {
       this.handlerInitInfo();
@@ -156,14 +184,17 @@
 
         this.subscribeServer.$on('live_over', data => {
           this.subOption.type = 3;
+          this.subscribeServer.state.isPlaying = false;
+          this.showVideo = false;
+          this.isLivingEnd = true;
           console.log(data);
         });
-        this.playerServer.$on(VhallPlayer.PLAY, () => {
-          this.showBottom = false;
-        });
-        this.playerServer.$on(VhallPlayer.ENDED, () => {
-          this.showBottom = true;
-        });
+        // this.playerServer.$on(VhallPlayer.PLAY, () => {
+        //   this.showBottom = false;
+        // });
+        // this.playerServer.$on(VhallPlayer.ENDED, () => {
+        //   this.showBottom = true;
+        // });
       },
       handlerInitInfo() {
         const { webinar, subscribe, join_info, warmup, agreement } =
@@ -180,19 +211,53 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        if (webinar.type == 3) {
+          this.showVideo = false;
+          this.isLivingEnd = true;
+          return;
+        }
         if (agreement && agreement.is_open === 1 && agreement.is_agree !== 1) {
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
-        if (this.isEmbed) {
-          // 嵌入的暖场视频只有免费的时候显示
-          if (webinar.verify == 0 && warmup.warmup_paas_record_id && webinar.type == 2) {
-            this.showVideo = true;
+        if (!this.warmUpVideoList.length) return;
+        this.showVideo = true;
+        if (this.warmUpVideoList.length > 1) {
+          this.getWarmupVideoInfo();
+        } else {
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+        }
+      },
+      getWarmupVideoInfo() {
+        // 如果存在recordIds
+        if (window.sessionStorage.getItem('recordIds')) {
+          let newRecordIds = this.warmUpVideoList.join(',');
+          // 刷新页面 newRecordIds和之前的数据不一致
+          if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
+            this.subscribeServer.state.isChangeOrder = true;
+            // 清除缓存，并且从第一个播放
+            window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
+            this.subscribeServer.state.playIndex = 0;
+            this.subscribeServer.state.initIndex = 0;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0]);
+          } else {
+            // 刷新页面 newRecordIds和之前的数据一致，拿到当前播放的id,并查询下标，重新赋值
+            this.subscribeServer.state.isChangeOrder = false;
+            let recordId = window.sessionStorage.getItem('warm_recordId');
+            let index = this.warmUpVideoList.findIndex(item => item == recordId);
+            console.log(index, '???pc当前index');
+            // 如果当前没有找到对应下标，从0开始初始化
+            index = index < 0 ? 0 : index;
+            this.subscribeServer.state.playIndex = index;
+            this.subscribeServer.state.initIndex = index;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex], true);
           }
         } else {
-          if (join_info.is_subscribe == 1 && warmup.warmup_paas_record_id && webinar.type == 2) {
-            this.showVideo = true;
-          }
+          // 不存在recordIds，从0初始化
+          this.subscribeServer.state.playIndex = 0;
+          this.subscribeServer.state.initIndex = 0;
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
         }
       },
       feeAuth(params) {
@@ -211,6 +276,9 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
+              // 如果往观看页跳转，需要清除暖场视频缓存
+              window.sessionStorage.removeItem('warm_recordId');
+              window.sessionStorage.removeItem('recordIds');
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_ROUTER_BASE_URL +
@@ -334,11 +402,22 @@
           height: 100%;
           border-radius: 4px;
         }
-        img {
+        .subscribe-bg {
           width: 100%;
           height: 100%;
           object-fit: fill;
           border-radius: 4px 4px 0 0;
+        }
+        .subscribe-img_end {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.6);
+          img {
+            width: 120px;
+            height: 120px;
+            object-fit: scale-down;
+          }
         }
       }
       .subscribe-language {
@@ -443,6 +522,10 @@
           outline: none;
         }
       }
+    }
+    .subscribe-img-bottom {
+      height: 70px;
+      position: relative;
     }
     &-tab {
       background: #2a2a2a;

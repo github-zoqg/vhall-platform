@@ -16,7 +16,7 @@
   >
     <div class="vmp-insert-stream-mask">
       <p>
-        <span class="vmp-insert-stream-mask__label">视图</span>
+        <span v-show="!isWatch" class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
           content="切换"
           placement="top"
@@ -166,7 +166,7 @@
   </div>
 </template>
 <script>
-  import videoPreview from '@/packages/app-shared/components/video-preview';
+  import videoPreview from '@/app-shared/components/video-preview';
   import {
     useInsertFileServer,
     useRoomBaseServer,
@@ -176,7 +176,7 @@
     useMicServer,
     useDocServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpInsertStream',
     data() {
@@ -246,6 +246,10 @@
       miniElement() {
         return this.$domainStore.state.roomBaseServer.miniElement;
       },
+      // 互动是否初始化完成
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
       hasStreamList() {
         return this.$domainStore.state.interactiveServer.streamListHeightInWatch >= 1;
       }
@@ -281,6 +285,16 @@
             this.closeInsertvideoHandler();
           }
         }
+      },
+      insertFileStreamVisible(val, oldVal) {
+        if (oldVal && !val && this.isFullScreen) {
+          this.autpExitFullscreen();
+        }
+      },
+      isInstanceInit(val, oldVal) {
+        if (oldVal && !val && this.isFullScreen) {
+          this.autpExitFullscreen();
+        }
       }
     },
     components: { videoPreview },
@@ -298,6 +312,13 @@
       this.initEventListener();
     },
     methods: {
+      // 自动退出全屏
+      autpExitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      },
       // 开始插播的入口
       async startInertFile() {
         const { watchInitData } = useRoomBaseServer().state;

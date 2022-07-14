@@ -29,7 +29,7 @@
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
               class="new-award-img"
-              :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
+              :src="require('@/app-shared/assets/img/wap/chat/reward.png')"
             />
           </template>
           {{ source.content.text_content }}
@@ -83,7 +83,7 @@
               </p>
               <img
                 class="new-award-img"
-                :src="require('@/packages/app-shared/assets/img/wap/chat/reward.png')"
+                :src="require('@/app-shared/assets/img/wap/chat/reward.png')"
               />
             </div>
             <div class="reward_txt">
@@ -113,11 +113,7 @@
           <img
             v-else
             class="new-gift-img"
-            :src="
-              require('@/packages/app-shared/assets/img/wap/chat/' +
-                source.content.gift_name +
-                '.png')
-            "
+            :src="require('@/app-shared/assets/img/wap/chat/' + source.content.gift_name + '.png')"
           />
         </div>
       </div>
@@ -257,7 +253,7 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     props: {

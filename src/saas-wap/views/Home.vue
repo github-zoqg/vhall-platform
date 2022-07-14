@@ -31,9 +31,9 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
-  import { getQueryString, getVhallReportOs, isWechatCom } from '@/packages/app-shared/utils/tool';
-  import { getBrowserType } from '@/packages/app-shared/utils/getBrowserType.js';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/packages/app-shared/utils/report';
+  import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
+  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -139,6 +139,10 @@
           document.title = roomBaseState.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
+
+          // 如果往观看页跳转，需要清除暖场视频缓存
+          window.sessionStorage.removeItem('warm_recordId');
+          window.sessionStorage.removeItem('recordIds');
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
@@ -146,10 +150,10 @@
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
-            t_start: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             os: getVhallReportOs(),
             type: 2, //播放平台 2: wap
-            entry_time: this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             pf: 3, // wap
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });

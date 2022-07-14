@@ -60,8 +60,8 @@
 <script>
   // import EventBus from '@/utils/Events';
   import { useWatchRewardServer, useChatServer } from 'middle-domain';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
-  import { boxEventOpitons, isWechat, isWechatCom } from '@/packages/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
+  import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
   export default {
     name: 'reward',
     props: {
@@ -302,13 +302,6 @@
                     if (res.err_msg == 'get_brand_wcpay_request:ok') {
                       that.$toast(`${that.$t('common.common_1005')}`);
                       that.close();
-                      // setTimeout(() => {
-                      //   window.location.href =
-                      //     window.location.protocol +
-                      //     process.env.VUE_APP_WAP_WATCH +
-                      //     process.env.VUE_APP_WEB_KEY +
-                      //     `/lives/watch/${that.$route.params.id}`;
-                      // }, 1500);
                     }
                   }
                 );

@@ -1,6 +1,7 @@
 <template>
   <div class="vmp-interact-tools-wap">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+      <!-- TODO:支付牌照问题 -->
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
@@ -13,7 +14,8 @@
         />
       </div>
       <!-- 打赏 -->
-      <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward" class="redpacket-box">
+      <!-- TODO:支付牌照问题 -->
+      <!-- <div v-show="!localRoomInfo.isEmbed && localRoomInfo.isShowReward" class="redpacket-box">
         <img class="tool redpacket-img" src="./img/icon_reward.png" @click="openReward" />
         <RewardCard
           ref="reward"
@@ -21,7 +23,7 @@
           :localRoomInfo="localRoomInfo"
           :cuid="cuid"
         />
-      </div>
+      </div> -->
       <!-- 邀请卡 -->
       <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box">
         <a
@@ -44,12 +46,12 @@
 <script>
   import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   import GiftCard from './component/GiftCard.vue';
-  import RewardCard from './component/reward.vue';
+  // import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
 
   export default {
     name: 'VmpInteractToolsWap',
-    components: { GiftCard, RewardCard, Parise },
+    components: { GiftCard, Parise },
     data() {
       let { configList } = useRoomBaseServer().state;
       let { groupInitData } = useGroupServer().state;

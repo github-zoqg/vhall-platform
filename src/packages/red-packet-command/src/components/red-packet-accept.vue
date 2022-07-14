@@ -63,6 +63,7 @@
         const getStatus = () => {
           this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
             this.opened = true;
+            //展示 1s 打开动画
             const st = setTimeout(() => {
               clearTimeout(st);
               this.$emit('navTo', 'RedPacketSuccess');

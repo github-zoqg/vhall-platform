@@ -160,6 +160,12 @@ export const serverConfig = {
         cuid: 'comStreamLocal',
         method: 'checkStartPush'
       }
+    ],
+    emitClickCheckValidatePullUrl: [
+      {
+        cuid: 'comThirdStream',
+        method: 'validatePullUrl'
+      }
     ]
   },
   // 顶部左侧组件
@@ -592,7 +598,14 @@ export const serverConfig = {
     component: 'VmpVirtualPeople'
   },
   comThirdStream: {
-    component: 'VmpThirdStream'
+    component: 'VmpThirdStream',
+    emitClickStartClick: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handleStartClick',
+        args: ['$0', '$1']
+      }
+    ]
   },
   comInsertVideoList: {
     component: 'VmpInsertVideoList',
@@ -847,7 +860,7 @@ export const serverConfig = {
     ],
     emitMediaSettingClick: [
       {
-        cuid: 'comMediaSetting',
+        cuid: 'recordComMediaSetting',
         method: 'showMediaSetting'
       }
     ]
@@ -882,7 +895,18 @@ export const serverConfig = {
   // 【录制页面】所有弹窗集合
   recordComAllDialog: {
     component: 'VmpAirContainer',
-    children: ['recordDlgDocList', 'comMediaSetting']
+    children: ['recordDlgDocList', 'recordComMediaSetting']
+  },
+  // 【录制页面】媒体设置
+  recordComMediaSetting: {
+    component: 'VmpPcMediaSetting',
+    saveOptions: [
+      {
+        cuid: 'recordComStreamLocal',
+        method: 'switchStreamType',
+        args: ['$0']
+      }
+    ]
   },
   // *******录制页面****结束
 

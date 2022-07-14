@@ -124,7 +124,7 @@
               <el-table :data="dataList" style="width: 100%" height="370px">
                 <!-- 未搜索到数据展示 -->
                 <template slot="empty">
-                  <img src="../../app-shared/assets/img/no-search.png" />
+                  <img src="@/app-shared/assets/img/no-search.png" />
                   <p>暂无搜索到您想要的内容</p>
                 </template>
                 <!-- 表格展示 -->
@@ -224,7 +224,7 @@
             >
               <!-- 未搜索到数据展示 -->
               <template slot="empty">
-                <img src="../../app-shared/assets/img/no-search.png" />
+                <img src="@/app-shared/assets/img/no-search.png" />
                 <p>暂无搜索到您想要的内容</p>
               </template>
               <el-table-column type="selection" width="55" align="left"></el-table-column>
@@ -273,7 +273,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
   import _ from 'lodash';
 
@@ -601,7 +601,7 @@
         const fileObj = {
           file_name: file.name,
           ext: file.name.split('.')[1],
-          created_at: new Date().format('yyyy-MM-dd hh:mm:ss'),
+          created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
           page: 1,
           docStatus: 'uploading', // 文档状态:上传中
           uploadPropress: 0, // 上传进度
