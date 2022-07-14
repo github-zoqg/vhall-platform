@@ -153,7 +153,6 @@
         this.isShowThirdStream = true;
         this.getThirdPushStream();
         this.getThirdPushStreamStatus();
-        this.changePushImage(true);
         this.getDefaultStream();
       }
     },
@@ -165,13 +164,16 @@
           this.isShowThirdStream = false;
         }
       });
+      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+        this.changePushImage(true);
+      }
     },
     methods: {
       getDefaultStream() {
         //开始类型：1-web（默认）， 2-app，3-sdk，4-推拉流，5-定时，6-admin后台， 7-第三方，8-windows客户端
         if (this.roomBaseServer.state.watchInitData.switch.start_type == 4) {
           //当switch.start_type=4时，pull.status 0-设置1,1-设置2
-          this.streamModal = this.roomBaseServer.state.watchInitData.stream.pull.status ? 1 : 2;
+          this.streamModal = this.roomBaseServer.state.watchInitData.stream.pull.status ? 2 : 1;
           this.pullUrl = this.roomBaseServer.state.watchInitData.stream.pull.dest_url;
         }
       },
