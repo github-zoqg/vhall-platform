@@ -90,6 +90,8 @@ import VmpWapInsertFIle from '@/packages/stream-insert-file-wap';
 import VmpInviteHandup from '@/packages/inviteHandup';
 // 观看协议
 import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
+// 点赞组件
+import VmpLikes from '@/packages/likes-wap';
 
 // 全局注册组件
 Vue.use(VmpContainer);
@@ -139,3 +141,4 @@ Vue.use(VmpWapDesktopScreen);
 Vue.use(VmpWapInsertFIle);
 Vue.use(VmpInviteHandup);
 Vue.use(VmpViewRestrictionWap);
+Vue.use(VmpLikes);

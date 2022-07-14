@@ -1,6 +1,7 @@
 <template>
   <div class="vhall-praise">
-    <div ref="dianzan" class="v-praise-dom" @touchstart="support">
+    <!-- <div ref="dianzan" class="v-praise-dom" @touchstart="support"> -->
+    <div ref="dianzan" class="v-praise-dom" @touchstart="giveLike">
       <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
       <img class="tool givealike-img" v-else src="../img/icon_like.png" />
     </div>
@@ -63,12 +64,16 @@
         }
       }
     },
+    destroyed() {
+      clearInterval(timeId);
+    },
     methods: {
       // 随机数
       selectRandom(arr) {
         const m = Math.floor(Math.random() * 4);
         return arr[m];
       },
+
       support(e) {
         const arr = ['praiseMove1', 'praiseMove3', 'praiseMove2', 'praiseMove4'];
         const str = this.selectRandom(arr);
@@ -102,10 +107,10 @@
             num
           })
           .then(() => {});
+      },
+      giveLike() {
+        this.$zan();
       }
-    },
-    destroyed() {
-      clearInterval(timeId);
     }
   };
 </script>
