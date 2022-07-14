@@ -181,17 +181,21 @@
       },
       //刷新房间内流状态
       getThirdPushStreamStatus() {
-        this.roomBaseServer.getLiveStreamStatus();
+        this.roomBaseServer.getLiveStreamStatus({
+          webinarId: this.$route.params.id
+        });
       },
       changePushImage(flag) {
         const thirdBackground = document.querySelector('.vmp-basic-right__hd');
-        if (flag) {
-          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
-        } else {
-          thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
+        if (thirdBackground) {
+          if (flag) {
+            thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
+          } else {
+            thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/base-right.png) no-repeat`;
+          }
+          thirdBackground.style.backgroundSize = '100% 100%';
+          thirdBackground.style.backgroundPosition = 'center';
         }
-        thirdBackground.style.backgroundSize = '100% 100%';
-        thirdBackground.style.backgroundPosition = 'center';
       },
       closeThirdStream() {
         this.isShowThirdStream = false;
