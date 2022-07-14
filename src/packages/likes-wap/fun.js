@@ -7,7 +7,8 @@ export default (options = {}) => {
     root = document.querySelectorAll(options.el)[0] || root;
   }
   const chList = root.querySelectorAll('.com-zan');
-  if (chList.length >= 10) { // 最多10个同时启动
+  if (chList.length >= 10) {
+    // 最多10个同时启动
     return;
   }
   const instance = new ComConstructor({
