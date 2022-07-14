@@ -1012,10 +1012,10 @@
       async startPush() {
         // 第三方推流直接开始直播
         if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
-          // 派发事件
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickPublishComplate')
-          );
+          // 派发事件 此处会导致重复回调emitClickPublishComplate
+          // window.$middleEventSdk?.event?.send(
+          //   boxEventOpitons(this.cuid, 'emitClickPublishComplate')
+          // );
           return;
         }
         try {
