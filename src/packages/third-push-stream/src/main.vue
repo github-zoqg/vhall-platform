@@ -106,6 +106,7 @@
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
+  import { copy } from '@/packages/chat/src/js/utils';
   export default {
     name: 'VmpThirdStream',
     data() {
@@ -153,6 +154,7 @@
         this.getThirdPushStream();
         this.getThirdPushStreamStatus();
         this.changePushImage(true);
+        this.getDefaultStream();
       }
     },
     mounted() {
@@ -165,6 +167,14 @@
       });
     },
     methods: {
+      getDefaultStream() {
+        //开始类型：1-web（默认）， 2-app，3-sdk，4-推拉流，5-定时，6-admin后台， 7-第三方，8-windows客户端
+        if (this.roomBaseServer.state.watchInitData.switch.start_type == 4) {
+          //当switch.start_type=4时，pull.status 0-设置1,1-设置2
+          this.streamModal = this.roomBaseServer.state.watchInitData.stream.pull.status ? 1 : 2;
+          this.pullUrl = this.roomBaseServer.state.watchInitData.stream.pull.dest_url;
+        }
+      },
       showThirdStream(info) {
         this.isShowThirdStream = info.status;
         this.roomBaseServer.setThirdPushStream(info.status);
@@ -201,20 +211,13 @@
         this.isShowThirdStream = false;
       },
       doCopy(type) {
-        let btn = '';
-        if (type == 1) {
-          btn = 'vmp-third-watch';
-        } else {
-          btn = 'vmp-third-play';
-        }
-        const input = document.getElementById(btn);
-        input.select();
-        document.execCommand('copy');
-        this.$message({
-          message: '复制成功！',
-          showClose: true,
-          type: 'success',
-          customClass: 'zdy-info-box'
+        copy(type == 1 ? this.thirdWatchWebUrl : this.thirdPlayUrl).then(res => {
+          this.$message({
+            message: '复制成功！',
+            showClose: true,
+            type: 'success',
+            customClass: 'zdy-info-box'
+          });
         });
       },
       validatePullUrl(cur = false) {
