@@ -1,6 +1,6 @@
 {
   "name": "middle-platform",
-  "version": "1.4.17",
+  "version": "1.4.16-beta.1",
   "domainVersion": "1.4.16-beta.1",
   "private": true,
   "scripts": {
