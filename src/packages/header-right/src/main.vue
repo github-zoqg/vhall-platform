@@ -420,6 +420,7 @@
         );
       },
       // 推流成功事件
+      // TODO：第三方发起 请求了两次接口，第一次开播之后，收到vrtc_connect_success上麦的消息，又回调了handlePublishComplate
       async handlePublishComplate() {
         const { watchInitData } = this.roomBaseServer.state;
         // 如果是录制页面
@@ -503,13 +504,11 @@
       async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
-
         //mode2  需要校验url，调用单独接口
-        if (this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
+        if (this.isThirdStream && this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
           this.checkValidatePullUrl();
           return false;
         }
-
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
@@ -532,11 +531,11 @@
               }
             ).then(() => {
               // 派发推流事件
-              this.emitClickStartLive();
+              this.clickStartLive();
             });
           } else {
             // 派发推流事件
-            this.emitClickStartLive();
+            this.clickStartLive();
           }
         }
       },
@@ -718,7 +717,7 @@
         }
       },
       // 派发推流事件
-      emitClickStartLive() {
+      clickStartLive() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
       }
     }
