@@ -16,8 +16,11 @@
       <div class="vmp-notice-list_container">
         <div class="container-title">
           <img src="./images/star1.png" alt="" class="star1" />
-          <span class="container-title-text">{{ $t('interact_tools.interact_tools_1086') }}</span>
-          <div class="container-title-text-line"></div>
+          <span class="container-title-text">
+            <span class="title_text">{{ $t('interact_tools.interact_tools_1086') }}</span>
+            <i class="container-title-text-line"></i>
+          </span>
+
           <img src="./images/star2.png" alt="" class="star2" />
           <i class="vh-iconfont vh-line-close" @click="closeNotice"></i>
         </div>
@@ -214,25 +217,28 @@
           height: auto;
         }
         .container-title-text {
-          text-shadow: 0 0.05333rem 0 #fff;
-          font-weight: 600;
-          font-size: 40px;
-          line-height: 56px;
           position: relative;
           top: 47px;
-          z-index: 1;
+          z-index: 2;
+          .title_text {
+            font-weight: 600;
+            text-shadow: 0 0.05333rem 0 #fff;
+            font-size: 40px;
+            line-height: 56px;
+          }
         }
         .container-title-text-line {
           display: inline-block;
-          width: 84px;
+          width: 100%;
           height: 18px;
           position: absolute;
-          top: 95px;
+          bottom: 0px;
           left: 49%;
           transform: translate(-51%);
           background: rgba(255, 171, 166, 0.6);
           border-radius: 36px;
           content: '';
+          z-index: -1;
         }
         .star2 {
           height: auto;
@@ -268,16 +274,18 @@
         }
         .data-text {
           position: relative;
-          padding-left: 10px;
+          padding-left: 12px;
           &_circle {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 27px;
             height: 27px;
             border-radius: 50%;
             background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
             border: 1px solid #fb2626;
             top: 30px;
-            left: 0;
+            left: 0px;
             position: absolute;
             .num {
               display: inline-block;
@@ -285,10 +293,6 @@
               height: 15px;
               border-radius: 50%;
               background: #fb2626;
-              position: absolute;
-              top: 49%;
-              left: 48%;
-              transform: translate(-50%, -50%);
             }
           }
           .col_bfb {
@@ -298,8 +302,7 @@
             border-color: #bfbfbf;
           }
           &_title {
-            margin-bottom: 21px;
-            padding: 0 0 0 32px;
+            padding: 0 0 21px 32px;
             color: #1a1a1a;
             line-height: 1.6;
             word-break: break-word;

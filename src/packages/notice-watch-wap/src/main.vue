@@ -10,7 +10,9 @@
       mode="closeable"
       v-if="announcement.isShow"
       @close="closeAnnouncement"
-    />
+    >
+      <i slot="left-icon" class="vh-iconfont vh-line-voice"></i>
+    </van-notice-bar>
   </div>
 </template>
 
@@ -99,9 +101,16 @@
       left: 0px;
       width: 100%;
       background: linear-gradient(59.32deg, #ffebe9 0%, #edecff 107.06%) !important;
+      .van-notice-bar__content {
+        color: #262626;
+      }
     }
     .van-notice-bar {
       box-sizing: border-box;
+    }
+    .vh-line-voice {
+      color: #fb3a32;
+      padding-right: 11px;
     }
   }
 </style>
