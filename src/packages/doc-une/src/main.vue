@@ -444,7 +444,14 @@
        * 全屏切换
        */
       fullscreen() {
-        screenfull.toggle(this.$refs.docWrapper);
+        if (this.$route?.query.assistantType) {
+          this.displayMode = this.displayMode == 'fullscreen' ? 'normal' : 'fullscreen';
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitFullscreen', this.displayMode)
+          );
+        } else {
+          screenfull.toggle(this.$refs.docWrapper);
+        }
       },
       /**
        * 缩略图列表展开与折叠
