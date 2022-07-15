@@ -252,6 +252,21 @@
       },
       hasStreamList() {
         return this.$domainStore.state.interactiveServer.streamListHeightInWatch >= 1;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      // 观众是否加载了旁路播放器
+      isPlayerInit() {
+        const { interactiveServer, roomBaseServer, micServer } = this.$domainStore.state;
+        return (
+          (roomBaseServer.watchInitData.join_info.role_name == 2 &&
+            roomBaseServer.watchInitData.webinar.mode == 3 &&
+            roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
+            (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+          interactiveServer.initInteractiveFailed
+        );
       }
     },
     watch: {
@@ -677,31 +692,39 @@
       },
       // 订阅插播流
       subscribeInsert() {
+        //观众加载旁路播放器的情况下，不走订阅插播流
+        if (this.isPlayerInit) return;
         const opt = {
           videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
-        this.insertFileServer.subscribeInsertStream(opt).then(() => {
-          // 展示插播流组件
-          this.insertFileStreamVisible = true;
-          // 如果不是观众(主持人\助理\嘉宾)
-          if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-            // 设置 miniElement 为 doc
-            this.roomBaseServer.setChangeElement('doc');
-          } else {
-            // 如果是观众
-            // 如果文档可见
-            if (this.docServer.state.switchStatus) {
-              // 设置 miniElement 为主屏流
+        try {
+          this.insertFileServer.subscribeInsertStream(opt).then(() => {
+            // 展示插播流组件
+            this.insertFileStreamVisible = true;
+            // 如果不是观众(主持人\助理\嘉宾)
+            if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+              // 设置 miniElement 为 doc
               this.roomBaseServer.setChangeElement('doc');
             } else {
-              this.roomBaseServer.setChangeElement('');
+              // 如果是观众
+              // 如果文档可见
+              if (this.docServer.state.switchStatus) {
+                // 设置 miniElement 为主屏流
+                this.roomBaseServer.setChangeElement('doc');
+              } else {
+                this.roomBaseServer.setChangeElement('');
+              }
             }
-          }
-        });
+          });
+        } catch (error) {
+          console.log('error', error);
+        }
       },
       // 取消订阅插播流
       unsubscribeInsert() {
+        // 观众加载旁路播放器的情况下，不走取消订阅插播流
+        if (this.isPlayerInit) return;
         // 隐藏插播流组件
         this.insertFileStreamVisible = false;
         // 如果不是观众(主持人\助理\嘉宾)
