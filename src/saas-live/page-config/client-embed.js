@@ -34,7 +34,14 @@ export default {
     emitOpenDocList: {
       cuid: 'dlgDocList',
       method: 'show'
-    }
+    },
+    emitFullscreen: [
+      {
+        cuid: 'embedClientRoot',
+        method: 'handleScreen',
+        args: ['$0']
+      }
+    ]
   },
   //文档列表对话框
   dlgDocList: {

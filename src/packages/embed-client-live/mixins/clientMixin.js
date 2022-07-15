@@ -68,6 +68,10 @@ export const clientMixin = {
     openQAAdmin(url) {
       this.assistantMsg('qa', url);
     },
+    //全屏幕切换
+    handleScreen(status) {
+      this.assistantMsg('docFullscreen', status == 'fullscreen');
+    },
     //打开聊天审核管理页面
     openChatFilterUrl(url) {
       this.assistantMsg('filterUrl', url);
