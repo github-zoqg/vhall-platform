@@ -400,7 +400,7 @@ export default {
     form_1043:
       'Provincia / región autónoma / municipio directamente dependiente del Gobierno central',
     form_1044: 'Distrito / condado',
-    form_1045: 'Presentar el cuestionario',
+    form_1045: 'Presentar',
     form_1046: 'Seleccionar la fecha',
     form_1047: 'Seleccionar la fecha + la hora',
     form_1048: 'Seleccionar la hora',

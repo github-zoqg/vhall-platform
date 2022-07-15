@@ -394,7 +394,7 @@ export default {
     form_1042: 'Please enter the detailed address',
     form_1043: 'Province/autonomous region/municipalities',
     form_1044: 'District/County',
-    form_1045: 'Submit questionnaire',
+    form_1045: 'Submit',
     form_1046: 'Select date',
     form_1047: 'Select date & time',
     form_1048: 'Select time',
