@@ -26,7 +26,7 @@
             @click="saySomething"
           >
             <span @click.stop="">
-              <chatSeting />
+              <chatSeting @filterChat="filterChat" />
             </span>
             <span
               v-if="
@@ -334,6 +334,11 @@
       window.chat = this;
     },
     methods: {
+      // 聊天过滤
+      filterChat(val) {
+        console.log(val);
+        this.$emit('filterChat', val);
+      },
       showMyQA() {
         this.isShowMyQA = !this.isShowMyQA;
         this.$emit('showMyQA', this.isShowMyQA);
@@ -491,7 +496,7 @@
 
         .content-input__placeholder {
           background-color: #f5f5f5;
-          color: #bfbfbf;
+          color: #8c8c8c;
           border-radius: 40px;
           width: 100%;
           height: 60px;
