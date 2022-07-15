@@ -10,7 +10,7 @@
       </div>
       <div class="vmp-third-stream-modal" :class="'streamModal' + streamModal">
         <div class="title">发起模式</div>
-        <el-radio-group v-model="streamModal">
+        <el-radio-group v-model="streamModal" :disabled="roomStatus == 1">
           <el-radio :label="1">拉流设置1</el-radio>
           <el-radio :label="2">拉流设置2</el-radio>
         </el-radio-group>
@@ -43,6 +43,7 @@
           >
             <el-input
               v-model="pullUrl"
+              :disabled="roomStatus == 1"
               @blur="validatePullUrl(true)"
               placeholder="请输入拉流地址，支持rtmp、hls协议"
             ></el-input>
@@ -124,6 +125,10 @@
       this.msgServer = useMsgServer();
     },
     computed: {
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      roomStatus() {
+        return this.roomBaseServer.state.watchInitData.webinar.type;
+      },
       isThirdStream() {
         return this.roomBaseServer.state.isThirdStream;
       },
@@ -149,7 +154,7 @@
     },
     created() {
       if (this.roleName != 1) return;
-      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+      if (this.isThirdStream && this.roomStatus == 1) {
         this.isShowThirdStream = true;
         this.getThirdPushStream();
         this.getThirdPushStreamStatus();
@@ -164,7 +169,7 @@
           this.isShowThirdStream = false;
         }
       });
-      if (this.isThirdStream && this.roomBaseServer.state.watchInitData.webinar.type == 1) {
+      if (this.isThirdStream && this.roomStatus == 1) {
         this.changePushImage(true);
       }
     },
@@ -222,6 +227,7 @@
           });
         });
       },
+      //校验拉流地址非法性
       validatePullUrl(cur = false) {
         if (!this.pullUrl) {
           this.showRulePullUrl = true;
