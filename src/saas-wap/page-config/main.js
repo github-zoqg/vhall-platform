@@ -319,6 +319,11 @@ export default {
         cuid: 'comWapBody',
         method: 'questionnaireVisible',
         args: ['$0']
+      },
+      {
+        cuid: 'comNoticeWap',
+        method: 'questionnaireVisible',
+        args: ['$0']
       }
     ]
   },

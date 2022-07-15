@@ -546,6 +546,7 @@
         justify-content: center;
         z-index: 7;
         background: transparent;
+        transform: translateZ(10px);
         img {
           width: 100%;
           height: 100%;
@@ -595,7 +596,7 @@
         left: 50%;
         top: 50%;
         text-align: center;
-        transform: translate(-32px, -32px);
+        transform: translate3d(-32px, -32px, 10px);
         border-radius: 50%;
       }
       &-background {
