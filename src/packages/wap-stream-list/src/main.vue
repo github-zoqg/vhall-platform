@@ -352,6 +352,9 @@
             this.scroll.scrollTo(0);
             this.scroll.destroy();
             this.scroll = null;
+            if (this.mainScreenDom) {
+              this.mainScreenDom.style.pointerEvents = 'auto';
+            }
           }
         });
 
