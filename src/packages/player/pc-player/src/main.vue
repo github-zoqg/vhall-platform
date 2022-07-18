@@ -549,7 +549,7 @@
               position: this.marquee.position // 跑马灯位置 , 1 随机 2上,3中 4下
             };
           }
-          // 水印
+          // 水印  播放器
           if (this.water && this.water.watermark_open == 1) {
             const alianMap = new Map([
               [1, 'tl'],
@@ -732,21 +732,28 @@
         this.startPlay();
       },
       initPlayerOtherInfo() {
-        const { webinar } = this.roomBaseServer.state.watchInitData;
-        this.playerServer
-          .getPlayerConfig({
-            webinar_id: webinar.id,
-            tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
-          })
-          .then(res => {
-            if (res.code === 200) {
-              this.definitionConfig = res.data.definition.data.default_definition;
-              this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
-              this.water = res.data['water-mark'] && res.data['water-mark'].data;
-              this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
-              this.initPlayer();
-            }
-          });
+        const unionConfig = this.roomBaseServer.state.unionConfig;
+        console.log(unionConfig, '????12342355466756---pc');
+        this.definitionConfig = unionConfig.definition.data.default_definition;
+        this.marquee = unionConfig['screen-config'] && unionConfig['screen-config'].data;
+        this.water = unionConfig['water-mark'] && unionConfig['water-mark'].data;
+        this.playerOtherOptions = unionConfig['basic-config'] && unionConfig['basic-config'].data;
+        this.initPlayer();
+        // const { webinar } = this.roomBaseServer.state.watchInitData;
+        // this.playerServer
+        //   .getPlayerConfig({
+        //     webinar_id: webinar.id,
+        //     tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
+        //   })
+        //   .then(res => {
+        //     if (res.code === 200) {
+        //       this.definitionConfig = res.data.definition.data.default_definition;
+        //       this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
+        //       this.water = res.data['water-mark'] && res.data['water-mark'].data;
+        //       this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
+        //       this.initPlayer();
+        //     }
+        //   });
       },
       handleSliderMouseDown() {
         // 鼠标拖动的时候，阻止slider值更新
