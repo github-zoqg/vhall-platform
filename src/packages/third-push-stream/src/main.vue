@@ -87,7 +87,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="title">使用第三方推流</div>
+          <div class="title">使用第三方拉流</div>
           <div class="content">
             <p>1.在第三方工具中获取拉流地址，并填写到拉流地址中;</p>
             <p>2.使用第三方工具推流;</p>
@@ -232,7 +232,7 @@
         if (!this.pullUrl) {
           this.showRulePullUrl = true;
         } else {
-          const reg = /^(rtmp:\/\/)|(rtmps:\/\/)/g;
+          const reg = /^(rtmp:\/\/)|(http:\/\/)/g;
           if (reg.test(this.pullUrl)) {
             this.showRulePullUrl = false;
             if (!cur) {
