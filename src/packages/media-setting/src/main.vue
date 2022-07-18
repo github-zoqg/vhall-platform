@@ -110,7 +110,7 @@
   import VideoSetting from './components/pages/video-setting.vue';
   import AudioInSetting from './components/pages/audio-in-setting.vue';
   import AudioOutSetting from './components/pages/audio-out-setting.vue';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   import {
     useMediaSettingServer,
@@ -178,7 +178,10 @@
       },
       // 是否为云导播活动
       streamYun() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.is_director == 1 &&
+          this.$route.name == 'yun'
+        );
       },
       // 当前人是否在视频轮巡
       isPolling() {
@@ -334,8 +337,11 @@
 
         console.log('diffOptions:', this._diffOptions);
 
-        // 直播中
-        if (watchInitData.webinar.type === 1 && (videoTypeChanged || pictureUrlChanged)) {
+        // 直播中或者录制中
+        if (
+          (watchInitData.webinar.type === 1 || watchInitData?.record?.is_recording == 1) &&
+          (videoTypeChanged || pictureUrlChanged)
+        ) {
           const text = this.$t('setting.setting_1031');
           action = await mediaSettingConfirm.show(text);
         }

@@ -80,8 +80,8 @@
     useMsgServer
   } from 'middle-domain';
   import { ImagePreview } from 'vh5-ui';
-  import defaultAvatar from '@/packages/app-shared/assets/img/default_avatar.png';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
   import EventBus from './js/Events.js';
   import { isMse } from './js/utils.js';
@@ -430,6 +430,17 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
+        const clientW = document.body.clientWidth;
+        const clientH = document.body.clientHeight;
+        const ratio = 2;
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
+            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+              clientH * ratio
+            },m_lfit`;
+          }
+        }
+        console.log('preview', list);
         ImagePreview({
           images: list,
           startPosition: index,

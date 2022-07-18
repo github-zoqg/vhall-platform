@@ -85,7 +85,7 @@
 
 <script>
   import { useTimerServer, useMsgServer, useChatServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     // props: ['timerInfo', 'rootActive', 'doc_permission'],
     name: 'VmpLiveTimer',

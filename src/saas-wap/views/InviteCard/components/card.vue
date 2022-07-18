@@ -131,8 +131,8 @@
 
   import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
-  import { sleep } from '@/packages/app-shared/utils/tool';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { sleep } from '@/app-shared/utils/tool';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useInviteServer } from 'middle-domain';
 
   export default {
@@ -255,8 +255,8 @@
           imgUrl: this.webinarInfo.avatar
         };
         const wechatRes = await initWeChatSdk(initData, shareData);
-        const shareSuccessStr = this.$t('webinar.webinar_1038');
-        wechatRes.isSuccess && this.$toast(shareSuccessStr);
+        // const shareSuccessStr = this.$t('webinar.webinar_1038');
+        // wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
       async submitCreateHistory(join_id) {

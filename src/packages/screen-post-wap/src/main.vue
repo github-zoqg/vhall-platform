@@ -4,11 +4,12 @@
     v-if="screenShow && useRoomBaseServer.state.screenPosterInfo.m_img"
     @click="handleLink"
   >
-    <img
-      :src="useRoomBaseServer.state.screenPosterInfo.m_img"
-      alt=""
+    <el-image
       class="vmp-screen-post-wap-img"
-    />
+      :src="screenPosterInfo_m_img"
+      fit="cover"
+      lazy
+    ></el-image>
     <div class="vmp-screen-post-wap-close-tip" @click.stop="screenPostClose">
       {{ $t('webinar.webinar_1001') }}
       <span v-if="useRoomBaseServer.state.screenPosterInfo.shutdown_type">{{ time }}s</span>
@@ -25,8 +26,15 @@
         useRoomBaseServer: {},
         timer: null,
         time: 5,
-        screenShow: false
+        screenShow: false,
+        screenWidth: 375, //默认是iphonexr设计稿1/2
+        screenHeight: 667
       };
+    },
+    computed: {
+      screenPosterInfo_m_img() {
+        return `${this.useRoomBaseServer.state.screenPosterInfo.m_img}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
+      }
     },
     created() {
       // 是否为嵌入页
@@ -37,6 +45,11 @@
       this.useRoomBaseServer = useRoomBaseServer();
       // status 1 关闭 0 开启
       this.useRoomBaseServer.state.screenPosterInfo.status === 0 && this.screenPostOpen();
+    },
+    mounted() {
+      //获取页面的宽度, 缩放至现有屏幕大小的2倍图
+      this.screenWidth = 2 * window.screen.width;
+      this.screenHeight = 2 * window.screen.height;
     },
     methods: {
       // 链接跳转
@@ -83,9 +96,7 @@
     right: 0;
     z-index: 120; // 公众号 100 开屏海报 120
     background: #333;
-
     .vmp-screen-post-wap-img {
-      display: block;
       width: 100%;
       height: 100%;
     }

@@ -26,7 +26,7 @@
 </template>
 <script>
   import { useSignServer, useChatServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/packages/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   // import EventBus from '../../utils/Events';
   import CountDown from './countDown.vue';
   export default {

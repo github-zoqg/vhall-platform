@@ -15,11 +15,12 @@
                 <img src="./img/livingEnd@2x.png" alt="" />
               </div>
               <h1 class="living_end_text">{{ $t('player.player_1017') }}</h1>
-              <div class="living_end_people" v-if="webinarType != 3">
-                <i18n path="appointment.appointment_1018">
-                  <span place="n">{{ subOption.num }}</span>
-                </i18n>
-              </div>
+              <!-- <div class="living_end_people" v-if="isEmbed">
+                <span>
+                  <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+                  {{ hotNum | formatHotNum }}
+                </span>
+              </div> -->
             </div>
             <span class="subscribe-type" v-if="webinarType != 3">
               {{
@@ -39,7 +40,15 @@
           </div>
         </template>
         <template v-if="showVideo">
-          <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+          <div
+            class="subscribe_warm"
+            v-for="item in subscribeWarmList"
+            :key="item"
+            :style="{ zIndex: item == warmUpVideoList[playIndex] ? 1 : 0 }"
+            v-show="item == warmUpVideoList[playIndex]"
+          >
+            <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
+          </div>
         </template>
       </template>
     </div>
@@ -145,6 +154,7 @@
     <alertBox
       v-if="popupLivingStart"
       :title="''"
+      :isShowClose="false"
       :titleBtn="$t('player.player_1013')"
       @authClose="livingCloseConfirm"
       @authSubmit="livingStartConfirm"
@@ -179,14 +189,14 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer, usePlayerServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import {
     boxEventOpitons,
     isWechat,
     isWechatCom,
     getQueryString
-  } from '@/packages/app-shared/utils/tool.js';
-  import { authWeixinAjax, buildPayUrl } from '@/packages/app-shared/utils/wechat';
+  } from '@/app-shared/utils/tool.js';
+  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
   import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
@@ -277,9 +287,13 @@
       webinarType() {
         return this.roomBaseServer.state.watchInitData.webinar.type;
       },
-      // 是否为完全嵌入页
+      // 是否为嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否为单视频嵌入页
+      isEmbedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       },
       isTryVideo() {
         return (
@@ -292,12 +306,23 @@
        */
       showInvite() {
         return this.$domainStore.state.roomBaseServer.inviteCard.status == 1;
+      },
+      initIndex() {
+        return this.$domainStore.state.subscribeServer.initIndex;
+      },
+      playIndex() {
+        return this.$domainStore.state.subscribeServer.playIndex;
+      },
+      subscribeWarmList() {
+        return this.$domainStore.state.subscribeServer.subscribeWarmList;
+      },
+      warmUpVideoList() {
+        return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
-      this.playerServer = usePlayerServer();
     },
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
@@ -311,6 +336,7 @@
     },
     methods: {
       handleScroll() {
+        if (this.isEmbedVideo) return;
         let dom = document.querySelector('.vmp-subscribe-body-info');
         //获取相对于父级.subscribe_tabs的高度，切勿修改css中的relative
         const menuDom = document.querySelector('.vmp-tab-menu__header');
@@ -355,6 +381,7 @@
         this.subscribeServer.$on('live_over', () => {
           this.subOption.type = 3;
           this.showBottomBtn = false;
+          this.showVideo = false;
           this.isLiveEnd = true;
           this.$refs.timeDowner.clearTimer();
           this.subscribeText = this.$t('player.player_1017');
@@ -387,15 +414,16 @@
           // 当开启观看协议且没有通过时,需要显示观看验证(观看协议)
           this.subOption.needAgreement = true;
         }
+        if (this.warmUpVideoList.length) {
+          this.showVideo = true;
+          if (this.warmUpVideoList.length > 1) {
+            this.getWarmupVideoInfo();
+          } else {
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
+          }
+        }
         // 如果是嵌入页并且没有开播，预约按钮不显示
         if (webinar.type == 2) {
-          if (
-            (join_info.is_subscribe == 1 || webinar.hide_subscribe == 0) &&
-            warmup.warmup_paas_record_id &&
-            webinar.type == 2
-          ) {
-            this.showVideo = true;
-          }
           if (this.isEmbed) {
             this.showBottomBtn = false;
             return;
@@ -417,6 +445,38 @@
           } else {
             this.subscribeText = this.$t('player.player_1013');
           }
+        }
+      },
+      getWarmupVideoInfo() {
+        // 如果存在recordIds
+        if (window.sessionStorage.getItem('recordIds')) {
+          let newRecordIds = this.warmUpVideoList.join(',');
+          // 刷新页面 newRecordIds和之前的数据不一致
+          if (newRecordIds !== window.sessionStorage.getItem('recordIds')) {
+            this.subscribeServer.state.isChangeOrder = true;
+            // 清除缓存，并且从第一个播放
+            window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
+            this.subscribeServer.state.playIndex = 0;
+            this.subscribeServer.state.initIndex = 0;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0]);
+          } else {
+            // 刷新页面 newRecordIds和之前的数据一致，拿到当前播放的id,并查询下标，重新赋值
+            this.subscribeServer.state.isChangeOrder = false;
+            let recordId = window.sessionStorage.getItem('warm_recordId');
+            let index = this.warmUpVideoList.findIndex(item => item == recordId);
+            console.log(index, '???wap当前index');
+            // 如果当前没有找到对应下标，从0开始初始化
+            index = index < 0 ? 0 : index;
+            this.subscribeServer.state.playIndex = index;
+            this.subscribeServer.state.initIndex = index;
+            this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex], true);
+          }
+        } else {
+          // 不存在recordIds，从0初始化
+          this.subscribeServer.state.playIndex = 0;
+          this.subscribeServer.state.initIndex = 0;
+          this.subscribeServer.setWarmVideoList(this.warmUpVideoList[0], true);
         }
       },
       playerAuthCheck(info) {
@@ -442,6 +502,9 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
+              // 如果往观看页跳转，需要清除暖场视频缓存
+              window.sessionStorage.removeItem('warm_recordId');
+              window.sessionStorage.removeItem('recordIds');
               location.replace(
                 window.location.origin +
                   process.env.VUE_APP_ROUTER_BASE_URL +
@@ -629,6 +692,9 @@
               if (location.pathname.indexOf('embedclient') != -1) {
                 pageUrl = '/embedclient';
               }
+              // 如果往观看页跳转，需要清除暖场视频缓存
+              window.sessionStorage.removeItem('warm_recordId');
+              window.sessionStorage.removeItem('recordIds');
               location.replace(
                 window.location.origin +
                   process.env.VUE_APP_ROUTER_BASE_URL +
@@ -817,8 +883,13 @@
           &_people {
             font-size: 22px;
             line-height: 28px;
+            padding-top: 10px;
           }
         }
+      }
+      .subscribe_warm {
+        height: 100%;
+        width: 100%;
       }
     }
     &-info {

@@ -81,7 +81,7 @@
 
 <script>
   import { useSubjectServer } from 'middle-domain';
-  import { initWeChatSdk } from '@/packages/app-shared/utils/wechat';
+  import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { urlToLink, padStringWhenTooLang } from './js/utils.js';
   export default {
     data() {
@@ -204,8 +204,8 @@
             imgUrl: info.cover
           }
         );
-        const shareSuccessStr = '分享成功';
-        wechatRes.isSuccess && this.$toast(shareSuccessStr);
+        // const shareSuccessStr = '分享成功';
+        // wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       handleOpenHide() {
         this.open_hide = !this.open_hide;
