@@ -1,12 +1,8 @@
 <template>
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
-      <header>
-        <img
-          v-show="formInfo.cover !== 1"
-          :src="formInfo.cover ? `${defaultImgUrl}${formInfo.cover}` : defaultHeader"
-          alt=""
-        />
+      <header class="cover-pic">
+        <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
@@ -495,6 +491,10 @@
       };
     },
     computed: {
+      // 广告头图
+      coverPic() {
+        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+      },
       //当前的城市列表
       currentCityList() {
         return this.cityList[this.province];
@@ -1542,20 +1542,13 @@
     position: relative;
     background: #fff;
     &__wrap {
-      header {
+      .cover-pic {
         width: 100%;
-        max-height: 2.3rem;
+        height: 125px;
         overflow: hidden;
-        display: -webkit-box;
         display: flex;
-        -webkit-box-pack: center;
         justify-content: center;
-        -webkit-box-align: center;
         align-items: center;
-        img {
-          height: 100%;
-          width: 100%;
-        }
       }
     }
     &__content {
@@ -1704,8 +1697,6 @@
           }
         }
       }
-    }
-    .vmp-wap-sign-up-form__content__tab-box {
     }
     .title-text {
       position: relative;

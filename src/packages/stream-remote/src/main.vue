@@ -460,6 +460,23 @@
         // 加入房间
         useMsgServer().$onMsg('JOIN', this.handleUserJoin);
         useMsgServer().$onMsg('LEFT', this.handleUserLeave);
+        // 下麦成功 退出全屏
+        this.micServer.$on('vrtc_disconnect_success', msg => {
+          if (
+            this.isFullScreen &&
+            this.liveMode == 3 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar != 1
+          ) {
+            this.interactiveServer
+              .exitStreamFullscreen({
+                streamId: this.stream.streamId,
+                vNode: `vmp-stream-remote__${this.stream.streamId}`
+              })
+              .then(() => {
+                this.isFullScreen = false;
+              });
+          }
+        });
       },
 
       // 监听离开加入房间事件，显示网络异常占位图
