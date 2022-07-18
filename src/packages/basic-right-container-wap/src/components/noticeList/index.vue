@@ -154,7 +154,9 @@
         this.getNoticeList(true);
       },
       closeNotice() {
-        this.pageInfo.pageNum = 0;
+        this.noticeList = [];
+        this.pageInfo.pageNum = 1;
+        this.pageInfo.pos = 0;
         this.isShowNotice = false;
       }
     }
