@@ -23,4 +23,28 @@ shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstati
 2、./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/element-ui/lib/2.6.2/index.js Cache-Control:max-age=2592000
 
 文件目录
-1、./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000 -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.jpg" --include "*.png" --include "*.gif" -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.woff" --include "*.woff2" --include "*.ttf" -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.svga" --include "*.mp3" --include "*.mp4" -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-wap Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
+./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-watch Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
+./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-live Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
+
+#上传目录
+./ossutilmac64 set-meta oss://vhallstatic/upload/ Cache-Control:max-age=31536000 --include "*.jpg" --include "*.png" --include "*.gif" -r -u
+
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static/images Cache-Control:max-age=2592000 -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static/old-questionarie Cache-Control:max-age=2592000 -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/element-ui Cache-Control:max-age=2592000 -r -u
+
+./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/vue Cache-Control:max-age=604800 -r -u
+
+
+
