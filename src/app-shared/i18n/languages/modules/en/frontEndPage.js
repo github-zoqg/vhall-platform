@@ -347,7 +347,9 @@ export default {
     chat_1092: 'You have been muted',
     chat_1093: 'Click for details',
     chat_1094: 'Chat only',
-    chat_1095: 'Setting'
+    chat_1095: 'Setting',
+    chat_1096: 'Chat only on',
+    chat_1097: 'Chat only off'
   },
   form: {
     form_1001: 'Name',

@@ -13,7 +13,7 @@
     >
       <div class="vmp-chat_set_container">
         <div class="container-title">
-          <span class="container-title-text">{{ $t('聊天设置') }}</span>
+          <span class="container-title-text">{{ $t('chat.chat_1095') }}</span>
           <i class="vh-iconfont vh-line-close" @click="closeSet"></i>
         </div>
         <van-cell center :title="$t('chat.chat_1012')" class="set_line_h">
@@ -98,10 +98,14 @@
         sessionStorage.setItem('isShieldingEffects', val);
         this.isShieldingEffects = val;
         this.$emit('filterChat', val);
+        // let message = val ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
+        // this.$message.success(message);
       },
       // 聊天
       changeChat(val) {
         sessionStorage.setItem('only_isChat', val);
+        // let message = val ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
+        // this.$message.success(message);
         this.isChat = val;
         this.$emit('filterChat', val);
       },
@@ -110,6 +114,8 @@
         sessionStorage.setItem('onlyShowSponsor', val);
         this.onlyShowSponsor = val;
         this.$emit('filterChat', val);
+        // let message = val ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
+        // this.$message.success(message);
       }
     }
   };

@@ -398,8 +398,7 @@
       },
       // 仅查看聊天内容
       onClickChat(status) {
-        // TODO: 待翻译
-        let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
+        let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
         this.$message.success(message);
 
         sessionStorage.setItem('filterStatus_isChat', status);
