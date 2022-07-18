@@ -417,7 +417,8 @@
         return new Promise((resolve, reject) => {
           this.insertFileServer
             .createLocalInsertStream({
-              videoNode: 'vmp-insert-local-stream'
+              videoNode: 'vmp-insert-local-stream',
+              videoContentHint: sessionStorage.getItem('videoHint') || 'detail'
             })
             .then(e => {
               console.log('创建插播本地流成功');

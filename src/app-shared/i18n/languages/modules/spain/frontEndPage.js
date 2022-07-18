@@ -550,7 +550,8 @@ export default {
     interact_tools_1081: '',
     interact_tools_1082: '',
     interact_tools_1083: '',
-    interact_tools_1085: ''
+    interact_tools_1085: '',
+    interact_tools_1086: ''
   },
   setting: {
     setting_1002: 'Configuración de la vista',

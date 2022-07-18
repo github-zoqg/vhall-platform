@@ -10,7 +10,9 @@
       mode="closeable"
       v-if="announcement.isShow"
       @close="closeAnnouncement"
-    />
+    >
+      <i slot="left-icon" class="vh-iconfont vh-line-voice"></i>
+    </van-notice-bar>
   </div>
 </template>
 
@@ -22,8 +24,7 @@
       return {
         announcement: {
           content: '12313',
-          isShow: false,
-          timer: null
+          isShow: false
         },
         mini: false
       };
@@ -104,12 +105,6 @@
           content: msg.room_announcement_text,
           isShow: true
         };
-        if (this.timer) {
-          clearTimeout(this.timer);
-        }
-        this.timer = setTimeout(() => {
-          this.announcement.isShow = false;
-        }, 30000);
       });
       // 直播结束自动关闭公告
       this.noticeServer.$on('live_over', () => {
@@ -145,12 +140,6 @@
             content: this.roomBaseServer.state.noticeInfo.list[0]?.content.content,
             isShow: true
           };
-          if (this.timer) {
-            clearTimeout(this.timer);
-          }
-          this.timer = setTimeout(() => {
-            this.announcement.isShow = false;
-          }, 30000);
         } else {
           this.announcement.isShow = false;
         }
@@ -166,6 +155,10 @@
       top: 80px;
       left: 0px;
       width: 100%;
+      background: linear-gradient(59.32deg, #ffebe9 0%, #edecff 107.06%) !important;
+      .van-notice-bar__content {
+        color: #262626;
+      }
     }
     .van-notice-bar {
       box-sizing: border-box;
@@ -189,6 +182,10 @@
       .notice {
         top: 0;
       }
+    }
+    .vh-line-voice {
+      color: #fb3a32;
+      padding-right: 11px;
     }
   }
 </style>
