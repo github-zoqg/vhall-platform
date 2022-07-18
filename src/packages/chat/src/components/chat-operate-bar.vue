@@ -88,29 +88,27 @@
           >
             <i class="chat-setting-btn">聊天设置</i>
             <div class="chat-setting-box">
-              <div class="chat-setting-box__item switch-box">
+              <div class="chat-setting-box__item_switch switch-box">
                 <span class="switch-title">屏蔽特效</span>
                 <el-switch
                   class="switch"
                   v-model="filterStatus.isShieldingEffects"
-                  inactive-color="#E2E2E2"
-                  :width="32"
-                  active-color="#fc5659"
+                  inactive-color="#CECECE"
+                  active-color="#fb3a32"
                   @change="onClickShieldingEffects"
                 />
               </div>
-              <div class="chat-setting-box__item switch-box">
+              <div class="chat-setting-box__item_switch switch-box switch-box_bottom">
                 <span class="switch-title">仅查看聊天内容</span>
                 <el-switch
                   class="switch"
                   v-model="filterStatus.isChat"
-                  inactive-color="#E2E2E2"
-                  :width="32"
-                  active-color="#fc5659"
+                  inactive-color="#CECECE"
+                  active-color="#fb3a32"
                   @change="onClickChat"
                 />
+                <span class="tip_only">仅针对个人生效</span>
               </div>
-              <div class="tip_only">仅针对个人生效</div>
               <div
                 class="chat-setting-box__item switch-box join-chat-btn"
                 v-if="configList['disable_msg']"
@@ -120,8 +118,7 @@
                 <el-switch
                   class="switch"
                   :value="allBanned"
-                  inactive-color="#E2E2E2"
-                  :width="32"
+                  inactive-color="#CECECE"
                   active-color="#fb3a32"
                   @change="toggleMutedAllStatus"
                 />
@@ -533,14 +530,28 @@
           bottom: 30px;
           right: -15px;
           width: 236px;
-          padding: 4px 20px;
+          padding: 24px 24px 10px;
           border-radius: 4px;
           background-color: #fff;
           text-align: left;
-          font-size: 14px;
+          font-size: 12px;
           color: #555;
           .tip_only {
-            line-height: 40px;
+            line-height: 31px;
+            color: #666;
+            font-size: 12px;
+            margin-left: 8px;
+          }
+          .el-switch__core {
+            width: 28px !important;
+            height: 16px;
+          }
+          .el-switch__core:after {
+            width: 12px;
+            height: 12px;
+          }
+          .el-switch.is-checked .el-switch__core::after {
+            margin-left: -13px;
           }
           &__item {
             height: 40px;
@@ -548,8 +559,16 @@
             padding-bottom: 4px;
             color: #1a1a1a;
           }
+          &__item_switch {
+            color: #1a1a1a;
+            line-height: 31px;
+          }
+          .switch-box_bottom {
+            padding-bottom: 6px;
+          }
           .el-checkbox {
             color: #1a1a1a;
+            font-size: 12px;
             &.is-disabled {
               .el-checkbox__label {
                 color: #b3b3b3 !important;
