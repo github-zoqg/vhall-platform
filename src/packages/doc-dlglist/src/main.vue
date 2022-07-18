@@ -58,7 +58,12 @@
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button type="white-primary" v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button
+                type="white-primary"
+                v-if="!isWatch && showDatabase"
+                round
+                @click="handleGotoDoclib"
+              >
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
@@ -79,7 +84,7 @@
                 <el-button type="primary" round>{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
               <!-- 资料库按钮 -->
-              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button v-if="!isWatch && showDatabase" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
 
@@ -319,6 +324,16 @@
       // 活动直播类型
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
+      },
+      configList() {
+        return this.roomBaseServer.state.configList;
+      },
+      //是否显示资料库
+      showDatabase() {
+        return (
+          (this.$route?.query.assistantType && this.configList['ui.database'] == 1) ||
+          !this.$route?.query.assistantType
+        );
       }
     },
     watch: {
