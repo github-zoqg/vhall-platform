@@ -528,10 +528,14 @@
                 // type: 'info',
                 // center: true
               }
-            ).then(() => {
-              // 派发推流事件
-              this.clickStartLive();
-            });
+            )
+              .then(() => {
+                // 派发推流事件
+                this.clickStartLive();
+              })
+              .catch(action => {
+                this.liveStep = 1;
+              });
           } else {
             // 派发推流事件
             this.clickStartLive();
