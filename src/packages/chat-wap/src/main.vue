@@ -7,7 +7,7 @@
     <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
-        v-if="hideChatHistory && !chatList.length && !historyLoaded"
+        v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
@@ -127,8 +127,6 @@
         isBanned: useChatServer().state.banned,
         //true全体禁言，false未禁言
         allBanned: useChatServer().state.allBanned,
-        //是否加载完聊天历史
-        historyLoaded: false,
         //虚拟列表配置
         virtual: {
           showlist: false,
@@ -148,6 +146,8 @@
         childrenCom: [],
         //小屏适配
         smFix: false,
+        //隐藏拉取历史聊天按钮
+        hideChatHistory: false,
         //回复或@消息id
         targetId: ''
       };
@@ -164,7 +164,7 @@
     },
     computed: {
       //是否开启手动加载聊天历史记录
-      hideChatHistory() {
+      isShowChatHistoryBtn() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
       //当前登录人信息
@@ -269,8 +269,8 @@
     mounted() {
       this.listenChatServer();
       this.showWelcomeTxt();
-      if (!this.hideChatHistory) {
-        this.getHistoryMessage();
+      if (!this.isShowChatHistoryBtn) {
+        this.getHistoryMessage(true);
       }
       const IsMse = isMse();
       if (IsMse.os === 'android') {
@@ -418,22 +418,30 @@
         this.getHistoryMessage();
       },
       // 获取历史消息
-      async getHistoryMessage() {
+      async getHistoryMessage(isfirst) {
         this.isLoading = true;
         const data = {
+          isfirst,
           room_id: this.roomId,
-          // webinar_id: this.webinar_id,
-          pos: this.pos,
-          limit: this.pageSize // 所有端统一显示50条
+          msg_id: this.getFirstMsg()?.msgId,
+          limit: this.pageSize,
+          is_role: 0,
+          anchor_path: this.chatList[0]?.msgId ? 'down' : undefined //up 拉新,down拉旧
         };
         // eslint-disable-next-line no-void
         if (['', void 0, null].includes(this.chatServer.state.defaultAvatar)) {
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
         const res = await this.chatServer.getHistoryMsg(data, 'h5');
-        this.historyLoaded = true;
+        this.hideChatHistory = true;
         this.isLoading = false;
         return res;
+      },
+      //获取第一条有msgid的消息
+      getFirstMsg() {
+        return this.chatList.find(item => {
+          return item.msgId;
+        });
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
@@ -539,7 +547,6 @@
         if (this.isLoading) {
           return;
         }
-        const offsetPos = this.pos;
         const { list } = await this.getHistoryMessage();
         const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
