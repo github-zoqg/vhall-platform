@@ -87,6 +87,7 @@
       initNotice() {
         const { groupInitData } = this.groupServer.state;
         this.noticeServer.$on('live_over', () => {
+          sessionStorage.setItem(this.$route.params.id, 0);
           this.isShowIcon = false;
         });
         // 结束讨论
