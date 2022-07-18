@@ -12,6 +12,7 @@
       class="notice_base"
       v-model="isShowNotice"
       position="bottom"
+      @close="closeNotice"
     >
       <div class="vmp-notice-list_container">
         <div class="container-title">
@@ -57,7 +58,8 @@
         isShowIcon: false,
         isShowNotice: false, //是否显示公告列表
         noticeList: [],
-        noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0
+        noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0,
+        pageInfo: {}
       };
     },
     computed: {
