@@ -1,0 +1,26 @@
+Error: accessKeyID and ecsUrl are both empty
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/images/base-right.png Cache-Control:max-age=2592000
+
+0.188277(s) elapsed
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000
+Error: oss: service returned error: StatusCode=404, ErrorCode=NoSuchKey, ErrorMessage="The specified key does not exist.", RequestId=62D51816B304E93237F363F5, Bucket=vhallstatic, Object=common-static/middle
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000 -r
+Do you really mean to recursivlly set meta on objects of oss://vhallstatic/common-static/middle(y or N)? Y
+警告：--update选项更新指定的header，--delete选项删除指定的header，两者同时缺失会更改object的全量meta信息，请确认是否要更改全量meta信息(y or N)? n
+Error: operation is canceled
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000 -r -u
+Do you really mean to recursivlly set meta on objects of oss://vhallstatic/common-static/middle(y or N)? y
+Total 14813 objects. Setted meta on 763 objects, Progress: 5%^C
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/element-ui/lib/2.6.2/index.js Cache-Control:max-age=2592000
+
+0.065431(s) elapsed
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000 -r -u
+
+
+单个文件
+1、./ossutilmac64 set-meta oss://vhallstatic/common-static/images/base-right.png Cache-Control:max-age=2592000
+
+2、./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/element-ui/lib/2.6.2/index.js Cache-Control:max-age=2592000
+
+文件目录
+1、./ossutilmac64 set-meta oss://vhallstatic/common-static/middle Cache-Control:max-age=2592000 -r -u
