@@ -287,7 +287,7 @@
             width: 27px;
             height: 27px;
             border-radius: 50%;
-            background: linear-gradient(359.08deg, #f0f9ff 0.67%, #f4fbff 86.17%);
+            background: #fdf1ed;
             border: 1px solid #fb2626;
             top: 30px;
             left: 0px;
