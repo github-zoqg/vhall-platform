@@ -32,6 +32,7 @@
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
+  import skins from '@/app-shared/skins/watch';
   export default {
     name: 'Home',
     components: {
@@ -106,6 +107,11 @@
           }
           const domain = await this.initReceiveLive(this.clientType);
           await roomState();
+
+          // 设置主题
+          window.skins = skins;
+          skins.setTheme(skins.themes.themeDefaultBlack);
+
           // 是否跳转预约页
           if (
             this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
