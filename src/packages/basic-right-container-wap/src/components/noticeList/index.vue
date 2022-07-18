@@ -152,6 +152,7 @@
         this.getNoticeList(true);
       },
       closeNotice() {
+        this.pageInfo.pageNum = 0;
         this.isShowNotice = false;
       }
     }
