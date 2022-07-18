@@ -59,7 +59,11 @@
         isShowNotice: false, //是否显示公告列表
         noticeList: [],
         noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0,
-        pageInfo: {}
+        pageInfo: {
+          pos: 0,
+          limit: 10,
+          pageNum: 1
+        }
       };
     },
     computed: {
@@ -155,8 +159,11 @@
       },
       closeNotice() {
         this.noticeList = [];
-        this.pageInfo.pageNum = 1;
-        this.pageInfo.pos = 0;
+        this.pageInfo = {
+          pos: 0,
+          limit: 10,
+          pageNum: 1
+        };
         this.isShowNotice = false;
       }
     }
