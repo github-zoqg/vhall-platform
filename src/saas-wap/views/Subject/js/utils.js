@@ -24,5 +24,5 @@ export function urlToLink(str) {
 export function padStringWhenTooLang(originString, padString = '', length) {
   if (originString.length <= length) return originString;
 
-  return originString.splice(0, length - 1) + padString;
+  return originString.substring(0, length - 1) + padString;
 }

@@ -386,7 +386,7 @@
           .vmp-stream-local__shadow-box {
             display: flex;
             height: 41px;
-            bottom: 10px;
+            bottom: 0px;
             flex-direction: row;
             top: auto;
             background: rgba(0, 0, 0, 0);
@@ -397,9 +397,9 @@
               }
             }
           }
-          .vmp-stream-local__bottom {
-            bottom: 18px;
-          }
+          // .vmp-stream-local__bottom {
+          //   bottom: 18px;
+          // }
         }
         // 远端流大窗样式
       }
