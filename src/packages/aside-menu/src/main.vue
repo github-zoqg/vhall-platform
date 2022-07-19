@@ -318,13 +318,10 @@
                 vn.setHiddenState(true);
               } else {
                 // 如果不在小组中
-                // 如果主持人把别人设为了主讲人，或者有人正在演示，或者开启分屏，或者开启第三方推流,插播文件禁用
-                if (
-                  this.doc_permission != this.userId ||
-                  this.presenterId != this.userId ||
-                  this.isOpenSplitScreen ||
-                  this.isThirdStream
-                ) {
+                /* // this.doc_permission != this.userId ||
+                  this.presenterId != this.userId ||  如果主持人把别人设为了主讲人，或者有人正在演示，或者开启分屏，或者开启第三方推流,插播文件禁用
+                */
+                if (this.isOpenSplitScreen || this.isThirdStream) {
                   vn.setHiddenState(false);
                   vn.setDisableState(true);
                 } else {
