@@ -232,7 +232,7 @@
         if (!this.pullUrl) {
           this.showRulePullUrl = true;
         } else {
-          const reg = /^(rtmp:\/\/)|(http:\/\/)/g;
+          const reg = /^(rtmp:\/\/.+)|(http:\/\/.+)/g;
           if (reg.test(this.pullUrl)) {
             this.showRulePullUrl = false;
             if (!cur) {
