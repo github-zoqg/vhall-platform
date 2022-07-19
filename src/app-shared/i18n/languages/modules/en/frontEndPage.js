@@ -394,7 +394,7 @@ export default {
     form_1042: 'Please enter the detailed address',
     form_1043: 'Province/autonomous region/municipalities',
     form_1044: 'District/County',
-    form_1045: 'Submit questionnaire',
+    form_1045: 'Submit',
     form_1046: 'Select date',
     form_1047: 'Select date & time',
     form_1048: 'Select time',
@@ -543,7 +543,8 @@ export default {
     interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
-    interact_tools_1085: 'TOP 10 list'
+    interact_tools_1085: 'TOP 10 list',
+    interact_tools_1086: 'Notice'
   },
   setting: {
     setting_1002: 'View settings',

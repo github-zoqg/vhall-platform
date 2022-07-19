@@ -394,6 +394,10 @@
       // 是不是嵌入页
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       }
     },
     data() {
@@ -460,7 +464,7 @@
       // 监听播放器大小
       isSmallPlayer: {
         handler: function (val) {
-          if (val) {
+          if (val && !this.isWapBodyDocSwitch) {
             document.querySelector('.vmp-basic-bd').classList.add('small_player');
           } else {
             document.querySelector('.vmp-basic-bd').classList.remove('small_player');
@@ -470,6 +474,14 @@
       },
       sliderVal(val) {
         this.circleSliderVal = val;
+      },
+      isWapBodyDocSwitch() {
+        if (this.isSmallPlayer && !this.isWapBodyDocSwitch) {
+          document.querySelector('.vmp-basic-bd').classList.add('small_player');
+        } else {
+          document.querySelector('.vmp-basic-bd').classList.remove('small_player');
+        }
+        this.setSetingHeight();
       },
       playIndex() {
         if (!this.isWarnPreview) return;
@@ -556,7 +568,7 @@
         if (this.isSubscribe) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
         let baseHeight = playerHeight + 71 + 90;
         let classname = '.tab-content';
         if (this.isEmbed) {
@@ -716,21 +728,27 @@
         });
       },
       initPlayerOtherInfo() {
-        const { webinar } = this.roomBaseState.watchInitData;
-        this.playerServer
-          .getPlayerConfig({
-            webinar_id: webinar.id,
-            tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
-          })
-          .then(res => {
-            if (res.code == 200) {
-              this.definitionConfig = res.data.definition.data.default_definition;
-              this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
-              this.water = res.data['water-mark'] && res.data['water-mark'].data;
-              this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
-              this.initPlayer();
-            }
-          });
+        const unionConfig = this.roomBaseServer.state.unionConfig;
+        this.definitionConfig = unionConfig.definition.data.default_definition;
+        this.marquee = unionConfig['screen-config'] && unionConfig['screen-config'].data;
+        this.water = unionConfig['water-mark'] && unionConfig['water-mark'].data;
+        this.playerOtherOptions = unionConfig['basic-config'] && unionConfig['basic-config'].data;
+        this.initPlayer();
+        // const { webinar } = this.roomBaseState.watchInitData;
+        // this.playerServer
+        //   .getPlayerConfig({
+        //     webinar_id: webinar.id,
+        //     tags: ['basic-config', 'definition', 'screen-config', 'water-mark']
+        //   })
+        //   .then(res => {
+        //     if (res.code == 200) {
+        //       this.definitionConfig = res.data.definition.data.default_definition;
+        //       this.marquee = res.data['screen-config'] && res.data['screen-config'].data;
+        //       this.water = res.data['water-mark'] && res.data['water-mark'].data;
+        //       this.playerOtherOptions = res.data['basic-config'] && res.data['basic-config'].data;
+        //       this.initPlayer();
+        //     }
+        //   });
       },
       // 获取跑马灯、水印等播放器配置
       getPlayerInfo() {
