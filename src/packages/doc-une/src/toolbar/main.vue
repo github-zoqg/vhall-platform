@@ -142,7 +142,7 @@
       <div
         class="vmp-icon-item"
         :title="$t('doc.doc_1010')"
-        v-if="roleName != 3"
+        v-if="roleName != 3 && !(this.roleName == 1 && this.presenterId != this.userId)"
         @click="fullscreen"
       >
         <i class="vh-iconfont vh-line-amplification"></i>
