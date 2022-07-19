@@ -352,7 +352,7 @@
         textarea {
           background-color: #f0f0f0;
           min-height: 64px !important;
-          padding: 20px 24px !important;
+          padding: 10px 24px !important;
           max-height: 144px !important;
           border-radius: 40px;
           border-color: #fff;

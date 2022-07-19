@@ -887,7 +887,7 @@
               } else {
                 this.isSpeakOn && (await this.startPush());
               }
-            } else if (this.localSpeaker.streamId) {
+            } else if (this.localSpeaker.streamId || this.isRecording) {
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {
@@ -1017,6 +1017,11 @@
             boxEventOpitons(this.cuid, 'emitClickPublishComplate')
           );
           return;
+        }
+        if (this.localStreamId) {
+          // 防止重复推流
+          console.log('防止重复推流-销毁本地流', this.localStreamId);
+          await this.interactiveServer.destroyStream();
         }
         try {
           // 创建本地流

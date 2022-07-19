@@ -5,7 +5,7 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <img :src="formInfo.cover ? `${baseUrl}${formInfo.cover}` : defaultHeader" alt="" />
+            <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
@@ -359,7 +359,7 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <img :src="formInfo.cover ? `${baseUrl}${formInfo.cover}` : defaultHeader" alt="" />
+          <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
@@ -1029,6 +1029,10 @@
       //   }
       //   return lang;
       // },
+      // 广告头图
+      coverPic() {
+        return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+      },
       //输入提示的多语言转换
       findPlaceHolder() {
         const _this = this;
@@ -1837,6 +1841,7 @@
       -webkit-box-align: center;
       -ms-flex-align: center;
       align-items: center;
+      z-index: 10;
       .el-dialog__close {
         color: #fff;
       }
@@ -1872,8 +1877,6 @@
       display: flex;
       align-items: center;
     }
-    &__wrap {
-    }
     &__banner {
       width: 100%;
       height: 120px;
@@ -1881,14 +1884,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      img {
-        width: 100%;
-        object-fit: cover;
-      }
     }
     &__content {
       padding: 0 75px 87px;
-      max-height: 60vh;
+      max-height: 58vh;
       overflow-y: auto;
     }
     &__title {
@@ -2149,7 +2148,7 @@
     align-items: center;
     color: #1a1a1a;
     .vmp-sign-up-form__wrap {
-      overflow-y: auto;
+      overflow-y: hidden;
       height: 85%;
       border-radius: 4px;
       background: #fff;
@@ -2157,7 +2156,7 @@
       z-index: 101;
       max-width: 720px;
       margin: 0 auto;
-      padding-bottom: 87px;
+      // padding-bottom: 87px;
     }
   }
   .vmp-sign-up-form__entry-form-select {
