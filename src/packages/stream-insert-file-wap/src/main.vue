@@ -34,7 +34,11 @@
           videoNode: 'vmp-wap-insert-file', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
-        this.insertFileServer.subscribeInsertStream(opt);
+        try {
+          this.insertFileServer.subscribeInsertStream(opt);
+        } catch (error) {
+          console.log('error', error);
+        }
       },
       addEvents() {
         // 监听插播流加入
@@ -43,7 +47,11 @@
         });
         // 监听插播流离开
         this.insertFileServer.$on('INSERT_FILE_STREAM_REMOVE', () => {
-          this.insertFileServer.unsubscribeInsertStream();
+          try {
+            this.insertFileServer.unsubscribeInsertStream();
+          } catch (error) {
+            console.log('error', error);
+          }
         });
         // 本地推流或订阅远端流异常断开事件
         this.insertFileServer.$on('INSERT_FILE_STREAM_FAILED', () => {

@@ -2,10 +2,17 @@
   <div
     id="docWrapper"
     class="vmp-doc-wap"
-    :class="[`vmp-doc-wap--${displayMode}`]"
+    :class="[
+      `vmp-doc-wap--${displayMode}`,
+      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `${rotateNum ? 'rotate' + rotateNum : ''}`,
+      wapDocClass
+    ]"
     :style="{
       height:
-        docViewRect.height > 0 && displayMode !== 'fullscreen ' ? docViewRect.height + 'px' : '100%'
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%',
+      minHeight:
+        docViewRect.height > 0 && displayMode !== 'fullscreen' ? docViewRect.height + 'px' : '100%'
     }"
     v-show="switchStatus"
     ref="docWrapper"
@@ -51,14 +58,37 @@
       </div>
     </div>
 
-    <!-- 全屏切换 -->
-    <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
-      <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-line-narrow"></i>
-      <i v-else class="vh-iconfont vh-line-amplification"></i>
+    <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
+      {{ pageNum }}/{{ pageTotal }}
     </div>
-    <!-- 文档拖动后还原 -->
-    <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
-      <i class="vh-saas-iconfont vh-saas-a-line-Documenttonarrow"></i>
+    <div class="tools">
+      <!-- 文档横屏 -->
+      <div
+        v-show="!!currentCid && displayMode == 'fullscreen'"
+        @click="doRotate"
+        class="btn-doc-rotate"
+      >
+        <i class="vh-iconfont vh-line-landscape" v-if="isPortrait && !!!rotateNum"></i>
+        <i class="vh-iconfont vh-line-vertical-screen" v-else></i>
+      </div>
+      <!-- 全屏切换 -->
+      <div v-show="!!currentCid" @click="fullscreen" class="btn-doc-fullscreen">
+        <i v-if="displayMode === 'fullscreen'" class="vh-iconfont vh-a-line-exitfullscreen"></i>
+        <i v-else class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <!-- 文档拖动后还原 -->
+      <div v-show="!!currentCid" @click="restore" class="btn-doc-restore">
+        <i class="vh-iconfont vh-line-c-scale-to-original"></i>
+      </div>
+
+      <!-- 文档播放器位置互换 -->
+      <div
+        v-show="!!currentCid && displayMode != 'fullscreen' && !isNotSupportTrans"
+        @click="transposition"
+        class="btn-doc-transposition"
+      >
+        <i class="vh-iconfont vh-line-sort1"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +102,8 @@
     useGroupServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
 
   export default {
     name: 'VmpDocWap',
@@ -86,10 +118,44 @@
           height: 0
         },
         rebroadcastStartTimer: null,
-        rebroadcastStopTimer: null
+        rebroadcastStopTimer: null,
+        rotateNum: 0, //旋转角度
+        isPortrait: true, // 是否是竖屏  设备
+        isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell)
       };
     },
     computed: {
+      wapDocClass() {
+        if (this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-doc-wap__top';
+        }
+        if (!this.showHeader && this.isWapBodyDocSwitch) {
+          return 'vmp-doc-wap__top-noheader';
+        }
+        return '';
+      },
+      /**
+       * 是否显示头部
+       */
+      showHeader() {
+        if (this.embedObj.embed || (this.webinarTag && this.webinarTag.organizers_status == 0)) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      // 是否为嵌入页
+      embedObj() {
+        return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 主办方配置
+      webinarTag() {
+        return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
@@ -140,6 +206,20 @@
             this.recoverLastDocs();
           }
         }
+      },
+      rotateNum() {
+        // this.docServer.zoomReset();
+        this.resize();
+        this.docServer.rotate(this.rotateNum);
+        this.docServer.zoomReset();
+      },
+      currentCid(newval) {
+        //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态
+        if (newval && this.docServer.singleLoadComplete()) {
+          setTimeout(() => {
+            this.docServer.zoomReset();
+          }, 50);
+        }
       }
     },
     beforeCreate() {
@@ -164,6 +244,8 @@
           this.recoverLastDocs();
         });
       }
+      //this.resizeDoc();
+      window.addEventListener('resize', this.resizeDoc);
     },
     methods: {
       /**
@@ -174,11 +256,23 @@
         this.displayMode = this.displayMode === 'fullscreen' ? 'normal' : 'fullscreen';
         // 切换后还原位置
         this.docServer.zoomReset();
+        this.resize();
+        this.rotateNum = 0;
+
+        if (!this.isPortrait) {
+          this.$toast(this.$t('message.message_1035'));
+          // For better watching experience, please use landscape mode
+        }
       },
 
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
+      },
+
+      // 文档播放器互换位置
+      transposition() {
+        this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
       },
 
       // 初始化事件
@@ -236,7 +330,49 @@
             this.recoverLastDocs();
           }, 1000);
         });
+
+        // 设置观看端文档是否可见
+        this.docServer.$on('dispatch_doc_switch_change', val => {
+          console.log('dispatch_doc_switch_change', val);
+          this.setRight();
+        });
+
+        this.groupServer.$on('ROOM_CHANNEL_CHANGE', () => {
+          this.roomBaseServer.state.isWapBodyDocSwitch = false;
+        });
+
+        // 所有文档加载完成
+        this.docServer.$on('dispatch_doc_all_complete', val => {
+          console.log('dispatch_doc_all_complete', val);
+          this.setRight();
+        });
+
+        // 所有文档加载完成
+        this.docServer.$on('dispatch_doc_load_complete', val => {
+          console.log('dispatch_doc_load_complete', val);
+          this.setRight();
+        });
+
+        // 文档切换
+        this.docServer.$on('dispatch_doc_select_container', val => {
+          console.log('dispatch_doc_select_container', val);
+          this.setRight();
+        });
       },
+
+      setRight: debounce(function (e) {
+        //如果是更换文档，判断是否需要纠正旋转
+        if (this.displayMode === 'fullscreen') {
+          //  this.docServer.zoomReset();
+          this.resize();
+          this.docServer.rotate(this.rotateNum);
+
+          //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态
+          setTimeout(() => {
+            this.docServer.zoomReset();
+          }, 50);
+        }
+      }, 300),
 
       /**
        * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
@@ -256,17 +392,24 @@
        * 获取文档白板容器大小
        */
       getDocViewRect() {
-        let rect = this.$refs.docWrapper?.getBoundingClientRect();
         let w = 0;
         let h = 0;
-        if (!rect || rect.width <= 0 || rect.height <= 0) {
-          // 竖屏
-          w =
-            window.screen.height < window.screen.width ? window.screen.height : window.screen.width;
+        //是否竖屏
+        if (this.isPortrait) {
+          //竖屏 90°  即 锁屏下旋转按钮触发
+          if (this.rotateNum == 90) {
+            h = window.innerWidth;
+            w = (16 * h) / 9;
+          } else {
+            //竖屏的 正常显示
+            w = window.innerWidth;
+            h = (9 * w) / 16;
+          }
         } else {
-          w = rect.width;
+          // 未锁屏，设备横向
+          h = window.innerHeight;
+          w = (16 * h) / 9;
         }
-        h = (w / 16) * 9;
         this.docViewRect = { width: w, height: h };
         console.log('[doc] ', this.docViewRect);
         return { width: w, height: h };
@@ -329,11 +472,42 @@
             boxEventOpitons(this.cuid, 'emitShowMenuTab', [this.docServer.state.switchStatus])
           );
         }
+      },
+      //监听系统横竖屏
+      resizeDoc(e) {
+        window.setTimeout(() => {
+          const newOir = window.innerWidth < window.innerHeight;
+          console.log(
+            '【resizeDoc】:',
+            'window.innerHeight: ' + window.innerHeight,
+            'window.innerWidth: ' + window.innerWidth,
+            '变化前---设备竖屏 isPortrait:' + this.isPortrait,
+            '变化后---当前设备竖屏:' + newOir
+          );
+          if (newOir != this.isPortrait) {
+            //方向发生了变化就重新计算文档大小
+            this.isPortrait = newOir;
+            this.rotateNum = 0;
+            this.resize();
+            this.docServer.zoomReset();
+          }
+        }, 50);
+      },
+      //自定义横竖屏
+      doRotate() {
+        if (this.isPortrait) {
+          this.rotateNum = this.rotateNum === 0 ? 90 : 0;
+          //  console.log('screen.orientation-> ', window.screen.orientation);
+        } else {
+          //设备横向 旋转即退出全屏
+          this.fullscreen();
+        }
       }
     },
     beforeDestroy() {
       this.docServer.$off('dispatch_doc_not_exit', this.dispatchDocNotExit);
       this.docServer.$off('dispatch_doc_vod_time_update', this.dispatchDocVodTimeUpdate);
+      window.removeEventListener('resize', this.resizeDoc);
     }
   };
 </script>
@@ -346,6 +520,30 @@
     flex-direction: column;
     background-color: #f2f2f2;
     color: #fff;
+    position: relative;
+    &__top {
+      position: fixed;
+      top: 71px;
+      left: 0;
+      .pageGroup {
+        margin-top: -80px !important;
+      }
+      .tools {
+        margin-top: -88px !important;
+      }
+    }
+
+    &__top-noheader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      .pageGroup {
+        margin-top: -80px !important;
+      }
+      .tools {
+        margin-top: -88px !important;
+      }
+    }
 
     .vmp-doc-une__content {
       flex: 1;
@@ -365,6 +563,9 @@
           position: absolute;
           transform: translateX(-50%);
           overflow: visible !important;
+          > div {
+            overflow: visible !important;
+          }
         }
       }
     }
@@ -398,34 +599,61 @@
       }
     }
 
-    .btn-doc-fullscreen {
+    .pageGroup {
       position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 0.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
+      left: 50%;
+      transform: translateX(-50%);
+      top: 100%;
+      margin-top: 40px;
+      color: #fff;
+      min-width: 90px;
+      height: 40px;
+      padding: 0 24px;
+      border-radius: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9;
+      background-color: rgba(0, 0, 0, 0.4);
+      font-size: 28px;
     }
-
-    .btn-doc-restore {
+    .tools {
       position: absolute;
-      cursor: pointer;
-      top: 0.4rem;
-      left: 1.4rem;
-      width: 0.8rem;
-      height: 0.8rem;
-      border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.4);
+      right: 0;
+      top: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9;
+      margin-top: 32px;
+      height: 56px;
+      > div {
+        margin-right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9;
+        &:nth-last-child(1) {
+          margin-right: 32px;
+        }
+      }
+      .vh-iconfont {
+        font-size: 30px;
+      }
+      .btn-doc-fullscreen {
+        .vh-iconfont {
+          margin-top: 2px;
+        }
+      }
+
+      .btn-doc-restore {
+      }
+
+      .btn-doc-rotate {
+      }
     }
 
     .btn-pager {
@@ -433,19 +661,28 @@
       top: 50%;
       transform: translateY(-50%);
       background-color: rgba(0, 0, 0, 0.4);
-      width: 64px;
-      height: 64px;
-      border-radius: 100px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10;
 
+      .vh-iconfont {
+        font-size: 30px;
+      }
       &--prev {
         left: 32px;
+        .vh-iconfont {
+          margin-right: 6px;
+        }
       }
       &--next {
         right: 32px;
+        .vh-iconfont {
+          margin-left: 6px;
+        }
       }
     }
 
@@ -459,7 +696,8 @@
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
       // 播放器的层级是1-12
-      z-index: 15;
+      //聊天框层级22, 礼物飘窗100 礼物全屏特效300
+      z-index: 301;
 
       .vmp-doc-une__content {
         .vmp-doc-inner {
@@ -470,6 +708,115 @@
             transform: translate(-50%, -50%);
             overflow: visible !important;
           }
+        }
+      }
+
+      .tools {
+        right: 0;
+        bottom: 32px;
+        top: auto;
+        > div:nth-last-child(2) {
+          margin-right: 32px;
+        }
+        .btn-doc-fullscreen {
+        }
+        .btn-doc-restore {
+        }
+        .btn-doc-rotate {
+        }
+      }
+      .pageGroup {
+        bottom: 40px;
+        top: auto;
+      }
+      &.doc-landscape {
+        .tools {
+          right: 0;
+          bottom: 16px;
+          top: auto;
+          margin-top: 0;
+          height: 28px;
+          > div {
+            margin-right: 12px;
+            width: 28px;
+            height: 28px;
+            &:nth-last-child(1) {
+              margin-right: 16px;
+            }
+          }
+          .vh-iconfont {
+            font-size: 15px;
+          }
+        }
+        .pageGroup {
+          right: 50%;
+          bottom: 20px;
+          top: auto;
+          font-size: 14px;
+          height: 20px;
+          min-width: 45px;
+        }
+        .btn-pager {
+          width: 28px;
+          height: 28px;
+          .vh-iconfont {
+            font-size: 15px;
+          }
+          &--prev {
+            .vh-iconfont {
+              margin-right: 2px;
+            }
+          }
+          &--next {
+            .vh-iconfont {
+              margin-left: 2px;
+            }
+          }
+        }
+      }
+      &.rotate90 {
+        .tools {
+          left: 32px;
+          bottom: 248px;
+          top: auto;
+          right: auto;
+          margin-top: 0;
+          height: 56px;
+          transform-origin: left bottom;
+          transform: rotate(90deg) !important;
+          > div {
+            margin-right: 24px;
+            width: 56px;
+            height: 56px;
+          }
+          .btn-doc-fullscreen {
+          }
+          .btn-doc-restore {
+          }
+          .btn-doc-rotate {
+          }
+        }
+        .btn-pager {
+          transform: rotate(90deg) !important ;
+          left: calc(50% - 32px);
+          right: auto;
+          &--prev {
+            top: 32px;
+            bottom: auto;
+          }
+          &--next {
+            top: auto;
+            bottom: 32px;
+          }
+        }
+        .pageGroup {
+          transform-origin: center;
+          transform: translateY(-50%) rotate(90deg) !important;
+          bottom: auto;
+          top: 50%;
+          left: 12px;
+          right: auto;
+          margin-top: 0;
         }
       }
     }

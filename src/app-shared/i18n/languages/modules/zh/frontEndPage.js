@@ -391,7 +391,7 @@ export default {
     form_1042: '请输入详细地址',
     form_1043: '省/自治区/直辖市',
     form_1044: '区/县',
-    form_1045: '提交问卷',
+    form_1045: '提交',
     form_1046: '选择日期',
     form_1047: '选择日期+时间',
     form_1048: '选择时间',
@@ -538,7 +538,8 @@ export default {
     interact_tools_1081: '支付宝搜“红包”，输入口令',
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
-    interact_tools_1085: '领取Top10名单'
+    interact_tools_1085: '领取Top10名单',
+    interact_tools_1086: '公告'
   },
   setting: {
     setting_1002: '观看设置',
