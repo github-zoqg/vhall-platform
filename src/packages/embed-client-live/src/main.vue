@@ -252,7 +252,12 @@
         document.title = watchInitData.webinar.subject;
 
         const mockResult = (this.rootActive = watchInitData);
-        await this.getTools(mockResult.interact.room_id);
+        const promiseList = [
+          // 获取房间互动工具状态
+          this.getTools(mockResult.interact.room_id),
+          this.roomBaseServer.getCustomRoleName()
+        ];
+        await Promise.all(promiseList);
         console.log('%c------获取互动工具状态完成', 'color:blue');
         await useMsgServer().initMaintMsg({ hide: 1 });
         console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');

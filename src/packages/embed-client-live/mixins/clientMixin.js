@@ -120,7 +120,6 @@ export const clientMixin = {
           container && (container.style.opacity = 1);
           break;
         case 9: // 文档最小化
-          alert();
           this.exitFullscreen('#vhall-document-container');
           break;
         case 11: // 打开红包
