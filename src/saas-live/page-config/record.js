@@ -54,7 +54,7 @@ export default {
     ],
     emitMediaSettingClick: [
       {
-        cuid: 'comMediaSetting',
+        cuid: 'recordComMediaSetting',
         method: 'showMediaSetting'
       }
     ]
@@ -184,10 +184,10 @@ export default {
     component: 'VmpContainer',
     className: 'vmp-basic-right__bd'
   },
-  // 所有弹窗集合
+  // 【录制页面】所有弹窗集合
   recordComAllDialog: {
     component: 'VmpAirContainer',
-    children: ['recordDlgDocList', 'comMediaSetting']
+    children: ['recordDlgDocList', 'recordComMediaSetting']
   },
   // 文档列表对话框
   recordDlgDocList: {
@@ -200,18 +200,12 @@ export default {
       }
     ]
   },
-  comMediaSetting: {
+  // 【录制页面】媒体设置
+  recordComMediaSetting: {
     component: 'VmpPcMediaSetting',
     saveOptions: [
       {
-        cuid: 'comStreamLocal',
-        method: 'switchStreamType',
-        args: ['$0']
-      }
-    ],
-    changeMediaOption: [
-      {
-        cuid: 'comPcPlayerLiveYun',
+        cuid: 'recordComStreamLocal',
         method: 'switchStreamType',
         args: ['$0']
       }

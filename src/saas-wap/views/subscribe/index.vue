@@ -100,12 +100,21 @@
           await this.initReceiveLive(clientType);
           // 是否跳转预约页
           if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
+            // 如果往观看页跳转，需要清除暖场视频缓存
+            window.sessionStorage.removeItem('warm_recordId');
+            window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(clientType);
             return;
           }
           await subscribeState();
           bindWeiXin();
           console.log('%c---初始化直播房间 完成', 'color:blue');
+          if (
+            this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
+            this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
+          ) {
+            await roomBaseServer.getUnionConfig();
+          }
 
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;

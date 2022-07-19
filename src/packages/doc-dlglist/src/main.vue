@@ -94,7 +94,7 @@
                   <div class="doc-help-tips">
                     <p>1.支持的文档格式： doc/docx,xls/xlsx,ppt</p>
                     <p>/pptx,pdf,jpeg/jpg,png,bmp</p>
-                    <p>2.单份文档不能超过200页,不超过100M</p>
+                    <p>2.单份文档不能超过500页,不超过300M</p>
                     <p>3.如果ppt格式转换失败或文档打开失败请尝试</p>
                     <p>用office转为pdf后上传</p>
                     <p>4.直播过程中发现PPT自动翻页，请检查源文件</p>
@@ -126,7 +126,13 @@
               </el-input>
             </div>
             <div class="vmp-doc-cur__bd">
-              <el-table :data="dataList" style="width: 100%" height="370px">
+              <el-table
+                :data="dataList"
+                style="width: 100%"
+                height="370px"
+                @cell-mouse-enter="handleCellMouseEnter"
+                @cell-mouse-leave="handleCellMouseLeave"
+              >
                 <!-- 未搜索到数据展示 -->
                 <template slot="empty">
                   <img src="@/app-shared/assets/img/no-search.png" />
@@ -135,14 +141,23 @@
                 <!-- 表格展示 -->
                 <el-table-column prop="file_name" label="文档名称" width="180">
                   <template slot-scope="scope">
-                    <p class="file-name">
-                      <span
-                        class="vh-iconfont doc-icon"
-                        :class="scope.row.ext | fileIconCss(false)"
-                        :style="scope.row.ext | fileIconCss(true)"
-                      ></span>
-                      <span class="file-name__text">{{ scope.row.file_name }}</span>
-                    </p>
+                    <el-tooltip
+                      placement="top"
+                      :disabled="!isTextOverflow"
+                      :content="scope.row.file_name"
+                    >
+                      <p class="file-name custom-tooltip-content">
+                        <span
+                          class="vh-iconfont doc-icon"
+                          :class="scope.row.ext | fileIconCss(false)"
+                          :style="scope.row.ext | fileIconCss(true)"
+                        ></span>
+
+                        <span class="file-name__text">
+                          {{ scope.row.file_name }}
+                        </span>
+                      </p>
+                    </el-tooltip>
                   </template>
                 </el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
@@ -226,6 +241,8 @@
               class="vmp-doc-lib__table"
               @selection-change="handleChangeSelection"
               @select-all="handleChangeSelectall"
+              @cell-mouse-enter="handleCellMouseEnter"
+              @cell-mouse-leave="handleCellMouseLeave"
             >
               <!-- 未搜索到数据展示 -->
               <template slot="empty">
@@ -235,14 +252,21 @@
               <el-table-column type="selection" width="55" align="left"></el-table-column>
               <el-table-column prop="file_name" label="文档名称" width="180">
                 <template slot-scope="scope">
-                  <p class="file-name">
-                    <span
-                      class="vh-iconfont"
-                      :class="scope.row.ext | fileIconCss(false)"
-                      :style="scope.row.ext | fileIconCss(true)"
-                    ></span>
-                    {{ scope.row.file_name }}
-                  </p>
+                  <el-tooltip
+                    placement="top"
+                    :disabled="!isTextOverflow"
+                    :content="scope.row.file_name"
+                  >
+                    <p class="file-name custom-tooltip-content">
+                      <span
+                        class="vh-iconfont"
+                        :class="scope.row.ext | fileIconCss(false)"
+                        :style="scope.row.ext | fileIconCss(true)"
+                      ></span>
+
+                      <span>{{ scope.row.file_name }}</span>
+                    </p>
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column prop="created_at" label="创建时间" width="170"></el-table-column>
@@ -280,6 +304,7 @@
   import { useRoomBaseServer, useMsgServer, useDocServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
+  import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
   import _ from 'lodash';
 
   export default {
@@ -287,6 +312,7 @@
     components: {
       DocProgressStatus
     },
+    mixins: [tableCellTooltip],
     data() {
       return {
         dialogVisible: false,
@@ -600,8 +626,8 @@
         this.mode = 1;
       },
       beforeUpload(file) {
-        if (file.size / 1024 / 1024 > 100) {
-          this.$message.warning('上传文件不可大于100M');
+        if (file.size / 1024 / 1024 > 300) {
+          this.$message.warning('上传文件不可大于300M');
           return false;
         }
         const acceptFileTypes = /(jpe?g|png|pptx?|xlsx?|docx?|pdf|bmp)$/i;

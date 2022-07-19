@@ -273,6 +273,9 @@
         console.warn('监听到了计时器重置-------', e);
         clearInterval(this.timer);
         this.timerVisible = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDisTimerIcon', ['disTimer', false])
+        );
         // 关闭计时器
         // 主讲人助理打开计时设置弹框
         // this.$emit('disTimer', true);
