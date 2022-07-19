@@ -107,7 +107,7 @@
                   active-color="#fb3a32"
                   @change="onClickChat"
                 />
-                <span class="tip_only">仅针对个人生效</span>
+                <span class="tip_only">仅对个人生效</span>
               </div>
               <div
                 class="chat-setting-box__item switch-box join-chat-btn"
@@ -134,7 +134,7 @@
                 ></el-checkbox>
               </div>
               <div
-                class="chat-setting-box__item join-chat-btn"
+                class="chat-setting-box__item join-chat-btn join-chat-but-col"
                 @click="joinChatAuth"
                 v-if="configList['comment_check']"
               >
@@ -529,15 +529,15 @@
           position: absolute;
           bottom: 30px;
           right: -15px;
-          width: 236px;
-          padding: 24px 24px 10px;
+          width: 212px;
+          padding: 20px 24px 10px;
           border-radius: 4px;
           background-color: #fff;
           text-align: left;
           font-size: 12px;
           color: #555;
           .tip_only {
-            line-height: 31px;
+            line-height: 29px;
             color: #666;
             font-size: 12px;
             margin-left: 8px;
@@ -554,14 +554,14 @@
             margin-left: -13px;
           }
           &__item {
-            height: 40px;
-            line-height: 40px;
+            height: 29px;
+            line-height: 29px;
             padding-bottom: 4px;
             color: #1a1a1a;
           }
           &__item_switch {
             color: #1a1a1a;
-            line-height: 31px;
+            line-height: 29px;
           }
           .switch-box_bottom {
             padding-bottom: 6px;
@@ -569,6 +569,7 @@
           .el-checkbox {
             color: #1a1a1a;
             font-size: 12px;
+            margin-right: 22px;
             &.is-disabled {
               .el-checkbox__label {
                 color: #b3b3b3 !important;
@@ -583,6 +584,9 @@
               border-color: #fff;
             }
           }
+          .el-checkbox__label {
+            font-size: 12px;
+          }
           .el-checkbox__input.is-checked + .el-checkbox__label {
             color: #1a1a1a;
           }
@@ -590,11 +594,15 @@
             .switch-title {
               display: inline-block;
               vertical-align: middle;
-              margin-right: 4px;
+              margin-right: 8px;
             }
           }
           .join-chat-btn {
             border-top: 1px solid #e2e2e2;
+            padding-top: 6px;
+          }
+          .join-chat-but-col {
+            color: #3562fa;
           }
         }
       }
