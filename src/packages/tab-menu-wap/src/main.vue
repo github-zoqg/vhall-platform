@@ -158,9 +158,28 @@
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       }
     },
     watch: {
+      isWapBodyDocSwitch(val) {
+        const docTabIndex = this.menu.findIndex(item => item.type == 2);
+        if (val) {
+          // 备份一下，还原时候用
+          this._docTabNameCopy = this.menu[docTabIndex].name;
+          const tabName =
+            this.webinarInfo.mode == 1 ? this.$t('menu.menu_1015') : this.$t('menu.menu_1014');
+          this.$set(this.menu, docTabIndex, { ...this.menu[docTabIndex], name: tabName });
+        } else {
+          this.$set(this.menu, docTabIndex, {
+            ...this.menu[docTabIndex],
+            name: this._docTabNameCopy
+          });
+        }
+      },
       async 'visibleMenu.length'() {
         if (this.isEmbedVideo) return;
         await this.$nextTick();
@@ -342,11 +361,15 @@
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
+          // 如果文档播放器互换位置，不需要切换自定义菜单
+          if (this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_status', val => {
           console.log('dispatch_doc_switch_status', val);
+          // 如果文档播放器互换位置，不需要切换自定义菜单
+          if (this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         //监听进出子房间消息
@@ -369,6 +392,8 @@
         if (val) {
           const obj = this.getItem({ type: 2 });
           this.select({ type: obj.type, id: obj.id });
+        } else {
+          this.roomBaseServer.state.isWapBodyDocSwitch = false;
         }
       },
       /**
@@ -593,6 +618,7 @@
         const item = this.getItem({ type, id });
 
         this.selectedType = item.type;
+        this.menuServer.state.selectedType = type;
         this.selectedId = item.id;
         this.scrollToItem({ id: item.id });
         item.tipsVisible = false;

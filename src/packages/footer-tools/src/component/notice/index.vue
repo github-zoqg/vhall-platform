@@ -1,7 +1,9 @@
 <template>
   <div class="vmp-notice-list" v-show="isShowIcon && noticeNum">
     <div class="vmp-notice-list_icon">
-      <div class="icon-num">{{ noticeNum > 99 ? '99+' : noticeNum }}</div>
+      <div class="icon-num" v-if="noticeNum - noticeNumIsWatch">
+        {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
+      </div>
       <div class="icon-img" @click="getNoticeHistoryList">
         <img src="./img/notice-icon.png" alt="" class="show_img" />
       </div>
@@ -46,7 +48,8 @@
           pageNum: 1
         },
         totalPages: 0,
-        total: 0
+        total: 0,
+        noticeNumIsWatch: sessionStorage.getItem(this.$route.params.id) || 0
       };
     },
     computed: {
@@ -70,6 +73,7 @@
       initNotice() {
         const { groupInitData } = this.groupServer.state;
         this.noticeServer.$on('live_over', () => {
+          sessionStorage.setItem(this.$route.params.id, 0);
           this.isShowIcon = false;
         });
         // 结束讨论
@@ -104,6 +108,7 @@
       },
       getNoticeHistoryList() {
         this.isShowNotice = true;
+        this.showNoticeNum = false;
         this.getNoticeList(false);
       },
       getNoticeList(flag) {
@@ -120,6 +125,8 @@
             this.totalPages = this.noticeServer.state.totalPages;
             this.total = result.data.total;
             this.noticeNum = result.data.total;
+            sessionStorage.setItem(this.$route.params.id, this.noticeNum);
+            this.noticeNumIsWatch = this.noticeNum;
           }
         });
       },
