@@ -82,6 +82,10 @@
       this.setSkinInfo(this.skinInfo);
     },
     computed: {
+      // 是否在小组中
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
       // 热度
       hotNum() {
         return (
@@ -239,7 +243,7 @@
 
 <style lang="less">
   .vh-concise-header-box {
-    padding: 9px 24px;
+    padding: 16px 24px;
     &__1 {
       display: flex;
       justify-content: space-between;

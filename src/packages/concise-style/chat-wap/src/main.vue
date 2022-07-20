@@ -129,7 +129,7 @@
         allBanned: useChatServer().state.allBanned,
         //虚拟列表配置
         virtual: {
-          showlist: false,
+          showlist: true,
           contentHeight: 0
         },
         //聊天消息是否有滚动条
@@ -397,14 +397,14 @@
           this.$toast(this.$t('chat.chat_1007'));
         });
         //监听切换到当前tab
-        this.menuServer.$on('tab-switched', data => {
-          this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
-            this.virtual.showlist = data.cuid == this.cuid;
-            this.chatlistHeight = this.virtual.contentHeight;
-            this.scrollBottom();
-          });
+        // this.menuServer.$on('tab-switched', data => {
+        this.$nextTick(() => {
+          this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+          // this.virtual.showlist = data.cuid == this.cuid;
+          this.chatlistHeight = this.virtual.contentHeight;
+          this.scrollBottom();
         });
+        // });
         msgServer.$onMsg('ROOM_MSG', msg => {
           if (msg.data.type == 'live_start') {
             chatServer.clearChatMsg();
