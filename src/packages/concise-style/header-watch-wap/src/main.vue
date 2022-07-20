@@ -48,7 +48,23 @@
         </span>
       </section>
     </section>
-    <section class="vh-concise-header-box__1" v-else></section>
+    <section class="vh-concise-header-box__2" v-else>
+      <!-- 在线人数\热度 -->
+      <div class="host-user-info__middle-num">
+        <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+        <p v-if="watchInitData.online.show && watchInitData.status != 'subscribe'">
+          <i class="vh-iconfont vh-line-user"></i>
+          <span>{{ personCount | formatHotNum }}</span>
+        </p>
+        <p
+          class="host-user-info__middle-num__hot"
+          v-if="watchInitData.pv.show && watchInitData.status != 'subscribe' && !isInGroup"
+        >
+          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+          <span>{{ hotNum | formatHotNum }}</span>
+        </p>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -243,7 +259,7 @@
 
 <style lang="less">
   .vh-concise-header-box {
-    padding: 16px 24px;
+    padding: 16px 24px 0 24px;
     &__1 {
       display: flex;
       justify-content: space-between;
@@ -269,25 +285,6 @@
           line-height: 28px;
           color: #fff;
         }
-        &-num {
-          display: flex;
-          line-height: 20px;
-          font-size: 20px;
-          color: #fff;
-          margin-top: 8px;
-          &__hot {
-            margin-left: 12px;
-          }
-          .vh-line-user {
-            font-size: 20px;
-          }
-          .vh-saas-line-heat {
-            font-size: 20px;
-          }
-          p span {
-            margin-left: 4px;
-          }
-        }
       }
       &__attention {
         margin-left: 12px;
@@ -297,6 +294,25 @@
         font-size: 24px;
         line-height: 28px;
         background: linear-gradient(280.56deg, #fb2626 9.45%, #ff685f 90.39%);
+      }
+    }
+    .host-user-info__middle-num {
+      display: flex;
+      line-height: 20px;
+      font-size: 20px;
+      color: #fff;
+      margin-top: 8px;
+      &__hot {
+        margin-left: 12px;
+      }
+      .vh-line-user {
+        font-size: 20px;
+      }
+      .vh-saas-line-heat {
+        font-size: 20px;
+      }
+      p span {
+        margin-left: 4px;
       }
     }
     &__tool-box {
@@ -314,6 +330,20 @@
         i {
           color: #fff;
         }
+      }
+    }
+    &__2 {
+      display: flex;
+      align-items: center;
+      padding: 6px 16px;
+      width: 164px;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 40px;
+      margin-left: 24px;
+      margin-top: 16px;
+      .host-user-info__middle-num {
+        margin-top: 0;
       }
     }
   }
