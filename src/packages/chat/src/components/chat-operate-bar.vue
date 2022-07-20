@@ -69,80 +69,79 @@
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
         </div>
-      </div>
+        <div class="operate-container__tool-bar__right">
+          <template v-if="chatOptions && chatOptions.enableChatSetting">
+            <!--聊天设置-->
+            <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
+            <!--            {{ $t('common.common_1008') }}-->
+            <!--          </i>-->
+            <!-- 主持人不在小组或组长在小组显示聊天设置 -->
+            <div
+              class="chat-setting-btn--chat-auth"
+              v-if="
+                (roleName == 1 || roleName == 3 || roleName == 4) &&
+                !isInGroup &&
+                (configList['comment_check'] || configList['disable_msg'])
+              "
+            >
+              <i class="chat-setting-btn vh-iconfont vh-line-audit"></i>
+              <div class="chat-setting-box">
+                <div class="chat-setting-box__item_switch switch-box">
+                  <span class="switch-title">屏蔽特效</span>
+                  <el-switch
+                    class="switch"
+                    v-model="filterStatus.isShieldingEffects"
+                    inactive-color="#CECECE"
+                    active-color="#fb3a32"
+                    @change="onClickShieldingEffects"
+                  />
+                </div>
+                <div class="chat-setting-box__item_switch switch-box switch-box_bottom">
+                  <span class="switch-title">仅查看聊天内容</span>
+                  <el-switch
+                    class="switch"
+                    v-model="filterStatus.isChat"
+                    inactive-color="#CECECE"
+                    active-color="#fb3a32"
+                    @change="onClickChat"
+                  />
+                  <span class="tip_only">仅对个人生效</span>
+                </div>
+                <div
+                  class="chat-setting-box__item switch-box join-chat-btn"
+                  v-if="configList['disable_msg']"
+                >
+                  <span class="switch-title">全体禁言</span>
 
-      <div class="operate-container__tool-bar__right">
-        <template v-if="chatOptions && chatOptions.enableChatSetting">
-          <!--聊天设置-->
-          <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
-          <!--            {{ $t('common.common_1008') }}-->
-          <!--          </i>-->
-          <!-- 主持人不在小组或组长在小组显示聊天设置 -->
-          <div
-            class="chat-setting-btn--chat-auth"
-            v-if="
-              (roleName == 1 || roleName == 3 || roleName == 4) &&
-              !isInGroup &&
-              (configList['comment_check'] || configList['disable_msg'])
-            "
-          >
-            <i class="chat-setting-btn">聊天设置</i>
-            <div class="chat-setting-box">
-              <div class="chat-setting-box__item_switch switch-box">
-                <span class="switch-title">屏蔽特效</span>
-                <el-switch
-                  class="switch"
-                  v-model="filterStatus.isShieldingEffects"
-                  inactive-color="#CECECE"
-                  active-color="#fb3a32"
-                  @change="onClickShieldingEffects"
-                />
-              </div>
-              <div class="chat-setting-box__item_switch switch-box switch-box_bottom">
-                <span class="switch-title">仅查看聊天内容</span>
-                <el-switch
-                  class="switch"
-                  v-model="filterStatus.isChat"
-                  inactive-color="#CECECE"
-                  active-color="#fb3a32"
-                  @change="onClickChat"
-                />
-                <span class="tip_only">仅对个人生效</span>
-              </div>
-              <div
-                class="chat-setting-box__item switch-box join-chat-btn"
-                v-if="configList['disable_msg']"
-              >
-                <span class="switch-title">全体禁言</span>
-
-                <el-switch
-                  class="switch"
-                  :value="allBanned"
-                  inactive-color="#CECECE"
-                  active-color="#fb3a32"
-                  @change="toggleMutedAllStatus"
-                />
-              </div>
-              <div class="chat-setting-box__item" v-if="showBannedCheckbox">
-                <el-checkbox
-                  v-for="(item, index) in bannedMoudleList"
-                  :key="index"
-                  :label="item.name"
-                  v-model="item.status"
-                  :disabled="item.isDisable || !allBanned"
-                  @change="setAllBanned(allBanned)"
-                ></el-checkbox>
-              </div>
-              <div
-                class="chat-setting-box__item join-chat-btn join-chat-but-col"
-                @click="joinChatAuth"
-                v-if="configList['comment_check']"
-              >
-                进入聊天审核
+                  <el-switch
+                    class="switch"
+                    :value="allBanned"
+                    inactive-color="#CECECE"
+                    active-color="#fb3a32"
+                    @change="toggleMutedAllStatus"
+                  />
+                </div>
+                <div class="chat-setting-box__item" v-if="showBannedCheckbox">
+                  <el-checkbox
+                    v-for="(item, index) in bannedMoudleList"
+                    :key="index"
+                    :label="item.name"
+                    v-model="item.status"
+                    :disabled="item.isDisable || !allBanned"
+                    @change="setAllBanned(allBanned)"
+                  ></el-checkbox>
+                </div>
+                <div
+                  class="chat-setting-box__item join-chat-btn join-chat-but-col"
+                  @click="joinChatAuth"
+                  v-if="configList['comment_check']"
+                >
+                  进入聊天审核
+                </div>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </div>
     <div class="operate-container__input-bar">
@@ -483,11 +482,7 @@
         flex: 1;
       }
       &__right {
-        display: flex;
-        justify-content: flex-end;
-        flex: 1;
         .chat-setting-btn {
-          margin-right: 10px;
           font-size: 14px;
           color: #999;
           cursor: pointer;
@@ -498,8 +493,6 @@
         }
         .chat-setting-btn--chat-auth {
           position: relative;
-          display: inline-flex;
-          margin-right: 10px;
           font-size: 14px;
           color: #999;
           cursor: pointer;
@@ -527,8 +520,8 @@
         .chat-setting-box {
           display: none;
           position: absolute;
-          bottom: 30px;
-          right: -15px;
+          bottom: 26px;
+          left: -14px;
           width: 212px;
           padding: 20px 24px 10px;
           border-radius: 4px;

@@ -3,7 +3,6 @@
     <span @click="openSet">
       <i class="vh-iconfont vh-line-audit"></i>
     </span>
-    <!-- 问卷列表弹框 -->
     <van-popup
       class="chat_set_base"
       overlay-class="van-overlay_chat_set"
