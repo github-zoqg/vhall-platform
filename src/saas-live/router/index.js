@@ -98,8 +98,8 @@ router.beforeEach(async (to, from, next) => {
     window.$serverConfig = pageConfig[to.meta.page];
     window.$serverConfig._page = to.meta.page;
   }
-
-  const res = await grayInit(to);
+  const option = Object.assign({ source: 1, to }); //source   1:发起端 0:其他端  默认其他端 （其他端不返回版本信息）
+  const res = await grayInit(option);
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
