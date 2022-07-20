@@ -247,7 +247,10 @@
         let payAuthStatus = 0; //默认支付流程为非授权或授权后
         let params = {};
 
-        if (isWechat()) {
+        if (
+          isWechat() &&
+          this.$domainStore.state.roomBaseServer.configList['ui.hide_wechat'] == 0
+        ) {
           if (open_id) {
             // 微信正常授权过
             params = {
