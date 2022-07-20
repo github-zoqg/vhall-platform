@@ -554,6 +554,7 @@
       },
       // 聊天过滤
       filterChat() {
+        console.log(this.chatList, 'this.chatList');
         // 过滤特效
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitSetHideEffect', [
@@ -564,7 +565,9 @@
         if (sessionStorage.getItem('onlyShowSponsor') == 'true') {
           console.log('onlyShowSponsor');
           return (this.renderList = this.chatList.filter(
-            item => ![2, '2'].includes(item.roleName) && item.roleName
+            item =>
+              (![2, '2'].includes(item.roleName) && item.roleName) ||
+              ['lottery_result_notice', 'lottery_push'].includes(item.type)
           ));
         }
         // 实现仅查看聊天消息

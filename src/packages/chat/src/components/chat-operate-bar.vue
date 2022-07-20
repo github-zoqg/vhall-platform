@@ -270,7 +270,8 @@
         //过滤状态集合
         filterStatus: {
           //只看主办方
-          onlyShowSponsor: false,
+          onlyShowSponsor:
+            sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true' ? true : false,
           //屏蔽特效
           isShieldingEffects:
             sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true' ? true : false,
@@ -380,6 +381,10 @@
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
         this.$message.success(message);
+
+        sessionStorage.setItem('filterStatus_isOnlyShowSponsor', status);
+        this.filterStatus.onlyShowSponsor = status;
+
         this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效

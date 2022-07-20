@@ -195,7 +195,8 @@
         //礼物特效数组
         specialEffectsList: [],
         //只看主办方
-        isOnlyShowSponsor: false,
+        isOnlyShowSponsor:
+          sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true' ? true : false,
         //特效样式map
         effectsMap: {
           鲜花: 'bg-flower',
@@ -234,6 +235,7 @@
       //视图中渲染的消息
       renderList() {
         // 实现主看主办方效果
+        console.log(this.chatList, 'this.chatList');
         if (this.isOnlyShowSponsor) {
           return this.chatList.filter(item => ![2, '2'].includes(item.roleName));
         }
