@@ -121,7 +121,10 @@ router.beforeEach(async (to, from, next) => {
         );
       } else {
         // 版本一致或者没有配置版本
-        if (res.data.version == undefined && window.location.href.indexOf(VUE_APP_BUILD_VERSION)) {
+        if (
+          res.data.version == undefined &&
+          window.location.href.indexOf(VUE_APP_BUILD_VERSION) != -1
+        ) {
           // 如果没有服务配置版本并且地址栏有版本则跳转到无版本地址
           window.location.replace(`${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
         } else {
