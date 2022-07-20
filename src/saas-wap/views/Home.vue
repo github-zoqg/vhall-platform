@@ -35,6 +35,7 @@
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
+  import { setPage } from '../page-config/index';
 
   export default {
     name: 'Home',
@@ -129,6 +130,11 @@
             this.goSubscribePage(clientType);
             return;
           }
+
+          // TODO: 根据状态判断是极简风格还是传统风格
+          // concise-极简风格    main-传统风格
+          setPage('concise');
+
           await roomState();
 
           //微信相关设置

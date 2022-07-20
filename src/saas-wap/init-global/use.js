@@ -91,6 +91,10 @@ import VmpInviteHandup from '@/packages/inviteHandup';
 // 观看协议
 import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 
+// ------------------------------【极简风格】引入组件------start----------
+import VmpConciseChatWap from '@/packages/concise-style/chat-wap';
+// ------------------------------【极简风格】引入组件------end----------
+
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -139,3 +143,6 @@ Vue.use(VmpWapDesktopScreen);
 Vue.use(VmpWapInsertFIle);
 Vue.use(VmpInviteHandup);
 Vue.use(VmpViewRestrictionWap);
+// ------------------------------【极简风格】注册组件------start----------
+Vue.use(VmpConciseChatWap);
+// ------------------------------【极简风格】注册组件------end----------
