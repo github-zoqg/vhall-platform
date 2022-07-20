@@ -240,7 +240,7 @@
         // 实现仅查看聊天消息
         if (this.$refs.chatOperator?.filterStatus.isChat) {
           // undefined为历史聊天消息
-          return this.chatList.filter(item => ['text', 'image', undefined].includes(item.type));
+          return this.chatList.filter(item => ['text', 'image'].includes(item.type));
         }
         return this.chatList;
       },

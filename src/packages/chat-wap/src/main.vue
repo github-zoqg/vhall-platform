@@ -572,7 +572,7 @@
           console.log('only_isChat');
           // undefined为历史聊天消息
           return (this.renderList = this.chatList.filter(item =>
-            ['text', 'image', undefined].includes(item.type)
+            ['text', 'image'].includes(item.type)
           ));
         }
         return (this.renderList = this.chatList);
