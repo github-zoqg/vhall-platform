@@ -73,6 +73,12 @@
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
+          if (this.join_info.role_name == 4) {
+            window.vhallReportForProduct?.report(110162);
+          } else if (this.join_info.role_name == 2) {
+            // window.vhallReportForProduct?.report(110131);
+          }
+
           this.senderId = temp.sender_id;
           this.isConfirmVisible = true;
           this.waitTime = 30;
@@ -82,6 +88,9 @@
             this.waitTime--;
             this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
+              if (this.join_info.role_name == 4) {
+                window.vhallReportForProduct?.report(110167);
+              }
               this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
               this.btnText = this.$t('interact.interact_1010');
@@ -134,6 +143,9 @@
       },
       // 接受邀请
       confirmSave() {
+        if (this.join_info.role_name == 4) {
+          window.vhallReportForProduct?.report(110163);
+        }
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -141,6 +153,11 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (this.join_info.role_name == 4) {
+              window.vhallReportForProduct?.report(110164, {
+                report_extra: res
+              });
+            }
             if (res.code !== 200) {
               if (res.code == 513345) {
                 this.$message.warning(this.$t('interact.interact_1037'));
@@ -158,6 +175,9 @@
       },
       // 拒绝邀请
       closeConfirm() {
+        if (this.join_info.role_name == 4) {
+          window.vhallReportForProduct?.report(110165);
+        }
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -165,6 +185,11 @@
             extra_params: this.senderId
           })
           .then(res => {
+            if (this.join_info.role_name == 4) {
+              window.vhallReportForProduct?.report(110166, {
+                report_extra: res
+              });
+            }
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;

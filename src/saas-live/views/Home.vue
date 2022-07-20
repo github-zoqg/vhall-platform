@@ -20,6 +20,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType';
   import {
     Domain,
     useRoomBaseServer,
@@ -74,7 +75,11 @@
           pf: 8, // 客户端类型  web 网页端用 8
           business_uid: watchInitData.join_info.third_party_user_id, // B端客户 id
           user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）
-          webinar_id: watchInitData.webinar.id // 活动 id
+          webinar_id: watchInitData.webinar.id, // 活动 id
+          webinar_type: watchInitData.webinar.mode, // 直播类型
+          created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          role_name: watchInitData.join_info.role_name, //用户类型
+          ua: getBrowserType() // 浏览器信息
         });
         window.vhallReport.report('ENTER_WATCH');
         await roomState();

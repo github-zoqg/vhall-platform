@@ -241,6 +241,7 @@
         useMicServer()
           .userApply()
           .then(res => {
+            window.vhallReportForProduct?.report(110158, { report_extra: res });
             if (+res.code !== 200) {
               if (res.code == 513025) {
                 this.$message.error(
@@ -259,7 +260,11 @@
                 this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
                 clearInterval(this._applyInterval);
                 this.isApplying = false;
+                window.vhallReportForProduct?.report(110160);
                 const { code, msg } = await useMicServer().speakOff();
+                window.vhallReportForProduct?.report(110161, {
+                  report_extra: { code, msg }
+                });
                 if (code === 513035) {
                   this.$message.error(msg);
                 }
@@ -272,7 +277,8 @@
         window.vhallReportForProduct?.report(110152);
         useMicServer()
           .userCancelApply()
-          .then(() => {
+          .then(res => {
+            window.vhallReportForProduct?.report(110159, { report_extra: res });
             this.isApplying = false;
             this.applyTime = 30;
             clearInterval(this._applyInterval);
@@ -283,6 +289,9 @@
         window.vhallReportForProduct?.report(110132);
         // 下麦接口停止推流，成功之后执行下面的逻辑
         const { code, msg } = await useMicServer().speakOff();
+        window.vhallReportForProduct?.report(110156, {
+          report_extra: { code, msg }
+        });
         if (parseInt(this.roleName) !== 4) {
           if (code !== 200) {
             this.$message.error(msg);

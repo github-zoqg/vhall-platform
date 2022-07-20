@@ -653,6 +653,7 @@
         //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
         //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
         // }
+        window.vhallReportForProduct?.report(110169);
         if (setMainScreen) {
           this.setMainScreen();
         }
@@ -661,6 +662,9 @@
             receive_account_id: accountId || this.stream.accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.report(110170, {
+              report_extra: res
+            });
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {

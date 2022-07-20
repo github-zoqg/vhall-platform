@@ -1283,11 +1283,15 @@
         if (setMainScreen) {
           this.setMainScreen();
         }
+        window.vhallReportForProduct?.report(110176);
         this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId || this.joinInfo.third_party_user_id
           })
           .then(res => {
+            window.vhallReportForProduct?.report(110177, {
+              report_extra: res
+            });
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {

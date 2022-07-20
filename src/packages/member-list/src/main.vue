@@ -546,6 +546,9 @@
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
+              if (this.roleName == 1) {
+                window.vhallReportForProduct?.report(110179);
+              }
               handleApplyConnect(temp);
               break;
             case 'vrtc_connect_apply_cancel':
@@ -1417,13 +1420,16 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
+        //数据埋点--开启/关闭允许举手
+        window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
         this.micServer
           .setHandsUp(params)
           .then(res => {
+            window.vhallReportForProduct?.report(element.target.checked ? 110153 : 110154, {
+              report_extra: res
+            });
             console.log('switch-mic-status', res);
             if (res.code == 200) {
-              //数据埋点--开启/关闭允许举手
-              window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
               this.$message.success({ message: '设置成功' });
             }
           })
@@ -1552,7 +1558,11 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
+            window.vhallReportForProduct?.report(110174);
             this.micServer.userSpeakOn().then(res => {
+              window.vhallReportForProduct?.report(110175, {
+                report_extra: res
+              });
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
@@ -1664,11 +1674,20 @@
             });
         }
         //设置主讲人
+        if (this.userId == accountId) {
+          window.vhallReportForProduct?.report(110176); // 主持人将自己设为主讲人
+        } else {
+          window.vhallReportForProduct?.report(110169); // 主持人将嘉宾设为主讲人
+        }
         return this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.report(this.userId == accountId ? 110177 : 110170, {
+              report_extra: res
+            });
+
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {
@@ -1687,16 +1706,18 @@
           receive_account_id: accountId,
           type: 1 // 0=邀请上麦|1=邀请演示
         };
+        //数据埋点--邀请上麦
+        window.vhallReportForProduct?.report(110130);
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {
+            window.vhallReportForProduct?.report(110155, {
+              report_extra: res
+            });
             if (res.code == 200) {
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')
               } else {
-                //数据埋点--邀请上麦
-                window.vhallReportForProduct?.report(110130);
-
                 this.$message.success(this.$t('message.message_1034'));
               }
             } else {
