@@ -16,7 +16,7 @@ export default {
   },
   // 顶部组件
   comHeaderWatch: {
-    component: 'VmpHeaderWatchWap',
+    component: 'VmpConciseHeaderWatchWap',
     children: [],
     emitClickLogin: [
       {
