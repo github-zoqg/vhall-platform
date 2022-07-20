@@ -173,12 +173,13 @@
         if (!this.isLiving) return false;
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenSign'));
       },
-      // TODO: 支付拍照问题（暂时不能打开），打开红包弹窗
+      // 打开红包弹窗
+      // TODO:支付牌照问题
       openRedPacket() {
         console.log('点击红包');
         if (!this.isLiving) return false;
-        this.$message.warning('合规自查中，该功能暂不支持使用');
-        // window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
+        // this.$message.warning('合规自查中，该功能暂不支持使用');
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenRedPacket'));
       },
       handleQAPopup() {
         if (!this.isLiving) return false;
