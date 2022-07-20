@@ -6,7 +6,7 @@ export default {
   },
   comSubjectDialog: {
     component: 'VmpAirContainer',
-    children: ['compRegLogin', 'comSubjectShare']
+    children: ['compRegLogin', 'comSubjectShare', 'comSignUpForm', 'comWatchAuth']
   },
   // 顶部容器
   layerSubjectHeader: {
@@ -39,7 +39,27 @@ export default {
     children: ['comSubjectBody']
   },
   comSubjectBody: {
-    component: 'VmpSubjectBody'
+    component: 'VmpSubjectBody',
+    emitClickLogin: [
+      //登录弹窗
+      {
+        cuid: 'compRegLogin',
+        method: 'open'
+      }
+    ],
+    emitClickAuth: [
+      // 权限弹窗
+      {
+        cuid: 'comWatchAuth',
+        method: 'openAuthDialog',
+        args: ['$0']
+      }
+    ],
+    // 弹窗报名表单
+    emitClickOpenSignUpForm: {
+      cuid: 'comSignUpForm',
+      method: 'openModal'
+    }
   },
   // 登录注册组件
   compRegLogin: {
@@ -52,5 +72,17 @@ export default {
       isInviteShare: false, //分享是否展示邀请卡
       isSubjectShare: true
     }
+  },
+  // 鉴权弹窗
+  comWatchAuth: {
+    component: 'VmpWatchAuth'
+    // emitClickOpenSignUpForm: {
+    //   cuid: 'comSignUpForm',
+    //   method: 'openModal'
+    // }
+  },
+  comSignUpForm: {
+    component: 'VmpSignUpForm',
+    options: {}
   }
 };

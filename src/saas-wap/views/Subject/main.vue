@@ -158,6 +158,7 @@
           }
 
           this.detailInfo = res.data;
+          this.subjectServer.initSubjectInfo();
           this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {

@@ -66,6 +66,7 @@
 </template>
 <script>
   import { useSubjectServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubjectBody',
     data() {
@@ -129,8 +130,73 @@
         console.log(strArr.join(''), '???123232432');
         return strArr.join('');
       },
-      toDetail() {
-        console.log('123124235');
+      toDetail(id) {
+        let data = {
+          subject_id: id,
+          refer: this.$route.query.refer,
+          record_id: this.$route.query.record_id,
+          type: this.subjectDetailInfo.type,
+          verify_value: this.subjectDetailInfo.subject_verify,
+          ...this.$route.query
+        };
+        this.subjectServer.getSubjectWatchAuth(data).then(res => {
+          this.handleAuthErrorCode(res.code, res.msg);
+        });
+      },
+      handleAuthErrorCode(code, msg) {
+        let placeHolder = '';
+        switch (code) {
+          case 510008: // 未登录
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+            break;
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+            );
+            break;
+          case 512002:
+          case 512522:
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+            break;
+          case 512531:
+            // 邀请码
+            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1024');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512528:
+            // 密码
+            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1022');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512532:
+            //白名单
+            placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+            );
+            break;
+          case 512523:
+            // 付费
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
+            );
+            break;
+          default:
+            this.$message({
+              message: '验证失败' || msg,
+              showClose: true,
+              // duration: 0,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+            break;
+        }
       }
     }
   };
