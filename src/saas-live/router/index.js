@@ -116,10 +116,17 @@ router.beforeEach(async (to, from, next) => {
         res.data.version &&
         res.data.version != VUE_APP_BUILD_VERSION
       ) {
-        window.location.href = `${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`;
+        window.location.replace(
+          `${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`
+        );
       } else {
         // 版本一致或者没有配置版本
-        next();
+        if (res.data.version == undefined && window.location.href.indexOf(VUE_APP_BUILD_VERSION)) {
+          // 如果没有服务配置版本并且地址栏有版本则跳转到无版本地址
+          window.location.replace(`${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+        } else {
+          next();
+        }
       }
     } else {
       next({
