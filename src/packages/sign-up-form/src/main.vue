@@ -720,8 +720,8 @@
         isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
         //是否是预览
         isPreview: this.$route.path.indexOf('/live/signup') !== -1,
-        //活动id
-        webinarId: '',
+        // 活动ID 或者 专题ID
+        webinarOrSubjectId: '',
         //表单信息
         formInfo: {},
         //简介内容是否超长
@@ -1106,6 +1106,15 @@
             trigger: 'blur'
           }
         };
+      },
+      // 当前界面类型
+      signUpPageType() {
+        if (window.location.href.indexOf('/subject/') != -1) {
+          // 专题
+          return 'subject';
+        } else {
+          return 'webinar';
+        }
       }
     },
     beforeCreate() {
@@ -1119,6 +1128,15 @@
       }
     },
     methods: {
+      // 设置接口入参，是活动维度 还是 专题维度
+      setParamsIdByRoute(params) {
+        if (this.signUpPageType === 'webinar') {
+          params.webinar_id = this.webinarOrSubjectId;
+        } else if (this.signUpPageType === 'subject') {
+          params.subject_id = this.webinarOrSubjectId;
+        }
+        return params;
+      },
       //打开模态窗
       async openModal() {
         this.initViewData();
@@ -1129,8 +1147,8 @@
       },
       //独立报名表单的初始化逻辑
       async init() {
-        //因为是独立页面，活动id只能从路由取
-        this.webinarId =
+        //因为是独立页面，活动id/专题id只能从路由取
+        this.webinarOrSubjectId =
           this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
         await this.getWebinarType();
         this.getBaseInfo();
@@ -1138,26 +1156,23 @@
       },
       //获取活动类型
       getWebinarType() {
-        const params = {
-          webinar_id: this.webinarId
-        };
         return this.signUpFormServer
-          .getWebinarType(params)
+          .getWebinarType(this.setParamsIdByRoute({}))
           .then(res => {
             this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
             this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
-              window.location.href = `${window.location.origin}/${this.webinarId}`;
+              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
             }
           });
       },
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        //活动id
-        this.webinarId = webinar.id || '';
+        // 活动id
+        this.webinarOrSubjectId = webinar.id || '';
       },
       // 手机号验证
       validPhone(rule, value, callback) {
@@ -1244,10 +1259,7 @@
       },
       //初始化活动信息
       getBaseInfo() {
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getFormBaseInfo(params).then(res => {
+        this.signUpFormServer.getFormBaseInfo(this.setParamsIdByRoute({})).then(res => {
           const { code = '', data = {} } = res || {};
           if ([200, '200'].includes(code)) {
             if (res.data.tab_form_title) {
@@ -1286,10 +1298,7 @@
       //初始化表单问题信息
       getQuestionList() {
         const _this = this;
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getQuestionsList(params).then(res => {
+        this.signUpFormServer.getQuestionsList(this.setParamsIdByRoute({})).then(res => {
           // 按照 order_num 从小到大排序
           const list = res.data.ques_list.sort(this.compare('order_num'));
           !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
@@ -1537,7 +1546,11 @@
 
         //获取短信验证码
         if (this.mobileKey) {
-          const params = { webinar_id: this.webinarId, phone: phone, captcha: this.mobileKey };
+          let params = {
+            ...this.setParamsIdByRoute({}),
+            phone: phone,
+            captcha: this.mobileKey
+          };
           this.signUpFormServer.sendVerifyCode(params).then(() => {
             this.countDown(isForm);
           });
@@ -1639,7 +1652,7 @@
           if (valid) {
             let form = this.generateFormParams();
             const params = {
-              webinar_id: this.webinarId,
+              ...this.setParamsIdByRoute({}),
               form: JSON.stringify(form)
             };
             this.isPhoneValidate && (params.verify_code = this.form.code);
@@ -1683,7 +1696,7 @@
         this.$refs.verifyForm.validate(valid => {
           if (valid) {
             const params = {
-              webinar_id: this.webinarId,
+              ...this.setParamsIdByRoute({}),
               phone: this.verifyForm.phone,
               verify_code: this.verifyForm.code
             };
@@ -1724,12 +1737,9 @@
       },
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getWebinarType(params).then(res => {
+        this.signUpFormServer.getWebinarType(this.setParamsIdByRoute({})).then(res => {
           if (res.code == 512503 || res.code == 512502) {
-            window.location.href = `${window.location.origin}/${this.webinarId}`;
+            window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
             return false;
           }
           // 如果是独立链接，判断状态进行跳转
@@ -1739,7 +1749,7 @@
               window.location.href =
                 window.location.origin +
                 process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinarId}${queryString}`;
+                `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
             } else {
               // 如果预约或结束，跳转到预约页
               if (res.data.webinar.type == 2 && isSubmitForm) {
@@ -1756,7 +1766,7 @@
                       window.location.href =
                         window.location.origin +
                         process.env.VUE_APP_WEB_KEY +
-                        `/lives/subscribe/${this.webinarId}${queryString}`;
+                        `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
                     }
                   }
                 );
@@ -1764,7 +1774,7 @@
                 window.location.href =
                   window.location.origin +
                   process.env.VUE_APP_WEB_KEY +
-                  `/lives/subscribe/${this.webinarId}${queryString}`;
+                  `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
               }
             }
           } else {
