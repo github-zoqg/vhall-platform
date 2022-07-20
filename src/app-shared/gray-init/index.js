@@ -11,7 +11,7 @@ export default function grayInit(options) {
       roomApi.webinar
         .webinarInitBefore({
           webinar_id: options.params.id,
-          soucre: options.source
+          source: options.source
         })
         .then(res => {
           const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
