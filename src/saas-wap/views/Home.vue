@@ -1,9 +1,9 @@
 <template>
   <div
-    class="vmp-basic-layout"
-    :class="{
-      'vmp-basic-layout__noHeader': !showHeader
-    }"
+    :class="[
+      { 'vmp-basic-layout__noHeader': !showHeader },
+      isConcise ? 'vmp-concise-layout' : 'vmp-basic-layout'
+    ]"
   >
     <van-loading
       v-show="state === 0"
@@ -45,7 +45,8 @@
     data() {
       return {
         state: 0,
-        liveErrorTip: ''
+        liveErrorTip: '',
+        isConcise: true
       };
     },
     computed: {

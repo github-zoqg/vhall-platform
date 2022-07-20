@@ -35,7 +35,8 @@ export default {
   // 颈部容器
   layerNeck: {
     component: 'VmpContainer',
-    className: 'vmp-basic-neck'
+    className: 'vmp-basic-neck',
+    children: ['comNoticeWap']
   },
   // 中间主区域容器
   layerBody: {
@@ -82,7 +83,7 @@ export default {
   },
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
-    children: ['comChatWap', 'comContainerRight', 'comNoticeWap']
+    children: ['comChatWap', 'comContainerRight']
   },
   // comTabMenuWap: {
   //   component: 'VmpTabMenuWap',
