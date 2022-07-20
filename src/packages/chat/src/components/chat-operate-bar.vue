@@ -486,10 +486,6 @@
           font-size: 14px;
           color: #999;
           cursor: pointer;
-          &:hover {
-            color: @font-error;
-            cursor: pointer;
-          }
         }
         .chat-setting-btn--chat-auth {
           position: relative;
@@ -654,7 +650,7 @@
           color: @active-color;
         }
         &:hover {
-          color: @active-color;
+          color: @font-error;
           cursor: pointer;
         }
         &.pic-disabled {
@@ -679,10 +675,6 @@
         font-size: 18px;
         color: #999;
         margin-left: 0;
-        &:hover {
-          color: @active-color;
-          cursor: pointer;
-        }
       }
     }
     .operate-container__input-bar {
