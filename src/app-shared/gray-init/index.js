@@ -10,7 +10,8 @@ export default function grayInit(options) {
     if (options.meta.grayType == 'webinar') {
       roomApi.webinar
         .webinarInitBefore({
-          webinar_id: options.params.id
+          webinar_id: options.params.id,
+          soucre: options.source
         })
         .then(res => {
           const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
@@ -38,48 +39,6 @@ export default function grayInit(options) {
           resolve({
             code: res.response.status
           });
-        });
-    } else if (options.meta.grayType == 'user') {
-      const grayUserId = options.params.id || null;
-      setGrayUserId(grayUserId);
-      resolve();
-    } else {
-      setGrayUserId(null);
-      resolve();
-    }
-  });
-}
-
-/**
- * 通过中台接口来走灰度
- */
-export function grayInitByMiddle(options) {
-  return new Promise(resolve => {
-    if (options.meta.grayType == 'webinar') {
-      roomApi.webinar
-        .webinarInitBeforeByMiddle({
-          webinar_id: options.params.id
-        })
-        .then(res => {
-          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
-          setGrayUserId(grayUserId);
-          resolve(res);
-        })
-        .catch(res => {
-          resolve(res);
-        });
-    } else if (options.meta.grayType == 'subject') {
-      roomSubjectApi.subject
-        .subjectInitBefore({
-          subject_id: options.query.id
-        })
-        .then(res => {
-          const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
-          setGrayUserId(grayUserId);
-          resolve(res);
-        })
-        .catch(res => {
-          resolve(res);
         });
     } else if (options.meta.grayType == 'user') {
       const grayUserId = options.params.id || null;
