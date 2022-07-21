@@ -50,16 +50,19 @@
     </section>
     <section class="vh-concise-header-box__2" v-else>
       <!-- 在线人数\热度 -->
-      <div class="host-user-info__middle-num">
+      <div
+        class="host-user-info__middle-num"
+        v-if="
+          watchInitData.status != 'subscribe' &&
+          (watchInitData.online.show || (watchInitData.pv.show && !isInGroup))
+        "
+      >
         <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-        <p v-if="watchInitData.online.show && watchInitData.status != 'subscribe'">
+        <p v-if="watchInitData.online.show">
           <i class="vh-iconfont vh-line-user"></i>
           <span>{{ personCount | formatHotNum }}</span>
         </p>
-        <p
-          class="host-user-info__middle-num__hot"
-          v-if="watchInitData.pv.show && watchInitData.status != 'subscribe' && !isInGroup"
-        >
+        <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show && !isInGroup">
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
           <span>{{ hotNum | formatHotNum }}</span>
         </p>
