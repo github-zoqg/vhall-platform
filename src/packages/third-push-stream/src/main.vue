@@ -290,6 +290,7 @@
       border-radius: 4px;
       padding: 24px;
       box-sizing: border-box;
+      color: #1a1a1a;
       &.streamModal2 {
         .input-item label {
           min-width: 68px;
@@ -406,6 +407,10 @@
           text-align: right;
           .vh-iconfont {
             cursor: pointer;
+            color: #666;
+            &:hover {
+              color: #1a1a1a;
+            }
           }
         }
       }
