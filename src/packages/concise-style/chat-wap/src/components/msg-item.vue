@@ -21,10 +21,10 @@
               )
             "
           >
-            {{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
+            {{ source.roleName != 1 ? overHidden(source.nickname, 6) : '' }}
           </template>
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
@@ -60,36 +60,13 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
-          {{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
+          {{ source.roleName != 1 ? overHidden(source.nickname, 6) : '' }}
+          &nbsp;
           {{ source.content.text_content }}
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
-        </div>
-      </div>
-    </template>
-    <!-- 打赏 -->
-    <template v-else-if="source.type == 'reward_pay_ok'">
-      <div class="msg-item new-gift reward_pay_ok">
-        <div class="interact-gift-box">
-          <div>
-            <div class="flex-box">
-              <p class="new-gift-name">
-                {{ source.nickName | overHidden(8) }}
-              </p>
-              <p class="new-gift-content">
-                {{ $t('chat.chat_1029') }}
-              </p>
-              <img
-                class="new-award-img"
-                :src="require('@/app-shared/assets/img/wap/chat/reward.png')"
-              />
-            </div>
-            <div class="reward_txt">
-              {{ source.content.text_content | overHidden(10) }}
-            </div>
-          </div>
         </div>
       </div>
     </template>
@@ -451,7 +428,29 @@
       padding: 0 0 16px;
       display: flex;
       align-items: flex-start;
-
+      .nickname {
+        font-size: 26px;
+      }
+      .role {
+        width: fit-content;
+        height: 30px;
+        max-height: 30px;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 8px;
+        padding: 0 8px;
+        border-radius: 16px;
+        font-size: 20px;
+        &.host {
+          background-color: #fb2626;
+        }
+        &.assistant {
+          background-color: #0a7ff5;
+        }
+        &.guest {
+          background-color: #0a7ff5;
+        }
+      }
       .msg-content {
         position: relative;
         .msg-content_body {
@@ -463,29 +462,6 @@
           color: #fff;
           font-size: 26px;
           max-width: 520px;
-          .nickname {
-            font-size: 26px;
-          }
-          .role {
-            width: fit-content;
-            height: 30px;
-            max-height: 30px;
-            text-align: center;
-            line-height: 30px;
-            margin-right: 8px;
-            padding: 0 8px;
-            border-radius: 16px;
-            font-size: 20px;
-            &.host {
-              background-color: #fb2626;
-            }
-            &.assistant {
-              background-color: #0a7ff5;
-            }
-            &.guest {
-              background-color: #0a7ff5;
-            }
-          }
           > .normal-msg {
             > .textInfo {
               line-height: 1.46;
@@ -603,20 +579,13 @@
         &.red {
           background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
         }
-        &.reward_pay_ok {
-          .interact-gift-box {
-            height: 88px;
-            padding: 0 74px 0 24px;
-            .reward_txt {
-              line-height: 1;
-              margin-top: 4px;
-            }
-          }
-        }
-        > .interact-gift-box {
-          position: relative;
+        > div {
           background: rgba(0, 0, 0, 0.25);
           border-radius: 20px;
+          position: relative;
+          font-size: 26px;
+        }
+        > .interact-gift-box {
           padding: 0 60px 0 16px;
           text-align: left;
           width: 100%;
@@ -625,14 +594,9 @@
           justify-content: center;
           align-items: center;
           border: none;
-          font-size: 26px;
+
           &.zdy {
             padding-right: 68px;
-          }
-          .flex-box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
           }
           .gift-zdy {
             width: 36px;
@@ -651,87 +615,27 @@
             right: 16px;
           }
         }
-        .new-gift-img,
-        .new-award-img {
-          width: 60px;
-          position: absolute;
-          right: 24px;
-        }
-        .reward_txt {
-          color: #d67900;
-          font-size: 28px;
+        > .interact-msg {
+          padding: 3px 16px;
+          border-width: 0;
+          height: 46px;
           line-height: 40px;
-          text-align: center;
-        }
-      }
-      .interact-msg {
-        padding: 4px 24px;
-        position: relative;
-        border-width: 0;
-        height: 48px;
-        line-height: 40px;
-        &.pwd_red_envelope_ok {
-          display: flex;
-          align-items: center;
-          padding-left: 84px;
-        }
-        .interact-content__role-name {
-          color: @font-link;
-          background-color: rgba(53, 98, 250, 0.2);
-          border-radius: 9px;
-          padding: 4px 8px;
-          font-size: 22px;
-          line-height: 16px;
-          margin: 2px 4px 0;
-          border-radius: 500px;
-          &.host {
-            background: rgba(251, 38, 38, 0.1);
-            color: #fb2626;
+          &.pwd_red_envelope_ok {
+            display: flex;
+            align-items: center;
+            padding-left: 60px;
           }
-          &.assistant {
-            background: rgba(173, 225, 255, 0.5);
+          .highlight {
             color: #0a7ff5;
           }
-          &.guest {
-            background: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+          .new-award-img {
+            width: 36px;
+            position: absolute;
+            left: 16px;
           }
         }
-        input {
-          background-color: transparent;
-          position: relative;
-          z-index: 1;
-        }
-        &::after {
-          content: ' ';
-          width: 200%;
-          height: 200%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          transform: scale(0.5);
-          transform-origin: 0 0;
-          box-sizing: border-box;
-          border-radius: 500px;
-        }
-        color: #262626;
-        p {
-          text-align: center;
-          line-height: 1;
-        }
-        .highlight {
-          padding-left: 10px;
-          color: #0a7ff5;
-        }
-        .reward-text {
-          margin-top: 13px;
-        }
-        .new-award-img {
-          width: 60px;
-          position: absolute;
-          left: 24px;
-        }
       }
+
       .question_msg_bg {
         padding: 10px 24px;
         background: rgba(255, 209, 201, 0.2);
@@ -739,88 +643,6 @@
         &::after {
           border: 0 !important;
         }
-      }
-    }
-    .new-gift {
-      padding-left: 0;
-      position: relative;
-      display: block;
-      &.interact {
-        justify-content: unset;
-      }
-      &.purpose {
-        background: linear-gradient(221deg, rgba(184, 58, 244, 0) 0%, #6950fb 100%);
-      }
-      &.red {
-        background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
-      }
-
-      .interact-gift-box {
-        padding: 0 84px 0 24px;
-        text-align: left;
-        width: 100%;
-        height: 48px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: none;
-        position: relative;
-        &.zdy {
-          padding-right: 90px;
-        }
-        p {
-          text-align: left;
-          font-weight: 400;
-          color: #fff;
-        }
-        .new-gift-name {
-          font-size: 28px;
-          margin-right: 8px;
-          color: #595959;
-        }
-        .new-gift-content {
-          font-size: 28px;
-          // transform: scale(0.9);
-          color: #262626;
-        }
-        .flex-box {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .gift-zdy {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          position: absolute;
-          right: 24px;
-          background-color: white;
-          background-size: contain;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-      }
-      &.reward_pay_ok {
-        .interact-gift-box {
-          height: 88px;
-          padding: 0 74px 0 24px;
-          .reward_txt {
-            line-height: 1;
-            margin-top: 4px;
-          }
-        }
-      }
-      .new-gift-img,
-      .new-award-img {
-        width: 60px;
-        position: absolute;
-        right: 24px;
-      }
-      .reward_txt {
-        color: #d67900;
-        font-size: 28px;
-        line-height: 40px;
-        text-align: center;
       }
     }
     .margin-top-bottom {
@@ -839,4 +661,3 @@
     }
   }
 </style>
-width: 40px;
