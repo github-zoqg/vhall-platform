@@ -1,6 +1,13 @@
 <template>
-  <div class="com-zan">
-    <span :class="['com-zan-icon', `com-zan-icon-0${imgType}`, 'zan-animation-01']"></span>
+  <div class="vmp-zan-zone">
+    <span
+      v-for="(item, idx) in eleList"
+      :key="idx"
+      class="vmp-zan-icon-wrapper"
+      :class="item.toTopAnimation"
+    >
+      <span :class="['vmp-zan-icon', `${item.icon}`, 'shake1']"></span>
+    </span>
   </div>
 </template>
 
@@ -8,179 +15,164 @@
   /**
    * @description 点赞动画效果组件
    */
+
+  /**
+   * @description 随机算法闭包生成封装
+   * @param array Array随机的总数据池
+   * @returns Function 随机算法闭包
+   */
+  function randomAlgorithmFactory(array) {
+    const randomBase = Math.ceil(array.length / 2); // 随机选择前半边的元素
+    return function () {
+      const idx = Math.floor(randomBase * Math.random());
+      const eleArr = array.splice(idx, 1); // 选中的元素摘除
+      const ele = eleArr[0];
+      array.push(ele); // 塞到队尾
+      return ele;
+    };
+  }
+  const iconList = ['happy', 'balloon', '666', 'star', 'microphone', 'love', 'likes2', 'likes']; //图标列表
+  const toTopAnimations = [
+    'zan-animation-01',
+    'zan-animation-02',
+    'zan-animation-03',
+    'zan-animation-04'
+  ];
+  const shakeAnimations = ['shake-animation-01', 'shake-animation-02', 'shake-animation-03'];
+  const pickIcon = randomAlgorithmFactory(iconList); // 挑选向上动画
+  const pick2TopAnimations = randomAlgorithmFactory(toTopAnimations); // 挑选向上动画
+  const pickShakeTopAnimations = randomAlgorithmFactory(shakeAnimations); // 挑选左右摇摆动画
+  export function hhhhh() {
+    const toTopAnimation = pick2TopAnimations();
+    console.log(toTopAnimation);
+    eleList.push({
+      icon: pickIcon(),
+      toTopAnimation: pick2TopAnimations(),
+      shakeTopAnimations: ''
+      // shakeTopAnimations: pickShakeTopAnimations()
+    });
+    // 及时删除第一个被占位的元素
+    const st = setTimeout(() => {
+      // eleList.shift();
+      clearTimeout(st);
+    }, 2000);
+  }
+  const eleList = []; // 元素列表
   export default {
     name: 'pariseAE',
-    props: {
-      imgName: {
-        type: String,
-        default: 'happy' // 默认必须有图
-      }
+    data() {
+      return {
+        eleList
+      };
     }
   };
 </script>
 
 <style lang="less">
-  .com-zan {
+  .vmp-zan-zone {
     position: fixed;
     right: 0;
-    bottom: 0;
+    bottom: 100px; //底部栏94px
     display: block;
     width: 100px;
-    height: 100px;
-    pointer-events: none; // 不可点击交互
-    transform: translateY(-100%);
+    height: 650px;
+    // pointer-events: none; // 不可点击交互
+    // transform: translateY(-100%);
+    background: yellow;
     z-index: 1000;
-    .com-zan-icon {
+    // overflow: hidden;
+    .vmp-zan-icon-wrapper {
       position: absolute;
-      top: 0;
+      display: block; // 定位需要
+      bottom: 0;
       left: 0;
-      display: block;
+      opacity: 0; // 防止动画结束后回到原先位置占位
+      // transform: translate3d(0, 50px, 0);
+    }
+    // 内部图标
+    .vmp-zan-icon {
+      display: inline-block;
       width: 70px;
       height: 70px;
-      opacity: 0;
+      position: relative;
       background-size: contain;
       background-repeat: no-repeat;
-      transform: translate3d(0, 50px, 0);
     }
     .zan-animation-01 {
-      animation: topFrame1 2s linear 0s;
+      animation: toTop 2s linear 0s;
     }
     .zan-animation-02 {
-      animation: topFrame2 2s linear 0s;
+      animation: toTop 1.8s linear 0s;
     }
-    .com-zan-icon-01 {
-      background-image: url('./img/zan-con01.png');
-      width: 100px;
-      height: 100px;
+    .zan-animation-03 {
+      animation: toTop 1.6s linear 0s;
     }
-    .com-zan-icon-02 {
-      background-image: url('./img/zan-con02.png');
+    .zan-animation-04 {
+      animation: toTop 1.4s linear 0s;
     }
-    .com-zan-icon-03 {
-      width: 80px;
-      height: 80px;
-      background-image: url('./img/zan-con03.png');
+    // 图片样式
+    @iconList: happy, balloon, 666, star, microphone, love, likes2, likes;
+    // less的index是从1开始到length
+    .loop(@i: 1) when(@i <= length(@iconList)) {
+      @iconName: extract(@iconList, @i); // extract取数组的第i个元素
+      .vmp-zan-icon.@{iconName} {
+        background-image: ~'url(./img/@{iconName}.png)';
+      }
+      .loop(@i + 1);
     }
-    .com-zan-icon-04 {
-      width: 40px;
-      height: 40px;
-      background-image: url('./img/zan-con04.png');
-    }
-    .com-zan-icon-05 {
-      background-image: url('./img/zan-con05.png');
-    }
-    .com-zan-icon-06 {
-      width: 80px;
-      height: 80px;
-      background-image: url('./img/zan-con06.png');
-    }
-    .com-zan-icon-07 {
-      width: 60px;
-      height: 60px;
-      background-image: url('./img/zan-con07.png');
-    }
+    .loop();
   }
-  @keyframes topFrame1 {
+  .shake1 {
+    animation: shake1 2s linear 0s;
+  }
+  // 向上移动动画
+  @keyframes toTop {
     0% {
-      top: 0px;
+      bottom: -40px;
       opacity: 1;
+      transform: scale(0);
     }
     10% {
-      top: -60px;
-      left: -20px;
-    }
-    20% {
-      top: -120px;
-      // left: 0px;
-    }
-    30% {
-      top: -180px;
-      left: 0px;
-      // right: -20px;
-    }
-    40% {
-      top: -240px;
-      // right: 0;
+      bottom: -20px;
+      opacity: 1;
+      transform: scale(1);
     }
     50% {
-      top: -300px;
-      // left: -20px;
-      right: -20px;
+      bottom: 300px;
     }
     60% {
-      top: -360px;
-      // left: 0;
+      bottom: 360px;
       opacity: 0.8;
     }
     70% {
-      top: -420px;
-      left: 0;
-      // right: -20px;
-      // opacity: 0.8;
+      bottom: 420px;
     }
     80% {
-      top: -480px;
-      right: 0;
-      // opacity: 0.8;
+      bottom: 480px;
     }
     90% {
-      top: -600px;
-      left: -20px;
-      opacity: 0.4;
+      bottom: 600px;
     }
     100% {
-      top: -660px;
-      left: 0;
+      bottom: 660px;
       opacity: 0;
     }
   }
-  @keyframes topFrame2 {
+  @keyframes shake1 {
     0% {
-      top: -60px;
-      opacity: 1;
-    }
-    10% {
-      top: -120px;
-      right: -20px;
-    }
-    20% {
-      top: -180px;
-      right: 0px;
-    }
-    30% {
-      top: -240px;
-      left: -20px;
-    }
-    40% {
-      top: -300px;
       left: 0;
+    }
+    25% {
+      left: -20px;
     }
     50% {
-      top: -360px;
-      right: -20px;
+      left: 0;
     }
-    60% {
-      top: -420px;
-      right: 0;
-    }
-    70% {
-      top: -480px;
+    75% {
       left: -20px;
     }
-    80% {
-      top: -540px;
-      left: 0;
-      opacity: 0.8;
-    }
-    90% {
-      top: -600px;
-      right: -20px;
-      opacity: 0.4;
-    }
     100% {
-      top: -660px;
-      right: 0;
-      opacity: 0;
+      left: 0;
     }
   }
 </style>

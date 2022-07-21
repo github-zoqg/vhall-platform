@@ -1,22 +1,29 @@
 <template>
-  <div class="vhall-praise">
-    <div ref="dianzan" class="v-praise-dom" @touchstart="support">
-      <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
-      <img class="tool givealike-img" v-else src="../img/icon_like.png" />
+  <div>
+    <div class="vhall-praise">
+      <div ref="dianzan" class="v-praise-dom" @touchstart="support">
+        <img class="tool givealike-img" v-if="like" src="../img/icon_like0.png" />
+        <img class="tool givealike-img" v-else src="../img/icon_like.png" />
+      </div>
+      <span v-if="like" class="like" :class="like < 10 ? 'single' : ''">
+        {{ like | transformWatchPraise }}
+      </span>
+      <div class="like-effect">
+        <div class="hello"></div>
+      </div>
     </div>
-    <span v-if="like" class="like" :class="like < 10 ? 'single' : ''">
-      {{ like | transformWatchPraise }}
-    </span>
-    <div class="like-effect">
-      <div class="hello"></div>
-    </div>
+    <PariseAE />
   </div>
 </template>
 <script>
   import { usePraiseServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+  import PariseAE, { hhhhh } from './pariseAE';
 
   const timeId = null;
   export default {
+    components: {
+      PariseAE
+    },
     data() {
       return {
         timess: 0,
@@ -83,7 +90,8 @@
         // doms.addEventListener('animationend', function () {
         //   this.outerHTML = '';
         // });
-        this.$zan();
+        // this.$zan();
+        hhhhh();
         this.timess++;
         this.like = this.like + 1;
         // this.$forceUpdate();
