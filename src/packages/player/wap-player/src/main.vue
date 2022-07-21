@@ -328,11 +328,12 @@
   </div>
 </template>
 <script>
-  import { isMse } from './js/utils';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
