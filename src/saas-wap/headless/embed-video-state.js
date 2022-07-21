@@ -28,7 +28,8 @@ export default async function () {
       });
     }),
     //多语言接口
-    roomBaseServer.getLangList()
+    roomBaseServer.getLangList(),
+    roomBaseServer.getUnionConfig()
   ];
   virtualAudienceServer.init();
 

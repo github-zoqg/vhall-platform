@@ -255,8 +255,8 @@
           imgUrl: this.webinarInfo.avatar
         };
         const wechatRes = await initWeChatSdk(initData, shareData);
-        const shareSuccessStr = this.$t('webinar.webinar_1038');
-        wechatRes.isSuccess && this.$toast(shareSuccessStr);
+        // const shareSuccessStr = this.$t('webinar.webinar_1038');
+        // wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       // 记录生成邀请卡, /create-invite-self-relation 传递了join_id
       async submitCreateHistory(join_id) {
