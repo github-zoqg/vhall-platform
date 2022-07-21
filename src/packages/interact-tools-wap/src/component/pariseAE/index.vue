@@ -32,7 +32,16 @@
     };
   }
   const eleList = []; // 元素列表
-  const iconList = ['happy', 'balloon', '666', 'star', 'microphone', 'love', 'likes2', 'likes']; //图标列表
+  const iconList = [
+    'happy',
+    'balloon',
+    'quitegood',
+    'star',
+    'microphone',
+    'love',
+    'likes2',
+    'likes'
+  ]; //图标列表
   const toTopAnimations = [
     'zan-animation-01',
     'zan-animation-02',
@@ -118,7 +127,7 @@
       animation: toTop 1.4s linear 0s;
     }
     // 图片样式
-    @iconList: happy, balloon, 666, star, microphone, love, likes2, likes;
+    @iconList: happy, balloon, quitegood, star, microphone, love, likes2, likes;
     // less的index是从1开始到length
     .loop(@i: 1) when(@i <= length(@iconList)) {
       @iconName: extract(@iconList, @i); // extract取数组的第i个元素
