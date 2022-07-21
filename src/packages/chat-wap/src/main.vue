@@ -565,9 +565,7 @@
         if (sessionStorage.getItem('onlyShowSponsor') == 'true') {
           console.log('onlyShowSponsor');
           return (this.renderList = this.chatList.filter(
-            item =>
-              (![2, '2'].includes(item.roleName) && item.roleName) ||
-              ['lottery_result_notice', 'lottery_push'].includes(item.type)
+            item => ![2, '2'].includes(item.roleName)
           ));
         }
         // 实现仅查看聊天消息

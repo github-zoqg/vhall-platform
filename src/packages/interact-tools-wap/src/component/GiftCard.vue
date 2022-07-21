@@ -130,6 +130,7 @@
             gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
             source_status: msg.data.source_status
           },
+          roleName: 2,
           type: 'gift_send_success',
           interactToolsStatus: true
         };

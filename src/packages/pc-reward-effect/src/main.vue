@@ -195,6 +195,7 @@
               source_status: msg.data.source_status
             },
             type: 'gift_send_success',
+            roleName: 2,
             interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);

@@ -705,9 +705,6 @@
         }
       }
       .question_msg_bg {
-        padding: 10px 24px;
-        background: rgba(255, 209, 201, 0.2);
-        border-radius: 500px;
         &::after {
           border: 0 !important;
         }
