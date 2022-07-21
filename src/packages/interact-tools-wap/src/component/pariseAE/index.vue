@@ -1,12 +1,12 @@
 <template>
   <div class="vmp-zan-zone">
     <span
-      v-for="(item, idx) in eleList"
-      :key="idx"
+      v-for="item in eleList"
+      :key="item.uuid"
       class="vmp-zan-icon-wrapper"
       :class="item.toTopAnimation"
     >
-      <span :class="['vmp-zan-icon', `${item.icon}`, 'shake1']"></span>
+      <span :class="['vmp-zan-icon', `${item.icon}`, `${item.shakeTopAnimations}`]"></span>
     </span>
   </div>
 </template>
@@ -31,6 +31,7 @@
       return ele;
     };
   }
+  const eleList = []; // 元素列表
   const iconList = ['happy', 'balloon', '666', 'star', 'microphone', 'love', 'likes2', 'likes']; //图标列表
   const toTopAnimations = [
     'zan-animation-01',
@@ -38,26 +39,35 @@
     'zan-animation-03',
     'zan-animation-04'
   ];
-  const shakeAnimations = ['shake-animation-01', 'shake-animation-02', 'shake-animation-03'];
+  const shakeAnimations = [
+    'shake-animation-01',
+    'shake-animation-02',
+    'shake-animation-03',
+    'shake-animation-04'
+  ];
   const pickIcon = randomAlgorithmFactory(iconList); // 挑选向上动画
   const pick2TopAnimations = randomAlgorithmFactory(toTopAnimations); // 挑选向上动画
   const pickShakeTopAnimations = randomAlgorithmFactory(shakeAnimations); // 挑选左右摇摆动画
-  export function hhhhh() {
+  let uuid = 1;
+  export function giveParise() {
     const toTopAnimation = pick2TopAnimations();
+    uuid++; // 自增唯一id
     console.log(toTopAnimation);
     eleList.push({
+      uuid,
       icon: pickIcon(),
       toTopAnimation: pick2TopAnimations(),
-      shakeTopAnimations: ''
-      // shakeTopAnimations: pickShakeTopAnimations()
+      // shakeTopAnimations: ''
+      shakeTopAnimations: pickShakeTopAnimations()
     });
+    console.log(eleList[eleList.length - 1]);
     // 及时删除第一个被占位的元素
     const st = setTimeout(() => {
-      // eleList.shift();
+      eleList.shift();
       clearTimeout(st);
     }, 2000);
   }
-  const eleList = []; // 元素列表
+
   export default {
     name: 'pariseAE',
     data() {
@@ -76,18 +86,14 @@
     display: block;
     width: 100px;
     height: 650px;
-    // pointer-events: none; // 不可点击交互
-    // transform: translateY(-100%);
-    background: yellow;
+    pointer-events: none; // 不可点击交互
     z-index: 1000;
-    // overflow: hidden;
     .vmp-zan-icon-wrapper {
       position: absolute;
       display: block; // 定位需要
       bottom: 0;
       left: 0;
       opacity: 0; // 防止动画结束后回到原先位置占位
-      // transform: translate3d(0, 50px, 0);
     }
     // 内部图标
     .vmp-zan-icon {
@@ -97,6 +103,7 @@
       position: relative;
       background-size: contain;
       background-repeat: no-repeat;
+      left: 0;
     }
     .zan-animation-01 {
       animation: toTop 2s linear 0s;
@@ -118,12 +125,25 @@
       .vmp-zan-icon.@{iconName} {
         background-image: ~'url(./img/@{iconName}.png)';
       }
+      .vmp-zan-icon.shake-animation-0@{i} {
+        animation: ~'shake@{i}' 2s linear 0s;
+      }
       .loop(@i + 1);
     }
     .loop();
   }
-  .shake1 {
+
+  .vmp-zan-icon.shake-animation-01 {
     animation: shake1 2s linear 0s;
+  }
+  .vmp-zan-icon.shake-animation-02 {
+    animation: shake2 2s linear 0s;
+  }
+  .vmp-zan-icon.shake-animation-03 {
+    animation: shake3 2s linear 0s;
+  }
+  .vmp-zan-icon.shake-animation-04 {
+    animation: shake4 2s linear 0s;
   }
   // 向上移动动画
   @keyframes toTop {
@@ -173,6 +193,42 @@
     }
     100% {
       left: 0;
+    }
+  }
+  @keyframes shake2 {
+    0% {
+      left: 0;
+    }
+    80% {
+      left: -80px;
+    }
+    100% {
+      left: -40px;
+    }
+  }
+  @keyframes shake3 {
+    0% {
+      left: 0;
+    }
+    65% {
+      left: -20px;
+    }
+    100% {
+      left: 30px;
+    }
+  }
+  @keyframes shake4 {
+    0% {
+      left: 0;
+    }
+    20% {
+      left: -15px;
+    }
+    70% {
+      left: 20px;
+    }
+    100% {
+      left: 5px;
     }
   }
 </style>

@@ -17,7 +17,7 @@
 </template>
 <script>
   import { usePraiseServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
-  import PariseAE, { hhhhh } from './pariseAE';
+  import PariseAE, { giveParise } from './pariseAE';
 
   const timeId = null;
   export default {
@@ -90,8 +90,10 @@
         // doms.addEventListener('animationend', function () {
         //   this.outerHTML = '';
         // });
-        // this.$zan();
-        hhhhh();
+        const count = Math.floor(2 * Math.random()) + 1;
+        for (let i = 0; i < count; i++) {
+          giveParise();
+        }
         this.timess++;
         this.like = this.like + 1;
         // this.$forceUpdate();
