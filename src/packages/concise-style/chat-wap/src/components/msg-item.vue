@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-wap-msg-item" style="pointer-events: auto">
+  <div class="vmp-chat-wap-msg-item-concise" style="pointer-events: auto">
     <!-- 发起抽奖/问答 -->
     <template
       v-if="
@@ -98,8 +98,9 @@
       <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
           <span class="new-gift-name">
-            {{ source.nickname | overHidden(8) }}
+            {{ source.nickname | overHidden(6) }}
           </span>
+          &nbsp;
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
@@ -120,134 +121,148 @@
     </template>
     <!-- 聊天消息 -->
     <template v-else>
-      <div v-if="showTime" class="msg-showtime">{{ showTime }}</div>
       <div class="msg-item">
-        <div class="avatar-wrap">
-          <img class="chat-avatar" :src="source.avatar || defaultAvatar" alt />
-        </div>
+        <!-- 正常聊天消息 -->
         <div class="msg-content">
-          <h1>极简风格聊天</h1>
-          <!-- 签到消息头部 相类似的可优化 -->
-          <!-- <p class="msg-content_name" v-if="['sign_in_push'].includes(source.type)">
-            {{ $t('interact_tools.interact_tools_1024') }}
-          </p> -->
-          <!-- 正常聊天消息 -->
-          <p class="msg-content_name">
-            <span class="nickname">
-              {{ source.nickname | overHidden(8) }}
-            </span>
-            <span
-              v-if="source.roleName && source.roleName != '2'"
-              class="role"
-              :class="source.roleName | roleClassFilter"
-            >
-              {{ source.roleName | roleFilter }}
-            </span>
-          </p>
-          <!-- <div class="msg-content_name" v-else>
-            <p>
-              <span
-                v-if="source.roleName && source.roleName != '2'"
-                class="role"
-                :class="source.roleName | roleClassFilter"
-              >
-                {{ source.roleName | roleFilter }}
-              </span>
-              <span class="nickname">
-                {{ source.nickname | overHidden(8) }}
-              </span>
-            </p>
-            <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
-          </div> -->
           <!-- 图文消息 -->
-          <div class="msg-content_body_pre">
-            <!-- 回复消息 -->
-            <template
-              v-if="
-                source.replyMsg &&
-                source.replyMsg.content &&
-                source.atList &&
-                source.atList.length == 0
-              "
-            >
-              <div class="msg-content_body">
-                <p class="reply-msg">
+          <!-- 回复消息 -->
+          <template
+            v-if="
+              source.replyMsg &&
+              source.replyMsg.content &&
+              source.atList &&
+              source.atList.length == 0
+            "
+          >
+            <div class="msg-content_body">
+              <div class="reply-msg">
+                <div class="textInfo">
                   <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
                   ：
                   <span v-html="source.replyMsg.content.text_content" />
-                </p>
-                <p class="reply-msg-content">
-                  <span class="reply-color">
-                    {{ $t('chat.chat_1036') }}
-                  </span>
-                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
-                </p>
+                </div>
                 <div class="imgs">
                   <div
                     @click="previewImg(img, index, source.content.image_urls)"
-                    class="msg-content_chat-img"
-                    v-for="(img, index) in source.content.image_urls"
+                    class="img"
+                    v-for="(img, index) in source.replyMsg.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
                 </div>
-                <img class="jian-left" :src="jiantou" alt />
               </div>
-            </template>
-            <!-- @消息 -->
-            <template v-if="source.atList && source.atList.length !== 0">
-              <div class="msg-content_body">
-                <span v-html="msgContent" class="chat-text"></span>
+              <div class="reply-msg-content">
+                <div class="textInfo">
+                  <span
+                    v-if="source.roleName && source.roleName != '2'"
+                    class="role"
+                    :class="source.roleName | roleClassFilter"
+                  >
+                    {{ source.roleName | roleFilter }}
+                  </span>
+                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span v-html="msgContent" class="chat-text"></span>
+                </div>
+                <div class="imgs">
+                  <div
+                    @click="previewImg(img, index, source.content.image_urls)"
+                    class="img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- @消息 -->
+          <template v-if="source.atList && source.atList.length !== 0">
+            <div class="msg-content_body">
+              <div class="normal-msg">
+                <div class="textInfo">
+                  <span
+                    v-if="source.roleName && source.roleName != '2'"
+                    class="role"
+                    :class="source.roleName | roleClassFilter"
+                  >
+                    {{ source.roleName | roleFilter }}
+                  </span>
+                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span v-html="msgContent" class="chat-text"></span>
+                </div>
+                <div class="imgs">
+                  <div
+                    @click="previewImg(img, index, source.content.image_urls)"
+                    class="img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 正常消息 -->
+          <template
+            v-if="
+              !Object.keys(source.replyMsg || {}).length &&
+              (!source.atList || !source.atList.length)
+            "
+          >
+            <div class="msg-content_body">
+              <div class="normal-msg">
                 <div
-                  @click="previewImg(img, index, source.content.image_urls)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
-                <img class="jian-left" :src="jiantou" alt />
-              </div>
-            </template>
-            <!-- 正常消息 -->
-            <template
-              v-if="
-                !Object.keys(source.replyMsg || {}).length &&
-                (!source.atList || !source.atList.length)
-              "
-            >
-              <div class="msg-content_body">
-                <span class="reply-color"></span>
-                <span
-                  v-html="msgContent"
-                  class="chat-text"
+                  class="textInfo"
                   :class="
-                    !!msgContent &&
-                    source.content.image_urls &&
-                    source.content.image_urls.length != 0
-                      ? 'existImg'
-                      : ''
+                    !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
                   "
-                ></span>
-                <div
-                  @click="previewImg(img, index, source.content.image_urls)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
-                <img class="jian-left" :src="jiantou" alt />
+                >
+                  <span
+                    v-if="source.roleName && source.roleName != '2'"
+                    class="role"
+                    :class="source.roleName | roleClassFilter"
+                  >
+                    <span>{{ source.roleName | roleFilter }}</span>
+                  </span>
+                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span v-html="msgContent" class="chat-text"></span>
+                  <template v-if="!!!msgContent">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="msg-content_chat-img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </template>
+                </div>
+                <div v-if="!!msgContent" class="imgs">
+                  <div
+                    @click="previewImg(img, index, source.content.image_urls)"
+                    class="img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
               </div>
-            </template>
-          </div>
+            </div>
+          </template>
         </div>
       </div>
     </template>
@@ -286,8 +301,7 @@
     data() {
       return {
         msgContent: '',
-        defaultAvatar: defaultAvatar,
-        jiantou: require('../img/jiantou.png')
+        defaultAvatar: defaultAvatar
       };
     },
     filters: {
@@ -329,15 +343,6 @@
       //     return true;
       //   }
       // },
-      showTime() {
-        if (!this.source.sendTime) {
-          return '';
-        }
-        if (!this.source.prevTime) {
-          return handleChatShowTime('', this.source.sendTime);
-        }
-        return handleChatShowTime(this.source.prevTime, this.source.sendTime);
-      }
     },
     mounted() {
       this.handleAt();
@@ -363,23 +368,23 @@
         //@用户
         //todo 可以考虑domaint提供统一的处理 实现@用户
         this.msgContent = this.urlToLink(this.source.content.text_content);
-        this.source.atList &&
-          this.source.atList.forEach(a => {
-            // TODO历史列表aList与直播中格式不一致作
-            const userName = `@${a.nick_name || a.nickName} `;
-            const match =
-              this.source.content &&
-              this.source.content.text_content &&
-              this.source.content.text_content.indexOf(userName) != -1;
-            if (match) {
-              this.msgContent = this.urlToLink(
-                this.source.content.text_content.replace(
-                  userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
-                )
-              );
-            }
-          });
+        // this.source.atList &&
+        //   this.source.atList.forEach(a => {
+        //     // TODO历史列表aList与直播中格式不一致作
+        //     const userName = `@${a.nick_name || a.nickName} `;
+        //     const match =
+        //       this.source.content &&
+        //       this.source.content.text_content &&
+        //       this.source.content.text_content.indexOf(userName) != -1;
+        //     if (match) {
+        //       this.msgContent = this.urlToLink(
+        //         this.source.content.text_content.replace(
+        //           userName,
+        //           `<span style='color:#3562fa'>${userName}</span>`
+        //         )
+        //       );
+        //     }
+        //   });
         if (
           (this.source.atList || []).find(u => this.joinInfo.third_party_user_id == u.accountId) &&
           !this.source.isHistoryMsg
@@ -439,171 +444,144 @@
   };
 </script>
 <style lang="less">
-  .vmp-chat-wap-msg-item {
+  .vmp-chat-wap-msg-item-concise {
     pointer-events: auto;
-    .msg-showtime {
-      padding: 8px 0 24px;
-      font-size: 24px;
-      color: #595959;
-      text-align: center;
-    }
     .msg-item {
       margin: 0 24px;
-      padding: 8px 0 24px;
+      padding: 0 0 16px;
       display: flex;
       align-items: flex-start;
 
-      .avatar-wrap {
-        position: relative;
-        margin-right: 10px;
-        .chat-avatar {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
-          display: block;
-          // border: 2px solid #e3e3e3;
-          object-fit: cover;
-        }
-        .chat-phone {
-          position: absolute;
-          right: 0;
-          bottom: 0;
-        }
-      }
       .msg-content {
-        flex: 1;
-        margin-left: 10px;
-        .msg-content_name {
-          display: flex;
-          align-items: center;
-          margin-bottom: 12px;
-          height: 34px;
-          .nickname {
-            font-size: 28px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            word-break: break-all;
-            color: #8c8c8c;
-            max-width: 300px;
-            line-height: 34px;
-            margin-right: 8px;
-          }
-          .send_time {
-            font-size: 24px;
-            font-weight: 400;
-            color: #8c8c8c;
-          }
-          .role {
-            margin-right: 10px;
-            padding: 0 10px;
-            line-height: 34px;
-            border-radius: 50px;
-            font-size: 20px;
-            &.host {
-              background-color: #ffd1c9;
-              color: #fb2626;
-            }
-            &.assistant {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
-            }
-            &.guest {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
-            }
-          }
-        }
-        .msg-content_body_pre {
-          position: relative;
-          .jian-left {
-            width: 11px;
-            height: 18px;
-            position: absolute;
-            left: -11px;
-            top: 14px;
-          }
-          // &.multi {
-          //   .msg-content_body {
-          //     padding: 12px;
-          //     .chat-text {
-          //       line-height: 39px;
-          //     }
-          //   }
-          // }
-        }
-        .reply-color {
-          color: #fc9600;
-          float: left;
-          line-height: 1.4;
-          margin-right: 8px !important;
-        }
-        .reply-msg-content {
-          word-break: break-word;
-          display: flex;
-          .reply-color {
-            min-width: 60px;
-          }
-        }
-        .reply-msg {
-          line-height: 40px;
-          margin: 8px 0;
-          color: #999;
-          padding-left: 18px;
-          position: relative;
-          .chat-text {
-            display: inline-block;
-            line-height: 1.4;
-          }
-          &::after {
-            content: ' ';
-            width: 6px;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: #bfbfbf;
-            border-radius: 3px;
-          }
-        }
+        position: relative;
         .msg-content_body {
           position: relative;
-          display: inline-block;
-          padding: 16px;
+          background: rgba(0, 0, 0, 0.25);
+          border-radius: 20px;
+          padding: 3px 16px;
           word-break: break-all;
-          color: #262626;
-          // line-height: 1.4;
-          // line-height: 40px;
-          font-size: 28px;
-          background-color: #fff;
-          border-radius: 0 8px 8px 8px;
-          span {
-            word-break: break-word;
+          color: #fff;
+          font-size: 26px;
+          max-width: 520px;
+          .nickname {
+            font-size: 26px;
           }
-          .chat-text {
-            display: block;
-            line-height: 1.4;
-            &.existImg {
-              margin-bottom: 8px;
+          .role {
+            width: fit-content;
+            height: 30px;
+            max-height: 30px;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 8px;
+            padding: 0 8px;
+            border-radius: 16px;
+            font-size: 20px;
+            &.host {
+              background-color: #fb2626;
+            }
+            &.assistant {
+              background-color: #0a7ff5;
+            }
+            &.guest {
+              background-color: #0a7ff5;
             }
           }
-          .msg-content_chat-img {
-            display: inline-block;
-            margin-right: 8px;
-            width: 84px;
-            height: 86px;
-            border-radius: 4px;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
+          > .normal-msg {
+            > .textInfo {
+              line-height: 1.46;
+              &.existSimpleImg {
+                padding-top: 5px;
+              }
+              span {
+                word-break: break-word;
+              }
+              .chat-text {
+                img {
+                  width: 34px;
+                  height: 34px;
+                }
+              }
+              .msg-content_chat-img {
+                vertical-align: text-top;
+                margin-top: 0;
+              }
+            }
+            > .imgs {
+              .img {
+                display: inline-block;
+                margin: 8px 8px 5px 0;
+                width: 60px;
+                height: 60px;
+                border-radius: 4px;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                &:nth-last-child(1) {
+                  margin-right: 0;
+                }
+              }
+            }
           }
-          & :nth-last-child(2) {
-            margin-right: 0;
+          > .reply-msg {
+            padding-left: 18px;
+            margin-bottom: 8px;
+            position: relative;
+            > .textInfo {
+              color: rgba(255, 255, 255, 0.6);
+              position: relative;
+              line-height: 1.46;
+            }
+
+            > .imgs {
+              .img {
+                display: inline-block;
+                margin: 8px 8px 0 0;
+                width: 60px;
+                height: 60px;
+                border-radius: 4px;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                &:nth-last-child(1) {
+                  margin-right: 0;
+                }
+              }
+            }
+
+            &::after {
+              content: ' ';
+              width: 6px;
+              height: calc(100% - 9px);
+              position: absolute;
+              top: 9px;
+              left: 0;
+              background: rgba(255, 255, 255, 0.6);
+              border-radius: 3px;
+            }
           }
-        }
-        .emoji-img {
-          width: 24px;
-          height: 24px;
+          > .reply-msg-content {
+            position: relative;
+            > .textInfo {
+              color: #fff;
+              line-height: 1.46;
+            }
+
+            > .imgs {
+              .img {
+                display: inline-block;
+                margin: 8px 8px 5px 0;
+                width: 60px;
+                height: 60px;
+                border-radius: 4px;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                &:nth-last-child(1) {
+                  margin-right: 0;
+                }
+              }
+            }
+          }
         }
       }
       &.interact {
@@ -611,30 +589,79 @@
       }
       &.new-gift,
       &.interact {
-        margin: 0 auto;
         width: fit-content;
-        > div {
-          background: rgba(255, 209, 201, 0.2);
-          border-radius: 40px;
+        padding-left: 0;
+        position: relative;
+        display: block;
+        color: #fff;
+        &.interact {
+          justify-content: unset;
         }
-        .role {
-          border-radius: 16px;
-          padding: 0 6px;
-          margin-right: 8px;
-          font-size: 22px;
-          line-height: 22px;
-          &.host {
-            background: rgba(251, 38, 38, 0.1);
-            color: #fb2626;
+        &.purpose {
+          background: linear-gradient(221deg, rgba(184, 58, 244, 0) 0%, #6950fb 100%);
+        }
+        &.red {
+          background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
+        }
+        &.reward_pay_ok {
+          .interact-gift-box {
+            height: 88px;
+            padding: 0 74px 0 24px;
+            .reward_txt {
+              line-height: 1;
+              margin-top: 4px;
+            }
           }
-          &.assistant {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+        }
+        > .interact-gift-box {
+          position: relative;
+          background: rgba(0, 0, 0, 0.25);
+          border-radius: 20px;
+          padding: 0 60px 0 16px;
+          text-align: left;
+          width: 100%;
+          height: 46px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: none;
+          font-size: 26px;
+          &.zdy {
+            padding-right: 68px;
           }
-          &.guest {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+          .flex-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
+          .gift-zdy {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            position: absolute;
+            right: 24px;
+            background-color: white;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+          .new-gift-img {
+            width: 36px;
+            position: absolute;
+            right: 16px;
+          }
+        }
+        .new-gift-img,
+        .new-award-img {
+          width: 60px;
+          position: absolute;
+          right: 24px;
+        }
+        .reward_txt {
+          color: #d67900;
+          font-size: 28px;
+          line-height: 40px;
+          text-align: center;
         }
       }
       .interact-msg {

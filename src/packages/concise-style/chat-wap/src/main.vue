@@ -396,7 +396,7 @@
         chatServer.$on('roomKickout', () => {
           this.$toast(this.$t('chat.chat_1007'));
         });
-        //监听切换到当前tab
+        //监听切换到当前tab  todo:先写死显示
         // this.menuServer.$on('tab-switched', data => {
         this.$nextTick(() => {
           this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
