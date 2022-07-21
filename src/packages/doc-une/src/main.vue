@@ -1007,8 +1007,8 @@
       // 初始化事件
       this.initEvents();
 
-      if (this.webinarType == 1) {
-        // 直播中才执行,恢复上一次的文档数据;
+      if (this.webinarType == 1 || !this.isWatch) {
+        // 发起端和直播中的观看端执行,恢复上一次的文档数据;
         this.$nextTick(() => {
           this.recoverLastDocs();
         });
