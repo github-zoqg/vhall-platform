@@ -59,6 +59,7 @@
     name: 'VmpSubjectHeader',
     data() {
       return {
+        userInfo: JSON.parse(localStorage.getItem('userInfo')),
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
     },
@@ -69,10 +70,6 @@
     computed: {
       subjectInfo() {
         return this.subjectServer.state.subjectDetailInfo;
-      },
-      // 获取用户信息
-      userInfo() {
-        return this.$domainStore.state.userServer.userInfo;
       }
     },
     methods: {
@@ -235,25 +232,28 @@
             z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
-            background: #383838;
+            background: #fff;
             display: none;
             ul {
               list-style: none;
+              border: 1px solid #f2f2f2;
+              box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
               li {
                 height: 40px;
                 line-height: 40px;
                 text-align: left;
-                color: @font-dark-normal;
+                color: #666;
                 font-size: 14px;
                 cursor: pointer;
                 &:hover {
-                  background: #444;
+                  background: #f7f7f7;
+                  color: #1a1a1a;
                 }
                 .vh-iconfont {
                   font-size: 18px;
                   margin-left: 10px;
                   margin-right: 6px;
-                  color: @font-dark-normal;
+                  color: #666;
                   display: inline-block;
                   vertical-align: top;
                 }

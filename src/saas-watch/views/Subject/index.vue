@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-  import { useSubjectServer } from 'middle-domain';
+  import { setRequestHeaders, useSubjectServer } from 'middle-domain';
   export default {
     name: 'SubjectWatch',
     data() {
@@ -27,6 +27,11 @@
       };
     },
     async created() {
+      if (localStorage.getItem('token')) {
+        setRequestHeaders({
+          token: localStorage.getItem('token') || undefined
+        });
+      }
       await this.initSubjectInfo();
     },
     mounted() {
