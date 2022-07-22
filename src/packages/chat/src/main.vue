@@ -111,7 +111,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
-  import { cl_previewImg } from '@/app-shared/client/client-methods.js';
+  import { cl_previewImg, cl_join, cl_left } from '@/app-shared/client/client-methods.js';
   //消息提示定时器
   let tipMsgTimer;
   export default {
@@ -414,6 +414,14 @@
         });
         //客户端嵌入处理互动消息
         if (this.$route.query.assistantType) {
+          msgServer.$onMsg('JOIN', msg => {
+            cl_join(msg);
+          });
+
+          //离开房间
+          msgServer.$onMsg('LEFT', msg => {
+            cl_left(msg);
+          });
           msgServer.$onMsg('CHAT', rawMsg => {
             let temp = Object.assign({}, rawMsg);
 
