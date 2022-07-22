@@ -82,6 +82,9 @@
       subjectDetailInfo() {
         return this.subjectServer.state.subjectDetailInfo;
       },
+      subjectAuthInfo() {
+        return this.subjectServer.state.subjectAuthInfo;
+      },
       subjectIntroInfo() {
         return this.urlToLink(this.subjectDetailInfo.intro);
       }
@@ -161,8 +164,8 @@
           subject_id: this.subjectDetailInfo.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
-          type: this.subjectDetailInfo.type,
-          verify_value: this.subjectDetailInfo.subject_verify,
+          type: this.subjectAuthInfo.verify,
+          verify_value: undefined,
           ...this.$route.query
         };
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
@@ -170,7 +173,11 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: this.webinarId,
+          isSubject: true
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -188,23 +195,26 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1024');
+            placeHolderInfo.placeHolder =
+              this.subjectAuthInfo.verify_tip || this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder =
+              this.subjectAuthInfo.verify_tip || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder =
+              this.subjectAuthInfo.verify_tip || this.$t('common.common_1006');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:
