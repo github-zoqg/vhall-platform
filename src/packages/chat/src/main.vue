@@ -89,6 +89,7 @@
         @closeImgPreview="onClosePreviewImg"
       ></img-preview>
       <chat-user-control
+        ref="control"
         :roomId="roomId"
         :userId="accountId"
         :reply="reply"
@@ -110,6 +111,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
+  import { cl_previewImg } from '@/app-shared/client/client-methods.js';
   //消息提示定时器
   let tipMsgTimer;
   export default {
@@ -698,9 +700,7 @@
         //处理掉图片携带的查询参数，只保留主要链接
         this.previewImgList = images.map(item => item.split('?')[0]);
         if (this.$route.query.assistantType) {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPreviewImage', { list: this.previewImgList, index })
-          );
+          cl_previewImg({ list: this.previewImgList, index });
           return;
         }
         this.imgPreviewVisible = true;
@@ -911,6 +911,10 @@
             this.overflow = vsl.getScrollSize() > vsl.getClientSize();
           }
         });
+      },
+      //客户端操作踢出
+      assistantKickout(data) {
+        this.$refs['control'].assistantKickout(data);
       }
     }
   };

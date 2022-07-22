@@ -117,6 +117,7 @@
     useMsgServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
+  import { cl_openQAAdmin } from '@/app-shared/client/client-methods.js';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   export default {
@@ -339,7 +340,7 @@
           ? `${base}lives/qa/${this.webinarId}`
           : `${base}lives/qa/${this.webinarId}`;
         if (!this.$route.query.assistantType) {
-          window.open(url);
+          cl_openQAAdmin(url);
         } else {
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitOpenQAAdmin', process.env.VUE_APP_WAP_WATCH + url)
@@ -375,6 +376,9 @@
       //处理唤起登录
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
+      },
+      handleQa(flag) {
+        flag ? this.handleQAPopup() : this.close();
       },
       close() {
         this.qaVisible = false;

@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
-
+  import { cl_kickout } from '@/app-shared/client/client-methods.js';
   export default {
     props: {
       //房间号
@@ -128,21 +128,22 @@
           }
         }
       );
+    },
+    methods: {
       // 监听客户端踢出操作
-      EventBus.$on('assistantKickoutCallback', msg => {
+      assistantKickout(msg) {
         if (msg.type == 0) return;
         this.chatServer
           .setKicked({
             room_id: this.roomId,
-            receive_account_id: msg.data.room_join_id,
-            status: 1
+            receive_account_id: msg.data.receive_account_id,
+            status: msg.data.status
           })
           .then(() => {
+            window.vhallReportForProduct?.report(110123);
             EventBus.$emit('kicked_in_chat', { nextStatus: 1, accountId: this.accountId });
           });
-      });
-    },
-    methods: {
+      },
       //删除消息
       deleteMsg(count) {
         this.$emit('deleteMsg', count);
@@ -198,11 +199,12 @@
           room_id: this.roomId
         };
         if (this.assistantType) {
-          return EventBus.$emit('assistantKickout', {
+          cl_kickout({
             ...data,
             confirmText,
             roleName: this.roleName
           });
+          return;
         }
         this.$confirm(confirmText, '提示', {
           confirmButtonText: '确定',

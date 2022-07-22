@@ -54,7 +54,7 @@ import VmpPollingSetting from '@/packages/video-polling-setting';
 // 视频轮询流订阅
 import VmpStreamPollingRemote from '@/packages/stream-polling-remote';
 // 客户端嵌入页
-import VmpEmbedClient from '@/packages/embed-client-live';
+// import VmpEmbedClient from '@/packages/embed-client-live';
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
 // 云导播播放器&本地流推送组件
@@ -111,6 +111,6 @@ Vue.use(VmpStreamPollingRemote);
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpStreamDesktopScreen);
-Vue.use(VmpEmbedClient);
+// Vue.use(VmpEmbedClient);
 Vue.use(VmpMicInvited);
 Vue.use(VmpPcPlayerLiveYun);

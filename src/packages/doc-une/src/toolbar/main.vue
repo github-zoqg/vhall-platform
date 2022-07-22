@@ -43,9 +43,7 @@
           <div class="whiteboard-tip" v-show="showWhiteboardTp">
             <div class="whiteboard-tip__arrow"></div>
             点我查看
-            <a href="https://saas-doc.vhall.com/docs/show/1490" target="_blank">
-              手写板兼容性测试报告
-            </a>
+            <a :href="docsUrl" target="_blank" @click="openUrl">手写板兼容性测试报告</a>
           </div>
         </div>
         <!-- 提示 -->
@@ -178,6 +176,7 @@
   import VmpTextPopup from './text-popup.vue';
   import { useRoomBaseServer, useDocServer, useMsgServer, useGroupServer } from 'middle-domain';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { cl_openUrl } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpDocToolbar',
     components: {
@@ -224,7 +223,8 @@
           size: 18, // 字号
           color: '#FD2C0A' //颜色
         },
-        isConfirmVisible: false //清空画板显示弹窗提示
+        isConfirmVisible: false, //清空画板显示弹窗提示
+        docsUrl: 'https://saas-doc.vhall.com/docs/show/1490'
       };
     },
     watch: {
@@ -409,6 +409,12 @@
       // 是否观众可见
       handleSwitchStatus() {
         this.docServer.toggleSwitchStatus();
+      },
+      openUrl(e) {
+        if (this.$route.query.assistantType) {
+          cl_openUrl(this.docsUrl);
+          e.preventDefault();
+        }
       }
     }
   };
