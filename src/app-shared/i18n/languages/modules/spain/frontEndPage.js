@@ -351,7 +351,11 @@ export default {
     chat_1090: '',
     chat_1091: '',
     chat_1092: '',
-    chat_1093: ''
+    chat_1093: '',
+    chat_1094: '',
+    chat_1095: '',
+    chat_1096: '',
+    chat_1097: ''
   },
   form: {
     form_1001: 'Nombre',
@@ -584,7 +588,8 @@ export default {
     setting_1028: 'Seleccione un altavoz externo o reemplace la computadora',
     setting_1029: 'Ayuda y apoyo',
     setting_1030: '',
-    setting_1031: ''
+    setting_1031: '',
+    setting_1032: ''
   },
   message: {
     message_1001:
