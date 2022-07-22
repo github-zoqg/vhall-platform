@@ -71,6 +71,7 @@
     name: 'VmpSubjectBody',
     data() {
       return {
+        webinarId: '',
         defaultImages: 'https://cnstatic01.e.vhall.com/static/img/v35-subject.png'
       };
     },
@@ -131,8 +132,33 @@
         return strArr.join('');
       },
       toDetail(id) {
+        this.webinarId = id;
+        const visitorId = sessionStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.subjectDetailInfo.id,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : '',
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        this.subjectServer.initSubjectInfo(params).then(res => {
+          if (res.code === 200) {
+            res.data.pass == 1 ? this.goWatch() : this.handleAuthInfo();
+          } else {
+            this.$message({
+              message: '获取信息失败' || res.msg,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      goWatch() {
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+      },
+      handleAuthInfo() {
         let data = {
-          subject_id: id,
+          subject_id: this.subjectDetailInfo.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
           type: this.subjectDetailInfo.type,
@@ -183,9 +209,6 @@
             break;
           case 512523:
             // 付费
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickPay', { flag: true })
-            );
             break;
           default:
             this.$message({
