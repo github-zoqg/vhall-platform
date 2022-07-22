@@ -220,3 +220,16 @@ export const replaceWithRules = (longText, rules = []) => {
   });
   return longText;
 };
+
+/**
+ * @description 获取浏览器的cookie (当前域下,且非http-only)
+ */
+export const getCookie = name => {
+  var reg = RegExp(name + '=([^;]+)');
+  var arr = document.cookie.match(reg);
+  if (arr) {
+    return arr[1];
+  } else {
+    return '';
+  }
+};
