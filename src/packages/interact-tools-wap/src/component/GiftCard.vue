@@ -177,52 +177,52 @@
        * url:''}
        */
       // 支付接口
-      payProcess(params) {
-        const that = this;
-        this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
-          if (res.data && res.code == 200) {
-            if (res.data.price == 0) {
-              this.$toast(this.$t('interact_tools.interact_tools_1063'));
-              this.close();
-              return;
-            }
-            if (isWechat()) {
-              WeixinJSBridge.invoke(
-                'getBrandWCPayRequest',
-                {
-                  appId: res.data.data.pay_data.appId,
-                  timeStamp: String(res.data.data.pay_data.timeStamp), // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                  nonceStr: res.data.data.pay_data.nonceStr, // 支付签名随机串，不长于 32 位
-                  package: res.data.data.pay_data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                  signType: res.data.data.pay_data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                  paySign: res.data.data.pay_data.paySign // 支付签名
-                },
-                function (res) {
-                  console.log(res, 'getBrandWCPayRequest');
-                  if (res.err_msg == 'get_brand_wcpay_request:ok') {
-                    that.$toast(this.$t('common.common_1005'));
-                    that.btnDisabled = true;
-                    that.close();
-                    if (that.handlerTimer) clearInterval(that.handlerTimer);
-                    that.handlerTimer = setInterval(() => {
-                      if (that.timer <= 0) {
-                        clearInterval(that.handlerTimer);
-                        that.handlerTimer = null;
-                        that.timer = 3;
-                        that.btnDisabled = false;
-                        return;
-                      }
-                      that.timer--;
-                    }, 1000);
-                  }
-                }
-              );
-            } else {
-              window.location.href = res.data.data.pay_data.url;
-            }
-          }
-        });
-      },
+      // payProcess(params) {
+      //   const that = this;
+      //   this.giftsServer.sendGift({ ...params }, this.currentGift).then(res => {
+      //     if (res.data && res.code == 200) {
+      //       if (res.data.price == 0) {
+      //         this.$toast(this.$t('interact_tools.interact_tools_1063'));
+      //         this.close();
+      //         return;
+      //       }
+      //       if (isWechat()) {
+      //         WeixinJSBridge.invoke(
+      //           'getBrandWCPayRequest',
+      //           {
+      //             appId: res.data.data.pay_data.appId,
+      //             timeStamp: String(res.data.data.pay_data.timeStamp), // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+      //             nonceStr: res.data.data.pay_data.nonceStr, // 支付签名随机串，不长于 32 位
+      //             package: res.data.data.pay_data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+      //             signType: res.data.data.pay_data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+      //             paySign: res.data.data.pay_data.paySign // 支付签名
+      //           },
+      //           function (res) {
+      //             console.log(res, 'getBrandWCPayRequest');
+      //             if (res.err_msg == 'get_brand_wcpay_request:ok') {
+      //               that.$toast(this.$t('common.common_1005'));
+      //               that.btnDisabled = true;
+      //               that.close();
+      //               if (that.handlerTimer) clearInterval(that.handlerTimer);
+      //               that.handlerTimer = setInterval(() => {
+      //                 if (that.timer <= 0) {
+      //                   clearInterval(that.handlerTimer);
+      //                   that.handlerTimer = null;
+      //                   that.timer = 3;
+      //                   that.btnDisabled = false;
+      //                   return;
+      //                 }
+      //                 that.timer--;
+      //               }, 1000);
+      //             }
+      //           }
+      //         );
+      //       } else {
+      //         window.location.href = res.data.data.pay_data.url;
+      //       }
+      //     }
+      //   });
+      // },
       /**
        * 赠送礼物
        */
@@ -243,66 +243,74 @@
           return;
         }
         // 如果开启手动加载历史聊天的配置项，并且是嵌入页面，就不会展示付费礼物，并且免费礼物通过聊天消息发送
-        const open_id = sessionStorage.getItem('open_id');
-        let payAuthStatus = 0; //默认支付流程为非授权或授权后
-        let params = {};
+        // const open_id = sessionStorage.getItem('open_id');
+        // let payAuthStatus = 0; //默认支付流程为非授权或授权后
+        let params = {
+          gift_id: this.currentGift.id,
+          channel: 'WEIXIN',
+          service_code: 'H5_PAY',
+          room_id: this.localRoomInfo.roomId
+        };
 
-        if (isWechat()) {
-          if (open_id) {
-            // 微信正常授权过
-            params = {
-              gift_id: this.currentGift.id,
-              channel: 'WEIXIN',
-              service_code: 'JSAPI',
-              room_id: this.localRoomInfo.roomId,
-              open_id: open_id
-            };
-          } else {
-            // 嵌入页不需要授权
-            if (!this.isEmbed) {
-              //重新授权
-              payAuthStatus = 1;
-              const payUrl = buildPayUrl(this.$route);
-              authWeixinAjax(this.$route, payUrl, () => {});
-            } else {
-              params = {
-                gift_id: this.currentGift.id,
-                channel: 'WEIXIN',
-                service_code: 'H5_PAY',
-                room_id: this.localRoomInfo.roomId
-              };
-            }
-          }
-        } else {
-          //如果是企业微信环境,需要启动微信h5支付相关参数
-          if (isWechatCom()) {
-            params = {
-              gift_id: this.currentGift.id,
-              channel: 'WEIXIN',
-              service_code: 'H5_PAY',
-              room_id: this.localRoomInfo.roomId
-            };
-          } else {
-            // 正常的h5支付, 支付宝
-            params = {
-              gift_id: this.currentGift.id,
-              channel: 'ALIPAY',
-              service_code: 'H5_PAY',
-              room_id: this.localRoomInfo.roomId
-            };
-          }
-        }
+        // if (isWechat()) {
+        //   if (open_id) {
+        //     // 微信正常授权过
+        //     params = {
+        //       gift_id: this.currentGift.id,
+        //       channel: 'WEIXIN',
+        //       service_code: 'JSAPI',
+        //       room_id: this.localRoomInfo.roomId,
+        //       open_id: open_id
+        //     };
+        //   } else {
+        //     // 嵌入页不需要授权
+        //     if (
+        //       !this.isEmbed &&
+        //       this.$domainStore.state.roomBaseServer.configList['ui.hide_wechat'] == 0
+        //     ) {
+        //       //重新授权
+        //       payAuthStatus = 1;
+        //       const payUrl = buildPayUrl(this.$route);
+        //       authWeixinAjax(this.$route, payUrl, () => {});
+        //     } else {
+        //       params = {
+        //         gift_id: this.currentGift.id,
+        //         channel: 'WEIXIN',
+        //         service_code: 'H5_PAY',
+        //         room_id: this.localRoomInfo.roomId
+        //       };
+        //     }
+        //   }
+        // } else {
+        //   //如果是企业微信环境,需要启动微信h5支付相关参数
+        //   if (isWechatCom()) {
+        //     params = {
+        //       gift_id: this.currentGift.id,
+        //       channel: 'WEIXIN',
+        //       service_code: 'H5_PAY',
+        //       room_id: this.localRoomInfo.roomId
+        //     };
+        //   } else {
+        //     // 正常的h5支付, 支付宝
+        //     params = {
+        //       gift_id: this.currentGift.id,
+        //       channel: 'ALIPAY',
+        //       service_code: 'H5_PAY',
+        //       room_id: this.localRoomInfo.roomId
+        //     };
+        //   }
+        // }
 
         // 如果不需要经过微信授权
-        if (payAuthStatus == 0) {
-          if (Number(this.currentGift.price) <= 0) {
-            //发送免费礼物
-            this.payFree(params);
-          } else {
-            //发送收费礼物
-            this.payProcess(params);
-          }
+        // if (payAuthStatus == 0) {
+        if (Number(this.currentGift.price) <= 0) {
+          //发送免费礼物
+          this.payFree(params);
+          // } else {
+          //   发送收费礼物
+          //   this.payProcess(params);
         }
+        // }
       },
       /**
        * 关闭礼物弹框

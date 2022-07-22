@@ -345,7 +345,11 @@ export default {
     chat_1090: '',
     chat_1091: '',
     chat_1092: 'You have been muted',
-    chat_1093: 'Click for details'
+    chat_1093: 'Click for details',
+    chat_1094: 'Chat only',
+    chat_1095: 'Setting',
+    chat_1096: 'Chat only on',
+    chat_1097: 'Chat only off'
   },
   form: {
     form_1001: 'Name',
@@ -540,7 +544,7 @@ export default {
     interact_tools_1078: 'Got',
     interact_tools_1079: 'Winning',
     interact_tools_1080: 'Red envelope',
-    interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
+    interact_tools_1081: 'search" 口令红包" in Alipay, then enter the password',
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
     interact_tools_1085: 'TOP 10 list',
@@ -576,7 +580,8 @@ export default {
     setting_1028: 'Choose external speakers or replace the computer',
     setting_1029: 'Help and support',
     setting_1030: 'Setting',
-    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving'
+    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving',
+    setting_1032: 'Setting'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',
