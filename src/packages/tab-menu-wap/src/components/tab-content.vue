@@ -3,10 +3,13 @@
     <!-- 主菜单区域 -->
     <section class="vmp-tab-container-mainarea" ref="mainArea">
       <section
-        :class="'type-' + tab.type"
+        :class="[
+          'type-' + tab.type,
+          alwaysShowTab.includes(tab.cuid) ? 'vmp-tab-container__h0' : ''
+        ]"
         v-for="tab of filterMenu"
         :key="tab.cuid"
-        v-show="curItem.cuid === tab.cuid"
+        v-show="curItem.cuid === tab.cuid || alwaysShowTab.includes(tab.cuid)"
       >
         <vmp-air-container :cuid="tab.cuid" :oneself="true" />
       </section>
@@ -29,7 +32,8 @@
     },
     data() {
       return {
-        curItem: {}
+        curItem: {},
+        alwaysShowTab: []
       };
     },
     computed: {
@@ -58,9 +62,32 @@
           return true;
         });
         return [...set];
+      },
+      // wap-body和文档是否切换位置
+      isWapBodyDocSwitch() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      }
+    },
+    watch: {
+      isWapBodyDocSwitch(val) {
+        val
+          ? this.addAlwaysShowTabContent('comDocWap')
+          : this.removeAlwaysShowTabContent('comDocWap');
       }
     },
     methods: {
+      // 添加常显的tabContent
+      addAlwaysShowTabContent(tabCuid) {
+        if (this.alwaysShowTab.includes(tabCuid)) return;
+        this.alwaysShowTab.push(tabCuid);
+      },
+      // 删除常显的tabContent
+      removeAlwaysShowTabContent(tabCuid) {
+        const index = this.alwaysShowTab.indexOf(tabCuid);
+        if (index > -1) {
+          this.alwaysShowTab.splice(index, 1);
+        }
+      },
       getComp(cuid) {
         return this.$children.find(i => i.cuid === cuid);
       },
@@ -103,6 +130,9 @@
         &.type-2 {
           background-color: #f2f2f2;
         }
+      }
+      .vmp-tab-container__h0 {
+        height: 0;
       }
     }
   }

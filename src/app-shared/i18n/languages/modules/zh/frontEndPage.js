@@ -344,7 +344,11 @@ export default {
     chat_1090: '悄悄回答你',
     chat_1091: '处理时间',
     chat_1092: '直播已结束，当前禁止发言',
-    chat_1093: '点击查看'
+    chat_1093: '点击查看',
+    chat_1094: '仅查看聊天内容',
+    chat_1095: '聊天设置',
+    chat_1096: '已开启仅查看聊天内容',
+    chat_1097: '已关闭仅查看聊天内容'
   },
   form: {
     form_1001: '姓名',
@@ -391,7 +395,7 @@ export default {
     form_1042: '请输入详细地址',
     form_1043: '省/自治区/直辖市',
     form_1044: '区/县',
-    form_1045: '提交问卷',
+    form_1045: '提交',
     form_1046: '选择日期',
     form_1047: '选择日期+时间',
     form_1048: '选择时间',
@@ -538,7 +542,8 @@ export default {
     interact_tools_1081: '支付宝搜“红包”，输入口令',
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
-    interact_tools_1085: '领取Top10名单'
+    interact_tools_1085: '领取Top10名单',
+    interact_tools_1086: '公告'
   },
   setting: {
     setting_1002: '观看设置',
@@ -570,7 +575,8 @@ export default {
     setting_1028: '选择外置扬声器或者更换电脑',
     setting_1029: '帮助与支持',
     setting_1030: '媒体设置',
-    setting_1031: '修改设置后导致重新推流，是否继续保存'
+    setting_1031: '修改设置后导致重新推流，是否继续保存',
+    setting_1032: '摄像头检测'
   },
   message: {
     message_1001: '主办方设置了视频加密功能，建议使用电脑访问观看',

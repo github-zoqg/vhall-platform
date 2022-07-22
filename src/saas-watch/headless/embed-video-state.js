@@ -21,7 +21,8 @@ export default async function () {
       });
     }),
     //多语言接口
-    roomBaseServer.getLangList()
+    roomBaseServer.getLangList(),
+    roomBaseServer.getUnionConfig()
   ];
 
   await Promise.all(promiseList);
@@ -29,11 +30,11 @@ export default async function () {
   console.log(roomBaseServer.state.configList);
   console.log('%c------多语言请求配置', 'color:pink');
   console.log(roomBaseServer.state.languages);
+
   // TODO 设置观看端测试权限数据
   // roomBaseServer.state.configList = {
   //   hasToolbar: false
   // };
-
   await msgServer.init();
   console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 

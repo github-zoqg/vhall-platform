@@ -337,7 +337,7 @@
       width: 322px;
       // width: 4.47rem;
       position: fixed;
-      z-index: 19;
+      z-index: 305; //文档全屏301
       padding: 0.266667rem 0px;
       top: 200px;
       left: 74%;

@@ -45,7 +45,8 @@ export default async function () {
     }),
     //多语言接口
     roomBaseServer.getLangList(),
-    roomBaseServer.getCustomRoleName()
+    roomBaseServer.getCustomRoleName(),
+    roomBaseServer.getUnionConfig()
   ];
   virtualAudienceServer.init();
 

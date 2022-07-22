@@ -205,8 +205,8 @@
             imgUrl: info.cover
           }
         );
-        const shareSuccessStr = '分享成功';
-        wechatRes.isSuccess && this.$toast(shareSuccessStr);
+        // const shareSuccessStr = '分享成功';
+        // wechatRes.isSuccess && this.$toast(shareSuccessStr);
       },
       handleOpenHide() {
         this.open_hide = !this.open_hide;

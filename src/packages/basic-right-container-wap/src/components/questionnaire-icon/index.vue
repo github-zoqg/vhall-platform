@@ -90,6 +90,7 @@
     },
     created() {
       this.questionnaireServer.checkIconStatus();
+      this.questionnaireServer.getSurveyList();
       this.setSetingHeight();
       this.questionnaireServer.$on(this.questionnaireServer.EVENT_TYPE.QUESTIONNAIRE_PUSH, msg => {
         this.closeQuestionList();

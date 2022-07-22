@@ -43,6 +43,12 @@ export default {
             }
           }
         }
+        const st = setTimeout(() => {
+          clearTimeout(st);
+          const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
+          console.log('initCheckAuth, url', url);
+          window.location.href = url; // 去除参数上的user_auth_key
+        }, 3000);
       };
       await useUserServer()
         .oauthCallback({
@@ -58,7 +64,6 @@ export default {
             }
             if (sceneId !== 2) {
               // 非提现功能时，绑定成功，界面初始化刷新(去掉user_auth_key参数)
-              // TODO: url后续得改
               const url = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
               window.location.href = url;
             }

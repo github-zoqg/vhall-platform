@@ -493,7 +493,7 @@
     computed: {
       // 广告头图
       coverPic() {
-        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_lfit,w_750`;
+        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
       },
       //当前的城市列表
       currentCityList() {

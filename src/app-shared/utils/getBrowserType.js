@@ -128,6 +128,12 @@ export function getBrowserType() {
   } else if (testUa(/360/gi)) {
     shell = '360'; // 360浏览器
     shellVs = testVs(/360 [\d.]+/gi);
+  } else if (testUa(/Quark/gi)) {
+    shell = 'Quark'; // 夸克浏览器
+    shellVs = testVs(/Quark [\d.]+/gi);
+  } else if (testUa(/UCBrowser/gi)) {
+    shell = 'UCBrowser'; // 夸克浏览器
+    shellVs = testVs(/UCBrowser [\d.]+/gi);
   }
   const shellObj = {
     shell,
