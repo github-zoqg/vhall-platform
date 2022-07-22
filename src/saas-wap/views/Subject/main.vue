@@ -1,93 +1,127 @@
 <template>
-  <div class="subject-detail" v-if="showSubject">
-    <div class="subject-poster">
-      <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
-    </div>
-    <section class="subject-header">
-      <h2 class="subject-title">{{ detailInfo.webinar_subject.title }}</h2>
-      <p class="subject-create-time">{{ detailInfo.webinar_subject.created_at }}</p>
-      <div class="subject-info">
-        <p>
-          共&nbsp;
-          <span class="subject-info_num">{{ detailInfo.webinar_subject.webinar_num }}</span>
-          &nbsp;个直播
-        </p>
-        <p :style="{ visibility: detailInfo.webinar_subject.hide_pv ? 'visible' : 'hidden' }">
-          <img src="./img/pv.png" alt="" />
-          热度&nbsp;
-          <span class="subject-info_num">{{ detailInfo.webinar_subject.pv }}</span>
-        </p>
-        <p
-          :style="{
-            visibility: detailInfo.webinar_subject.hide_appointment ? 'visible' : 'hidden'
-          }"
-        >
-          <span class="subject-info_num">{{ detailInfo.webinar_subject.order_num }}</span>
-          &nbsp;次预约
-        </p>
+  <div>
+    <div class="subject-detail" v-if="showSubject">
+      <div class="subject-poster">
+        <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
       </div>
-    </section>
-    <section class="subject-intro">
-      <p class="subject-intro_title">简介</p>
-      <div
-        @click="handleOpenHide"
-        class="subject-intro_value"
-        :style="`height: ${open_hide ? 'auto' : ''}`"
-      >
-        <p v-html="detailInfo.webinar_subject.intro"></p>
-      </div>
-      <p @click="handleOpenHide" class="subject-intro_switch">
-        <i class="vh-iconfont" :class="[open_hide ? 'vh-line-arrow-up' : 'vh-line-arrow-down']" />
-      </p>
-    </section>
-    <section class="subject-menu">
-      <p class="subject-menu_title">目录</p>
-      <article
-        @click="toWatch(item.webinar_id)"
-        v-for="item in detailInfo.webinar_subject.webinar_list"
-        :key="item.id"
-        class="subject-menu_item clearfix"
-      >
-        <div class="subject-menu_item-left">
-          <img :src="item.img_url" alt="" class="item-poster" />
-          <span
-            class="item-status"
-            :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
-          >
-            {{ liveTag(item) }}
-            <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
-              | 无延迟
-            </span>
-          </span>
-          <!-- <span class="item-type">付费</span> -->
-        </div>
-        <div class="subject-menu_item-right">
-          <p class="item-title">{{ item.subject }}</p>
-          <span v-if="item.hide_pv" class="item-num">
+      <section class="subject-header">
+        <h2 class="subject-title">{{ detailInfo.webinar_subject.title }}</h2>
+        <p class="subject-create-time">{{ detailInfo.webinar_subject.created_at }}</p>
+        <div class="subject-info">
+          <p>
+            共&nbsp;
+            <span class="subject-info_num">{{ detailInfo.webinar_subject.webinar_num }}</span>
+            &nbsp;个直播
+          </p>
+          <p :style="{ visibility: detailInfo.webinar_subject.hide_pv ? 'visible' : 'hidden' }">
             <img src="./img/pv.png" alt="" />
-            <span>{{ item.pv }}</span>
-          </span>
-          <span class="item-date">{{ item.start_time }}</span>
+            热度&nbsp;
+            <span class="subject-info_num">{{ detailInfo.webinar_subject.pv }}</span>
+          </p>
+          <p
+            :style="{
+              visibility: detailInfo.webinar_subject.hide_appointment ? 'visible' : 'hidden'
+            }"
+          >
+            <span class="subject-info_num">{{ detailInfo.webinar_subject.order_num }}</span>
+            &nbsp;次预约
+          </p>
         </div>
-      </article>
-    </section>
-  </div>
-  <!-- 没有此专题 -->
-  <div v-else class="error-page">
-    <img src="./img/subject_null.png" alt="" />
-    <p>专题已下线</p>
+      </section>
+      <section class="subject-intro">
+        <p class="subject-intro_title">简介</p>
+        <div
+          @click="handleOpenHide"
+          class="subject-intro_value"
+          :style="`height: ${open_hide ? 'auto' : ''}`"
+        >
+          <p v-html="detailInfo.webinar_subject.intro"></p>
+        </div>
+        <p @click="handleOpenHide" class="subject-intro_switch">
+          <i class="vh-iconfont" :class="[open_hide ? 'vh-line-arrow-up' : 'vh-line-arrow-down']" />
+        </p>
+      </section>
+      <section class="subject-menu">
+        <p class="subject-menu_title">目录</p>
+        <article
+          @click="toWatch(item.webinar_id)"
+          v-for="item in detailInfo.webinar_subject.webinar_list"
+          :key="item.id"
+          class="subject-menu_item clearfix"
+        >
+          <div class="subject-menu_item-left">
+            <img :src="item.img_url" alt="" class="item-poster" />
+            <span
+              class="item-status"
+              :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
+            >
+              {{ liveTag(item) }}
+              <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
+                | 无延迟
+              </span>
+            </span>
+            <!-- <span class="item-type">付费</span> -->
+          </div>
+          <div class="subject-menu_item-right">
+            <p class="item-title">{{ item.subject }}</p>
+            <span v-if="item.hide_pv" class="item-num">
+              <img src="./img/pv.png" alt="" />
+              <span>{{ item.pv }}</span>
+            </span>
+            <span class="item-date">{{ item.start_time }}</span>
+          </div>
+        </article>
+      </section>
+    </div>
+    <!-- 没有此专题 -->
+    <div v-else class="error-page">
+      <img src="./img/subject_null.png" alt="" />
+      <p>专题已下线</p>
+    </div>
+    <!-- 登录弹窗 -->
+    <login-wap ref="loginWap"></login-wap>
+    <!-- 权限弹窗 -->
+    <confirm-auth
+      title="权限验证"
+      :width="'100%'"
+      v-if="isShowCheck"
+      @authSubmit="authSubmit"
+      @authClose="authClose"
+    >
+      <div slot="content" class="vmp-subscribe-body_input">
+        <input
+          :type="`${isHidden ? 'password' : 'text'}`"
+          v-model="textAuth"
+          :placeHolder="authInfo.placeHolder"
+        />
+        <i
+          :class="`vh-iconfont ${isHidden ? 'vh-line-hidden' : 'vh-line-view'}`"
+          @click="isHidden = !isHidden"
+        ></i>
+      </div>
+    </confirm-auth>
   </div>
 </template>
 
 <script>
   import { useSubjectServer } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
+  import { getQueryString } from '@/app-shared/utils/tool.js';
   import { urlToLink, padStringWhenTooLang } from './js/utils.js';
+  import loginWap from '@/packages/reg-login-wap/src/main.vue';
+  import confirmAuth from '../components/confirm.vue';
   export default {
     data() {
       return {
         open_hide: false,
         showSubject: true,
+        isShowCheck: false,
+        webinarId: '',
+        textAuth: '',
+        isHidden: true,
+        authInfo: {
+          placeHolder: '11111111'
+        },
         detailInfo: {
           webinar_subject: {
             cover: '',
@@ -125,12 +159,19 @@
         ]
       };
     },
+    components: {
+      loginWap,
+      confirmAuth
+    },
     beforeCreate() {
       this.subjectServer = useSubjectServer();
     },
     created() {
       this.getDetail();
       this.hasDelayPermission = this.$route.query.delay;
+    },
+    mounted() {
+      this.$i18n.locale = 'zh-CN';
     },
     methods: {
       liveTag(val) {
@@ -158,7 +199,6 @@
           }
 
           this.detailInfo = res.data;
-          this.subjectServer.initSubjectInfo();
           this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {
@@ -212,7 +252,114 @@
         this.open_hide = !this.open_hide;
       },
       toWatch(id) {
-        window.location.href = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${id}`;
+        this.webinarId = id;
+        const visitorId = sessionStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.detailInfo.webinar_subject.id,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : '',
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        this.subjectServer.initSubjectInfo(params).then(res => {
+          if (res.code === 200) {
+            this.authInfo = res.data;
+            res.data.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
+          } else {
+            this.$toast('获取信息失败' || res.msg);
+          }
+        });
+      },
+      goWatchUrl() {
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+      },
+      handleAuthInfo() {
+        let data = {
+          subject_id: this.detailInfo.webinar_subject.id,
+          refer: this.$route.query.refer,
+          record_id: this.$route.query.record_id,
+          type: this.authInfo.verify,
+          verify_value: undefined,
+          ...this.$route.query
+        };
+        this.subjectServer.getSubjectWatchAuth(data).then(res => {
+          this.handleAuthErrorCode(res.code, res.msg);
+        });
+      },
+      handleAuthErrorCode(code, msg) {
+        let queryString = '';
+        let shareId = getQueryString('shareId');
+        let share_id = getQueryString('share_id');
+        switch (code) {
+          case 510008: // 未登录
+            this.$refs.loginWap.open();
+            break;
+          case 512525: // 填写表单emitClickOpenSignUpForm
+            queryString = this.$route.query.refer
+              ? `?refer=${this.$route.query.refer}&isIndependent=0`
+              : '?isIndependent=0';
+            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+            if (queryString.indexOf('?') != -1) {
+              queryString += share_id ? `&share_id=${share_id}` : '';
+              queryString += shareId ? `&shareId=${shareId}` : '';
+            } else if (queryString.indexOf('?') == -1 && share_id) {
+              queryString += share_id ? `?share_id=${share_id}` : '';
+            } else if (queryString.indexOf('?') == -1 && shareId) {
+              queryString += shareId ? `?shareId=${shareId}` : '';
+            }
+            // 邀请卡分享
+            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            break;
+          case 512002:
+          case 512522:
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+            break;
+          case 512531:
+            // 邀请码
+            this.authInfo.placeHolder = this.authInfo.fcode_verify || '请输入邀请码';
+            this.isShowCheck = true;
+            break;
+          case 512528:
+            // 密码
+            this.authInfo.placeHolder = this.authInfo.password_verify || '请输入密码';
+            this.isShowCheck = true;
+            break;
+          case 512532:
+            //白名单
+            this.authInfo.placeHolder = this.authInfo.white_verify || '请输入手机号/邮箱/工号';
+            this.isShowCheck = true;
+            break;
+          case 512523:
+            // 付费
+            break;
+          default:
+            this.$toast('验证失败' || msg);
+            break;
+        }
+      },
+      authSubmit() {
+        let data = {
+          subject_id: this.detailInfo.webinar_subject.id,
+          visitor_id: this.authInfo.visitor_id,
+          type: this.authInfo.type,
+          verify_value: this.textAuth,
+          ...this.$route.query
+        };
+        this.subjectServer.getSubjectWatchAuth(data).then(res => {
+          if (res.code == 200) {
+            window.location.href =
+              window.location.origin +
+              process.env.VUE_APP_ROUTER_BASE_URL +
+              `/lives/watch/${this.webinarId}${window.location.search}`;
+          } else {
+            this.$toast('验证失败' || res.msg);
+          }
+        });
+      },
+      authClose() {
+        this.isShowCheck = false;
       }
     }
   };

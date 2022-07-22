@@ -29,6 +29,9 @@
     async created() {
       await this.initSubjectInfo();
     },
+    mounted() {
+      this.$i18n.locale = 'zh-CN';
+    },
     methods: {
       async initSubjectInfo() {
         const subjectServer = useSubjectServer();
@@ -40,7 +43,6 @@
             this.state = 2;
             return;
           }
-          subjectServer.state.subjectDetailInfo = res.data.webinar_subject;
           this.state = 1;
         } catch (err) {
           this.state = 2;

@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer, useSubjectServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWatchAuth',
@@ -38,6 +38,8 @@
       return {
         authVisible: false,
         isHideEye: false,
+        isSubject: false,
+        webinarId: '',
         placeholder: '',
         authTitle: ''
       };
@@ -45,11 +47,15 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
+      this.subjectServer = useSubjectServer();
     },
     methods: {
       openAuthDialog(info) {
+        console.log(info);
+        this.isSubject = info.isSubject;
+        this.webinarId = info.webinarId;
         this.authVisible = true;
-        this.placeholder = info;
+        this.placeholder = info.placeHolder;
       },
       hideEye() {
         this.isHideEye = !this.isHideEye;
@@ -61,6 +67,14 @@
         this.authVisible = false;
       },
       authSubmit() {
+        if (this.isSubject) {
+          this.authSubjectCheck();
+        } else {
+          this.authWebinarCheck();
+        }
+      },
+      // 活动验证
+      authWebinarCheck() {
         const { webinar } = this.roomBaseServer.state.watchInitData;
         console.log(webinar, '???13214');
         let data = {
@@ -91,6 +105,31 @@
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
             );
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || res.msg,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      // 专题验证
+      authSubjectCheck() {
+        let data = {
+          subject_id: this.subjectServer.state.subjectDetailInfo.id,
+          visitor_id: this.subjectServer.state.subjectAuthInfo.visitor_id,
+          type: this.subjectServer.state.subjectAuthInfo.verify,
+          verify_value: this.authTitle,
+          ...this.$route.query
+        };
+        this.subjectServer.getSubjectWatchAuth(data).then(res => {
+          if (res.code == 200) {
+            window.location.href =
+              window.location.origin +
+              process.env.VUE_APP_ROUTER_BASE_URL +
+              `/lives/watch/${this.webinarId}${window.location.search}`;
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
