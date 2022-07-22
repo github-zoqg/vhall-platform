@@ -6,6 +6,7 @@ import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
 
@@ -81,6 +82,9 @@ const router = new VueRouter({
   routes
 });
 
+// 当前是否为开发环境
+const isDev = process.env.NODE_ENV === 'development';
+
 router.beforeEach(async (to, from, next) => {
   if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
     // 根据不同的页面，动态加载不同的配置
@@ -89,6 +93,9 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const res = await grayInit(to);
+  if (!isDev) {
+    await ssoAutoLogin(); // sso自动登录置换token
+  }
   console.log('---grayInit---', res);
   if (res) {
     //处理限流逻辑

@@ -101,6 +101,9 @@
       }
     },
     methods: {
+      handleRedPacket(flag) {
+        flag ? this.open() : this.close();
+      },
       open() {
         this.sendDialogVisible = true;
         this.restForm();

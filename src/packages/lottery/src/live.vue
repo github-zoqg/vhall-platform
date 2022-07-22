@@ -115,6 +115,9 @@
           this.timer = null;
         }
       },
+      handleLottery(flag) {
+        flag ? this.open() : this.close();
+      },
       /**
        * @description 打开整个抽奖组件
        */

@@ -105,7 +105,7 @@
           nickname: e.data.sign_creator_nickname,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: `${e.data.sign_creator_nickname}${this.$t('chat.chat_1028')}`
+            text_content: `${this.$t('chat.chat_1028')}`
           },
           type: e.data.type,
           interactStatus: true
@@ -114,6 +114,9 @@
       });
     },
     methods: {
+      handleSign(flag) {
+        flag ? this.openSign() : this.closeSign();
+      },
       openSign() {
         // 是否发起了签到
         this.getSignInfo();

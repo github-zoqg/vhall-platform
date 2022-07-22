@@ -147,6 +147,7 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
+  import { cl_openChatFilterUrl } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -324,9 +325,7 @@
         }
         if (this.$route.query.assistantType) {
           //客户端嵌入通知客户端打开聊天审核页面
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons('comChat', 'emitOpenChatFilterUrl', url)
-          );
+          cl_openChatFilterUrl(url);
         } else {
           window.open(url, '_blank');
         }

@@ -62,6 +62,7 @@
   import { getQueryString } from '@/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';
   import { clientMixin } from '../mixins/clientMixin';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpEmbedClient',
     mixins: [clientMixin],
@@ -151,27 +152,75 @@
             console.log(`房间-灰度ID-获取活动by用户信息失败~${e}`);
           });
       },
-      /*
-       * assistantMsg 给予 客户端嵌入使用方法 【注意错误提示也是这个】
-       * type 消息类型
-       * msg 消息内容
-       * error_type 异常提示类型，参数有：success、error、info、warning （注意： error_type此参数在 type=‘notice_msg'时生效）
-       */
-      assistantMsg(type, msg, error_type = null) {
-        console.log('接受客户上下线消息、前端异常提示等', { type, msg, error_type });
-        let messageObj = { type, msg };
-        if (type === 'notice_msg' && error_type) {
-          messageObj.error_type = error_type;
+      handleAssitant(type) {
+        // 获取文档dom
+        let container = '';
+        try {
+          container = document.querySelector('.vhall-document-container');
+        } catch (error) {
+          console.log(error);
         }
-        if (this.webviewType != 'cef') {
-          if (window.bridge) {
-            window.bridge.JsCallQtMsg(JSON.stringify(messageObj));
-          } else {
-            console.error('此方法不存在');
-          }
-        } else {
-          window.JsCallQtMsg(JSON.stringify(messageObj)); // Join,Leave
+        switch (type) {
+          case 1: // 文档
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emiSwitchTo', ['document'])
+            );
+            break;
+          case 2: // 白板
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emiSwitchTo', ['board'])
+            );
+            break;
+          case 3: // 问卷
+            this.showAssistantTools('questionnaire');
+            this.$refs.questionnaire.open();
+            break;
+          case 4: // 抽奖
+            this.showAssistantTools('lottery');
+            this.$refs.lottery.open();
+            break;
+          case 5: // 签到
+            this.showAssistantTools('signLive');
+            this.$refs.signLive.openSign();
+            break;
+          case 6: // 答题
+            this.showAssistantTools('qa');
+            this.$refs.qa.handleQAPopup();
+            break;
+          case 7: // 隐藏文档
+            container && (container.style.opacity = 0);
+            break;
+          case 8: // 显示文档
+            container && (container.style.opacity = 1);
+            break;
+          case 9: // 文档最小化
+            this.exitFullscreen('#vhall-document-container');
+            break;
+          case 11: // 打开红包
+            this.showAssistantTools('redPacketLive');
+            this.$refs.redPacketLive.open();
+            break;
+          case 12: // 通知文档调用doc.sdk.start
+            // EventBus.$emit('live_start');
+            break;
+          // case 13: // 退出全屏
+          //   break;
+          // case 14: // 全屏
+          //   break;
+          case 15: // 计时器
+            this.showAssistantTools('timerSetLive');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+            break;
         }
+      },
+      // 展示当前互动工具
+      showAssistantTools(name) {
+        this.$refs.questionnaire.close();
+        this.$refs.lottery.close();
+        this.$refs.signLive.closeSign();
+        this.$refs.qa.close();
+        // this.$refs.redPacketLive.close();
+        this.tool_component_name = name;
       },
       initAssistantMsg() {
         // window.vhallClientEmbed = this.$refs.vhallClient;
