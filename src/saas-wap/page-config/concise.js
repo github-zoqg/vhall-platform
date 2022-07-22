@@ -179,7 +179,7 @@ export default {
   },
   // 礼物动画组件
   comWapRewardEffect: {
-    component: 'VmpWapRewardEffect'
+    component: 'VmpConciseWapRewardEffect'
   },
   // 礼物动画组件-SVGA
   comWapRewardEffectSVGA: {

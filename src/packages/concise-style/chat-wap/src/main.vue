@@ -1,14 +1,14 @@
 <template>
-  <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
+  <div class="vmp-chat-wap-concise" ref="chatWap" :class="smFix ? 'smFix' : ''">
     <!-- 礼物动画组件 -->
     <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
     <!-- 礼物动画组件-svga -->
     <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
-    <div class="vmp-chat-wap__content" ref="chatContentMain">
+    <div class="vmp-chat-wap-concise__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
         v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
-        class="vmp-chat-wap__content__get-list-btn-container"
+        class="vmp-chat-wap-concise__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
@@ -16,9 +16,11 @@
       </p>
       <div ref="chatContent" class="virtual-content">
         <virtual-list
+          class="virtual-list"
           v-if="virtual.showlist"
           ref="chatlist"
-          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
+          :style="{ height: chatlistHeight + 'px' }"
+          :class="{ overflow: overflow }"
           :keeps="20"
           :estimate-size="100"
           :data-key="'count'"
@@ -30,11 +32,12 @@
             emitQuestionnaireEvent,
             joinInfo
           }"
+          @resized="onItemRendered"
           @totop="onTotop"
           @tobottom="toBottom"
         ></virtual-list>
         <div
-          class="vmp-chat-wap__content__new-msg-tips"
+          class="vmp-chat-wap-concise__content__new-msg-tips"
           v-show="
             unReadMessageCount !== 0 &&
             (isHasUnreadNormalMsg || isHasUnreadAtMeMsg || isHasUnreadReplyMsg)
@@ -150,7 +153,8 @@
         //隐藏拉取历史聊天按钮
         hideChatHistory: false,
         //回复或@消息id
-        targetId: ''
+        targetId: '',
+        isFirstPageReady: false
       };
     },
     watch: {
@@ -601,6 +605,24 @@
       //关闭遮罩层
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
+      },
+      //判断是否需要滚动条
+      checkOverFlow() {
+        const chatlist = this.$refs.chatlist;
+        if (chatlist) {
+          this.overflow = chatlist.getScrollSize() > chatlist.getClientSize();
+        }
+      },
+      onItemRendered() {
+        if (!this.$refs.chatlist) {
+          return;
+        }
+        // 第一页的元素全部加载，滚动到底部
+        if (!this.isFirstPageReady && this.$refs.chatlist.getSizes() >= this.pageSize) {
+          this.isFirstPageReady = true;
+          this.scrollBottom();
+        }
+        this.checkOverFlow();
       }
     }
   };
@@ -610,7 +632,7 @@
   .van-image-preview__overlay {
     background-color: rgb(0, 0, 0) !important;
   }
-  .vmp-chat-wap {
+  .vmp-chat-wap-concise {
     height: 100%;
     overflow: hidden;
     position: relative;
@@ -620,9 +642,22 @@
       position: relative;
       background-color: #f7f7f7;
 
+      // TODO: 首条置底
+      /*     .virtual-list {
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        &.overflow {
+          flex-direction: column;
+        }
+      } */
+
       .virtual-list {
         height: 100%;
-        overflow: auto;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
       }
 
       > div:first-of-type {
@@ -648,23 +683,22 @@
       }
       &__new-msg-tips {
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 20px;
-        width: 337px;
-        height: 56px;
-        background: #ffffff;
+        left: 24px;
+        bottom: 16px;
+        width: fit-content;
+        height: 44px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.6);
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 4px 12px rgba(0, 0, 0, 0.1);
         border-radius: 28px;
-        color: #0a7ff5;
-        font-size: 28px;
+        font-size: 26px;
+        padding: 3px 16px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto;
         .vh-iconfont {
           font-size: 16px;
-          margin-left: 7px;
+          margin-left: 11px;
         }
       }
     }

@@ -94,6 +94,8 @@ import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 // ------------------------------【极简风格】引入组件------start----------
 import VmpConciseChatWap from '@/packages/concise-style/chat-wap';
 import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap';
+// 送礼物飘屏动画
+import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
 // ------------------------------【极简风格】引入组件------end----------
 
 // 全局注册组件
@@ -147,4 +149,5 @@ Vue.use(VmpViewRestrictionWap);
 // ------------------------------【极简风格】注册组件------start----------
 Vue.use(VmpConciseChatWap);
 Vue.use(VmpConciseHeaderWatchWap);
+Vue.use(VmpConciseWapRewardEffect);
 // ------------------------------【极简风格】注册组件------end----------
