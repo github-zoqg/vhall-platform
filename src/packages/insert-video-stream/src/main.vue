@@ -267,6 +267,10 @@
             (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
           interactiveServer.initInteractiveFailed
         );
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     watch: {
@@ -417,7 +421,8 @@
       },
       // 插播文件更改
       async inertFileChange(video, type) {
-        if (!this.checkInsertFileProcess()) {
+        // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
+        if (!this.checkInsertFileProcess() || this.isShareScreen) {
           // 当前不可演示插播, 关闭插播列表弹窗
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
