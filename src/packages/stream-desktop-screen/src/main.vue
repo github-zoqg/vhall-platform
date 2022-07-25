@@ -500,11 +500,10 @@
           videoNode: 'vmp-desktop-screen-publish', // 传入本地视频显示容器，必填
           profile, // 自定义分辨率，使用分辨率模板，选填，与videoQuality参数互斥，优先使用profile参数，推荐使用。
           videoContentHint:
-            sessionStorage.getItem('selectedScreenRate') == VhallRTC.RTC_SCREEN_PROFILE_1080P_16x9_M
-              ? 'detail'
-              : 'motion'
+            sessionStorage.getItem('selectedScreenRate') == 'RTC_SCREEN_PROFILE_1080P_16x9_H'
+              ? 'motion'
+              : 'detail'
         };
-
         this.desktopShareServer
           .startShareScreen(options)
           .then(() => {
