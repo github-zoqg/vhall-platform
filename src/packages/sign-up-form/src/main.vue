@@ -1150,7 +1150,13 @@
         //因为是独立页面，活动id/专题id只能从路由取
         this.webinarOrSubjectId =
           this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
-        await this.getWebinarType();
+        if (this.signUpPageType === 'subject') {
+          // 专题-默认 活动报名在前
+          this.isSubscribe = 1;
+          this.activeTab = 1;
+        } else {
+          await this.getWebinarType();
+        }
         this.getBaseInfo();
         this.getQuestionList();
       },
@@ -1665,8 +1671,12 @@
               if (res.code == 200) {
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
                 // 报名成功的操作，跳转到直播间
-                // 判断当前直播状态，进行相应的跳转
-                this.getWebinarStatus(true);
+                if (this.signUpPageType === 'subject') {
+                  this.getSubjectStatus();
+                } else {
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus(true);
+                }
               } else if (res.code == 512809 || res.code == 512570) {
                 // 短信验证码验证失败，触发表单验证失败
                 // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
@@ -1681,7 +1691,12 @@
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
-                this.getWebinarStatus();
+                if (this.signUpPageType === 'subject') {
+                  this.getSubjectStatus();
+                } else {
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus();
+                }
               } else {
                 this.$message.error(this.$tec(res.code) || res.msg);
               }
@@ -1712,8 +1727,12 @@
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
-                  // 判断当前直播状态，进行相应的跳转
-                  this.getWebinarStatus();
+                  if (this.signUpPageType === 'subject') {
+                    this.getSubjectStatus();
+                  } else {
+                    // 判断当前直播状态，进行相应的跳转
+                    this.getWebinarStatus();
+                  }
                 } else {
                   this.$message.warning(this.$t('form.form_1034'));
                   this.activeTab = 1;
@@ -1800,6 +1819,21 @@
             }
           }
         });
+      },
+      // 获取当前专题状态
+      getSubjectStatus() {
+        // 如果是独立链接，判断状态进行跳转
+        if (this.isEntryForm) {
+          const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/special/detail/${this.webinarOrSubjectId}${queryString}`;
+        } else {
+          this.closePreview();
+          //验证成功,刷新页面
+          location.reload();
+        }
       },
       //关闭当前视图
       closePreview() {

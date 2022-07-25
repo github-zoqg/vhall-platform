@@ -62,6 +62,12 @@ const routes = [
     meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
+    path: '/subject/entryform/:id',
+    component: entryForm,
+    name: 'entryFormSubject',
+    meta: { title: '独立报名表单', grayType: 'subject' }
+  },
+  {
     path: '/forgetPwd',
     component: forgetPwd,
     name: 'forgetPwd',
