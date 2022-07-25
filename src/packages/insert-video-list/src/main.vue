@@ -225,7 +225,7 @@
             customClass: 'zdy-message-box',
             cancelButtonClass: 'zdy-confirm-cancel'
           });
-          return;
+          return false;
         }
 
         // 如果在插播中，并且不是当前用户插播，alert提示
@@ -245,7 +245,7 @@
               cancelButtonClass: 'zdy-confirm-cancel'
             }
           );
-          return;
+          return false;
         }
 
         // 判断该当前浏览器是否支持插播
@@ -262,7 +262,7 @@
               callback: () => {}
             }
           );
-          return;
+          return false;
         }
         return true;
       },
@@ -272,6 +272,12 @@
       },
       // 选择本地文件插播
       selectLocalVideo() {
+        // 检查是否可以插播文件
+        if (!this.checkInsertFileProcess()) {
+          // 当前不可演示插播, 关闭插播列表弹窗
+          this.closeInserVideoDialog();
+          return;
+        }
         const insertFileServer = useInsertFileServer();
         const { watchInitData } = useRoomBaseServer().state;
         const _this = this;
