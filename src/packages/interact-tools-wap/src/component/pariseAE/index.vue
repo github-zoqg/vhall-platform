@@ -13,10 +13,6 @@
 
 <script>
   /**
-   * @description 点赞动画效果组件
-   */
-
-  /**
    * @description 随机算法闭包生成封装
    * @param array Array随机的总数据池
    * @returns Function 随机算法闭包
@@ -58,25 +54,36 @@
   const pick2TopAnimations = randomAlgorithmFactory(toTopAnimations); // 挑选向上动画
   const pickShakeTopAnimations = randomAlgorithmFactory(shakeAnimations); // 挑选左右摇摆动画
   let uuid = 1;
-  export function giveParise() {
-    const toTopAnimation = pick2TopAnimations();
+  /**
+   * @description 单次渲染一个元素的动画
+   */
+  function renderParise() {
     uuid++; // 自增唯一id
-    console.log(toTopAnimation);
     eleList.push({
       uuid,
       icon: pickIcon(),
       toTopAnimation: pick2TopAnimations(),
-      // shakeTopAnimations: ''
       shakeTopAnimations: pickShakeTopAnimations()
     });
-    console.log(eleList[eleList.length - 1]);
     // 及时删除第一个被占位的元素
     const st = setTimeout(() => {
       eleList.shift();
       clearTimeout(st);
     }, 2000);
   }
-
+  /**
+   * @description 对外暴露的点赞函数
+   */
+  export function giveParise() {
+    const maxCount = 2; //一次点赞最大渲染元素次数
+    const count = Math.ceil(Math.random() * maxCount);
+    for (let i = 0; i < count; i++) {
+      renderParise();
+    }
+  }
+  /**
+   * @description 点赞动画效果组件
+   */
   export default {
     name: 'pariseAE',
     data() {
