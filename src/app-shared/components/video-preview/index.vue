@@ -169,7 +169,7 @@
     },
     methods: {
       initPlayer() {
-        this.initSDK().then(async () => {
+        this.initSDK().then(() => {
           if (this.isInsertVideoPreview) {
             this._firstInit = true;
           }
@@ -179,12 +179,13 @@
           }); // 获取视频总时长
           this.initSlider(); // 初始化播放进度条
           this.listen();
-          await this.$nextTick(0);
-          try {
-            this.videoParam.autoplay && this.playerServer.play(); // TODO: player sdk 2.3.9+ 如果首次拉流404，后续不会自动播放，先hack解决
-          } catch (err) {
-            console.error('自动播放失败');
-          }
+          this.$nextTick(0).then(() => {
+            try {
+              this.videoParam.autoplay && this.playerServer.play(); // TODO: player sdk 2.3.9+ 如果首次拉流404，后续不会自动播放，先hack解决
+            } catch (err) {
+              console.error('自动播放失败');
+            }
+          });
         });
       },
       async initSDK() {
