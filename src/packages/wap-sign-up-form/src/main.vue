@@ -354,8 +354,13 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString } from '@/app-shared/utils/tool';
-  import { useSignUpFormServer, useRoomBaseServer, setRequestHeaders } from 'middle-domain';
+  import { validEmail, validPhone, getQueryString, replaceHtml } from '@/app-shared/utils/tool';
+  import {
+    useSignUpFormServer,
+    useRoomBaseServer,
+    setRequestHeaders,
+    useSubjectServer
+  } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
@@ -369,8 +374,8 @@
     },
     data() {
       return {
-        //活动id
-        webinar_id: this.$route.params.id,
+        // 活动id 或者 专题ID
+        webinarOrSubjectId: this.$route.params.id,
         //报名表单独立链接是否有效
         formOpenLinkStatus: 0,
         //默认的图片前缀地址
@@ -578,6 +583,15 @@
           }
           return maxLength;
         };
+      },
+      // 当前界面类型
+      signUpPageType() {
+        if (window.location.href.indexOf('/subject/entryform') != -1) {
+          // 专题
+          return 'subject';
+        } else {
+          return 'webinar';
+        }
       }
     },
     watch: {
@@ -634,28 +648,77 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
-      this.roomBaseServer = useRoomBaseServer();
     },
-    async mounted() {
-      await this.getFormLinkStatus();
-      await this.roomBaseServer.getLangList(this.$route.params.id);
-      const roomBaseState = this.roomBaseServer.state;
-      document.title = roomBaseState.languages.curLang.subject;
-      let lang = roomBaseState.languages.lang;
-      this.$i18n.locale = lang.type;
-      setRequestHeaders({
-        token: localStorage.getItem('token') || ''
+    mounted() {
+      if (this.signUpPageType === 'subject') {
+        this.subjectServer = useSubjectServer();
+        this.$i18n.locale = 'zh-CN';
+      } else {
+        this.roomBaseServer = useRoomBaseServer();
+      }
+      this.$nextTick(() => {
+        if (this.signUpPageType === 'subject') {
+          this.initSubjectInfo();
+        } else {
+          this.initWebinarInfo();
+        }
       });
-      // if (localStorage.getItem('lang')) {
-      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
-      // } else {
-      //   this.$i18n.locale = 'zh';
-      // }
-      this.getWebinarType();
-      this.getBaseInfo();
-      this.getQuestionList();
     },
     methods: {
+      // 设置接口入参，是活动维度 还是 专题维度
+      setParamsIdByRoute(params) {
+        if (this.signUpPageType === 'webinar') {
+          params.webinar_id = this.webinarOrSubjectId;
+        } else if (this.signUpPageType === 'subject') {
+          params.subject_id = this.webinarOrSubjectId;
+        }
+        return params;
+      },
+      async initWebinarInfo() {
+        await this.getFormLinkStatus();
+        await this.roomBaseServer.getLangList(this.$route.params.id);
+        const roomBaseState = this.roomBaseServer.state;
+        document.title = roomBaseState.languages.curLang.subject;
+        let lang = roomBaseState.languages.lang;
+        this.$i18n.locale = lang.type;
+        setRequestHeaders({
+          token: localStorage.getItem('token') || ''
+        });
+        // if (localStorage.getItem('lang')) {
+        //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+        // } else {
+        //   this.$i18n.locale = 'zh';
+        // }
+        this.getWebinarType();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      async initSubjectInfo() {
+        await this.getFormLinkStatus();
+        setRequestHeaders({
+          token: localStorage.getItem('token') || ''
+        });
+        this.isSubscribe = 1;
+        this.activeTab = 1;
+        this.cascadeResultList = [];
+        this.getSubjectDetail();
+        this.getBaseInfo();
+        this.getQuestionList();
+      },
+      async getSubjectDetail() {
+        try {
+          const res = await this.subjectServer.getSubjectInfo({
+            subject_id: this.webinarOrSubjectId
+          });
+          if (res.code !== 200) {
+            this.$toast(res.msg || '获取专题信息失败');
+            return;
+          }
+          this.wxShareInfoSubject(res.data.webinar_subject);
+        } catch (err) {
+          this.$toast(err.msg || '获取专题信息失败');
+        }
+      },
       //获取报名独立链接状态
       getFormLinkStatus() {
         if (this.$route.query.isIndependent == 0) {
@@ -663,7 +726,7 @@
           return;
         }
         const params = {
-          webinar_id: this.webinar_id,
+          ...this.setParamsIdByRoute({}),
           visit_id: sessionStorage.getItem('visitorId')
         };
         return this.signUpFormServer.getFormLinkStatus(params).then(res => {
@@ -673,11 +736,8 @@
       },
       //获取活动类型
       getWebinarType() {
-        const params = {
-          webinar_id: this.webinar_id
-        };
         return this.signUpFormServer
-          .getWebinarType(params)
+          .getWebinarType(this.setParamsIdByRoute({}))
           .then(res => {
             this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
             this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
@@ -687,16 +747,13 @@
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
               // 不支持的活动类型（flash）
-              window.location.href = `${window.location.origin}/${this.webinar_id}`;
+              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
             }
           });
       },
       //获取表单基本信息
       getBaseInfo() {
-        const params = {
-          webinar_id: this.webinar_id
-        };
-        this.signUpFormServer.getFormBaseInfo(params).then(res => {
+        this.signUpFormServer.getFormBaseInfo(this.setParamsIdByRoute({})).then(res => {
           if (res.data.tab_form_title) {
             res.data.tab_form_title =
               this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
@@ -727,11 +784,8 @@
       },
       //获取问题列表
       getQuestionList() {
-        const params = {
-          webinar_id: this.webinar_id
-        };
         this.signUpFormServer
-          .getQuestionsList(params)
+          .getQuestionsList(this.setParamsIdByRoute({}))
           .then(res => {
             // 按照 order_num 从小到大排序
             const list = res.data.ques_list.sort(this.compare('order_num'));
@@ -807,7 +861,10 @@
           captchaId: that.captchaKey,
           element: id,
           mode: 'float',
-          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
+          lang:
+            this.signupPageType === 'subject'
+              ? 'zh-CN'
+              : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady() {},
           onVerify(err, data) {
             if (data) {
@@ -927,7 +984,7 @@
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
             process.env.VUE_APP_WEB_KEY +
-            `/lives/watch/${this.webinar_id}${this.queryString}`
+            `/lives/watch/${this.webinarOrSubjectId}${this.queryString}`
         );
       },
       //提交表单到服务器
@@ -936,7 +993,7 @@
         const nameItem = this.list.find(item => item.type === 0 && item.default_type === 1);
 
         const params = {
-          webinar_id: this.webinar_id,
+          ...this.setParamsIdByRoute({}),
           phone: this.form[phoneItem.id],
           form: JSON.stringify(this.answer),
           report: JSON.stringify({
@@ -962,8 +1019,13 @@
           .then(res => {
             if (res && [200, '200'].includes(res.code)) {
               sessionStorage.setItem('visitorId', res.data.visit_id);
-              // 报名成功
-              this.getWebinarStatus();
+              if (this.signUpPageType === 'subject') {
+                // 专题 -- 报名成功后处理
+                this.getSubjectStatus();
+              } else {
+                // 活动 -- 报名成功后处理
+                this.getWebinarStatus();
+              }
             } else {
               return Promise.reject(res);
             }
@@ -975,61 +1037,54 @@
               this.errMsgMap.code = this.$t('cash.cash_1039');
             } else if (err.code == 512814 || err.code == 512815) {
               this.$toast(this.$t('form.form_1033'));
-              let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
-              if (queryString && this.$route.query.invite) {
-                queryString += this.$route.query.invite
-                  ? `&invite=${this.$route.query.invite}`
-                  : '';
-              } else if (this.$route.query.invite) {
-                queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
+              const queryString = this.returnQueryString();
+              if (this.signUpPageType === 'subject') {
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/special/detail/${this.webinarOrSubjectId}${queryString}`
+                );
+              } else {
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                );
               }
-              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-              const share_id = getQueryString('share_id');
-              const shareId = getQueryString('shareId');
-              if (queryString.indexOf('?') != -1) {
-                queryString += share_id ? `&share_id=${share_id}` : '';
-                queryString += shareId ? `&shareId=${shareId}` : '';
-              } else if (queryString.indexOf('?') == -1 && share_id) {
-                queryString += share_id ? `?share_id=${share_id}` : '';
-              } else if (queryString.indexOf('?') == -1 && shareId) {
-                queryString += shareId ? `?shareId=${shareId}` : '';
-              }
-              location.replace(
-                window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinar_id}${queryString}`
-              );
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
           });
       },
+      // 组装地址栏入参
+      returnQueryString() {
+        let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+        if (queryString && this.$route.query.invite) {
+          queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+        } else if (this.$route.query.invite) {
+          queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
+        }
+        //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+        const share_id = getQueryString('share_id');
+        const shareId = getQueryString('shareId');
+        if (queryString.indexOf('?') != -1) {
+          queryString += share_id ? `&share_id=${share_id}` : '';
+          queryString += shareId ? `&shareId=${shareId}` : '';
+        } else if (queryString.indexOf('?') == -1 && share_id) {
+          queryString += share_id ? `?share_id=${share_id}` : '';
+        } else if (queryString.indexOf('?') == -1 && shareId) {
+          queryString += shareId ? `?shareId=${shareId}` : '';
+        }
+        return queryString;
+      },
       //获取活动报名状态
       getWebinarStatus() {
-        const params = {
-          webinar_id: this.webinar_id
-        };
         this.signUpFormServer
-          .getWebinarType(params)
+          .getWebinarType(this.setParamsIdByRoute({}))
           .then(res => {
-            let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
-            if (queryString && this.$route.query.invite) {
-              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            } else if (this.$route.query.invite) {
-              queryString = this.$route.query.invite ? `?invite=${this.$route.query.invite}` : '';
-            }
-            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-            const share_id = getQueryString('share_id');
-            const shareId = getQueryString('shareId');
-            if (queryString.indexOf('?') != -1) {
-              queryString += share_id ? `&share_id=${share_id}` : '';
-              queryString += shareId ? `&shareId=${shareId}` : '';
-            } else if (queryString.indexOf('?') == -1 && share_id) {
-              queryString += share_id ? `?share_id=${share_id}` : '';
-            } else if (queryString.indexOf('?') == -1 && shareId) {
-              queryString += shareId ? `?shareId=${shareId}` : '';
-            }
+            const queryString = this.returnQueryString();
             if (res.data.webinar.type == 2) {
               this.startTime = res.data.webinar.start_time;
               this.queryString = queryString;
@@ -1039,16 +1094,28 @@
                 window.location.protocol +
                   process.env.VUE_APP_WAP_WATCH +
                   process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinar_id}${queryString}`
+                  `/lives/watch/${this.webinarOrSubjectId}${queryString}`
               );
             }
           })
           .catch(e => {
             if (e.code == 512503 || e.code == 512502) {
               // 不支持的活动类型（flash）
-              window.location.href = `${window.location.origin}/${this.webinar_id}`;
+              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
             }
           });
+      },
+      // 获取专题报名表单状态
+      getSubjectStatus() {
+        // webinar_state =》 1 直播  2 预告  3 结束 4 点播 5 回放
+        const queryString = this.returnQueryString();
+        // 提交报名表单成功，跳转专题详情
+        location.replace(
+          window.location.protocol +
+            process.env.VUE_APP_WAP_WATCH +
+            process.env.VUE_APP_WEB_KEY +
+            `/special/detail/${this.webinarOrSubjectId}${queryString}`
+        );
       },
       //将原始表单转化为答案
       formHandler() {
@@ -1193,7 +1260,7 @@
           window.location.protocol +
           process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
-          `/lives/entryform/${this.webinar_id}`;
+          `/lives/entryform/${this.webinarOrSubjectId}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
             const params = {
@@ -1213,11 +1280,37 @@
                 desc,
                 link:
                   window.location.protocol +
-                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/entryform/${this.webinar_id}`,
+                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/entryform/${this.webinarOrSubjectId}`,
                 imgUrl: info.img_url
               }
             );
           }
+        });
+      },
+      // 获取微信分享信息
+      wxShareInfoSubject(info) {
+        const wx_url =
+          window.location.protocol +
+          process.env.VUE_APP_WAP_WATCH +
+          process.env.VUE_APP_WEB_KEY +
+          `/subject/entryform/${this.webinarOrSubjectId}`;
+        this.subjectServer.wechatShare({ wx_url: wx_url }).then(res => {
+          initWeChatSdk(
+            {
+              appId: res.data.appId,
+              timestamp: res.data.timestamp,
+              nonceStr: res.data.nonceStr,
+              signature: res.data.signature
+            },
+            {
+              title: info.title,
+              desc: replaceHtml(info.intro),
+              link:
+                window.location.protocol +
+                `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/subject/entryform/${this.webinarOrSubjectId}`,
+              imgUrl: info.cover
+            }
+          );
         });
       },
       //切换展开/收起状态
@@ -1378,7 +1471,7 @@
         // 获取短信验证码
         if (isValidate && this.mobileKey) {
           this.countDown(isForm);
-          const params = { webinar_id: this.webinar_id, phone: phone, captcha: this.mobileKey };
+          const params = { ...this.setParamsIdByRoute({}), phone: phone, captcha: this.mobileKey };
           this.signUpFormServer.sendVerifyCode(params);
         }
       },
@@ -1454,7 +1547,7 @@
         if (!this.errPhone && !this.errCode) {
           const refer = this.getQueryVariable('refer');
           const params = {
-            webinar_id: this.webinar_id,
+            ...this.setParamsIdByRoute({}),
             phone: this.verifyForm.phone,
             refer
           };
@@ -1477,34 +1570,12 @@
               if (res.data.has_registed == 1) {
                 sessionStorage.setItem('visitorId', res.data.visit_id);
                 this.$toast(this.$t('form.form_1033'));
-                let queryString = this.$route.query.refer
-                  ? `?refer=${this.$route.query.refer}`
-                  : '';
-                if (queryString && this.$route.query.invite) {
-                  queryString += this.$route.query.invite
-                    ? `&invite=${this.$route.query.invite}`
-                    : '';
-                } else if (this.$route.query.invite) {
-                  queryString = this.$route.query.invite
-                    ? `?invite=${this.$route.query.invite}`
-                    : '';
-                }
-                //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-                const share_id = getQueryString('share_id');
-                const shareId = getQueryString('shareId');
-                if (queryString.indexOf('?') != -1) {
-                  queryString += share_id ? `&share_id=${share_id}` : '';
-                  queryString += shareId ? `&shareId=${shareId}` : '';
-                } else if (queryString.indexOf('?') == -1 && share_id) {
-                  queryString += share_id ? `?share_id=${share_id}` : '';
-                } else if (queryString.indexOf('?') == -1 && shareId) {
-                  queryString += shareId ? `?shareId=${shareId}` : '';
-                }
+                const queryString = this.returnQueryString();
                 location.replace(
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinar_id}${queryString}`
+                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
                 );
               } else {
                 this.$toast(this.$t('form.form_1034'));
