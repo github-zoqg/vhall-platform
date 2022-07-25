@@ -176,6 +176,10 @@
       // 当前插播中的云插播文件
       currentRemoteInsertFile() {
         return this.$domainStore.state.insertFileServer.currentRemoteInsertFile;
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       }
     },
     components: {
@@ -272,8 +276,8 @@
       },
       // 选择本地文件插播
       selectLocalVideo() {
-        // 检查是否可以插播文件
-        if (!this.checkInsertFileProcess()) {
+        // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
+        if (!this.checkInsertFileProcess() || this.isShareScreen) {
           // 当前不可演示插播, 关闭插播列表弹窗
           this.closeInserVideoDialog();
           return;
