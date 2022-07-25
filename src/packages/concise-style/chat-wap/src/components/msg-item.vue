@@ -138,12 +138,24 @@
                     class="role"
                     :class="source.roleName | roleClassFilter"
                   >
-                    {{ source.roleName | roleFilter }}
+                    <span>{{ source.roleName | roleFilter }}</span>
                   </span>
                   <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
                   <span v-html="msgContent" class="chat-text"></span>
+                  <template v-if="!!!msgContent">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="msg-content_chat-img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </template>
                 </div>
-                <div class="imgs">
+                <div v-if="!!msgContent" class="imgs">
                   <div
                     @click="previewImg(img, index, source.content.image_urls)"
                     class="img"
@@ -168,7 +180,7 @@
                     class="role"
                     :class="source.roleName | roleClassFilter"
                   >
-                    {{ source.roleName | roleFilter }}
+                    <span>{{ source.roleName | roleFilter }}</span>
                   </span>
                   <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
                   <span v-html="msgContent" class="chat-text"></span>
@@ -453,6 +465,26 @@
           color: #fff;
           font-size: 26px;
           max-width: 520px;
+          .chat-text {
+            img {
+              width: 34px;
+              height: 34px;
+            }
+          }
+          .msg-content_chat-img {
+            vertical-align: text-top;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            margin: 0 8px 5px 0;
+            border-radius: 4px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            &:nth-last-child(1) {
+              margin-right: 0;
+            }
+          }
           > .normal-msg {
             > .textInfo {
               line-height: 1.46;
@@ -461,16 +493,6 @@
               }
               span {
                 word-break: break-word;
-              }
-              .chat-text {
-                img {
-                  width: 34px;
-                  height: 34px;
-                }
-              }
-              .msg-content_chat-img {
-                vertical-align: text-top;
-                margin-top: 0;
               }
             }
             > .imgs {
@@ -495,7 +517,7 @@
             position: relative;
             > .textInfo {
               color: rgba(255, 255, 255, 0.6);
-              position: relative;
+              position: relati ve;
               line-height: 1.46;
             }
 
@@ -518,7 +540,7 @@
             &::after {
               content: ' ';
               width: 6px;
-              height: calc(100% - 9px);
+              height: calc(100% - 14px);
               position: absolute;
               top: 9px;
               left: 0;
