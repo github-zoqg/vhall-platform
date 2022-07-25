@@ -1109,7 +1109,7 @@
       },
       // 当前界面类型
       signUpPageType() {
-        if (window.location.href.indexOf('/subject/') != -1) {
+        if (window.location.href.indexOf('/subject/entryform') != -1) {
           // 专题
           return 'subject';
         } else {
@@ -1122,6 +1122,9 @@
       this.signUpFormServer = useSignUpFormServer();
     },
     mounted() {
+      if (this.signUpPageType === 'subject') {
+        this.$i18n.locale = 'zh-CN';
+      }
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
       if (this.isEntryForm) {
         this.init();
@@ -1602,7 +1605,10 @@
         initNECaptcha({
           captchaId: that.captchaKey,
           element: id,
-          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
+          lang:
+            this.signUpPageType === 'subject'
+              ? 'zh-CN'
+              : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           mode: 'float',
           onReady() {},
           onVerify(err, data) {

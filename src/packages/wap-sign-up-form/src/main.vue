@@ -586,7 +586,7 @@
       },
       // 当前界面类型
       signUpPageType() {
-        if (window.location.href.indexOf('/subject/') != -1) {
+        if (window.location.href.indexOf('/subject/entryform') != -1) {
           // 专题
           return 'subject';
         } else {
@@ -652,6 +652,7 @@
     mounted() {
       if (this.signUpPageType === 'subject') {
         this.subjectServer = useSubjectServer();
+        this.$i18n.locale = 'zh-CN';
       } else {
         this.roomBaseServer = useRoomBaseServer();
       }
@@ -860,7 +861,10 @@
           captchaId: that.captchaKey,
           element: id,
           mode: 'float',
-          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
+          lang:
+            this.signupPageType === 'subject'
+              ? 'zh-CN'
+              : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady() {},
           onVerify(err, data) {
             if (data) {
