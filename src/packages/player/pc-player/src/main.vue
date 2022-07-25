@@ -862,6 +862,7 @@
             this.liveOption.useSWF = false;
           } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         } else {
           this.vodOption.recordId = id;
@@ -870,6 +871,7 @@
             this.liveOption.useSWF = false;
           } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         }
         if (this.isWarnPreview) {
