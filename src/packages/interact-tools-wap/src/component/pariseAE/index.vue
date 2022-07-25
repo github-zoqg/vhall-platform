@@ -53,7 +53,7 @@
   const pickIcon = randomAlgorithmFactory(iconList); // 挑选向上动画
   const pick2TopAnimations = randomAlgorithmFactory(toTopAnimations); // 挑选向上动画
   const pickShakeTopAnimations = randomAlgorithmFactory(shakeAnimations); // 挑选左右摇摆动画
-  let uuid = 1;
+  let uuid = 1; // v-for的key(禁用index)
   /**
    * @description 单次渲染一个元素的动画
    */

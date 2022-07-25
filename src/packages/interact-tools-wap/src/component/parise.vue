@@ -77,8 +77,7 @@
         return arr[m];
       },
       support(e) {
-        console.log(111111);
-        giveParise();
+        giveParise(); // 点赞效果
         this.timess++;
         this.like = this.like + 1;
         // this.$forceUpdate();
