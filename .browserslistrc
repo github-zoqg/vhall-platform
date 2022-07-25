@@ -1,6 +1,6 @@
 > 1%
-last 3 versions
+last 10 versions
 chrome  > 30
-ios 7
+ios >=7
 not ie <= 8
 not dead
