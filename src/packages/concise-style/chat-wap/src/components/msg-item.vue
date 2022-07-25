@@ -24,7 +24,7 @@
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
-            {{ source.roleName != 1 ? overHidden(source.nickname, 6) : '' }}
+            <span>{{ overHidden(source.nickname, 6) }}</span>
           </template>
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
@@ -63,8 +63,7 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          {{ source.roleName != 1 ? overHidden(source.nickname, 6) : '' }}
-          &nbsp;
+          <span>{{ overHidden(source.nickname, 6) }}</span>
           {{ source.content.text_content }}
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
