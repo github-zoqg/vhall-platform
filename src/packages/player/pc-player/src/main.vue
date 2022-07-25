@@ -290,6 +290,7 @@
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import swfList from './js/swf-list.js';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -841,6 +842,10 @@
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
         const winVersion = windowVersion();
+        const ua = window.navigator.userAgent;
+        const swf = swfList.some(item => {
+          return ua.includes(item);
+        });
         // 直播
         this.playerServer.setType(type);
         if (type === 'live') {
@@ -855,7 +860,7 @@
           };
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
           }
         } else {
@@ -863,7 +868,7 @@
           this.liveOption = {};
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
           }
         }
