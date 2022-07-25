@@ -75,6 +75,7 @@ const checkValidArgs = argv => {
 };
 
 function getShortEnv(mode) {
+  console.log('---', mode);
   const saasEnv = getEnv(mode, 'VUE_APP_SAAS_ENV');
   return saasEnv === 'production' ? 'prod' : saasEnv === 'development' ? 'dev' : saasEnv;
 }
@@ -148,9 +149,9 @@ async function checkRes(url) {
   }
 }
 
-async function checkDomainRes(project) {
+async function checkDomainRes(project, mode) {
   try {
-    const vConfig = this.createSpecialConfig(project);
+    const vConfig = this.createSpecialConfig(project, mode);
     let domainUrl = vConfig.pages.index.cdnJs['MiddleDomain'];
     if (domainUrl.startsWith('//')) {
       domainUrl = `https:${domainUrl}`;

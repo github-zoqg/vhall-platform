@@ -53,7 +53,8 @@ btool.bootstripTip({
     spinner.info(`${chalk.magenta('准备构建项目')}${chalk.magenta.bold(project)}\r\n`);
     // 进度开始
     spinner.start(`正在检查domain资源\n`);
-    const { status } = await btool.checkDomainRes(project);
+    const vueMode = btool.getVueMode(cmd, mode);
+    const { status } = await btool.checkDomainRes(project, vueMode);
     if (status === 1) {
       spinner.succeed(chalk.green(`domain资源存在\n`));
     } else {
