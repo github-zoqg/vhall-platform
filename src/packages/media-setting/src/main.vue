@@ -367,7 +367,8 @@
           // 推流过程中动态切换视频清晰或流畅模式
           this.mediaSettingServer.setVideoContentHint({
             streamId: this.localDesktopStreamId,
-            hint: this.mediaState.screenRate
+            hint:
+              this.mediaState.screenRate == 'RTC_SCREEN_PROFILE_1080P_16x9_H' ? 'motion' : 'detail'
           });
         }
       },
