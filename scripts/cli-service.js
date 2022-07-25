@@ -38,7 +38,7 @@ const cmdOption = cmdArgs.join(' ');
 const cmd = _[0];
 // 获取各种环境
 const vueMode = btool.getVueMode(cmd, mode);
-const nodeEnv = btool.getNodeEnv(vueMode);
+const nodeEnv = btool.getEnv(vueMode, 'NODE_ENV');
 process.env.NODE_ENV = nodeEnv;
 // 开启提示文字
 btool.bootstripTip({
