@@ -968,7 +968,11 @@
             return;
           }
           if (_this.isInteract !== 1 && msg.data.room_role == 1) {
-            _this.$message.success({ message: '直播发起成功' });
+            if (_this.roomBaseServer.state.isThirdStream) {
+              _this.$message.success({ message: '正在使用第三方推流' });
+            } else {
+              _this.$message.success({ message: '直播发起成功' });
+            }
             return;
           }
           if (msg.data.room_join_id == _this.userId) {
