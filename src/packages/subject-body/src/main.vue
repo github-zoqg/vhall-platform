@@ -196,7 +196,7 @@
           case 512531:
             // 邀请码
             placeHolderInfo.placeHolder =
-              this.subjectAuthInfo.verify_tip || this.$t('appointment.appointment_1024');
+              this.subjectAuthInfo.fcode_verify || this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
@@ -204,7 +204,7 @@
           case 512528:
             // 密码
             placeHolderInfo.placeHolder =
-              this.subjectAuthInfo.verify_tip || this.$t('appointment.appointment_1022');
+              this.subjectAuthInfo.password_verify || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
@@ -212,7 +212,7 @@
           case 512532:
             //白名单
             placeHolderInfo.placeHolder =
-              this.subjectAuthInfo.verify_tip || this.$t('common.common_1006');
+              this.subjectAuthInfo.white_verify || this.$t('common.common_1006');
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
@@ -426,6 +426,15 @@
     background-color: #bbbbbb !important;
   }
   @media (min-width: 1920px) {
+    .vmp-subject-body {
+      width: 1510px;
+      margin: 0 auto;
+    }
+    .el-col-xl-6 {
+      width: 20%;
+    }
+  }
+  @media (min-width: 1600px) {
     .vmp-subject-body {
       width: 1510px;
       margin: 0 auto;
