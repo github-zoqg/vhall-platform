@@ -70,7 +70,7 @@
         // 产品侧数据埋点初始化（只有发起端用）
         domain.initVhallReportForProduct({
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-          app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
+          app_id: process.env.VUE_APP_SAAS_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
           pf: 8, // 客户端类型  web 网页端用 8
           business_uid: watchInitData.join_info.third_party_user_id, // B端客户 id
           user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）

@@ -74,11 +74,11 @@ const checkValidArgs = argv => {
 };
 
 function getShortEnv() {
-  return process.env.NODE_ENV === 'production'
+  return process.env.VUE_APP_SAAS_ENV === 'production'
     ? 'prod'
-    : process.env.NODE_ENV === 'development'
+    : process.env.VUE_APP_SAAS_ENV === 'development'
     ? 'dev'
-    : process.env.NODE_ENV;
+    : process.env.VUE_APP_SAAS_ENV;
 }
 
 /**
