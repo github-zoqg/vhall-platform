@@ -143,7 +143,7 @@
           v-if="(configList['ui.hide_handsUp'] && mode !== 6) || guestHasInvitePer"
         >
           <label class="raise-hand-switch" for="raiseHandSwitch">
-            允许观众上麦
+            允许观众申请连麦
             <input
               style="display: none"
               v-model="allowRaiseHand"
