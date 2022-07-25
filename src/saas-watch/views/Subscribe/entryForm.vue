@@ -17,7 +17,9 @@
     },
     data() {
       return {
-        webinar_id: this.$route.params.id,
+        signUpPageType:
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar',
+        webinarOrSubjectId: this.$route.params.id,
         formOpenLinkStatus: 0
       };
     },
@@ -26,29 +28,52 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
-      // await this.getGrayConfig();
-      this.getFormOpenLinkStatus();
-      //多语言接口
-      await this.roomBaseServer.getLangList(this.webinar_id);
-      const roomBaseState = this.roomBaseServer.state;
-      document.title = roomBaseState.languages.curLang.subject;
-      let lang = roomBaseState.languages.lang;
-      this.$i18n.locale = lang.type;
-      // if (localStorage.getItem('lang')) {
-      //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
-      // } else {
-      //   this.$i18n.locale = 'zh';
-      // }
+      if (this.signUpPageType === 'webinar') {
+        this.initWebinarInfo();
+      } else {
+        this.initSubjectInfo();
+      }
     },
     methods: {
+      async initWebinarInfo() {
+        // await this.getGrayConfig();
+        this.getFormOpenLinkStatus();
+        //多语言接口
+        await this.roomBaseServer.getLangList(this.webinarOrSubjectId);
+        const roomBaseState = this.roomBaseServer.state;
+        document.title = roomBaseState.languages.curLang.subject;
+        let lang = roomBaseState.languages.lang;
+        this.$i18n.locale = lang.type;
+        // if (localStorage.getItem('lang')) {
+        //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
+        // } else {
+        //   this.$i18n.locale = 'zh';
+        // }
+      },
+      initSubjectInfo() {
+        this.entryformServer
+          .verifyOpenLink({
+            subject_id: this.webinarOrSubjectId,
+            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
+          })
+          .then(res => {
+            // 如果当前 visitor_id 已经报名，跳转到专题页
+            if (res.data.has_registed)
+              return (window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail/${this.webinarOrSubjectId}`);
+            // 如果独立链接无效，显示无效页
+            if (res.data.available == 0) return (this.formOpenLinkStatus = 2);
+            // 显示报名表单
+            this.formOpenLinkStatus = 1;
+          });
+      },
       // getGrayConfig() {
       //   return this.roomBaseServer
       //     .webinarInitBefore({
-      //       webinar_id: this.webinar_id
+      //       webinarOrSubjectId: this.webinarOrSubjectId
       //     })
       //     .then(res => {
       //       if (res.code == 200 && res.data) {
-      //         sessionStorage.setItem(`V3_WAP_US_${this.webinar_id}`, res.data.user_id);
+      //         sessionStorage.setItem(`V3_WAP_US_${this.webinarOrSubjectId}`, res.data.user_id);
       //       } else {
       //         console.log(`灰度ID-获取活动by用户信息失败~${res.msg}`);
       //       }
@@ -61,7 +86,7 @@
       getFormOpenLinkStatus() {
         this.entryformServer
           .verifyOpenLink({
-            webinar_id: this.webinar_id,
+            webinar_id: this.webinarOrSubjectId,
             visit_id: this.roomBaseServer.state.watchInitData.visitor_id
           })
           .then(res => {
@@ -77,20 +102,20 @@
       getWebinarStatus() {
         this.entryformServer
           .watchInit({
-            webinar_id: this.webinar_id
+            webinar_id: this.webinarOrSubjectId
           })
           .then(res => {
             if (res.data.status == 'live') {
-              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinar_id}`;
+              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarOrSubjectId}`;
             } else if (res.data.status == 'subscribe') {
               // 如果预约或结束，跳转到预约页
-              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinar_id}`;
+              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinarOrSubjectId}`;
             }
           })
           .catch(e => {
             //512502 不支持的活动类型(flash)、512503	不支持的活动类型(旧h5)
             if (e.code == 512503 || e.code == 512502) {
-              window.location.href = `${window.location.origin}/${this.webinar_id}`;
+              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
             }
           });
       }
