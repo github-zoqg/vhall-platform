@@ -16,7 +16,7 @@
         <div class="content">
           <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
           <span class="nick-name">
-            {{ gift_user_nickname(rewardEffectInfo) | overHidden(7) }}
+            {{ gift_user_nickname(rewardEffectInfo) | overHidden(8) }}
           </span>
           <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
@@ -145,7 +145,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 3000,
+        minTaskTime: 300000,
         maxQueueLen: 2
       });
 
@@ -290,7 +290,7 @@
     z-index: 100;
 
     .reward-effect-box {
-      height: 56px;
+      height: 46px;
       width: fit-content;
       position: relative;
       background-size: contain;
@@ -354,7 +354,7 @@
     }
     .content {
       position: relative;
-      top: -14px;
+      top: -16px;
       left: 24px;
       display: flex;
       align-items: center;

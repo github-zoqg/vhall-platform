@@ -133,8 +133,20 @@
           }
 
           // TODO: 根据状态判断是极简风格还是传统风格
-          // concise-极简风格    main-传统风格
-          setPage('concise');
+          // concise-极简风格    main-传统风格    fashion——时尚风格
+          // TODO: 暂时存到session中，之后再改。
+          let room_style = window.sessionStorage.getItem('room_style');
+          if (room_style) {
+            setPage(room_style == 'fashion' ? 'main' : room_style);
+            if (room_style == 'fashion') {
+              console.log(window.$serverConfig);
+              window.$serverConfig.comChatWap.component = 'VmpChatWapFashion';
+              window.$serverConfig._page = 'fashion';
+            }
+          } else {
+            window.sessionStorage.setItem('room_style', 'concise');
+            setPage('concise');
+          }
 
           await roomState();
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-wap-msg-item-concise" style="pointer-events: auto">
+  <div class="vmp-chat-wap-msg-item-fashion" style="pointer-events: auto">
     <!-- 发起抽奖/问答 -->
     <template
       v-if="
@@ -21,10 +21,10 @@
               )
             "
           >
+            <span>{{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}</span>
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
-            <span>{{ overHidden(source.nickname, 6) }}</span>
           </template>
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
@@ -60,10 +60,10 @@
           @tap="checkQuestionDetail(source.content.questionnaire_id)"
           @click="checkQuestionDetail(source.content.questionnaire_id)"
         >
+          <span>{{ source.roleName != 1 ? overHidden(source.nickname, 8) : '' }}</span>
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          <span>{{ overHidden(source.nickname, 6) }}</span>
           {{ source.content.text_content }}
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
@@ -74,9 +74,8 @@
       <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
           <span class="new-gift-name">
-            {{ source.nickname | overHidden(6) }}
+            {{ source.nickname | overHidden(8) }}
           </span>
-          &nbsp;
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
@@ -97,9 +96,25 @@
     </template>
     <!-- 聊天消息 -->
     <template v-else>
+      <div v-if="showTime" class="msg-showtime">{{ showTime }}</div>
       <div class="msg-item">
-        <!-- 正常聊天消息 -->
+        <div class="avatar-wrap">
+          <img class="chat-avatar" :src="source.avatar || defaultAvatar" alt />
+        </div>
         <div class="msg-content">
+          <!-- 正常聊天消息 -->
+          <!-- <div class="msg-content_name">
+            <span class="nickname">
+              {{ source.nickname | overHidden(8) }}
+            </span>
+            <span
+              v-if="source.roleName && source.roleName != '2'"
+              class="role"
+              :class="source.roleName | roleClassFilter"
+            >
+              <span>{{ source.roleName | roleFilter }}</span>
+            </span>
+          </div> -->
           <!-- 图文消息 -->
           <!-- 回复消息 -->
           <template
@@ -112,34 +127,20 @@
           >
             <div class="msg-content_body">
               <div class="reply-msg">
-                <div
-                  class="textInfo"
-                  :class="
-                    !!!source.replyMsg.content.text_content &&
-                    source.replyMsg.content.image_urls.length != 0
-                      ? 'existSimpleImg'
-                      : ''
-                  "
-                >
+                <div class="textInfo">
                   <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
                   ：
                   <span v-html="source.replyMsg.content.text_content" />
-                  <template v-if="!!!source.replyMsg.content.text_content">
-                    <div
-                      @click="previewImg(img, index, source.replyMsg.content.image_urls)"
-                      class="msg-content_chat-img"
-                      v-for="(img, index) in source.replyMsg.content.image_urls"
-                      :key="index"
-                      :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
-                      }')`"
-                      :alt="$t('chat.chat_1065')"
-                    ></div>
-                  </template>
                 </div>
-                <div v-if="!!source.replyMsg.content.text_content" class="imgs">
+                <div class="reply-msg-content">
+                  <span class="reply-color">
+                    {{ $t('chat.chat_1036') }}
+                  </span>
+                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
+                </div>
+                <div class="imgs">
                   <div
-                    @click="previewImg(img, index, source.replyMsg.content.image_urls)"
+                    @click="previewImg(img, index, source.content.image_urls)"
                     class="img"
                     v-for="(img, index) in source.replyMsg.content.image_urls"
                     :key="index"
@@ -151,12 +152,7 @@
                 </div>
               </div>
               <div class="reply-msg-content">
-                <div
-                  class="textInfo"
-                  :class="
-                    !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
-                  "
-                >
+                <div class="textInfo">
                   <span
                     v-if="source.roleName && source.roleName != '2'"
                     class="role"
@@ -164,7 +160,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(5) }}：</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -196,31 +192,29 @@
           </template>
           <!-- @消息 -->
           <template v-if="source.atList && source.atList.length !== 0">
-            <div class="msg-content_body">
-              <div class="normal-msg">
-                <div class="textInfo">
-                  <span
-                    v-if="source.roleName && source.roleName != '2'"
-                    class="role"
-                    :class="source.roleName | roleClassFilter"
-                  >
-                    <span>{{ source.roleName | roleFilter }}</span>
-                  </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
-                  <span v-html="msgContent" class="chat-text"></span>
-                </div>
-                <div class="imgs">
-                  <div
-                    @click="previewImg(img, index, source.content.image_urls)"
-                    class="img"
-                    v-for="(img, index) in source.content.image_urls"
-                    :key="index"
-                    :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
-                    }')`"
-                    :alt="$t('chat.chat_1065')"
-                  ></div>
-                </div>
+            <div class="normal-msg">
+              <div class="textInfo">
+                <span
+                  v-if="source.roleName && source.roleName != '2'"
+                  class="role"
+                  :class="source.roleName | roleClassFilter"
+                >
+                  <span>{{ source.roleName | roleFilter }}</span>
+                </span>
+                <span class="nickname">{{ source.nickname | overHidden(5) }}：</span>
+                <span v-html="msgContent" class="chat-text"></span>
+              </div>
+              <div class="imgs">
+                <div
+                  @click="previewImg(img, index, source.content.image_urls)"
+                  class="img"
+                  v-for="(img, index) in source.content.image_urls"
+                  :key="index"
+                  :style="`backgroundImage: url('${
+                    img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                  }')`"
+                  :alt="$t('chat.chat_1065')"
+                ></div>
               </div>
             </div>
           </template>
@@ -246,7 +240,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(5) }}：</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -283,6 +277,7 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { handleChatShowTime } from '../js/handle-time.js';
   export default {
     props: {
       source: {
@@ -313,7 +308,8 @@
     data() {
       return {
         msgContent: '',
-        defaultAvatar: defaultAvatar
+        defaultAvatar: defaultAvatar,
+        jiantou: require('../img/jiantou.png')
       };
     },
     filters: {
@@ -347,7 +343,24 @@
         return '';
       }
     },
-    computed: {},
+    computed: {
+      // multi() {
+      //   if (this.msgContent.indexOf('<br/>') == -1) {
+      //     return false;
+      //   } else {
+      //     return true;
+      //   }
+      // },
+      showTime() {
+        if (!this.source.sendTime) {
+          return '';
+        }
+        if (!this.source.prevTime) {
+          return handleChatShowTime('', this.source.sendTime);
+        }
+        return handleChatShowTime(this.source.prevTime, this.source.sendTime);
+      }
+    },
     mounted() {
       this.handleAt();
     },
@@ -384,7 +397,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#FB2626'>${userName}</span>`
+                  `<span style='color:#3562fa'>${userName}</span>`
                 )
               );
             }
@@ -448,13 +461,36 @@
   };
 </script>
 <style lang="less">
-  .vmp-chat-wap-msg-item-concise {
+  .vmp-chat-wap-msg-item-fashion {
     pointer-events: auto;
+    .msg-showtime {
+      padding: 8px 0 24px;
+      font-size: 24px;
+      color: #595959;
+      text-align: center;
+    }
     .msg-item {
       margin: 0 24px;
       padding: 0 0 16px;
       display: flex;
       align-items: flex-start;
+      .avatar-wrap {
+        position: relative;
+        margin-right: 10px;
+        .chat-avatar {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          display: block;
+          // border: 2px solid #e3e3e3;
+          object-fit: cover;
+        }
+        .chat-phone {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
       .nickname {
         font-size: 26px;
       }
@@ -509,12 +545,12 @@
               margin-right: 0;
             }
           }
-          .existSimpleImg {
-            padding-top: 5px;
-          }
           > .normal-msg {
             > .textInfo {
-              line-height: 1.46;
+              line-height: 38px;
+              &.existSimpleImg {
+                padding-top: 5px;
+              }
               span {
                 word-break: break-word;
               }
@@ -542,7 +578,7 @@
             > .textInfo {
               color: rgba(255, 255, 255, 0.6);
               position: relati ve;
-              line-height: 1.46;
+              line-height: 38px;
             }
 
             > .imgs {
@@ -576,7 +612,7 @@
             position: relative;
             > .textInfo {
               color: #fff;
-              line-height: 1.46;
+              line-height: 38px;
             }
 
             > .imgs {
