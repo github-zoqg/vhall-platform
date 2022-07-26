@@ -862,7 +862,7 @@
           element: id,
           mode: 'float',
           lang:
-            this.signupPageType === 'subject'
+            this.signUpPageType === 'subject'
               ? 'zh-CN'
               : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady() {},
