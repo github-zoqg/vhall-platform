@@ -24,7 +24,7 @@
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
-            <span>{{ overHidden(source.nickname, 6) }}</span>
+            <span class="nickname">{{ overHidden(source.nickname, 6) }}&nbsp;</span>
           </template>
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
@@ -32,7 +32,7 @@
               :src="require('@/app-shared/assets/img/wap/chat/reward.png')"
             />
           </template>
-          {{ source.content.text_content }}
+          <span class="chat-text">{{ source.content.text_content }}</span>
         </div>
       </div>
     </template>
@@ -63,8 +63,8 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          <span>{{ overHidden(source.nickname, 6) }}</span>
-          {{ source.content.text_content }}
+          <span class="nickname">{{ overHidden(source.nickname, 6) }}&nbsp;</span>
+          <span class="chat-text">{{ source.content.text_content }}</span>
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
       </div>
@@ -73,10 +73,7 @@
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
-          <span class="new-gift-name">
-            {{ source.nickname | overHidden(6) }}
-          </span>
-          &nbsp;
+          <span class="new-gift-name">{{ source.nickname | overHidden(6) }}&nbsp;</span>
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
           </span>
@@ -100,7 +97,6 @@
       <div class="msg-item">
         <!-- 正常聊天消息 -->
         <div class="msg-content">
-          <!-- 图文消息 -->
           <!-- 回复消息 -->
           <template
             v-if="
@@ -490,7 +486,7 @@
           position: relative;
           background: rgba(0, 0, 0, 0.25);
           border-radius: 20px;
-          padding: 3px 16px;
+          padding: 3px 12px;
           word-break: break-all;
           font-size: 26px;
           max-width: 520px;
@@ -661,6 +657,12 @@
             background-repeat: no-repeat;
             background-position: center;
           }
+          .new-gift-name {
+            color: rgba(255, 255, 255, 0.65);
+          }
+          .new-gift-content {
+            color: rgba(255, 255, 255, 1);
+          }
           .new-gift-img {
             width: 36px;
             position: absolute;
@@ -684,6 +686,12 @@
             width: 36px;
             position: absolute;
             left: 16px;
+          }
+          .nickname {
+            color: rgba(255, 255, 255, 0.65);
+          }
+          .chat-text {
+            color: rgba(255, 255, 255, 1);
           }
         }
       }
