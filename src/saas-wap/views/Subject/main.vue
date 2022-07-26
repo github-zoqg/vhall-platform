@@ -92,7 +92,7 @@
         <input
           :type="`${isHidden ? 'password' : 'text'}`"
           v-model="textAuth"
-          :placeHolder="authInfo.placeHolder"
+          :placeHolder="subjectAuthInfo.placeHolder"
         />
         <i
           :class="`vh-iconfont ${isHidden ? 'vh-line-hidden' : 'vh-line-view'}`"
@@ -353,7 +353,7 @@
             window.location.href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
-              `/lives/watch/${this.webinarId}${window.location.search}`;
+              `/lives/watch/${this.webinarId}`;
           } else {
             this.$toast('验证失败' || res.msg);
           }
