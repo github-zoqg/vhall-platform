@@ -51,7 +51,13 @@
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
   // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
-  import { useRoomBaseServer, useQaServer, useChatServer, useGroupServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useQaServer,
+    useChatServer,
+    useGroupServer,
+    useMenuServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
@@ -145,7 +151,7 @@
     },
     mounted() {
       this.listenEvents();
-      this.getQaHistoryMsg();
+
       this.initLoginStatus();
       this.initInputStatus();
     },
@@ -153,6 +159,7 @@
       listenEvents() {
         const qaServer = useQaServer();
         const chatServer = useChatServer();
+        const menuServer = useMenuServer();
         //监听新建问答消息
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
@@ -192,6 +199,12 @@
         useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           if (!this.isInGroup) {
             this.getQaHistoryMsg();
+          }
+        });
+        menuServer.$on('tab-switched', async data => {
+          if (this.cuid === data.cuid && !qaServer.state.active) {
+            await this.getQaHistoryMsg();
+            qaServer.setState('active', true);
           }
         });
       },
@@ -234,7 +247,7 @@
       },
       // 获取历史消息
       getQaHistoryMsg() {
-        useQaServer().getQaHistory();
+        return useQaServer().getQaHistory();
       },
       chatTextareaHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;
