@@ -67,7 +67,7 @@
         </div>
         <div
           class="vmp-interact-menu-list-item"
-          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving || isThirdStream }"
           @click="openRebroadcast"
           v-if="!isNoDelay && configList['rebroadcast']"
         >
@@ -161,6 +161,10 @@
       },
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否为第三方发起
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
       // 无延迟 Type:Boolean
       isNoDelay() {

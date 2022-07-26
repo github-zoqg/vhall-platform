@@ -803,7 +803,8 @@ export default {
     interact_1039:
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
-      'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions'
+      'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
+    interact_1041: 'Apply for video interaction'
   },
   doc: {
     doc_1001: 'This documentation is loading',
