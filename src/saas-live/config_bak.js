@@ -162,6 +162,12 @@ export const serverConfig = {
         cuid: 'comStreamLocal',
         method: 'checkStartPush'
       }
+    ],
+    emitClickCheckValidatePullUrl: [
+      {
+        cuid: 'comThirdStream',
+        method: 'validatePullUrl'
+      }
     ]
   },
   // 顶部左侧组件
@@ -599,7 +605,14 @@ export const serverConfig = {
     component: 'VmpVirtualPeople'
   },
   comThirdStream: {
-    component: 'VmpThirdStream'
+    component: 'VmpThirdStream',
+    emitClickStartClick: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handleStartClick',
+        args: ['$0', '$1']
+      }
+    ]
   },
   comInsertVideoList: {
     component: 'VmpInsertVideoList',
