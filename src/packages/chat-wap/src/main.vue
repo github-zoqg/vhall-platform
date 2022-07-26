@@ -552,7 +552,7 @@
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
       },
-      // 聊天过滤
+      // 聊天过滤TODO:修改过滤情况
       filterChat() {
         console.log(this.chatList, 'this.chatList');
         // 过滤特效
@@ -562,14 +562,30 @@
           ])
         );
         // 实现主看主办方效果
-        if (sessionStorage.getItem('onlyShowSponsor') == 'true') {
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') != 'true'
+        ) {
           console.log('onlyShowSponsor');
           return (this.renderList = this.chatList.filter(
             item => ![2, '2'].includes(item.roleName)
           ));
         }
+        // 实现主看主办方效果&&仅查看聊天内容
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') == 'true'
+        ) {
+          console.log('onlyShowSponsor');
+          return (this.renderList = this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName) && ['text', 'image'].includes(item.type)
+          ));
+        }
         // 实现仅查看聊天消息
-        if (sessionStorage.getItem('only_isChat') == 'true') {
+        if (
+          sessionStorage.getItem('only_isChat') == 'true' &&
+          sessionStorage.getItem('onlyShowSponsor') != 'true'
+        ) {
           console.log('only_isChat');
           // undefined为历史聊天消息
           return (this.renderList = this.chatList.filter(item =>

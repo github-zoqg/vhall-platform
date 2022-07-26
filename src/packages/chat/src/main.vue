@@ -236,11 +236,17 @@
       renderList() {
         // 实现主看主办方效果
         console.log(this.chatList, 'this.chatList');
-        if (this.isOnlyShowSponsor) {
+        if (this.isOnlyShowSponsor && !this.$refs.chatOperator?.filterStatus.isChat) {
           return this.chatList.filter(item => ![2, '2'].includes(item.roleName));
         }
+        // 实现主看主办方效果&&仅查看聊天内容
+        if (this.isOnlyShowSponsor && this.$refs.chatOperator?.filterStatus.isChat) {
+          return this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName) && ['text', 'image'].includes(item.type)
+          );
+        }
         // 实现仅查看聊天消息
-        if (this.$refs.chatOperator?.filterStatus.isChat) {
+        if (this.$refs.chatOperator?.filterStatus.isChat && !this.isOnlyShowSponsor) {
           // undefined为历史聊天消息
           return this.chatList.filter(item => ['text', 'image'].includes(item.type));
         }
