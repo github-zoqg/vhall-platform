@@ -117,10 +117,11 @@
       },
       // 专题验证
       authSubjectCheck() {
+        const { subjectDetailInfo, subjectAuthInfo } = this.subjectServer.state;
         let data = {
-          subject_id: this.subjectServer.state.subjectDetailInfo.id,
-          visitor_id: this.subjectServer.state.subjectAuthInfo.visitor_id,
-          type: this.subjectServer.state.subjectAuthInfo.verify,
+          subject_id: subjectDetailInfo.id,
+          visitor_id: subjectAuthInfo.visitor_id,
+          type: subjectAuthInfo.verify,
           verify_value: this.authTitle,
           ...this.$route.query
         };

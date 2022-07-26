@@ -119,9 +119,6 @@
         webinarId: '',
         textAuth: '',
         isHidden: true,
-        authInfo: {
-          placeHolder: '11111111'
-        },
         detailInfo: {
           webinar_subject: {
             cover: '',
@@ -170,6 +167,11 @@
       this.getDetail();
       this.hasDelayPermission = this.$route.query.delay;
     },
+    computed: {
+      subjectAuthInfo() {
+        return this.subjectServer.state.subjectAuthInfo;
+      }
+    },
     mounted() {
       this.$i18n.locale = 'zh-CN';
     },
@@ -200,10 +202,22 @@
 
           this.detailInfo = res.data;
           this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
+          this.initSubjectAuth();
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {
           this.$toast(err.msg);
         }
+      },
+      // 获取专题的初始化信息
+      initSubjectAuth() {
+        const visitorId = sessionStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.$route.query.id,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        this.subjectServer.initSubjectInfo(params);
       },
       // 获取微信分享信息
       async wxShareInfo(info) {
@@ -253,21 +267,7 @@
       },
       toWatch(id) {
         this.webinarId = id;
-        const visitorId = sessionStorage.getItem('visitorId');
-        let params = {
-          subject_id: this.detailInfo.webinar_subject.id,
-          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : '',
-          ...this.$route.query
-        };
-        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
-        this.subjectServer.initSubjectInfo(params).then(res => {
-          if (res.code === 200) {
-            this.authInfo = res.data;
-            res.data.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
-          } else {
-            this.$toast('获取信息失败' || res.msg);
-          }
-        });
+        this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
       },
       goWatchUrl() {
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
@@ -277,7 +277,7 @@
           subject_id: this.detailInfo.webinar_subject.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
-          type: this.authInfo.verify,
+          type: this.subjectAuthInfo.verify,
           verify_value: undefined,
           ...this.$route.query
         };
@@ -293,7 +293,7 @@
           case 510008: // 未登录
             this.$refs.loginWap.open();
             break;
-          case 512525: // 填写表单emitClickOpenSignUpForm
+          case 512525: // 填写表单
             queryString = this.$route.query.refer
               ? `?refer=${this.$route.query.refer}&isIndependent=0`
               : '?isIndependent=0';
@@ -308,7 +308,7 @@
             }
             // 邀请卡分享
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.webinarId}${queryString}`;
             break;
           case 512002:
           case 512522:
@@ -318,17 +318,18 @@
             break;
           case 512531:
             // 邀请码
-            this.authInfo.placeHolder = this.authInfo.fcode_verify || '请输入邀请码';
+            this.subjectAuthInfo.placeHolder = this.subjectAuthInfo.fcode_verify || '请输入邀请码';
             this.isShowCheck = true;
             break;
           case 512528:
             // 密码
-            this.authInfo.placeHolder = this.authInfo.password_verify || '请输入密码';
+            this.subjectAuthInfo.placeHolder = this.subjectAuthInfo.password_verify || '请输入密码';
             this.isShowCheck = true;
             break;
           case 512532:
             //白名单
-            this.authInfo.placeHolder = this.authInfo.white_verify || '请输入手机号/邮箱/工号';
+            this.subjectAuthInfo.placeHolder =
+              this.subjectAuthInfo.white_verify || '请输入手机号/邮箱/工号';
             this.isShowCheck = true;
             break;
           case 512523:
@@ -342,8 +343,8 @@
       authSubmit() {
         let data = {
           subject_id: this.detailInfo.webinar_subject.id,
-          visitor_id: this.authInfo.visitor_id,
-          type: this.authInfo.type,
+          visitor_id: this.subjectAuthInfo.visitor_id,
+          type: this.subjectAuthInfo.verify,
           verify_value: this.textAuth,
           ...this.$route.query
         };

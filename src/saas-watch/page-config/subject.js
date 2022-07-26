@@ -58,7 +58,8 @@ export default {
     // 弹窗报名表单
     emitClickOpenSignUpForm: {
       cuid: 'comSignUpForm',
-      method: 'openModal'
+      method: 'openModal',
+      args: ['$0']
     }
   },
   // 登录注册组件
@@ -76,10 +77,6 @@ export default {
   // 鉴权弹窗
   comWatchAuth: {
     component: 'VmpWatchAuth'
-    // emitClickOpenSignUpForm: {
-    //   cuid: 'comSignUpForm',
-    //   method: 'openModal'
-    // }
   },
   comSignUpForm: {
     component: 'VmpSignUpForm',
