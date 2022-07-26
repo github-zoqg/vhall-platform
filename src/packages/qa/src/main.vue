@@ -339,7 +339,7 @@
         const url = location.search
           ? `${base}lives/qa/${this.webinarId}`
           : `${base}lives/qa/${this.webinarId}`;
-        if (!this.$route.query.assistantType) {
+        if (this.$route.query.assistantType) {
           cl_openQAAdmin(url);
         } else {
           window.$middleEventSdk?.event?.send(
