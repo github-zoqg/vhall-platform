@@ -52,7 +52,7 @@
             v-if="
               hasDocPermission ||
               [3, 4].includes(roleName) ||
-              (roleName == 1 && doc_permission != userId)
+              (!isInGroup && roleName == 1 && doc_permission != userId)
             "
           >
             {{ $t('doc.doc_1011') }}
@@ -238,7 +238,7 @@
             this.displayMode === 'normal' &&
             (this.roleName == 3 ||
               this.hasDocPermission ||
-              (this.roleName == 1 && this.doc_permission != this.userId)) &&
+              (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId)) &&
             !this.watchInitData.rebroadcast?.isRebroadcasting
           );
         }
@@ -320,7 +320,7 @@
           this.webinarMode != 5 &&
           (this.hasDocPermission ||
             [3].includes(this.roleName) ||
-            (this.roleName == 1 && this.doc_permission != this.userId)) &&
+            (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId)) &&
           ['normal', 'fullscreen'].includes(this.displayMode) &&
           !this.watchInitData.rebroadcast?.isRebroadcasting
         );
@@ -382,7 +382,7 @@
         return (
           this.hasDocPermission ||
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
-          (this.roleName == 1 && this.doc_permission != this.userId) ||
+          (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId) ||
           (this.webinarType === 1 && this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc)
         );
       },
