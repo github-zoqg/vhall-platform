@@ -1141,8 +1141,11 @@
         return params;
       },
       //打开模态窗
-      async openModal() {
-        this.initViewData();
+      async openModal(webinarId = null) {
+        this.webinarOrSubjectId = webinarId;
+        if (!webinarId) {
+          this.initViewData();
+        }
         this.visible = true;
         await this.getWebinarType();
         this.getBaseInfo();
