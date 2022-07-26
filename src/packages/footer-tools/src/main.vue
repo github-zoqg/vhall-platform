@@ -271,7 +271,7 @@
       },
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
-        return this.roomBaseServer.state.configList['watch_embed_hide_entrance'] && this.isEmbed;
+        return this.roomBaseServer.state.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {

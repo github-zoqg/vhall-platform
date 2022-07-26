@@ -289,7 +289,7 @@
       },
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
-        return this.configList['watch_embed_hide_entrance'] && this.isEmbed;
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     watch: {
