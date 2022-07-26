@@ -610,12 +610,6 @@
         &.interact {
           justify-content: unset;
         }
-        &.purpose {
-          background: linear-gradient(221deg, rgba(184, 58, 244, 0) 0%, #6950fb 100%);
-        }
-        &.red {
-          background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
-        }
         > div {
           background: rgba(0, 0, 0, 0.25);
           border-radius: 20px;
@@ -672,25 +666,6 @@
           }
         }
       }
-
-      .question_msg_bg {
-        padding: 10px 24px;
-        background: rgba(255, 209, 201, 0.2);
-        border-radius: 500px;
-        &::after {
-          border: 0 !important;
-        }
-      }
-    }
-    .margin-top-bottom {
-      text-align: center;
-      margin: 10px 0;
-    }
-    .sign-msg {
-      background: #aaa;
-      display: inline-block;
-      padding: 2px 30px;
-      border-radius: 20px;
     }
     .msg-item__content-body__content-link {
       color: #3562fa;
