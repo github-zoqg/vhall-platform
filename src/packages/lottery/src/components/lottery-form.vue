@@ -214,7 +214,10 @@
       },
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
-        return this.configList['initiate_embed_function_close'] && this.$route.query.liveT;
+        return (
+          this.configList['initiate_embed_function_close'] &&
+          (this.$route.query.liveT || this.$route.query.live_token)
+        );
       }
     },
     watch: {
