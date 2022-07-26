@@ -640,7 +640,6 @@
           > .reply-msg-content {
             position: relative;
             > .textInfo {
-              color: #fff;
               line-height: 38px;
               .nickname {
                 color: rgba(0, 0, 0, 0.65);

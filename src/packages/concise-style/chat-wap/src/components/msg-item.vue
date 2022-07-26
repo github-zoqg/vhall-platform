@@ -121,9 +121,12 @@
                       : ''
                   "
                 >
-                  <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                  <span
+                    class="nickname"
+                    v-html="source.replyMsg.nick_name || source.replyMsg.nickname"
+                  />
                   ：
-                  <span v-html="source.replyMsg.content.text_content" />
+                  <span class="chat-text" v-html="source.replyMsg.content.text_content" />
                   <template v-if="!!!source.replyMsg.content.text_content">
                     <div
                       @click="previewImg(img, index, source.replyMsg.content.image_urls)"
@@ -469,13 +472,16 @@
         border-radius: 16px;
         font-size: 20px;
         &.host {
-          background-color: #fb2626;
+          color: rgba(251, 38, 38, 1);
+          background-color: rgba(251, 38, 38, 0.15);
         }
         &.assistant {
-          background-color: #0a7ff5;
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
         }
         &.guest {
-          background-color: #0a7ff5;
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
         }
       }
       .msg-content {
@@ -486,7 +492,6 @@
           border-radius: 20px;
           padding: 3px 16px;
           word-break: break-all;
-          color: #fff;
           font-size: 26px;
           max-width: 520px;
           .chat-text {
@@ -514,9 +519,15 @@
           }
           > .normal-msg {
             > .textInfo {
-              line-height: 1.46;
+              line-height: 38px;
               span {
                 word-break: break-word;
+              }
+              .nickname {
+                color: rgba(255, 255, 255, 0.65);
+              }
+              .chat-text {
+                color: rgba(255, 255, 255, 1);
               }
             }
             > .imgs {
@@ -539,10 +550,16 @@
             padding-left: 18px;
             margin-bottom: 8px;
             position: relative;
+            opacity: 0.6;
             > .textInfo {
-              color: rgba(255, 255, 255, 0.6);
-              position: relati ve;
-              line-height: 1.46;
+              position: relative;
+              line-height: 38px;
+              .nickname {
+                color: rgba(255, 255, 255, 0.65);
+              }
+              .chat-text {
+                color: rgba(255, 255, 255, 1);
+              }
             }
 
             > .imgs {
@@ -575,8 +592,13 @@
           > .reply-msg-content {
             position: relative;
             > .textInfo {
-              color: #fff;
-              line-height: 1.46;
+              line-height: 38px;
+              .nickname {
+                color: rgba(255, 255, 255, 0.65);
+              }
+              .chat-text {
+                color: rgba(255, 255, 255, 1);
+              }
             }
 
             > .imgs {
@@ -606,7 +628,6 @@
         padding-left: 0;
         position: relative;
         display: block;
-        color: #fff;
         &.interact {
           justify-content: unset;
         }
