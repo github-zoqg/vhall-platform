@@ -59,7 +59,6 @@
     name: 'VmpSubjectHeader',
     data() {
       return {
-        userInfo: JSON.parse(localStorage.getItem('userInfo')),
         isLogin: Boolean(window.localStorage.getItem('token'))
       };
     },
@@ -70,6 +69,10 @@
     computed: {
       subjectInfo() {
         return this.subjectServer.state.subjectDetailInfo;
+      },
+      // 获取用户信息
+      userInfo() {
+        return this.userServer.state.userInfo;
       }
     },
     methods: {
