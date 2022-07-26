@@ -130,7 +130,7 @@
             window.location.href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
-              `/lives/watch/${this.webinarId}${window.location.search}`;
+              `/lives/watch/${this.webinarId}`;
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
