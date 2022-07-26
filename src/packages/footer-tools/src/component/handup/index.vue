@@ -35,7 +35,7 @@
       const interactStatus = this.$domainStore.state.roomBaseServer.interactToolStatus;
       console.log('禁言状态-----11111', groupData.isInGroup, groupData, interactStatus);
       return {
-        btnText: this.$t('interact.interact_1001'),
+        btnText: this.$t('interact.interact_1041'),
         isApplyed: false, // 是否申请上麦
         waitTime: 30, // 等待倒计时时间
         waitInterval: null,
@@ -95,7 +95,7 @@
         if (this.joinInfo.third_party_user_id == msg.data.room_join_id) {
           clearInterval(this.waitInterval);
           this.isApplyed = false;
-          this.btnText = this.$t('interact.interact_1001');
+          this.btnText = this.$t('interact.interact_1041');
         }
       });
       // 用户成功下麦
@@ -132,7 +132,7 @@
           this.loading = false;
           this.isApplyed = false;
           this.waitInterval && clearInterval(this.waitInterval);
-          this.btnText = this.$t('interact.interact_1001');
+          this.btnText = this.$t('interact.interact_1041');
         }
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
@@ -140,7 +140,7 @@
         this.loading = false;
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
-        this.btnText = this.$t('interact.interact_1001');
+        this.btnText = this.$t('interact.interact_1041');
       });
     },
     methods: {
@@ -220,7 +220,7 @@
             this.loading = false;
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
-            this.btnText = this.$t('interact.interact_1001');
+            this.btnText = this.$t('interact.interact_1041');
             this.$message({
               message: this.$t('interact.interact_1027'),
               showClose: true,
@@ -239,7 +239,7 @@
           this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
           if (this.waitTime <= 0) {
             clearInterval(this.waitInterval);
-            this.btnText = this.$t('interact.interact_1001');
+            this.btnText = this.$t('interact.interact_1041');
             this.isApplyed = false;
             useMicServer().userCancelApply();
             // TODO: 分组
