@@ -32,13 +32,13 @@
           token: localStorage.getItem('token') || undefined
         });
       }
-      await this.initSubjectInfo();
+      await this.getSubjectInfo();
     },
     mounted() {
       this.$i18n.locale = 'zh-CN';
     },
     methods: {
-      async initSubjectInfo() {
+      async getSubjectInfo() {
         const subjectServer = useSubjectServer();
         try {
           const res = await subjectServer.getSubjectInfo({
@@ -49,9 +49,21 @@
             return;
           }
           this.state = 1;
+          this.initSubjectAuth();
         } catch (err) {
           this.state = 2;
         }
+      },
+      initSubjectAuth() {
+        const subjectServer = useSubjectServer();
+        const visitorId = sessionStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.$route.query.id,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        subjectServer.initSubjectInfo(params);
       }
     }
   };

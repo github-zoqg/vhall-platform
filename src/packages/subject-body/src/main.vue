@@ -136,25 +136,7 @@
       },
       toDetail(id) {
         this.webinarId = id;
-        const visitorId = sessionStorage.getItem('visitorId');
-        let params = {
-          subject_id: this.subjectDetailInfo.id,
-          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : '',
-          ...this.$route.query
-        };
-        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
-        this.subjectServer.initSubjectInfo(params).then(res => {
-          if (res.code === 200) {
-            res.data.pass == 1 ? this.goWatch() : this.handleAuthInfo();
-          } else {
-            this.$message({
-              message: '获取信息失败' || res.msg,
-              showClose: true,
-              type: 'warning',
-              customClass: 'zdy-info-box'
-            });
-          }
-        });
+        this.subjectAuthInfo.pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
@@ -184,7 +166,7 @@
             break;
           case 512525: // 填写表单emitClickOpenSignUpForm
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
+              boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm', this.webinarId)
             );
             break;
           case 512002:
