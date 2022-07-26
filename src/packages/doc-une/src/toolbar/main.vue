@@ -140,7 +140,7 @@
       <div
         class="vmp-icon-item"
         :title="$t('doc.doc_1010')"
-        v-if="roleName != 3 && !(this.roleName == 1 && this.presenterId != this.userId)"
+        v-if="roleName != 3 && !(roleName == 1 && doc_permission != userId)"
         @click="fullscreen"
       >
         <i class="vh-iconfont vh-line-amplification"></i>
@@ -263,6 +263,14 @@
         return this.isInGroup
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      // 主讲人权限
+      doc_permission() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.doc_permission;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.doc_permission;
+        }
       },
       // 是否观看端
       isWatch() {
