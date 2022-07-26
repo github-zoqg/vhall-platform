@@ -1,6 +1,6 @@
 <template>
-  <div class="vmp-send-box" :class="[className]">
-    <div class="vmp-send-box__content">
+  <div class="vmp-send-box-concise" :class="[className]">
+    <div class="vmp-send-box-concise__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
@@ -448,7 +448,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-send-box {
+  .vmp-send-box-concise {
     // background-color: #fff;
     // box-shadow: 0px -1px 1px #f1f1f1;
     // &::after {

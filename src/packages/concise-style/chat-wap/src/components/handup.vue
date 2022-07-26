@@ -7,7 +7,7 @@
       :overlay="true"
       :round="true"
     >
-      <div class="handsup-box">
+      <div class="handsup-box-concise">
         <div class="link-btn mic-btns" v-if="isSpeakOn">
           <!-- 摄像头按钮 -->
           <button class="btn" @click="handleClickMuteDevice('video')">
@@ -257,7 +257,7 @@
     border-radius: 20px 20px 0px 0px;
     background: #fff;
   }
-  .handsup-box {
+  .handsup-box-concise {
     width: 100%;
     .btn {
       font-size: 30px;

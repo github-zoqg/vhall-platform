@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
+  <div class="chat-input-modal-fashion" :class="smFix ? 'smFix' : ''" v-show="visible">
     <div class="input-info">
       <div class="send-box" @touchend.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
@@ -280,7 +280,7 @@
   }
 
   .smFix {
-    .chat-input-modal {
+    .chat-input-modal-fashion {
       position: fixed !important;
       bottom: 0 !important;
       left: 0 !important;
@@ -288,7 +288,7 @@
     }
   }
 
-  .chat-input-modal {
+  .chat-input-modal-fashion {
     width: 100%;
     position: relative;
     z-index: 9999;
