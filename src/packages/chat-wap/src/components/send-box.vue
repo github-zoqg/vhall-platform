@@ -322,12 +322,12 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$toast(this.$t('interact.interact_1003'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$toast(this.$t('interact.interact_1002'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
       });
       window.chat = this;
