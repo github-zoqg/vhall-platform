@@ -6,14 +6,14 @@
     <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
     <div class="vmp-chat-wap-fashion__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
-      <p
+      <!-- <p
         v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
         class="vmp-chat-wap-fashion-fashion__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap-fashion__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
         </span>
-      </p>
+      </p> -->
       <div ref="chatContent" class="virtual-content">
         <virtual-list
           v-if="virtual.showlist"
