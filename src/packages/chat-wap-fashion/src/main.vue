@@ -1,16 +1,16 @@
 <template>
-  <div class="vmp-chat-wap" ref="chatWap" :class="smFix ? 'smFix' : ''">
+  <div class="vmp-chat-wap-fashion" ref="chatWap" :class="smFix ? 'smFix' : ''">
     <!-- 礼物动画组件 -->
     <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
     <!-- 礼物动画组件-svga -->
     <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
-    <div class="vmp-chat-wap__content" ref="chatContentMain">
+    <div class="vmp-chat-wap-fashion__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
       <p
         v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
-        class="vmp-chat-wap__content__get-list-btn-container"
+        class="vmp-chat-wap-fashion-fashion__content__get-list-btn-container"
       >
-        <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
+        <span @click="getHistoryMessage" class="vmp-chat-wap-fashion__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
         </span>
       </p>
@@ -34,7 +34,7 @@
           @tobottom="toBottom"
         ></virtual-list>
         <div
-          class="vmp-chat-wap__content__new-msg-tips"
+          class="vmp-chat-wap-fashion__content__new-msg-tips"
           v-show="
             unReadMessageCount !== 0 &&
             (isHasUnreadNormalMsg || isHasUnreadAtMeMsg || isHasUnreadReplyMsg)
@@ -573,7 +573,7 @@
   .van-image-preview__overlay {
     background-color: rgb(0, 0, 0) !important;
   }
-  .vmp-chat-wap {
+  .vmp-chat-wap-fashion {
     height: 100%;
     overflow: hidden;
     position: relative;
@@ -611,23 +611,23 @@
       }
       &__new-msg-tips {
         position: absolute;
-        left: 0;
-        right: 0;
+        left: 17px;
+        right: 16px;
         bottom: 20px;
-        width: 337px;
-        height: 56px;
-        background: #ffffff;
+        width: fit-content;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.85);
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 4px 12px rgba(0, 0, 0, 0.1);
         border-radius: 28px;
         color: #0a7ff5;
         font-size: 28px;
+        padding: 10px 16px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto;
         .vh-iconfont {
           font-size: 16px;
-          margin-left: 7px;
+          margin-left: 11px;
         }
       }
     }
