@@ -52,7 +52,7 @@
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div class="icon-wrapper" v-show="isShowMicBtn">
+        <div class="icon-wrapper" v-show="isShowMicBtn && !hideItem">
           <!-- 上麦 -->
           <div
             v-if="isAllowHandUp || isSpeakOn"
@@ -286,6 +286,10 @@
       //当前直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_hide_entrance'] && this.isEmbed;
       }
     },
     watch: {
@@ -318,12 +322,12 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$toast(this.$t('interact.interact_1003'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$toast(this.$t('interact.interact_1002'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
       });
       window.chat = this;
