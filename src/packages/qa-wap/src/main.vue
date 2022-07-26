@@ -140,7 +140,6 @@
     // },
     created() {
       this.menuServer = useMenuServer();
-      this.getQAHistroy();
     },
     beforeDestroy() {
       //移除事件
@@ -236,13 +235,19 @@
           }
         });
         //监听切换到当前tab
-        this.menuServer.$on('tab-switched', data => {
-          this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.qaContent?.offsetHeight;
-            this.virtual.showlist = data.cuid == this.cuid;
-            this.chatlistHeight = this.virtual.contentHeight;
-            this.scrollBottom();
-          });
+        this.menuServer.$on('tab-switched', async data => {
+          if (this.cuid === data.cuid) {
+            if (!qaServer.state.active) {
+              await this.getQAHistroy();
+              qaServer.setState('active', true);
+            }
+            this.$nextTick(() => {
+              this.virtual.contentHeight = this.$refs.qaContent?.offsetHeight;
+              this.virtual.showlist = data.cuid == this.cuid;
+              this.chatlistHeight = this.virtual.contentHeight;
+              this.scrollBottom();
+            });
+          }
         });
         useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           if (!this.isInGroup) {
