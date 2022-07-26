@@ -564,7 +564,7 @@
             &::after {
               content: ' ';
               width: 6px;
-              height: calc(100% - 14px);
+              height: calc(100% - 12px);
               position: absolute;
               top: 9px;
               left: 0;
