@@ -172,14 +172,14 @@
       border-bottom: 1px solid #f0f0f0;
       &__cover {
         width: 240px;
-        height: 136px;
+        height: 135px;
         background: #1a1a1a;
         border-radius: 16px;
         flex-shrink: 0;
         img {
           width: 100%;
           height: 100%;
-          object-fit: scale-down;
+          object-fit: cover;
           border-radius: 12px;
         }
       }
