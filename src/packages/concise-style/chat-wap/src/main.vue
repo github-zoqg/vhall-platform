@@ -289,6 +289,11 @@
       }
       // this.initEvent();
       this.eventListener();
+
+      //TODO：临时看效果加的背景
+      document.getElementsByClassName(
+        'vmp-concise-layout'
+      )[0].style.backgroundImage = `url(${require('./img/temp_bg.png')})`;
     },
     beforeDestroy() {
       //移除事件
@@ -662,7 +667,7 @@
       }
 
       > div:first-of-type {
-        padding-top: 24px;
+        padding-top: 8px;
       }
     }
     &__content {

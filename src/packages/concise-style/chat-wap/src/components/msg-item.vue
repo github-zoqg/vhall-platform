@@ -24,7 +24,7 @@
             <span class="role" :class="source.roleName | roleClassFilter">
               <span>{{ source.roleName | roleFilter }}</span>
             </span>
-            <span class="nickname">{{ overHidden(source.nickname, 6) }}&nbsp;</span>
+            <span class="nickname">{{ overHidden(source.nickname, 5) }}&nbsp;</span>
           </template>
           <template v-if="source.type == 'pwd_red_envelope_ok'">
             <img
@@ -63,7 +63,7 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          <span class="nickname">{{ overHidden(source.nickname, 6) }}&nbsp;</span>
+          <span class="nickname">{{ overHidden(source.nickname, 5) }}&nbsp;</span>
           <span class="chat-text">{{ source.content.text_content }}</span>
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
@@ -73,9 +73,9 @@
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
         <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
-          <span class="new-gift-name">{{ source.nickname | overHidden(6) }}&nbsp;</span>
+          <span class="new-gift-name">{{ source.nickname | overHidden(5) }}&nbsp;</span>
           <span class="new-gift-content">
-            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
+            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(8) }}
           </span>
           <div
             v-if="source.content.source_status == 1"
@@ -117,11 +117,9 @@
                       : ''
                   "
                 >
-                  <span
-                    class="nickname"
-                    v-html="source.replyMsg.nick_name || source.replyMsg.nickname"
-                  />
-                  ：
+                  <span class="nickname">
+                    <span>{{ source.replyMsg.nick_name || source.replyMsg.nickname }}&nbsp;</span>
+                  </span>
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
                   <template v-if="!!!source.replyMsg.content.text_content">
                     <div
@@ -163,7 +161,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(5) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -205,7 +203,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(5) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                 </div>
                 <div class="imgs">
@@ -245,7 +243,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(6) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(5) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -451,7 +449,7 @@
     pointer-events: auto;
     .msg-item {
       margin: 0 24px;
-      padding: 0 0 16px;
+      padding: 0 0 8px;
       display: flex;
       align-items: flex-start;
       .nickname {
@@ -529,9 +527,9 @@
             > .imgs {
               .img {
                 display: inline-block;
-                margin: 8px 8px 5px 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 5px 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -546,24 +544,28 @@
             padding-left: 18px;
             margin-bottom: 8px;
             position: relative;
-            opacity: 0.6;
             > .textInfo {
               position: relative;
-              line-height: 38px;
+              line-height: 36px;
+              font-size: 24px;
               .nickname {
-                color: rgba(255, 255, 255, 0.65);
+                color: rgba(255, 255, 255, 0.45);
               }
               .chat-text {
-                color: rgba(255, 255, 255, 1);
+                color: rgba(255, 255, 255, 0.65);
+              }
+              .role {
+                opacity: 0.65;
               }
             }
 
             > .imgs {
               .img {
+                opacity: 0.65;
                 display: inline-block;
-                margin: 8px 8px 0 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 0 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -577,12 +579,15 @@
             &::after {
               content: ' ';
               width: 6px;
-              height: calc(100% - 12px);
+              height: 100%;
               position: absolute;
-              top: 9px;
+              top: 0;
               left: 0;
-              background: rgba(255, 255, 255, 0.6);
+              background: rgba(255, 255, 255, 0.25);
               border-radius: 3px;
+            }
+            .existSimpleImg .msg-content_chat-img {
+              margin-bottom: 0;
             }
           }
           > .reply-msg-content {
@@ -600,9 +605,9 @@
             > .imgs {
               .img {
                 display: inline-block;
-                margin: 8px 8px 5px 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 5px 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -611,6 +616,10 @@
                   margin-right: 0;
                 }
               }
+            }
+
+            .existSimpleImg {
+              padding-top: 0;
             }
           }
         }
@@ -634,24 +643,21 @@
           font-size: 26px;
         }
         > .interact-gift-box {
-          padding: 0 60px 0 16px;
+          padding: 0 56px 0 12px;
           text-align: left;
           width: 100%;
-          height: 46px;
+          height: 44px;
           display: flex;
           justify-content: center;
           align-items: center;
           border: none;
 
-          &.zdy {
-            padding-right: 68px;
-          }
           .gift-zdy {
             width: 36px;
             height: 36px;
             border-radius: 50%;
             position: absolute;
-            right: 24px;
+            right: 12px;
             background-color: white;
             background-size: contain;
             background-repeat: no-repeat;
@@ -666,26 +672,26 @@
           .new-gift-img {
             width: 36px;
             position: absolute;
-            right: 16px;
+            right: 12px;
           }
         }
         > .interact-msg {
-          padding: 3px 16px;
+          padding: 3px 12px;
           border-width: 0;
-          height: 46px;
-          line-height: 40px;
+          height: 44px;
+          line-height: 38px;
           &.pwd_red_envelope_ok {
             display: flex;
             align-items: center;
-            padding-left: 60px;
+            padding-left: 56px;
           }
           .highlight {
-            color: #0a7ff5;
+            color: rgba(10, 127, 245, 1);
           }
           .new-award-img {
             width: 36px;
             position: absolute;
-            left: 16px;
+            left: 12px;
           }
           .nickname {
             color: rgba(255, 255, 255, 0.65);

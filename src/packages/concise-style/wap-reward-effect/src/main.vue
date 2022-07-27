@@ -14,15 +14,9 @@
         }"
       >
         <div class="content">
-          <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
           <span class="nick-name">
             {{ gift_user_nickname(rewardEffectInfo) | overHidden(8) }}
           </span>
-          <!-- <span v-if="rewardEffectInfo.type == 'reward'">
-            打赏
-            <span class="money">{{ rewardEffectInfo.gift_price }}</span>
-            元
-          </span> -->
           <span
             class="gift-name"
             v-if="
@@ -30,12 +24,7 @@
               rewardEffectInfo.data.event_type == 'free_gift_send'
             "
           >
-            <!-- 礼物标题 -->
             送出{{ rewardEffectInfo.data.gift_name | overHidden(8) }}
-            <!-- <span class="count">
-              <span class="multiple">x</span>
-              {{ rewardEffectInfo.num }}
-            </span> -->
           </span>
           <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
             {{ rewardEffectInfo.data.reward_describe }}
@@ -50,7 +39,7 @@
             <template v-if="!!Sources[rewardEffectInfo.data.gift_name]">
               <img
                 :src="
-                  require('@/app-shared/assets/img/wap/gift/' +
+                  require('@/app-shared/assets/img/wap/chat/' +
                     rewardEffectInfo.data.gift_name +
                     '.png')
                 "
@@ -77,14 +66,6 @@
                 alt=""
               />
             </template>
-            <!-- <img
-              :class="rewardEffectInfo.data.source_status == 1 ? 'zdy-gigt-img' : ''"
-              :src="
-                (rewardEffectInfo.data.gift_image_url || rewardEffectInfo.data.gift_url) +
-                '?x-oss-process=image/resize,m_lfit,w_100'
-              "
-              alt=""
-            /> -->
           </div>
           <div v-else-if="rewardEffectInfo.data.type == 'reward_pay_ok'" class="gift-img">
             <img
@@ -145,7 +126,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 300000,
+        minTaskTime: 3000,
         maxQueueLen: 2
       });
 
@@ -285,131 +266,67 @@
   .vmp-wap-reward-effect-concise {
     // .flex();
     position: absolute;
-    left: 0;
-    top: 40px;
+    left: 0px;
+    top: 24px;
     z-index: 100;
 
     .reward-effect-box {
-      height: 46px;
+      height: 40px;
       width: fit-content;
       position: relative;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
-      margin-bottom: 32px;
-      &.default {
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 44px;
-      }
-      &.bg-coffee {
-        background: linear-gradient(90deg, #fb3a32 2.14%, rgba(255, 172, 44, 0.8) 85.3%);
-        .gift-img {
-          background-image: url(images/bg3.png);
-          right: 12px;
-          width: 98px;
-          margin-left: 12px;
-        }
-      }
-      &.bg-custom,
-      &.bg-red-package {
-        background: linear-gradient(90.01deg, #fb3a32 1.37%, rgba(255, 172, 44, 0.8) 97.58%);
-        .gift-img {
-          background-image: url(images/bg5.png);
-          right: 2px;
-          width: 108px;
-          margin-right: 2px;
-        }
-      }
-      &.bg-flower {
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/bg4.png);
-          right: -2px;
-          width: 124px;
-          margin-left: -2px;
-        }
-      }
-      &.bg-love,
-      &.bg-rocket {
-        background: linear-gradient(90deg, #fb3a32 2.42%, rgba(255, 172, 44, 0.8) 96.39%);
-        .gift-img {
-          background-image: url(images/bg2.png);
-          right: 24px;
-          width: 86px;
-          margin-left: 24px;
-        }
-      }
-      &.bg-666,
-      &.bg-car,
-      &.bg-plane,
-      &.bg-fireworks {
-        background: linear-gradient(90deg, #6a59ff 1.81%, rgba(249, 51, 249, 0.6) 98.01%);
-        .gift-img {
-          background-image: url(images/bg1.png);
-          right: 8px;
-          width: 124px;
-          margin-left: 8px;
-        }
-      }
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #8274ff 2.98%, rgba(249, 51, 249, 0.4) 118.57%);
+      border-radius: 20px;
+      padding-right: 32px;
     }
     .content {
       position: relative;
-      top: -16px;
-      left: 24px;
+      top: -8px;
+      left: 16px;
       display: flex;
       align-items: center;
     }
-    .money-img {
-      display: inline-block;
-      width: 50px;
-      height: 50px;
-      background-image: url('images/reward-chat.png');
-    }
 
     .gift-img {
-      height: 82px;
+      height: 56px;
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
       z-index: 10;
       position: relative;
       top: 0;
-      right: -6px;
+      right: -8px;
       img {
-        height: 88px;
-        margin-left: 0;
-        margin-top: -18px;
+        height: 56px;
+        position: relative;
+        bottom: 4px;
       }
     }
 
     .zdy-gigt-img {
-      width: 54px;
-      height: 54px;
+      width: 56px;
+      height: 56px;
       background-color: white;
       border-radius: 50%;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
-      margin-left: 13px;
+      position: relative;
+      bottom: 8px;
     }
     .nick-name {
       font-size: 24px;
       line-height: 28px;
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.65);
       margin-right: 8px;
     }
     .gift-name {
       font-size: 24px;
-      line-height: 24px;
-      color: #ffffff;
-      opacity: 0.8;
-    }
-    .money,
-    .count {
-      color: #ffd63b;
-    }
-    .multiple {
-      font-size: 12px;
+      line-height: 28px;
+      color: rgba(255, 255, 255, 1);
     }
   }
 </style>
