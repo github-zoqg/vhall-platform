@@ -40,7 +40,7 @@
           v-for="(item, index) in subjectDetailInfo.webinar_list"
           :key="index"
         >
-          <div class="living_inner" @click="toDetail(item.webinar_id)">
+          <div class="living_inner" @click="toDetail(item)">
             <div class="living_top">
               <span class="living_top_hot" v-if="item.hide_pv">
                 <i class="vh-saas-iconfont vh-saas-line-heat">{{ item.pv }}</i>
@@ -134,12 +134,22 @@
         console.log(strArr.join(''), '???123232432');
         return strArr.join('');
       },
-      toDetail(id) {
-        this.webinarId = id;
+      toDetail(item) {
+        this.webinarId = item.webinar_id;
+        // 预告状态、有暖场视频
+        if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
+          this.goWatch();
+          return;
+        }
+        // 回放状态、开启了试看
+        if (item.webinar_state == 5 && this.subjectAuthInfo.is_preview == 1) {
+          this.goWatch();
+          return;
+        }
         this.subjectAuthInfo.pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}`;
       },
       handleAuthInfo() {
         let data = {
