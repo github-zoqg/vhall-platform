@@ -262,9 +262,13 @@
             padding-right: 18px;
             color: #666;
             font-size: 14px;
-            i {
-              font-size: 18px;
-              vertical-align: text-bottom;
+            line-height: 20px;
+            .vh-line-video-camera {
+              font-size: 16px;
+            }
+            .vh-saas-line-heat,
+            .vh-line-time {
+              font-size: 14px;
             }
           }
         }
