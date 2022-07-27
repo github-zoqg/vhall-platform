@@ -44,7 +44,7 @@
       <section class="subject-menu">
         <p class="subject-menu_title">目录</p>
         <article
-          @click="toWatch(item.webinar_id)"
+          @click="toWatch(item)"
           v-for="item in detailInfo.webinar_subject.webinar_list"
           :key="item.id"
           class="subject-menu_item clearfix"
@@ -265,12 +265,22 @@
       handleOpenHide() {
         this.open_hide = !this.open_hide;
       },
-      toWatch(id) {
-        this.webinarId = id;
+      toWatch(item) {
+        this.webinarId = item.webinar_id;
+        // 预告状态、有暖场视频
+        if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
+          this.goWatch();
+          return;
+        }
+        // 回放状态、开启了试看
+        if (item.webinar_state == 5 && this.subjectAuthInfo.is_preview == 1) {
+          this.goWatch();
+          return;
+        }
         this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
       },
       goWatchUrl() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}`;
       },
       handleAuthInfo() {
         let data = {
