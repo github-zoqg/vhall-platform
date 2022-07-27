@@ -9,6 +9,7 @@ export default {
       'comHeaderWatch',
       'layerNeck',
       'layerBody',
+      'layerBodyBlock',
       'layerBodyCenter',
       'comAllDialog',
       'comGoodsDetail',
@@ -43,6 +44,12 @@ export default {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['comWapBody']
+  },
+  // 中间主区域容器
+  layerBodyBlock: {
+    component: 'VmpContainer',
+    className: 'vmp-block',
+    children: ['comBodyBlock']
   },
   // 中间主区域内容容器
   comWapBody: {
@@ -84,6 +91,9 @@ export default {
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
     children: ['comChatWap', 'comContainerRight']
+  },
+  comBodyBlock: {
+    component: 'VmpConciseBodyBlockWap'
   },
   // comTabMenuWap: {
   //   component: 'VmpTabMenuWap',
