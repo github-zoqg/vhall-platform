@@ -1,15 +1,7 @@
 import semver from 'semver';
 import UAParser from 'ua-parser-js';
-export function computeRecordTime(val) {
-  const s = val; // 秒
-  let m = 0; // 分
-  if (s > 59) {
-    m = s / 60;
-  }
-  return parseInt(m);
-}
 export const isMse = function () {
-  window.semver = semver;
+  // window.semver = semver;
   const result = Object.create(null);
   const uaResult = new UAParser().getResult();
   result.isTencent =
@@ -98,57 +90,3 @@ export const isMse = function () {
   result.supportMSE = judgeMSE();
   return result;
 };
-
-// 判断访问终端
-var browser = {
-  versions: (function () {
-    var u = navigator.userAgent;
-    // var app = navigator.appVersion
-    // console.log(app)
-    var isIphoneX =
-      !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/) &&
-      window.devicePixelRatio &&
-      (window.devicePixelRatio === 3 || window.devicePixelRatio === 2) &&
-      (window.screen.width === 414 || window.screen.width === 375) &&
-      (window.screen.height === 896 || window.screen.height === 812);
-    let jude9 = false;
-    const ios9 = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-    if (ios9) {
-      const iosVersion = u
-        .toLowerCase()
-        .match(/os (.*?) like mac os/)[1]
-        .replace(/_/g, '.')
-        .substr(0, 2);
-      // // ios系统低于且等于9的
-      if (iosVersion <= 9) {
-        jude9 = true;
-      }
-    }
-    // 判断是否为X系列
-    var terminalHei = u.match(/QQ/i) == 'QQ' || u.indexOf('MicroMessenger') > -1;
-    window.u = u;
-    return {
-      trident: u.indexOf('Trident') > -1, // IE内核
-      presto: u.indexOf('Presto') > -1, // opera内核
-      webKit: u.indexOf('AppleWebKit') > -1, // 苹果、谷歌内核
-      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, // 火狐内核
-      mobile: !!u.match(/AppleWebKit.*Mobile.*/), // 是否为移动终端
-      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), // ios终端
-      android: u.indexOf('Android') > -1 || u.indexOf('Adr') > -1, // android终端
-      iPhone: u.indexOf('iPhone') > -1, // 是否为iPhone或者QQHD浏览器
-      iPad: u.indexOf('iPad') > -1, // 是否iPad
-      webApp: u.indexOf('Safari') == -1, // 是否web应该程序，没有头部与底部
-      weixin: u.indexOf('MicroMessenger') > -1, // 是否微信 （2015-01-22新增）
-      qq: u.match(/QQ/i) == 'QQ', // 是否QQ
-      iPhoneX: isIphoneX, // 是否为iPhonex系列
-      ios9: ios9,
-      terminal: terminalHei,
-      judeLow9: jude9,
-      u: u,
-      X5: u.indexOf('TBS') > -1 ? true : false
-    };
-  })(),
-  language: (navigator.browserLanguage || navigator.language).toLowerCase()
-};
-
-export default browser;

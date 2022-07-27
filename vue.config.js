@@ -51,9 +51,9 @@ function getPlugins() {
           process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT
         ),
         //化蝶观看端(pc、wap)域名
-        VUE_APP_WAP_WATCH_SAAS: JSON.stringify(process.env.VUE_APP_WAP_WATCH_SAAS),
+        VUE_APP_WAP_WATCH: JSON.stringify(process.env.VUE_APP_WAP_WATCH),
         //化蝶发起端域名
-        VUE_APP_WEB_BASE_SAAS: JSON.stringify(process.env.VUE_APP_WEB_BASE_SAAS),
+        VUE_APP_WEB_BASE: JSON.stringify(process.env.VUE_APP_WEB_BASE),
 
         // 是否wap端
         VUE_APP_IS_WAP: argv.project === 'saas-wap'
