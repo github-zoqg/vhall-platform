@@ -232,7 +232,7 @@
           // 观看端，普通模式或全屏模式下，打开了文档或白板
           return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
         } else {
-          // 发起端，打开了文档，普通模式，助理或者有演示权限 或者“是主持人但是主讲人是别人”,非转播状态
+          // 发起端，打开了文档，普通模式，助理或者有演示权限 或者“不在分组内，是主持人角色但是主讲人不是自己”,非转播状态
           return (
             this.currentType === 'document' &&
             this.displayMode === 'normal' &&
@@ -315,7 +315,7 @@
       },
       // 是否显示文档白板工具栏
       showToolbar() {
-        // 非定时直播，有演示权限或者是助理角色角色 或者“是主持人角色但是主讲人不是自己”，在普通或全屏模式下,非转播状态，显示工具栏
+        // 非定时直播，有演示权限或者是助理角色角色 或者“不在分组内，是主持人角色但是主讲人不是自己”，在普通或全屏模式下,非转播状态，显示工具栏
         return (
           this.webinarMode != 5 &&
           (this.hasDocPermission ||
@@ -378,7 +378,7 @@
         if (this.currentType !== 'document') return false;
         // 定时直播所有人都没有翻页权限
         if (this.webinarMode == 5) return false;
-        // 有演示权限，或者助理配有翻页权限 或者 “是主持人但是主讲人是其他人“，或者活动设置了有翻页权限(开发状态下)
+        // 有演示权限，或者助理配有翻页权限 或者 “不在分组内，是主持人角色但是主讲人不是自己“，或者活动设置了有翻页权限(开发状态下)
         return (
           this.hasDocPermission ||
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
