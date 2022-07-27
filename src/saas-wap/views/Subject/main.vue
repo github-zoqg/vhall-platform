@@ -336,7 +336,7 @@
             // 付费
             break;
           default:
-            this.$toast('验证失败' || msg);
+            this.$toast(msg || '验证失败');
             break;
         }
       },
@@ -355,7 +355,7 @@
               process.env.VUE_APP_ROUTER_BASE_URL +
               `/lives/watch/${this.webinarId}`;
           } else {
-            this.$toast('验证失败' || res.msg);
+            this.$toast(res.msg || '验证失败');
           }
         });
       },
