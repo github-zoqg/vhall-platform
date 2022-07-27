@@ -190,6 +190,10 @@
       accountId() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id;
       },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
       },
@@ -507,19 +511,26 @@
         this.desktopShareServer
           .startShareScreen(options)
           .then(() => {
-            this.desktopShareServer
-              .publishDesktopShareStream()
-              .then(() => {
-                // 重新布局旁路
-                console.log('[screen] 桌面共享推流成功');
-                this.interactiveServer.resetLayout();
-                this.docServer.resetLayoutByMiniElement();
-
-                this.setDesktop('1');
-              })
-              .catch(error => {
-                console.log(error, this.$t('interact.interact_1021'));
+            // console.log('当前是否正在插播', this.isInsertFilePushing, this.isShareScreen);
+            if (this.isInsertFilePushing && this.isShareScreen) {
+              this.desktopShareServer.endStartShareScreen({
+                streamId: this.isShareScreen
               });
+            } else {
+              this.desktopShareServer
+                .publishDesktopShareStream()
+                .then(() => {
+                  // 重新布局旁路
+                  console.log('[screen] 桌面共享推流成功');
+                  this.interactiveServer.resetLayout();
+                  this.docServer.resetLayoutByMiniElement();
+
+                  this.setDesktop('1');
+                })
+                .catch(error => {
+                  console.log(error, this.$t('interact.interact_1021'));
+                });
+            }
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
