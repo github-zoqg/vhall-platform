@@ -95,7 +95,7 @@
                           >
                             <el-dropdown-item
                               command="data"
-                              v-if="item.publish == 1 && !isEmbed && role == 1"
+                              v-if="item.publish == 1 && !isEmbed && role == 1 && !hideItem"
                             >
                               数据
                             </el-dropdown-item>
@@ -269,6 +269,17 @@
       // 当前角色
       role() {
         return this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info.role_name;
+      },
+      // 权限配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return (
+          this.configList['initiate_embed_function_close'] &&
+          (this.$route.query.liveT || this.$route.query.live_token)
+        );
       }
     },
     beforeCreate() {
@@ -280,6 +291,7 @@
     },
     created() {
       this.initEvent();
+      console.log(this.configList, this.$route.query.liveT, 'configList');
     },
     methods: {
       open() {
@@ -313,7 +325,11 @@
               window.vhallReportForProduct.report(110062, {
                 report_extra: { id: data.id }
               });
-            this.saveDialogVisible = true;
+            if (!this.hideItem) {
+              this.saveDialogVisible = true;
+            } else {
+              this.saveQuestionnaire(false);
+            }
             this.shareQuestionnaire = true;
             this.saving = false;
           }
