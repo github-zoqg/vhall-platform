@@ -310,6 +310,64 @@
 
       // 展示欢迎语
       this.showWelcome();
+      [
+        {
+          nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: '推送了问卷',
+            questionnaire_id: '687607'
+          },
+          roleName: '1',
+          type: 'questionnaire_push',
+          interactStatus: true,
+          isCheck: true,
+          count: 37
+        },
+        {
+          content: {
+            text_content: '正在进行抽奖环节'
+          },
+          type: 'lottery_push',
+          interactStatus: true,
+          count: 38
+        },
+        {
+          roleName: 1,
+          nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: '发起了签到'
+          },
+          type: 'sign_in_push',
+          interactStatus: true,
+          count: 39
+        },
+        {
+          content: {
+            text_content: '开启了问答'
+          },
+          roleName: 1,
+          nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
+          type: 'question_answer_open',
+          interactStatus: true,
+          count: 40
+        },
+        {
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: '红包派发中'
+          },
+          type: 'pwd_red_envelope_ok',
+          interactStatus: true,
+          Show: true,
+          count: 41
+        }
+      ].forEach(item => {
+        setTimeout(() => {
+          // this.chatList.push(item);
+        }, 500);
+      });
     },
     destroyed() {},
     methods: {
@@ -782,12 +840,10 @@
     .chat-content {
       position: relative;
       .chat_loading {
-        color: #fff;
         text-align: center;
-        font-size: 12px;
-        line-height: 30px;
-      }
-      .vmp-chat-msg-item {
+        font-size: 14px;
+        line-height: 22px;
+        color: rgba(255, 255, 255, 0.65);
       }
       &__get-list-btn-container {
         display: block;
@@ -806,24 +862,23 @@
       &__tip-box {
         position: absolute;
         z-index: 0;
-        bottom: 5px;
+        bottom: 4px;
         left: 50%;
         transform: translate(-50%, 0);
       }
       &__tip-box-content {
-        padding: 0 14px;
-        line-height: 28px;
-        border-radius: 14px;
-        background-color: #363636;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-        color: @font-error;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 30px;
+        padding: 4px 8px;
         font-size: 14px;
+        line-height: 22px;
+        color: #fb2626;
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
         .vh-line-arrow-down {
           font-size: 12px;
-          margin-left: 6px;
+          margin-left: 7px;
         }
       }
     }

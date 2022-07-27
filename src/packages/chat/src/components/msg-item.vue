@@ -61,6 +61,18 @@
 
           <div class="normal-msg__content">
             <p class="normal-msg__content__info-wrap clearfix">
+              <span
+                v-if="
+                  (['text', 'image'].includes(source.type) || source.isHistoryMsg) &&
+                  source.roleName &&
+                  source.roleName != '2'
+                "
+                class="info-wrap__role-name"
+                :class="source.roleName | roleClassFilter"
+              >
+                {{ source.roleName | roleFilter }}
+              </span>
+
               <template>
                 <span
                   class="info-wrap__nick-name cur-pointer"
@@ -78,123 +90,121 @@
                   {{ source.nickname }}
                 </span>
               </template>
-
-              <span
-                v-if="
-                  (['text', 'image'].includes(source.type) || source.isHistoryMsg) &&
-                  source.roleName &&
-                  source.roleName != '2'
-                "
-                class="info-wrap__role-name"
-                :class="source.roleName | roleClassFilter"
-              >
-                {{ source.roleName | roleFilter }}
-              </span>
             </p>
-            <!-- 被回复的消息 -->
-            <div
-              v-if="
-                source.replyMsg &&
-                source.replyMsg.content &&
-                (source.replyMsg.content.text_content || source.replyMsg.content.image_urls)
-              "
-              class="normal-msg__content__reply-wrapper"
-            >
-              <!-- 文本 -->
-              <p
-                v-if="
-                  source.replyMsg && source.replyMsg.content && source.replyMsg.content.text_content
-                "
-                class="reply-wrapper__content reply-msg"
-                v-html="
-                  `<span class='reply-wrapper__content__nick-name'>${
-                    source.replyMsg.nickname || source.replyMsg.nick_name
-                  }</span>&nbsp;${source.replyMsg.content.text_content}`
-                "
-              ></p>
-              <!-- 图片 -->
+            <div class="normal-msg__content__msg-wrap">
+              <!-- 被回复的消息 -->
               <div
                 v-if="
-                  source.replyMsg && source.replyMsg.content && source.replyMsg.content.image_urls
+                  source.replyMsg &&
+                  source.replyMsg.content &&
+                  (source.replyMsg.content.text_content || source.replyMsg.content.image_urls)
                 "
-                class="reply-wrapper__img-wrapper reply-msg"
-                :style="source.replyMsg.content.text_content && 'margin-top:-3px;'"
+                class="normal-msg__content__reply-wrapper"
               >
+                <!-- 文本 -->
                 <p
                   v-if="
                     source.replyMsg &&
                     source.replyMsg.content &&
                     source.replyMsg.content.text_content
                   "
-                  class="msg-item__content-hr"
+                  class="reply-wrapper__content reply-msg"
+                  v-html="
+                    `<span class='reply-wrapper__content__nick-name'>${
+                      source.replyMsg.nickname || source.replyMsg.nick_name
+                    }</span>${source.replyMsg.content.text_content}`
+                  "
                 ></p>
-                <!-- 回复 -->
-                <span
-                  v-if="!source.replyMsg.content.text_content"
-                  class="reply-wrapper__img-wrapper__nick-name"
-                >
-                  {{ source.replyMsg.nickname }}
-                </span>
-                <p class="msg-item__content-hr"></p>
+                <!-- 图片 -->
                 <div
-                  v-for="(img, index) in source.replyMsg.content.image_urls"
+                  v-if="
+                    source.replyMsg &&
+                    source.replyMsg.content &&
+                    source.replyMsg.content.image_urls &&
+                    source.replyMsg.content.image_urls.length
+                  "
+                  class="reply-wrapper__img-wrapper reply-msg"
+                  :style="source.replyMsg.content.text_content && 'margin-top:-3px;'"
+                >
+                  <p
+                    v-if="
+                      source.replyMsg &&
+                      source.replyMsg.content &&
+                      source.replyMsg.content.text_content
+                    "
+                    class="msg-item__content-hr msg-item__content-hr__4"
+                  ></p>
+                  <!-- 回复 -->
+                  <span
+                    v-if="!source.replyMsg.content.text_content"
+                    class="reply-wrapper__img-wrapper__nick-name"
+                  >
+                    {{ source.replyMsg.nickname || source.replyMsg.nick_name }}
+                  </span>
+                  <p
+                    v-if="!source.replyMsg.content.text_content"
+                    class="msg-item__content-hr msg-item__content-hr__4"
+                  ></p>
+                  <div
+                    v-for="(img, index) in source.replyMsg.content.image_urls"
+                    :key="index"
+                    :class="[
+                      'reply-wrapper__img-wrapper__img-box reply-msg',
+                      { 'is-watch': isWatch },
+                      { 'first-child': index === 0 }
+                    ]"
+                  >
+                    <img
+                      class="img-box__content-img"
+                      width="40"
+                      height="40"
+                      :src="img + '?x-oss-process=image/resize,m_lfit,h_80,w_80'"
+                      :alt="$t('chat.chat_1065')"
+                      @click="previewImg(index, source.replyMsg.content.image_urls)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <!-- 文本 -->
+              <p
+                v-if="source.content.text_content"
+                class="normal-msg__content-wrapper"
+                v-html="msgContent"
+              ></p>
+              <!-- 图片 -->
+              <div
+                v-if="source.content.image_urls && source.content.image_urls.length"
+                class="normal-msg__img-wrapper clearfix"
+              >
+                <!-- 回复，直播间装修，删除回复消息的“回复” -->
+                <!-- <span
+                  v-if="source.replyMsg && source.replyMsg.content && !source.content.text_content"
+                  class="normal-msg__img-wrapper__label"
+                >
+                  {{ $t('chat.chat_1036') }}
+                </span> -->
+                <p
+                  class="msg-item__content-hr msg-item__content-hr__1"
+                  v-if="source.content.text_content || (source.replyMsg && source.replyMsg.content)"
+                ></p>
+                <div
+                  v-for="(img, index) in source.content.image_urls"
                   :key="index"
                   :class="[
-                    'reply-wrapper__img-wrapper__img-box reply-msg',
+                    'normal-msg__img-wrapper__img-box',
                     { 'is-watch': isWatch },
                     { 'first-child': index === 0 }
                   ]"
                 >
                   <img
-                    class="img-box__content-img"
+                    class="normal-msg__img-wrapper__img-box__content-img"
                     width="40"
                     height="40"
-                    :src="img + '?x-oss-process=image/resize,m_lfit,h_80,w_80'"
+                    :src="img + '?x-oss-process=image/resize,m_fill,h_80,w_80'"
                     :alt="$t('chat.chat_1065')"
-                    @click="previewImg(index, source.replyMsg.content.image_urls)"
+                    @click="previewImg(index, source.content.image_urls)"
                   />
                 </div>
-              </div>
-            </div>
-            <!-- 文本 -->
-            <p
-              v-if="source.content.text_content"
-              class="normal-msg__content-wrapper"
-              v-html="
-                source.replyMsg && source.replyMsg.content
-                  ? `<span class='normal-msg__content-wrapper__label'>${$t(
-                      'chat.chat_1036'
-                    )}&nbsp;</span> ${msgContent}`
-                  : msgContent
-              "
-            ></p>
-            <!-- 图片 -->
-            <div v-if="source.content.image_urls" class="normal-msg__img-wrapper">
-              <!-- 回复 -->
-              <span
-                v-if="source.replyMsg && source.replyMsg.content && !source.content.text_content"
-                class="normal-msg__img-wrapper__label"
-              >
-                {{ $t('chat.chat_1036') }}
-              </span>
-              <p class="msg-item__content-hr"></p>
-              <div
-                v-for="(img, index) in source.content.image_urls"
-                :key="index"
-                :class="[
-                  'normal-msg__img-wrapper__img-box',
-                  { 'is-watch': isWatch },
-                  { 'first-child': index === 0 }
-                ]"
-              >
-                <img
-                  class="normal-msg__img-wrapper__img-box__content-img"
-                  width="40"
-                  height="40"
-                  :src="img + '?x-oss-process=image/resize,m_fill,h_80,w_80'"
-                  :alt="$t('chat.chat_1065')"
-                  @click="previewImg(index, source.content.image_urls)"
-                />
               </div>
             </div>
           </div>
@@ -207,17 +217,17 @@
         >
           <div class="msg-item-template__interact-content">
             <span
-              v-show="source.nickname && source.roleName != 1"
-              class="interact-content__nick-name"
-            >
-              {{ source.nickname | overHidden(8) }}
-            </span>
-            <span
               v-show="source.roleName"
               class="interact-content__role-name"
               :class="source.roleName | roleClassFilterForMsg"
             >
               {{ source.roleName | roleFilter }}
+            </span>
+            <span
+              v-show="source.nickname && source.roleName != 1"
+              class="interact-content__nick-name"
+            >
+              {{ source.nickname | overHidden(8) }}
             </span>
             <img
               v-if="source.type == 'pwd_red_envelope_ok'"
@@ -456,7 +466,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                  `<span class='normal-msg__content-wrapper__at'>${userName}</span>`
                 )
               );
             }
@@ -529,7 +539,8 @@
     pointer-events: auto;
 
     &__showtime {
-      margin-top: 20px;
+      margin-top: 16px;
+      margin-bottom: 12px;
       text-align: center;
       font-size: 14px;
       color: @font-dark-low;
@@ -537,13 +548,20 @@
     }
 
     .msg-item-template {
-      margin: 0 10px 0 12px;
-      padding-top: 20px;
+      margin: 0 10px 0px 12px;
+      padding-top: 8px;
+      padding-bottom: 4px;
       display: flex;
       align-items: center;
       .msg-item__content-hr {
         height: 6px;
         display: block;
+        &__1 {
+          height: 1px;
+        }
+        &__4 {
+          height: 4px;
+        }
       }
       &--welcome {
         width: 270px;
@@ -589,11 +607,18 @@
         }
         .normal-msg__content {
           flex: 1;
-          padding-left: 10px;
+          padding-left: 12px;
           word-break: break-all;
           .normal-msg__content__info-wrap {
             display: flex;
             align-items: center;
+          }
+          .normal-msg__content__msg-wrap {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
           }
           .info-wrap__nick-name {
             max-width: 126px;
@@ -603,52 +628,63 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-left: 4px;
           }
           .info-wrap__role-name {
-            padding: 0 4px;
-            margin-left: 8px;
+            padding: 2px 4px;
             font-size: 12px;
-            line-height: 16px;
-            background-color: rgba(251, 58, 50, 0.2);
+            line-height: 12px;
+            background-color: rgba(251, 38, 38, 0.15);
             border-radius: 9px;
             &.host {
-              background: rgba(251, 58, 50, 0.2);
-              color: #fb3a32;
+              background: rgba(251, 38, 38, 0.15);
+              color: #fb2626;
             }
             &.assistant {
-              background-color: rgba(53, 98, 250, 0.2);
-              color: #3562fa;
+              background: rgba(10, 127, 245, 0.15);
+              color: #33a0ff;
             }
             &.guest {
-              background-color: rgba(53, 98, 250, 0.2);
-              color: #3562fa;
+              background: rgba(10, 127, 245, 0.15);
+              color: #33a0ff;
             }
           }
 
           .normal-msg__content__reply-wrapper {
-            margin-top: 8px;
-            background: #222222;
             border-radius: 4px;
-            padding: 6px;
+            position: relative;
+            &::before {
+              content: '';
+              width: 3px;
+              position: absolute;
+              top: 4px;
+              bottom: 4px;
+              border-radius: 6px;
+              background: rgba(255, 255, 255, 0.45);
+            }
           }
           .reply-wrapper__content {
             margin-top: 4px;
-            font-size: 14px;
-            color: @font-dark-normal;
+            margin-left: 8px;
+            font-size: 12px;
             line-height: 20px;
+            color: rgba(255, 255, 255, 0.45);
             &.reply-msg {
               margin-top: 0;
             }
             .reply-wrapper__content__nick-name {
-              color: @font-dark-low;
+              margin-right: 4px;
+              line-height: 20px;
+              color: rgba(255, 255, 255, 0.35);
             }
             .reply-msg__label {
               color: #fa9a32;
             }
           }
           .reply-wrapper__img-wrapper {
+            margin-left: 8px;
             .reply-msg__label {
-              font-size: 14px;
+              font-size: 12px;
               line-height: 20px;
               display: block;
               color: #fa9a32;
@@ -686,19 +722,25 @@
             color: @font-dark-low;
             font-size: 14px;
             line-height: 20px;
+            margin-right: 4px;
           }
           .normal-msg__content-wrapper {
-            margin-top: 4px;
             font-size: 14px;
             color: @font-dark-normal;
-            line-height: 20px;
+            line-height: 22px;
             word-break: break-word;
             .normal-msg__content-wrapper__label {
               color: #fa9a32;
             }
+            .normal-msg__content-wrapper__at {
+              color: rgba(255, 255, 255, 0.45);
+              font-size: 14px;
+              line-height: 22px;
+            }
           }
 
           .normal-msg__img-wrapper {
+            padding: 4px 0;
             .normal-msg__img-wrapper__label {
               font-size: 14px;
               line-height: 20px;
@@ -707,7 +749,7 @@
             }
           }
           .normal-msg__img-wrapper__img-box {
-            display: inline-block;
+            float: left;
             width: 40px;
             height: 40px;
             &.is-watch {
@@ -738,13 +780,13 @@
         display: flex;
         justify-content: center;
         &-content {
-          // margin: 20px 46px 0;
-          line-height: 20px;
-          padding: 5px 16px;
-          background-color: #222;
-          border-radius: 15px;
-          color: @font-dark-normal;
+          padding: 3px 8px;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 14px;
           font-size: 14px;
+          line-height: 22px;
+          padding: 4px 8px;
+          color: #ffffff;
           text-align: center;
           > span {
             float: left;
@@ -753,30 +795,33 @@
         .interact-content__nick-name {
           display: inline-block;
           max-width: 124px;
-          color: #999999;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          font-size: 14px;
+          line-height: 22px;
+          color: rgba(255, 255, 255, 0.45);
+          margin-right: 4px;
         }
         .interact-content__role-name {
-          color: @font-link;
+          color: #fb2626;
           background-color: rgba(53, 98, 250, 0.2);
           border-radius: 9px;
-          padding: 0 4px;
+          padding: 2px 4px;
           font-size: 12px;
-          line-height: 16px;
-          margin: 2px 4px 0;
+          line-height: 12px;
+          margin: 4px 4px 0 0;
           &.host {
-            background-color: rgba(251, 58, 50, 0.2);
-            color: #fb3a32;
+            background: rgba(251, 38, 38, 0.15);
+            color: #fb2626;
           }
           &.assistant {
-            background-color: rgba(166, 166, 166, 0.15);
-            color: #3562fa;
+            background: rgba(10, 127, 245, 0.15);
+            color: #33a0ff;
           }
           &.guest {
-            background-color: rgba(53, 98, 250, 0.2);
-            color: #a6a6a6;
+            background: rgba(10, 127, 245, 0.15);
+            color: #33a0ff;
           }
         }
         .interact-content__redpackage-img {
