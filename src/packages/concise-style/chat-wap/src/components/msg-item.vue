@@ -64,7 +64,7 @@
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
           <span class="nickname">{{ overHidden(source.nickname, 5) }}&nbsp;</span>
-          <span class="chat-text">{{ source.content.text_content }}</span>
+          <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
       </div>
@@ -680,6 +680,7 @@
           border-width: 0;
           height: 44px;
           line-height: 38px;
+          color: rgba(255, 255, 255, 1);
           &.pwd_red_envelope_ok {
             display: flex;
             align-items: center;
