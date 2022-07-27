@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="subject-detail" v-if="showSubject">
+  <div class="subject-detail">
+    <div v-if="showSubject">
       <div class="subject-poster">
         <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
       </div>

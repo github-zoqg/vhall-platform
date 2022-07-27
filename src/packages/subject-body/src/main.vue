@@ -52,8 +52,10 @@
               <div class="living_box"><img :src="item.img_url || defaultImages" alt="" /></div>
             </div>
             <div class="living_bottom">
-              <div class="">
-                <p class="living_bottom_title" :title="item.subject">{{ item.subject }}</p>
+              <div>
+                <p class="living_bottom_title" :title="item.subject">
+                  {{ item.subject }}
+                </p>
                 <p class="living_bottom_time">{{ item.start_time }}</p>
               </div>
             </div>
@@ -214,7 +216,7 @@
             break;
           default:
             this.$message({
-              message: '验证失败' || msg,
+              message: msg || '验证失败',
               showClose: true,
               // duration: 0,
               type: 'warning',
@@ -386,13 +388,14 @@
               color: #1a1a1a;
               font-size: 16px;
               margin-bottom: 6px;
-              text-overflow: -o-ellipsis-lastline;
+              line-height: 22px;
               overflow: hidden;
               text-overflow: ellipsis;
               display: -webkit-box;
               -webkit-line-clamp: 2;
               line-clamp: 2;
-              line-height: 22px;
+              text-align: left;
+              /* autoprefixer: ignore next */
               -webkit-box-orient: vertical;
             }
             &_time {
