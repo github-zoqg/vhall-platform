@@ -137,6 +137,7 @@
           // TODO: 暂时存到session中，之后再改。
           let room_style = window.sessionStorage.getItem('room_style');
           if (room_style) {
+            this.isConcise = room_style == 'concise';
             setPage(room_style == 'fashion' ? 'main' : room_style);
             if (room_style == 'fashion') {
               console.log(window.$serverConfig);
