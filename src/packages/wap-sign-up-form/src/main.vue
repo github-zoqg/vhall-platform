@@ -369,7 +369,7 @@
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
-  import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
