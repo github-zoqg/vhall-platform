@@ -1107,10 +1107,10 @@
           }
         };
       },
-      // 当前界面类型
-      signUpPageType() {
+      // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+      interfaceType() {
         if (window.location.href.indexOf('/subject/entryform') != -1) {
-          // 专题
+          // 专题(当前只针对专题-独立报名表单，说明类型是subject；其它情况下认为都应该调用活动接口)
           return 'subject';
         } else {
           return 'webinar';
@@ -1122,7 +1122,10 @@
       this.signUpFormServer = useSignUpFormServer();
     },
     mounted() {
-      if (this.signUpPageType === 'subject') {
+      if (
+        this.interfaceType === 'subject' ||
+        window.location.href.indexOf('/special/detail') != -1
+      ) {
         this.$i18n.locale = 'zh-CN';
       }
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
@@ -1133,9 +1136,9 @@
     methods: {
       // 设置接口入参，是活动维度 还是 专题维度
       setParamsIdByRoute(params) {
-        if (this.signUpPageType === 'webinar') {
+        if (this.interfaceType === 'webinar') {
           params.webinar_id = this.webinarOrSubjectId;
-        } else if (this.signUpPageType === 'subject') {
+        } else if (this.interfaceType === 'subject') {
           params.subject_id = this.webinarOrSubjectId;
         }
         return params;
@@ -1156,7 +1159,7 @@
         //因为是独立页面，活动id/专题id只能从路由取
         this.webinarOrSubjectId =
           this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
-        if (this.signUpPageType === 'subject') {
+        if (this.interfaceType === 'subject') {
           // 专题-默认 活动报名在前
           this.isSubscribe = 1;
           this.activeTab = 1;
@@ -1609,7 +1612,8 @@
           captchaId: that.captchaKey,
           element: id,
           lang:
-            this.signUpPageType === 'subject'
+            this.interfaceType === 'subject' ||
+            window.location.href.indexOf('/special/detail') != -1
               ? 'zh-CN'
               : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           mode: 'float',
@@ -1680,7 +1684,7 @@
               if (res.code == 200) {
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
                 // 报名成功的操作，跳转到直播间
-                if (this.signUpPageType === 'subject') {
+                if (this.interfaceType === 'subject') {
                   this.getSubjectStatus();
                 } else {
                   // 判断当前直播状态，进行相应的跳转
@@ -1700,7 +1704,7 @@
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
-                if (this.signUpPageType === 'subject') {
+                if (this.interfaceType === 'subject') {
                   this.getSubjectStatus();
                 } else {
                   // 判断当前直播状态，进行相应的跳转
@@ -1736,7 +1740,7 @@
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
-                  if (this.signUpPageType === 'subject') {
+                  if (this.interfaceType === 'subject') {
                     this.getSubjectStatus();
                   } else {
                     // 判断当前直播状态，进行相应的跳转

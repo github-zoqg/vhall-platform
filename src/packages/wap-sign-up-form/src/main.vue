@@ -590,8 +590,8 @@
           return maxLength;
         };
       },
-      // 当前界面类型
-      signUpPageType() {
+      // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+      interfaceType() {
         if (window.location.href.indexOf('/subject/entryform') != -1) {
           // 专题
           return 'subject';
@@ -656,14 +656,17 @@
       this.signUpFormServer = useSignUpFormServer();
     },
     mounted() {
-      if (this.signUpPageType === 'subject') {
+      if (
+        this.interfaceType === 'subject' ||
+        window.location.href.indexOf('/special/detail') != -1
+      ) {
         this.subjectServer = useSubjectServer();
         this.$i18n.locale = 'zh-CN';
       } else {
         this.roomBaseServer = useRoomBaseServer();
       }
       this.$nextTick(() => {
-        if (this.signUpPageType === 'subject') {
+        if (this.interfaceType === 'subject') {
           this.initSubjectInfo();
         } else {
           this.initWebinarInfo();
@@ -673,9 +676,9 @@
     methods: {
       // 设置接口入参，是活动维度 还是 专题维度
       setParamsIdByRoute(params) {
-        if (this.signUpPageType === 'webinar') {
+        if (this.interfaceType === 'webinar') {
           params.webinar_id = this.webinarOrSubjectId;
-        } else if (this.signUpPageType === 'subject') {
+        } else if (this.interfaceType === 'subject') {
           params.subject_id = this.webinarOrSubjectId;
         }
         return params;
@@ -881,7 +884,8 @@
           element: id,
           mode: 'float',
           lang:
-            this.signUpPageType === 'subject'
+            this.interfaceType === 'subject' ||
+            window.location.href.indexOf('/special/detail') != -1
               ? 'zh-CN'
               : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           onReady() {},
@@ -1038,7 +1042,7 @@
           .then(res => {
             if (res && [200, '200'].includes(res.code)) {
               sessionStorage.setItem('visitorId', res.data.visit_id);
-              if (this.signUpPageType === 'subject') {
+              if (this.interfaceType === 'subject') {
                 // 专题 -- 报名成功后处理
                 this.getSubjectStatus();
               } else {
@@ -1057,7 +1061,7 @@
             } else if (err.code == 512814 || err.code == 512815) {
               this.$toast(this.$t('form.form_1033'));
               const queryString = this.returnQueryString();
-              if (this.signUpPageType === 'subject') {
+              if (this.interfaceType === 'subject') {
                 location.replace(
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
