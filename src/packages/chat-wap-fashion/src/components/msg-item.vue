@@ -72,7 +72,7 @@
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
-        <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
+        <div class="interact-gift-box">
           <span class="new-gift-name">{{ source.nickname | overHidden(8) }}&nbsp;</span>
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
@@ -95,7 +95,7 @@
     <!-- 聊天消息 -->
     <template v-else>
       <div class="msg-item" v-if="showTime">
-        <div class="msg-content">
+        <div class="msg-content timeline">
           <!-- 事件消息 -->
           <div class="msg-content_body">
             <div class="normal-msg">
@@ -133,7 +133,7 @@
                     class="nickname"
                     v-html="source.replyMsg.nick_name || source.replyMsg.nickname"
                   />
-                  ：
+                  &nbsp;
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
                   <template v-if="!!!source.replyMsg.content.text_content">
                     <div
@@ -142,7 +142,7 @@
                       v-for="(img, index) in source.replyMsg.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -155,7 +155,7 @@
                     v-for="(img, index) in source.replyMsg.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -175,7 +175,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(8) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(8) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -184,7 +184,7 @@
                       v-for="(img, index) in source.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -197,7 +197,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -218,7 +218,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(8) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(8) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                 </div>
                 <div class="imgs">
@@ -228,7 +228,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -259,7 +259,7 @@
                   >
                     <span>{{ source.roleName | roleFilter }}</span>
                   </span>
-                  <span class="nickname">{{ source.nickname | overHidden(8) }}：</span>
+                  <span class="nickname">{{ source.nickname | overHidden(8) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
                   <template v-if="!!!msgContent">
                     <div
@@ -268,7 +268,7 @@
                       v-for="(img, index) in source.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -281,7 +281,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -482,11 +482,15 @@
 <style lang="less">
   .vmp-chat-wap-msg-item-fashion {
     pointer-events: auto;
-    .msg-showtime {
-      padding: 8px 0 24px;
-      font-size: 24px;
-      color: #595959;
-      text-align: center;
+
+    .timeline {
+      margin: 0 auto;
+      .msg-showtime {
+        padding: 10px 0 24px;
+        font-size: 28px;
+        color: rgba(0, 0, 0, 0.85);
+        text-align: center;
+      }
     }
     .msg-item {
       margin: 0 24px;
@@ -536,8 +540,8 @@
         .msg-content_body {
           position: relative;
           background: rgba(255, 255, 255, 0.85);
-          border-radius: 20px;
-          padding: 10px 16px;
+          border-radius: 30px;
+          padding: 10px 12px;
           word-break: break-all;
           color: rgba(0, 0, 0, 0.85);
           font-size: 26px;
@@ -549,10 +553,10 @@
           }
           .msg-content_chat-img {
             vertical-align: text-top;
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             display: inline-block;
-            margin: 0 8px 5px 0;
+            margin: 0 8px 0 0;
             border-radius: 4px;
             background-size: cover;
             background-repeat: no-repeat;
@@ -565,7 +569,6 @@
             > .textInfo {
               line-height: 38px;
               &.existSimpleImg {
-                padding-top: 5px;
               }
               span {
                 word-break: break-word;
@@ -580,9 +583,9 @@
             > .imgs {
               .img {
                 display: inline-block;
-                margin: 8px 8px 0 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 0 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -595,25 +598,30 @@
           }
           > .reply-msg {
             padding-left: 18px;
-            margin-bottom: 9px;
+            margin-bottom: 8px;
             position: relative;
             > .textInfo {
               position: relative;
-              line-height: 38px;
+              line-height: 36px;
+              font-size: 24px;
               .nickname {
-                color: rgba(0, 0, 0, 0.25);
+                color: rgba(0, 0, 0, 0.45);
               }
               .chat-text {
-                color: rgba(0, 0, 0, 0.45);
+                color: rgba(0, 0, 0, 0.65);
+              }
+              .role {
+                opacity: 0.65;
               }
             }
 
             > .imgs {
               .img {
+                opacity: 0.65;
                 display: inline-block;
-                margin: 8px 8px 0 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 0 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -627,12 +635,16 @@
             &::after {
               content: ' ';
               width: 6px;
-              height: calc(100% - 14px);
+              height: 100%;
               position: absolute;
-              top: 9px;
+              top: 0;
               left: 0;
               background: rgba(0, 0, 0, 0.25);
               border-radius: 3px;
+            }
+            .existSimpleImg .msg-content_chat-img {
+              margin-bottom: 0;
+              opacity: 0.65;
             }
           }
           > .reply-msg-content {
@@ -650,9 +662,9 @@
             > .imgs {
               .img {
                 display: inline-block;
-                margin: 8px 8px 0 0;
-                width: 60px;
-                height: 60px;
+                margin: 4px 8px 0 0;
+                width: 56px;
+                height: 56px;
                 border-radius: 4px;
                 background-size: cover;
                 background-repeat: no-repeat;
@@ -661,6 +673,9 @@
                   margin-right: 0;
                 }
               }
+            }
+            .existSimpleImg {
+              padding-top: 0;
             }
           }
         }
@@ -680,15 +695,16 @@
         }
         > div {
           background: rgba(255, 255, 255, 0.85);
-          border-radius: 40px;
+          border-radius: 30px;
           position: relative;
           font-size: 26px;
+          line-height: 38px;
         }
         > .interact-gift-box {
           padding: 0 64px 0 12px;
           text-align: left;
           width: 100%;
-          height: 46px;
+          height: 60px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -698,10 +714,7 @@
             color: rgba(0, 0, 0, 0.85);
           }
           .new-gift-content {
-            color: rgba(252, 150, 0, 0.85);
-          }
-          &.zdy {
-            padding-right: 68px;
+            color: rgba(0, 0, 0, 0.65);
           }
           .gift-zdy {
             width: 40px;
@@ -717,14 +730,14 @@
           .new-gift-img {
             width: 40px;
             position: absolute;
-            right: 12px;
+            right: 16px;
           }
         }
         > .interact-msg {
-          padding: 3px 16px;
+          padding: 11px 12px;
           border-width: 0;
-          height: 46px;
-          line-height: 40px;
+          height: 60px;
+          line-height: 38px;
           &.pwd_red_envelope_ok {
             display: flex;
             align-items: center;
@@ -734,12 +747,12 @@
             color: rgba(10, 127, 245, 1);
           }
           .new-award-img {
-            width: 36px;
+            width: 40px;
             position: absolute;
-            left: 16px;
+            left: 12px;
           }
           .nickname {
-            color: rgba(0, 0, 0, 0.85);
+            color: rgba(0, 0, 0, 0.65);
           }
           .chat-text {
             color: rgba(0, 0, 0, 0.85);
