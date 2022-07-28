@@ -72,7 +72,7 @@
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
-        <div class="interact-gift-box" :class="source.content.source_status == 1 ? 'zdy' : ''">
+        <div class="interact-gift-box">
           <span class="new-gift-name">{{ source.nickname | overHidden(5) }}&nbsp;</span>
           <span class="new-gift-content">
             {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(8) }}
@@ -128,7 +128,7 @@
                       v-for="(img, index) in source.replyMsg.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -141,7 +141,7 @@
                     v-for="(img, index) in source.replyMsg.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -170,7 +170,7 @@
                       v-for="(img, index) in source.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -183,7 +183,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -213,7 +213,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -252,7 +252,7 @@
                       v-for="(img, index) in source.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -265,7 +265,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_60,w_60'
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
@@ -483,7 +483,7 @@
         .msg-content_body {
           position: relative;
           background: rgba(0, 0, 0, 0.25);
-          border-radius: 20px;
+          border-radius: 22px;
           padding: 3px 12px;
           word-break: break-all;
           font-size: 26px;
@@ -496,8 +496,8 @@
           }
           .msg-content_chat-img {
             vertical-align: text-top;
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             display: inline-block;
             margin: 0 8px 5px 0;
             border-radius: 4px;
@@ -588,6 +588,7 @@
             }
             .existSimpleImg .msg-content_chat-img {
               margin-bottom: 0;
+              opacity: 0.65;
             }
           }
           > .reply-msg-content {
@@ -641,6 +642,7 @@
           border-radius: 20px;
           position: relative;
           font-size: 26px;
+          line-height: 38px;
         }
         > .interact-gift-box {
           padding: 0 56px 0 12px;
