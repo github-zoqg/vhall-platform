@@ -611,20 +611,21 @@
       }
       &__new-msg-tips {
         position: absolute;
-        left: 17px;
-        right: 16px;
-        bottom: 20px;
+        left: 0;
+        right: 0;
+        bottom: 16px;
         width: fit-content;
         height: 60px;
-        background: rgba(255, 255, 255, 0.85);
+        background: #ffffff;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 4px 12px rgba(0, 0, 0, 0.1);
-        border-radius: 28px;
+        border-radius: 30px;
         color: #0a7ff5;
         font-size: 28px;
         padding: 10px 16px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 0 auto;
         .vh-iconfont {
           font-size: 16px;
           margin-left: 11px;

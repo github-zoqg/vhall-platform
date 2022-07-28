@@ -291,9 +291,7 @@
       this.eventListener();
 
       //TODO：临时看效果加的背景
-      document.getElementsByClassName(
-        'vmp-concise-layout'
-      )[0].style.backgroundImage = `url(${require('./img/temp_bg.png')})`;
+      document.body.style.backgroundImage = `url(${require('./img/temp_bg.png')})`;
     },
     beforeDestroy() {
       //移除事件
