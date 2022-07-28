@@ -193,6 +193,10 @@
       // 是否开启了桌面共享
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 桌面共享人信息
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
       }
     },
     components: {
@@ -291,6 +295,21 @@
       selectLocalVideo() {
         // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
         if (!this.checkInsertFileProcess() || this.isShareScreen) {
+          if (this.isShareScreen && this.desktopShareInfo) {
+            // 当前有桌面共享，并且桌面共享演示人信息能获取的时候
+            this.$alert(
+              `${this.$getRoleName(this.desktopShareInfo.role)}${
+                this.desktopShareInfo.role != 1 ? this.desktopShareInfo.nickname : ''
+              }正在进行桌面共享，请稍后重试`,
+              '',
+              {
+                title: '提示',
+                confirmButtonText: '确定',
+                customClass: 'zdy-message-box',
+                cancelButtonClass: 'zdy-confirm-cancel'
+              }
+            );
+          }
           // 当前不可演示插播, 关闭插播列表弹窗
           this.closeInserVideoDialog();
           return;

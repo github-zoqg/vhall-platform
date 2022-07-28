@@ -264,6 +264,10 @@
       // 当前文档或白板容器的Id
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      // 插播信息
+      insertStreamInfo() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo;
       }
     },
     components: {
@@ -491,10 +495,29 @@
           this.stopShare();
         }
       },
-
+      // 提示xxx正在插播文件，请稍后重试
+      alertInsertWarning() {
+        this.$alert(
+          `${this.$getRoleName(this.insertStreamInfo.userInfo.role)}${
+            this.insertStreamInfo.userInfo.role != 1 ? this.insertStreamInfo.userInfo.nickname : ''
+          }正在插播文件，请稍后重试`,
+          '',
+          {
+            title: '提示',
+            confirmButtonText: '确定',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          }
+        );
+      },
       // 开始共享
       startShare() {
         this.closeConfirm();
+        // 点击弹出框 - 确定的时候判断
+        if (this.isInsertFilePushing) {
+          this.alertInsertWarning();
+          return;
+        }
         const configuredProfile = this.mediaSettingServer.state.screenRate;
         let profile = VhallRTC.RTC_SCREEN_PROFILE_1080P_16x9_M;
         if (configuredProfile) {
@@ -513,6 +536,7 @@
           .then(() => {
             // console.log('当前是否正在插播', this.isInsertFilePushing, this.isShareScreen);
             if (this.isInsertFilePushing && this.isShareScreen) {
+              this.alertInsertWarning();
               this.desktopShareServer.endStartShareScreen({
                 streamId: this.isShareScreen
               });
