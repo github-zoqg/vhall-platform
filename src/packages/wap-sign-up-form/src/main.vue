@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-wap-sign-up-form">
-    <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
+    <div v-if="formOpenLinkStatus == 1 && !isShowError" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
         <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
       </header>
@@ -323,11 +323,16 @@
         </ul>
       </div>
     </div>
-    <div v-if="formOpenLinkStatus == 2" class="no-authority-wrap">
+    <div v-if="formOpenLinkStatus == 2 && !isShowError" class="no-authority-wrap">
       <p>
         {{ $t('message.message_1006') }}
         <br />
         {{ $t('message.message_1025') }}
+      </p>
+    </div>
+    <div v-if="isShowError" class="no-authority-wrap">
+      <p>
+        {{ isShowError }}
       </p>
     </div>
     <!-- 这个元素不显示用于计算两行的高度 -->
@@ -492,7 +497,8 @@
         isFirstChange: true,
         startTime: '',
         queryString: '',
-        isSubmitSuccess: false
+        isSubmitSuccess: false,
+        isShowError: '' // 是否展示后端错误码内容
       };
     },
     computed: {
@@ -729,10 +735,23 @@
           ...this.setParamsIdByRoute({}),
           visit_id: sessionStorage.getItem('visitorId')
         };
-        return this.signUpFormServer.getFormLinkStatus(params).then(res => {
-          // 如果独立链接无效，显示无效页
-          this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
-        });
+        return this.signUpFormServer
+          .getFormLinkStatus(params)
+          .then(res => {
+            if (res.code !== 200) {
+              // 错误异常，显示后端返回码
+              this.isShowError =
+                res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
+            } else {
+              this.isShowError = '';
+              // 如果独立链接无效，显示无效页
+              this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
+            }
+          })
+          .catch(res => {
+            // 错误异常，显示后端返回码
+            this.isShowError = this.$tec(res.code) || this.$t('message.message_1026');
+          });
       },
       //获取活动类型
       getWebinarType() {
