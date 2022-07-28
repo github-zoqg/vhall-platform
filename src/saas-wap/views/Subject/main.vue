@@ -280,7 +280,7 @@
         this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
       },
       goWatchUrl() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
       },
       handleAuthInfo() {
         let data = {
@@ -363,7 +363,7 @@
             window.location.href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
-              `/lives/watch/${this.webinarId}`;
+              `/lives/watch/${this.webinarId}${window.location.search}`;
           } else {
             this.$toast(res.msg || '验证失败');
           }
