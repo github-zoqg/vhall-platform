@@ -127,11 +127,15 @@
         };
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
           if (res.code == 200) {
+            this.authVisible = false;
             let href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
               `/lives/watch/${this.webinarId}${window.location.search}`;
             window.open(href, '_blank');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
