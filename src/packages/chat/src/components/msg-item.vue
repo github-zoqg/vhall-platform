@@ -216,19 +216,17 @@
             >
               {{ source.roleName | roleFilter }}
             </span>
-            <span
-              v-show="source.nickname && source.roleName != 1"
-              class="interact-content__nick-name"
-            >
+            <span v-show="source.nickname" class="interact-content__nick-name">
               {{ source.nickname | overHidden(8) }}
             </span>
+            <span>{{ source.content.text_content }}</span>
+            <!-- 红包图标 -->
             <img
               v-if="source.type == 'pwd_red_envelope_ok'"
               class="interact-content__redpackage-img"
               src="../img/red-package-1.png"
               alt=""
             />
-            <span>{{ source.content.text_content }}</span>
             <span
               v-if="source.isCheck"
               class="interact-content__click-detail"
@@ -836,7 +834,7 @@
         }
         .interact-content__redpackage-img {
           width: 16px;
-          margin-right: 4px;
+          margin-left: 4px;
           margin-top: 1px;
           float: left;
         }
@@ -854,28 +852,27 @@
         justify-content: center;
         .interact-tools-content {
           /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
-          line-height: 20px;
-          padding: 5px 16px;
-          background-color: #222;
+          line-height: 22px;
+          padding: 4px 8px;
+          background-color: rgba(255, 255, 255, 0.08);
           border-radius: 15px;
-          color: @font-dark-normal;
+          color: #ffffff;
           font-size: 14px;
           text-align: center;
           > span {
             //float: left;
           }
           &__nick-name {
-            color: @font-dark-low;
-            border-radius: 9px;
-            padding: 0 4px;
+            color: rgba(255, 255, 255, 0.45);
+            padding-right: 4px;
             font-size: 14px;
-            line-height: 20px;
+            line-height: 22px;
           }
           &__img {
-            height: 18px;
-            padding-left: 7px;
+            height: 24px;
+            padding-left: 4px;
             &-scale {
-              transform: scale(1.4);
+              transform: scale(1);
             }
             &-reward {
               transform: scale(0.8);
