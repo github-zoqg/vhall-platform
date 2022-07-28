@@ -198,7 +198,7 @@
   } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
-  import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
     data() {
