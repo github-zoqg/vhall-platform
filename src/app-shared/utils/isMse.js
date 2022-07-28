@@ -1,7 +1,7 @@
 import semver from 'semver';
 import UAParser from 'ua-parser-js';
 export const isMse = function () {
-  window.semver = semver;
+  // window.semver = semver;
   const result = Object.create(null);
   const uaResult = new UAParser().getResult();
   result.isTencent =

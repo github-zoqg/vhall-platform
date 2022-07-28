@@ -16,7 +16,7 @@
   import MsgTip from './MsgTip';
   import Chrome from './Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     data() {
       return {
@@ -63,8 +63,6 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-        //上报日志
-        logRoomInitSuccess({ isSend: true });
       } catch (err) {
         //上报日志
         logRoomInitFailed({ isSend: true, error: err });
@@ -72,9 +70,7 @@
         console.error(err);
         if (err.code == 510008) {
           // 未登录
-          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
-            location.search
-          }`;
+          location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
         }
         this.state = 2;
         this.errMsg = err.msg;

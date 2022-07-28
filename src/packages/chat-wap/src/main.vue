@@ -69,6 +69,12 @@
 
 <script>
   import VirtualList from 'vue-virtual-scroll-list';
+  import { ImagePreview } from 'vh5-ui';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
+  import { isMse } from '@/app-shared/utils/isMse';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import emitter from '@/app-shared/mixins/emitter';
+
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
   import {
@@ -79,12 +85,8 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-  import { ImagePreview } from 'vh5-ui';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
-  import { boxEventOpitons } from '@/app-shared/utils/tool';
-  import emitter from '@/app-shared/mixins/emitter';
+
   import EventBus from './js/Events.js';
-  import { isMse } from './js/utils.js';
 
   export default {
     name: 'VmpChatWap',
