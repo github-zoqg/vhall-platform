@@ -121,9 +121,11 @@
             <br />
             2.视频格式支持1280*720及以下分辨率，文件小于5G
             <br />
-            3.想要上传更多文件格式，可在活动详情-插播文件中进行上传
-            <br />
-            4.发起端插播文件仅支持本地插播，不会上传到活动下哦！
+            <span v-if="!hideItem">
+              3.想要上传更多文件格式，可在活动详情-插播文件中进行上传
+              <br />
+              4.发起端插播文件仅支持本地插播，不会上传到活动下哦！
+            </span>
           </div>
         </div>
       </div>
@@ -176,6 +178,17 @@
       // 当前插播中的云插播文件
       currentRemoteInsertFile() {
         return this.$domainStore.state.insertFileServer.currentRemoteInsertFile;
+      },
+      // 权限配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return (
+          this.configList['initiate_embed_function_close'] &&
+          (this.$route.query.liveT || this.$route.query.live_token)
+        );
       }
     },
     components: {

@@ -46,7 +46,7 @@
       </div>
     </div>
     <!-- 上下麦按钮 -->
-    <div class="vmp-footer-tools__center">
+    <div class="vmp-footer-tools__center" v-if="!hideItem">
       <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
@@ -274,6 +274,10 @@
       },
       isBanned() {
         return !this.isInGroup && (useChatServer().state.banned || useChatServer().state.allBanned); //true禁言，false未禁言
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.roomBaseServer.state.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
