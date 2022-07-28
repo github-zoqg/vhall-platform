@@ -340,11 +340,9 @@
           ? `${base}lives/qa/${this.webinarId}`
           : `${base}lives/qa/${this.webinarId}`;
         if (this.$route.query.assistantType) {
-          cl_openQAAdmin(url);
+          cl_openQAAdmin(process.env.VUE_APP_WAP_WATCH + url);
         } else {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitOpenQAAdmin', process.env.VUE_APP_WAP_WATCH + url)
-          );
+          window.open(`${base}lives/qa/${this.webinarId}${location.search}`);
         }
       },
       //滚动到底部
