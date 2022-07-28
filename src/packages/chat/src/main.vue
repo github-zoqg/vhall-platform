@@ -310,6 +310,7 @@
 
       // 展示欢迎语
       this.showWelcome();
+      // TODO:开发调试代码，提测之后删除
       [
         {
           nickname: '很长de昵称很长d昵称很长de昵称很长de昵称很长de昵称',
