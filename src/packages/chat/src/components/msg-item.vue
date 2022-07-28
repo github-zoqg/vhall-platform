@@ -93,14 +93,7 @@
             </p>
             <div class="normal-msg__content__msg-wrap">
               <!-- 被回复的消息 -->
-              <div
-                v-if="
-                  source.replyMsg &&
-                  source.replyMsg.content &&
-                  (source.replyMsg.content.text_content || source.replyMsg.content.image_urls)
-                "
-                class="normal-msg__content__reply-wrapper"
-              >
+              <div v-if="hasReplyMsg" class="normal-msg__content__reply-wrapper">
                 <!-- 文本 -->
                 <p
                   v-if="
@@ -124,7 +117,6 @@
                     source.replyMsg.content.image_urls.length
                   "
                   class="reply-wrapper__img-wrapper reply-msg"
-                  :style="source.replyMsg.content.text_content && 'margin-top:-3px;'"
                 >
                   <p
                     v-if="
@@ -169,6 +161,7 @@
               <p
                 v-if="source.content.text_content"
                 class="normal-msg__content-wrapper"
+                :class="hasReplyMsg ? 'normal-msg__content-wrapper__mt4' : ''"
                 v-html="msgContent"
               ></p>
               <!-- 图片 -->
@@ -183,10 +176,10 @@
                 >
                   {{ $t('chat.chat_1036') }}
                 </span> -->
-                <p
+                <!-- <p
                   class="msg-item__content-hr msg-item__content-hr__1"
                   v-if="source.content.text_content || (source.replyMsg && source.replyMsg.content)"
-                ></p>
+                ></p> -->
                 <div
                   v-for="(img, index) in source.content.image_urls"
                   :key="index"
@@ -368,6 +361,13 @@
       };
     },
     computed: {
+      hasReplyMsg() {
+        return (
+          this.source.replyMsg &&
+          this.source.replyMsg.content &&
+          (this.source.replyMsg.content.text_content || this.source.replyMsg.content.image_urls)
+        );
+      },
       showTime() {
         if (!this.source.sendTime) {
           return '';
@@ -457,16 +457,19 @@
         this.source.atList &&
           this.source.atList.forEach(a => {
             // TODO历史列表aList与直播中格式不一致作
-            const userName = `@${a.nick_name || a.nickName} `;
+            const userName = `@${a.nick_name || a.nickName}`;
             const match =
               this.source.content &&
               this.source.content.text_content &&
               this.source.content.text_content.indexOf(userName) != -1;
             if (match) {
+              const isStart = this.source.content.text_content.startsWith(userName);
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span class='normal-msg__content-wrapper__at'>${userName}</span>`
+                  `<span class='normal-msg__content-wrapper__at ${
+                    !isStart ? 'normal-msg__content-wrapper__at-ml__4' : ''
+                  }'>${userName}</span>`
                 )
               );
             }
@@ -607,7 +610,7 @@
         }
         .normal-msg__content {
           flex: 1;
-          padding-left: 12px;
+          padding-left: 8px;
           word-break: break-all;
           .normal-msg__content__info-wrap {
             display: flex;
@@ -623,8 +626,8 @@
           .info-wrap__nick-name {
             max-width: 126px;
             font-size: 14px;
-            color: @font-dark-low;
-            line-height: 16px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 22px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -665,7 +668,7 @@
           }
           .reply-wrapper__content {
             margin-top: 4px;
-            margin-left: 8px;
+            margin-left: 7px;
             font-size: 12px;
             line-height: 20px;
             color: rgba(255, 255, 255, 0.45);
@@ -683,6 +686,8 @@
           }
           .reply-wrapper__img-wrapper {
             margin-left: 8px;
+            padding-bottom: 4px;
+            line-height: 1;
             .reply-msg__label {
               font-size: 12px;
               line-height: 20px;
@@ -691,7 +696,6 @@
             }
           }
           .reply-wrapper__img-wrapper__img-box {
-            display: inline-block;
             width: 40px;
             height: 40px;
             &.is-watch {
@@ -726,16 +730,22 @@
           }
           .normal-msg__content-wrapper {
             font-size: 14px;
-            color: @font-dark-normal;
+            color: #ffffff;
             line-height: 22px;
             word-break: break-word;
+            &__mt4 {
+              margin-top: 4px;
+            }
             .normal-msg__content-wrapper__label {
               color: #fa9a32;
             }
             .normal-msg__content-wrapper__at {
-              color: rgba(255, 255, 255, 0.45);
+              color: #0a7ff5;
               font-size: 14px;
               line-height: 22px;
+              &-ml__4 {
+                margin-left: 4px;
+              }
             }
           }
 
@@ -753,8 +763,8 @@
             width: 40px;
             height: 40px;
             &.is-watch {
-              width: 60px;
-              height: 60px;
+              width: 56px;
+              height: 56px;
             }
             border-radius: 4px;
             overflow: hidden;
