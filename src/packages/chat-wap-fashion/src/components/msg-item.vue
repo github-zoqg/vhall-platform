@@ -296,7 +296,7 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
-  import { handleChatShowTime } from '../js/handle-time.js';
+  import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
   export default {
     props: {
       source: {
@@ -371,6 +371,9 @@
       //   }
       // },
       showTime() {
+        if (this.source.showTime) {
+          return this.source.showTime;
+        }
         if (!this.source.sendTime) {
           return '';
         }
