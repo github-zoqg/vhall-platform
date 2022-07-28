@@ -127,10 +127,11 @@
         };
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
           if (res.code == 200) {
-            window.location.href =
+            let href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
-              `/lives/watch/${this.webinarId}`;
+              `/lives/watch/${this.webinarId}${window.location.search}`;
+            window.open(href, '_blank');
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
