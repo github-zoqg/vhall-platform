@@ -195,8 +195,7 @@
         //礼物特效数组
         specialEffectsList: [],
         //只看主办方
-        isOnlyShowSponsor:
-          sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true' ? true : false,
+        isOnlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
         //特效样式map
         effectsMap: {
           鲜花: 'bg-flower',

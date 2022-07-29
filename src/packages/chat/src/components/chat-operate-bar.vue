@@ -270,13 +270,11 @@
         //过滤状态集合
         filterStatus: {
           //只看主办方
-          onlyShowSponsor:
-            sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true' ? true : false,
+          onlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
           //屏蔽特效
-          isShieldingEffects:
-            sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true' ? true : false,
+          isShieldingEffects: sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true',
           // 仅查看聊天内容
-          isChat: sessionStorage.getItem('filterStatus_isChat') == 'true' ? true : false
+          isChat: sessionStorage.getItem('filterStatus_isChat') == 'true'
         },
         //聊天审核链接
         chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
