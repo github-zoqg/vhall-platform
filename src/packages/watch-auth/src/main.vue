@@ -127,13 +127,13 @@
         };
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
           if (res.code == 200) {
-            this.initSubjectAuth();
+            this.subjectServer.state.subjectAuthInfo.pass = 1;
+            this.authVisible = false;
             let href =
               window.location.origin +
               process.env.VUE_APP_ROUTER_BASE_URL +
               `/lives/watch/${this.webinarId}${window.location.search}`;
             window.open(href, '_blank');
-            this.authVisible = false;
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
@@ -143,17 +143,6 @@
             });
           }
         });
-      },
-      // 获取专题的初始化信息
-      initSubjectAuth() {
-        const visitorId = sessionStorage.getItem('visitorId');
-        let params = {
-          subject_id: this.$route.query.id,
-          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
-          ...this.$route.query
-        };
-        // 如果通过鉴权，就更新pass的值
-        this.subjectServer.initSubjectInfo(params);
       }
     }
   };

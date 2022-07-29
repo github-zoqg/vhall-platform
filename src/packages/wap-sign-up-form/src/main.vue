@@ -1327,7 +1327,7 @@
             },
             {
               title: info.title,
-              desc: replaceHtml(info.intro),
+              desc: replaceHtml(info.intro, 42),
               link:
                 window.location.protocol +
                 `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/subject/entryform/${this.webinarOrSubjectId}`,

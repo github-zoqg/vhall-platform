@@ -1,6 +1,21 @@
 <template>
   <div class="subject-detail">
-    <div v-if="showSubject">
+    <van-loading
+      v-show="state === 0"
+      size="32px"
+      type="spinner"
+      :vertical="true"
+      style="
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      "
+    >
+      {{ $t('common.common_1001') }}
+    </van-loading>
+    <div v-if="state === 1">
       <div class="subject-poster">
         <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
       </div>
@@ -74,7 +89,7 @@
       </section>
     </div>
     <!-- 没有此专题 -->
-    <div v-else class="error-page">
+    <div v-if="state === 2" class="error-page">
       <img src="./img/subject_null.png" alt="" />
       <p>专题已下线</p>
     </div>
@@ -104,17 +119,17 @@
 </template>
 
 <script>
-  import { useSubjectServer } from 'middle-domain';
+  import { useSubjectServer, useUserServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { getQueryString } from '@/app-shared/utils/tool.js';
-  import { urlToLink, padStringWhenTooLang } from './js/utils.js';
+  import { handleIntroInfo, replaceHtml } from '@/app-shared/utils/tool.js';
   import loginWap from '@/packages/reg-login-wap/src/main.vue';
   import confirmAuth from '@/app-shared/components/confirm.vue';
   export default {
     data() {
       return {
+        state: 0,
         open_hide: false,
-        showSubject: true,
         isShowCheck: false,
         webinarId: '',
         textAuth: '',
@@ -162,10 +177,17 @@
     },
     beforeCreate() {
       this.subjectServer = useSubjectServer();
+      this.userServer = useUserServer();
     },
-    created() {
-      this.getDetail();
+    async created() {
       this.hasDelayPermission = this.$route.query.delay;
+      if (localStorage.getItem('token')) {
+        setRequestHeaders({
+          token: localStorage.getItem('token') || undefined
+        });
+        await this.userServer.getUserInfo({ scene_id: 2 });
+      }
+      await this.getDetail();
     },
     computed: {
       subjectAuthInfo() {
@@ -195,13 +217,15 @@
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
-            this.showSubject = false;
+            this.state = 2;
             this.$toast(res.msg);
             return;
           }
-
+          this.state = 1;
           this.detailInfo = res.data;
-          this.detailInfo.webinar_subject.intro = urlToLink(this.detailInfo.webinar_subject.intro);
+          this.detailInfo.webinar_subject.intro = handleIntroInfo(
+            this.detailInfo.webinar_subject.intro
+          );
           this.initSubjectAuth();
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {
@@ -241,9 +265,7 @@
         };
 
         // set desc
-        let desc = info.intro.replace(/&nbsp;/g, '');
-        desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
-        desc = padStringWhenTooLang(desc, '...', 32);
+        let desc = replaceHtml(info.intro, 32);
 
         const link =
           window.location.protocol +
@@ -264,6 +286,11 @@
       },
       handleOpenHide() {
         this.open_hide = !this.open_hide;
+      },
+      padStringWhenTooLang(originString, padString = '', length) {
+        if (originString.length <= length) return originString;
+
+        return originString.substring(0, length - 1) + padString;
       },
       toWatch(item) {
         this.webinarId = item.webinar_id;

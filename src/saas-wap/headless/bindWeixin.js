@@ -54,7 +54,7 @@ export default function () {
         let shareInfo = {
           title: title,
           img_url: res.data.img_url,
-          introduction: replaceHtml(res.data.introduction)
+          introduction: replaceHtml(res.data.introduction, 42)
         };
         wxShareInfo(shareInfo);
       }

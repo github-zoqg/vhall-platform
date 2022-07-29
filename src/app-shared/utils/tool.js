@@ -181,7 +181,7 @@ export const validEmail = (required, value, vueThis) => {
  * @param {*} value
  * @returns
  */
-export const replaceHtml = str => {
+export const replaceHtml = (str, length = 42) => {
   let desc = null;
   desc = str.replace(/&nbsp;/g, '');
   desc = desc
@@ -189,7 +189,7 @@ export const replaceHtml = str => {
     .replace(/&(lt|gt|nbsp|amp|quot|middot);/gi, '')
     .replace(/(\r\n)|(\n)/g, '');
   desc = desc.replace(/<[^>]+>/g, ''); // 截取html标签
-  desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
+  desc = desc.length > length ? `${desc.trim().substring(0, length)}...` : desc.trim();
   return desc;
 };
 
@@ -232,4 +232,28 @@ export const getCookie = name => {
   } else {
     return '';
   }
+};
+
+export const handleIntroInfo = str => {
+  if (!str) return '';
+  const regImg = /<img.*?(?:>|\/>)/g;
+  const imgArr = str.match(regImg);
+  const strArr = str.split(regImg);
+  const regUrl =
+    /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+  strArr.forEach((item, index) => {
+    const tempStr = item.replace(regUrl, function (match) {
+      return `<a class='show-link' href='${match}' target='_blank'>${match}</a>`;
+    });
+    strArr[index] = tempStr;
+  });
+  if (imgArr) {
+    const imgArrLength = imgArr.length;
+    let imgIndex = 0;
+    for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+      strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+      imgIndex++;
+    }
+  }
+  return strArr.join('');
 };
