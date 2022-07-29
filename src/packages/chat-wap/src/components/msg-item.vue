@@ -170,28 +170,81 @@
               "
             >
               <div class="msg-content_body">
-                <p class="reply-msg">
-                  <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
-                  ：
-                  <span v-html="source.replyMsg.content.text_content" />
-                </p>
-                <p class="reply-msg-content">
-                  <span class="reply-color">
-                    {{ $t('chat.chat_1036') }}
-                  </span>
-                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
-                </p>
-                <div class="imgs">
+                <div class="reply-msg">
                   <div
-                    @click="previewImg(img, index, source.content.image_urls)"
-                    class="msg-content_chat-img"
-                    v-for="(img, index) in source.content.image_urls"
-                    :key="index"
-                    :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                    }')`"
-                    :alt="$t('chat.chat_1065')"
-                  ></div>
+                    class="textInfo"
+                    :class="
+                      !!!source.replyMsg.content.text_content &&
+                      source.replyMsg.content.image_urls.length != 0
+                        ? 'existSimpleImg'
+                        : ''
+                    "
+                  >
+                    <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                    ：
+                    <span v-html="source.replyMsg.content.text_content" />
+                    <template v-if="!!!source.replyMsg.content.text_content">
+                      <div
+                        @click="previewImg(img, index, source.replyMsg.content.image_urls)"
+                        class="msg-content_chat-img"
+                        v-for="(img, index) in source.replyMsg.content.image_urls"
+                        :key="index"
+                        :style="`backgroundImage: url('${
+                          img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                        }')`"
+                        :alt="$t('chat.chat_1065')"
+                      ></div>
+                    </template>
+                  </div>
+                  <div v-if="!!source.replyMsg.content.text_content" class="imgs">
+                    <div
+                      @click="previewImg(img, index, source.replyMsg.content.image_urls)"
+                      class="img"
+                      v-for="(img, index) in source.replyMsg.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </div>
+                </div>
+                <div class="reply-msg-content">
+                  <div
+                    class="textInfo"
+                    :class="
+                      !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
+                    "
+                  >
+                    <span class="reply-color">
+                      {{ $t('chat.chat_1036') }}
+                    </span>
+                    <span v-html="msgContent" class="chat-text"></span>
+                    <template v-if="!!!msgContent">
+                      <div
+                        @click="previewImg(img, index, source.content.image_urls)"
+                        class="msg-content_chat-img"
+                        v-for="(img, index) in source.content.image_urls"
+                        :key="index"
+                        :style="`backgroundImage: url('${
+                          img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                        }')`"
+                        :alt="$t('chat.chat_1065')"
+                      ></div>
+                    </template>
+                  </div>
+                  <div v-if="!!msgContent" class="imgs">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </div>
                 </div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
@@ -199,7 +252,9 @@
             <!-- @消息 -->
             <template v-if="source.atList && source.atList.length !== 0">
               <div class="msg-content_body">
-                <span v-html="msgContent" class="chat-text"></span>
+                <div class="textInfo">
+                  <span v-html="msgContent" class="chat-text"></span>
+                </div>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
@@ -221,28 +276,49 @@
               "
             >
               <div class="msg-content_body">
-                <span class="reply-color"></span>
-                <span
-                  v-html="msgContent"
-                  class="chat-text"
-                  :class="
-                    !!msgContent &&
-                    source.content.image_urls &&
-                    source.content.image_urls.length != 0
-                      ? 'existImg'
-                      : ''
-                  "
-                ></span>
                 <div
-                  @click="previewImg(img, index, source.content.image_urls)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
+                  class="textInfo"
+                  :class="
+                    !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
+                  "
+                >
+                  <span class="reply-color"></span>
+                  <span
+                    v-html="msgContent"
+                    class="chat-text"
+                    :class="
+                      !!msgContent &&
+                      source.content.image_urls &&
+                      source.content.image_urls.length != 0
+                        ? 'existImg'
+                        : ''
+                    "
+                  ></span>
+                  <template v-if="!!!msgContent">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="msg-content_chat-img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </template>
+                </div>
+                <div v-if="!!msgContent" class="imgs">
+                  <div
+                    @click="previewImg(img, index, source.content.image_urls)"
+                    class="img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
                 <img class="jian-left" :src="jiantou" alt />
               </div>
             </template>
@@ -525,14 +601,6 @@
             left: -11px;
             top: 14px;
           }
-          // &.multi {
-          //   .msg-content_body {
-          //     padding: 12px;
-          //     .chat-text {
-          //       line-height: 39px;
-          //     }
-          //   }
-          // }
         }
         .reply-color {
           color: #fc9600;
@@ -542,9 +610,26 @@
         }
         .reply-msg-content {
           word-break: break-word;
-          display: flex;
           .reply-color {
             min-width: 60px;
+          }
+          > .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0 !important;
+              }
+            }
+          }
+          .existSimpleImg {
+            padding-top: 0;
           }
         }
         .reply-msg {
@@ -553,8 +638,10 @@
           color: #999;
           padding-left: 18px;
           position: relative;
+          .textInfo {
+            position: relative;
+          }
           .chat-text {
-            display: inline-block;
             line-height: 1.4;
           }
           &::after {
@@ -566,6 +653,35 @@
             left: 0;
             background: #bfbfbf;
             border-radius: 3px;
+          }
+          > .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0 !important;
+              }
+            }
+          }
+          .existSimpleImg .msg-content_chat-img {
+            margin-bottom: 0;
+          }
+        }
+        .msg-content_chat-img {
+          vertical-align: text-top;
+          display: inline-block;
+          border-radius: 4px;
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
+          &:nth-last-child(1) {
+            margin-right: 0 !important;
           }
         }
         .msg-content_body {
@@ -583,10 +699,13 @@
             word-break: break-word;
           }
           .chat-text {
-            display: block;
             line-height: 1.4;
             &.existImg {
               margin-bottom: 8px;
+            }
+            img {
+              width: 40px;
+              height: 40px;
             }
           }
           .msg-content_chat-img {
@@ -599,8 +718,20 @@
             background-repeat: no-repeat;
             background-position: center;
           }
-          & :nth-last-child(2) {
-            margin-right: 0;
+          .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0;
+              }
+            }
           }
         }
         .emoji-img {
