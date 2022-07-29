@@ -486,15 +486,6 @@
   .vmp-chat-wap-msg-item-fashion {
     pointer-events: auto;
 
-    .timeline {
-      margin: 0 auto;
-      .msg-showtime {
-        padding: 10px 0 24px;
-        font-size: 28px;
-        color: rgba(0, 0, 0, 0.85);
-        text-align: center;
-      }
-    }
     .msg-item {
       margin: 0 24px;
       padding: 0 0 24px;
@@ -679,6 +670,18 @@
             }
             .existSimpleImg {
               padding-top: 0;
+            }
+          }
+        }
+        &.timeline {
+          margin: 0 auto;
+          .msg-content_body {
+            background: none !important;
+            padding: 0 !important;
+            .msg-showtime {
+              font-size: 28px;
+              color: rgba(0, 0, 0, 0.85);
+              text-align: center;
             }
           }
         }
