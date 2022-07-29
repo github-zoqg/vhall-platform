@@ -564,8 +564,6 @@
           > .normal-msg {
             > .textInfo {
               line-height: 38px;
-              &.existSimpleImg {
-              }
               span {
                 word-break: break-word;
               }
