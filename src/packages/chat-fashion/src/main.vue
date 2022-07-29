@@ -113,7 +113,7 @@
   //消息提示定时器
   let tipMsgTimer;
   export default {
-    name: 'VmpChat',
+    name: 'VmpFashionChat',
     mixins: [emitter],
     components: {
       ImgPreview,

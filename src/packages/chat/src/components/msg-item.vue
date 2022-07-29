@@ -764,8 +764,8 @@
             width: 40px;
             height: 40px;
             &.is-watch {
-              width: 56px;
-              height: 56px;
+              width: 64px;
+              height: 64px;
             }
             border-radius: 4px;
             overflow: hidden;
