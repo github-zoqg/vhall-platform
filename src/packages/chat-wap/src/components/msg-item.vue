@@ -329,7 +329,7 @@
       //   }
       // },
       showTime() {
-        if (this.source.showTime) {
+        if (this.source.showTime || this.source.isHistoryMsg) {
           return this.source.showTime;
         }
         if (!this.source.sendTime) {
