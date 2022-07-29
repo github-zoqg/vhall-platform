@@ -6,6 +6,7 @@ import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
 
@@ -81,6 +82,9 @@ const router = new VueRouter({
   routes
 });
 
+// 当前是否为开发环境
+const isDev = process.env.NODE_ENV === 'development';
+
 router.beforeEach(async (to, from, next) => {
   if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
     // 根据不同的页面，动态加载不同的配置
@@ -89,19 +93,13 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const res = await grayInit(to);
+  if (!isDev) {
+    await ssoAutoLogin(); // sso自动登录置换token
+  }
   console.log('---grayInit---', res);
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度、如果是中台用户, 跳转到中台
-      // const VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT = process.env.VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT;
-      // const VUE_APP_WAP_WATCH_MIDDLE = process.env.VUE_APP_WAP_WATCH_MIDDLE;
-      // let protocol = window.location.protocol;
-      // if (res.data.is_csd_user == 1) {
-      //   if (window.location.origin != `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}`) {
-      //     window.location.href = `${protocol}${VUE_APP_WAP_WATCH_MIDDLE}/${VUE_MIDDLE_SAAS_WATCH_WAP_PROJECT}${window.location.pathname}`;
-      //   }
-      // }
       next();
     } else {
       next({

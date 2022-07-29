@@ -3,7 +3,7 @@
     class="vmp-questionnaire-icon"
     v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
   >
-    <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" />
+    <img src="./images/questionnaire.png" alt="" @click="throttleCheckQues" />
     <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
     <div class="vmp-questionnaire-list_container" v-if="isShowQuestionList">
@@ -42,6 +42,7 @@
    * @description 红包的图标 + 小红点
    */
   import { useQuestionnaireServer } from 'middle-domain';
+  import { throttle } from 'lodash';
   export default {
     name: 'QuestionnaireIcon',
     data() {
@@ -100,6 +101,7 @@
           }
         }
       );
+      this.throttleCheckQues = throttle(this.checkQuestionnaireIcon, 2000, { trailing: false });
     },
     methods: {
       async checkQuestionnaireIcon() {

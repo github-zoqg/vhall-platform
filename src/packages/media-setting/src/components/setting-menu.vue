@@ -1,6 +1,6 @@
 <template>
   <ul class="vmp-media-setting-menu">
-    <li class="vmp-media-setting-menu__title">{{ $t('setting.setting_1030') }}</li>
+    <!-- <li class="vmp-media-setting-menu__title">{{ $t('setting.setting_1030') }}</li> -->
     <li
       class="vmp-media-setting-menu__item"
       :class="{ 'vmp-media-setting-menu__item--active': selectedItem === item.id }"
@@ -45,7 +45,7 @@
         const isInteractMode =
           this.liveMode == LIVE_MODE_MAP['INTERACT'] || this.liveMode == LIVE_MODE_MAP['GROUP'];
         const cond1 = !(this.roleName == '1' && this.mediaState.video && this.liveMode != 1);
-        const cond2 = !(this.roleName == '1' && this.liveMode != 1);
+        const cond2 = !([1, 4].includes(this.roleName) && this.liveMode != 1);
         const cond3 = !(this.roleName == '1' && this.liveMode != 2 && isInteractMode);
 
         console.log('cond::', cond1, cond2, cond3);

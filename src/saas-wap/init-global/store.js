@@ -15,6 +15,7 @@ import {
   useMediaCheckServer,
   usePlayerServer,
   useChatServer,
+  useMenuServer,
   useSubscribeServer
 } from 'middle-domain';
 
@@ -46,6 +47,7 @@ export default new DomainStore.Store({
     mediaCheckServer: useMediaCheckServer().state,
     playerServer: usePlayerServer().state,
     chatServer: useChatServer().state,
+    menuServer: useMenuServer().state,
     subscribeServer: useSubscribeServer().state
   }
 });

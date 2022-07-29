@@ -252,6 +252,29 @@
       },
       hasStreamList() {
         return this.$domainStore.state.interactiveServer.streamListHeightInWatch >= 1;
+      },
+      // 是否是上麦状态
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      // 观众是否加载了旁路播放器
+      isPlayerInit() {
+        const { interactiveServer, roomBaseServer, micServer } = this.$domainStore.state;
+        return (
+          (roomBaseServer.watchInitData.join_info.role_name == 2 &&
+            roomBaseServer.watchInitData.webinar.mode == 3 &&
+            roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
+            (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+          interactiveServer.initInteractiveFailed
+        );
+      },
+      // 是否开启了桌面共享
+      isShareScreen() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 桌面共享人信息
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
       }
     },
     watch: {
@@ -340,8 +363,91 @@
           this.initRemoteInsertFile();
         }
       },
+      // 检测当前用户是否可以插播
+      checkInsertFileProcess() {
+        const { watchInitData } = useRoomBaseServer().state;
+        const { isInsertFilePushing, insertStreamInfo } = this.insertFileServer.state;
+        console.log('---点击插播文件-确定按钮----', insertStreamInfo);
+
+        // 如果是直播状态需要判断当前主持人是否是用网页发起直播
+        // 嘉宾：设为主讲人的时候 可以插播
+        // 助理： 如果是网页发起，一直都有插播。如果是客户端发起，不支持插播文件，存在提示
+        if (
+          watchInitData.switch.start_type != 1 &&
+          watchInitData.webinar.type == 1 &&
+          watchInitData.join_info.role_name == 3
+        ) {
+          this.$alert('仅发起端为PC网页时支持使用插播文件功能', '', {
+            title: '提示',
+            confirmButtonText: '知道了',
+            // center: true,
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          });
+          return false;
+        }
+        // 如果在插播中，并且不是当前用户插播，alert提示
+        if (
+          isInsertFilePushing &&
+          insertStreamInfo.userInfo.accountId != watchInitData.join_info.third_party_user_id
+        ) {
+          this.$alert(
+            `${this.$getRoleName(insertStreamInfo.userInfo.role)}${
+              insertStreamInfo.userInfo.role != 1 ? insertStreamInfo.userInfo.nickname : ''
+            }正在插播文件，请稍后重试`,
+            '',
+            {
+              title: '提示',
+              confirmButtonText: '确定',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel'
+            }
+          );
+          return false;
+        }
+        // 判断该当前浏览器是否支持插播
+        if (!this.insertFileServer.isCanUseCaptureStream()) {
+          this.$alert(
+            '当前浏览器版本不支持插播文件。<br>建议您下载chrome72及以上版本后使用<br>下载<a href="https://www.google.cn/chrome/" target="_blank" style="color: #3562fa">Chrome浏览器</a>',
+            '',
+            {
+              title: '提示',
+              confirmButtonText: '知道了',
+              customClass: 'zdy-message-box',
+              cancelButtonClass: 'zdy-confirm-cancel',
+              dangerouslyUseHTMLString: true,
+              callback: () => {}
+            }
+          );
+          return false;
+        }
+        return true;
+      },
       // 插播文件更改
       async inertFileChange(video, type) {
+        // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
+        if (!this.checkInsertFileProcess() || this.isShareScreen) {
+          if (this.isShareScreen && this.desktopShareInfo) {
+            // 当前有桌面共享，并且桌面共享演示人信息能获取的时候
+            this.$alert(
+              `${this.$getRoleName(this.desktopShareInfo.role)}${
+                this.desktopShareInfo.role != 1 ? this.desktopShareInfo.nickname : ''
+              }正在进行桌面共享，请稍后重试`,
+              '',
+              {
+                title: '提示',
+                confirmButtonText: '确定',
+                customClass: 'zdy-message-box',
+                cancelButtonClass: 'zdy-confirm-cancel'
+              }
+            );
+          }
+          // 当前不可演示插播, 关闭插播列表弹窗
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
+          );
+          return;
+        }
         // 如果当前正在插播中，需要先结束现有插播
         if (this.insertFileServer.state.isInsertFilePushing) {
           await this.closeInsertvideoHandler();
@@ -402,7 +508,8 @@
         return new Promise((resolve, reject) => {
           this.insertFileServer
             .createLocalInsertStream({
-              videoNode: 'vmp-insert-local-stream'
+              videoNode: 'vmp-insert-local-stream',
+              videoContentHint: sessionStorage.getItem('videoHint') || 'detail'
             })
             .then(e => {
               console.log('创建插播本地流成功');
@@ -677,31 +784,39 @@
       },
       // 订阅插播流
       subscribeInsert() {
+        //观众加载旁路播放器的情况下，不走订阅插播流
+        if (this.isPlayerInit) return;
         const opt = {
           videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
           mute: { audio: false, video: false } // 是否静音，关视频。选填 默认false
         };
-        this.insertFileServer.subscribeInsertStream(opt).then(() => {
-          // 展示插播流组件
-          this.insertFileStreamVisible = true;
-          // 如果不是观众(主持人\助理\嘉宾)
-          if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
-            // 设置 miniElement 为 doc
-            this.roomBaseServer.setChangeElement('doc');
-          } else {
-            // 如果是观众
-            // 如果文档可见
-            if (this.docServer.state.switchStatus) {
-              // 设置 miniElement 为主屏流
+        try {
+          this.insertFileServer.subscribeInsertStream(opt).then(() => {
+            // 展示插播流组件
+            this.insertFileStreamVisible = true;
+            // 如果不是观众(主持人\助理\嘉宾)
+            if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
+              // 设置 miniElement 为 doc
               this.roomBaseServer.setChangeElement('doc');
             } else {
-              this.roomBaseServer.setChangeElement('');
+              // 如果是观众
+              // 如果文档可见
+              if (this.docServer.state.switchStatus) {
+                // 设置 miniElement 为主屏流
+                this.roomBaseServer.setChangeElement('doc');
+              } else {
+                this.roomBaseServer.setChangeElement('');
+              }
             }
-          }
-        });
+          });
+        } catch (error) {
+          console.log('error', error);
+        }
       },
       // 取消订阅插播流
       unsubscribeInsert() {
+        // 观众加载旁路播放器的情况下，不走取消订阅插播流
+        if (this.isPlayerInit) return;
         // 隐藏插播流组件
         this.insertFileStreamVisible = false;
         // 如果不是观众(主持人\助理\嘉宾)

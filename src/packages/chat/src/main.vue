@@ -17,7 +17,7 @@
     >
       <!-- {{ configList['ui.hide_chat_history'] }} -->
       <p
-        v-if="hideChatHistory && !chatList.length && !historyloaded"
+        v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
         class="chat-content__get-list-btn-container"
       >
         <span class="chat-content__get-list-btn" @click="getHistoryMsg">查看聊天历史消息</span>
@@ -27,8 +27,8 @@
         ref="chatlist"
         style="height: 100%; overflow: auto"
         :keeps="20"
-        :data-key="'count'"
         :estimate-size="100"
+        :data-key="'count'"
         :data-sources="renderList"
         :data-component="MsgItem"
         :extra-props="{
@@ -211,13 +211,13 @@
 
         // 是否展示欢迎语
         isShowWelcome: false,
-        //加载聊天历史完成
-        historyloaded: false,
         //聊天消息是否有滚动条
         overflow: false,
         //每次加载的消息条数
         pageSize: 50,
         isLoading: false,
+        //隐藏拉取历史聊天按钮
+        hideChatHistory: false,
         //回复或@消息id
         targetId: ''
       };
@@ -228,7 +228,7 @@
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       //是否开启手动加载聊天历史记录
-      hideChatHistory() {
+      isShowChatHistoryBtn() {
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
@@ -317,8 +317,8 @@
       // 1--是需要登录才能参与互动   0--不登录也能参与互动
       this.initChatLoginStatus();
       //拉取聊天历史
-      if (!this.hideChatHistory) {
-        this.getHistoryMsg();
+      if (!this.isShowChatHistoryBtn) {
+        this.getHistoryMsg(true);
       }
       //监听domain层chatServer通知
       this.listenChatServer();
@@ -479,18 +479,26 @@
         this.getHistoryMsg();
       },
       // 获取历史消息
-      async getHistoryMsg() {
+      async getHistoryMsg(isfirst) {
         this.isLoading = true;
         const params = {
-          // webinar_id: this.webinarId,
+          isfirst,
           room_id: this.roomId,
-          pos: this.pos,
-          limit: this.pageSize
+          msg_id: this.getFirstMsg()?.msgId,
+          limit: this.pageSize,
+          // is_role: this.isOnlyShowSponsor ? 1 : 0,
+          anchor_path: this.chatList[0]?.msgId ? 'down' : undefined //up 拉新,down拉旧
         };
         const res = await useChatServer().getHistoryMsg(params);
-        this.historyloaded = true;
+        this.hideChatHistory = true;
         this.isLoading = false;
         return res;
+      },
+      //获取第一条有msgid的消息
+      getFirstMsg() {
+        return this.chatList.find(item => {
+          return item.msgId;
+        });
       },
       //抽奖情况检查
       emitLotteryEvent(msg) {
@@ -604,11 +612,13 @@
         );
       },
       //处理只看主办方
-      onSwitchShowSponsor(status) {
+      async onSwitchShowSponsor(status) {
         this.isOnlyShowSponsor = status;
-        this.$nextTick(() => {
-          this.scrollBottom();
-        });
+        // useChatServer().clearChatMsg();
+        // await this.getHistoryMsg();
+        // this.$nextTick(() => {
+        //   this.scrollBottom();
+        // });
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {
@@ -798,6 +808,10 @@
         display: block;
         text-align: center;
         padding-top: 10px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
       }
       &__get-list-btn {
         cursor: pointer;

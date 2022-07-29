@@ -395,7 +395,7 @@ export default {
     form_1042: '请输入详细地址',
     form_1043: '省/自治区/直辖市',
     form_1044: '区/县',
-    form_1045: '提交问卷',
+    form_1045: '提交',
     form_1046: '选择日期',
     form_1047: '选择日期+时间',
     form_1048: '选择时间',
@@ -542,7 +542,8 @@ export default {
     interact_tools_1081: '支付宝搜“红包”，输入口令',
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
-    interact_tools_1085: '领取Top10名单'
+    interact_tools_1085: '领取Top10名单',
+    interact_tools_1086: '公告'
   },
   setting: {
     setting_1002: '观看设置',
@@ -574,7 +575,8 @@ export default {
     setting_1028: '选择外置扬声器或者更换电脑',
     setting_1029: '帮助与支持',
     setting_1030: '媒体设置',
-    setting_1031: '修改设置后导致重新推流，是否继续保存'
+    setting_1031: '修改设置后导致重新推流，是否继续保存',
+    setting_1032: '摄像头检测'
   },
   message: {
     message_1001: '主办方设置了视频加密功能，建议使用电脑访问观看',
@@ -778,7 +780,8 @@ export default {
     interact_1038:
       '主办方开启了视频轮巡功能，在主持人端将会看到您的视频画面，请保证视频设备一切正常，点击“{n}”进行媒体设置',
     interact_1039: '只有获取摄像头和麦克风权限后，才能参与连麦',
-    interact_1040: '参与连麦需获取摄像头和麦克风权限，前往浏览器设置中心开启权限'
+    interact_1040: '参与连麦需获取摄像头和麦克风权限，前往浏览器设置中心开启权限',
+    interact_1041: '申请连麦'
   },
   doc: {
     doc_1001: '文档加载中',

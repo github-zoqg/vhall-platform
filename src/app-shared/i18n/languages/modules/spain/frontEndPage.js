@@ -351,7 +351,11 @@ export default {
     chat_1090: '',
     chat_1091: '',
     chat_1092: '',
-    chat_1093: ''
+    chat_1093: '',
+    chat_1094: '',
+    chat_1095: '',
+    chat_1096: '',
+    chat_1097: ''
   },
   form: {
     form_1001: 'Nombre',
@@ -400,7 +404,7 @@ export default {
     form_1043:
       'Provincia / región autónoma / municipio directamente dependiente del Gobierno central',
     form_1044: 'Distrito / condado',
-    form_1045: 'Presentar el cuestionario',
+    form_1045: 'Presentar',
     form_1046: 'Seleccionar la fecha',
     form_1047: 'Seleccionar la fecha + la hora',
     form_1048: 'Seleccionar la hora',
@@ -550,7 +554,8 @@ export default {
     interact_tools_1081: '',
     interact_tools_1082: '',
     interact_tools_1083: '',
-    interact_tools_1085: ''
+    interact_tools_1085: '',
+    interact_tools_1086: ''
   },
   setting: {
     setting_1002: 'Configuración de la vista',
@@ -583,7 +588,8 @@ export default {
     setting_1028: 'Seleccione un altavoz externo o reemplace la computadora',
     setting_1029: 'Ayuda y apoyo',
     setting_1030: '',
-    setting_1031: ''
+    setting_1031: '',
+    setting_1032: ''
   },
   message: {
     message_1001:

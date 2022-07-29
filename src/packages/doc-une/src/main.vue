@@ -46,7 +46,13 @@
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
           <img src="./img/doc_null.png" style="width: 140px; margin-bottom: 20px" />
-          <span v-if="hasDocPermission || [3, 4].includes(roleName)">
+          <span
+            v-if="
+              hasDocPermission ||
+              [3, 4].includes(roleName) ||
+              (!isInGroup && roleName == 1 && doc_permission != userId)
+            "
+          >
             {{ $t('doc.doc_1011') }}
           </span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
@@ -220,11 +226,13 @@
           // 观看端，普通模式或全屏模式下，打开了文档或白板
           return this.currentCid && ['normal', 'fullscreen'].includes(this.displayMode);
         } else {
-          // 发起端，打开了文档，普通模式，助理或者有演示权限,非转播状态
+          // 发起端，打开了文档，普通模式，助理或者有演示权限 或者“不在分组内，是主持人角色但是主讲人不是自己”,非转播状态
           return (
             this.currentType === 'document' &&
             this.displayMode === 'normal' &&
-            (this.roleName == 3 || this.hasDocPermission) &&
+            (this.roleName == 3 ||
+              this.hasDocPermission ||
+              (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId)) &&
             !this.watchInitData.rebroadcast?.isRebroadcasting
           );
         }
@@ -238,6 +246,14 @@
         return this.isInGroup
           ? this.groupServer.state.groupInitData.presentation_screen
           : this.roomBaseServer.state.interactToolStatus.presentation_screen;
+      },
+      // 主讲人权限
+      doc_permission() {
+        if (this.isInGroup) {
+          return this.groupServer.state.groupInitData.doc_permission;
+        } else {
+          return this.roomBaseServer.state.interactToolStatus.doc_permission;
+        }
       },
       // 是否观看端
       isWatch() {
@@ -293,10 +309,12 @@
       },
       // 是否显示文档白板工具栏
       showToolbar() {
-        // 非定时直播，有演示权限或者是助理角色角色，在普通或全屏模式下,非转播状态，显示工具栏
+        // 非定时直播，有演示权限或者是助理角色角色 或者“不在分组内，是主持人角色但是主讲人不是自己”，在普通或全屏模式下,非转播状态，显示工具栏
         return (
           this.webinarMode != 5 &&
-          (this.hasDocPermission || [3].includes(this.roleName)) &&
+          (this.hasDocPermission ||
+            [3].includes(this.roleName) ||
+            (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId)) &&
           ['normal', 'fullscreen'].includes(this.displayMode) &&
           !this.watchInitData.rebroadcast?.isRebroadcasting
         );
@@ -354,10 +372,11 @@
         if (this.currentType !== 'document') return false;
         // 定时直播所有人都没有翻页权限
         if (this.webinarMode == 5) return false;
-        // 有演示权限，或者助理配有翻页权限，或者活动设置了有翻页权限(开发状态下)
+        // 有演示权限，或者助理配有翻页权限 或者 “不在分组内，是主持人角色但是主讲人不是自己“，或者活动设置了有翻页权限(开发状态下)
         return (
           this.hasDocPermission ||
           (this.roleName == 3 && !this.roomBaseServer.state.configList.close_assistant_flip_doc) ||
+          (!this.isInGroup && this.roleName == 1 && this.doc_permission != this.userId) ||
           (this.webinarType === 1 && this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc)
         );
       },
@@ -1007,8 +1026,8 @@
       // 初始化事件
       this.initEvents();
 
-      if (this.webinarType == 1) {
-        // 直播中才执行,恢复上一次的文档数据;
+      if (this.webinarType == 1 || !this.isWatch) {
+        // 发起端和直播中的观看端执行,恢复上一次的文档数据;
         this.$nextTick(() => {
           this.recoverLastDocs();
         });

@@ -398,7 +398,7 @@ export default {
     form_1042: 'Please enter the detailed address',
     form_1043: 'Province/autonomous region/municipalities',
     form_1044: 'District/County',
-    form_1045: 'Submit questionnaire',
+    form_1045: 'Submit',
     form_1046: 'Select date',
     form_1047: 'Select date & time',
     form_1048: 'Select time',
@@ -544,10 +544,11 @@ export default {
     interact_tools_1078: 'Got',
     interact_tools_1079: 'Winning',
     interact_tools_1080: 'Red envelope',
-    interact_tools_1081: 'search" red envelope" in Alipay, then enter the password',
+    interact_tools_1081: 'search" 口令红包" in Alipay, then enter the password',
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
-    interact_tools_1085: 'TOP 10 list'
+    interact_tools_1085: 'TOP 10 list',
+    interact_tools_1086: 'Notice'
   },
   setting: {
     setting_1002: 'View settings',
@@ -579,7 +580,8 @@ export default {
     setting_1028: 'Choose external speakers or replace the computer',
     setting_1029: 'Help and support',
     setting_1030: 'Setting',
-    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving'
+    setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving',
+    setting_1032: 'Setting'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',
@@ -801,7 +803,8 @@ export default {
     interact_1039:
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
-      'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions'
+      'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
+    interact_1041: 'Apply for video interaction'
   },
   doc: {
     doc_1001: 'This documentation is loading',

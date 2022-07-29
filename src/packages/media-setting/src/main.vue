@@ -2,10 +2,9 @@
   <section class="vmp-media-setting-container">
     <saas-dialog
       :visible="isShow"
-      :title="$t('account.account_1005')"
+      :title="$t('setting.setting_1030')"
       width="480px"
       style="min-width: 480px"
-      :showDefault="false"
       @onReturn="cancelMediaSetting"
       @onClose="cancelMediaSetting"
     >
@@ -187,6 +186,21 @@
       // 当前人是否在视频轮巡
       isPolling() {
         return this.videoPollingServer.state.isPolling;
+      },
+      // 插播流详情
+      insertStreamInfo() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo;
+      },
+      // 桌面共享流
+      localDesktopStreamId() {
+        return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      // 主讲人
+      isDoc_permission() {
+        return (
+          this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
+          this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
       }
     },
     beforeCreate() {
@@ -339,6 +353,23 @@
           this.sendChangeEvent();
           this.setReport();
           this.getStateCapture(); // 更新快照
+        }
+        // 如果插播流为真
+        if (this.insertStreamInfo.streamId && this.isDoc_permission) {
+          // 推流过程中动态切换视频清晰或流畅模式
+          this.mediaSettingServer.setVideoContentHint({
+            streamId: this.insertStreamInfo.streamId,
+            hint: this.mediaState.videoHint
+          });
+        }
+        // 如果桌面共享流为真
+        if (this.localDesktopStreamId && this.isDoc_permission) {
+          // 推流过程中动态切换视频清晰或流畅模式
+          this.mediaSettingServer.setVideoContentHint({
+            streamId: this.localDesktopStreamId,
+            hint:
+              this.mediaState.screenRate == 'RTC_SCREEN_PROFILE_1080P_16x9_H' ? 'motion' : 'detail'
+          });
         }
       },
       setReport() {
@@ -507,7 +538,8 @@
           ['selectedAudioOutputDeviceId', this.mediaState.audioInput || ''],
           ['selectedRate', this.mediaState.rate || ''],
           ['selectedScreenRate', this.mediaState.screenRate || ''],
-          ['layout', this.mediaState.layout || '']
+          ['layout', this.mediaState.layout || ''],
+          ['videoHint', this.mediaState.videoHint || '']
         ]);
 
         // 记录
@@ -588,6 +620,14 @@
 </script>
 
 <style lang="less">
+  .vmp-media-setting-container {
+    .vmp-popup-dialog {
+      height: 500px;
+    }
+    .header {
+      height: 64px;
+    }
+  }
   .vmp-media-setting-dialog-body {
     .el-radio__input.is-checked + .el-radio__label {
       color: #606266;
@@ -595,7 +635,7 @@
 
     background: #fff;
     display: flex;
-    height: 500px;
+    height: 436px;
     box-sizing: border-box;
 
     // 左侧菜单
@@ -614,10 +654,10 @@
       display: flex;
       flex-direction: column;
       width: 360px;
-      padding: 64px 32px 24px;
-
       &-main {
         flex: 1;
+        overflow: auto;
+        padding: 14px 32px 0px;
 
         // 复用元素
         .vmp-media-setting-item {
@@ -665,7 +705,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
+        padding: 0 32px 16px;
+        box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.1);
         & > * {
           margin-top: 8px;
         }

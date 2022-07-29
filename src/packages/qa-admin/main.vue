@@ -953,7 +953,7 @@
       this.getQaShowName();
       this.ready = true;
       this.qaServer.setState('pageSize', this.page_size);
-      // this.select(0);
+      this.select(0);
     },
     methods: {
       /**
