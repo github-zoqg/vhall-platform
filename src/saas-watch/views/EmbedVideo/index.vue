@@ -20,7 +20,7 @@
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../../headless/embed-video-state.js';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Home',
     components: {
@@ -91,8 +91,6 @@
         }
         this.state = 1;
         this.addEventListener();
-        //上报日志
-        logRoomInitSuccess();
       } catch (err) {
         //上报日志
         logRoomInitFailed({ error: err });

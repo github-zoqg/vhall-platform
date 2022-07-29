@@ -190,6 +190,10 @@
       accountId() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id;
       },
+      // 是否开启了插播
+      isInsertFilePushing() {
+        return this.$domainStore.state.insertFileServer.isInsertFilePushing;
+      },
       watchInitData() {
         return this.roomBaseServer.state.watchInitData;
       },
@@ -260,6 +264,10 @@
       // 当前文档或白板容器的Id
       currentCid() {
         return this.docServer.state.currentCid;
+      },
+      // 插播信息
+      insertStreamInfo() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo;
       }
     },
     components: {
@@ -487,10 +495,29 @@
           this.stopShare();
         }
       },
-
+      // 提示xxx正在插播文件，请稍后重试
+      alertInsertWarning() {
+        this.$alert(
+          `${this.$getRoleName(this.insertStreamInfo.userInfo.role)}${
+            this.insertStreamInfo.userInfo.role != 1 ? this.insertStreamInfo.userInfo.nickname : ''
+          }正在插播文件，请稍后重试`,
+          '',
+          {
+            title: '提示',
+            confirmButtonText: '确定',
+            customClass: 'zdy-message-box',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          }
+        );
+      },
       // 开始共享
       startShare() {
         this.closeConfirm();
+        // 点击弹出框 - 确定的时候判断
+        if (this.isInsertFilePushing) {
+          this.alertInsertWarning();
+          return;
+        }
         const configuredProfile = this.mediaSettingServer.state.screenRate;
         let profile = VhallRTC.RTC_SCREEN_PROFILE_1080P_16x9_M;
         if (configuredProfile) {
@@ -507,19 +534,27 @@
         this.desktopShareServer
           .startShareScreen(options)
           .then(() => {
-            this.desktopShareServer
-              .publishDesktopShareStream()
-              .then(() => {
-                // 重新布局旁路
-                console.log('[screen] 桌面共享推流成功');
-                this.interactiveServer.resetLayout();
-                this.docServer.resetLayoutByMiniElement();
-
-                this.setDesktop('1');
-              })
-              .catch(error => {
-                console.log(error, this.$t('interact.interact_1021'));
+            // console.log('当前是否正在插播', this.isInsertFilePushing, this.isShareScreen);
+            if (this.isInsertFilePushing && this.isShareScreen) {
+              this.alertInsertWarning();
+              this.desktopShareServer.endStartShareScreen({
+                streamId: this.isShareScreen
               });
+            } else {
+              this.desktopShareServer
+                .publishDesktopShareStream()
+                .then(() => {
+                  // 重新布局旁路
+                  console.log('[screen] 桌面共享推流成功');
+                  this.interactiveServer.resetLayout();
+                  this.docServer.resetLayoutByMiniElement();
+
+                  this.setDesktop('1');
+                })
+                .catch(error => {
+                  console.log(error, this.$t('interact.interact_1021'));
+                });
+            }
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);

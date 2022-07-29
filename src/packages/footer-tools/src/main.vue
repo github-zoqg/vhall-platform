@@ -88,7 +88,12 @@
       <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
-          <img src="./img/iconGifts@2x.png" @click.stop="handleShowGift" alt="" class="show_img" />
+          <img
+            src="./img/iconGifts@2x.png"
+            @click.stop="throttleHandleShowGift"
+            alt=""
+            class="show_img"
+          />
           <!-- showCount展示次数，只有第一次点击礼物图标的时候才会调接口 -->
           <vh-gifts
             v-show="showGift && roomBaseState.watchInitData.interact.room_id"
@@ -166,6 +171,7 @@
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
+  import { throttle } from 'lodash';
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -301,6 +307,7 @@
       if (this.isVideoPolling && [2, 3].includes(liveMode)) {
         this.videoPollingServer._addListeners();
       }
+      this.throttleHandleShowGift = throttle(this.handleShowGift, 500, { trailing: false });
     },
     mounted() {
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
