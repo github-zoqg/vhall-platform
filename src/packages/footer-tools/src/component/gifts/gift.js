@@ -159,7 +159,6 @@ export default {
         this.showGift = false;
         return false;
       }
-      debugger;
       // 获取支付宝支付码
       if (this.giftInfo.price != 0) {
         // 微信支付二维码, 组件传递过来的
