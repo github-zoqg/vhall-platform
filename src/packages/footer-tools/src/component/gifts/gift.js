@@ -159,7 +159,7 @@ export default {
         this.showGift = false;
         return false;
       }
-
+      debugger;
       // 获取支付宝支付码
       if (this.giftInfo.price != 0) {
         // 微信支付二维码, 组件传递过来的
@@ -191,7 +191,8 @@ export default {
             gift_id: this.giftInfo.id,
             channel: payType || 'WEIXIN',
             service_code: 'QR_PAY', //两种支付方式 - 'ALIPAY'
-            room_id: this.watchInitData.interact.room_id
+            room_id: this.watchInitData.interact.room_id,
+            nickname: this.watchInitData.join_info.nickname
           },
           this.giftInfo
         )

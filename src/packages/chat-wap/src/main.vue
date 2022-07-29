@@ -588,9 +588,9 @@
             return previousSize + vsl.getSize(Number(currentSid));
           });
           vsl.scrollToOffset(offset);
-          setTimeout(() => {
-            this.allowScroll = true;
-          });
+        });
+        setTimeout(() => {
+          this.allowScroll = true;
         });
       },
       // eventBus监听
