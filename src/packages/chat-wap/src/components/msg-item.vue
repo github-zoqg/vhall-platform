@@ -301,7 +301,7 @@
                       v-for="(img, index) in source.content.image_urls"
                       :key="index"
                       :style="`backgroundImage: url('${
-                        img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
@@ -314,7 +314,7 @@
                     v-for="(img, index) in source.content.image_urls"
                     :key="index"
                     :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_56,w_56'
+                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
                     }')`"
                     :alt="$t('chat.chat_1065')"
                   ></div>
