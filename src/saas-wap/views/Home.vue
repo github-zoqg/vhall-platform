@@ -36,6 +36,7 @@
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
+  import skins from '@/app-shared/skins/wap';
 
   export default {
     name: 'Home',
@@ -148,6 +149,10 @@
             window.sessionStorage.setItem('room_style', 'concise');
             setPage('concise');
           }
+
+          // 设置主题
+          window.skins = skins;
+          skins.setTheme(skins.themes.themeDefaultBlack);
 
           await roomState();
 
