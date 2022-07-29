@@ -548,7 +548,7 @@
           return;
         }
         const { list } = await this.getHistoryMessage();
-        const vsl = this.$refs.chatlist;
+        // const vsl = this.$refs.chatlist;
         this.$nextTick(() => {
           // alert(this.chatList.length - offsetPos);
           this.$refs.chatlist.scrollToIndex(list.length);
