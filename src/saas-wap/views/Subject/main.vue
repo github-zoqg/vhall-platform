@@ -104,7 +104,7 @@
 </template>
 
 <script>
-  import { useSubjectServer } from 'middle-domain';
+  import { useSubjectServer, useUserServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { getQueryString } from '@/app-shared/utils/tool.js';
   import { urlToLink, padStringWhenTooLang } from './js/utils.js';
@@ -162,10 +162,17 @@
     },
     beforeCreate() {
       this.subjectServer = useSubjectServer();
+      this.userServer = useUserServer();
     },
-    created() {
-      this.getDetail();
+    async created() {
       this.hasDelayPermission = this.$route.query.delay;
+      if (localStorage.getItem('token')) {
+        setRequestHeaders({
+          token: localStorage.getItem('token') || undefined
+        });
+        await this.userServer.getUserInfo({ scene_id: 2 });
+      }
+      await this.getDetail();
     },
     computed: {
       subjectAuthInfo() {
