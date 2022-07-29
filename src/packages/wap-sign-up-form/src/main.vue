@@ -498,6 +498,8 @@
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
+        interfaceType:
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
         isShowError: '' // 是否展示后端错误码内容
       };
     },
@@ -589,15 +591,6 @@
           }
           return maxLength;
         };
-      },
-      // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
-      interfaceType() {
-        if (window.location.href.indexOf('/subject/entryform') != -1) {
-          // 专题
-          return 'subject';
-        } else {
-          return 'webinar';
-        }
       }
     },
     watch: {
@@ -655,23 +648,24 @@
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
+    created() {
       if (
         this.interfaceType === 'subject' ||
         window.location.href.indexOf('/special/detail') != -1
       ) {
         this.subjectServer = useSubjectServer();
         this.$i18n.locale = 'zh-CN';
-      } else {
+      }
+    },
+    mounted() {
+      if (
+        this.interfaceType !== 'subject' &&
+        window.location.href.indexOf('/special/detail') == -1
+      ) {
+        // 如果是活动下才使用房间Server
         this.roomBaseServer = useRoomBaseServer();
       }
-      this.$nextTick(() => {
-        if (this.interfaceType === 'subject') {
-          this.initSubjectInfo();
-        } else {
-          this.initWebinarInfo();
-        }
-      });
+      this.interfaceType === 'subject' ? this.initSubjectInfo() : this.initWebinarInfo();
     },
     methods: {
       // 设置接口入参，是活动维度 还是 专题维度
@@ -711,8 +705,8 @@
         this.activeTab = 1;
         this.cascadeResultList = [];
         this.getSubjectDetail();
-        this.getBaseInfo();
-        this.getQuestionList();
+        this.getBaseInfo(); // 获取表单 - 表单基本信息
+        this.getQuestionList(); // 获取表单 - 题目列表
       },
       async getSubjectDetail() {
         try {
@@ -1042,13 +1036,8 @@
           .then(res => {
             if (res && [200, '200'].includes(res.code)) {
               sessionStorage.setItem('visitorId', res.data.visit_id);
-              if (this.interfaceType === 'subject') {
-                // 专题 -- 报名成功后处理
-                this.getSubjectStatus();
-              } else {
-                // 活动 -- 报名成功后处理
-                this.getWebinarStatus();
-              }
+              // 专题/活动 -- 报名成功后处理
+              this.interfaceType === 'subject' ? this.getSubjectStatus() : this.getWebinarStatus();
             } else {
               return Promise.reject(res);
             }
@@ -1061,21 +1050,15 @@
             } else if (err.code == 512814 || err.code == 512815) {
               this.$toast(this.$t('form.form_1033'));
               const queryString = this.returnQueryString();
-              if (this.interfaceType === 'subject') {
-                location.replace(
-                  window.location.protocol +
-                    process.env.VUE_APP_WAP_WATCH +
-                    process.env.VUE_APP_WEB_KEY +
-                    `/special/detail/${this.webinarOrSubjectId}${queryString}`
-                );
-              } else {
-                location.replace(
-                  window.location.protocol +
-                    process.env.VUE_APP_WAP_WATCH +
-                    process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
-                );
-              }
+              // 跳转专题详情 还是 活动报名表单详情
+              location.replace(
+                window.location.protocol +
+                  process.env.VUE_APP_WAP_WATCH +
+                  process.env.VUE_APP_WEB_KEY +
+                  `${this.interfaceType === 'subject' ? '/special/detail/' : '/lives/watch/'}${
+                    this.webinarOrSubjectId
+                  }${queryString}`
+              );
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
