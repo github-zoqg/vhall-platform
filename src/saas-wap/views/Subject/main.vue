@@ -109,7 +109,7 @@
   import { getQueryString } from '@/app-shared/utils/tool.js';
   import { urlToLink, padStringWhenTooLang } from './js/utils.js';
   import loginWap from '@/packages/reg-login-wap/src/main.vue';
-  import confirmAuth from '../components/confirm.vue';
+  import confirmAuth from '@/app-shared/components/confirm.vue';
   export default {
     data() {
       return {
