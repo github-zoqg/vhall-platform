@@ -50,13 +50,13 @@
             this.state = 2;
             return;
           }
+          await this.initSubjectAuth();
           this.state = 1;
-          this.initSubjectAuth();
         } catch (err) {
           this.state = 2;
         }
       },
-      initSubjectAuth() {
+      async initSubjectAuth() {
         const subjectServer = useSubjectServer();
         const visitorId = sessionStorage.getItem('visitorId');
         let params = {

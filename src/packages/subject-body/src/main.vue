@@ -107,29 +107,30 @@
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
+        const { pass, is_preview } = this.subjectServer.state.subjectAuthInfo;
         // 预告状态、有暖场视频
         if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
           this.goWatch();
           return;
         }
         // 回放状态、开启了试看
-        if (item.webinar_state == 5 && this.subjectAuthInfo.is_preview == 1) {
+        if (item.webinar_state == 5 && is_preview == 1) {
           this.goWatch();
           return;
         }
-        this.subjectAuthInfo.pass == 1 ? this.goWatch() : this.handleAuthInfo();
+        pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
         let href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
         window.open(href, '_blank');
       },
       handleAuthInfo() {
+        const { verify } = this.subjectServer.state.subjectAuthInfo;
         let data = {
           subject_id: this.subjectDetailInfo.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
-          type: this.subjectAuthInfo.verify,
-          verify_value: undefined,
+          type: verify,
           ...this.$route.query
         };
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
