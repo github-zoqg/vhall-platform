@@ -233,6 +233,7 @@
                       : ''
                   "
                 ></span>
+                {{ source.count }}
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
