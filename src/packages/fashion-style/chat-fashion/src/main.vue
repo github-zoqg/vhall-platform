@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-chat-container" :class="{ assistant: assistantType }">
+  <div class="vmp-chat-container-fashion" :class="{ assistant: assistantType }">
     <transition name="el-fade-in-linear">
       <div v-if="isWatch && nickName && welcomeText && isShowWelcome" class="vmp-chat-welcome">
         <!-- 欢迎语显示 -->
@@ -777,7 +777,7 @@
 </script>
 
 <style lang="less">
-  .vmp-chat-container {
+  .vmp-chat-container-fashion {
     @active-color: #fb3a32;
     @font-error: #fb3a32;
     width: 100%;
