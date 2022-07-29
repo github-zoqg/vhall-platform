@@ -39,11 +39,7 @@
       this.roomBaseServer = useRoomBaseServer();
     },
     async created() {
-      if (this.interfaceType === 'webinar') {
-        this.initWebinarInfo();
-      } else {
-        this.initSubjectInfo();
-      }
+      this.interfaceType === 'webinar' ? this.initWebinarInfo() : this.initSubjectInfo();
     },
     methods: {
       async initWebinarInfo() {
@@ -101,11 +97,7 @@
             visit_id: this.roomBaseServer.state.watchInitData.visitor_id
           })
           .then(res => {
-            if (res.code !== 200) {
-              // 错误异常，显示后端返回码
-              this.isShowError =
-                res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
-            } else {
+            if (res.code == 200) {
               this.isShowError = '';
               // 如果当前 visitor_id 已经报名，跳转到直播间
               if (res.data.has_registed) return this.getWebinarStatus();
@@ -113,6 +105,10 @@
               if (res.data.available == 0) return (this.formOpenLinkStatus = 2);
               // 显示报名表单
               this.formOpenLinkStatus = 1;
+            } else {
+              // 错误异常，显示后端返回码
+              this.isShowError =
+                res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
             }
           })
           .catch(res => {
