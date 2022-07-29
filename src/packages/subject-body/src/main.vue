@@ -68,7 +68,7 @@
 </template>
 <script>
   import { useSubjectServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, handleIntroInfo } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSubjectBody',
     data() {
@@ -88,7 +88,7 @@
         return this.subjectServer.state.subjectAuthInfo;
       },
       subjectIntroInfo() {
-        return this.urlToLink(this.subjectDetailInfo.intro);
+        return handleIntroInfo(this.subjectDetailInfo.intro);
       }
     },
     methods: {
@@ -104,37 +104,6 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
-      },
-      urlToLink(str) {
-        if (!str) return '';
-
-        // 提取聊天内容中的 img 标签
-        const regImg = /<img.*?(?:>|\/>)/g;
-        const imgArr = str.match(regImg);
-
-        // 提取聊天内容中除去 img 标签以外的部分
-        const strArr = str.split(regImg);
-        const regUrl = /(((ht|f)tps?):\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])/g;
-
-        // 将聊天内容中除去 img 标签以外的聊天内容中的链接用 a 标签包裹
-        strArr.forEach((item, index) => {
-          const tempStr = item.replace(regUrl, function (match) {
-            return `<a class='show-link' href='${match}' target='_blank'>${match}</a>`;
-          });
-          strArr[index] = tempStr;
-        });
-
-        // // 遍历 img 标签数组，将聊天内容中的 img 标签插回原来的位置
-        if (imgArr) {
-          const imgArrLength = imgArr.length;
-          let imgIndex = 0;
-          for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
-            strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
-            imgIndex++;
-          }
-        }
-        console.log(strArr.join(''), '???123232432');
-        return strArr.join('');
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
