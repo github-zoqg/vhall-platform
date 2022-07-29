@@ -243,6 +243,7 @@
       .vmp-split-screen__stream-container {
         box-sizing: border-box;
         position: relative;
+        border: 1px solid #000;
         &-box {
           padding-top: 56.25%;
           .vmp-stream-local {
