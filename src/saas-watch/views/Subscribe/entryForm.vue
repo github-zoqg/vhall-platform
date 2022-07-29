@@ -1,17 +1,8 @@
 <template>
   <div class="openlink-wrap">
-    <vmp-sign-up-form v-if="formOpenLinkStatus == 1 && !isShowError"></vmp-sign-up-form>
-    <div v-if="formOpenLinkStatus == 2 && !isShowError" class="no-open">
+    <vmp-sign-up-form v-if="formOpenLinkStatus == 1"></vmp-sign-up-form>
+    <div v-if="formOpenLinkStatus == 2" class="no-open">
       <errorPage prop-type="stop_serve"></errorPage>
-    </div>
-    <div v-if="isShowError" class="no-open">
-      <errorPage prop-type="stop_serve">
-        <slot slot-name="body">
-          <p>
-            {{ isShowError }}
-          </p>
-        </slot>
-      </errorPage>
     </div>
   </div>
 </template>
@@ -30,8 +21,7 @@
         interfaceType:
           window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar',
         webinarOrSubjectId: this.$route.params.id,
-        formOpenLinkStatus: 0,
-        isShowError: '' // 是否展示后端错误码内容
+        formOpenLinkStatus: 0
       };
     },
     beforeCreate() {
@@ -98,7 +88,6 @@
           })
           .then(res => {
             if (res.code == 200) {
-              this.isShowError = '';
               // 如果当前 visitor_id 已经报名，跳转到直播间
               if (res.data.has_registed) return this.getWebinarStatus();
               // 如果独立链接无效，显示无效页
@@ -106,15 +95,13 @@
               // 显示报名表单
               this.formOpenLinkStatus = 1;
             } else {
-              // 错误异常，显示后端返回码
-              this.isShowError =
-                res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
+              // 错误异常
+              this.formOpenLinkStatus = 2;
             }
           })
           .catch(res => {
-            // 错误异常，显示后端返回码
-            this.isShowError =
-              res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
+            // 错误异常
+            this.formOpenLinkStatus = 2;
           });
       },
       // 获取当前活动状态，如果直播中，跳转到直播间
