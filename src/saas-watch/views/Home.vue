@@ -108,6 +108,11 @@
           const domain = await this.initReceiveLive(this.clientType);
           await roomState();
 
+          // TODO:设置聊天组件
+          if (localStorage.getItem('chatStyle') == 'fashion') {
+            window.$serverConfig.comChat.component = 'VmpFashionChat';
+          }
+
           // 设置主题
           window.skins = skins;
           skins.setTheme(skins.themes.themeDefaultBlack);
