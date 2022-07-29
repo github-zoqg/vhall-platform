@@ -607,8 +607,6 @@
         font-size: 28px;
         padding-top: 20px;
       }
-      &__get-list-btn {
-      }
       &__new-msg-tips {
         position: absolute;
         left: 0;
