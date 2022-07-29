@@ -13,7 +13,6 @@ import VmpHeaderLeft from '@/packages/header-left';
 import VmpHeaderWatch from '@/packages/header-watch-pc';
 import VmpPcPlayer from '@/packages/player/pc-player';
 import VmpChat from '@/packages/chat';
-import VmpFashionChat from '@/packages/chat-fashion';
 import VmpDocUne from '@/packages/doc-une';
 import VmpDocDlglist from '@/packages/doc-dlglist';
 import VmpStreamList from '@/packages/stream-list';
@@ -79,6 +78,10 @@ import VmpCameraCheck from '@/packages/camera-check/index';
 
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
+// ------------------------------【时尚风格】引入组件------start----------
+import VmpFashionChat from '@/packages/fashion-style/chat-fashion';
+// ------------------------------【时尚风格】引入组件------end----------
+
 // 全局注册组件
 Vue.use(ElementUI);
 Vue.use(VmpContainer);
@@ -90,7 +93,6 @@ Vue.use(VmpHeaderLeft);
 Vue.use(VmpHeaderWatch);
 Vue.use(VmpPcPlayer);
 Vue.use(VmpChat);
-Vue.use(VmpFashionChat);
 Vue.use(VmpDocUne);
 Vue.use(VmpDocDlglist);
 Vue.use(VmpStreamList);
@@ -142,3 +144,7 @@ Vue.use(VmpInsertStream);
 Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
+
+// ------------------------------【时尚风格】注册组件------start----------
+Vue.use(VmpFashionChat);
+// ------------------------------【时尚风格】注册组件------end----------

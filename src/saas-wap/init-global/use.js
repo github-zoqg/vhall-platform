@@ -32,7 +32,6 @@ import VmpCustomMenuWap from '@/packages/custom-menu-wap';
 // 商品列表
 import VmpGoodListWap from '@/packages/good-wap';
 import VmpChatWap from '@/packages/chat-wap';
-import VmpChatWapFashion from '@/packages/chat-wap-fashion';
 import VmpGoodsDetail from '@/packages/wap-goods-detail';
 
 import 'overlayscrollbars/css/OverlayScrollbars.css';
@@ -100,6 +99,10 @@ import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap'
 import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
 // ------------------------------【极简风格】引入组件------end----------
 
+// ------------------------------【时尚风格】引入组件------start----------
+import VmpChatWapFashion from '@/packages/fashion-style/chat-wap-fashion';
+// ------------------------------【时尚风格】引入组件------end----------
+
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -125,7 +128,6 @@ Vue.use(VmpWapQrCode);
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpInteractToolsWap);
 Vue.use(VmpChatWap);
-Vue.use(VmpChatWapFashion);
 Vue.use(VmpCustomMenuWap);
 Vue.use(VmpSignWap);
 Vue.use(VmpMemberListWap);
@@ -155,3 +157,7 @@ Vue.use(VmpConciseBodyBlockWap);
 Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
 // ------------------------------【极简风格】注册组件------end----------
+
+// ------------------------------【时尚风格】注册组件------start----------
+Vue.use(VmpChatWapFashion);
+// ------------------------------【时尚风格】注册组件------end----------
