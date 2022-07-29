@@ -22,7 +22,8 @@
     data() {
       return {
         //是否屏蔽特效
-        hideEffect: false,
+        hideEffect:
+          sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true' ? true : false,
         showEffectStatus: false,
         taskQueue: null, // 飘窗列队
         isSvga: true
