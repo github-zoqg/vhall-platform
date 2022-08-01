@@ -708,6 +708,7 @@
 <script>
   import defaultHeader from './img/formHeader.png';
   import { useRoomBaseServer, useSignUpFormServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSignUpForm',
     data() {
@@ -823,6 +824,7 @@
         isVerifyCodeErr: false,
         //地域验证是否通过
         isValidRegional: true,
+        isSubject: false, // 是否从专题入口打开
         interfaceType:
           window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
@@ -1144,7 +1146,9 @@
         if (webinarId) {
           // 专题下 点击活动，若有专题报名表单，传递活动ID给本函数。之后本页面中逻辑执行：后端通过活动ID获取是专题报名表单内容 还是 活动的报名表单内容
           this.webinarOrSubjectId = webinarId;
+          this.isSubject = true;
         } else {
+          this.isSubject = false;
           this.initViewData();
         }
         this.visible = true;
@@ -1681,6 +1685,10 @@
             this.signUpFormServer.submitSignUpForm(params).then(res => {
               if (res.code == 200) {
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                if (this.isSubject) {
+                  // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                  window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
+                }
                 // 报名成功的操作，跳转到直播间
                 if (this.interfaceType === 'subject') {
                   this.goToSubjectDetailOrReload();
@@ -1774,40 +1782,9 @@
           }
           // 如果是独立链接，判断状态进行跳转
           if (this.isEntryForm) {
-            const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
-            if (res.data.status == 'live') {
-              window.location.href =
-                window.location.origin +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
-            } else {
-              // 如果预约或结束，跳转到预约页
-              if (res.data.webinar.type == 2 && isSubmitForm) {
-                // 如果是预约状态，显示开播时间提醒
-                this.$alert(
-                  this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
-                  this.$t('account.account_1061'),
-                  {
-                    confirmButtonText: this.$t('common.common_1033'),
-                    customClass: 'zdy-alert-box',
-                    callback: action => {
-                      console.log(action);
-                      this.closePreview();
-                      window.location.href =
-                        window.location.origin +
-                        process.env.VUE_APP_WEB_KEY +
-                        `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
-                    }
-                  }
-                );
-              } else {
-                window.location.href =
-                  window.location.origin +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
-              }
-            }
+            this.gotoWebinarPage(res, isSubmitForm);
           } else {
+            // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
             if (res.data.webinar.type == 2 && isSubmitForm) {
               // 如果是预约状态，显示开播时间提醒
               this.$alert(
@@ -1819,17 +1796,76 @@
                   callback: action => {
                     console.log(action);
                     this.closePreview();
-                    //验证成功,刷新页面
-                    location.reload();
+                    if (this.isSubject) {
+                      const queryString = this.$route.query.refer
+                        ? `?refer=${this.$route.query.refer}`
+                        : '';
+                      window.location.href =
+                        window.location.origin +
+                        process.env.VUE_APP_WEB_KEY +
+                        `/lives/${res.data.webinar.type == 1 ? 'watch' : 'subscribe'}/${
+                          this.webinarOrSubjectId
+                        }${queryString}`;
+                    } else {
+                      location.reload();
+                    }
                   }
                 }
               );
             } else {
               this.closePreview();
-              location.reload();
+              if (this.isSubject) {
+                const queryString = this.$route.query.refer
+                  ? `?refer=${this.$route.query.refer}`
+                  : '';
+                window.location.href =
+                  window.location.origin +
+                  process.env.VUE_APP_WEB_KEY +
+                  `/lives/${res.data.webinar.type == 1 ? 'watch' : 'subscribe'}/${
+                    this.webinarOrSubjectId
+                  }${queryString}`;
+              } else {
+                location.reload();
+              }
             }
           }
         });
+      },
+      // 跳转活动页
+      gotoWebinarPage(res, isSubmitForm) {
+        const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+        if (res.data.status == 'live') {
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+        } else {
+          // 如果预约或结束，跳转到预约页
+          if (res.data.webinar.type == 2 && isSubmitForm) {
+            // 如果是预约状态，显示开播时间提醒
+            this.$alert(
+              this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+              this.$t('account.account_1061'),
+              {
+                confirmButtonText: this.$t('common.common_1033'),
+                customClass: 'zdy-alert-box',
+                callback: action => {
+                  console.log(action);
+                  this.closePreview();
+                  window.location.href =
+                    window.location.origin +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+                }
+              }
+            );
+          } else {
+            window.location.href =
+              window.location.origin +
+              process.env.VUE_APP_WEB_KEY +
+              `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+          }
+        }
       },
       // 提交报名表单结束，跳转专题详情页（独立报名表单），或者刷新（专题详情页弹出报名表单）
       goToSubjectDetailOrReload() {
@@ -1844,7 +1880,10 @@
         } else {
           this.closePreview();
           //验证成功,刷新页面
-          location.reload();
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/subscribe/${this.webinarOrSubjectId}`;
         }
       },
       //关闭当前视图
