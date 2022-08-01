@@ -65,7 +65,7 @@
           ...this.$route.query
         };
         // 如果已经鉴权过，就直接进入观看端，否则走鉴权
-        subjectServer.initSubjectInfo(params);
+        await subjectServer.initSubjectInfo(params);
       }
     }
   };
