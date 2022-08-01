@@ -307,7 +307,7 @@
         this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
       },
       goWatchUrl() {
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+        window.location.href = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
       },
       handleAuthInfo() {
         let data = {
@@ -388,7 +388,7 @@
         this.subjectServer.getSubjectWatchAuth(data).then(res => {
           if (res.code == 200) {
             window.location.href =
-              window.location.origin +
+              process.env.VUE_APP_WAP_WATCH +
               process.env.VUE_APP_ROUTER_BASE_URL +
               `/lives/watch/${this.webinarId}${window.location.search}`;
           } else {

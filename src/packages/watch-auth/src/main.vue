@@ -130,7 +130,7 @@
             this.subjectServer.state.subjectAuthInfo.pass = 1;
             this.authVisible = false;
             let href =
-              window.location.origin +
+              process.env.VUE_APP_WAP_WATCH +
               process.env.VUE_APP_ROUTER_BASE_URL +
               `/lives/watch/${this.webinarId}${window.location.search}`;
             window.open(href, '_blank');
