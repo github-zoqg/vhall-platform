@@ -636,7 +636,7 @@
   .vmp-tab-menu {
     height: 100%;
     position: relative;
-    background: #fff;
+    background: var(--theme-default-bg);
     font-size: 28px;
     display: flex;
     flex-direction: column;
@@ -674,7 +674,7 @@
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: var(--theme-tab-menu-border);
 
       /*  &::before {
         content: '';
@@ -738,7 +738,7 @@
         justify-content: center;
         align-items: center;
         padding: 0 32px;
-        color: #595959;
+        color: var(--theme-tab-menu-font);
         cursor: pointer;
         user-select: none;
         &_subscrbe {
@@ -759,8 +759,8 @@
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: #ff0005;
-          border: 9px solid #ff0005;
+          background: var(--theme-tab-menu-tip);
+          border: 9px solid var(--theme-tab-menu-tip);
           right: 18px;
           top: 10px;
         }
@@ -782,7 +782,7 @@
         }
 
         &__active {
-          color: #262626;
+          color: var(--theme-tab-menu-font);
           position: relative;
 
           .bottom-line {

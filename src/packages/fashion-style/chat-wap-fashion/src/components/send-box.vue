@@ -449,8 +449,8 @@
 </script>
 <style lang="less" scoped>
   .vmp-send-box-fashion {
-    background-color: #fff;
-    box-shadow: 0px -1px 1px #f1f1f1;
+    // background-color: #fff;
+    // box-shadow: 0px -1px 1px #f1f1f1;
     // &::after {
     //   content: '';
     //   position: absolute;

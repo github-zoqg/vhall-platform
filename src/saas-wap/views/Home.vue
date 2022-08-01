@@ -152,7 +152,7 @@
 
           // 设置主题
           window.skins = skins;
-          skins.setTheme(skins.themes.themeDefaultBlack);
+          skins.setTheme(skins.themes.themeFestiveRed);
 
           await roomState();
 

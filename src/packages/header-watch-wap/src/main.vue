@@ -197,7 +197,7 @@
 <style lang="less">
   .vh-header-box {
     height: 71px;
-    background: rgba(255, 255, 255, 1);
+    background: var(--theme-header-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
