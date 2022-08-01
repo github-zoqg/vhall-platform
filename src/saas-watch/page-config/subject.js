@@ -80,6 +80,14 @@ export default {
   },
   comSignUpForm: {
     component: 'VmpSignUpForm',
-    options: {}
+    options: {},
+    emitChangePass: [
+      // 权限弹窗
+      {
+        cuid: 'comSubjectBody',
+        method: 'changePass',
+        args: []
+      }
+    ]
   }
 };

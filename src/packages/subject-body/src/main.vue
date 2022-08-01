@@ -121,8 +121,11 @@
         pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
-        let href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
+        let href = `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
         window.open(href, '_blank');
+      },
+      changePass() {
+        this.subjectServer.state.subjectAuthInfo.pass = 1;
       },
       handleAuthInfo() {
         const { verify } = this.subjectServer.state.subjectAuthInfo;
