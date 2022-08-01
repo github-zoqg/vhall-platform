@@ -315,6 +315,7 @@
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
+            this.mainScreenDom.style.pointerEvents = 'auto';
           }
         });
         const str =
