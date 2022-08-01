@@ -121,8 +121,7 @@
         pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
-        let href = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
-        console.log(href, '13214235');
+        let href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
         window.open(href, '_blank');
       },
       changePass() {
