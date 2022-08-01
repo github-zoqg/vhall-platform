@@ -707,11 +707,13 @@
           const res = await this.subjectServer.getSubjectInfo({
             subject_id: this.webinarOrSubjectId
           });
-          if (res.code !== 200) {
+          if (res.code == 200 && res.data && res.data.webinar_subject) {
+            // 获取专题分享信息
+            this.wxShareInfoSubject(res.data.webinar_subject);
+          } else {
             this.$toast(res.msg || '获取专题信息失败');
             return;
           }
-          this.wxShareInfoSubject(res.data.webinar_subject);
         } catch (err) {
           this.$toast(err.msg || '获取专题信息失败');
         }
@@ -1040,23 +1042,31 @@
               this.errMsgMap.code = this.$t('cash.cash_1039');
             } else if (err.code == 512814 || err.code == 512815) {
               this.$toast(this.$t('form.form_1033'));
-              const queryString = this.returnQueryString();
               // 跳转专题详情 还是 活动报名表单详情
-              location.replace(
-                window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `${this.interfaceType === 'subject' ? '/special/detail/' : '/lives/watch/'}${
-                    this.webinarOrSubjectId
-                  }${queryString}`
-              );
+              if (this.interfaceType === 'subject') {
+                const queryString = this.returnQueryString('subject');
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
+                );
+              } else {
+                const queryString = this.returnQueryString();
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                );
+              }
             } else {
               this.$toast(this.$tec(err.code) || err.msg);
             }
           });
       },
       // 组装地址栏入参
-      returnQueryString() {
+      returnQueryString(type = null) {
         let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
         if (queryString && this.$route.query.invite) {
           queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
@@ -1073,6 +1083,13 @@
           queryString += share_id ? `?share_id=${share_id}` : '';
         } else if (queryString.indexOf('?') == -1 && shareId) {
           queryString += shareId ? `?shareId=${shareId}` : '';
+        }
+        if (type === 'subject') {
+          // 专题地址栏要拼接-是否无延迟
+          const hasDelay = getQueryString('delay');
+          queryString += hasDelay
+            ? `${queryString.indexOf('?') != -1 ? '&' : '?'}delay=${hasDelay}`
+            : '';
         }
         return queryString;
       },
@@ -1105,13 +1122,13 @@
       // 获取专题报名表单状态
       getSubjectStatus() {
         // webinar_state =》 1 直播  2 预告  3 结束 4 点播 5 回放
-        const queryString = this.returnQueryString();
+        const queryString = this.returnQueryString('subject');
         // 提交报名表单成功，跳转专题详情
         location.replace(
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
             process.env.VUE_APP_WEB_KEY +
-            `/special/detail/${this.webinarOrSubjectId}${queryString}`
+            `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
         );
       },
       //将原始表单转化为答案

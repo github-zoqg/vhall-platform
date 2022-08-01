@@ -56,7 +56,7 @@
           .then(res => {
             // 如果当前 visitor_id 已经报名，跳转到专题页
             if (res.data.has_registed)
-              return (window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail/${this.webinarOrSubjectId}`);
+              return (window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${this.webinarOrSubjectId}`);
             // 如果独立链接无效，显示无效页
             if (res.data.available == 0) return (this.formOpenLinkStatus = 2);
             // 显示报名表单
