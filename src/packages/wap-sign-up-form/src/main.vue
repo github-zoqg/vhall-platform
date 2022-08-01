@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-wap-sign-up-form">
-    <div v-if="formOpenLinkStatus == 1 && !isShowError" class="vmp-wap-sign-up-form__wrap">
+    <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
         <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
       </header>
@@ -323,16 +323,11 @@
         </ul>
       </div>
     </div>
-    <div v-if="formOpenLinkStatus == 2 && !isShowError" class="no-authority-wrap">
+    <div v-if="formOpenLinkStatus == 2" class="no-authority-wrap">
       <p>
         {{ $t('message.message_1006') }}
         <br />
         {{ $t('message.message_1025') }}
-      </p>
-    </div>
-    <div v-if="isShowError" class="no-authority-wrap">
-      <p>
-        {{ isShowError }}
       </p>
     </div>
     <!-- 这个元素不显示用于计算两行的高度 -->
@@ -498,7 +493,8 @@
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
-        isShowError: '' // 是否展示后端错误码内容
+        interfaceType:
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     computed: {
@@ -589,15 +585,6 @@
           }
           return maxLength;
         };
-      },
-      // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
-      interfaceType() {
-        if (window.location.href.indexOf('/subject/entryform') != -1) {
-          // 专题
-          return 'subject';
-        } else {
-          return 'webinar';
-        }
       }
     },
     watch: {
@@ -655,23 +642,24 @@
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
+    created() {
       if (
         this.interfaceType === 'subject' ||
         window.location.href.indexOf('/special/detail') != -1
       ) {
         this.subjectServer = useSubjectServer();
         this.$i18n.locale = 'zh-CN';
-      } else {
+      }
+    },
+    mounted() {
+      if (
+        this.interfaceType !== 'subject' &&
+        window.location.href.indexOf('/special/detail') == -1
+      ) {
+        // 如果是活动下才使用房间Server
         this.roomBaseServer = useRoomBaseServer();
       }
-      this.$nextTick(() => {
-        if (this.interfaceType === 'subject') {
-          this.initSubjectInfo();
-        } else {
-          this.initWebinarInfo();
-        }
-      });
+      this.interfaceType === 'subject' ? this.initSubjectInfo() : this.initWebinarInfo();
     },
     methods: {
       // 设置接口入参，是活动维度 还是 专题维度
@@ -711,19 +699,21 @@
         this.activeTab = 1;
         this.cascadeResultList = [];
         this.getSubjectDetail();
-        this.getBaseInfo();
-        this.getQuestionList();
+        this.getBaseInfo(); // 获取表单 - 表单基本信息
+        this.getQuestionList(); // 获取表单 - 题目列表
       },
       async getSubjectDetail() {
         try {
           const res = await this.subjectServer.getSubjectInfo({
             subject_id: this.webinarOrSubjectId
           });
-          if (res.code !== 200) {
+          if (res.code == 200 && res.data && res.data.webinar_subject) {
+            // 获取专题分享信息
+            this.wxShareInfoSubject(res.data.webinar_subject);
+          } else {
             this.$toast(res.msg || '获取专题信息失败');
             return;
           }
-          this.wxShareInfoSubject(res.data.webinar_subject);
         } catch (err) {
           this.$toast(err.msg || '获取专题信息失败');
         }
@@ -741,19 +731,16 @@
         return this.signUpFormServer
           .getFormLinkStatus(params)
           .then(res => {
-            if (res.code !== 200) {
-              // 错误异常，显示后端返回码
-              this.isShowError =
-                res.code === 512821 ? this.$tec(res.code) : this.$t('message.message_1026');
-            } else {
-              this.isShowError = '';
+            if (res.code == 200) {
               // 如果独立链接无效，显示无效页
               this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
+            } else {
+              this.formOpenLinkStatus = 2;
             }
           })
           .catch(res => {
-            // 错误异常，显示后端返回码
-            this.isShowError = this.$tec(res.code) || this.$t('message.message_1026');
+            // 错误异常
+            this.formOpenLinkStatus = 2;
           });
       },
       //获取活动类型
@@ -1042,13 +1029,8 @@
           .then(res => {
             if (res && [200, '200'].includes(res.code)) {
               sessionStorage.setItem('visitorId', res.data.visit_id);
-              if (this.interfaceType === 'subject') {
-                // 专题 -- 报名成功后处理
-                this.getSubjectStatus();
-              } else {
-                // 活动 -- 报名成功后处理
-                this.getWebinarStatus();
-              }
+              // 专题/活动 -- 报名成功后处理
+              this.interfaceType === 'subject' ? this.getSubjectStatus() : this.getWebinarStatus();
             } else {
               return Promise.reject(res);
             }
@@ -1060,15 +1042,17 @@
               this.errMsgMap.code = this.$t('cash.cash_1039');
             } else if (err.code == 512814 || err.code == 512815) {
               this.$toast(this.$t('form.form_1033'));
-              const queryString = this.returnQueryString();
+              // 跳转专题详情 还是 活动报名表单详情
               if (this.interfaceType === 'subject') {
+                const queryString = this.returnQueryString('subject');
                 location.replace(
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
-                    `/special/detail/${this.webinarOrSubjectId}${queryString}`
+                    `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
                 );
               } else {
+                const queryString = this.returnQueryString();
                 location.replace(
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
@@ -1082,7 +1066,7 @@
           });
       },
       // 组装地址栏入参
-      returnQueryString() {
+      returnQueryString(type = null) {
         let queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
         if (queryString && this.$route.query.invite) {
           queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
@@ -1099,6 +1083,13 @@
           queryString += share_id ? `?share_id=${share_id}` : '';
         } else if (queryString.indexOf('?') == -1 && shareId) {
           queryString += shareId ? `?shareId=${shareId}` : '';
+        }
+        if (type === 'subject') {
+          // 专题地址栏要拼接-是否无延迟
+          const hasDelay = getQueryString('delay');
+          queryString += hasDelay
+            ? `${queryString.indexOf('?') != -1 ? '&' : '?'}delay=${hasDelay}`
+            : '';
         }
         return queryString;
       },
@@ -1131,13 +1122,13 @@
       // 获取专题报名表单状态
       getSubjectStatus() {
         // webinar_state =》 1 直播  2 预告  3 结束 4 点播 5 回放
-        const queryString = this.returnQueryString();
+        const queryString = this.returnQueryString('subject');
         // 提交报名表单成功，跳转专题详情
         location.replace(
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
             process.env.VUE_APP_WEB_KEY +
-            `/special/detail/${this.webinarOrSubjectId}${queryString}`
+            `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
         );
       },
       //将原始表单转化为答案

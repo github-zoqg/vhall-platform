@@ -822,7 +822,9 @@
         //是否是短信验证码错误
         isVerifyCodeErr: false,
         //地域验证是否通过
-        isValidRegional: true
+        isValidRegional: true,
+        interfaceType:
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     watch: {
@@ -1106,28 +1108,22 @@
             trigger: 'blur'
           }
         };
-      },
-      // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
-      interfaceType() {
-        if (window.location.href.indexOf('/subject/entryform') != -1) {
-          // 专题(当前只针对专题-独立报名表单，说明类型是subject；其它情况下认为都应该调用活动接口)
-          return 'subject';
-        } else {
-          return 'webinar';
-        }
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
     },
-    mounted() {
+    created() {
+      // TODO 待确认此处是否需要如此设置。
       if (
         this.interfaceType === 'subject' ||
         window.location.href.indexOf('/special/detail') != -1
       ) {
         this.$i18n.locale = 'zh-CN';
       }
+    },
+    mounted() {
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
       if (this.isEntryForm) {
         this.init();
@@ -1145,8 +1141,10 @@
       },
       //打开模态窗
       async openModal(webinarId = null) {
-        this.webinarOrSubjectId = webinarId;
-        if (!webinarId) {
+        if (webinarId) {
+          // 专题下 点击活动，若有专题报名表单，传递活动ID给本函数。之后本页面中逻辑执行：后端通过活动ID获取是专题报名表单内容 还是 活动的报名表单内容
+          this.webinarOrSubjectId = webinarId;
+        } else {
           this.initViewData();
         }
         this.visible = true;
@@ -1685,7 +1683,7 @@
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
                 // 报名成功的操作，跳转到直播间
                 if (this.interfaceType === 'subject') {
-                  this.getSubjectStatus();
+                  this.goToSubjectDetailOrReload();
                 } else {
                   // 判断当前直播状态，进行相应的跳转
                   this.getWebinarStatus(true);
@@ -1705,7 +1703,7 @@
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
                 if (this.interfaceType === 'subject') {
-                  this.getSubjectStatus();
+                  this.goToSubjectDetailOrReload();
                 } else {
                   // 判断当前直播状态，进行相应的跳转
                   this.getWebinarStatus();
@@ -1741,7 +1739,7 @@
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
                   if (this.interfaceType === 'subject') {
-                    this.getSubjectStatus();
+                    this.goToSubjectDetailOrReload();
                   } else {
                     // 判断当前直播状态，进行相应的跳转
                     this.getWebinarStatus();
@@ -1833,15 +1831,16 @@
           }
         });
       },
-      // 获取当前专题状态
-      getSubjectStatus() {
+      // 提交报名表单结束，跳转专题详情页（独立报名表单），或者刷新（专题详情页弹出报名表单）
+      goToSubjectDetailOrReload() {
         // 如果是独立链接，判断状态进行跳转
         if (this.isEntryForm) {
-          const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
           window.location.href =
             window.location.origin +
             process.env.VUE_APP_WEB_KEY +
-            `/special/detail/${this.webinarOrSubjectId}${queryString}`;
+            `/special/detail?id=${this.webinarOrSubjectId}&refer=${
+              this.$route.query.refer ? this.$route.query.refer : ''
+            }`;
         } else {
           this.closePreview();
           //验证成功,刷新页面
