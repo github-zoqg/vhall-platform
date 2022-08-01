@@ -129,11 +129,12 @@
                       : ''
                   "
                 >
+                  <img class="chat-avatar" :src="source.replyMsg.avatar || defaultAvatar" alt />
                   <span
                     class="nickname"
                     v-html="source.replyMsg.nick_name || source.replyMsg.nickname"
                   />
-                  &nbsp;
+                  <span>&nbsp;</span>
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
                   <template v-if="!!!source.replyMsg.content.text_content">
                     <div
@@ -168,6 +169,7 @@
                     !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
                   "
                 >
+                  <img class="chat-avatar" :src="source.avatar || defaultAvatar" alt />
                   <span
                     v-if="source.roleName && source.roleName != '2'"
                     class="role"
@@ -562,8 +564,6 @@
           > .normal-msg {
             > .textInfo {
               line-height: 38px;
-              &.existSimpleImg {
-              }
               span {
                 word-break: break-word;
               }
@@ -594,6 +594,9 @@
             padding-left: 18px;
             margin-bottom: 8px;
             position: relative;
+            .chat-avatar {
+              opacity: 0.65;
+            }
             > .textInfo {
               position: relative;
               line-height: 36px;
