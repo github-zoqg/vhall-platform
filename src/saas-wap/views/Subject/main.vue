@@ -296,12 +296,12 @@
         this.webinarId = item.webinar_id;
         // 预告状态、有暖场视频
         if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
-          this.goWatch();
+          this.goWatchUrl();
           return;
         }
         // 回放状态、开启了试看
         if (item.webinar_state == 5 && this.subjectAuthInfo.is_preview == 1) {
-          this.goWatch();
+          this.goWatchUrl();
           return;
         }
         this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
