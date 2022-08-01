@@ -232,7 +232,7 @@
               class="interact-content__click-detail"
               @click="clickToView(source.type, source.content)"
             >
-              {{ $t('nav.nav_1027') }}
+              {{ $t('chat.chat_1098') }}
             </span>
           </div>
         </div>

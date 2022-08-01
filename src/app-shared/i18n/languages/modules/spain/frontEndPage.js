@@ -355,7 +355,8 @@ export default {
     chat_1094: '',
     chat_1095: '',
     chat_1096: '',
-    chat_1097: ''
+    chat_1097: '',
+    chat_1098: 'Hace clic para ver los detalles'
   },
   form: {
     form_1001: 'Nombre',
@@ -814,7 +815,8 @@ export default {
     interact_1037: '',
     interact_1038: '',
     interact_1039: '',
-    interact_1040: ''
+    interact_1040: '',
+    interact_1041: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',

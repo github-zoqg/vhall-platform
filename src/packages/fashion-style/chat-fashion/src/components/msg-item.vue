@@ -237,7 +237,7 @@
               class="interact-content__click-detail"
               @click="clickToView(source.type, source.content)"
             >
-              {{ $t('nav.nav_1027') }}
+              {{ $t('chat.chat_1098') }}
             </span>
           </div>
         </div>
@@ -379,6 +379,9 @@
         );
       },
       showTime() {
+        if (this.source.showTime || this.source.isHistoryMsg) {
+          return this.source.showTime;
+        }
         if (!this.source.sendTime) {
           return '';
         }
@@ -851,9 +854,9 @@
           }
         }
         .interact-content__redpackage-img {
-          width: 16px;
-          margin-left: 4px;
-          margin-top: 1px;
+          width: 19px;
+          margin-left: 5px;
+          margin-top: 2px;
           float: left;
         }
         .interact-content__click-detail {

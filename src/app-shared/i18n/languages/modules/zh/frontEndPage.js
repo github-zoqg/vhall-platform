@@ -348,7 +348,8 @@ export default {
     chat_1094: '仅查看聊天内容',
     chat_1095: '聊天设置',
     chat_1096: '已开启仅查看聊天内容',
-    chat_1097: '已关闭仅查看聊天内容'
+    chat_1097: '已关闭仅查看聊天内容',
+    chat_1098: '点击查看'
   },
   form: {
     form_1001: '姓名',
@@ -478,7 +479,7 @@ export default {
     interact_tools_1018: '请填写领奖信息，方便主办方与您联系',
     interact_tools_1019: '提交',
     interact_tools_1020: '中奖名单',
-    interact_tools_1021: '正在进行抽奖环节',
+    interact_tools_1021: '正在进行抽奖...',
     interact_tools_1022: '很遗憾，您没有中奖！',
     interact_tools_1023: '恭喜您中奖了！',
     interact_tools_1024: '签到',
