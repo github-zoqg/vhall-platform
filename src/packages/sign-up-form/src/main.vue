@@ -1835,11 +1835,12 @@
       goToSubjectDetailOrReload() {
         // 如果是独立链接，判断状态进行跳转
         if (this.isEntryForm) {
-          const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
           window.location.href =
             window.location.origin +
             process.env.VUE_APP_WEB_KEY +
-            `/special/detail/${this.webinarOrSubjectId}${queryString}`;
+            `/special/detail?id=${this.webinarOrSubjectId}&refer=${
+              this.$route.query.refer ? this.$route.query.refer : ''
+            }`;
         } else {
           this.closePreview();
           //验证成功,刷新页面
