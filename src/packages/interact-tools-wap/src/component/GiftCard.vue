@@ -61,6 +61,7 @@
   // import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
+  import { A } from 'caniuse-lite/data/features/css-shapes';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',
@@ -101,6 +102,9 @@
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
       }
     },
     // watch: {
@@ -249,7 +253,8 @@
           gift_id: this.currentGift.id,
           channel: 'WEIXIN',
           service_code: 'H5_PAY',
-          room_id: this.localRoomInfo.roomId
+          room_id: this.localRoomInfo.roomId,
+          nickname: this.watchInitData.join_info.nickname
         };
 
         // if (isWechat()) {
