@@ -149,17 +149,21 @@
         this.initLoginStatus();
       }
     },
-    mounted() {
+    async mounted() {
       this.listenEvents();
-
       this.initLoginStatus();
       this.initInputStatus();
+      if (this.roleName != 2) {
+        const qaServer = useQaServer();
+        await this.getQaHistoryMsg();
+        qaServer.setState('active', true);
+      }
     },
     methods: {
       listenEvents() {
-        const qaServer = useQaServer();
         const chatServer = useChatServer();
         const menuServer = useMenuServer();
+        const qaServer = useQaServer();
         //监听新建问答消息
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
@@ -202,7 +206,11 @@
           }
         });
         menuServer.$on('tab-switched', async data => {
-          if (this.cuid === data.cuid && !qaServer.state.active) {
+          if (
+            this.cuid === data.cuid &&
+            !qaServer.state.active &&
+            [2, '2'].includes(this.roleName)
+          ) {
             await this.getQaHistoryMsg();
             qaServer.setState('active', true);
           }
