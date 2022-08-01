@@ -16,7 +16,7 @@
               {{ subjectDetailInfo.pv }}
             </p>
             <p v-if="subjectDetailInfo.hide_appointment">
-              <i class="vh-iconfont vh-line-time"></i>
+              <i class="vh-iconfont vh-line-appointments"></i>
               {{ subjectDetailInfo.order_num }}
             </p>
           </div>
