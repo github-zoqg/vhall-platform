@@ -60,6 +60,7 @@
           <span class="vh-iconfont vh-line-arrow-down"></span>
         </div>
       </div>
+      <div class="chat-content__tip-mask"></div>
     </div>
     <div class="chat-operate-bar">
       <chat-operate-bar
@@ -862,10 +863,18 @@
       }
       &__tip-box {
         position: absolute;
-        z-index: 0;
+        z-index: 1;
         bottom: 4px;
         left: 50%;
         transform: translate(-50%, 0);
+      }
+      &__tip-mask {
+        position: absolute;
+        z-index: 0;
+        bottom: 0;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.35) 3.39%, rgba(0, 0, 0, 0) 100%);
       }
       &__tip-box-content {
         background: rgba(255, 255, 255, 0.85);
