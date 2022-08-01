@@ -158,6 +158,10 @@
         });
       },
       handleErrorCode(err) {
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         if (err.code == 512522) {
           this.liveErrorTip = this.$t('message.message_1009');
         } else if (err.code == 512541) {
@@ -182,9 +186,9 @@
               _embedQuery.indexOf('record_id=') > -1
                 ? _embedQuery.replace('record_id=', 'rid=')
                 : _embedQuery;
-            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+            window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
           } else {
-            window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+            window.location.href = `${origin}/${this.$route.params.id}`;
           }
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址

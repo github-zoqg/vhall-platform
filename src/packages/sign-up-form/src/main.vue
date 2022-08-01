@@ -1181,7 +1181,12 @@
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
-              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
+              // 老活动没有test4环境，无论哪个测试环境一律跳到t-webinar.e.vhall.com环境
+              let origin =
+                process.env.NODE_ENV === 'production'
+                  ? window.location.origin
+                  : 'https://t-webinar.e.vhall.com';
+              window.location.href = `${origin}/${this.webinarOrSubjectId}`;
             }
           });
       },

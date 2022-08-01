@@ -121,7 +121,11 @@
           .catch(e => {
             //512502 不支持的活动类型(flash)、512503	不支持的活动类型(旧h5)
             if (e.code == 512503 || e.code == 512502) {
-              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
+              let origin =
+                process.env.NODE_ENV === 'production'
+                  ? window.location.origin
+                  : 'https://t-webinar.e.vhall.com';
+              window.location.href = `${origin}/${this.webinarOrSubjectId}`;
             }
           });
       }
