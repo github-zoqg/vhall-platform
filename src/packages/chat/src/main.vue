@@ -78,6 +78,7 @@
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @onSwitchShowSponsor="onSwitchShowSponsor"
+        @onSwitchShowIsChat="onSwitchShowIsChat"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
         @sendEnd="sendMsgEnd"
@@ -616,8 +617,12 @@
         // useChatServer().clearChatMsg();
         // await this.getHistoryMsg();
         // this.$nextTick(() => {
-        //   this.scrollBottom();
+        this.scrollBottom();
         // });
+      },
+      // 仅查看聊天内容
+      onSwitchShowIsChat() {
+        this.scrollBottom();
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {

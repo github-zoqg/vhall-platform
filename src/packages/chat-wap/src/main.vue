@@ -159,7 +159,7 @@
     },
     watch: {
       chatList: function () {
-        this.filterChat();
+        this.filterChat(false);
         if (this.isBottom()) {
           this.scrollBottom();
         }
@@ -572,8 +572,11 @@
         EventBus.$emit('showSendBox', false);
       },
       // 聊天过滤TODO:修改过滤情况
-      filterChat() {
+      filterChat(data) {
         console.log(this.chatList, 'this.chatList');
+        if (data) {
+          this.scrollBottom();
+        }
         // 过滤特效
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitSetHideEffect', [

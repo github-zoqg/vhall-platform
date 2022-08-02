@@ -400,6 +400,7 @@
         let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
         this.$message.success(message);
 
+        this.$emit('onSwitchShowIsChat', status);
         sessionStorage.setItem('filterStatus_isChat', status);
         this.filterStatus.isChat = status;
       },

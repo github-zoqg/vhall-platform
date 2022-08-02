@@ -96,7 +96,7 @@
       changeEffects(val) {
         sessionStorage.setItem('isShieldingEffects', val);
         this.isShieldingEffects = val;
-        this.$emit('filterChat', val);
+        this.$emit('filterChat', false);
         // let message = val ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
         // this.$message.success(message);
       },
@@ -106,13 +106,13 @@
         // let message = val ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
         // this.$message.success(message);
         this.isChat = val;
-        this.$emit('filterChat', val);
+        this.$emit('filterChat', true);
       },
       // 主办方
       changeSponsor(val) {
         sessionStorage.setItem('onlyShowSponsor', val);
         this.onlyShowSponsor = val;
-        this.$emit('filterChat', val);
+        this.$emit('filterChat', true);
         // let message = val ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
         // this.$message.success(message);
       }
