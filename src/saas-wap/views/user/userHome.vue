@@ -206,12 +206,15 @@
           });
       },
       toPage(item) {
+        const visitorId = this.$route.query.visitorId || undefined;
         window.location.href =
           this.tabType === 'live'
             ? `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${item.webinar_id}`
             : `//${process.env.VUE_APP_WEB_BASE}${
                 process.env.VUE_APP_ROUTER_BASE_URL
-              }/special/detail?id=${item.id}&delay=${this.hasDelayPermission ? 1 : 0}`;
+              }/special/detail?id=${item.id}&delay=${
+                this.hasDelayPermission ? 1 : 0
+              }&visitorId=${visitorId}`;
       },
       // 查询
       searchHandle() {

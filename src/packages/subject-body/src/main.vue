@@ -107,18 +107,22 @@
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
-        const { pass, is_preview } = this.subjectServer.state.subjectAuthInfo;
-        // 预告状态、有暖场视频
-        if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
-          this.goWatch();
-          return;
+        const { pass, is_preview, subject_verify } = this.subjectServer.state.subjectAuthInfo;
+        if (pass == 1) {
+          this.goWatchUrl();
+        } else {
+          // 预告状态、有暖场视频
+          if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
+            this.goWatchUrl();
+            return;
+          }
+          // 回放状态、开启了试看 并且观看限制不能是报名表单
+          if (item.webinar_state == 5 && is_preview == 1 && subject_verify != 2) {
+            this.goWatchUrl();
+            return;
+          }
+          this.handleAuthInfo();
         }
-        // 回放状态、开启了试看
-        if (item.webinar_state == 5 && is_preview == 1) {
-          this.goWatch();
-          return;
-        }
-        pass == 1 ? this.goWatch() : this.handleAuthInfo();
       },
       goWatch() {
         let href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
