@@ -347,7 +347,7 @@
           this.setRight();
         });
 
-        // 所有文档加载完成
+        // 当前文档加载完成
         this.docServer.$on('dispatch_doc_load_complete', val => {
           console.log('dispatch_doc_load_complete', val);
           this.setRight();

@@ -7,5 +7,5 @@ export default {
   '--theme-tab-menu-tip': '#ff0005',
   '--theme-tab-menu-bg': '#fff',
   '--theme-header-bg': 'rgba(255, 255, 255, 1)',
-  '--theme-tab-menu-border': '1px solid #f0f0f0',
+  '--theme-tab-menu-border': '1px solid #f0f0f0'
 };

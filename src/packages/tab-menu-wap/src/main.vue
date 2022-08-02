@@ -680,7 +680,7 @@
         content: '';
         position: absolute;
         bottom: 0;
-        width: 100%;
+        width: 100%; 
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
       } */
