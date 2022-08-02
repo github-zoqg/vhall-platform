@@ -58,7 +58,7 @@
       },
       async initSubjectAuth() {
         const subjectServer = useSubjectServer();
-        const visitorId = sessionStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId');
         let params = {
           subject_id: this.$route.query.id,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
