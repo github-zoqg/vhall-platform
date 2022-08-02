@@ -391,7 +391,7 @@
     height: 72px;
     width: 100%;
     margin-bottom: 20px;
-    background: #2a2a2a;
+    background: var(--header-background-color-base);
     &.vmp-basic-hd {
       display: none;
     }
@@ -413,7 +413,7 @@
     &_center {
       text-align: left;
       flex: 1;
-      color: @font-dark-normal;
+      color: var(--header-font-color-primary);
       .center_title {
         font-size: 18px;
         .tags {
@@ -471,11 +471,11 @@
       }
       .center_host {
         font-size: 14px;
-        color: @font-dark-low;
+        color: var(--header-font-color-regular);
         a {
-          color: @font-dark-low;
+          color: var(--header-font-color-regular);
           &:hover {
-            color: @font-link;
+            color: var(--header-font-color-link);
           }
         }
         span {
@@ -493,6 +493,7 @@
       .right_share {
         padding-right: 24px;
         &_icon {
+          color: var(--header-font-color-primary);
           text-align: center;
           cursor: pointer;
           i {
