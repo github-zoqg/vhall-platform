@@ -282,6 +282,9 @@
       }
       // this.initEvent();
       this.eventListener();
+
+      //TODO：临时看效果加的背景
+      document.body.style.backgroundImage = `url(${require('../../../concise-style/chat-wap/src/img/temp_bg.png')})`;
     },
     beforeDestroy() {
       //移除事件
@@ -581,7 +584,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
-      background-color: #f7f7f7;
+      background-color: var(--theme-chat-zone-bg);
 
       .virtual-list {
         height: 100%;
