@@ -234,7 +234,8 @@
       },
       // 获取专题的初始化信息
       initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId');
+        // this.$route.query.visitorId 个人主页点击专题
+        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
         let params = {
           subject_id: this.$route.query.id,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
@@ -294,17 +295,25 @@
       },
       toWatch(item) {
         this.webinarId = item.webinar_id;
-        // 预告状态、有暖场视频
-        if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
+        if (this.subjectAuthInfo.pass == 1) {
           this.goWatchUrl();
-          return;
+        } else {
+          // 预告状态、有暖场视频
+          if (item.webinar_state == 2 && item.is_open_warm_video == 1) {
+            this.goWatchUrl();
+            return;
+          }
+          // 回放状态、开启了试看 并且观看限制不能是报名表单
+          if (
+            item.webinar_state == 5 &&
+            this.subjectAuthInfo.is_preview == 1 &&
+            this.subjectAuthInfo.subject_verify != 2
+          ) {
+            this.goWatchUrl();
+            return;
+          }
+          this.handleAuthInfo();
         }
-        // 回放状态、开启了试看
-        if (item.webinar_state == 5 && this.subjectAuthInfo.is_preview == 1) {
-          this.goWatchUrl();
-          return;
-        }
-        this.subjectAuthInfo.pass == 1 ? this.goWatchUrl() : this.handleAuthInfo();
       },
       goWatchUrl() {
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarId}${window.location.search}`;
