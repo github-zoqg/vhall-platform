@@ -559,6 +559,9 @@
           .el-switch.is-checked .el-switch__core::after {
             margin-left: -13px;
           }
+          .el-checkbox__input.is-disabled .el-checkbox__inner {
+            background-color: #e6e6e6;
+          }
           &__item {
             height: 29px;
             line-height: 29px;
