@@ -50,11 +50,21 @@
             this.state = 2;
             return;
           }
+          await this.getWebinarList();
           await this.initSubjectAuth();
           this.state = 1;
         } catch (err) {
           this.state = 2;
         }
+      },
+      async getWebinarList() {
+        const subjectServer = useSubjectServer();
+        let params = {
+          subject_id: this.$route.query.id,
+          pos: 0,
+          limit: 12
+        };
+        await subjectServer.getWebinarList(params);
       },
       async initSubjectAuth() {
         const subjectServer = useSubjectServer();
