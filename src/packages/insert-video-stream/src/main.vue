@@ -443,7 +443,7 @@
               }
             );
           }
-          if (watchInitData.rebroadcast.id) {
+          if (watchInitData.rebroadcast?.id) {
             this.$message.warning('正在转播,请稍后重试');
           }
           // 当前不可演示插播, 关闭插播列表弹窗
