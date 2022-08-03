@@ -1,5 +1,10 @@
 import cssVars from 'css-vars-ponyfill';
 
+/**
+ * 获取更新主题色的 DOM 元素
+ * @param {String|Object} el 选择器 | Element
+ * @returns Element
+ */
 function queryTargetElement(el) {
   if (!el) return document.body;
   if (typeof el === 'string') {
@@ -14,6 +19,11 @@ function queryTargetElement(el) {
   }
 }
 
+/**
+ * 更新主题色
+ * @param {Object} themeMap css变量对应的map
+ * @param {Object} el 要更改css变量的元素，默认值为 body
+ */
 export const setTheme = (themeMap, el) => {
   const targetElement = queryTargetElement(el);
 
