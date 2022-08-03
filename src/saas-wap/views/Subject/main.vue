@@ -1,5 +1,5 @@
 <template>
-  <div class="subject-detail">
+  <div class="subject-detail" id="subjectDetail">
     <van-loading
       v-show="state === 0"
       size="32px"
@@ -17,7 +17,8 @@
     </van-loading>
     <div v-if="state === 1">
       <div class="subject-poster">
-        <img class="poster-image" :src="detailInfo.cover" alt="" />
+        <img class="poster-image" :src="detailInfo.cover" alt="" v-if="detailInfo.cover" />
+        <img class="poster-image" :src="defaultImages" alt="" v-else />
       </div>
       <section class="subject-header">
         <h2 class="subject-title">{{ detailInfo.title }}</h2>
@@ -87,6 +88,12 @@
           </div>
         </article>
       </section>
+      <div class="null-page" v-if="!(webinarList && webinarList.length > 0)">
+        <div class="search">
+          <img src="./img/no-search@2x.png" class="no-search" />
+          <p class="null-info">暂无数据~</p>
+        </div>
+      </div>
     </div>
     <!-- 没有此专题 -->
     <div v-if="state === 2" class="error-page">
@@ -115,6 +122,7 @@
         ></i>
       </div>
     </confirm-auth>
+    <div style="height: 60px">&nbsp;</div>
   </div>
 </template>
 
@@ -136,6 +144,7 @@
         isHidden: true,
         webinarList: [],
         total: 0,
+        defaultImages: 'https://cnstatic01.e.vhall.com/static/img/v35-subject.png',
         detailInfo: {
           cover: '',
           title: '',
@@ -171,7 +180,14 @@
             value: '回放',
             bgcolor: '#2ab804'
           }
-        ]
+        ],
+        loading: true,
+        query: {
+          pos: 0,
+          limit: 12,
+          pageNumber: 1
+        },
+        isBool: true // 是否触发下一页加载
       };
     },
     components: {
@@ -199,6 +215,7 @@
     },
     mounted() {
       this.$i18n.locale = 'zh-CN';
+      document.getElementById('subjectDetail').addEventListener('scroll', this.lazyLoading, true); // 滚动到底部，再加载的处理事件
     },
     methods: {
       liveTag(val) {
@@ -237,15 +254,33 @@
       getWebinarList() {
         let params = {
           subject_id: this.$route.query.id,
-          pos: 0,
-          limit: 12
+          pos: this.query.pos,
+          limit: this.query.limit
         };
-        this.subjectServer.getWebinarList(params).then(res => {
-          if (res.code === 200) {
-            this.webinarList = res.data.list;
-            this.total = res.data.total;
-          }
-        });
+        this.loading = true;
+        this.subjectServer
+          .getWebinarList(params)
+          .then(res => {
+            this.isBool = true;
+            this.loading = false;
+            if (res.code === 200) {
+              if (res.data.list.length > 0) {
+                // this.webinarList.unshift(...list)
+                this.webinarList = this.webinarList.concat(res.data.list);
+                console.log('每次打印出来的活动个数' + this.webinarList.length);
+                this.isPullingDown = true;
+              } else {
+                console.log('触发了结尾');
+                this.isPullingDown = false;
+              }
+              this.total = res.data.total;
+            }
+          })
+          .catch(res => {
+            console.log(res);
+            this.isBool = true;
+            this.loading = false;
+          });
       },
       // 获取专题的初始化信息
       initSubjectAuth() {
@@ -258,6 +293,36 @@
         };
         // 如果已经鉴权过，就直接进入观看端，否则走鉴权
         this.subjectServer.initSubjectInfo(params);
+      },
+      lazyLoading() {
+        // 滚动到底部，再加载的处理事件
+        const dom = document.getElementById('subjectDetail');
+        const scrollTop = dom.scrollTop || document.body.scrollTop;
+        const clientHeight = dom.clientHeight;
+        const scrollHeight = dom.scrollHeight;
+        // console.log('专题页触发scrollTop + clientHeight=' + Math.round(scrollTop + clientHeight), scrollHeight);
+        // console.log('专题页触发isBool', this.isBool);
+        // console.log('专题页触发isPullingDown', this.isPullingDown);
+        // isPullingDown => 限制加载下一页触发动作是否允许, isPullingDown => true表示还有数据
+        if (
+          Math.round(scrollTop + clientHeight) >= scrollHeight &&
+          this.isBool == true &&
+          this.isPullingDown == true
+        ) {
+          // 如果滚动到接近底部，自动加载下一页
+          // 事件处理
+          console.log('当前是否下一页');
+          this.isBool = false;
+          this.pullingDown();
+        } else {
+          // console.log('当前木的下一页');
+        }
+      },
+      pullingDown() {
+        this.query.pageNumber++;
+        this.query.pos = parseInt((this.query.pageNumber - 1) * this.query.limit);
+        this.isPullingDown = true;
+        this.getWebinarList();
       },
       // 获取微信分享信息
       async wxShareInfo(info) {
@@ -403,7 +468,7 @@
       },
       authSubmit() {
         let data = {
-          subject_id: this.detailInfo.webinar_subject.id,
+          subject_id: this.detailInfo.id,
           visitor_id: this.subjectAuthInfo.visitor_id,
           type: this.subjectAuthInfo.verify,
           verify_value: this.textAuth,
@@ -423,6 +488,10 @@
       authClose() {
         this.isShowCheck = false;
       }
+    },
+    beforeDestroy() {
+      document.getElementById('subjectDetail') &&
+        document.getElementById('subjectDetail').removeEventListener('scroll', this.lazyLoading); // 离开页面时移除
     }
   };
 </script>
