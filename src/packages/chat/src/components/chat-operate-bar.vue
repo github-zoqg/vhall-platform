@@ -88,7 +88,7 @@
                 class="chat-setting-btn vh-iconfont vh-line-audit"
                 @click.stop="toggleChatSetingBoxIsShow"
               ></i>
-              <div class="chat-setting-box" v-show="chatSetingBoxIsShow">
+              <div class="chat-setting-box" v-show="chatSetingBoxIsShow" @click.stop="">
                 <div class="chat-setting-box__item_switch switch-box">
                   <span class="switch-title">屏蔽特效</span>
                   <el-switch
