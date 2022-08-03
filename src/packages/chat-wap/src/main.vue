@@ -571,7 +571,7 @@
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
       },
-      // 聊天过滤TODO:修改过滤情况
+      // 聊天过滤
       filterChat(data) {
         console.log(this.chatList, 'this.chatList');
         if (data) {

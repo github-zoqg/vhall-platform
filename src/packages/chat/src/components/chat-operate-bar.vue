@@ -84,8 +84,15 @@
                 (configList['comment_check'] || configList['disable_msg'])
               "
             >
-              <i class="chat-setting-btn vh-iconfont vh-line-audit"></i>
-              <div class="chat-setting-box">
+              <i
+                class="chat-setting-btn vh-iconfont vh-line-audit"
+                @click.stop="chatSetingBoxIsShow = !chatSetingBoxIsShow"
+              ></i>
+              <div
+                class="chat-setting-box"
+                v-show="chatSetingBoxIsShow"
+                @mouseout="chatSetingBoxIsShow = !chatSetingBoxIsShow"
+              >
                 <div class="chat-setting-box__item_switch switch-box">
                   <span class="switch-title">屏蔽特效</span>
                   <el-switch
@@ -297,7 +304,8 @@
             name: '私聊',
             isDisable: false
           }
-        }
+        },
+        chatSetingBoxIsShow: false
       };
     },
     beforeCreate() {
@@ -305,6 +313,11 @@
     },
     mounted() {
       this.listenEvents();
+      document.addEventListener('click', () => {
+        if (this.chatSetingBoxIsShow) {
+          this.chatSetingBoxIsShow = false;
+        }
+      });
     },
     methods: {
       listenEvents() {
@@ -512,13 +525,10 @@
             &:after {
               display: block;
             }
-            .chat-setting-box {
-              display: block;
-            }
           }
         }
         .chat-setting-box {
-          display: none;
+          display: block;
           position: absolute;
           bottom: 26px;
           left: -14px;
@@ -563,6 +573,7 @@
             color: #1a1a1a;
             font-size: 12px;
             margin-right: 22px;
+            font-weight: 400;
             &.is-disabled {
               .el-checkbox__label {
                 color: #b3b3b3 !important;
