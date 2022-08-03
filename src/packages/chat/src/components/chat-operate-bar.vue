@@ -86,13 +86,9 @@
             >
               <i
                 class="chat-setting-btn vh-iconfont vh-line-audit"
-                @click.stop="chatSetingBoxIsShow = !chatSetingBoxIsShow"
+                @click.stop="toggleChatSetingBoxIsShow"
               ></i>
-              <div
-                class="chat-setting-box"
-                v-show="chatSetingBoxIsShow"
-                @mouseout="chatSetingBoxIsShow = !chatSetingBoxIsShow"
-              >
+              <div class="chat-setting-box" v-show="chatSetingBoxIsShow">
                 <div class="chat-setting-box__item_switch switch-box">
                   <span class="switch-title">屏蔽特效</span>
                   <el-switch
@@ -374,6 +370,13 @@
           return;
         }
         this.$refs.emoji.toggleShow();
+        // 关闭聊天设置弹框
+        this.chatSetingBoxIsShow = false;
+      },
+      // 打开聊天设置box
+      toggleChatSetingBoxIsShow() {
+        this.chatSetingBoxIsShow = !this.chatSetingBoxIsShow;
+        this.$refs.emoji.closeModal();
       },
       //将表情发送给input
       emojiInput(value) {
