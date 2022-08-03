@@ -425,8 +425,9 @@
       },
       // 插播文件更改
       async inertFileChange(video, type) {
+        const { watchInitData } = useRoomBaseServer().state;
         // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
-        if (!this.checkInsertFileProcess() || this.isShareScreen) {
+        if (!this.checkInsertFileProcess() || this.isShareScreen || watchInitData.rebroadcast?.id) {
           if (this.isShareScreen && this.desktopShareInfo) {
             // 当前有桌面共享，并且桌面共享演示人信息能获取的时候
             this.$alert(
@@ -441,6 +442,9 @@
                 cancelButtonClass: 'zdy-confirm-cancel'
               }
             );
+          }
+          if (watchInitData.rebroadcast.id) {
+            this.$message.warning('正在转播,请稍后重试');
           }
           // 当前不可演示插播, 关闭插播列表弹窗
           window.$middleEventSdk?.event?.send(
