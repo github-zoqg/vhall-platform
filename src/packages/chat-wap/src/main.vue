@@ -18,8 +18,8 @@
         <virtual-list
           v-if="virtual.showlist"
           ref="chatlist"
-          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
-          :keeps="20"
+          :style="{ height: chatlistHeight + 'px', overflow: allowScroll ? 'auto' : 'hidden' }"
+          :keeps="50"
           :estimate-size="100"
           :data-key="'count'"
           :data-sources="renderList"
@@ -32,7 +32,16 @@
           }"
           @totop="onTotop"
           @tobottom="toBottom"
-        ></virtual-list>
+        >
+          <div
+            class="chat_loading"
+            slot="header"
+            v-show="overflow && isLoading"
+            style="height: 20px"
+          >
+            <i class="el-icon-loading"></i>
+          </div>
+        </virtual-list>
         <div
           class="vmp-chat-wap__content__new-msg-tips"
           v-show="
@@ -154,7 +163,8 @@
         //回复或@消息id
         targetId: '',
         renderList: [],
-        isShieldingEffects: sessionStorage.getItem('isShieldingEffects') == 'true'
+        isShieldingEffects: sessionStorage.getItem('isShieldingEffects') == 'true',
+        allowScroll: true
       };
     },
     watch: {
@@ -162,6 +172,7 @@
         this.filterChat(false);
         if (this.isBottom()) {
           this.scrollBottom();
+          this.checkOverflow();
         }
       },
       isWapBodyDocSwitch() {
@@ -310,6 +321,14 @@
           });
         });
       },
+      checkOverflow() {
+        this.$nextTick(() => {
+          const vsl = this.$refs.chatlist;
+          if (vsl) {
+            this.overflow = vsl.getScrollSize() > vsl.getClientSize();
+          }
+        });
+      },
       resizeAndroid() {
         const newInnerHeight = window.innerHeight;
         if (this.innerHeight > newInnerHeight) {
@@ -440,7 +459,9 @@
         }
         const res = await this.chatServer.getHistoryMsg(data, 'h5');
         this.hideChatHistory = true;
-        this.isLoading = false;
+        this.$nextTick(() => {
+          this.isLoading = false;
+        });
         return res;
       },
       //获取第一条有msgid的消息
@@ -553,11 +574,27 @@
         if (this.isLoading) {
           return;
         }
+        this.allowScroll = false;
         const { list } = await this.getHistoryMessage();
+        const IdList = list.map(item => {
+          return item.count.toString();
+        });
         const vsl = this.$refs.chatlist;
+        console.log(IdList);
         this.$nextTick(() => {
-          // alert(this.chatList.length - offsetPos);
-          this.$refs.chatlist.scrollToIndex(list.length);
+          const offset = IdList.reduce((previousValue, currentSid) => {
+            const previousSize =
+              typeof previousValue === 'string'
+                ? vsl.getSize(Number(previousValue))
+                : previousValue;
+            console.log(previousValue);
+            console.log(vsl.getSize(Number(currentSid)));
+            return previousSize + vsl.getSize(Number(currentSid));
+          });
+          vsl.scrollToOffset(offset);
+        });
+        setTimeout(() => {
+          this.allowScroll = true;
         });
       },
       // eventBus监听
@@ -642,6 +679,9 @@
       > div:first-of-type {
         padding-top: 24px;
       }
+    }
+    .chat_loading {
+      text-align: center;
     }
     &__content {
       position: absolute;
