@@ -361,7 +361,7 @@
             this.isShareScreen &&
             this.accountId == this.desktopShareInfo.accountId
           ) {
-            this.stopShare();
+            this.stopShare('ENTER_GROUP_FROM_MAIN');
           }
         });
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -375,7 +375,7 @@
               this.accountId == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.accountId
             ) {
-              this.stopShare();
+              this.stopShare('vrtc_speaker_switch');
             }
           }
           // 演示着变更
@@ -386,7 +386,7 @@
               this.accountId == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.accountId
             ) {
-              this.stopShare();
+              this.stopShare('vrtc_presentation_screen_set');
             }
           }
           if (
@@ -414,7 +414,7 @@
               this.isShareScreen &&
               this.accountId == this.desktopShareInfo.accountId
             ) {
-              this.stopShare();
+              this.stopShare(msg.data.type);
             }
           }
 
@@ -483,8 +483,9 @@
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
+          window.vhallReportForProduct?.report(110247);
         } else {
-          this.stopShare();
+          this.stopShare('live_over');
         }
       },
 
@@ -508,6 +509,8 @@
         this.desktopShareServer
           .startShareScreen(options)
           .then(() => {
+            window.vhallReportForProduct?.report(110251);
+            window.vhallReportForProduct?.report(110254);
             this.desktopShareServer
               .publishDesktopShareStream()
               .then(() => {
@@ -517,6 +520,7 @@
                 this.docServer.resetLayoutByMiniElement();
 
                 this.setDesktop('1');
+                window.vhallReportForProduct?.report(110255);
               })
               .catch(error => {
                 console.log(error, this.$t('interact.interact_1021'));
@@ -524,6 +528,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
+            window.vhallReportForProduct?.report(110252);
             if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
@@ -532,7 +537,8 @@
           });
       },
       // 停止共享
-      async stopShare() {
+      async stopShare(source) {
+        window.vhallReportForProduct?.report(110259, { report_extra: { source: source } });
         await this.desktopShareServer.stopShareScreen();
         this.setDesktop('0');
         this.interactiveServer.resetLayout();
