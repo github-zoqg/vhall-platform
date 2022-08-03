@@ -400,7 +400,7 @@
       },
       handleAuthInfo() {
         let data = {
-          subject_id: this.detailInfo.webinar_subject.id,
+          subject_id: this.detailInfo.id,
           refer: this.$route.query.refer,
           record_id: this.$route.query.record_id,
           type: this.subjectAuthInfo.verify,
