@@ -17,28 +17,28 @@
     </van-loading>
     <div v-if="state === 1">
       <div class="subject-poster">
-        <img class="poster-image" :src="detailInfo.webinar_subject.cover" alt="" />
+        <img class="poster-image" :src="detailInfo.cover" alt="" />
       </div>
       <section class="subject-header">
-        <h2 class="subject-title">{{ detailInfo.webinar_subject.title }}</h2>
-        <p class="subject-create-time">{{ detailInfo.webinar_subject.created_at }}</p>
+        <h2 class="subject-title">{{ detailInfo.title }}</h2>
+        <p class="subject-create-time">{{ detailInfo.created_at }}</p>
         <div class="subject-info">
           <p>
             共&nbsp;
-            <span class="subject-info_num">{{ detailInfo.webinar_subject.webinar_num }}</span>
+            <span class="subject-info_num">{{ detailInfo.webinar_num }}</span>
             &nbsp;个直播
           </p>
-          <p :style="{ visibility: detailInfo.webinar_subject.hide_pv ? 'visible' : 'hidden' }">
+          <p :style="{ visibility: detailInfo.hide_pv ? 'visible' : 'hidden' }">
             <img src="./img/pv.png" alt="" />
             热度&nbsp;
-            <span class="subject-info_num">{{ detailInfo.webinar_subject.pv }}</span>
+            <span class="subject-info_num">{{ detailInfo.pv }}</span>
           </p>
           <p
             :style="{
-              visibility: detailInfo.webinar_subject.hide_appointment ? 'visible' : 'hidden'
+              visibility: detailInfo.hide_appointment ? 'visible' : 'hidden'
             }"
           >
-            <span class="subject-info_num">{{ detailInfo.webinar_subject.order_num }}</span>
+            <span class="subject-info_num">{{ detailInfo.order_num }}</span>
             &nbsp;次预约
           </p>
         </div>
@@ -50,7 +50,7 @@
           class="subject-intro_value"
           :style="`height: ${open_hide ? 'auto' : ''}`"
         >
-          <p v-html="detailInfo.webinar_subject.intro"></p>
+          <p v-html="detailInfo.intro"></p>
         </div>
         <p @click="handleOpenHide" class="subject-intro_switch">
           <i class="vh-iconfont" :class="[open_hide ? 'vh-line-arrow-up' : 'vh-line-arrow-down']" />
@@ -60,7 +60,7 @@
         <p class="subject-menu_title">目录</p>
         <article
           @click="toWatch(item)"
-          v-for="item in detailInfo.webinar_subject.webinar_list"
+          v-for="item in webinarList"
           :key="item.id"
           class="subject-menu_item clearfix"
         >
@@ -134,18 +134,21 @@
         webinarId: '',
         textAuth: '',
         isHidden: true,
+        webinarList: [],
+        total: 0,
         detailInfo: {
-          webinar_subject: {
-            cover: '',
-            title: '',
-            created_at: '',
-            webinar_num: '',
-            hide_pv: '',
-            order_num: '',
-            intro: '',
-            webinar_list: [],
-            hasDelayPermission: 0
-          }
+          cover: '',
+          title: '',
+          created_at: '',
+          webinar_num: '',
+          hide_pv: '',
+          order_num: '',
+          intro: '',
+          hasDelayPermission: 0
+        },
+        pageInfo: {
+          pos: 0,
+          limit: 12
         },
         stateArr: [
           {
@@ -223,14 +226,26 @@
           }
           this.state = 1;
           this.detailInfo = res.data;
-          this.detailInfo.webinar_subject.intro = handleIntroInfo(
-            this.detailInfo.webinar_subject.intro
-          );
+          this.detailInfo.intro = handleIntroInfo(this.detailInfo.intro);
+          this.getWebinarList();
           this.initSubjectAuth();
           this.wxShareInfo(res.data.webinar_subject);
         } catch (err) {
           this.$toast(err.msg);
         }
+      },
+      getWebinarList() {
+        let params = {
+          subject_id: this.$route.query.id,
+          pos: 0,
+          limit: 12
+        };
+        this.subjectServer.getWebinarList(params).then(res => {
+          if (res.code === 200) {
+            this.webinarList = res.data.list;
+            this.total = res.data.total;
+          }
+        });
       },
       // 获取专题的初始化信息
       initSubjectAuth() {
