@@ -229,7 +229,7 @@
           this.detailInfo.intro = handleIntroInfo(this.detailInfo.intro);
           this.getWebinarList();
           this.initSubjectAuth();
-          this.wxShareInfo(res.data.webinar_subject);
+          this.wxShareInfo(this.detailInfo);
         } catch (err) {
           this.$toast(err.msg);
         }

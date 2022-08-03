@@ -82,6 +82,7 @@
     },
     mounted() {
       console.log(this.webinarList, '???woshi我是专题下活动');
+      document.addEventListener('');
     },
     computed: {
       subjectDetailInfo() {
@@ -98,6 +99,18 @@
       }
     },
     methods: {
+      handleScroll() {
+        let dom = document.querySelector('.vmp-subject-body');
+        // let offsetTop;
+        dom.addEventListener(
+          'scroll',
+          e => {
+            let scrollTop = e.target.scrollTop;
+            console.log(scrollTop, '????ga高度');
+          },
+          true
+        );
+      },
       liveTag(val) {
         /**
          * webinar_state  1直播 2预约 3结束 4点播 5回放
