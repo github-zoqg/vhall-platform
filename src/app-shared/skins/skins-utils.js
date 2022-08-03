@@ -1,15 +1,29 @@
 import cssVars from 'css-vars-ponyfill';
 
-export const setTheme = themeMap => {
-  const body = document.body;
+function queryTargetElement(el) {
+  if (!el) return document.body;
+  if (typeof el === 'string') {
+    const selected = document.querySelector(el);
+    if (!selected) {
+      console.warn('Cannot find element: ' + el);
+      return document.body;
+    }
+    return selected;
+  } else {
+    return el;
+  }
+}
+
+export const setTheme = (themeMap, el) => {
+  const targetElement = queryTargetElement(el);
 
   /* 实现方式一 */
   Object.keys(themeMap).forEach(key => {
-    body.style.setProperty(key, themeMap[key]);
+    targetElement.style.setProperty(key, themeMap[key]);
   });
 
   /* 实现方式二 */
-  // body.style.setProperty('thee', isLight ? 'light' : 'dark')
+  // targetElement.style.setProperty('thee', isLight ? 'light' : 'dark')
 
   // 实现兼容方案
   cssVars({
