@@ -2,6 +2,7 @@
   <!-- pc专题详情页 -->
   <div
     class="vmp-watch-subject"
+    @scroll="handleScroll"
     v-loading="state === 0"
     element-loading-text="加载中"
     element-loading-background="rgba(255, 255, 255, 0.1)"
@@ -23,7 +24,14 @@
     name: 'SubjectWatch',
     data() {
       return {
-        state: 0
+        state: 0,
+        total: 0,
+        maxPage: 1,
+        pageNum: 1,
+        pageInfo: {
+          pos: 0,
+          limit: 10
+        }
       };
     },
     async created() {
@@ -62,9 +70,35 @@
         let params = {
           subject_id: this.$route.query.id,
           pos: 0,
-          limit: 12
+          limit: this.pageInfo.limit
         };
-        await subjectServer.getWebinarList(params);
+        await subjectServer.getWebinarList(params).then(res => {
+          if (res.code === 200) {
+            this.total = res.data.total;
+            this.maxPage = Math.ceil(res.data.total / this.pageInfo.limit);
+          }
+        });
+      },
+      getWebinarMoreList() {
+        console.log(this.maxPage, this.pageNum, this.total, '???!2324235');
+        const subjectServer = useSubjectServer();
+        let params = {
+          subject_id: this.$route.query.id,
+          pos: parseInt((this.pageNum - 1) * this.pageInfo.limit),
+          limit: this.pageInfo.limit
+        };
+        subjectServer.getWebinarList(params);
+      },
+      handleScroll(e) {
+        let scrollTop = e.target.scrollTop;
+        let scrollBottom = e.target.scrollHeight - scrollTop - e.target.clientHeight;
+        if (scrollBottom < 10) {
+          if (this.pageNum >= this.maxPage) {
+            return;
+          }
+          this.pageNum++;
+          this.getWebinarMoreList();
+        }
       },
       async initSubjectAuth() {
         const subjectServer = useSubjectServer();
@@ -83,8 +117,9 @@
 <style lang="less">
   .vmp-watch-subject {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background: #f7f7f7;
+    overflow: auto;
     &_error {
       width: 202px;
       height: 90px;

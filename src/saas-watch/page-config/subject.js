@@ -35,7 +35,7 @@ export default {
   // 内容区域
   layerSubjectBody: {
     component: 'VmpContainer',
-    // className: 'vmp-basic-bd',
+    className: 'vmp-subject-bd',
     children: ['comSubjectBody']
   },
   comSubjectBody: {
