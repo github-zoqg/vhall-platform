@@ -34,7 +34,7 @@
                     alt
                   />
                 </div>
-                <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
+                <p class="title" v-show="!secItem.active">{{ $tdefault(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
                   <!-- TODO:支付牌照问题 -->
                   <!-- {{

@@ -252,7 +252,7 @@
               {{
                 source.type === 'reward_pay_ok'
                   ? $t('chat.chat_1029')
-                  : `${$t('chat.chat_1032')}${source.content.gift_name}`
+                  : `${$t('chat.chat_1032')} ${$tdefault(source.content.gift_name)}`
               }}
             </span>
             <div
