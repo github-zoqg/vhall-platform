@@ -553,6 +553,10 @@ export default {
     interact_tools_1090: '汽车'
   },
   setting: {
+    setting_1002: '观看设置',
+    setting_1003: '摄像头',
+    setting_1004: '麦克风',
+    setting_1005: '扬声器',
     setting_1006: '推流画面',
     setting_1007: '图片',
     setting_1008: '设备切换中，请稍后…',

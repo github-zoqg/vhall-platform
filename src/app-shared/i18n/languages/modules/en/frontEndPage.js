@@ -558,6 +558,10 @@ export default {
     interact_tools_1090: 'Car'
   },
   setting: {
+    setting_1002: 'View settings',
+    setting_1003: 'Camera',
+    setting_1004: 'Microphone',
+    setting_1005: 'Speaker',
     setting_1006: 'Screen',
     setting_1007: 'Picture',
     setting_1008: 'Device switching, please wait...',
