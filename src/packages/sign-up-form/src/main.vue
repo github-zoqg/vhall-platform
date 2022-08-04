@@ -1150,9 +1150,9 @@
         } else {
           this.isSubject = false;
           this.initViewData();
+          await this.getWebinarInfo(); // 活动下调用活动类型接口
         }
         this.visible = true;
-        await this.getWebinarType();
         this.getBaseInfo();
         this.getQuestionList();
       },
@@ -1166,18 +1166,21 @@
           this.isSubscribe = 1;
           this.activeTab = 1;
         } else {
-          await this.getWebinarType();
+          await this.getWebinarInfo();
         }
         this.getBaseInfo();
         this.getQuestionList();
       },
-      //获取活动类型
-      getWebinarType() {
-        return this.signUpFormServer
-          .getWebinarType(this.setParamsIdByRoute({}))
+      // 获取活动信息
+      getWebinarInfo() {
+        return this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
+          })
           .then(res => {
-            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+            this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
@@ -1780,61 +1783,47 @@
       },
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
-        this.signUpFormServer.getWebinarType(this.setParamsIdByRoute({})).then(res => {
-          if (res.code == 512503 || res.code == 512502) {
-            window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
-            return false;
-          }
-          // 如果是独立链接，判断状态进行跳转
-          if (this.isEntryForm) {
-            this.gotoWebinarPage(res, isSubmitForm);
-          } else {
-            // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
-            if (res.data.webinar.type == 2 && isSubmitForm) {
-              // 如果是预约状态，显示开播时间提醒
-              this.$alert(
-                this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
-                this.$t('account.account_1061'),
-                {
-                  confirmButtonText: this.$t('common.common_1033'),
-                  customClass: 'zdy-alert-box',
-                  callback: action => {
-                    console.log(action);
-                    this.closePreview();
-                    if (this.isSubject) {
-                      const queryString = this.$route.query.refer
-                        ? `?refer=${this.$route.query.refer}`
-                        : '';
-                      window.location.href =
-                        window.location.origin +
-                        process.env.VUE_APP_WEB_KEY +
-                        `/lives/${res.data.webinar.type == 1 ? 'watch' : 'subscribe'}/${
-                          this.webinarOrSubjectId
-                        }${queryString}`;
-                    } else {
+        if (this.isSubject) {
+          // 当前是点击专题下的活动进入的时候，直接跳转/lives/watch（由该页面自行判断页面跳转)
+          const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+        } else {
+          // 当前是正常活动点开
+          this.signUpFormServer.getWebinarInfo(this.setParamsIdByRoute({})).then(res => {
+            if (res.code == 512503 || res.code == 512502) {
+              window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
+              return false;
+            }
+            // 如果是独立链接，判断状态进行跳转
+            if (this.isEntryForm) {
+              this.gotoWebinarPage(res, isSubmitForm);
+            } else {
+              // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
+              if (res.data.webinar.type == 2 && isSubmitForm) {
+                // 如果是预约状态，显示开播时间提醒
+                this.$alert(
+                  this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
+                  this.$t('account.account_1061'),
+                  {
+                    confirmButtonText: this.$t('common.common_1033'),
+                    customClass: 'zdy-alert-box',
+                    callback: action => {
+                      console.log(action);
+                      this.closePreview();
                       location.reload();
                     }
                   }
-                }
-              );
-            } else {
-              this.closePreview();
-              if (this.isSubject) {
-                const queryString = this.$route.query.refer
-                  ? `?refer=${this.$route.query.refer}`
-                  : '';
-                window.location.href =
-                  window.location.origin +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/${res.data.webinar.type == 1 ? 'watch' : 'subscribe'}/${
-                    this.webinarOrSubjectId
-                  }${queryString}`;
+                );
               } else {
+                this.closePreview();
                 location.reload();
               }
             }
-          }
-        });
+          });
+        }
       },
       // 跳转活动页
       gotoWebinarPage(res, isSubmitForm) {

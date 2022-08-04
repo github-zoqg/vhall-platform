@@ -686,7 +686,7 @@
         // } else {
         //   this.$i18n.locale = 'zh';
         // }
-        this.getWebinarType();
+        this.getWebinarInfo();
         this.getBaseInfo();
         this.getQuestionList();
       },
@@ -743,15 +743,30 @@
             this.formOpenLinkStatus = 2;
           });
       },
-      //获取活动类型
-      getWebinarType() {
-        return this.signUpFormServer
-          .getWebinarType(this.setParamsIdByRoute({}))
-          .then(res => {
-            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+      // 获取活动信息 及 分享信息
+      getWebinarInfo() {
+        return this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
+          })
+          .then(async res => {
+            this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
             this.cascadeResultList = [];
-            this.wxShareInfo(res.data.webinar);
+            const shareInfo = await this.roomBaseServer.getShareSettingInfo({
+              webinarId: res.data.id
+            });
+            if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
+              let title = shareInfo.data.title;
+              title = title.length - 30 > 0 ? title.substring(0, 30) : title;
+              let shareInfo = {
+                title: title,
+                img_url: shareInfo.data.img_url,
+                introduction: replaceHtml(shareInfo.data.introduction, 42)
+              };
+              this.wxShareInfoWebinar(shareInfo);
+            }
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
@@ -1099,12 +1114,15 @@
       },
       //获取活动报名状态
       getWebinarStatus() {
-        this.signUpFormServer
-          .getWebinarType(this.setParamsIdByRoute({}))
+        return this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
+          })
           .then(res => {
             const queryString = this.returnQueryString();
-            if (res.data.webinar.type == 2) {
-              this.startTime = res.data.webinar.start_time;
+            if (res.data.webinar_type == 2) {
+              this.startTime = res.data.start_time;
               this.queryString = queryString;
               this.isSubmitSuccess = true;
             } else {
@@ -1273,7 +1291,7 @@
         };
       },
       // 获取微信分享信息
-      wxShareInfo(info) {
+      wxShareInfoWebinar(info) {
         const wx_url =
           window.location.protocol +
           process.env.VUE_APP_WAP_WATCH +
@@ -1294,7 +1312,7 @@
             initWeChatSdk(
               { ...params },
               {
-                title: info.subject,
+                title: info.title,
                 desc,
                 link:
                   window.location.protocol +
