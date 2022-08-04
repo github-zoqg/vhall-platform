@@ -449,7 +449,9 @@ export default {
     form_1085: '',
     form_1086: '',
     form_1087: 'Enviar con éxito, gracias por su participación',
-    form_1088: 'Enviar con éxito'
+    form_1088: 'Enviar con éxito',
+    form_1089: '',
+    form_1090: ''
   },
   menu: {
     menu_1001: 'Documentación',
@@ -563,6 +565,10 @@ export default {
     interact_tools_1090: ''
   },
   setting: {
+    setting_1002: '',
+    setting_1003: '',
+    setting_1004: '',
+    setting_1005: '',
     setting_1006: 'Pantalla de flujo de empuje',
     setting_1007: 'Imagen',
     setting_1008: 'Cambiando el dispositivo, por favor, espere ...',
