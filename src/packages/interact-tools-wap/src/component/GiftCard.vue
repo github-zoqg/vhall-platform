@@ -34,7 +34,7 @@
                     alt
                   />
                 </div>
-                <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
+                <p class="title" v-show="!secItem.active">{{ $tdefault(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
                   <!-- TODO:支付牌照问题 -->
                   <!-- {{
@@ -134,6 +134,7 @@
             gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
             source_status: msg.data.source_status
           },
+          roleName: 2,
           type: 'gift_send_success',
           interactToolsStatus: true
         };
