@@ -355,7 +355,8 @@ export default {
     chat_1094: '',
     chat_1095: '',
     chat_1096: '',
-    chat_1097: ''
+    chat_1097: '',
+    chat_1098: 'Hace clic para ver los detalles'
   },
   form: {
     form_1001: 'Nombre',
@@ -555,13 +556,13 @@ export default {
     interact_tools_1082: '',
     interact_tools_1083: '',
     interact_tools_1085: '',
-    interact_tools_1086: ''
+    interact_tools_1086: '',
+    interact_tools_1087: '',
+    interact_tools_1088: '',
+    interact_tools_1089: '',
+    interact_tools_1090: ''
   },
   setting: {
-    setting_1002: 'Configuración de la vista',
-    setting_1003: 'Cámara',
-    setting_1004: 'Micrófono',
-    setting_1005: 'Altavoz',
     setting_1006: 'Pantalla de flujo de empuje',
     setting_1007: 'Imagen',
     setting_1008: 'Cambiando el dispositivo, por favor, espere ...',
@@ -814,7 +815,8 @@ export default {
     interact_1037: '',
     interact_1038: '',
     interact_1039: '',
-    interact_1040: ''
+    interact_1040: '',
+    interact_1041: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',

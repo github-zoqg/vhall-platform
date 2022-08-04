@@ -348,7 +348,8 @@ export default {
     chat_1094: '仅查看聊天内容',
     chat_1095: '聊天设置',
     chat_1096: '已开启仅查看聊天内容',
-    chat_1097: '已关闭仅查看聊天内容'
+    chat_1097: '已关闭仅查看聊天内容',
+    chat_1098: '点击查看'
   },
   form: {
     form_1001: '姓名',
@@ -480,7 +481,7 @@ export default {
     interact_tools_1018: '请填写领奖信息，方便主办方与您联系',
     interact_tools_1019: '提交',
     interact_tools_1020: '中奖名单',
-    interact_tools_1021: '正在进行抽奖环节',
+    interact_tools_1021: '正在进行抽奖...',
     interact_tools_1022: '很遗憾，您没有中奖！',
     interact_tools_1023: '恭喜您中奖了！',
     interact_tools_1024: '签到',
@@ -520,9 +521,9 @@ export default {
     interact_tools_1057: '进行中...',
     interact_tools_1058: '免费',
     interact_tools_1059: '咖啡',
-    interact_tools_1060: '赞',
+    interact_tools_1060: '爱心',
     interact_tools_1061: '鼓掌',
-    interact_tools_1062: '鲜花',
+    interact_tools_1062: '玫瑰',
     interact_tools_1063: '礼物赠送成功',
     interact_tools_1064: '请选择礼物',
     interact_tools_1065: '发送口令{n}参与抽奖吧',
@@ -545,13 +546,13 @@ export default {
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
     interact_tools_1085: '领取Top10名单',
-    interact_tools_1086: '公告'
+    interact_tools_1086: '公告',
+    interact_tools_1087: '火箭',
+    interact_tools_1088: '飞机',
+    interact_tools_1089: '礼炮',
+    interact_tools_1090: '汽车'
   },
   setting: {
-    setting_1002: '观看设置',
-    setting_1003: '摄像头',
-    setting_1004: '麦克风',
-    setting_1005: '扬声器',
     setting_1006: '推流画面',
     setting_1007: '图片',
     setting_1008: '设备切换中，请稍后…',

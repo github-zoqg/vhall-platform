@@ -101,7 +101,7 @@
             {{ source.nickname | overHidden(8) }}
           </span>
           <span class="new-gift-content">
-            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
+            {{ $t('chat.chat_1061') }} {{ $tdefault(source.content.gift_name) | overHidden(10) }}
           </span>
           <div
             v-if="source.content.source_status == 1"
