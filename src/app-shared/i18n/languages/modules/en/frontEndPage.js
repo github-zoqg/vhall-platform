@@ -442,7 +442,9 @@ export default {
     form_1085: 'address',
     form_1086: '',
     form_1087: 'Submitted successfully, thank you for your participation',
-    form_1088: 'Submitted successfully'
+    form_1088: 'Submitted successfully',
+    form_1089: 'Fill in',
+    form_1090: 'Filled'
   },
   menu: {
     menu_1001: 'Doc',
