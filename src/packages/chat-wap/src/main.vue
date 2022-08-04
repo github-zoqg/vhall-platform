@@ -22,7 +22,7 @@
           :keeps="50"
           :estimate-size="100"
           :data-key="'count'"
-          :data-sources="chatList"
+          :data-sources="renderList"
           :data-component="msgItem"
           :extra-props="{
             previewImg: previewImg.bind(this),
@@ -72,6 +72,7 @@
       @showUserPopup="showUserPopup"
       @login="handleLogin"
       @sendEnd="sendMsgEnd"
+      @filterChat="filterChat"
     ></send-box>
   </div>
 </template>
@@ -161,11 +162,14 @@
         hideChatHistory: false,
         //回复或@消息id
         targetId: '',
+        renderList: [],
+        isShieldingEffects: sessionStorage.getItem('isShieldingEffects') == 'true',
         allowScroll: true
       };
     },
     watch: {
       chatList: function () {
+        this.filterChat(false);
         if (this.isBottom()) {
           this.scrollBottom();
           this.checkOverflow();
@@ -603,6 +607,51 @@
       //关闭遮罩层
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
+      },
+      // 聊天过滤
+      filterChat(data) {
+        console.log(this.chatList, 'this.chatList');
+        if (data) {
+          this.scrollBottom();
+        }
+        // 过滤特效
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitSetHideEffect', [
+            sessionStorage.getItem('isShieldingEffects') == 'true'
+          ])
+        );
+        // 实现主看主办方效果
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') != 'true'
+        ) {
+          console.log('onlyShowSponsor');
+          return (this.renderList = this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName)
+          ));
+        }
+        // 实现主看主办方效果&&仅查看聊天内容
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') == 'true'
+        ) {
+          console.log('onlyShowSponsor');
+          return (this.renderList = this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName) && ['text', 'image'].includes(item.type)
+          ));
+        }
+        // 实现仅查看聊天消息
+        if (
+          sessionStorage.getItem('only_isChat') == 'true' &&
+          sessionStorage.getItem('onlyShowSponsor') != 'true'
+        ) {
+          console.log('only_isChat');
+          // undefined为历史聊天消息
+          return (this.renderList = this.chatList.filter(item =>
+            ['text', 'image'].includes(item.type)
+          ));
+        }
+        return (this.renderList = this.chatList);
       }
     }
   };

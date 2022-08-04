@@ -22,7 +22,7 @@
     data() {
       return {
         //是否屏蔽特效
-        hideEffect: false,
+        hideEffect: sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true',
         showEffectStatus: false,
         taskQueue: null, // 飘窗列队
         isSvga: true

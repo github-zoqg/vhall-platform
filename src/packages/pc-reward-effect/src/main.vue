@@ -86,7 +86,7 @@
           // 'bg-custom': 'bg-custom' //用户自定义礼物
         },
         //是否屏蔽特效
-        hideEffect: false,
+        hideEffect: sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true',
         rewardEffectList: [],
         showEffectStatus: false, //是否显示礼物动画, 如果当前tab为聊天时才显示
         taskQueue: null // 飘窗列队
@@ -195,6 +195,7 @@
               source_status: msg.data.source_status
             },
             type: 'gift_send_success',
+            roleName: 2,
             interactToolsStatus: true
           };
           this.chatServer.addChatToList(data);

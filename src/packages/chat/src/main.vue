@@ -78,6 +78,7 @@
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @onSwitchShowSponsor="onSwitchShowSponsor"
+        @onSwitchShowIsChat="onSwitchShowIsChat"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
         @sendEnd="sendMsgEnd"
@@ -195,7 +196,7 @@
         //礼物特效数组
         specialEffectsList: [],
         //只看主办方
-        isOnlyShowSponsor: false,
+        isOnlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
         //特效样式map
         effectsMap: {
           鲜花: 'bg-flower',
@@ -231,7 +232,7 @@
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
-      //视图中渲染的消息,为了实现主看主办方效果
+      //视图中渲染的消息
       renderList() {
         let list = this.chatList;
         // 实现主看主办方效果
@@ -620,8 +621,12 @@
         // useChatServer().clearChatMsg();
         // await this.getHistoryMsg();
         // this.$nextTick(() => {
-        //   this.scrollBottom();
+        this.scrollBottom();
         // });
+      },
+      // 仅查看聊天内容
+      onSwitchShowIsChat() {
+        this.scrollBottom();
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {
