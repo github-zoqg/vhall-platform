@@ -31,7 +31,7 @@
           "
         >
           <!-- 礼物标题 -->
-          送出{{ rewardEffectInfo.data.gift_name }}
+          {{ `${$t('chat.chat_1032')} ${$tdefault(rewardEffectInfo.data.gift_name)}` }}
           <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}

@@ -154,6 +154,18 @@
       // 退出全屏   原因同wap-stream-remote
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
+      },
+      // 权限list
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
@@ -199,7 +211,7 @@
             未检测时，则检测互动SDK的支持情况
               不支持上麦时，确认是否在麦上
           */
-          if (this.mediaCheckServer.state.isBrowserNotSupport) {
+          if (this.mediaCheckServer.state.isBrowserNotSupport && !this.hideItem) {
             this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();
