@@ -246,13 +246,13 @@
           list = this.chatList.filter(item => ['text', 'image'].includes(item.type));
         }
         // 实现仅查看聊天消息
-        if (this.$refs.chatOperator?.filterStatus.isShieldingEffects) {
-          // undefined为历史聊天消息
-          return this.chatList.filter(
-            item => !['gift_send_success', 'free_gift_send'].includes(item.type)
-          );
-        }
-        console.log(list);
+        // if (this.$refs.chatOperator?.filterStatus.isShieldingEffects) {
+        //   // undefined为历史聊天消息
+        //   return this.chatList.filter(
+        //     item => !['gift_send_success', 'free_gift_send'].includes(item.type)
+        //   );
+        // }
+        // console.log(list);
         return list;
       },
       // 是否观看端
