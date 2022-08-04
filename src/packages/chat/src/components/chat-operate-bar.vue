@@ -90,7 +90,7 @@
               ></i>
               <div class="chat-setting-box" v-show="chatSetingBoxIsShow" @click.stop="">
                 <div class="chat-setting-box__item_switch switch-box">
-                  <span class="switch-title">屏蔽特效</span>
+                  <span class="switch-title">屏蔽礼物特效</span>
                   <el-switch
                     class="switch"
                     v-model="filterStatus.isShieldingEffects"
@@ -100,7 +100,7 @@
                   />
                 </div>
                 <div class="chat-setting-box__item_switch switch-box switch-box_bottom">
-                  <span class="switch-title">仅查看聊天内容</span>
+                  <span class="switch-title">仅看聊天信息</span>
                   <el-switch
                     class="switch"
                     v-model="filterStatus.isChat"
