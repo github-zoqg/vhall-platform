@@ -62,7 +62,11 @@
         </template>
         <div
           class="subscribe_into_container"
-          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType != 2)"
+          v-if="
+            ((subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
+              !isEmbed) ||
+            (isEmbed && webinarType != 2)
+          "
         >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -102,7 +106,12 @@
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
-    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
+    <template
+      v-if="
+        showBottomBtn &&
+        (subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1))
+      "
+    >
       <div class="vmp-subscribe-body-auth">
         <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -198,7 +207,7 @@
   } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
-  import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
     data() {

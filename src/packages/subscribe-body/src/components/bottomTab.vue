@@ -260,6 +260,8 @@
                   : this.$t('webinar.webinar_1041', { n: `￥${this.fee}` });
             } else if (this.verify == 4) {
               ret = this.handleTypeText();
+            } else if (this.verify == 5) {
+              ret = this.handleTypeText();
             } else if (this.verify == 6) {
               ret = this.$t('appointment.appointment_1011');
               this.addText =

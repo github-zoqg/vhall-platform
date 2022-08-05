@@ -134,6 +134,10 @@
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -150,9 +154,9 @@
                 _embedQuery.indexOf('record_id=') > -1
                   ? _embedQuery.replace('record_id=', 'rid=')
                   : _embedQuery;
-              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+              window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
             } else {
-              window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+              window.location.href = `${origin}/${this.$route.params.id}`;
             }
             break;
           case 512002:
