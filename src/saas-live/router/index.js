@@ -6,6 +6,7 @@ import ChatAuth from '@/packages/chat-auth/index';
 import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import { sessionOrLocal } from '@/packages/chat/src/js/utils';
 
 Vue.use(VueRouter);
 
@@ -131,6 +132,10 @@ router.beforeEach(async (to, from, next) => {
           next();
         }
       }
+    } else if ([512506, 512507, 511058, 511005, 511006, 511007, 510008].includes(res.code)) {
+      sessionOrLocal.set('token', '', 'localStorage');
+      sessionOrLocal.set('live_token', '', 'localStorage');
+      location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
     } else {
       next({
         name: 'PageError',
