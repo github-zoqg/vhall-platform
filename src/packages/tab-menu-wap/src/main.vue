@@ -96,11 +96,11 @@
       };
     },
     computed: {
-      themeBgColor() {
-        return {
-          'background-color': this.themeClass.pageBg
-        };
-      },
+      // themeBgColor() {
+      //   return {
+      //     'background-color': this.themeClass.pageBg
+      //   };
+      // },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -680,7 +680,7 @@
         content: '';
         position: absolute;
         bottom: 0;
-        width: 100%; 
+        width: 100%;
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
       } */
@@ -773,6 +773,7 @@
           width: 40px;
           height: 5px;
           border-radius: 3px;
+          background: var(--theme-tab-menu-tip);
         }
 
         &:hover {
@@ -782,7 +783,7 @@
         }
 
         &__active {
-          color: var(--theme-tab-menu-font);
+          color: var(--theme-tab-menu-font-active);
           position: relative;
 
           .bottom-line {

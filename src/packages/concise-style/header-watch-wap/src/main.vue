@@ -293,10 +293,10 @@
         margin-left: 12px;
         padding: 8px 16px;
         border-radius: 30px;
-        color: #fff;
+        color: var(--theme-header-attention-color);
         font-size: 24px;
         line-height: 28px;
-        background: linear-gradient(280.56deg, #fb2626 9.45%, #ff685f 90.39%);
+        background: var(--theme-header-attention-bg);
       }
     }
     .host-user-info__middle-num {
