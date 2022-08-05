@@ -136,23 +136,31 @@
           // TODO: 根据状态判断是极简风格还是传统风格
           // concise-极简风格    main-传统风格    fashion——时尚风格
           // TODO: 暂时存到session中，之后再改。
-          let room_style = window.sessionStorage.getItem('room_style');
-          if (room_style) {
-            this.isConcise = room_style == 'concise';
-            setPage(room_style == 'fashion' ? 'main' : room_style);
-            if (room_style == 'fashion') {
-              console.log(window.$serverConfig);
+          let room_theme = window.localStorage.getItem('room_theme');
+          if (room_theme) {
+            this.isConcise = room_theme == 'concise';
+            setPage(room_theme == 'fashion' ? 'main' : room_theme);
+            if (room_theme == 'fashion') {
+              // console.log(window.$serverConfig);
               window.$serverConfig.comChatWap.component = 'VmpChatWapFashion';
               window.$serverConfig._page = 'fashion';
             }
           } else {
-            window.sessionStorage.setItem('room_style', 'concise');
-            setPage('concise');
+            room_theme = 'main';
+            window.localStorage.setItem('room_theme', room_theme);
+            setPage(room_theme);
           }
 
-          // 设置主题
+          // 设置主题颜色
           window.skins = skins;
-          skins.setTheme(skins.themes.themeFestiveRed);
+          let room_skin = window.localStorage.getItem('room_skin');
+          if (!room_skin) {
+            room_skin = 'white';
+            window.localStorage.setItem('room_skin', room_skin);
+          }
+          skins.setTheme(skins.themes[`theme_${room_theme}_${room_skin}`]);
+          console.log('当前主题是', room_theme, room_skin);
+          this.drawTheme(room_theme, room_skin);
 
           await roomState();
 
@@ -294,6 +302,23 @@
         window.location.replace(
           `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`
         );
+      },
+      drawTheme(theme, skin) {
+        if (theme == 'main' && (skin == 'black' || skin == 'white')) {
+          if (skin == 'black') {
+            document.body.style.background = `#333`;
+          }
+          if (skin == 'white') {
+            document.body.style.background = `#fff`;
+          }
+        } else {
+          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+            theme +
+            '_' +
+            skin +
+            '.png')})`;
+          document.body.style.backgroundSize = 'cover';
+        }
       }
     }
   };

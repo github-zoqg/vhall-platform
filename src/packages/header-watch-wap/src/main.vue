@@ -202,7 +202,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
+
     .host-user-info {
+      color: var(--theme-header-font-color);
       .ellipsis();
       font-size: 28px;
       line-height: 71px;
@@ -223,6 +225,7 @@
     .tool-box {
       display: flex;
       justify-content: space-between;
+      color: var(--theme-header-icon-color);
       i {
         margin-left: 37px;
         font-size: 30px;
