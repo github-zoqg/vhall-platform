@@ -1805,6 +1805,8 @@
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
         if (this.isSubject) {
+          // 报名成功的操作，跳转到直播间
+          this.closePreview();
           // 当前是点击专题下的活动进入的时候，直接跳转/lives/watch（由该页面自行判断页面跳转)
           const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
           const href =
