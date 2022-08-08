@@ -36,7 +36,7 @@
           >
             <span class="item-text">{{ $tdefault(item.name) }}</span>
             <i class="tips" v-show="item.tipsVisible"></i>
-            <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
+            <hr v-show="selectedId === item.id" class="bottom-line" />
           </li>
         </ul>
 
@@ -96,11 +96,11 @@
       };
     },
     computed: {
-      themeBgColor() {
-        return {
-          'background-color': this.themeClass.pageBg
-        };
-      },
+      // themeBgColor() {
+      //   return {
+      //     'background-color': this.themeClass.pageBg
+      //   };
+      // },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -636,7 +636,7 @@
   .vmp-tab-menu {
     height: 100%;
     position: relative;
-    background: var(--theme-default-bg);
+    background: var(--theme-tab-menu-bg);
     font-size: 28px;
     display: flex;
     flex-direction: column;
@@ -665,6 +665,7 @@
     }
     .tab_box {
       height: 80px;
+      background: var(--theme-tab-menu-box-bg);
     }
     &__header {
       position: relative;
@@ -680,7 +681,7 @@
         content: '';
         position: absolute;
         bottom: 0;
-        width: 100%; 
+        width: 100%;
         height: 1px;
         border-bottom: 1px solid #d4d4d4;
       } */
@@ -773,6 +774,7 @@
           width: 40px;
           height: 5px;
           border-radius: 3px;
+          background: var(--theme-tab-menu-tip);
         }
 
         &:hover {
@@ -782,7 +784,7 @@
         }
 
         &__active {
-          color: var(--theme-tab-menu-font);
+          color: var(--theme-tab-menu-font-active);
           position: relative;
 
           .bottom-line {

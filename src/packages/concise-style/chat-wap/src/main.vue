@@ -289,9 +289,6 @@
       }
       // this.initEvent();
       this.eventListener();
-
-      //TODO：临时看效果加的背景
-      document.body.style.backgroundImage = `url(${require('./img/temp_bg.png')})`;
     },
     beforeDestroy() {
       //移除事件

@@ -303,6 +303,23 @@
         skins.setTheme(skins.themes[themeMap[skinInfo?.bgColor || 2]]);
         // 挂载到window方便调试
         window.skins = skins;
+      },
+      drawTheme(theme, skin) {
+        if (theme == 'main' && (skin == 'black' || skin == 'white')) {
+          if (skin == 'black') {
+            document.body.style.background = `#333`;
+          }
+          if (skin == 'white') {
+            document.body.style.background = `#fff`;
+          }
+        } else {
+          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+            theme +
+            '_' +
+            skin +
+            '.png')})`;
+          document.body.style.backgroundSize = 'cover';
+        }
       }
     }
   };

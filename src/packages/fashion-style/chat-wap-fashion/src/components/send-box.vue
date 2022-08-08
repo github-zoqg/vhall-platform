@@ -485,7 +485,7 @@
         align-items: center;
 
         .content-input__placeholder {
-          background-color: #f5f5f5;
+          background-color: var(--theme-chat-input-bg);
           color: #bfbfbf;
           border-radius: 40px;
           width: 100%;

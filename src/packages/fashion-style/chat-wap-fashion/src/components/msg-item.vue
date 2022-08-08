@@ -535,11 +535,11 @@
         position: relative;
         .msg-content_body {
           position: relative;
-          background: rgba(255, 255, 255, 0.85);
+          background: var(--theme-chat-msg-bg);
           border-radius: 30px;
           padding: 10px 12px;
           word-break: break-all;
-          color: rgba(0, 0, 0, 0.85);
+          color: var(--theme-chat-msg-font);
           font-size: 26px;
           .chat-text {
             img {
@@ -568,10 +568,10 @@
                 word-break: break-word;
               }
               .nickname {
-                color: rgba(0, 0, 0, 0.65);
+                color: var(--theme-chat-msg-name-font);
               }
               .chat-text {
-                color: rgba(0, 0, 0, 0.85);
+                color: var(--theme-chat-msg-font);
               }
             }
             > .imgs {
@@ -602,10 +602,10 @@
               line-height: 36px;
               font-size: 24px;
               .nickname {
-                color: rgba(0, 0, 0, 0.45);
+                color: var(--theme-chat-msg-reply-name-font);
               }
               .chat-text {
-                color: rgba(0, 0, 0, 0.65);
+                color: var(--theme-chat-msg-reply-font);
               }
               .role {
                 opacity: 0.65;
@@ -636,7 +636,7 @@
               position: absolute;
               top: 0;
               left: 0;
-              background: rgba(0, 0, 0, 0.25);
+              background: var(--theme-chat-msg-reply-after);
               border-radius: 3px;
             }
             .existSimpleImg .msg-content_chat-img {
@@ -649,10 +649,10 @@
             > .textInfo {
               line-height: 38px;
               .nickname {
-                color: rgba(0, 0, 0, 0.65);
+                color: var(--theme-chat-msg-name-font);
               }
               .chat-text {
-                color: rgba(0, 0, 0, 0.85);
+                color: var(--theme-chat-msg-reply-content);
               }
             }
 
@@ -683,7 +683,7 @@
             padding: 0 !important;
             .msg-showtime {
               font-size: 28px;
-              color: rgba(0, 0, 0, 0.85);
+              color: var(--theme-chat-msg-timeline);
               text-align: center;
             }
           }
@@ -698,12 +698,12 @@
         padding-left: 0;
         position: relative;
         display: block;
-        color: rgba(0, 0, 0, 0.85);
+        color: var(--theme-chat-msg-font);
         &.interact {
           justify-content: unset;
         }
         > div {
-          background: rgba(255, 255, 255, 0.85);
+          background: var(--theme-chat-msg-bg);
           border-radius: 30px;
           position: relative;
           font-size: 26px;
@@ -720,10 +720,10 @@
           border: none;
 
           .new-gift-name {
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--theme-chat-msg-name-font);
           }
           .new-gift-content {
-            color: rgba(0, 0, 0, 0.65);
+            color: var(--theme-chat-msg-font);
           }
           .gift-zdy {
             width: 40px;
@@ -761,10 +761,10 @@
             left: 12px;
           }
           .nickname {
-            color: rgba(0, 0, 0, 0.65);
+            color: var(--theme-chat-msg-name-font);
           }
           .chat-text {
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--theme-chat-msg-font);
           }
         }
       }
