@@ -2,7 +2,11 @@
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
-        <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+        <el-image
+          v-if="formInfo && formInfo.cover != 1"
+          :src="formInfo.cover ? coverPic : defaultHeader"
+          fit="cover"
+        ></el-image>
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
@@ -264,7 +268,7 @@
             </div>
             <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
           </li>
-          <li class="tab-content-li">
+          <li class="tab-content-li" v-show="loadingEnd">
             <button @click="submit" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1019') }}
             </button>
@@ -493,14 +497,24 @@
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
+        ajaxInfoEnd: false,
+        ajaxListEnd: false,
         interfaceType:
           window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     computed: {
+      // 报名表单是否加载完毕
+      loadingEnd() {
+        return this.ajaxInfoEnd && this.ajaxListEnd;
+      },
       // 广告头图
       coverPic() {
-        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover != 1) {
+          return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        } else {
+          return '';
+        }
       },
       //当前的城市列表
       currentCityList() {
@@ -802,24 +816,31 @@
       },
       //获取表单基本信息
       getBaseInfo() {
-        this.signUpFormServer.getFormBaseInfo(this.setParamsIdByRoute({})).then(res => {
-          if (res.data.tab_form_title) {
-            res.data.tab_form_title =
-              this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
-                ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
-                : res.data.tab_form_title;
-          }
-          if (res.data.tab_verify_title) {
-            res.data.tab_verify_title =
-              this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
-                ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
-                : res.data.tab_verify_title;
-          }
-          this.formInfo = res.data;
-          this.$nextTick(() => {
-            this.calculateText();
+        this.ajaxInfoEnd = false;
+        this.signUpFormServer
+          .getFormBaseInfo(this.setParamsIdByRoute({}))
+          .then(res => {
+            this.ajaxInfoEnd = true;
+            if (res.data.tab_form_title) {
+              res.data.tab_form_title =
+                this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                  : res.data.tab_form_title;
+            }
+            if (res.data.tab_verify_title) {
+              res.data.tab_verify_title =
+                this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                  : res.data.tab_verify_title;
+            }
+            this.formInfo = res.data;
+            this.$nextTick(() => {
+              this.calculateText();
+            });
+          })
+          .catch(e => {
+            this.ajaxInfoEnd = true;
           });
-        });
       },
       //计算简介文字是否过长
       calculateText() {
@@ -833,9 +854,11 @@
       },
       //获取问题列表
       getQuestionList() {
+        this.ajaxListEnd = false;
         this.signUpFormServer
           .getQuestionsList(this.setParamsIdByRoute({}))
           .then(res => {
+            this.ajaxListEnd = true;
             // 按照 order_num 从小到大排序
             const list = res.data.ques_list.sort(this.compare('order_num'));
             this.currentPhone = res.data.phone;
@@ -871,6 +894,7 @@
             this.generateRefArr(list);
           })
           .catch(error => {
+            this.ajaxListEnd = true;
             console.log(error);
           });
       },

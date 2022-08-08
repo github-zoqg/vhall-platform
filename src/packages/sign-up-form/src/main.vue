@@ -5,7 +5,11 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+            <el-image
+              v-if="formInfo && formInfo.cover != 1"
+              :src="formInfo.cover ? coverPic : defaultHeader"
+              fit="cover"
+            ></el-image>
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
@@ -359,7 +363,11 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+          <el-image
+            v-if="formInfo && formInfo.cover != 1"
+            :src="formInfo.cover ? coverPic : defaultHeader"
+            fit="cover"
+          ></el-image>
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
@@ -624,7 +632,7 @@
                     </el-checkbox>
                   </template>
                 </el-form-item>
-                <div class="btn-box">
+                <div class="btn-box" v-show="loadingEnd">
                   <el-button
                     style="margin-top: 11px"
                     :disabled="isPreview"
@@ -685,7 +693,7 @@
                     </el-col>
                   </el-row>
                 </el-form-item>
-                <div class="btn-box">
+                <div class="btn-box" v-show="loadingEnd">
                   <el-button
                     :disabled="isPreview"
                     :class="[formInfo.theme_color + '1']"
@@ -724,7 +732,9 @@
         // 活动ID 或者 专题ID
         webinarOrSubjectId: '',
         //表单信息
-        formInfo: {},
+        formInfo: {
+          cover: 1 // 默认蓝色底图 闪动问题做区分
+        },
         //简介内容是否超长
         overflowStatus: false,
         //模态窗是否可见
@@ -825,6 +835,8 @@
         //地域验证是否通过
         isValidRegional: true,
         isSubject: false, // 是否从专题入口打开
+        ajaxInfoEnd: false,
+        ajaxListEnd: false,
         interfaceType:
           window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
@@ -1017,6 +1029,10 @@
       }
     },
     computed: {
+      // 报名表单是否加载完毕
+      loadingEnd() {
+        return this.ajaxInfoEnd && this.ajaxListEnd;
+      },
       // 与网易易盾图片插件语言匹配
       // langNECaptcha() {
       //   const locale = window.$globalConfig.currentLang;
@@ -1035,7 +1051,11 @@
       // },
       // 广告头图
       coverPic() {
-        return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover != 1) {
+          return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        } else {
+          return '';
+        }
       },
       //输入提示的多语言转换
       findPlaceHolder() {
@@ -1305,29 +1325,36 @@
       },
       //初始化活动信息
       getBaseInfo() {
-        this.signUpFormServer.getFormBaseInfo(this.setParamsIdByRoute({})).then(res => {
-          const { code = '', data = {} } = res || {};
-          if ([200, '200'].includes(code)) {
-            if (res.data.tab_form_title) {
-              res.data.tab_form_title =
-                this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
-                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
-                  : res.data.tab_form_title;
+        this.ajaxInfoEnd = false;
+        this.signUpFormServer
+          .getFormBaseInfo(this.setParamsIdByRoute({}))
+          .then(res => {
+            this.ajaxInfoEnd = true;
+            const { code = '', data = {} } = res || {};
+            if ([200, '200'].includes(code)) {
+              if (res.data.tab_form_title) {
+                res.data.tab_form_title =
+                  this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                    ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                    : res.data.tab_form_title;
+              }
+              if (res.data.tab_verify_title) {
+                res.data.tab_verify_title =
+                  this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                    ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                    : res.data.tab_verify_title;
+              }
+              this.formInfo = data;
+              this.$nextTick(() => {
+                this.calculateText();
+              });
+            } else {
+              this.$message.error(this.$t('form.form_1031'));
             }
-            if (res.data.tab_verify_title) {
-              res.data.tab_verify_title =
-                this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
-                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
-                  : res.data.tab_verify_title;
-            }
-            this.formInfo = data;
-            this.$nextTick(() => {
-              this.calculateText();
-            });
-          } else {
-            this.$message.error(this.$t('form.form_1031'));
-          }
-        });
+          })
+          .catch(e => {
+            this.ajaxInfoEnd = true;
+          });
       },
       //计算简介是否太长
       calculateText() {
@@ -1344,50 +1371,58 @@
       //初始化表单问题信息
       getQuestionList() {
         const _this = this;
-        this.signUpFormServer.getQuestionsList(this.setParamsIdByRoute({})).then(res => {
-          // 按照 order_num 从小到大排序
-          const list = res.data.ques_list.sort(this.compare('order_num'));
-          !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
-          // 手机号验证开启状态
-          const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
-          this.isPhoneValidate =
-            phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
-          // 是否支持国外手机号
-          this.isAbroadPhoneValide =
-            phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
-          // 默认填写手机号
-          !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
-          if (!_this.isPreview) {
-            _this.$refs.verifyForm.validateField('phone', err => {
-              if (!err) {
-                _this.isValidPhone = true;
-              } else {
-                _this.isValidPhone = false;
+        this.ajaxListEnd = false;
+        this.signUpFormServer
+          .getQuestionsList(this.setParamsIdByRoute({}))
+          .then(res => {
+            this.ajaxListEnd = true;
+            // 按照 order_num 从小到大排序
+            const list = res.data.ques_list.sort(this.compare('order_num'));
+            !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
+            // 手机号验证开启状态
+            const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
+            this.isPhoneValidate =
+              phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+            // 是否支持国外手机号
+            this.isAbroadPhoneValide =
+              phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
+            // 默认填写手机号
+            !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
+            if (!_this.isPreview) {
+              _this.$refs.verifyForm.validateField('phone', err => {
+                if (!err) {
+                  _this.isValidPhone = true;
+                } else {
+                  _this.isValidPhone = false;
+                }
+              });
+            }
+            this.list = list;
+            //地域 options 格式化处理
+            this.list.some(item => {
+              if (item.type == 5) {
+                this.isValidRegional = !!item.is_must;
+                item.options = JSON.parse(item.options);
+                item.colNum = 8;
+                item.options.show_district == 0 && (item.colNum = 12);
+                item.options.show_city == 0 && (item.colNum = 24);
+                this.colNum = item.colNum;
+                this.regionalId = item.id;
+                return true;
               }
             });
-          }
-          this.list = list;
-          //地域 options 格式化处理
-          this.list.some(item => {
-            if (item.type == 5) {
-              this.isValidRegional = !!item.is_must;
-              item.options = JSON.parse(item.options);
-              item.colNum = 8;
-              item.options.show_district == 0 && (item.colNum = 12);
-              item.options.show_city == 0 && (item.colNum = 24);
-              this.colNum = item.colNum;
-              this.regionalId = item.id;
-              return true;
+            // 隐私声明格式处理
+            const lastQuestion = this.list[this.list.length - 1];
+            if (lastQuestion.subject === '隐私声明') {
+              this.privacy = lastQuestion;
+              this.privacy && this.privacyFormatter();
             }
+            list.some(item => item.type === 5) && this.getAreaList();
+          })
+          .catch(error => {
+            this.ajaxListEnd = true;
+            console.log(error);
           });
-          // 隐私声明格式处理
-          const lastQuestion = this.list[this.list.length - 1];
-          if (lastQuestion.subject === '隐私声明') {
-            this.privacy = lastQuestion;
-            this.privacy && this.privacyFormatter();
-          }
-          list.some(item => item.type === 5) && this.getAreaList();
-        });
       },
       //生成表单提交参数
       generateFormParams() {
