@@ -707,7 +707,7 @@
           const res = await this.subjectServer.getSubjectInfo({
             subject_id: this.webinarOrSubjectId
           });
-          if (res.code == 200 && res.data && res.data) {
+          if (res.code == 200 && res.data) {
             // 获取专题分享信息
             this.wxShareInfoSubject(res.data);
           } else {
