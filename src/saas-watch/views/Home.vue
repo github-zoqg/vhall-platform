@@ -109,6 +109,8 @@
           const domain = await this.initReceiveLive(this.clientType);
           await roomState();
 
+          this.setPageConfig();
+
           // 是否跳转预约页
           if (
             this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&

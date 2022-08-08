@@ -279,44 +279,62 @@
       },
       setPageConfig() {
         const themeMap = {
-          1: 'themeDefaultBlack', // 黑
-          2: 'themeSimpleWhite', // 白
-          3: 'themeFestiveRed', // 红
-          4: 'themeScienceBlue' // 蓝
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'blue',
+          5: 'golden'
+        };
+
+        const styleMap = {
+          1: 'main', // 传统风格
+          2: 'fashion', // 时尚风格
+          3: 'concise' // 极简风格
         };
 
         // TODO:暂时注掉，使用写死的值调试
         // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        const skinInfo = {
-          style: 2,
+        // TODO:调试代码
+        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
+          style: 3,
           bgColor: 4
         };
 
-        if (skinInfo?.style == 2) {
+        // TODO:调试代码
+        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+
+        if (skinInfo?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
-        } else if (skinInfo?.style == 3) {
+        } else if (skinInfo?.style == 2) {
           // 设置聊天组件为左右风格
           updatePageNode('comChatWap', 'component', 'VmpChatWapFashion');
         }
-        // 设置主题，如果没有就用白色
-        skins.setTheme(skins.themes[themeMap[skinInfo?.bgColor || 2]]);
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skinInfo?.style || 1];
+        const theme = themeMap[skinInfo?.bgColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(style, theme);
+
         // 挂载到window方便调试
         window.skins = skins;
       },
-      drawTheme(theme, skin) {
-        if (theme == 'main' && (skin == 'black' || skin == 'white')) {
-          if (skin == 'black') {
+      drawBody(style, theme) {
+        if (style == 'main' && (theme == 'black' || theme == 'white')) {
+          if (theme == 'black') {
             document.body.style.background = `#333`;
           }
-          if (skin == 'white') {
+          if (theme == 'white') {
             document.body.style.background = `#fff`;
           }
         } else {
           document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
-            theme +
+            style +
             '_' +
-            skin +
+            theme +
             '.png')})`;
           document.body.style.backgroundSize = 'cover';
         }
