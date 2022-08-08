@@ -52,6 +52,9 @@ const cl_openUrl = function (url) {
 const cl_moveToDoc = function (status) {
   assistantMsg('docmouseenter', status);
 };
+const cl_toast = function (type, msg) {
+  assistantMsg('notice_msg', msg, type);
+};
 export {
   cl_left,
   cl_join,
@@ -65,5 +68,6 @@ export {
   cl_openAlipayCashier,
   cl_openUrl,
   cl_setDocMenu,
-  cl_moveToDoc
+  cl_moveToDoc,
+  cl_toast
 };
