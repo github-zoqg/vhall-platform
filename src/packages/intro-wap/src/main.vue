@@ -13,6 +13,7 @@
             <!-- <i class="vh-iconfont vh-line-time" /> -->
             {{ startTime }}
           </p>
+          <!-- 预约人数 -->
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
             <p v-if="watchInitData.subscribe.show">
               <i18n path="appointment.appointment_1018">
@@ -20,6 +21,7 @@
               </i18n>
             </p>
           </template>
+          <!-- 在线人数 -->
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">

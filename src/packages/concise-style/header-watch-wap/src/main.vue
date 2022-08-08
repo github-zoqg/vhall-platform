@@ -10,16 +10,16 @@
             {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
           </p>
           <!-- 在线人数\热度 -->
-          <div class="host-user-info__middle-num">
+          <div
+            class="host-user-info__middle-num"
+            v-show="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
+          >
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-            <p v-if="watchInitData.online.show && watchInitData.status != 'subscribe'">
+            <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
               <i class="vh-iconfont vh-line-user"></i>
               <span>{{ personCount | formatHotNum }}</span>
             </p>
-            <p
-              class="host-user-info__middle-num__hot"
-              v-if="watchInitData.pv.show && watchInitData.status != 'subscribe' && !isInGroup"
-            >
+            <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               <span>{{ hotNum | formatHotNum }}</span>
             </p>
@@ -48,21 +48,19 @@
         </span>
       </section>
     </section>
+    <!-- 不显示头部，只显示在线人数和热度的情况 -->
     <section class="vh-concise-header-box__2" v-else>
       <!-- 在线人数\热度 -->
       <div
         class="host-user-info__middle-num"
-        v-if="
-          watchInitData.status != 'subscribe' &&
-          (watchInitData.online.show || (watchInitData.pv.show && !isInGroup))
-        "
+        v-if="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
       >
         <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-        <p v-if="watchInitData.online.show">
+        <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
           <i class="vh-iconfont vh-line-user"></i>
           <span>{{ personCount | formatHotNum }}</span>
         </p>
-        <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show && !isInGroup">
+        <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
           <i class="vh-saas-iconfont vh-saas-line-heat"></i>
           <span>{{ hotNum | formatHotNum }}</span>
         </p>
@@ -305,8 +303,8 @@
       font-size: 20px;
       color: #fff;
       margin-top: 8px;
-      &__hot {
-        margin-left: 12px;
+      &__online {
+        margin-right: 12px;
       }
       .vh-line-user {
         font-size: 20px;
@@ -315,7 +313,7 @@
         font-size: 20px;
       }
       p span {
-        margin-left: 4px;
+        margin-left: 6px;
       }
     }
     &__tool-box {
@@ -336,11 +334,11 @@
       }
     }
     &__2 {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       padding: 6px 16px;
-      width: 164px;
-      height: 32px;
+      font-size: 20px;
+      line-height: 20px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 40px;
       margin-left: 24px;
