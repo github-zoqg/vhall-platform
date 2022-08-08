@@ -453,8 +453,8 @@
 </script>
 <style lang="less" scoped>
   .vmp-send-box {
-    background-color: #fff;
-    box-shadow: 0px -1px 1px #f1f1f1;
+    background-color: var(--theme-chat-sendBox-bg);
+    // box-shadow: 0px -1px 1px #f1f1f1;
     // &::after {
     //   content: '';
     //   position: absolute;
@@ -489,7 +489,7 @@
         align-items: center;
 
         .content-input__placeholder {
-          background-color: #f5f5f5;
+          background-color: var(--theme-chat-input-bg);
           color: #bfbfbf;
           border-radius: 40px;
           width: 100%;

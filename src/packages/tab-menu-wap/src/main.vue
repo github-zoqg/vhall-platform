@@ -36,7 +36,7 @@
           >
             <span class="item-text">{{ $tdefault(item.name) }}</span>
             <i class="tips" v-show="item.tipsVisible"></i>
-            <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
+            <hr v-show="selectedId === item.id" class="bottom-line" />
           </li>
         </ul>
 
@@ -636,7 +636,7 @@
   .vmp-tab-menu {
     height: 100%;
     position: relative;
-    background: var(--theme-default-bg);
+    background: var(--theme-tab-menu-bg);
     font-size: 28px;
     display: flex;
     flex-direction: column;
@@ -665,6 +665,7 @@
     }
     .tab_box {
       height: 80px;
+      background: var(--theme-tab-menu-box-bg);
     }
     &__header {
       position: relative;

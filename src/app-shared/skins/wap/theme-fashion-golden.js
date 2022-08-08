@@ -3,7 +3,7 @@ export default {
   '--theme-default-bg': 'transparent',
   '--theme-tab-menu-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-menu-font-active': 'rgba(0, 0, 0, 0.85)',
-  '--theme-tab-menu-tip': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-menu-tip': 'rgba(224, 185, 110, 1)',
   '--theme-tab-menu-bg': 'transparent',
   '--theme-tab-menu-border': 'none',
   '--theme-header-bg': 'transparent',
