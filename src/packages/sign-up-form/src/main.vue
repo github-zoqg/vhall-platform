@@ -707,7 +707,7 @@
 
 <script>
   import defaultHeader from './img/formHeader.png';
-  import { useRoomBaseServer, useSignUpFormServer } from 'middle-domain';
+  import { useRoomBaseServer, useSignUpFormServer, useSubjectServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSignUpForm',
@@ -1115,6 +1115,10 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
+      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+        // 专题下独立报名表单
+        this.subjectServer = useSubjectServer();
+      }
     },
     created() {
       // TODO 待确认此处是否需要如此设置。
@@ -1165,11 +1169,28 @@
           // 专题-默认 活动报名在前
           this.isSubscribe = 1;
           this.activeTab = 1;
+          if (this.subjectServer) {
+            // 初始化专题
+            this.initSubjectAuth();
+          } else {
+            console.log('没有专题subjectServer');
+          }
         } else {
           await this.getWebinarInfo();
         }
         this.getBaseInfo();
         this.getQuestionList();
+      },
+      // 初始化专题信息，获取专题访客ID
+      async initSubjectAuth() {
+        const visitorId = localStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.webinarOrSubjectId,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        await this.subjectServer.initSubjectInfo(params);
       },
       // 获取活动信息
       getWebinarInfo() {
@@ -1800,6 +1821,7 @@
             })
             .then(res => {
               if (res.code == 512503 || res.code == 512502) {
+                // 跳转老活动
                 window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
                 return false;
               }
