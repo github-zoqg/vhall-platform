@@ -286,10 +286,10 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
-  import { computeRecordTime, isIE, windowVersion } from './js/utils';
+  import { computeRecordTime, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, isIE } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
