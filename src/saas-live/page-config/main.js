@@ -66,6 +66,12 @@ export default {
         cuid: 'comStreamLocal',
         method: 'checkStartPush'
       }
+    ],
+    emitClickCheckValidatePullUrl: [
+      {
+        cuid: 'comThirdStream',
+        method: 'validatePullUrl'
+      }
     ]
   },
   // 中间主区域容器
@@ -446,10 +452,6 @@ export default {
       }
     ]
   },
-  // 三方推流
-  comThirdStream: {
-    component: 'VmpThirdStream'
-  },
   // 转播流
   comRebroadcastSteam: {
     component: 'VmpRebroadcastStream'
@@ -518,7 +520,13 @@ export default {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    // 屏蔽特效
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
+    }
   },
   // 通知组件
   comNotice: {
@@ -584,6 +592,16 @@ export default {
   // 虚拟人数
   comVirtualPeople: {
     component: 'VmpVirtualPeople'
+  },
+  comThirdStream: {
+    component: 'VmpThirdStream',
+    emitClickStartClick: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handleStartClick',
+        args: ['$0', '$1']
+      }
+    ]
   },
   // 发起端--私聊组件
   comLivePrivateChat: {

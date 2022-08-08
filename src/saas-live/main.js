@@ -30,6 +30,11 @@ if (process.env.NODE_ENV !== 'production') {
   Vue.config.devtools = true;
 }
 
+// 全局版本变量
+window.app_global_variable = {
+  VUE_APP_BUILD_VERSION: process.env.VUE_APP_BUILD_VERSION
+};
+
 new Vue({
   router,
   i18n,
