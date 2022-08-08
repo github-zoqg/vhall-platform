@@ -65,7 +65,8 @@
           v-if="
             ((subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
               !isEmbed) ||
-            (isEmbed && webinarType != 2)
+            (isEmbed && webinarType != 2) ||
+            (webinarType == 2 && subOption.reg_form == 1)
           "
         >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
@@ -431,19 +432,21 @@
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
           }
         }
-        // 如果是嵌入页并且没有开播，预约按钮不显示
+        // 如果是嵌入页并且没有开播 并且（未开启报名表单）预约按钮不显示
         if (webinar.type == 2) {
-          if (this.isEmbed) {
+          if (this.isEmbed && this.subOption.reg_form != 1) {
             this.showBottomBtn = false;
             return;
           }
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
-            if (webinar.verify == 3) {
+            if (webinar.verify == 3 && !this.isEmbed) {
               this.subscribeText = this.$t('webinar.webinar_1040', {
                 n: `￥${this.subOption.fee}`
               });
+            } else if (webinar.verify == 3 && this.isEmbed) {
+              this.showBottomBtn = false;
             } else {
               this.subscribeText = this.$t('appointment.appointment_1017');
             }
@@ -555,7 +558,11 @@
             }
             // 邀请卡分享
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            window.location.href = `${window.location.origin}${
+              process.env.VUE_APP_ROUTER_BASE_URL
+            }${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${
+              this.$route.params.id
+            }${queryString}`;
             break;
           case 512002:
           case 512522:
@@ -730,7 +737,11 @@
             }
             // 邀请卡
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            window.location.href = `${window.location.origin}${
+              process.env.VUE_APP_ROUTER_BASE_URL
+            }${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${
+              this.$route.params.id
+            }${queryString}`;
           } else {
             this.$toast(this.$tec(res.code) || res.msg);
           }

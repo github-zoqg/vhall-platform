@@ -500,7 +500,8 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+        isEmbed: window.location.href.indexOf('/embedclient/') != -1
       };
     },
     computed: {
@@ -655,7 +656,7 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
-      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+      if ((window.location.href.indexOf('/subject/entryform/') != -1) != -1) {
         // 专题下独立报名表单
         this.subjectServer = useSubjectServer();
       }
@@ -1058,7 +1059,9 @@
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
             process.env.VUE_APP_WEB_KEY +
-            `/lives/watch/${this.webinarOrSubjectId}${this.queryString}`
+            `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${this.webinarOrSubjectId}${
+              this.queryString
+            }`
         );
       },
       //提交表单到服务器
@@ -1121,7 +1124,9 @@
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                    `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                      this.webinarOrSubjectId
+                    }${queryString}`
                 );
               }
             } else {
@@ -1175,7 +1180,9 @@
                 window.location.protocol +
                   process.env.VUE_APP_WAP_WATCH +
                   process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                  `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                    this.webinarOrSubjectId
+                  }${queryString}`
               );
             }
           })
@@ -1341,7 +1348,7 @@
           window.location.protocol +
           process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
-          `/lives/entryform/${this.webinarOrSubjectId}`;
+          `${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${this.webinarOrSubjectId}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
             const params = {
@@ -1361,7 +1368,9 @@
                 desc,
                 link:
                   window.location.protocol +
-                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/entryform/${this.webinarOrSubjectId}`,
+                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}${
+                    this.isEmbed ? '/embedclient' : ''
+                  }/lives/entryform/${this.webinarOrSubjectId}`,
                 imgUrl: info.img_url
               }
             );
@@ -1656,7 +1665,9 @@
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                    `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                      this.webinarOrSubjectId
+                    }${queryString}`
                 );
               } else {
                 this.$toast(this.$t('form.form_1034'));

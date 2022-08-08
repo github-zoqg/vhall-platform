@@ -75,6 +75,12 @@ const routes = [
     meta: { grayType: 'webinar' }
   },
   {
+    path: '/embedclient/lives/entryform/:id',
+    name: 'signupEmbed',
+    component: () => import('@/packages/wap-sign-up-form'),
+    meta: { grayType: 'webinar' }
+  },
+  {
     path: '/subject/entryform/:id',
     name: 'signupSubject',
     component: () => import('@/packages/wap-sign-up-form'),
