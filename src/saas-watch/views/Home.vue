@@ -33,6 +33,7 @@
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   import skins from '@/app-shared/skins/watch';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   export default {
     name: 'Home',
     components: {
@@ -107,15 +108,6 @@
           }
           const domain = await this.initReceiveLive(this.clientType);
           await roomState();
-
-          // TODO:设置聊天组件
-          if (localStorage.getItem('chatStyle') == 'fashion') {
-            window.$serverConfig.comChat.component = 'VmpFashionChat';
-          }
-
-          // 设置主题
-          window.skins = skins;
-          skins.setTheme(skins.themes.themeDefaultBlack);
 
           // 是否跳转预约页
           if (
@@ -316,6 +308,31 @@
       },
       handleChangeNoticeState() {
         this.$emit('notice_panel_close', false);
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'themeDefaultBlack', // 黑
+          2: 'themeSimpleWhite', // 白
+          3: 'themeFestiveRed', // 红
+          4: 'themeScienceBlue' // 蓝
+        };
+
+        // TODO:暂时注掉，使用写死的值调试
+        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        const skinInfo = {
+          style: 2,
+          bgColor: 4,
+          chatLayout: 1 // 聊天布局 1 上下 2 左右
+        };
+
+        if (skinInfo?.chatLayout == 2) {
+          // 设置聊天组件为左右风格
+          updatePageNode('comChat', 'component', 'VmpFashionChat');
+        }
+        // 设置主题，如果没有就用白色
+        skins.setTheme(skins.themes[themeMap[skinInfo?.bgColor || 1]]);
+        // 挂载到window方便调试
+        window.skins = skins;
       }
     }
   };

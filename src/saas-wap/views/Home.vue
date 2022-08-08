@@ -36,6 +36,7 @@
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   import skins from '@/app-shared/skins/wap';
 
   export default {
@@ -133,28 +134,9 @@
             return;
           }
 
-          // TODO: 根据状态判断是极简风格还是传统风格
-          // concise-极简风格    main-传统风格    fashion——时尚风格
-          // TODO: 暂时存到session中，之后再改。
-          let room_style = window.sessionStorage.getItem('room_style');
-          if (room_style) {
-            this.isConcise = room_style == 'concise';
-            setPage(room_style == 'fashion' ? 'main' : room_style);
-            if (room_style == 'fashion') {
-              console.log(window.$serverConfig);
-              window.$serverConfig.comChatWap.component = 'VmpChatWapFashion';
-              window.$serverConfig._page = 'fashion';
-            }
-          } else {
-            window.sessionStorage.setItem('room_style', 'concise');
-            setPage('concise');
-          }
-
-          // 设置主题
-          window.skins = skins;
-          skins.setTheme(skins.themes.themeFestiveRed);
-
           await roomState();
+
+          this.setPageConfig();
 
           //微信相关设置
           bindWeiXin();
@@ -294,6 +276,33 @@
         window.location.replace(
           `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`
         );
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'themeDefaultBlack', // 黑
+          2: 'themeSimpleWhite', // 白
+          3: 'themeFestiveRed', // 红
+          4: 'themeScienceBlue' // 蓝
+        };
+
+        // TODO:暂时注掉，使用写死的值调试
+        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        const skinInfo = {
+          style: 2,
+          bgColor: 4
+        };
+
+        if (skinInfo?.style == 2) {
+          // 设置极简风格页面
+          setPage('concise');
+        } else if (skinInfo?.style == 3) {
+          // 设置聊天组件为左右风格
+          updatePageNode('comChatWap', 'component', 'VmpChatWapFashion');
+        }
+        // 设置主题，如果没有就用白色
+        skins.setTheme(skins.themes[themeMap[skinInfo?.bgColor || 2]]);
+        // 挂载到window方便调试
+        window.skins = skins;
       }
     }
   };

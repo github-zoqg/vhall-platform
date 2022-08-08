@@ -233,3 +233,7 @@ export const getCookie = name => {
     return '';
   }
 };
+
+export const isFunction = val => {
+  return typeof val === 'function';
+};
