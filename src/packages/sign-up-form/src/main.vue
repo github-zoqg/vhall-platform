@@ -1786,10 +1786,11 @@
         if (this.isSubject) {
           // 当前是点击专题下的活动进入的时候，直接跳转/lives/watch（由该页面自行判断页面跳转)
           const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
-          window.location.href =
+          const href =
             window.location.origin +
             process.env.VUE_APP_WEB_KEY +
             `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+          window.open(href, '_blank');
         } else {
           // 当前是正常活动点开
           this.roomBaseServer
