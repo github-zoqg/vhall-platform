@@ -641,6 +641,10 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
+      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+        // 专题下独立报名表单
+        this.subjectServer = useSubjectServer();
+      }
     },
     created() {
       if (
@@ -691,6 +695,12 @@
         this.getQuestionList();
       },
       async initSubjectInfo() {
+        if (this.subjectServer) {
+          // 初始化专题
+          await this.initSubjectAuth();
+        } else {
+          console.log('没有专题subjectServer');
+        }
         await this.getFormLinkStatus();
         setRequestHeaders({
           token: localStorage.getItem('token') || ''
@@ -717,6 +727,17 @@
         } catch (err) {
           this.$toast(err.msg || '获取专题信息失败');
         }
+      },
+      // 初始化专题信息，获取专题访客ID
+      async initSubjectAuth() {
+        const visitorId = localStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.webinarOrSubjectId,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
+          ...this.$route.query
+        };
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        await this.subjectServer.initSubjectInfo(params);
       },
       //获取报名独立链接状态
       getFormLinkStatus() {
