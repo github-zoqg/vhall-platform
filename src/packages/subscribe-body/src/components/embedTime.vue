@@ -31,8 +31,8 @@
       <button
         v-if="btnText"
         class="sub-auth"
-        :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
-        :disabled="btnText == $t('webinar.webinar_1036')"
+        :class="{ disabledBtn: disabled }"
+        :disabled="disabled"
         @click="authCheck"
       >
         {{ btnText }}
@@ -111,6 +111,8 @@
             this.is_subscribe = val.is_subscribe;
             this.actual_start_time = val.actual_start_time;
             this.show = val.show;
+            this.save_reg_form = val.save_reg_form;
+            this.open_reg_form = val.open_reg_form;
             // this.num = val.num
             console.log('>>>>>>1', val);
             // if (val.is_subscribe == 1) this.disabled = true
@@ -132,10 +134,15 @@
       agreement() {
         this.$emit('agreement');
       },
+      // 获取预约页状态进度等
       handleSubscribeProcess() {
+        // 清除历史计时器
         this.clearTimer();
+        // 时间提示文案： 已开播/距离开播
         this.handleTips();
+        // 处理当前界面展示文案 及 按钮状态
         this.handleBtnText();
+        // 根据开播时间等，启动具体的计时器（1秒间隔）
         this.timer = setInterval(() => {
           this.remainTimes();
         }, 1 * 1000);
@@ -235,29 +242,44 @@
         this.btnText = this.$t('player.player_1013');
       },
       handleBtnText() {
-        if (this.type == 1) {
+        // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
+        // webinar.verify: 验证类别，0 无验证，1 密码，2 白名单，3 付费活动, 4 F码, 6 F码+付费
+        // join_info.verified: 是否已通过观看限制（不含报名表单）
+        // webinar.hide_subscribe: 预约按钮状态 1开启 0关闭
+        // webinar.reg_form	是否开启报名表单
+        // join_info.reg_form 是否已填写报名表单
+        // join_info.is_subscribe 是否预约：0-否，1-是
+        if (this.type == 3) {
           if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.type == 3 || this.type == 2) {
-          if (this.verify == 1) {
+            // 已结束 活动  && 观看限制 - 密码
             this.btnText = this.$t('webinar.webinar_1036');
             this.disabled = true;
           } else {
             this.btnText = '';
             this.disabled = false;
           }
-        } else if (this.type == 4 || this.type == 5) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
+        } else if (this.is_subscribe == 1) {
+          this.btnText = this.$t('appointment.appointment_1006');
+          this.disabled = true;
+        } else {
+          if (this.type == 1 || this.type == 4 || this.type == 5) {
+            if (this.verify == 1 || this.open_reg_form) {
+              // 直播中 || 点播 || 回放 活动 && 观看限制 - 密码
+              this.btnText = this.$t('player.player_1013');
+              this.disabled = false;
+            } else {
+              this.btnText = '';
+              this.disabled = false;
+            }
+          } else if (this.type == 2) {
+            if (this.verify == 1 || this.open_reg_form) {
+              // 预约中 活动  && 观看限制 - 密码
+              this.btnText = this.$t('appointment.appointment_1017');
+              this.disabled = false;
+            } else {
+              this.btnText = '';
+              this.disabled = false;
+            }
           }
         }
       },
