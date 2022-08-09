@@ -65,11 +65,25 @@
         const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
         const isLive = this.webinarType != 2 && this.webinarType != 3;
         if (isAgreement && isLive && !isEmbedVideo) {
+          // 观看协议验证通过，并且当前活动状态不是 预约和结束，且不是单视频嵌入的时候，展示观看验证按钮。
           return true;
         } else {
           return false;
         }
         // if (isAgreement && ((!btnText && type == 1) || btnText))
+      },
+      // 嵌入页是否支持报名表单展示
+      embedShowRegForm() {
+        const isEmbed = this.$domainStore.state.roomBaseServer.embedObj.embed;
+        const isEmbedVideo = this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+        // 观看限制 - 无or密码，且当前是完全嵌入页，开启了报名表单，展示按钮。
+        return (
+          isEmbed && !isEmbedVideo && this.open_reg_form && (this.verify == 0 || this.verify == 1)
+        );
+      },
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     data() {
@@ -242,29 +256,19 @@
         this.btnText = this.$t('player.player_1013');
       },
       handleBtnText() {
-        // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
-        // webinar.verify: 验证类别，0 无验证，1 密码，2 白名单，3 付费活动, 4 F码, 6 F码+付费
-        // join_info.verified: 是否已通过观看限制（不含报名表单）
-        // webinar.hide_subscribe: 预约按钮状态 1开启 0关闭
-        // webinar.reg_form	是否开启报名表单
-        // join_info.reg_form 是否已填写报名表单
-        // join_info.is_subscribe 是否预约：0-否，1-是
         if (this.type == 3) {
-          if (this.verify == 1) {
-            // 已结束 活动  && 观看限制 - 密码
-            this.btnText = this.$t('webinar.webinar_1036');
-            this.disabled = true;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.is_subscribe == 1) {
+          // 活动已结束，观看限制为密码时，展示按钮“密码活动”，按钮不可点击
+          this.btnText = this.verify == 1 ? this.$t('webinar.webinar_1036') : '';
+          this.disabled = this.verify == 1;
+          return;
+        }
+        if (this.is_subscribe == 1) {
           this.btnText = this.$t('appointment.appointment_1006');
           this.disabled = true;
         } else {
+          // 直播中、点播、回放 的时候，按钮文案“立即观看”，预告状态 按钮文案“立即预约”
           if (this.type == 1 || this.type == 4 || this.type == 5) {
-            if (this.verify == 1 || this.open_reg_form) {
-              // 直播中 || 点播 || 回放 活动 && 观看限制 - 密码
+            if (this.verify == 1 || this.embedShowRegForm) {
               this.btnText = this.$t('player.player_1013');
               this.disabled = false;
             } else {
@@ -272,8 +276,7 @@
               this.disabled = false;
             }
           } else if (this.type == 2) {
-            if (this.verify == 1 || this.open_reg_form) {
-              // 预约中 活动  && 观看限制 - 密码
+            if (this.verify == 1 || this.embedShowRegForm) {
               this.btnText = this.$t('appointment.appointment_1017');
               this.disabled = false;
             } else {

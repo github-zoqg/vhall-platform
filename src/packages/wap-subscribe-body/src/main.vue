@@ -53,6 +53,7 @@
       </template>
     </div>
     <div class="vmp-subscribe-body-info">
+      <!-- !isLiveEnd 不是直播结束情况下 -->
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -60,15 +61,7 @@
         <template v-else>
           <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
-        <div
-          class="subscribe_into_container"
-          v-if="
-            ((subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
-              !isEmbed) ||
-            (isEmbed && webinarType != 2) ||
-            (webinarType == 2 && subOption.reg_form == 1)
-          "
-        >
+        <div class="subscribe_into_container" v-if="showBottomBtnPannel">
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
@@ -107,12 +100,7 @@
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
-    <template
-      v-if="
-        showBottomBtn &&
-        (subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1))
-      "
-    >
+    <template v-if="showBottomBtnPannel2">
       <div class="vmp-subscribe-body-auth">
         <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -272,7 +260,9 @@
           return false;
         }
       },
+      // 是否展示 F码+付费组合按钮
       showSubscribeBtn() {
+        // 观看限制 - F码+付费 并且 非结束状态下，未预约成功
         if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
           return true;
         } else {
@@ -328,6 +318,24 @@
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      // 是否展示下侧按钮面板区域
+      showBottomBtnPannel() {
+        // 非嵌入情况下，（观看限制-非免费 或者 观看限制=免费 并且 隐藏预约按钮）；嵌入情况下，不是预约页。
+        return (
+          ((this.subOption.verify != 0 ||
+            (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
+            !this.isEmbed) ||
+          (this.isEmbed && this.webinarType != 2)
+        );
+      },
+      // 是否展示下侧按钮面板区域2
+      showBottomBtnPannel2() {
+        return (
+          this.showBottomBtn &&
+          (this.subOption.verify != 0 ||
+            (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1))
+        );
       }
     },
     beforeCreate() {
@@ -434,7 +442,7 @@
         }
         // 如果是嵌入页并且没有开播 并且（未开启报名表单）预约按钮不显示
         if (webinar.type == 2) {
-          if (this.isEmbed && this.subOption.reg_form != 1) {
+          if (this.isEmbed) {
             this.showBottomBtn = false;
             return;
           }
