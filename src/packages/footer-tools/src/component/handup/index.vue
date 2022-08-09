@@ -128,13 +128,6 @@
         }
         const { type = '' } = temp.data || {};
         if (type === 'vrtc_connect_refused') {
-          // 申请连麦_结果
-          window?.vhallReportForProduct.report(170005, {
-            report_extra: {
-              waiting_time: this.waitTime,
-              failed_reason: msg
-            }
-          });
           if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
           this.loading = false;
           this.isApplyed = false;
@@ -144,13 +137,6 @@
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMicServer().$on('vrtc_connect_refused', msg => {
-        // 申请连麦_结果
-        window?.vhallReportForProduct.report(170005, {
-          report_extra: {
-            waiting_time: this.waitTime,
-            failed_reason: msg
-          }
-        });
         this.loading = false;
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
@@ -167,14 +153,19 @@
           const { code, msg } = await useMicServer().speakOff();
           if (code === 513035) {
             this.$message.error(msg);
-            // 下麦_结果上报
-            window?.vhallReportForProduct.report(170003);
           }
           this.loading = false;
+          // 下麦_结果上报
+          window?.vhallReportForProduct.report(170003, {
+            report_extra: {
+              code: code,
+              msg: msg
+            }
+          });
         } catch (error) {
           this.loading = false;
           // 下麦_结果上报
-          window?.vhallReportForProduct.report(170003);
+          window?.vhallReportForProduct.report(170003, { report_extra: error });
         }
       },
       // 举手按钮点击事件
@@ -224,13 +215,6 @@
                 failed_reason = this.$t('interact.interact_1029', { n: res.data.replace_data[0] });
                 this.$message.error(failed_reason);
               }
-              // 申请连麦_结果
-              window?.vhallReportForProduct.report(170005, {
-                report_extra: {
-                  waiting_time: this.waitTime,
-                  failed_reason: encodeURIComponent(failed_reason)
-                }
-              });
               return;
             }
             this.isApplyed = true;
@@ -290,6 +274,12 @@
               tip = this.$t('other.other_1006');
             }
             this.$message.warning(tip);
+            window?.vhallReportForProduct.report(170005, {
+              report_extra: {
+                waiting_time: this.waitTime,
+                failed_reason: encodeURIComponent(tip)
+              }
+            });
           }
         }, 1000);
       }
