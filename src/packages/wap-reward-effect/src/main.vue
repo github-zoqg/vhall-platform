@@ -31,7 +31,8 @@
             "
           >
             <!-- 礼物标题 -->
-            送出{{ rewardEffectInfo.data.gift_name | overHidden(8) }}
+            {{ $t('chat.chat_1032') }}
+            {{ $tdefault(rewardEffectInfo.data.gift_name) | overHidden(8) }}
             <!-- <span class="count">
               <span class="multiple">x</span>
               {{ rewardEffectInfo.num }}

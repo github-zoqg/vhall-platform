@@ -64,6 +64,7 @@
                   :rules="rules"
                   :validate-on-rule-change="false"
                   label-position="top"
+                  @submit.native.prevent
                 >
                   <el-form-item
                     v-for="(question, quesIndex) in list"
@@ -299,6 +300,7 @@
                   class="entryForm"
                   :model="verifyForm"
                   :rules="verifyRules"
+                  @submit.native.prevent
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
@@ -422,6 +424,7 @@
                 :rules="rules"
                 :validate-on-rule-change="false"
                 label-position="top"
+                @submit.native.prevent
               >
                 <el-form-item
                   v-for="(question, quesIndex) in list"
@@ -651,7 +654,13 @@
           <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
             <!-- 验证 -->
             <template>
-              <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
+              <el-form
+                ref="verifyForm"
+                class="entryForm"
+                :model="verifyForm"
+                :rules="verifyRules"
+                @submit.native.prevent
+              >
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
                     v-if="!isAbroadPhoneValide"
