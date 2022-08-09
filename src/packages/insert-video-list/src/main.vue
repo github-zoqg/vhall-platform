@@ -355,7 +355,7 @@
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-
+        window.vhallReportForProduct?.report(110217);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
         );
