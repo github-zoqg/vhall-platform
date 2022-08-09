@@ -507,6 +507,7 @@
         );
         this.initSlider(); // 初始化播放器控件
         this.play();
+        window.vhallReportForProduct.report(110218);
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
