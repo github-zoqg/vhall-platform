@@ -122,6 +122,13 @@
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMsgServer().$onMsg('ROOM_MSG', msg => {
+        // 申请连麦_结果
+        window?.vhallReportForProduct.report(170005, {
+          report_extra: {
+            waiting_time: 30 - this.waitTime,
+            failed_reason: msg
+          }
+        });
         let temp = Object.assign({}, msg);
         if (Object.prototype.toString.call(temp.data) !== '[object Object]') {
           temp.data = JSON.parse(temp.data);
@@ -141,6 +148,13 @@
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
         this.btnText = this.$t('interact.interact_1041');
+        // 申请连麦_结果
+        window?.vhallReportForProduct.report(170005, {
+          report_extra: {
+            waiting_time: 30 - this.waitTime,
+            failed_reason: msg
+          }
+        });
       });
     },
     methods: {
@@ -163,6 +177,7 @@
         if (this.isApplyed) {
           this.userCancelApply();
         } else {
+          window?.vhallReportForProduct.report(170004);
           this.mediaCheckClick();
         }
       },
@@ -201,6 +216,7 @@
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );
               }
+              window?.vhallReportForProduct.report(170000, { report_extra: res });
               return;
             }
             this.isApplyed = true;
@@ -210,6 +226,7 @@
           })
           .catch(err => {
             this.loading = false;
+            window?.vhallReportForProduct.report(170000, { report_extra: err });
           });
       },
       // 取消申请
@@ -227,9 +244,13 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
+            window?.vhallReportForProduct.report(170008, {
+              report_extra: { waiting_time: this.waitTime }
+            });
           })
           .catch(err => {
             this.loading = false;
+            window?.vhallReportForProduct.report(170000, { report_extra: res });
           });
       },
       // 等待倒计时
@@ -248,6 +269,16 @@
               tip = '组长拒绝了您的上麦请求';
             } else {
               tip = this.$t('other.other_1006');
+
+              // 超时自动取消连麦申请
+              window?.vhallReportForProduct.report(170009);
+              // 申请连麦_结果
+              window?.vhallReportForProduct.report(170005, {
+                report_extra: {
+                  waiting_time: 30 - this.waitTime,
+                  failed_reason: encodeURIComponent(tip)
+                }
+              });
             }
             this.$message.warning(tip);
           }
