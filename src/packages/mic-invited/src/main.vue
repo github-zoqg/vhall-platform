@@ -81,6 +81,8 @@
 
           this.senderId = temp.sender_id;
           this.isConfirmVisible = true;
+          // 主持人邀请您上麦”弹窗曝光时触发上报
+          window?.vhallReportForProduct.report(170007);
           this.waitTime = 30;
           clearInterval(this.waitInterval);
           this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
@@ -168,6 +170,17 @@
               useMicServer().userSpeakOn();
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             }
+            // 接受连麦邀请上报
+            window?.vhallReportForProduct.report(170009, {
+              report_extra: {
+                waiting_time: this.waitTime
+              }
+            });
+
+            // 接受连麦邀请结果上报
+            window?.vhallReportForProduct.report(170010, {
+              report_extra: res
+            });
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
@@ -187,6 +200,18 @@
           .then(res => {
             if (this.join_info.role_name == 4) {
               window.vhallReportForProduct?.report(110166, {
+                report_extra: res
+              });
+            } else if (this.join_info.role_name == 2) {
+              // 拒绝连麦邀请上报
+              window?.vhallReportForProduct.report(170011, {
+                report_extra: {
+                  waiting_time: this.waitTime,
+                  rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
+                }
+              });
+              // 拒绝连麦邀请结果上报
+              window?.vhallReportForProduct.report(170012, {
                 report_extra: res
               });
             }

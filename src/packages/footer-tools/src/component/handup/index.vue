@@ -128,6 +128,13 @@
         }
         const { type = '' } = temp.data || {};
         if (type === 'vrtc_connect_refused') {
+          // 申请连麦_结果
+          window?.vhallReportForProduct.report(170005, {
+            report_extra: {
+              waiting_time: this.waitTime,
+              failed_reason: msg
+            }
+          });
           if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
           this.loading = false;
           this.isApplyed = false;
@@ -137,6 +144,13 @@
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMicServer().$on('vrtc_connect_refused', msg => {
+        // 申请连麦_结果
+        window?.vhallReportForProduct.report(170005, {
+          report_extra: {
+            waiting_time: this.waitTime,
+            failed_reason: msg
+          }
+        });
         this.loading = false;
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
@@ -146,15 +160,21 @@
     methods: {
       // 下麦
       async speakOff() {
+        // 下麦上报
+        window?.vhallReportForProduct.report(170002);
         this.loading = true;
         try {
           const { code, msg } = await useMicServer().speakOff();
           if (code === 513035) {
             this.$message.error(msg);
+            // 下麦_结果上报
+            window?.vhallReportForProduct.report(170003);
           }
           this.loading = false;
         } catch (error) {
           this.loading = false;
+          // 下麦_结果上报
+          window?.vhallReportForProduct.report(170003);
         }
       },
       // 举手按钮点击事件
@@ -189,18 +209,28 @@
       },
       // 申请上麦
       userApply() {
+        // 申请连麦
+        window?.vhallReportForProduct.report(170004);
         useMicServer()
           .userApply()
           .then(res => {
             this.loading = false;
             if (res.code != 200) {
+              let failed_reason = res;
               if (res.code == 513345) {
-                this.$message.warning(this.$t('interact.interact_1037'));
+                failed_reason = this.$t('interact.interact_1037');
+                this.$message.warning(failed_reason);
               } else if (res.code == 513025) {
-                this.$message.error(
-                  this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
-                );
+                failed_reason = this.$t('interact.interact_1029', { n: res.data.replace_data[0] });
+                this.$message.error(failed_reason);
               }
+              // 申请连麦_结果
+              window?.vhallReportForProduct.report(170005, {
+                report_extra: {
+                  waiting_time: this.waitTime,
+                  failed_reason: encodeURIComponent(failed_reason)
+                }
+              });
               return;
             }
             this.isApplyed = true;
@@ -214,6 +244,12 @@
       },
       // 取消申请
       userCancelApply() {
+        // 取消连麦申请上报
+        window?.vhallReportForProduct.report(170008, {
+          report_extra: {
+            waiting_time: this.waitTime
+          }
+        });
         useMicServer()
           .userCancelApply()
           .then(() => {
@@ -227,9 +263,13 @@
               type: 'success',
               customClass: 'zdy-info-box'
             });
+            window?.vhallReportForProduct.report(170006);
           })
           .catch(err => {
             this.loading = false;
+            window?.vhallReportForProduct.report(170006, {
+              report_extra: err
+            });
           });
       },
       // 等待倒计时

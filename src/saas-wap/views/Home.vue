@@ -157,6 +157,7 @@
             pf: 3, // wap
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });
+
           window.vhallReport.report('ENTER_WATCH');
           this.state = 1;
           this.addEventListener();
