@@ -192,10 +192,13 @@
       // 显示插播列表 dialog
       openInsertFileDialog() {
         // 检查是否可以插播文件
+        window.vhallReportForProduct.report(110189);
         const isCanInsert = this.checkInsertFileProcess();
+        window.vhallReportForProduct.report(110190, { report_extra: { isCanInsert } });
         if (isCanInsert) {
           // 显示插播列表
           this.insertVideoVisible = true;
+          window.vhallReportForProduct.report(110191);
           this.getTableList({
             isNeedResetPage: true,
             isInvokeInCreated: true
@@ -272,6 +275,7 @@
       },
       // 选择本地文件插播
       selectLocalVideo() {
+        window.vhallReportForProduct?.report(110216);
         const insertFileServer = useInsertFileServer();
         const { watchInitData } = useRoomBaseServer().state;
         const _this = this;
@@ -385,6 +389,7 @@
       }, 300),
       // 云插播开始播放
       handlePlay(video) {
+        window.vhallReportForProduct.report(110197);
         const insertFileServer = useInsertFileServer();
         const insertFileServerState = insertFileServer.state;
         const { watchInitData } = useRoomBaseServer().state;
@@ -422,6 +427,7 @@
         }
       },
       handleDelete(video) {
+        window.vhallReportForProduct.report(110231);
         this.$confirm('删除后将会影响视频的演示和观看，确定删除？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -429,11 +435,13 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
+            window.vhallReportForProduct.report(110233);
             this.insertFileServer
               .deleteInsertFile({
                 ids: video.id
               })
               .then(res => {
+                window.vhallReportForProduct.report(110238, { report_extra: res });
                 if (res.code === 200) {
                   this.getTableList({
                     isNeedResetPage: true
@@ -447,6 +455,7 @@
                 }
               })
               .catch(res => {
+                window.vhallReportForProduct.report(110234);
                 this.$message({
                   message: res.msg || '删除失败',
                   showClose: true,
@@ -460,6 +469,7 @@
       // 预览页面
       handlePreview(video) {
         this.previewDialog = true;
+        window.vhallReportForProduct.report(110192);
         if (video.transcode_status == 1) {
           this.videoParam = {
             autoplay: true,

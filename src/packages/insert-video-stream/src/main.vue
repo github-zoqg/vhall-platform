@@ -80,7 +80,7 @@
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
         @handleRemoteInsertVideoPause="handleRemoteInsertVideoPause"
-        @closeInsertvideo="closeInsertvideo"
+        @closeInsertvideo="closeInsertvideo({ type: 'remote' })"
         v-if="insertFileType == 'remote' && isCurrentRoleInsert"
       ></video-preview>
     </div>
@@ -146,7 +146,8 @@
             <i
               @click="
                 closeInsertvideo({
-                  isShowConfirmDialog: true
+                  isShowConfirmDialog: true,
+                  type: 'btn_close'
                 })
               "
               class="vh-iconfont vh-line-close"
@@ -352,6 +353,7 @@
           this.initLocalInsertFile();
         } else {
           // 云插播
+          window.vhallReportForProduct.report(110199);
           this.initRemoteInsertFile();
         }
       },
@@ -428,7 +430,8 @@
             .catch(() => {
               console.log('创建插播本地流失败');
               this.closeInsertvideo({
-                isShowConfirmDialog: false
+                isShowConfirmDialog: false,
+                type: 'created_field'
               });
               reject(new Error('创建插播本地流失败'));
               this.$message.warning('插播创建失败，请重新选择');
@@ -526,7 +529,8 @@
           isShowConfirmDialog: false
         }
       ) {
-        console.log('----关闭插播----', options.isShowConfirmDialog);
+        window.vhallReportForProduct.report(110203, { report_extra: { type: options.type } });
+        console.log('----关闭插播----', options.isShowConfirmDialog, options.type);
         // 如果不需要展示确认关闭按钮
         if (!options.isShowConfirmDialog) {
           await this.closeInsertvideoHandler();
@@ -536,6 +540,7 @@
         if (this.isFullScreen) {
           this.exitFullScreen();
         }
+        window.vhallReportForProduct.report(110206);
         this.$confirm('确认关闭插播文件，并退出插播页面吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -543,13 +548,16 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
+            window.vhallReportForProduct.report(110209);
             // 关闭插播列表弹窗
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
             );
             this.closeInsertvideoHandler();
           })
-          .catch(() => {});
+          .catch(() => {
+            window.vhallReportForProduct.report(110207);
+          });
       },
       // 关闭插播，还原插播状态 isliveStart 是否是开始直播调用的关闭插播的方法
       // 如果是开始直播触发的关闭插播,不需要更改对端的麦克风状态
@@ -561,7 +569,9 @@
         }
         // 设置插播状态为 false
         // this.insertFileServer.setInsertFilePushing(false);
+        window.vhallReportForProduct.report(110210);
         return this.stopPushStream().then(() => {
+          window.vhallReportForProduct.report(110211);
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
           // 还原插播状态
@@ -875,6 +885,7 @@
         } else {
           this.pause();
         }
+        window.vhallReportForProduct.report(110212, { report_extra: { status: ispaused } });
       },
       // 大小窗切换
       exchange() {
@@ -908,6 +919,7 @@
         console.log(this.conctorObj.sliderVal, '快进');
         this._localFileVideoElement.currentTime = time;
         this.play();
+        window.vhallReportForProduct.report(110213, { report_extra: { currentTime: time } });
       },
       // 本地插播video暂停
       pause() {
