@@ -1012,6 +1012,7 @@
           await this.createLocalStream();
           // 推流
           await this.publishLocalStream();
+
           // 实时获取网络状况
           this.getLevel();
 
@@ -1079,14 +1080,32 @@
       },
       // 推流
       async publishLocalStream() {
-        await this.interactiveServer.publishStream().catch(e => {
-          console.log('paltForm publishLocalStream failed....', e);
-          if (e.code === '611007') {
-            this.handleSpeakOnError('noPermission');
-          } else {
-            this.handleSpeakOnError('publishStreamError');
-          }
-        });
+        // 开始推流上报
+        window?.vhallReportForProduct.report(170013);
+        await this.interactiveServer
+          .publishStream()
+          .then(data => {
+            // 开始推流_结果上报
+            window?.vhallReportForProduct.report(170014, {
+              report_extra: {
+                data: data
+              }
+            });
+          })
+          .catch(e => {
+            console.log('paltForm publishLocalStream failed....', e);
+            if (e.code === '611007') {
+              this.handleSpeakOnError('noPermission');
+            } else {
+              this.handleSpeakOnError('publishStreamError');
+            }
+            // 开始推流_结果上报
+            window?.vhallReportForProduct.report(170014, {
+              report_extra: {
+                e: e
+              }
+            });
+          });
       },
 
       // 设置主屏
@@ -1142,10 +1161,10 @@
             // );
             resolve();
           }
-
+          window?.vhallReportForProduct.report(170015);
           this.interactiveServer
             .unpublishStream()
-            .then(() => {
+            .then(data => {
               clearInterval(this._audioLeveInterval);
               // 如果是主持人，并且是结束直播导致的停止推流，需要派发事件改变开始直播按钮状态
               if (this.joinInfo.role_name == 1 && options?.source === 'live_over') {
@@ -1153,9 +1172,11 @@
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );
               }
+              window?.vhallReportForProduct.report(170016, { report_extra: data });
               resolve();
             })
             .catch(err => {
+              window?.vhallReportForProduct.report(170016, { report_extra: err });
               reject(err);
             });
         });
