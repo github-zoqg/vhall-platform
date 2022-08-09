@@ -47,11 +47,13 @@
     data() {
       return {
         state: 0,
-        liveErrorTip: '',
-        isConcise: true
+        liveErrorTip: ''
       };
     },
     computed: {
+      isConcise() {
+        return this.$domainStore.state.roomBaseServer.skinInfo?.style == 3;
+      },
       /**
        * 是否显示头部
        */
@@ -301,6 +303,7 @@
         };
 
         // TODO:调试代码
+        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
         sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
 
         if (skinInfo?.style == 3) {
