@@ -48,7 +48,6 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpLivingEnd from '@/packages/living-end-pc';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';

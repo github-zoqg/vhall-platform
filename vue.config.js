@@ -193,7 +193,9 @@ const sharedConfig = {
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
       vant: 'vant',
-      lodash: '_'
+      lodash: '_',
+      html2canvas: 'html2canvas',
+      overlayscrollbars: 'OverlayScrollbars'
     },
     // 插件
     plugins: getPlugins()

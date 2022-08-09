@@ -16,11 +16,11 @@ const htmlConfig = {
     Moment: '//s1.e.vhall.com/common-static/middle/moment/2.24.0/moment.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
-    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
-    // 通过s3域名加载
+    // 通过s2域名加载
     Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/js/vh5-ui.min.js',
-    loadLazyWap: '//s3.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
+    loadLazyWap: '//s2.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
 
     // 可以延迟加载的
     // TODO: 图片验证码涉及到的地方，需引入该文件，如何放置
@@ -32,12 +32,11 @@ const htmlConfig = {
   },
   // cdn css
   cdnCss: {
-    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
+    ElementUi: '//s3.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/css/vh5-ui.min.css',
-
     iconfontCommon:
-      '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.7/iconfont.min.css'
+      '//s3.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
+    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.7/iconfont.min.css'
   }
 };
 
