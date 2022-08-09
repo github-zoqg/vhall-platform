@@ -26,9 +26,9 @@
                 </span>
               </p>
               <span class="write write_hover" v-if="item.is_answered == 0" @click="writeQ(item)">
-                填写
+                {{ $t('form.form_1089') }}
               </span>
-              <span v-else class="write write_over">已填</span>
+              <span v-else class="write write_over">{{ $t('form.form_1090') }}</span>
             </div>
           </li>
         </ul>

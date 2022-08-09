@@ -1,5 +1,13 @@
 <template>
-  <div class="vmp-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName == 2)">
+  <div
+    class="vmp-chat-msg-item"
+    v-if="
+      !(
+        isOnlyShowSponsor &&
+        (source.roleName == 2 || ['gift_send_success', 'free_gift_send'].includes(source.type))
+      )
+    "
+  >
     <!--消息发送时间-->
     <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
@@ -252,7 +260,7 @@
               {{
                 source.type === 'reward_pay_ok'
                   ? $t('chat.chat_1029')
-                  : `${$t('chat.chat_1032')}${source.content.gift_name}`
+                  : `${$t('chat.chat_1032')} ${$tdefault(source.content.gift_name)}`
               }}
             </span>
             <div
