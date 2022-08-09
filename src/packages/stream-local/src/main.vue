@@ -641,29 +641,6 @@
               this.startPushStreamOnce = false;
               return;
             }
-            // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-            let device_status = useMediaCheckServer().state.deviceInfo.device_status;
-            if (device_status == 2) {
-              this.speakOff();
-              return;
-            } else if (device_status == 0 && [2, 4].includes(this.joinInfo.role_name)) {
-              // 观众 嘉宾
-              let _flag = await this.mediaCheckServer.getMediaInputPermission({
-                isNeedBroadcast: this.isVideoPolling && this.mode != 6
-              });
-              if (!_flag) {
-                this.speakOff();
-                this.$message.warning(this.$t('interact.interact_1039'));
-                return;
-              }
-            }
-
-            console.log('[stream-local] vrtc_connect_success startPush');
-
-            // 上麦成功后，如果开启文档可见，把主画面置为小屏
-            if (useDocServer().state.switchStatus) {
-              useRoomBaseServer().setChangeElement('stream-list');
-            }
 
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 轮询判断是否有互动实例
@@ -723,6 +700,13 @@
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'initPlayer', { autoPlay: true })
             );
+          }
+        });
+
+        // micServe异常处理
+        this.micServer.$on('vrtc_exception_msg', msg => {
+          if (msg.type === 1039) {
+            this.$message.warning(this.$t('interact.interact_1039'));
           }
         });
         // 结束直播
