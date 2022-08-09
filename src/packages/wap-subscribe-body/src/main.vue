@@ -449,12 +449,10 @@
           if (join_info.is_subscribe == 1) {
             this.subscribeText = this.$t('appointment.appointment_1006');
           } else {
-            if (webinar.verify == 3 && !this.isEmbed) {
+            if (webinar.verify == 3) {
               this.subscribeText = this.$t('webinar.webinar_1040', {
                 n: `￥${this.subOption.fee}`
               });
-            } else if (webinar.verify == 3 && this.isEmbed) {
-              this.showBottomBtn = false;
             } else {
               this.subscribeText = this.$t('appointment.appointment_1017');
             }
