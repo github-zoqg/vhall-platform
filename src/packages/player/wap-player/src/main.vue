@@ -328,11 +328,12 @@
   </div>
 </template>
 <script>
-  import { isMse } from './js/utils';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -622,7 +623,9 @@
           }
         } else {
           if (webinar.type === 3) return; //结束状态
-          if (webinar.type === 5) {
+          // 1-直播中，2-预约，3-结束，4-点播，5-回放
+          // 点播回放没有暖场，但是可能有试看
+          if (webinar.type === 5 || webinar.type === 4) {
             // 试看
             this.vodType = 'shikan';
             this.isTryPreview = true;

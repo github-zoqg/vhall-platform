@@ -2,7 +2,7 @@
   <section class="vmp-camera-check-container">
     <saas-dialog
       :visible="isShow"
-      title="摄像头检测"
+      :title="$t('setting.setting_1032')"
       width="380px"
       style="min-width: 380px"
       @onReturn="closeVideoSetting"

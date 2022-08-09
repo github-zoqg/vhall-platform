@@ -32,24 +32,6 @@ export function getSendCommonLogData() {
 }
 
 /**
- * 房间初始化成功的上报
- * @param {Object} options isSend 是否是发起端
- */
-export function logRoomInitSuccess(options = { isSend: false }) {
-  try {
-    const commonData = options.isSend ? getSendCommonLogData() : getReceiveCommonLogData();
-    window.vhallLog({
-      tag: 'live_room_init', // 日志所属功能模块
-      ...commonData,
-      data: 'live_room_init_success',
-      type: 'log' // log 日志埋点，event 业务数据埋点
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-/**
  * 房间初始化失败的上报
  * @param {Object} options isSend 是否是发起端   error 报错信息
  */
@@ -58,7 +40,7 @@ export function logRoomInitFailed(options = { isSend: false, error: {} }) {
     const commonData = options.isSend ? getSendCommonLogData() : getReceiveCommonLogData();
     console.log('--------------初始化错误日志上报--------------开始---------');
     window.vhallLog({
-      tag: 'live_room_init', // 日志所属功能模块
+      tag: 'live_room_init_error', // 日志所属功能模块
       ...commonData,
       error: _toString(options.error),
       type: 'log' // log 日志埋点，event 业务数据埋点

@@ -25,6 +25,9 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
+            <span @click.stop="">
+              <chatSeting @filterChat="filterChat" />
+            </span>
             <span
               v-if="
                 isBanned ||
@@ -52,7 +55,7 @@
       </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
-        <div class="icon-wrapper" v-show="isShowMicBtn">
+        <div class="icon-wrapper" v-show="isShowMicBtn && !hideItem">
           <!-- 上麦 -->
           <div
             v-if="isAllowHandUp || isSpeakOn"
@@ -99,6 +102,7 @@
 
 <script>
   import chatWapInput from './chatWapInput';
+  import chatSeting from './chatSeting';
   import EventBus from '../js/Events';
   import { emojiToPath } from '@/packages/chat/src/js/emoji';
   import {
@@ -176,7 +180,8 @@
     },
     components: {
       chatWapInput,
-      Handup
+      Handup,
+      chatSeting
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
@@ -286,6 +291,10 @@
       //当前直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     watch: {
@@ -318,17 +327,22 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$toast(this.$t('interact.interact_1003'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$toast(this.$t('interact.interact_1002'));
+        !this.hideItem && this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
       });
       window.chat = this;
     },
     methods: {
+      // 聊天过滤
+      filterChat(val) {
+        console.log(val);
+        this.$emit('filterChat', val);
+      },
       showMyQA() {
         this.isShowMyQA = !this.isShowMyQA;
         this.$emit('showMyQA', this.isShowMyQA);
@@ -486,7 +500,7 @@
 
         .content-input__placeholder {
           background-color: #f5f5f5;
-          color: #bfbfbf;
+          color: #8c8c8c;
           border-radius: 40px;
           width: 100%;
           height: 60px;
