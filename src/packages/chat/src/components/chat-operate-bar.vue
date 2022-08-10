@@ -329,7 +329,11 @@
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         if (this.liveStatus !== 1) {
-          this.$message.error('直播未开始禁止调用');
+          if (this.$route.query.assistantType) {
+            cl_toast('error', '直播未开始禁止调用');
+          } else {
+            this.$message.error('直播未开始禁止调用');
+          }
           return;
         }
         this.setAllBanned(val);
@@ -373,7 +377,11 @@
         }
 
         if (this.inputStatus.disable) {
-          this.$message.warning(this.$t('chat.chat_1006'));
+          if (this.$route.query.assistantType) {
+            cl_toast('success', this.$t('chat.chat_1006'));
+          } else {
+            this.$message.warning(this.$t('chat.chat_1006'));
+          }
           return;
         }
         this.$refs.emoji.toggleShow();
@@ -401,9 +409,11 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        this.$route.query.assistantType
-          ? cl_toast('success', message)
-          : this.$message.success(message);
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
         sessionStorage.setItem('filterStatus_isOnlyShowSponsor', status);
         this.filterStatus.onlyShowSponsor = status;
 
@@ -412,9 +422,11 @@
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        this.$route.query.assistantType
-          ? cl_toast('success', message)
-          : this.$message.success(message);
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
         sessionStorage.setItem('filterStatus_isShieldingEffects', status);
         this.filterStatus.isShieldingEffects = status;
         this.$emit('onSwitchShowSpecialEffects', status);
@@ -422,7 +434,11 @@
       // 仅查看聊天内容
       onClickChat(status) {
         let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
-        this.$message.success(message);
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
 
         this.$emit('onSwitchShowIsChat', status);
         sessionStorage.setItem('filterStatus_isChat', status);
