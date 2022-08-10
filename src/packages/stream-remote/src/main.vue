@@ -558,13 +558,15 @@
         }
       },
       speakOff() {
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.report(110133);
+        }
         this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
-
-        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
-          window.vhallReportForProduct?.report(110133);
-        }
       },
       fullScreen() {
         if (!this.isFullScreen) {

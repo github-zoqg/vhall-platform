@@ -668,6 +668,9 @@
         });
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
+          if (this.joinInfo.role_name == 4) {
+            window.vhallReportForProduct?.report(110182);
+          }
           await this.stopPush();
 
           if (this.joinInfo.role_name == 2) {
