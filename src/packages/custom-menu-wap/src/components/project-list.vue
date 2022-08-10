@@ -123,7 +123,7 @@
     height: 306px;
     margin: 20px 14px;
     border-radius: 6px;
-    background: #f7f7f7;
+    background: var(--theme-tab-content-project-card-bg);
     overflow: hidden;
 
     &__cover {
@@ -223,7 +223,7 @@
       max-height: 76px;
       font-size: 28px;
       font-weight: 400;
-      color: #1a1a1a;
+      color: var(--theme-tab-content-project-title-font);
       line-height: 36px;
       margin-top: 4px;
       box-sizing: border-box;
@@ -235,7 +235,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 24px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-project-info-font);
       line-height: 42px;
       text-align: left;
       padding: 0px 8px;

@@ -574,16 +574,16 @@
             border-radius: 50px;
             font-size: 20px;
             &.host {
-              background-color: #ffd1c9;
-              color: #fb2626;
+              color: rgba(251, 38, 38, 1);
+              background-color: rgba(251, 38, 38, 0.15);
             }
             &.assistant {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
             &.guest {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
           }
         }
@@ -752,16 +752,16 @@
           font-size: 22px;
           line-height: 22px;
           &.host {
-            background: rgba(251, 38, 38, 0.1);
-            color: #fb2626;
+            color: rgba(251, 38, 38, 1);
+            background-color: rgba(251, 38, 38, 0.15);
           }
           &.assistant {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+            color: rgba(10, 127, 245, 1);
+            background-color: rgba(10, 127, 245, 0.15);
           }
           &.guest {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+            color: rgba(10, 127, 245, 1);
+            background-color: rgba(10, 127, 245, 0.15);
           }
         }
       }

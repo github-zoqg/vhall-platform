@@ -146,7 +146,7 @@
 
 <style lang="less">
   .vmp-intro {
-    background-color: #f2f2f2;
+    background-color: var(--theme-tab-content-intro-introLink-bg);
     height: 100%;
     overflow-y: auto;
     position: relative;
@@ -155,7 +155,7 @@
 
     .vmp-intro-block {
       padding: 32px 24px 0 24px;
-      background-color: #fff;
+      background-color: var(--theme-tab-content-intro-introLink-bg);
       position: relative;
 
       // &:not(:first-child) {
@@ -179,7 +179,7 @@
         word-break: break-all;
         font-weight: 500;
         line-height: 48px;
-        color: #262626;
+        color: var(--theme-tab-content-intro-title-font);
         .delay-icon {
           display: inline-block;
           width: 116px;
@@ -219,6 +219,7 @@
         width: 100%;
         justify-content: space-between;
         align-items: center;
+        color: var(--theme-tab-content-intro-subTitle-font);
         p {
           i {
             margin-right: 8px;
@@ -238,7 +239,7 @@
 
       &__content-main {
         padding-bottom: 24px;
-        color: #595959;
+        color: var(--theme-tab-content-intro-subTitle-font);
         word-break: break-all;
         line-height: 1.4;
         p {
@@ -281,7 +282,7 @@
         height: 100px;
         font-size: 28px;
         font-weight: 400;
-        color: rgba(129, 129, 129, 1);
+        color: var(--theme-tab-content-intro-introLink-font);
         line-height: 100px;
         text-align: center;
         display: block;

@@ -128,7 +128,7 @@
 
         // 文档容器
         &.type-2 {
-          background-color: #f2f2f2;
+          // background-color: #f2f2f2;
         }
       }
       .vmp-tab-container__h0 {
