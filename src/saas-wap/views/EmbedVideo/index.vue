@@ -26,7 +26,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
   import { getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -91,8 +91,6 @@
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
         this.addEventListener();
-        //上报日志
-        logRoomInitSuccess();
       } catch (err) {
         //上报日志
         logRoomInitFailed({ error: err });

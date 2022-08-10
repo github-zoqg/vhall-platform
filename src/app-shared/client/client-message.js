@@ -4,6 +4,7 @@ export function assistantMsg(type, msg, error_type = null) {
   if (type === 'notice_msg' && error_type) {
     messageObj.error_type = error_type;
   }
+  console.log('通知客户端', messageObj);
   window.JsCallQtMsg(JSON.stringify(messageObj)); // Join,Leave
 }
 //调用浏览器新开页面

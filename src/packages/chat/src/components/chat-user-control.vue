@@ -34,7 +34,7 @@
 <script>
   import EventBus from '../js/Events.js';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
-  import { cl_kickout } from '@/app-shared/client/client-methods.js';
+  import { cl_kickout, cl_banned, cl_permit } from '@/app-shared/client/client-methods.js';
   export default {
     props: {
       //房间号
@@ -184,6 +184,9 @@
           status: nextStatus,
           room_id: this.roomId
         };
+        if (this.$route.query.assistantType) {
+          nextStatus == 1 ? cl_banned(this.accountId) : cl_permit(this.accountId);
+        }
         this.chatServer.setBanned(params);
         window.vhallReportForProduct?.report(110122);
       },

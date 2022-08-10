@@ -26,7 +26,7 @@
       <virtual-list
         ref="chatlist"
         style="height: 100%; overflow: auto"
-        :keeps="20"
+        :keeps="50"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -78,6 +78,7 @@
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @onSwitchShowSponsor="onSwitchShowSponsor"
+        @onSwitchShowIsChat="onSwitchShowIsChat"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
         @sendEnd="sendMsgEnd"
@@ -197,7 +198,7 @@
         //礼物特效数组
         specialEffectsList: [],
         //只看主办方
-        isOnlyShowSponsor: false,
+        isOnlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
         //特效样式map
         effectsMap: {
           鲜花: 'bg-flower',
@@ -233,11 +234,29 @@
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
-      //视图中渲染的消息,为了实现主看主办方效果
+      //视图中渲染的消息
       renderList() {
-        return this.isOnlyShowSponsor
-          ? this.chatList.filter(item => ![2, '2'].includes(item.roleName))
-          : this.chatList;
+        let list = this.chatList;
+        // 实现主看主办方效果
+        if (this.isOnlyShowSponsor) {
+          list = this.chatList.filter(
+            item =>
+              item.roleName != 2 && !['gift_send_success', 'free_gift_send'].includes(item.type)
+          );
+        }
+        // 仅查看聊天内容
+        if (this.$refs.chatOperator?.filterStatus.isChat) {
+          list = this.chatList.filter(item => ['text', 'image'].includes(item.type));
+        }
+        // 实现仅查看聊天消息
+        // if (this.$refs.chatOperator?.filterStatus.isShieldingEffects) {
+        //   // undefined为历史聊天消息
+        //   return this.chatList.filter(
+        //     item => !['gift_send_success', 'free_gift_send'].includes(item.type)
+        //   );
+        // }
+        // console.log(list);
+        return list;
       },
       // 是否观看端
       isWatch() {
@@ -809,8 +828,12 @@
         // useChatServer().clearChatMsg();
         // await this.getHistoryMsg();
         // this.$nextTick(() => {
-        //   this.scrollBottom();
+        this.scrollBottom();
         // });
+      },
+      // 仅查看聊天内容
+      onSwitchShowIsChat() {
+        this.scrollBottom();
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {
@@ -907,9 +930,33 @@
         }
         const offsetPos = this.pos;
         const { list } = await this.getHistoryMsg();
+        // const vsl = this.$refs.chatlist;
+        // this.$nextTick(() => {
+        //   this.$refs.chatlist.scrollToIndex(
+        //     this.isOnlyShowSponsor
+        //       ? list.filter(item => {
+        //           return item.roleName != 2;
+        //         }).length
+        //       : list.length
+        //   );
+        // });
+        const IdList = list.map(item => {
+          return item.count.toString();
+        });
         const vsl = this.$refs.chatlist;
+        console.log(IdList);
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToIndex(list.length);
+          const offset = IdList.reduce((previousValue, currentSid) => {
+            const previousSize =
+              typeof previousValue === 'string'
+                ? vsl.getSize(Number(previousValue))
+                : previousValue;
+            console.log(previousValue);
+            console.log(currentSid);
+            console.log(vsl.getSize(Number(currentSid)));
+            return previousSize + (vsl.getSize(Number(currentSid)) || 0);
+          });
+          vsl.scrollToOffset(offset);
         });
       },
       checkOverflow() {

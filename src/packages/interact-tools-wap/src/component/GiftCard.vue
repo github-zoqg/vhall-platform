@@ -34,7 +34,7 @@
                     alt
                   />
                 </div>
-                <p class="title" v-show="!secItem.active">{{ $t(secItem.name) }}</p>
+                <p class="title" v-show="!secItem.active">{{ $tdefault(secItem.name) }}</p>
                 <p class="money" :class="{ free: secItem.price == 0 }">
                   <!-- TODO:支付牌照问题 -->
                   <!-- {{
@@ -61,6 +61,7 @@
   // import { debounce } from 'lodash';
   import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
+  import { A } from 'caniuse-lite/data/features/css-shapes';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',
@@ -101,6 +102,9 @@
       },
       isSmallPlayer() {
         return this.$domainStore.state.playerServer.isSmallPlayer;
+      },
+      watchInitData() {
+        return this.$domainStore.state.roomBaseServer.watchInitData;
       }
     },
     // watch: {
@@ -130,6 +134,7 @@
             gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
             source_status: msg.data.source_status
           },
+          roleName: 2,
           type: 'gift_send_success',
           interactToolsStatus: true
         };
@@ -249,7 +254,8 @@
           gift_id: this.currentGift.id,
           channel: 'WEIXIN',
           service_code: 'H5_PAY',
-          room_id: this.localRoomInfo.roomId
+          room_id: this.localRoomInfo.roomId,
+          nickname: this.watchInitData.join_info.nickname
         };
 
         // if (isWechat()) {
