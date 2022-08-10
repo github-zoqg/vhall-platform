@@ -897,9 +897,9 @@
       overflow-y: auto;
       width: 100%;
       position: relative;
-      background: #f2f2f2;
+      // background: #f2f2f2;
       .subscribe_into {
-        background: #fff;
+        background: var(--theme-tab-menu-box-bg);
         padding: 40px 0;
         margin-bottom: 16px;
         .vod_title {
@@ -909,6 +909,14 @@
           font-weight: 500;
           color: #262626;
           font-size: 36px;
+        }
+        .subscribe_into_down {
+          span {
+            color: var(--theme-component-subscribe-text);
+          }
+          .des {
+            color: var(--theme-component-subscribe-num);
+          }
         }
       }
       .subscribe_tabs {
@@ -956,7 +964,7 @@
       width: 520px;
       margin: 0 auto;
       height: 80px;
-      background: #fb3a32;
+      background: var(--theme-component-subscribe);
       border-radius: 50px;
       color: #fff;
       text-align: center;
@@ -966,8 +974,8 @@
       }
       &.is-subscribe {
         background: #fff;
-        border: 1px solid #fb3a32;
-        color: #fb3a32;
+        border: 1px solid var(--theme-component-subscribe);
+        color: var(--theme-component-subscribe);
       }
     }
     .subscribe_into_center {
@@ -988,7 +996,7 @@
         line-height: 80px;
         text-align: center;
         border-radius: 50px;
-        background: #fb3a32;
+        background: var(--theme-component-subscribe);
       }
     }
     &-auth {

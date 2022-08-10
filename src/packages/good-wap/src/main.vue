@@ -401,7 +401,7 @@
               color: var(--theme-tab-content-good-buy-font);
               font-size: 24px;
               text-align: center;
-              background: #fff;
+              background: transparent;
               position: absolute;
               right: 0;
               bottom: 0;
