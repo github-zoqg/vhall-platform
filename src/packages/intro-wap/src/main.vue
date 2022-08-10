@@ -15,7 +15,7 @@
           </p>
           <!-- 预约人数 -->
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p v-if="watchInitData.subscribe.show">
+            <p class="num" v-if="watchInitData.subscribe.show">
               <i18n path="appointment.appointment_1018">
                 <span place="n">{{ watchInitData.subscribe.num }}</span>
               </i18n>
@@ -234,6 +234,9 @@
           // margin-top: 15px;
           display: flex;
           align-items: center;
+        }
+        .num {
+          color: var(--theme-component-subscribe);
         }
       }
 

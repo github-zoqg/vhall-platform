@@ -64,5 +64,16 @@ export default {
   '--theme-tab-content-qa-onlyMe-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-private-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-tab-content-private-content-font': '#fff',
-  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.65)'
+  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.65)',
+  //组件
+  '--theme-component-qa': '#fb2626',
+  '--theme-component-subscribe': '#fb2626',
+  '--theme-component-subscribe-text': 'rgba(255, 255, 255, 0.65)',
+  '--theme-component-subscribe-num': 'rgba(255, 255, 255, 1)',
+  //冗余
+  '--theme-tab-content-recommend-bg-font': ' ',
+  '--theme-header-attention-bg': ' ',
+  '--theme-chat-msg-reply-name-font': ' ',
+  '--theme-chat-msg-reply-content': ' ',
+  '--theme-header-attention-color': ' '
 };

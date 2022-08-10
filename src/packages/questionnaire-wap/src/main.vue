@@ -152,47 +152,47 @@
       }
       .el-checkbox__input.is-checked .el-checkbox__inner,
       .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__inner:hover {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__input.is-checked + .el-checkbox__label {
         color: #1a1a1a;
       }
       .el-checkbox__input.is-focus .el-checkbox__inner {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       /*单选选中效果重置*/
       .el-radio__input.is-checked .el-radio__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       .el-radio__inner:hover {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-radio__input.is-focus .el-radio__inner {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-radio__input.is-checked + .el-radio__label {
         color: #1a1a1a;
       }
       /* 日期选择效果重置*/
       .el-date-table td.today span {
-        color: #fb3a32;
+        color: var(--theme-component-qa);
         font-weight: normal;
       }
       .el-date-table td.available:hover {
-        color: #fb3a32;
+        color: var(--theme-component-qa);
       }
       .el-date-table td.current:not(.disabled) span {
         color: #fff;
-        background-color: #fb3a32;
+        background-color: var(--theme-component-qa);
       }
       .q-wrap {
         padding-bottom: 400px;
@@ -200,6 +200,11 @@
           height: 125px;
           overflow: hidden;
         }
+      }
+      .q-btns span {
+        border: 1px solid var(--theme-component-qa) !important;
+        background-color: var(--theme-component-qa) !important;
+        color: #fff !important;
       }
     }
   }

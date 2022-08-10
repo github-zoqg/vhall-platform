@@ -18,6 +18,9 @@
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { setPage } from '../../page-config/index';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+  import skins from '@/app-shared/skins/wap';
   export default {
     name: 'Subcribe',
     components: {
@@ -107,6 +110,9 @@
             return;
           }
           await subscribeState();
+
+          this.setPageConfig();
+
           bindWeiXin();
           console.log('%c---初始化直播房间 完成', 'color:blue');
           if (
@@ -224,6 +230,56 @@
           this.showBottom = true;
         } else {
           this.showBottom = false;
+        }
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'blue',
+          5: 'golden'
+        };
+
+        // TODO:暂时注掉，使用写死的值调试
+        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        // TODO:调试代码
+        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
+          style: 1,
+          bgColor: 2
+        };
+
+        // TODO:调试代码
+        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
+        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = 'main';
+        const theme = themeMap[skinInfo?.bgColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(style, theme);
+
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(style, theme) {
+        if (style == 'main' && (theme == 'black' || theme == 'white')) {
+          if (theme == 'black') {
+            document.body.style.background = `#262626`;
+          }
+          if (theme == 'white') {
+            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
+          }
+        } else {
+          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+            style +
+            '_' +
+            theme +
+            '.png')})`;
+          document.body.style.backgroundSize = 'cover';
         }
       }
     }
