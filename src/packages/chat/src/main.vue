@@ -341,6 +341,9 @@
 
       // 展示欢迎语
       this.showWelcome();
+      this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+      this.virtual.showlist = true;
+      this.chatlistHeight = this.virtual.contentHeight;
     },
     destroyed() {},
     methods: {
