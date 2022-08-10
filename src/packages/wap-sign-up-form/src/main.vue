@@ -790,18 +790,21 @@
             this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
             this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
             this.cascadeResultList = [];
-            const shareInfo = await this.roomBaseServer.getShareSettingInfo({
-              webinarId: res.data.id
-            });
-            if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
-              let title = shareInfo.data.title;
-              title = title.length - 30 > 0 ? title.substring(0, 30) : title;
-              let shareInfo = {
-                title: title,
-                img_url: shareInfo.data.img_url,
-                introduction: replaceHtml(shareInfo.data.introduction, 42)
-              };
-              this.wxShareInfoWebinar(shareInfo);
+            if (!this.isEmbed) {
+              // 如果不是嵌入报名表单的时候 才支持分享
+              const shareInfo = await this.roomBaseServer.getShareSettingInfo({
+                webinarId: res.data.id
+              });
+              if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
+                let title = shareInfo.data.title;
+                title = title.length - 30 > 0 ? title.substring(0, 30) : title;
+                let shareInfo = {
+                  title: title,
+                  img_url: shareInfo.data.img_url,
+                  introduction: replaceHtml(shareInfo.data.introduction, 42)
+                };
+                this.wxShareInfoWebinar(shareInfo);
+              }
             }
           })
           .catch(error => {
@@ -1069,7 +1072,7 @@
         const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
         const nameItem = this.list.find(item => item.type === 0 && item.default_type === 1);
 
-        const params = {
+        let params = {
           ...this.setParamsIdByRoute({}),
           phone: this.form[phoneItem.id],
           form: JSON.stringify(this.answer),
@@ -1082,15 +1085,20 @@
         if (this.isPhoneValidate) {
           params.verify_code = this.form.code;
         }
-
-        if (this.$route.query.refer) {
-          params.refer = this.$route.query.refer;
+        if (this.isEmbed) {
+          // 如果是嵌入页-报名表单，地址栏有啥就传递啥
+          params = {
+            ...params,
+            ...this.$route.query
+          };
+        } else {
+          if (this.$route.query.refer) {
+            params.refer = this.$route.query.refer;
+          }
         }
-
         if (sessionStorage.getItem('visitorId')) {
           params.visit_id = sessionStorage.getItem('visitorId');
         }
-
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
@@ -1170,20 +1178,34 @@
             is_no_check: 1
           })
           .then(res => {
-            const queryString = this.returnQueryString();
+            let queryString = this.returnQueryString();
             if (res.data.webinar_type == 2) {
               this.startTime = res.data.start_time;
-              this.queryString = queryString;
+              if (this.isEmbed) {
+                // 如果是嵌入页表单
+                this.queryString = window.location.search;
+              } else {
+                this.queryString = queryString;
+              }
               this.isSubmitSuccess = true;
             } else {
-              location.replace(
-                window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
-                    this.webinarOrSubjectId
-                  }${queryString}`
-              );
+              if (this.isEmbed) {
+                // 如果是嵌入页表单
+                let queryString = window.location.search;
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/embedclient/watch/${this.webinarOrSubjectId}${queryString}`
+                );
+              } else {
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                );
+              }
             }
           })
           .catch(e => {

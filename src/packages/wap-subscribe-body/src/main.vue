@@ -61,7 +61,19 @@
         <template v-else>
           <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
-        <div class="subscribe_into_container" v-if="showBottomBtnPannel">
+        <div
+          class="subscribe_into_container"
+          v-if="
+            ((this.subOption.verify != 0 ||
+              (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
+              !this.isEmbed) ||
+            (this.isEmbed && this.webinarType != 2) ||
+            (this.isEmbed &&
+              !this.isEmbedVideo &&
+              this.subOption.open_reg_form &&
+              (this.subOption.verify == 0 || this.subOption.verify == 1))
+          "
+        >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
@@ -100,7 +112,13 @@
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
-    <template v-if="showBottomBtnPannel2">
+    <template
+      v-if="
+        this.showBottomBtn &&
+        (this.subOption.verify != 0 ||
+          (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1))
+      "
+    >
       <div class="vmp-subscribe-body-auth">
         <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -318,24 +336,6 @@
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
-      },
-      // 是否展示下侧按钮面板区域
-      showBottomBtnPannel() {
-        // 非嵌入情况下，（观看限制-非免费 或者 观看限制=免费 并且 隐藏预约按钮）；嵌入情况下，不是预约页。
-        return (
-          ((this.subOption.verify != 0 ||
-            (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
-            !this.isEmbed) ||
-          (this.isEmbed && this.webinarType != 2)
-        );
-      },
-      // 是否展示下侧按钮面板区域2
-      showBottomBtnPannel2() {
-        return (
-          this.showBottomBtn &&
-          (this.subOption.verify != 0 ||
-            (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1))
-        );
       }
     },
     beforeCreate() {
@@ -368,7 +368,16 @@
             let scrollTop = e.target.scrollTop;
             if (scrollTop > offsetTop) {
               this.isScorllTab = true;
-              if (this.webinarType == 2 && this.isEmbed) {
+              if (
+                this.webinarType == 2 &&
+                this.isEmbed &&
+                !(
+                  this.isEmbed &&
+                  !this.isEmbedVideo &&
+                  this.subOption.open_reg_form &&
+                  (this.subOption.verify == 0 || this.subOption.verify == 1)
+                )
+              ) {
                 this.showBottomBtn = false;
               } else {
                 this.showBottomBtn = true;
@@ -417,6 +426,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        // 报名表单是否已填写
+        this.subOption.save_reg_form = join_info.reg_form;
+        // 报名表单是否已开启
+        this.subOption.open_reg_form = webinar.reg_form;
         if (webinar.type == 2 && subscribe.show == 1) {
           this.subOption.num = subscribe.num;
         }
@@ -442,7 +455,15 @@
         }
         // 如果是嵌入页并且没有开播 并且（未开启报名表单）预约按钮不显示
         if (webinar.type == 2) {
-          if (this.isEmbed) {
+          if (
+            this.isEmbed &&
+            !(
+              this.isEmbed &&
+              !this.isEmbedVideo &&
+              this.subOption.open_reg_form &&
+              (this.subOption.verify == 0 || this.subOption.verify == 1)
+            )
+          ) {
             this.showBottomBtn = false;
             return;
           }
@@ -550,25 +571,26 @@
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
           case 512525: // 填写表单
-            queryString = this.$route.query.refer
-              ? `?refer=${this.$route.query.refer}&isIndependent=0`
-              : '?isIndependent=0';
-            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-            if (queryString.indexOf('?') != -1) {
-              queryString += share_id ? `&share_id=${share_id}` : '';
-              queryString += shareId ? `&shareId=${shareId}` : '';
-            } else if (queryString.indexOf('?') == -1 && share_id) {
-              queryString += share_id ? `?share_id=${share_id}` : '';
-            } else if (queryString.indexOf('?') == -1 && shareId) {
-              queryString += shareId ? `?shareId=${shareId}` : '';
+            if (this.isEmbed) {
+              queryString = window.location.search;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
+            } else {
+              queryString = this.$route.query.refer
+                ? `?refer=${this.$route.query.refer}&isIndependent=0`
+                : '?isIndependent=0';
+              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+              if (queryString.indexOf('?') != -1) {
+                queryString += share_id ? `&share_id=${share_id}` : '';
+                queryString += shareId ? `&shareId=${shareId}` : '';
+              } else if (queryString.indexOf('?') == -1 && share_id) {
+                queryString += share_id ? `?share_id=${share_id}` : '';
+              } else if (queryString.indexOf('?') == -1 && shareId) {
+                queryString += shareId ? `?shareId=${shareId}` : '';
+              }
+              // 邀请卡分享
+              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             }
-            // 邀请卡分享
-            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${
-              process.env.VUE_APP_ROUTER_BASE_URL
-            }${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${
-              this.$route.params.id
-            }${queryString}`;
             break;
           case 512002:
           case 512522:

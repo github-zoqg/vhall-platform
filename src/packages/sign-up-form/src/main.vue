@@ -1139,6 +1139,10 @@
             trigger: 'blur'
           }
         };
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {
@@ -1745,16 +1749,23 @@
           console.log(object);
           if (valid) {
             let form = this.generateFormParams();
-            const params = {
+            let params = {
               ...this.setParamsIdByRoute({}),
               form: JSON.stringify(form)
             };
             this.isPhoneValidate && (params.verify_code = this.form.code);
+            if (this.isEmbed) {
+              params = {
+                ...params,
+                ...this.$route.query
+              };
+            } else {
+              this.$route.query.refer && (params.refer = this.$route.query.refer);
+            }
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }
-            this.$route.query.refer && (params.refer = this.$route.query.refer);
             this.signUpFormServer.submitSignUpForm(params).then(res => {
               if (res.code == 200) {
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
