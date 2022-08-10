@@ -5,7 +5,11 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+            <el-image
+              v-if="formInfo && formInfo.cover != 1"
+              :src="formInfo.cover ? coverPic : defaultHeader"
+              fit="cover"
+            ></el-image>
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
@@ -60,6 +64,7 @@
                   :rules="rules"
                   :validate-on-rule-change="false"
                   label-position="top"
+                  @submit.native.prevent
                 >
                   <el-form-item
                     v-for="(question, quesIndex) in list"
@@ -295,6 +300,7 @@
                   class="entryForm"
                   :model="verifyForm"
                   :rules="verifyRules"
+                  @submit.native.prevent
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
@@ -359,7 +365,11 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+          <el-image
+            v-if="formInfo && formInfo.cover != 1"
+            :src="formInfo.cover ? coverPic : defaultHeader"
+            fit="cover"
+          ></el-image>
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
@@ -414,6 +424,7 @@
                 :rules="rules"
                 :validate-on-rule-change="false"
                 label-position="top"
+                @submit.native.prevent
               >
                 <el-form-item
                   v-for="(question, quesIndex) in list"
@@ -624,7 +635,7 @@
                     </el-checkbox>
                   </template>
                 </el-form-item>
-                <div class="btn-box">
+                <div class="btn-box" v-show="loadingEnd">
                   <el-button
                     style="margin-top: 11px"
                     :disabled="isPreview"
@@ -643,7 +654,13 @@
           <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
             <!-- 验证 -->
             <template>
-              <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
+              <el-form
+                ref="verifyForm"
+                class="entryForm"
+                :model="verifyForm"
+                :rules="verifyRules"
+                @submit.native.prevent
+              >
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
                     v-if="!isAbroadPhoneValide"
@@ -685,7 +702,7 @@
                     </el-col>
                   </el-row>
                 </el-form-item>
-                <div class="btn-box">
+                <div class="btn-box" v-show="loadingEnd">
                   <el-button
                     :disabled="isPreview"
                     :class="[formInfo.theme_color + '1']"
@@ -707,7 +724,8 @@
 
 <script>
   import defaultHeader from './img/formHeader.png';
-  import { useRoomBaseServer, useSignUpFormServer } from 'middle-domain';
+  import { useRoomBaseServer, useSignUpFormServer, useSubjectServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpSignUpForm',
     data() {
@@ -720,10 +738,12 @@
         isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
         //是否是预览
         isPreview: this.$route.path.indexOf('/live/signup') !== -1,
-        //活动id
-        webinarId: '',
+        // 活动ID 或者 专题ID
+        webinarOrSubjectId: '',
         //表单信息
-        formInfo: {},
+        formInfo: {
+          cover: 1 // 默认蓝色底图 闪动问题做区分
+        },
         //简介内容是否超长
         overflowStatus: false,
         //模态窗是否可见
@@ -822,7 +842,12 @@
         //是否是短信验证码错误
         isVerifyCodeErr: false,
         //地域验证是否通过
-        isValidRegional: true
+        isValidRegional: true,
+        isSubject: false, // 是否从专题入口打开
+        ajaxInfoEnd: false,
+        ajaxListEnd: false,
+        interfaceType:
+          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     watch: {
@@ -1013,6 +1038,10 @@
       }
     },
     computed: {
+      // 报名表单是否加载完毕
+      loadingEnd() {
+        return this.ajaxInfoEnd && this.ajaxListEnd;
+      },
       // 与网易易盾图片插件语言匹配
       // langNECaptcha() {
       //   const locale = window.$globalConfig.currentLang;
@@ -1031,7 +1060,11 @@
       // },
       // 广告头图
       coverPic() {
-        return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover != 1) {
+          return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        } else {
+          return '';
+        }
       },
       //输入提示的多语言转换
       findPlaceHolder() {
@@ -1106,11 +1139,28 @@
             trigger: 'blur'
           }
         };
+      },
+      isEmbed() {
+        // 是不是音视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
+      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+        // 专题下独立报名表单
+        this.subjectServer = useSubjectServer();
+      }
+    },
+    created() {
+      // TODO 待确认此处是否需要如此设置。
+      if (
+        this.interfaceType === 'subject' ||
+        window.location.href.indexOf('/special/detail') != -1
+      ) {
+        this.$i18n.locale = 'zh-CN';
+      }
     },
     mounted() {
       //因为这个组件也会在独立报名表单页使用，所以增加一下判断
@@ -1119,45 +1169,89 @@
       }
     },
     methods: {
+      // 设置接口入参，是活动维度 还是 专题维度
+      setParamsIdByRoute(params) {
+        if (this.interfaceType === 'webinar') {
+          params.webinar_id = this.webinarOrSubjectId;
+        } else if (this.interfaceType === 'subject') {
+          params.subject_id = this.webinarOrSubjectId;
+        }
+        return params;
+      },
       //打开模态窗
-      async openModal() {
-        this.initViewData();
+      async openModal(webinarId = null) {
+        if (webinarId) {
+          // 专题下 点击活动，若有专题报名表单，传递活动ID给本函数。之后本页面中逻辑执行：后端通过活动ID获取是专题报名表单内容 还是 活动的报名表单内容
+          this.webinarOrSubjectId = webinarId;
+          this.isSubject = true;
+        } else {
+          this.isSubject = false;
+          this.initViewData();
+          await this.getWebinarInfo(); // 活动下调用活动类型接口
+        }
         this.visible = true;
-        await this.getWebinarType();
         this.getBaseInfo();
         this.getQuestionList();
       },
       //独立报名表单的初始化逻辑
       async init() {
-        //因为是独立页面，活动id只能从路由取
-        this.webinarId =
+        //因为是独立页面，活动id/专题id只能从路由取
+        this.webinarOrSubjectId =
           this.$route.params.id || this.$route.params.str || this.$route.params.il_id;
-        await this.getWebinarType();
+        if (this.interfaceType === 'subject') {
+          // 专题-默认 活动报名在前
+          this.isSubscribe = 1;
+          this.activeTab = 1;
+          if (this.subjectServer) {
+            // 初始化专题
+            this.initSubjectAuth();
+          } else {
+            console.log('没有专题subjectServer');
+          }
+        } else {
+          await this.getWebinarInfo();
+        }
         this.getBaseInfo();
         this.getQuestionList();
       },
-      //获取活动类型
-      getWebinarType() {
-        const params = {
-          webinar_id: this.webinarId
+      // 初始化专题信息，获取专题访客ID
+      async initSubjectAuth() {
+        const visitorId = localStorage.getItem('visitorId');
+        let params = {
+          subject_id: this.webinarOrSubjectId,
+          visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
+          ...this.$route.query
         };
-        return this.signUpFormServer
-          .getWebinarType(params)
+        // 如果已经鉴权过，就直接进入观看端，否则走鉴权
+        await this.subjectServer.initSubjectInfo(params);
+      },
+      // 获取活动信息
+      getWebinarInfo() {
+        return this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
+          })
           .then(res => {
-            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+            this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
-              window.location.href = `${window.location.origin}/${this.webinarId}`;
+              // 老活动没有test4环境，无论哪个测试环境一律跳到t-webinar.e.vhall.com环境
+              let origin =
+                process.env.NODE_ENV === 'production'
+                  ? window.location.origin
+                  : 'https://t-webinar.e.vhall.com';
+              window.location.href = `${origin}/${this.webinarOrSubjectId}`;
             }
           });
       },
       initViewData() {
         const { watchInitData = {} } = this.roomBaseServer.state;
         const { webinar = {} } = watchInitData;
-        //活动id
-        this.webinarId = webinar.id || '';
+        // 活动id
+        this.webinarOrSubjectId = webinar.id || '';
       },
       // 手机号验证
       validPhone(rule, value, callback) {
@@ -1244,32 +1338,36 @@
       },
       //初始化活动信息
       getBaseInfo() {
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getFormBaseInfo(params).then(res => {
-          const { code = '', data = {} } = res || {};
-          if ([200, '200'].includes(code)) {
-            if (res.data.tab_form_title) {
-              res.data.tab_form_title =
-                this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
-                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
-                  : res.data.tab_form_title;
+        this.ajaxInfoEnd = false;
+        this.signUpFormServer
+          .getFormBaseInfo(this.setParamsIdByRoute({}))
+          .then(res => {
+            this.ajaxInfoEnd = true;
+            const { code = '', data = {} } = res || {};
+            if ([200, '200'].includes(code)) {
+              if (res.data.tab_form_title) {
+                res.data.tab_form_title =
+                  this.langDefaultZH.indexOf(res.data.tab_form_title) > -1
+                    ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_form_title)]
+                    : res.data.tab_form_title;
+              }
+              if (res.data.tab_verify_title) {
+                res.data.tab_verify_title =
+                  this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
+                    ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
+                    : res.data.tab_verify_title;
+              }
+              this.formInfo = data;
+              this.$nextTick(() => {
+                this.calculateText();
+              });
+            } else {
+              this.$message.error(this.$t('form.form_1031'));
             }
-            if (res.data.tab_verify_title) {
-              res.data.tab_verify_title =
-                this.langDefaultZH.indexOf(res.data.tab_verify_title) > -1
-                  ? this.langDefaultCode[this.langDefaultZH.indexOf(res.data.tab_verify_title)]
-                  : res.data.tab_verify_title;
-            }
-            this.formInfo = data;
-            this.$nextTick(() => {
-              this.calculateText();
-            });
-          } else {
-            this.$message.error(this.$t('form.form_1031'));
-          }
-        });
+          })
+          .catch(e => {
+            this.ajaxInfoEnd = true;
+          });
       },
       //计算简介是否太长
       calculateText() {
@@ -1286,53 +1384,58 @@
       //初始化表单问题信息
       getQuestionList() {
         const _this = this;
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getQuestionsList(params).then(res => {
-          // 按照 order_num 从小到大排序
-          const list = res.data.ques_list.sort(this.compare('order_num'));
-          !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
-          // 手机号验证开启状态
-          const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
-          this.isPhoneValidate =
-            phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
-          // 是否支持国外手机号
-          this.isAbroadPhoneValide =
-            phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
-          // 默认填写手机号
-          !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
-          if (!_this.isPreview) {
-            _this.$refs.verifyForm.validateField('phone', err => {
-              if (!err) {
-                _this.isValidPhone = true;
-              } else {
-                _this.isValidPhone = false;
+        this.ajaxListEnd = false;
+        this.signUpFormServer
+          .getQuestionsList(this.setParamsIdByRoute({}))
+          .then(res => {
+            this.ajaxListEnd = true;
+            // 按照 order_num 从小到大排序
+            const list = res.data.ques_list.sort(this.compare('order_num'));
+            !this.isPreview && res.data.phone && (this.currentPhone = Number(res.data.phone));
+            // 手机号验证开启状态
+            const phoneItem = list.find(item => item.type == 0 && item.default_type == 2);
+            this.isPhoneValidate =
+              phoneItem.options && JSON.parse(phoneItem.options).open_verify == 1;
+            // 是否支持国外手机号
+            this.isAbroadPhoneValide =
+              phoneItem.options && JSON.parse(phoneItem.options).support_foreign_phone == 1;
+            // 默认填写手机号
+            !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
+            if (!_this.isPreview) {
+              _this.$refs.verifyForm.validateField('phone', err => {
+                if (!err) {
+                  _this.isValidPhone = true;
+                } else {
+                  _this.isValidPhone = false;
+                }
+              });
+            }
+            this.list = list;
+            //地域 options 格式化处理
+            this.list.some(item => {
+              if (item.type == 5) {
+                this.isValidRegional = !!item.is_must;
+                item.options = JSON.parse(item.options);
+                item.colNum = 8;
+                item.options.show_district == 0 && (item.colNum = 12);
+                item.options.show_city == 0 && (item.colNum = 24);
+                this.colNum = item.colNum;
+                this.regionalId = item.id;
+                return true;
               }
             });
-          }
-          this.list = list;
-          //地域 options 格式化处理
-          this.list.some(item => {
-            if (item.type == 5) {
-              this.isValidRegional = !!item.is_must;
-              item.options = JSON.parse(item.options);
-              item.colNum = 8;
-              item.options.show_district == 0 && (item.colNum = 12);
-              item.options.show_city == 0 && (item.colNum = 24);
-              this.colNum = item.colNum;
-              this.regionalId = item.id;
-              return true;
+            // 隐私声明格式处理
+            const lastQuestion = this.list[this.list.length - 1];
+            if (lastQuestion.subject === '隐私声明') {
+              this.privacy = lastQuestion;
+              this.privacy && this.privacyFormatter();
             }
+            list.some(item => item.type === 5) && this.getAreaList();
+          })
+          .catch(error => {
+            this.ajaxListEnd = true;
+            console.log(error);
           });
-          // 隐私声明格式处理
-          const lastQuestion = this.list[this.list.length - 1];
-          if (lastQuestion.subject === '隐私声明') {
-            this.privacy = lastQuestion;
-            this.privacy && this.privacyFormatter();
-          }
-          list.some(item => item.type === 5) && this.getAreaList();
-        });
       },
       //生成表单提交参数
       generateFormParams() {
@@ -1537,7 +1640,11 @@
 
         //获取短信验证码
         if (this.mobileKey) {
-          const params = { webinar_id: this.webinarId, phone: phone, captcha: this.mobileKey };
+          let params = {
+            ...this.setParamsIdByRoute({}),
+            phone: phone,
+            captcha: this.mobileKey
+          };
           this.signUpFormServer.sendVerifyCode(params).then(() => {
             this.countDown(isForm);
           });
@@ -1583,7 +1690,11 @@
         initNECaptcha({
           captchaId: that.captchaKey,
           element: id,
-          lang: (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
+          lang:
+            this.interfaceType === 'subject' ||
+            window.location.href.indexOf('/special/detail') != -1
+              ? 'zh-CN'
+              : (localStorage.getItem('lang') == '1' ? 'zh-CN' : 'en') || 'zh-CN',
           mode: 'float',
           onReady() {},
           onVerify(err, data) {
@@ -1638,22 +1749,37 @@
           console.log(object);
           if (valid) {
             let form = this.generateFormParams();
-            const params = {
-              webinar_id: this.webinarId,
+            let params = {
+              ...this.setParamsIdByRoute({}),
               form: JSON.stringify(form)
             };
             this.isPhoneValidate && (params.verify_code = this.form.code);
+            if (this.isEmbed) {
+              params = {
+                ...params,
+                ...this.$route.query
+              };
+            } else {
+              this.$route.query.refer && (params.refer = this.$route.query.refer);
+            }
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }
-            this.$route.query.refer && (params.refer = this.$route.query.refer);
             this.signUpFormServer.submitSignUpForm(params).then(res => {
               if (res.code == 200) {
                 res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                if (this.isSubject) {
+                  // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                  window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
+                }
                 // 报名成功的操作，跳转到直播间
-                // 判断当前直播状态，进行相应的跳转
-                this.getWebinarStatus(true);
+                if (this.interfaceType === 'subject') {
+                  this.goToSubjectDetailOrReload();
+                } else {
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus(true);
+                }
               } else if (res.code == 512809 || res.code == 512570) {
                 // 短信验证码验证失败，触发表单验证失败
                 // 现在的表单验证码逻辑完全由后端返回结果决定，前端不验证格式
@@ -1668,7 +1794,12 @@
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
-                this.getWebinarStatus();
+                if (this.interfaceType === 'subject') {
+                  this.goToSubjectDetailOrReload();
+                } else {
+                  // 判断当前直播状态，进行相应的跳转
+                  this.getWebinarStatus();
+                }
               } else {
                 this.$message.error(this.$tec(res.code) || res.msg);
               }
@@ -1683,7 +1814,7 @@
         this.$refs.verifyForm.validate(valid => {
           if (valid) {
             const params = {
-              webinar_id: this.webinarId,
+              ...this.setParamsIdByRoute({}),
               phone: this.verifyForm.phone,
               verify_code: this.verifyForm.code
             };
@@ -1699,8 +1830,12 @@
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
-                  // 判断当前直播状态，进行相应的跳转
-                  this.getWebinarStatus();
+                  if (this.interfaceType === 'subject') {
+                    this.goToSubjectDetailOrReload();
+                  } else {
+                    // 判断当前直播状态，进行相应的跳转
+                    this.getWebinarStatus();
+                  }
                 } else {
                   this.$message.warning(this.$t('form.form_1034'));
                   this.activeTab = 1;
@@ -1724,72 +1859,111 @@
       },
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
-        const params = {
-          webinar_id: this.webinarId
-        };
-        this.signUpFormServer.getWebinarType(params).then(res => {
-          if (res.code == 512503 || res.code == 512502) {
-            window.location.href = `${window.location.origin}/${this.webinarId}`;
-            return false;
-          }
-          // 如果是独立链接，判断状态进行跳转
-          if (this.isEntryForm) {
-            const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
-            if (res.data.status == 'live') {
-              window.location.href =
-                window.location.origin +
-                process.env.VUE_APP_WEB_KEY +
-                `/lives/watch/${this.webinarId}${queryString}`;
-            } else {
-              // 如果预约或结束，跳转到预约页
-              if (res.data.webinar.type == 2 && isSubmitForm) {
-                // 如果是预约状态，显示开播时间提醒
-                this.$alert(
-                  this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
-                  this.$t('account.account_1061'),
-                  {
-                    confirmButtonText: this.$t('common.common_1033'),
-                    customClass: 'zdy-alert-box',
-                    callback: action => {
-                      console.log(action);
-                      this.closePreview();
-                      window.location.href =
-                        window.location.origin +
-                        process.env.VUE_APP_WEB_KEY +
-                        `/lives/subscribe/${this.webinarId}${queryString}`;
-                    }
-                  }
-                );
-              } else {
-                window.location.href =
-                  window.location.origin +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/subscribe/${this.webinarId}${queryString}`;
+        if (this.isSubject) {
+          // 报名成功的操作，跳转到直播间
+          this.closePreview();
+          // 当前是点击专题下的活动进入的时候，直接跳转/lives/watch（由该页面自行判断页面跳转)
+          const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+          const href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+          window.open(href, '_blank');
+        } else {
+          // 当前是正常活动点开
+          this.roomBaseServer
+            .getWebinarInfo({
+              webinar_id: this.webinarOrSubjectId,
+              is_no_check: 1
+            })
+            .then(res => {
+              if (res.code == 512503 || res.code == 512502) {
+                // 跳转老活动
+                window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
+                return false;
               }
-            }
-          } else {
-            if (res.data.webinar.type == 2 && isSubmitForm) {
-              // 如果是预约状态，显示开播时间提醒
-              this.$alert(
-                this.$t('form.form_1032', { n: res.data.webinar.start_time.substring(0, 16) }),
-                this.$t('account.account_1061'),
-                {
-                  confirmButtonText: this.$t('common.common_1033'),
-                  customClass: 'zdy-alert-box',
-                  callback: action => {
-                    console.log(action);
-                    this.closePreview();
-                    //验证成功,刷新页面
-                    location.reload();
-                  }
+              // 如果是独立链接，判断状态进行跳转
+              if (this.isEntryForm) {
+                this.gotoWebinarPage(res, isSubmitForm);
+              } else {
+                // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
+                if (res.data.webinar_type == 2 && isSubmitForm) {
+                  // 如果是预约状态，显示开播时间提醒
+                  this.$alert(
+                    this.$t('form.form_1032', { n: res.data.start_time.substring(0, 16) }),
+                    this.$t('account.account_1061'),
+                    {
+                      confirmButtonText: this.$t('common.common_1033'),
+                      customClass: 'zdy-alert-box',
+                      callback: action => {
+                        console.log(action);
+                        this.closePreview();
+                        location.reload();
+                      }
+                    }
+                  );
+                } else {
+                  this.closePreview();
+                  location.reload();
                 }
-              );
-            } else {
-              this.closePreview();
-              location.reload();
-            }
+              }
+            });
+        }
+      },
+      // 跳转活动页
+      gotoWebinarPage(res, isSubmitForm) {
+        const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+        if (res.data.status == 'live') {
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+        } else {
+          // 如果预约或结束，跳转到预约页
+          if (res.data.webinar_type == 2 && isSubmitForm) {
+            // 如果是预约状态，显示开播时间提醒
+            this.$alert(
+              this.$t('form.form_1032', { n: res.data.start_time.substring(0, 16) }),
+              this.$t('account.account_1061'),
+              {
+                confirmButtonText: this.$t('common.common_1033'),
+                customClass: 'zdy-alert-box',
+                callback: action => {
+                  console.log(action);
+                  this.closePreview();
+                  window.location.href =
+                    window.location.origin +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+                }
+              }
+            );
+          } else {
+            window.location.href =
+              window.location.origin +
+              process.env.VUE_APP_WEB_KEY +
+              `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
           }
-        });
+        }
+      },
+      // 提交报名表单结束，跳转专题详情页（独立报名表单），或者刷新（专题详情页弹出报名表单）
+      goToSubjectDetailOrReload() {
+        // 如果是独立链接，判断状态进行跳转
+        if (this.isEntryForm) {
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/special/detail?id=${this.webinarOrSubjectId}&refer=${
+              this.$route.query.refer ? this.$route.query.refer : ''
+            }`;
+        } else {
+          this.closePreview();
+          //验证成功,刷新页面
+          window.location.href =
+            window.location.origin +
+            process.env.VUE_APP_WEB_KEY +
+            `/lives/subscribe/${this.webinarOrSubjectId}`;
+        }
       },
       //关闭当前视图
       closePreview() {

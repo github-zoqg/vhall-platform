@@ -53,6 +53,7 @@
       </template>
     </div>
     <div class="vmp-subscribe-body-info">
+      <!-- !isLiveEnd 不是直播结束情况下 -->
       <div class="subscribe_into" v-if="!isLiveEnd">
         <template v-if="webinarType == 1 || webinarType == 2">
           <time-down ref="timeDowner"></time-down>
@@ -62,7 +63,16 @@
         </template>
         <div
           class="subscribe_into_container"
-          v-if="(subOption.hide_subscribe == 1 && !isEmbed) || (isEmbed && webinarType != 2)"
+          v-if="
+            ((this.subOption.verify != 0 ||
+              (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
+              !this.isEmbed) ||
+            (this.isEmbed && this.webinarType != 2) ||
+            (this.isEmbed &&
+              !this.isEmbedVideo &&
+              this.subOption.open_reg_form &&
+              (this.subOption.verify == 0 || this.subOption.verify == 1))
+          "
         >
           <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -102,7 +112,13 @@
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </div>
     </div>
-    <template v-if="showBottomBtn && subOption.hide_subscribe == 1">
+    <template
+      v-if="
+        this.showBottomBtn &&
+        (this.subOption.verify != 0 ||
+          (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1))
+      "
+    >
       <div class="vmp-subscribe-body-auth">
         <div class="subscribe_into_other" v-if="showSubscribeBtn">
           <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
@@ -198,7 +214,7 @@
   } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
-  import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -262,7 +278,9 @@
           return false;
         }
       },
+      // 是否展示 F码+付费组合按钮
       showSubscribeBtn() {
+        // 观看限制 - F码+付费 并且 非结束状态下，未预约成功
         if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
           return true;
         } else {
@@ -350,7 +368,16 @@
             let scrollTop = e.target.scrollTop;
             if (scrollTop > offsetTop) {
               this.isScorllTab = true;
-              if (this.webinarType == 2 && this.isEmbed) {
+              if (
+                this.webinarType == 2 &&
+                this.isEmbed &&
+                !(
+                  this.isEmbed &&
+                  !this.isEmbedVideo &&
+                  this.subOption.open_reg_form &&
+                  (this.subOption.verify == 0 || this.subOption.verify == 1)
+                )
+              ) {
                 this.showBottomBtn = false;
               } else {
                 this.showBottomBtn = true;
@@ -399,6 +426,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        // 报名表单是否已填写
+        this.subOption.save_reg_form = join_info.reg_form;
+        // 报名表单是否已开启
+        this.subOption.open_reg_form = webinar.reg_form;
         if (webinar.type == 2 && subscribe.show == 1) {
           this.subOption.num = subscribe.num;
         }
@@ -422,9 +453,17 @@
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
           }
         }
-        // 如果是嵌入页并且没有开播，预约按钮不显示
+        // 如果是嵌入页并且没有开播 并且（未开启报名表单）预约按钮不显示
         if (webinar.type == 2) {
-          if (this.isEmbed) {
+          if (
+            this.isEmbed &&
+            !(
+              this.isEmbed &&
+              !this.isEmbedVideo &&
+              this.subOption.open_reg_form &&
+              (this.subOption.verify == 0 || this.subOption.verify == 1)
+            )
+          ) {
             this.showBottomBtn = false;
             return;
           }
@@ -532,21 +571,26 @@
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
           case 512525: // 填写表单
-            queryString = this.$route.query.refer
-              ? `?refer=${this.$route.query.refer}&isIndependent=0`
-              : '?isIndependent=0';
-            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-            if (queryString.indexOf('?') != -1) {
-              queryString += share_id ? `&share_id=${share_id}` : '';
-              queryString += shareId ? `&shareId=${shareId}` : '';
-            } else if (queryString.indexOf('?') == -1 && share_id) {
-              queryString += share_id ? `?share_id=${share_id}` : '';
-            } else if (queryString.indexOf('?') == -1 && shareId) {
-              queryString += shareId ? `?shareId=${shareId}` : '';
+            if (this.isEmbed) {
+              queryString = window.location.search;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
+            } else {
+              queryString = this.$route.query.refer
+                ? `?refer=${this.$route.query.refer}&isIndependent=0`
+                : '?isIndependent=0';
+              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+              if (queryString.indexOf('?') != -1) {
+                queryString += share_id ? `&share_id=${share_id}` : '';
+                queryString += shareId ? `&shareId=${shareId}` : '';
+              } else if (queryString.indexOf('?') == -1 && share_id) {
+                queryString += share_id ? `?share_id=${share_id}` : '';
+              } else if (queryString.indexOf('?') == -1 && shareId) {
+                queryString += shareId ? `?shareId=${shareId}` : '';
+              }
+              // 邀请卡分享
+              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             }
-            // 邀请卡分享
-            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             break;
           case 512002:
           case 512522:
@@ -721,7 +765,11 @@
             }
             // 邀请卡
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            window.location.href = `${window.location.origin}${
+              process.env.VUE_APP_ROUTER_BASE_URL
+            }${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${
+              this.$route.params.id
+            }${queryString}`;
           } else {
             this.$toast(this.$tec(res.code) || res.msg);
           }

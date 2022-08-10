@@ -181,6 +181,10 @@
       },
       handleErrorCode(err) {
         let currentQuery = location.search;
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -195,7 +199,7 @@
               currentQuery.indexOf('record_id=') > -1
                 ? currentQuery.replace('record_id=', 'rid=')
                 : currentQuery;
-            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
             break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了

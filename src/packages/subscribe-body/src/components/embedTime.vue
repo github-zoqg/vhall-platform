@@ -31,8 +31,8 @@
       <button
         v-if="btnText"
         class="sub-auth"
-        :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
-        :disabled="btnText == $t('webinar.webinar_1036')"
+        :class="{ disabledBtn: disabled }"
+        :disabled="disabled"
         @click="authCheck"
       >
         {{ btnText }}
@@ -65,11 +65,25 @@
         const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
         const isLive = this.webinarType != 2 && this.webinarType != 3;
         if (isAgreement && isLive && !isEmbedVideo) {
+          // 观看协议验证通过，并且当前活动状态不是 预约和结束，且不是单视频嵌入的时候，展示观看验证按钮。
           return true;
         } else {
           return false;
         }
         // if (isAgreement && ((!btnText && type == 1) || btnText))
+      },
+      // 嵌入页是否支持报名表单展示
+      embedShowRegForm() {
+        const isEmbed = this.$domainStore.state.roomBaseServer.embedObj.embed;
+        const isEmbedVideo = this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+        // 观看限制 - 无or密码，且当前是完全嵌入页，开启了报名表单，展示按钮。
+        return (
+          isEmbed && !isEmbedVideo && this.open_reg_form && (this.verify == 0 || this.verify == 1)
+        );
+      },
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     data() {
@@ -111,6 +125,8 @@
             this.is_subscribe = val.is_subscribe;
             this.actual_start_time = val.actual_start_time;
             this.show = val.show;
+            this.save_reg_form = val.save_reg_form;
+            this.open_reg_form = val.open_reg_form;
             // this.num = val.num
             console.log('>>>>>>1', val);
             // if (val.is_subscribe == 1) this.disabled = true
@@ -132,10 +148,15 @@
       agreement() {
         this.$emit('agreement');
       },
+      // 获取预约页状态进度等
       handleSubscribeProcess() {
+        // 清除历史计时器
         this.clearTimer();
+        // 时间提示文案： 已开播/距离开播
         this.handleTips();
+        // 处理当前界面展示文案 及 按钮状态
         this.handleBtnText();
+        // 根据开播时间等，启动具体的计时器（1秒间隔）
         this.timer = setInterval(() => {
           this.remainTimes();
         }, 1 * 1000);
@@ -235,29 +256,33 @@
         this.btnText = this.$t('player.player_1013');
       },
       handleBtnText() {
-        if (this.type == 1) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.type == 3 || this.type == 2) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('webinar.webinar_1036');
-            this.disabled = true;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.type == 4 || this.type == 5) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
+        if (this.type == 3) {
+          // 活动已结束，观看限制为密码时，展示按钮“密码活动”，按钮不可点击
+          this.btnText = this.verify == 1 ? this.$t('webinar.webinar_1036') : '';
+          this.disabled = this.verify == 1;
+          return;
+        }
+        if (this.is_subscribe == 1) {
+          this.btnText = this.$t('appointment.appointment_1006');
+          this.disabled = true;
+        } else {
+          // 直播中、点播、回放 的时候，按钮文案“立即观看”，预告状态 按钮文案“立即预约”
+          if (this.type == 1 || this.type == 4 || this.type == 5) {
+            if (this.verify == 1 || this.embedShowRegForm) {
+              this.btnText = this.$t('player.player_1013');
+              this.disabled = false;
+            } else {
+              this.btnText = '';
+              this.disabled = false;
+            }
+          } else if (this.type == 2) {
+            if (this.verify == 1 || this.embedShowRegForm) {
+              this.btnText = this.$t('appointment.appointment_1017');
+              this.disabled = false;
+            } else {
+              this.btnText = '';
+              this.disabled = false;
+            }
           }
         }
       },
