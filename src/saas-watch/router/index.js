@@ -79,7 +79,7 @@ const routes = [
     path: '/special/detail',
     component: Subject,
     name: 'Subject',
-    meta: { title: '专题详情', page: 'subject' }
+    meta: { title: '专题详情', page: 'subject', grayType: 'subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
