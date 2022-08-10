@@ -16,10 +16,13 @@ const htmlConfig = {
     Moment: '//s1.e.vhall.com/common-static/middle/moment/2.24.0/moment.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
-    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
 
     // 通过s2域名加载
-    Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/js/vh5-ui.min.js',
+    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    html2canvas: '//s2.e.vhall.com/common-static/middle/html2canvas/1.0.0-rc.4/html2canvas.min.js',
+    overlayscrollbars:
+      '//s2.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/js/OverlayScrollbars.min.js',
+    Vh5Ui: '//s2.e.vhall.com/common-static/middle/vh5-ui/1.0.4/js/vh5-ui.min.js',
     loadLazyWap: '//s2.e.vhall.com/common-static/middle/loadLazyWap/1.1.0/index.min.js',
 
     // 可以延迟加载的
@@ -36,7 +39,9 @@ const htmlConfig = {
     Vh5Ui: '//s3.e.vhall.com/common-static/middle/vh5-ui/1.0.4/css/vh5-ui.min.css',
     iconfontCommon:
       '//s3.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.7/iconfont.min.css'
+    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.7/iconfont.min.css',
+    overlayscrollbarsCss:
+      '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css'
   }
 };
 

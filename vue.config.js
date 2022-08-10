@@ -192,7 +192,8 @@ const sharedConfig = {
       // moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant',
+      // vant: 'vant',
+      'vh5-ui': 'vant',
       lodash: '_',
       html2canvas: 'html2canvas',
       overlayscrollbars: 'OverlayScrollbars'
