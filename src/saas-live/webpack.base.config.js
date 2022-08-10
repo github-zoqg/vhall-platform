@@ -16,6 +16,8 @@ const htmlConfig = {
     Moment: '//s1.e.vhall.com/common-static/middle/moment/2.24.0/moment.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
+
+    // 通过s2域名加载
     ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
     html2canvas: '//s2.e.vhall.com/common-static/middle/html2canvas/1.0.0-rc.4/html2canvas.min.js',
     overlayscrollbars:
