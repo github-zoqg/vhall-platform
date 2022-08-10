@@ -378,7 +378,7 @@
 
         if (this.inputStatus.disable) {
           if (this.$route.query.assistantType) {
-            cl_toast('success', this.$t('chat.chat_1006'));
+            cl_toast('warning', this.$t('chat.chat_1006'));
           } else {
             this.$message.warning(this.$t('chat.chat_1006'));
           }
