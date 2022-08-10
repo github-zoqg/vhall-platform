@@ -847,7 +847,7 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     watch: {
@@ -1144,7 +1144,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
-      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+      if (window.location.href.indexOf('/special/entryform/') != -1) {
         // 专题下独立报名表单
         this.subjectServer = useSubjectServer();
       }
