@@ -5,7 +5,11 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+            <el-image
+              v-if="formInfo && formInfo.cover != 1"
+              :src="formInfo.cover ? coverPic : defaultHeader"
+              fit="cover"
+            ></el-image>
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
@@ -60,6 +64,7 @@
                   :rules="rules"
                   :validate-on-rule-change="false"
                   label-position="top"
+                  @submit.native.prevent
                 >
                   <el-form-item
                     v-for="(question, quesIndex) in list"
@@ -295,6 +300,7 @@
                   class="entryForm"
                   :model="verifyForm"
                   :rules="verifyRules"
+                  @submit.native.prevent
                 >
                   <el-form-item :label="$t('form.form_1022')" prop="phone">
                     <el-input
@@ -359,7 +365,11 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+          <el-image
+            v-if="formInfo && formInfo.cover != 1"
+            :src="formInfo.cover ? coverPic : defaultHeader"
+            fit="cover"
+          ></el-image>
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
@@ -414,6 +424,7 @@
                 :rules="rules"
                 :validate-on-rule-change="false"
                 label-position="top"
+                @submit.native.prevent
               >
                 <el-form-item
                   v-for="(question, quesIndex) in list"
@@ -643,7 +654,13 @@
           <div class="vmp-sign-up-form__verify-form" v-show="activeTab === 2">
             <!-- 验证 -->
             <template>
-              <el-form ref="verifyForm" class="entryForm" :model="verifyForm" :rules="verifyRules">
+              <el-form
+                ref="verifyForm"
+                class="entryForm"
+                :model="verifyForm"
+                :rules="verifyRules"
+                @submit.native.prevent
+              >
                 <el-form-item :label="$t('form.form_1022')" prop="phone">
                   <el-input
                     v-if="!isAbroadPhoneValide"
@@ -724,7 +741,9 @@
         // 活动ID 或者 专题ID
         webinarOrSubjectId: '',
         //表单信息
-        formInfo: {},
+        formInfo: {
+          cover: 1 // 默认蓝色底图 闪动问题做区分
+        },
         //简介内容是否超长
         overflowStatus: false,
         //模态窗是否可见
@@ -1041,7 +1060,11 @@
       // },
       // 广告头图
       coverPic() {
-        return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover != 1) {
+          return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        } else {
+          return '';
+        }
       },
       //输入提示的多语言转换
       findPlaceHolder() {

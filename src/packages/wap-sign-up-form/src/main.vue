@@ -2,7 +2,11 @@
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
-        <el-image :src="formInfo.cover ? coverPic : defaultHeader" fit="cover"></el-image>
+        <el-image
+          v-if="formInfo && formInfo.cover != 1"
+          :src="formInfo.cover ? coverPic : defaultHeader"
+          fit="cover"
+        ></el-image>
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
@@ -506,7 +510,11 @@
       },
       // 广告头图
       coverPic() {
-        return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover != 1) {
+          return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        } else {
+          return '';
+        }
       },
       //当前的城市列表
       currentCityList() {

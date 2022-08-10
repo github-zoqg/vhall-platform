@@ -154,6 +154,18 @@
       // 退出全屏   原因同wap-stream-remote
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
+      },
+      // 权限list
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
@@ -199,7 +211,7 @@
             未检测时，则检测互动SDK的支持情况
               不支持上麦时，确认是否在麦上
           */
-          if (this.mediaCheckServer.state.isBrowserNotSupport) {
+          if (this.mediaCheckServer.state.isBrowserNotSupport && !this.hideItem) {
             this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();
@@ -271,23 +283,6 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
-          // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-          let device_status = this.mediaCheckServer.state.deviceInfo.device_status;
-          if (device_status == 2) {
-            this.speakOff();
-            return;
-          } else if (device_status == 0) {
-            let _flag = await this.mediaCheckServer.getMediaInputPermission({
-              isNeedBroadcast: false
-            });
-            if (!_flag) {
-              this.speakOff();
-              this.$toast(this.$t('interact.interact_1040'));
-              return;
-            }
-          }
-          console.log('[stream-local] vrtc_connect_success startPush');
-
           // 无延迟｜分组直播
           // 如果成功，销毁播放器
           if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar == 0) {
@@ -319,6 +314,12 @@
           }
         });
 
+        // micServe异常处理
+        this.micServer.$on('vrtc_exception_msg', msg => {
+          if (msg.type === 1039) {
+            this.$toast(this.$t('interact.interact_1040'));
+          }
+        });
         // 开启摄像头
         this.interactiveServer.$on('vrtc_frames_display', () => {
           this.$toast(this.$t('interact.interact_1024'));

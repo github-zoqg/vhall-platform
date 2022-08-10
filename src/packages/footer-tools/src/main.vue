@@ -3,7 +3,7 @@
     <div class="vmp-footer-tools__left">
       <div
         class="vmp-footer-tools__left-setting"
-        v-if="isInteractLive || (isVideoLive && isVideoPolling)"
+        v-if="isInteractLive || (isVideoLive && isVideoPolling && isLiving)"
         @click="settingShow()"
       >
         <i class="vh-iconfont vh-line-setting"></i>
