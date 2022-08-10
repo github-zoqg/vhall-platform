@@ -64,7 +64,7 @@ const routes = [
     meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
-    path: '/subject/entryform/:id',
+    path: '/special/entryform/:id',
     component: entryForm,
     name: 'entryFormSubject',
     meta: { title: '独立报名表单', grayType: 'subject' }

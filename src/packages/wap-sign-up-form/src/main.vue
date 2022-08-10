@@ -500,7 +500,7 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
         isEmbed: window.location.href.indexOf('/embedclient/') != -1
       };
     },
@@ -656,7 +656,7 @@
     },
     beforeCreate() {
       this.signUpFormServer = useSignUpFormServer();
-      if ((window.location.href.indexOf('/subject/entryform/') != -1) != -1) {
+      if (window.location.href.indexOf('/special/entryform/') != -1) {
         // 专题下独立报名表单
         this.subjectServer = useSubjectServer();
       }
@@ -1405,7 +1405,7 @@
           window.location.protocol +
           process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
-          `/subject/entryform/${this.webinarOrSubjectId}`;
+          `/special/entryform/${this.webinarOrSubjectId}`;
         this.subjectServer.wechatShare({ wx_url: wx_url }).then(res => {
           initWeChatSdk(
             {
@@ -1419,7 +1419,7 @@
               desc: replaceHtml(info.intro, 42),
               link:
                 window.location.protocol +
-                `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/subject/entryform/${this.webinarOrSubjectId}`,
+                `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/special/entryform/${this.webinarOrSubjectId}`,
               imgUrl: info.cover
             }
           );
