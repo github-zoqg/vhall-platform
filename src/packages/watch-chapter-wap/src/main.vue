@@ -32,8 +32,8 @@
   </div>
 </template>
 <script>
+  import { isMse } from '@/app-shared/utils/isMse';
   import { useRoomBaseServer, useDocServer, usePlayerServer } from 'middle-domain';
-  import { isMse } from '../../player/wap-player/src/js/utils';
   export default {
     name: 'VmpChapterWap',
     data() {

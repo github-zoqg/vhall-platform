@@ -519,7 +519,13 @@ export default {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    // 屏蔽特效
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
+    }
   },
   // 通知组件
   comNotice: {

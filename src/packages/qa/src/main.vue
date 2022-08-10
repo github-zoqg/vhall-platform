@@ -114,7 +114,8 @@
     useQaServer,
     useChatServer,
     useGroupServer,
-    useMsgServer
+    useMsgServer,
+    useMenuServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import { cl_openQAAdmin } from '@/app-shared/client/client-methods.js';
@@ -219,17 +220,22 @@
         this.initLoginStatus();
       }
     },
-    mounted() {
+    async mounted() {
       this.listenEvents();
-      this.getQaHistoryMsg();
       this.initLoginStatus();
       this.initInputStatus();
+      if (this.roleName != 2) {
+        const qaServer = useQaServer();
+        await this.getQaHistoryMsg();
+        qaServer.setState('active', true);
+      }
     },
     methods: {
       listenEvents() {
-        const qaServer = useQaServer();
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const menuServer = useMenuServer();
+        const qaServer = useQaServer();
         //监听新建问答消息
         qaServer.$on(qaServer.Events.QA_CREATE, msg => {
           if (msg.sender_id == this.thirdPartyId) {
@@ -284,6 +290,16 @@
             this.getQaHistoryMsg();
           }
         });
+        menuServer.$on('tab-switched', async data => {
+          if (
+            this.cuid === data.cuid &&
+            !qaServer.state.active &&
+            [2, '2'].includes(this.roleName)
+          ) {
+            await this.getQaHistoryMsg();
+            qaServer.setState('active', true);
+          }
+        });
       },
       initInputStatus() {
         this.inputStatus.disable = this.isBanned || (this.allBanned && this.qa_allBanned_status);
@@ -324,7 +340,7 @@
       },
       // 获取历史消息
       getQaHistoryMsg() {
-        useQaServer().getQaHistory();
+        return useQaServer().getQaHistory();
       },
       chatTextareaHeightChange(operatorHeight) {
         this.operatorHeight = operatorHeight;

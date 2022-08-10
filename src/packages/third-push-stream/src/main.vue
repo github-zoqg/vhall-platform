@@ -11,8 +11,8 @@
       <div class="vmp-third-stream-modal" :class="'streamModal' + streamModal">
         <div class="title">发起模式</div>
         <el-radio-group v-model="streamModal" :disabled="roomStatus == 1">
-          <el-radio :label="1">拉流设置1</el-radio>
-          <el-radio :label="2">拉流设置2</el-radio>
+          <el-radio :label="1">推流设置</el-radio>
+          <el-radio :label="2">拉流设置</el-radio>
         </el-radio-group>
         <div class="input-item" v-show="streamModal == 1">
           <label>RTMP/URL</label>
@@ -89,9 +89,8 @@
         <template v-else>
           <div class="title">使用第三方拉流</div>
           <div class="content">
-            <p>1.在第三方工具中获取拉流地址，并填写到拉流地址中;</p>
-            <p>2.使用第三方工具推流;</p>
-            <p>3.点击右上角的“开始直播”按钮。</p>
+            <p>1.在第三方工具中获取拉流地址，并填写到本平台拉流地址中;</p>
+            <p>2.点击右上角的“开始直播”按钮。</p>
           </div>
           <div class="title">注意事项</div>
           <div class="content">

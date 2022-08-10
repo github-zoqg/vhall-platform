@@ -346,10 +346,11 @@ export default {
     chat_1091: '',
     chat_1092: 'You have been muted',
     chat_1093: 'Click for details',
-    chat_1094: 'Chat only',
+    chat_1094: 'Chat only',
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
-    chat_1097: 'Chat only off'
+    chat_1097: 'Chat only off',
+    chat_1098: 'Click for details'
   },
   form: {
     form_1001: 'Name',
@@ -442,7 +443,9 @@ export default {
     form_1085: 'address',
     form_1086: '',
     form_1087: 'Submitted successfully, thank you for your participation',
-    form_1088: 'Submitted successfully'
+    form_1088: 'Submitted successfully',
+    form_1089: 'Fill in',
+    form_1090: 'Filled'
   },
   menu: {
     menu_1001: 'Doc',
@@ -523,9 +526,9 @@ export default {
     interact_tools_1057: 'In progress',
     interact_tools_1058: 'Free',
     interact_tools_1059: 'Coffee',
-    interact_tools_1060: 'Like',
+    interact_tools_1060: 'Love',
     interact_tools_1061: 'Applaud',
-    interact_tools_1062: 'Flowers',
+    interact_tools_1062: 'Rose',
     interact_tools_1063: 'Successfully presented',
     interact_tools_1064: 'Please choose a gift',
     interact_tools_1065: 'Send in your password {n} and enter the lottery',
@@ -548,7 +551,11 @@ export default {
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
     interact_tools_1085: 'TOP 10 list',
-    interact_tools_1086: 'Notice'
+    interact_tools_1086: 'Notice',
+    interact_tools_1087: 'Rocket',
+    interact_tools_1088: 'Aircraft',
+    interact_tools_1089: 'Salute',
+    interact_tools_1090: 'Car'
   },
   setting: {
     setting_1002: 'View settings',
@@ -804,7 +811,7 @@ export default {
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
-    interact_1041: 'Apply for video interaction'
+    interact_1041: 'Apply for video interaction'
   },
   doc: {
     doc_1001: 'This documentation is loading',

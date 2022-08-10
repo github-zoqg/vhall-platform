@@ -52,14 +52,23 @@ const cl_openUrl = function (url) {
 const cl_moveToDoc = function (status) {
   assistantMsg('docmouseenter', status);
 };
+//调用客户端toast提示
 const cl_toast = function (type, msg) {
   assistantMsg('notice_msg', msg, type);
+};
+//禁言某人后通知客户端
+const cl_banned = function (type, id) {
+  assistantMsg('banned', id);
+};
+//解除某人禁言后通知客户端
+const cl_permit = function (type, id) {
+  assistantMsg('permit', id);
 };
 export {
   cl_left,
   cl_join,
-  // cl_banned,
-  // cl_permit,
+  cl_banned,
+  cl_permit,
   cl_kickout,
   cl_previewImg,
   cl_openQAAdmin,
