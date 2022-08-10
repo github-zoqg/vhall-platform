@@ -317,7 +317,6 @@
         const style = styleMap[skinInfo?.style || 1];
         const theme = themeMap[skinInfo?.bgColor || 2];
 
-        this.isConcise = style == 'concise';
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
