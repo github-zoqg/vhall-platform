@@ -576,6 +576,7 @@
       }
       .only-my-default {
         margin-left: 16px;
+        color: var(--theme-tab-content-qa-onlyMe-font);
       }
     }
   }

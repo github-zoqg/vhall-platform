@@ -296,8 +296,8 @@
         // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
         // TODO:调试代码
         const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
-          style: 3,
-          bgColor: 4
+          style: 1,
+          bgColor: 2
         };
 
         // TODO:调试代码
@@ -314,6 +314,7 @@
         const style = styleMap[skinInfo?.style || 1];
         const theme = themeMap[skinInfo?.bgColor || 2];
 
+        this.isConcise = style == 'concise';
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
@@ -325,10 +326,10 @@
       drawBody(style, theme) {
         if (style == 'main' && (theme == 'black' || theme == 'white')) {
           if (theme == 'black') {
-            document.body.style.background = `#333`;
+            document.body.style.background = `#262626`;
           }
           if (theme == 'white') {
-            document.body.style.background = `#fff`;
+            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
           }
         } else {
           document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
