@@ -744,7 +744,7 @@
       },
       // 初始化专题信息，获取专题访客ID
       async initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
         let params = {
           subject_id: this.webinarOrSubjectId,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
