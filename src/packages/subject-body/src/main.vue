@@ -122,8 +122,12 @@
             this.goWatch();
             return;
           }
-          // 回放状态、开启了试看 并且观看限制不能是报名表单
-          if (item.webinar_state == 5 && is_preview == 1 && subject_verify != 2) {
+          // 回放或点播、开启了试看 并且观看限制不能是报名表单
+          if (
+            (item.webinar_state == 5 || item.webinar_state == 4) &&
+            is_preview == 1 &&
+            subject_verify != 2
+          ) {
             this.goWatch();
             return;
           }
