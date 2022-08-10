@@ -5,7 +5,7 @@ export default {
   // 客户端嵌入页聊天组件
   imClientRoot: {
     component: 'VmpContainer',
-    children: ['comChat'],
+    children: ['comChat', 'comPcRewardEffect'],
     emitKickout: [
       {
         cuid: 'comChat',
@@ -36,5 +36,9 @@ export default {
         method: 'openModal'
       }
     ]
+  },
+  // 礼物动画组件
+  comPcRewardEffect: {
+    component: 'VmpPcRewardEffect'
   }
 };

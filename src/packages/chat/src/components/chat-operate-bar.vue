@@ -147,7 +147,7 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
-  import { cl_openChatFilterUrl } from '@/app-shared/client/client-methods.js';
+  import { cl_openChatFilterUrl, cl_toast } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -363,13 +363,17 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        this.$message.success(message);
+        this.$route.query.assistantType
+          ? cl_toast('success', message)
+          : this.$message.success(message);
         this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        this.$message.success(message);
+        this.$route.query.assistantType
+          ? cl_toast('success', message)
+          : this.$message.success(message);
         this.$emit('onSwitchShowSpecialEffects', status);
       },
       //点击筛选

@@ -6,7 +6,7 @@ const htmlConfig = {
     // 开发环境采用非压缩版vue.js方便查找问题
     vue: '//t-alistatic01.e.vhall.com/common-static/middle/vue/2.6.14/dist/vue.js',
     // 开发环境domain
-    MiddleDomain: 'http://172.16.20.125:10001/lib/middle-domain.js'
+    MiddleDomain: 'http://172.16.21.155:10001/lib/middle-domain.js'
   }
 };
 
