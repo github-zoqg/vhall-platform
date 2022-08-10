@@ -286,11 +286,13 @@
       initSubjectAuth() {
         // this.$route.query.visitorId 个人主页点击专题
         const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
+        debugger;
         let params = {
           subject_id: this.$route.query.id,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
           ...this.$route.query
         };
+        debugger;
         // 如果已经鉴权过，就直接进入观看端，否则走鉴权
         this.subjectServer.initSubjectInfo(params);
       },
