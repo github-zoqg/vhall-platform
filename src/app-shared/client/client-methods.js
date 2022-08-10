@@ -57,11 +57,11 @@ const cl_toast = function (type, msg) {
   assistantMsg('notice_msg', msg, type);
 };
 //禁言某人后通知客户端
-const cl_banned = function (type, id) {
+const cl_banned = function (id) {
   assistantMsg('banned', id);
 };
 //解除某人禁言后通知客户端
-const cl_permit = function (type, id) {
+const cl_permit = function (id) {
   assistantMsg('permit', id);
 };
 export {
