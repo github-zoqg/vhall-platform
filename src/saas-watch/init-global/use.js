@@ -1,7 +1,6 @@
 import Vue from 'vue';
-// element-ui
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+
+//字体图标样式
 import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
@@ -78,7 +77,6 @@ import VmpCameraCheck from '@/packages/camera-check/index';
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
 // 全局注册组件
-Vue.use(ElementUI);
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
 Vue.use(VmpWatchAsideMenu);

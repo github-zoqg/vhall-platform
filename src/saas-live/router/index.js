@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
-import NotFound from '../views/NotFound.vue';
-import ChatAuth from '@/packages/chat-auth/index';
-import PasswordLogin from '@/packages/password-login/index';
+// import Home from '../views/Home.vue';
+// import NotFound from '../views/NotFound.vue';
+// import ChatAuth from '@/packages/chat-auth/index';
+// import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
 
@@ -12,76 +12,77 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/lives/room/:id',
-    component: Home,
     name: 'LiveRoom',
+    component: () => import(/* webpackChunkName: "LiveRoom" */ '../views/Home.vue'),
     meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/recordvideo/:id',
-    component: () => import('../views/RecordVideo/index.vue'),
     name: 'RecordVideo',
+    component: () => import(/* webpackChunkName: "RecordVideo" */ '../views/RecordVideo/index.vue'),
     meta: { title: '录制视频', grayType: 'webinar', page: 'record' }
   },
   {
     path: '/lives/keylogin/:id/:role_name',
     name: 'KeyLogin',
-    component: PasswordLogin,
+    component: () => import(/* webpackChunkName: "KeyLogin" */ '@/packages/password-login/index'),
     meta: { title: '口令登录', grayType: 'webinar' }
   },
   {
     path: '/lives/keylogin-host/:id/:role_name',
     name: 'KeyLoginHost',
-    component: PasswordLogin,
+    component: () =>
+      import(/* webpackChunkName: "KeyLoginHost" */ '@/packages/password-login/index'),
     meta: { title: '口令登录', grayType: 'webinar' }
   },
   {
     path: '/lives/authchat/:id',
     name: 'ChatAuth',
-    component: ChatAuth,
+    component: () => import(/* webpackChunkName: "ChatAuth" */ '@/packages/chat-auth/index'),
     meta: { title: '聊天审核', grayType: 'webinar' }
   },
   {
     path: '/lives/qa/:id',
     name: 'qa',
-    component: () => import('@/packages/qa-admin/main.vue'),
+    component: () => import(/* webpackChunkName: "qa" */ '@/packages/qa-admin/main.vue'),
     meta: { title: '问答', grayType: 'webinar' }
   },
   {
     path: '/lives/split-screen/:id',
     name: 'SplitScreen',
-    component: () => import('../views/SplitScreen.vue'),
+    component: () => import(/* webpackChunkName: "SplitScreen" */ '../views/SplitScreen.vue'),
     meta: { title: '分屏', grayType: 'webinar', page: 'split-screen' }
   },
   {
     path: '/lives/video-polling/:id',
     name: 'VideoPolling',
-    component: () => import('../views/VideoPolling'),
+    component: () => import(/* webpackChunkName: "VideoPolling" */ '../views/VideoPolling'),
     meta: { title: '视频轮询', grayType: 'webinar', page: 'video-polling' }
   },
   {
     path: '/lives/client/:il_id', // 客户端嵌入
     name: 'Client',
-    component: () => import('@/saas-live/views/clientEmbed/index'),
+    component: () => import(/* webpackChunkName: "Client" */ '@/saas-live/views/clientEmbed/index'),
     meta: { page: 'client-embed' }
   },
   {
     path: '/lives/yun/:id', // 云导播
     name: 'yun',
-    component: () => import('@/saas-live/views/yun'),
+    component: () => import(/* webpackChunkName: "yun" */ '@/saas-live/views/yun'),
     meta: { keepAlive: false, grayType: 'webinar', page: 'live-yun' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
-    meta: { title: '系统异常' },
-    component: () => import('../views/ErrorPage/error.vue')
+    component: () => import(/* webpackChunkName: "PageError" */ '../views/ErrorPage/error.vue'),
+    meta: { title: '系统异常' }
   },
   {
     // 其它没有匹配到的路由都会跳至此模块(404）
     // 该路由为必须路由，不需要权限，必须放在最后
     path: '*',
     name: 'notfound',
-    component: NotFound,
+    component: () => import(/* webpackChunkName: "notfound" */ '../views/NotFound.vue'),
     meta: { keepAlive: false, grayType: '' }
   }
 ];
