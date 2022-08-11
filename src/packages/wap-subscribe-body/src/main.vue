@@ -60,31 +60,76 @@
         <template v-else>
           <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
+        <template v-if="subOption.needAgreement">
+          <div class="subscribe_into_container">
+            <div class="subscribe_into_person subscribe_into_center" @click="showAgreement">
+              <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div
+            class="subscribe_into_container"
+            v-if="
+              ((subOption.verify != 0 ||
+                (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
+                !isEmbed) ||
+              (isEmbed && webinarType != 2)
+            "
+          >
+            <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+              <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
+              <span @click="authCheck(3)">
+                {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
+              </span>
+            </div>
+            <div
+              v-else
+              :class="[
+                'subscribe_into_person subscribe_into_center',
+                {
+                  'is-subscribe': subOption.is_subscribe == 1
+                }
+              ]"
+              @click="authCheck(subOption.verify)"
+            >
+              <span class="subscribe_btn">
+                {{ subscribeText }}
+              </span>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div
+        :class="[
+          'subscribe_tabs',
+          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
+        ]"
+      >
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
+      </div>
+    </div>
+    <template v-if="showBottomBtn">
+      <div class="vmp-subscribe-body-auth" v-if="subOption.needAgreement">
+        <div class="subscribe_into_person" @click="showAgreement">
+          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+        </div>
+      </div>
+      <template v-else>
         <div
-          class="subscribe_into_container"
-          v-if="
-            ((subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
-              !isEmbed) ||
-            (isEmbed && webinarType != 2)
-          "
+          class="vmp-subscribe-body-auth"
+          v-if="subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1)"
         >
-          <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+          <div class="subscribe_into_other" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
               {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
             </span>
           </div>
           <div
-            class="subscribe_into_person subscribe_into_center"
-            v-else-if="subOption.needAgreement"
-            @click="showAgreement"
-          >
-            <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
-          </div>
-          <div
             v-else
             :class="[
-              'subscribe_into_person subscribe_into_center',
+              'subscribe_into_person',
               {
                 'is-subscribe': subOption.is_subscribe == 1
               }
@@ -96,49 +141,7 @@
             </span>
           </div>
         </div>
-      </div>
-      <div
-        :class="[
-          'subscribe_tabs',
-          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
-        ]"
-      >
-        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
-      </div>
-    </div>
-    <template
-      v-if="
-        showBottomBtn &&
-        (subOption.verify != 0 || (subOption.verify == 0 && subOption.hide_subscribe == 1))
-      "
-    >
-      <div class="vmp-subscribe-body-auth">
-        <div class="subscribe_into_other" v-if="showSubscribeBtn">
-          <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
-          <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
-        </div>
-        <div
-          class="subscribe_into_person"
-          v-else-if="subOption.needAgreement"
-          @click="showAgreement"
-        >
-          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
-        </div>
-        <div
-          v-else
-          :class="[
-            'subscribe_into_person',
-            {
-              'is-subscribe': subOption.is_subscribe == 1
-            }
-          ]"
-          @click="authCheck(subOption.verify)"
-        >
-          <span class="subscribe_btn">
-            {{ subscribeText }}
-          </span>
-        </div>
-      </div>
+      </template>
     </template>
     <alertBox
       v-if="isSubscribeShow"
