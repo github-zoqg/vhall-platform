@@ -22,10 +22,12 @@ export default {
   '--theme-chat-msg-interact-bg': 'rgba(255, 209, 201, 0.2)',
   '--theme-chat-sendBox-bg': '#fff',
   //菜单-内容
+  //简介
   '--theme-tab-content-intro-title-font': '#262626',
   '--theme-tab-content-intro-subTitle-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-intro-introLink-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-intro-introLink-bg': 'transparent',
+  //商品
   '--theme-tab-content-good-name-font': '#262626',
   '--theme-tab-content-good-describe-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-good-discountPrice-font': 'rgba(0, 0, 0, 0.45)',
@@ -35,6 +37,7 @@ export default {
   '--theme-tab-content-good-buyBorder-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-good-bg': '#fff',
   '--theme-tab-content-good-split-bg': 'rgba(0, 0, 0, 0.06)',
+  //排行榜
   '--theme-tab-content-rank-title-font': '#262626',
   '--theme-tab-content-rank-rule-active-font': '#3552ea',
   '--theme-tab-content-rank-rule-font': 'rgba(0, 0, 0, 0.65)',
@@ -42,25 +45,33 @@ export default {
   '--theme-tab-content-rank-rule-content-bg': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-rank-content-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(0, 0, 0, 0.45)',
+  //图文组件
   '--theme-tab-content-word-font': 'rgba(0, 0, 0, 0.65)',
+  //直播
   '--theme-tab-content-live-title-font': '#262626',
   '--theme-tab-content-live-info-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-live-card-bg': 'transparent',
+  //专题
   '--theme-tab-content-project-title-font': '#262626',
   '--theme-tab-content-project-info-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-project-card-bg': 'transparent',
+  //自定义菜单
   '--theme-tab-content-title-font': '#262626',
+  //推荐
   '--theme-tab-content-recommend-title-font': '#262626',
   '--theme-tab-content-recommend-buy-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-recommend-buy-border': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-recommend-bg': '#fff',
   '--theme-tab-content-recommend-border': 'rgba(0, 0, 0, 0.06)',
+  //文档
   '--theme-tab-content-doc-font': 'rgba(0, 0, 0, 0.45)',
+  //问答
   '--theme-tab-content-qa-text-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-qa-replyText-font': '#262626',
   '--theme-tab-content-qa-replyText-bg': '#fff',
   '--theme-tab-content-qa-qaLabel-font': '#fc9600',
   '--theme-tab-content-qa-onlyMe-font': 'rgba(0, 0, 0, 0.45)',
+  //私聊
   '--theme-tab-content-private-name-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-private-content-font': '#262626',
   '--theme-tab-content-private-time-font': 'rgba(0, 0, 0, 0.65)',
