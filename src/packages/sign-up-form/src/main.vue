@@ -1216,7 +1216,7 @@
       },
       // 初始化专题信息，获取专题访客ID
       async initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
         let params = {
           subject_id: this.webinarOrSubjectId,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
@@ -1794,6 +1794,10 @@
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
+                if (this.isSubject) {
+                  // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                  window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
+                }
                 if (this.interfaceType === 'subject') {
                   this.goToSubjectDetailOrReload();
                 } else {
@@ -1830,6 +1834,12 @@
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
+                  if (this.isSubject) {
+                    // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                    window.$middleEventSdk?.event?.send(
+                      boxEventOpitons(this.cuid, 'emitChangePass')
+                    );
+                  }
                   if (this.interfaceType === 'subject') {
                     this.goToSubjectDetailOrReload();
                   } else {
