@@ -154,6 +154,8 @@
         if (this.lowerWheatFun) {
           return;
         }
+        // 申请连麦
+        window?.vhallReportForProduct.report(170004);
         this.mediaCheckClick();
       },
       // 打开连麦弹框
@@ -178,11 +180,23 @@
               } else {
                 this.$toast(this.$t('interact.interact_1040'));
                 this.closeConnectPop();
+                // 设备不支持 上报
+                window?.vhallReportForProduct.report(170005, {
+                  report_extra: {
+                    msg: encodeURIComponent(this.$t('interact.interact_1040'))
+                  }
+                });
               }
             });
         } else {
           this.$toast(this.$t('interact.interact_1040'));
           this.closeConnectPop();
+          // 设备不支持 上报
+          window?.vhallReportForProduct.report(170005, {
+            report_extra: {
+              msg: encodeURIComponent(this.$t('interact.interact_1040'))
+            }
+          });
         }
       },
       // 主动上麦方法
@@ -199,6 +213,13 @@
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );
               }
+              // 席位已满、设备暂不支持上麦 上报
+              window?.vhallReportForProduct.report(170005, {
+                report_extra: {
+                  waiting_time: this.lowerWheatTimer,
+                  failed_reason: res
+                }
+              });
               return;
             }
             /*
@@ -224,7 +245,14 @@
                   tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
-
+                // 倒计时自动结束，主持人拒绝 上报
+                window?.vhallReportForProduct.report(170005, {
+                  report_extra: {
+                    waiting_time: this.lowerWheatTimer,
+                    failed_reason: res,
+                    msg: encodeURIComponent(tip)
+                  }
+                });
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
