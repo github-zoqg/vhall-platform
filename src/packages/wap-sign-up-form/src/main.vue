@@ -786,8 +786,10 @@
             is_no_check: 1
           })
           .then(async res => {
-            this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
+            // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+            // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
+            this.isSubscribe = res.data.webinar_state == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_state == 2 ? 1 : 2;
             this.cascadeResultList = [];
             const shareInfo = await this.roomBaseServer.getShareSettingInfo({
               webinarId: res.data.id
@@ -1166,7 +1168,7 @@
           })
           .then(res => {
             const queryString = this.returnQueryString();
-            if (res.data.webinar_type == 2) {
+            if (res.data.webinar_state == 2) {
               this.startTime = res.data.start_time;
               this.queryString = queryString;
               this.isSubmitSuccess = true;
