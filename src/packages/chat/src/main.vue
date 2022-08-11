@@ -24,9 +24,10 @@
       </p>
 
       <virtual-list
+        v-if="virtual.showlist"
         ref="chatlist"
-        style="height: 100%; overflow: auto"
-        :keeps="50"
+        :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
+        :keeps="30"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -107,7 +108,13 @@
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
-  import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useMsgServer,
+    useGroupServer,
+    useMenuServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
@@ -219,7 +226,12 @@
         //隐藏拉取历史聊天按钮
         hideChatHistory: false,
         //回复或@消息id
-        targetId: ''
+        targetId: '',
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0
+        }
       };
     },
     computed: {
@@ -329,6 +341,9 @@
 
       // 展示欢迎语
       this.showWelcome();
+      this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+      this.virtual.showlist = true;
+      this.chatlistHeight = this.virtual.contentHeight;
     },
     destroyed() {},
     methods: {
@@ -358,6 +373,7 @@
       listenChatServer() {
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const menuServer = useMenuServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
@@ -427,6 +443,17 @@
             chatServer.clearChatMsg();
             this.getHistoryMsg();
           }
+        });
+        //监听切换到当前tab
+        menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            if (data.cuid == this.cuid) {
+              this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+              this.virtual.showlist = data.cuid == this.cuid;
+              this.chatlistHeight = this.virtual.contentHeight;
+              this.scrollBottom();
+            }
+          });
         });
       },
       //初始化聊天输入框数据
@@ -737,7 +764,9 @@
           return item.count.toString();
         });
         const vsl = this.$refs.chatlist;
-        console.log(IdList);
+        if (IdList.length == 0) {
+          return;
+        }
         this.$nextTick(() => {
           const offset = IdList.reduce((previousValue, currentSid) => {
             const previousSize =
