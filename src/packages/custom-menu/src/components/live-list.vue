@@ -166,8 +166,9 @@
     height: 80px;
     padding: 8px 10px 8px;
     border-radius: 4px;
+    background-color: var(--theme-tab-content-live-card-bg);
     &:hover {
-      background: #383838;
+      background: var(--theme-color);
       cursor: pointer;
     }
     &__cover {
@@ -252,7 +253,7 @@
       margin: 10px 0 4px 0;
       font-size: 14px;
       font-weight: 400;
-      color: #e6e6e6;
+      color: var(--theme-tab-content-live-title-font);
       line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -269,7 +270,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 12px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-live-info-font);
       line-height: 16px;
       text-align: left;
     }

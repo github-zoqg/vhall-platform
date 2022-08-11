@@ -287,9 +287,9 @@
         flex-direction: row;
         align-items: center;
         box-sizing: border-box;
-        border-bottom: 1px solid #444;
+        border-bottom: 1px solid var(--theme-tab-content-recommend-border);
         padding: 16px 5px;
-
+        background-color: var(--theme-tab-content-recommend-bg);
         a {
           display: inline-block;
           margin-bottom: 30px;
@@ -313,7 +313,7 @@
         .title {
           font-size: 14px;
           font-weight: bold;
-          color: @font-dark-normal;
+          color: var(--theme-tab-content-recommend-title-font);
           line-height: 22px;
           height: 34px;
         }
@@ -331,22 +331,22 @@
             width: 64px;
             height: 26px;
             border-radius: 15px;
-            border: 1px solid #ccc;
-            color: #fff;
+            border: 1px solid var(--theme-tab-content-recommend-buy-border);
+            color: var(--theme-tab-content-recommend-buy-font);
             text-align: center;
             line-height: 26px;
           }
         }
 
         &:hover {
-          background: #3c3c3c;
+          background: var(--theme-tab-content-recommend-hover-bg);
           border-radius: 4px;
           cursor: pointer;
           border-bottom-color: transparent;
 
           .check-btn {
-            background: #fb3a32;
-            border-color: #fb3a32;
+            background: var(--theme-color);
+            border-color: var(--theme-color);
           }
         }
       }
@@ -357,7 +357,7 @@
       width: 100%;
       text-align: center;
       padding: 10px 0px;
-      color: #999;
+      color: var(--theme-tab-content-recommend-noData-font);
     }
 
     @media screen and (max-width: 1366px) {

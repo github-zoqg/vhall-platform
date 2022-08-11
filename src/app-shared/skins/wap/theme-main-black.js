@@ -60,8 +60,8 @@ export default {
   '--theme-tab-content-title-font': '#fff',
   //推荐
   '--theme-tab-content-recommend-title-font': '#fff',
-  '--theme-tab-content-recommend-bug-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-recommend-bug-border': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-recommend-buy-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-recommend-buy-border': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-recommend-bg': '#262626',
   '--theme-tab-content-recommend-border': 'rgba(255, 255, 255, 0.06)',
   //文档

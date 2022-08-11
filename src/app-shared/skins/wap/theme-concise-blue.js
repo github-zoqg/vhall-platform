@@ -51,8 +51,8 @@ export default {
   '--theme-tab-content-project-card-bg': ' ',
   '--theme-tab-content-title-font': ' ',
   '--theme-tab-content-recommend-title-font': ' ',
-  '--theme-tab-content-recommend-bug-font': ' ',
-  '--theme-tab-content-recommend-bug-border': ' ',
+  '--theme-tab-content-recommend-buy-font': ' ',
+  '--theme-tab-content-recommend-buy-border': ' ',
   '--theme-tab-content-recommend-bg': ' ',
   '--theme-tab-content-recommend-border': ' ',
   '--theme-tab-content-doc-font': ' ',
@@ -68,7 +68,6 @@ export default {
   '--theme-component-subscribe': ' ',
   '--theme-component-subscribe-text': ' ',
   '--theme-component-subscribe-num': ' ',
-  '--theme-tab-content-recommend-buy-border': ' ',
   '--theme-tab-content-recommend-bg-font': ' ',
   '--theme-chat-msg-reply-name-font': ' ',
   '--theme-chat-msg-reply-content': ' '
