@@ -572,7 +572,15 @@
             break;
           case 512525: // 填写表单
             if (this.isEmbed) {
-              queryString = window.location.search;
+              if (window.location.search) {
+                let searchStr =
+                  window.location.search.indexOf('?') != -1
+                    ? window.location.search
+                    : window.location.search.replace('&', '?');
+                queryString = searchStr + '&isIndependent=0';
+              } else {
+                queryString = '?isIndependent=0';
+              }
               window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
             } else {
               queryString = this.$route.query.refer
