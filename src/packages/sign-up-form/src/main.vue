@@ -847,7 +847,7 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
       };
     },
     watch: {
@@ -1148,7 +1148,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.signUpFormServer = useSignUpFormServer();
-      if (window.location.href.indexOf('/subject/entryform/') != -1) {
+      if (window.location.href.indexOf('/special/entryform/') != -1) {
         // 专题下独立报名表单
         this.subjectServer = useSubjectServer();
       }
@@ -1216,7 +1216,7 @@
       },
       // 初始化专题信息，获取专题访客ID
       async initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
         let params = {
           subject_id: this.webinarOrSubjectId,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
@@ -1233,8 +1233,10 @@
             is_no_check: 1
           })
           .then(res => {
-            this.isSubscribe = res.data.webinar_type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar_type == 2 ? 1 : 2;
+            // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+            // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
+            this.isSubscribe = res.data.webinar_state == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_state == 2 ? 1 : 2;
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
@@ -1794,6 +1796,10 @@
                 this.closePreview();
                 // 判断当前直播状态，进行相应的跳转
                 this.$message.success(this.$t('form.form_1033'));
+                if (this.isSubject) {
+                  // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                  window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
+                }
                 if (this.interfaceType === 'subject') {
                   this.goToSubjectDetailOrReload();
                 } else {
@@ -1830,6 +1836,12 @@
                   this.closePreview();
                   sessionStorage.setItem('visitor_id', res.data.visit_id);
                   this.$message.success(this.$t('form.form_1033'));
+                  if (this.isSubject) {
+                    // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
+                    window.$middleEventSdk?.event?.send(
+                      boxEventOpitons(this.cuid, 'emitChangePass')
+                    );
+                  }
                   if (this.interfaceType === 'subject') {
                     this.goToSubjectDetailOrReload();
                   } else {
@@ -1877,6 +1889,8 @@
               is_no_check: 1
             })
             .then(res => {
+              // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+              // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
               if (res.code == 512503 || res.code == 512502) {
                 // 跳转老活动
                 window.location.href = `${window.location.origin}/${this.webinarOrSubjectId}`;
@@ -1886,8 +1900,8 @@
               if (this.isEntryForm) {
                 this.gotoWebinarPage(res, isSubmitForm);
               } else {
-                // webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
-                if (res.data.webinar_type == 2 && isSubmitForm) {
+                // init接口中 webinar.type: 1-直播中，2-预约，3-结束，4-点播，5-回放
+                if (res.data.webinar_state == 2 && isSubmitForm) {
                   // 如果是预约状态，显示开播时间提醒
                   this.$alert(
                     this.$t('form.form_1032', { n: res.data.start_time.substring(0, 16) }),
@@ -1920,7 +1934,7 @@
             `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
         } else {
           // 如果预约或结束，跳转到预约页
-          if (res.data.webinar_type == 2 && isSubmitForm) {
+          if (res.data.webinar_state == 2 && isSubmitForm) {
             // 如果是预约状态，显示开播时间提醒
             this.$alert(
               this.$t('form.form_1032', { n: res.data.start_time.substring(0, 16) }),

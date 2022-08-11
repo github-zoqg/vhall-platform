@@ -74,12 +74,21 @@
       },
       // 嵌入页是否支持报名表单展示
       embedShowRegForm() {
-        const isEmbed = this.$domainStore.state.roomBaseServer.embedObj.embed;
-        const isEmbedVideo = this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
         // 观看限制 - 无or密码，且当前是完全嵌入页，开启了报名表单，展示按钮。
+        console.log('当前数据情况isEmbed=' + this.isEmbed);
+        console.log('当前数据情况isEmbedVideo=' + this.isEmbedVideo);
+        console.log('当前数据情况verify=' + this.verify);
+        console.log('当前数据情况open_reg_form=' + this.open_reg_form);
         return (
-          isEmbed && !isEmbedVideo && this.open_reg_form && (this.verify == 0 || this.verify == 1)
+          this.isEmbed &&
+          !this.isEmbedVideo &&
+          this.open_reg_form &&
+          (this.verify == 0 || this.verify == 1)
         );
+      },
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       isEmbedVideo() {
         // 是不是单视频嵌入
@@ -268,7 +277,13 @@
         } else {
           // 直播中、点播、回放 的时候，按钮文案“立即观看”，预告状态 按钮文案“立即预约”
           if (this.type == 1 || this.type == 4 || this.type == 5) {
-            if (this.verify == 1 || this.embedShowRegForm) {
+            if (
+              this.verify == 1 ||
+              (this.isEmbed &&
+                !this.isEmbedVideo &&
+                this.open_reg_form &&
+                (this.verify == 0 || this.verify == 1))
+            ) {
               this.btnText = this.$t('player.player_1013');
               this.disabled = false;
             } else {
@@ -276,9 +291,18 @@
               this.disabled = false;
             }
           } else if (this.type == 2) {
-            if (this.verify == 1 || this.embedShowRegForm) {
+            if (
+              this.isEmbed &&
+              !this.isEmbedVideo &&
+              this.open_reg_form == 1 &&
+              (this.verify == 0 || this.verify == 1)
+            ) {
+              // 嵌入页 但 不是单视频嵌入，并且开启了报名表单，并且观看限制是 “无” 或 "密码", 按钮展示“立即预约”
               this.btnText = this.$t('appointment.appointment_1017');
               this.disabled = false;
+            } else if (this.verify == 1) {
+              this.btnText = this.$t('webinar.webinar_1036');
+              this.disabled = true;
             } else {
               this.btnText = '';
               this.disabled = false;

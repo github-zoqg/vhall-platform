@@ -19,7 +19,7 @@
       return {
         // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
         interfaceType:
-          window.location.href.indexOf('/subject/entryform') != -1 ? 'subject' : 'webinar',
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar',
         webinarOrSubjectId: this.$route.params.id,
         formOpenLinkStatus: 0
       };

@@ -572,7 +572,16 @@
             break;
           case 512525: // 填写表单
             if (this.isEmbed) {
-              queryString = window.location.search;
+              if (window.location.search) {
+                let searchStr =
+                  window.location.search.indexOf('?') != -1
+                    ? window.location.search
+                    : window.location.search.replace('&', '?');
+                queryString = searchStr + '&isIndependent=0';
+              } else {
+                console.log('跳转报名表单-地址栏啥也没有');
+                queryString = '?isIndependent=0';
+              }
               window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
             } else {
               queryString = this.$route.query.refer
@@ -750,26 +759,36 @@
               }, 1000);
             }
           } else if (res.code === 512525) {
-            // 开启了报名表单的时候，需要跳转至报名表单界面，这个时候还没有参会
-            queryString = this.$route.query.refer
-              ? `?refer=${this.$route.query.refer}&isIndependent=0`
-              : '?isIndependent=0';
-            //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-            if (queryString.indexOf('?') != -1) {
-              queryString += share_id ? `&share_id=${share_id}` : '';
-              queryString += shareId ? `&shareId=${shareId}` : '';
-            } else if (queryString.indexOf('?') == -1 && share_id) {
-              queryString += share_id ? `?share_id=${share_id}` : '';
-            } else if (queryString.indexOf('?') == -1 && shareId) {
-              queryString += shareId ? `?shareId=${shareId}` : '';
+            if (this.isEmbed) {
+              if (window.location.search) {
+                let searchStr =
+                  window.location.search.indexOf('?') != -1
+                    ? window.location.search
+                    : window.location.search.replace('&', '?');
+                queryString = searchStr + '&isIndependent=0';
+              } else {
+                console.log('跳转报名表单-地址栏啥也没有');
+                queryString = '?isIndependent=0';
+              }
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
+            } else {
+              // 开启了报名表单的时候，需要跳转至报名表单界面，这个时候还没有参会
+              queryString = this.$route.query.refer
+                ? `?refer=${this.$route.query.refer}&isIndependent=0`
+                : '?isIndependent=0';
+              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+              if (queryString.indexOf('?') != -1) {
+                queryString += share_id ? `&share_id=${share_id}` : '';
+                queryString += shareId ? `&shareId=${shareId}` : '';
+              } else if (queryString.indexOf('?') == -1 && share_id) {
+                queryString += share_id ? `?share_id=${share_id}` : '';
+              } else if (queryString.indexOf('?') == -1 && shareId) {
+                queryString += shareId ? `?shareId=${shareId}` : '';
+              }
+              // 邀请卡
+              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
             }
-            // 邀请卡
-            queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${
-              process.env.VUE_APP_ROUTER_BASE_URL
-            }${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${
-              this.$route.params.id
-            }${queryString}`;
           } else {
             this.$toast(this.$tec(res.code) || res.msg);
           }

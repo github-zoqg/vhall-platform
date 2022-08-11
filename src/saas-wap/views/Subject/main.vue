@@ -385,7 +385,7 @@
           }
           // 回放状态、开启了试看 并且观看限制不能是报名表单
           if (
-            item.webinar_state == 5 &&
+            (item.webinar_state == 5 || item.webinar_state == 4) &&
             this.subjectAuthInfo.is_preview == 1 &&
             this.subjectAuthInfo.subject_verify != 2
           ) {

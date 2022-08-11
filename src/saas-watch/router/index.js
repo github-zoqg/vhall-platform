@@ -64,7 +64,7 @@ const routes = [
     meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
-    path: '/subject/entryform/:id',
+    path: '/special/entryform/:id',
     component: entryForm,
     name: 'entryFormSubject',
     meta: { title: '独立报名表单', grayType: 'subject' }
@@ -79,7 +79,7 @@ const routes = [
     path: '/special/detail',
     component: Subject,
     name: 'Subject',
-    meta: { title: '专题详情', page: 'subject' }
+    meta: { title: '专题详情', page: 'subject', grayType: 'subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
