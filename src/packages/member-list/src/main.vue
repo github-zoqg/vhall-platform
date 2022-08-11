@@ -1036,6 +1036,7 @@
           // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
           if (_this.LocalCatchTarget_id != msg.data.target_id) {
             _this.LocalCatchTarget_id = msg.data.target_id;
+            window.vhallReportForProduct?.report(110180);
             if (msg.data.room_role != 2) {
               _this.$message.success({
                 message: _this.$t('interact.interact_1030', { n: msg.data.nick_name })
@@ -1596,6 +1597,10 @@
           room_id: this.roomId,
           receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
+        if (this.userId == accountId && this.roleName == 1) {
+          // 主持人下麦自己
+          window.vhallReportForProduct?.report(110172);
+        }
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1609,6 +1614,10 @@
               .speakOff(data)
               .then(res => {
                 //todo 埋点上报
+                if (this.userId == accountId && this.roleName == 1) {
+                  // 主持人下麦自己
+                  window.vhallReportForProduct?.report(110173);
+                }
                 return res;
               })
               .catch(error => {
@@ -1620,6 +1629,10 @@
             .speakOff(data)
             .then(res => {
               //todo 埋点上报
+              if (this.userId == accountId && this.roleName == 1) {
+                // 主持人下麦自己
+                window.vhallReportForProduct?.report(110173);
+              }
               return res;
             })
             .catch(error => {

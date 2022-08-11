@@ -557,13 +557,21 @@
           window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
         }
       },
-      speakOff() {
-        this.micServer.speakOff({
+      async speakOff() {
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.report(110133);
+        }
+        const res = await this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
-
-        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
-          window.vhallReportForProduct?.report(110133);
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.report(110157, { report_extra: res });
         }
       },
       fullScreen() {

@@ -75,8 +75,6 @@
           }
           if (this.join_info.role_name == 4) {
             window.vhallReportForProduct?.report(110162);
-          } else if (this.join_info.role_name == 2) {
-            // window.vhallReportForProduct?.report(110131);
           }
 
           this.senderId = temp.sender_id;
