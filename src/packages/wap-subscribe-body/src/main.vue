@@ -61,36 +61,87 @@
         <template v-else>
           <p class="vod_title">{{ $t('player.player_1026') }}</p>
         </template>
+        <template v-if="subOption.needAgreement">
+          <div class="subscribe_into_container">
+            <div class="subscribe_into_person subscribe_into_center" @click="showAgreement">
+              <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div
+            class="subscribe_into_container"
+            v-if="
+              ((subOption.verify != 0 ||
+                (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
+                !isEmbed) ||
+              (isEmbed && webinarType != 2) ||
+              (isEmbed &&
+                !isEmbedVideo &&
+                subOption.open_reg_form &&
+                (subOption.verify == 0 || subOption.verify == 1))
+            "
+          >
+            <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+              <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
+              <span @click="authCheck(3)">
+                {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
+              </span>
+            </div>
+            <div
+              v-else
+              :class="[
+                'subscribe_into_person subscribe_into_center',
+                {
+                  'is-subscribe': subOption.is_subscribe == 1
+                }
+              ]"
+              @click="authCheck(subOption.verify)"
+            >
+              <span class="subscribe_btn">
+                {{ subscribeText }}
+              </span>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div
+        :class="[
+          'subscribe_tabs',
+          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
+        ]"
+      >
+        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
+      </div>
+    </div>
+    <template v-if="showBottomBtn">
+      <div class="vmp-subscribe-body-auth" v-if="subOption.needAgreement">
+        <div class="subscribe_into_person" @click="showAgreement">
+          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
+        </div>
+      </div>
+      <template v-else>
         <div
-          class="subscribe_into_container"
+          class="vmp-subscribe-body-auth"
           v-if="
-            ((this.subOption.verify != 0 ||
-              (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
-              !this.isEmbed) ||
-            (this.isEmbed && this.webinarType != 2) ||
-            (this.isEmbed &&
-              !this.isEmbedVideo &&
-              this.subOption.open_reg_form &&
-              (this.subOption.verify == 0 || this.subOption.verify == 1))
+            subOption.verify != 0 ||
+            (subOption.verify == 0 && subOption.hide_subscribe == 1) ||
+            (isEmbed &&
+              !isEmbedVideo &&
+              subOption.open_reg_form &&
+              (subOption.verify == 0 || subOption.verify == 1))
           "
         >
-          <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+          <div class="subscribe_into_other" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
               {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
             </span>
           </div>
           <div
-            class="subscribe_into_person subscribe_into_center"
-            v-else-if="subOption.needAgreement"
-            @click="showAgreement"
-          >
-            <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
-          </div>
-          <div
             v-else
             :class="[
-              'subscribe_into_person subscribe_into_center',
+              'subscribe_into_person',
               {
                 'is-subscribe': subOption.is_subscribe == 1
               }
@@ -102,50 +153,7 @@
             </span>
           </div>
         </div>
-      </div>
-      <div
-        :class="[
-          'subscribe_tabs',
-          { top_menu: isScorllTab && !showHeader, embed_menu: showHeader && isScorllTab }
-        ]"
-      >
-        <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
-      </div>
-    </div>
-    <template
-      v-if="
-        this.showBottomBtn &&
-        (this.subOption.verify != 0 ||
-          (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1))
-      "
-    >
-      <div class="vmp-subscribe-body-auth">
-        <div class="subscribe_into_other" v-if="showSubscribeBtn">
-          <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
-          <span @click="authCheck(3)">{{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}</span>
-        </div>
-        <div
-          class="subscribe_into_person"
-          v-else-if="subOption.needAgreement"
-          @click="showAgreement"
-        >
-          <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
-        </div>
-        <div
-          v-else
-          :class="[
-            'subscribe_into_person',
-            {
-              'is-subscribe': subOption.is_subscribe == 1
-            }
-          ]"
-          @click="authCheck(subOption.verify)"
-        >
-          <span class="subscribe_btn">
-            {{ subscribeText }}
-          </span>
-        </div>
-      </div>
+      </template>
     </template>
     <alertBox
       v-if="isSubscribeShow"
@@ -278,9 +286,7 @@
           return false;
         }
       },
-      // 是否展示 F码+付费组合按钮
       showSubscribeBtn() {
-        // 观看限制 - F码+付费 并且 非结束状态下，未预约成功
         if (this.subOption.verify == 6 && !this.subOption.is_subscribe && this.webinarType != 3) {
           return true;
         } else {
@@ -453,7 +459,8 @@
             this.subscribeServer.setWarmVideoList(this.warmUpVideoList[this.initIndex]);
           }
         }
-        // 如果是嵌入页并且没有开播 并且（未开启报名表单）预约按钮不显示
+        // 如果是嵌入页并且没有开播 预约按钮不显示
+        // 如果不是 （开启报名表单 且观看限制=无或者密码的 非单视频嵌入页） 情况，预约按钮不展示
         if (webinar.type == 2) {
           if (
             this.isEmbed &&
