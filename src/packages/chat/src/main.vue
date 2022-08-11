@@ -26,6 +26,7 @@
       <virtual-list
         v-if="virtual.showlist"
         ref="chatlist"
+        :key="virtual.key"
         :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
         :keeps="30"
         :estimate-size="100"
@@ -230,7 +231,8 @@
         //虚拟列表配置
         virtual: {
           showlist: false,
-          contentHeight: 0
+          contentHeight: 0,
+          key: 1
         }
       };
     },
@@ -318,6 +320,11 @@
       // 聊天免登录的配置项更改，重新计算是否需要登录聊天
       noLoginKey() {
         this.initChatLoginStatus();
+      },
+      ['roomBaseServer.state.miniElement'](oldval, newval) {
+        if (Boolean(oldval) != Boolean(newval)) {
+          this.updateHeight();
+        }
       }
     },
     beforeCreate() {
@@ -338,15 +345,23 @@
       }
       //监听domain层chatServer通知
       this.listenChatServer();
-
       // 展示欢迎语
       this.showWelcome();
-      this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
-      this.virtual.showlist = true;
-      this.chatlistHeight = this.virtual.contentHeight;
+      if (this.$route.query.assistantType) {
+        this.updateHeight();
+      }
     },
     destroyed() {},
     methods: {
+      updateHeight() {
+        this.$nextTick(() => {
+          this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+          this.virtual.showlist = true;
+          this.virtual.key++;
+          this.chatlistHeight = this.virtual.contentHeight;
+          this.scrollBottom();
+        });
+      },
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -448,10 +463,7 @@
         menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
             if (data.cuid == this.cuid) {
-              this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
-              this.virtual.showlist = data.cuid == this.cuid;
-              this.chatlistHeight = this.virtual.contentHeight;
-              this.scrollBottom();
+              this.updateHeight();
             }
           });
         });
