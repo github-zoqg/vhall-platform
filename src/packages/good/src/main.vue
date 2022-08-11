@@ -242,11 +242,12 @@
 
     .vh-goods_item {
       height: 100px;
-      border-bottom: 1px solid @border-bormal;
+      border-bottom: 1px solid var(--theme-tab-content-good-split-bg);
       display: flex;
       flex-direction: row;
       cursor: pointer;
       padding: 16px;
+      background-color: var(--theme-tab-content-good-bg);
       &-cover {
         width: 100px;
         height: 100px;
@@ -272,7 +273,7 @@
           display: block;
           width: 100%;
           font-size: 14px;
-          color: @font-dark-normal;
+          color: var(--theme-tab-content-good-name-font);
           line-height: 20px;
           overflow: hidden;
           text-align: left;
@@ -282,7 +283,7 @@
           height: 18px;
           line-height: 20px;
           font-size: 12px;
-          color: #999999;
+          color: var(--theme-tab-content-good-describe-font);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -290,7 +291,7 @@
         .discount_price {
           display: inline-block;
           width: 100%;
-          color: @font-light-low;
+          color: var(--theme-tab-content-good-discountPrice-font);
           line-height: 16px;
           text-decoration: line-through;
           text-align: left;
@@ -307,7 +308,7 @@
           position: absolute;
           bottom: 0px;
           .price {
-            color: @font-dark-normal;
+            color: var(--theme-tab-content-good-price-font);
             line-height: 20px;
             font-size: 16px;
             .remainder {
@@ -323,25 +324,25 @@
             width: 36px;
             height: 17px;
             padding: 0px 4px;
-            background: #fff0f0;
+            background: var(--theme-tab-content-good-priceTag-bg);
             border-radius: 2px;
             line-height: 18px;
             font-size: 10px;
-            color: #fb3a32;
+            color: #fb2626;
             margin-right: 2px;
           }
           .buy {
             display: inline-block;
             width: 52px;
             border-radius: 20px;
-            border: 1px solid #cccccc;
+            border: 1px solid var(--theme-tab-content-good-buyBorder-font);
             background: transparent;
-            color: #fff;
+            color: var(--theme-tab-content-good-buy-font);
             padding: 4px 0;
             cursor: pointer;
             &:hover {
-              background: #fb3a32;
-              border: 1px solid #fb3a32;
+              background: var(--theme-color);
+              border: 1px solid var(--theme-color);
             }
           }
         }
@@ -361,8 +362,8 @@
         }
       }
       &:hover {
-        background: #3c3c3c;
-        border-bottom: 1px solid @bg-dark-section;
+        background: var(--theme-tab-content-good-hover-bg);
+        border-bottom: 1px solid var(--theme-tab-content-good-split-bg);
         .vh-goods_item {
           &-info {
             .showEllipse::after {

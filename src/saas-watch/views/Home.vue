@@ -313,17 +313,22 @@
       },
       setPageConfig() {
         const themeMap = {
-          1: 'themeDefaultBlack', // 黑
-          2: 'themeSimpleWhite', // 白
-          3: 'themeFestiveRed', // 红
-          4: 'themeScienceBlue' // 蓝
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'blue',
+          5: 'golden'
         };
 
+        const styleMap = {
+          1: 'default', // 传统风格
+          2: 'simple' // 简洁风格
+        };
         // TODO:暂时注掉，使用写死的值调试
         // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
         const skinInfo = {
-          style: 2,
-          bgColor: 4,
+          style: 1,
+          bgColor: 1,
           chatLayout: 1 // 聊天布局 1 上下 2 左右
         };
 
@@ -331,8 +336,15 @@
           // 设置聊天组件为左右风格
           updatePageNode('comChat', 'component', 'VmpFashionChat');
         }
-        // 设置主题，如果没有就用白色
-        skins.setTheme(skins.themes[themeMap[skinInfo?.bgColor || 1]]);
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skinInfo?.style || 1];
+        const theme = themeMap[skinInfo?.bgColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+
         // 挂载到window方便调试
         window.skins = skins;
       }
