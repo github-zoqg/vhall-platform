@@ -454,13 +454,32 @@
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
-      // 是否开启视频轮巡
-      isVideoPolling() {
-        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
-      },
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      pollingData() {
+        return {
+          agreeStatus: this.videoPollingServer.state.agreeStatus,
+          isPolling: this.videoPollingServer.state.isPolling
+        };
+      }
+    },
+    watch: {
+      // 视频轮训观众收到轮训消息，点击“我知道了” => 获取设备权限 => 开始视频推流
+      pollingData: {
+        async handler(val, oldVal) {
+          console.log('pollingData-', val, oldVal);
+          if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
+            if (val.agreeStatus == 1) {
+              await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+              if (val.isPolling) {
+                this.videoStartPush({ type: 1, ...val });
+              }
+            }
+          }
+        },
+        deep: true
       }
     },
     beforeCreate() {
@@ -477,11 +496,6 @@
       this.listenEvents();
     },
     async mounted() {
-      // 轮训列表更新消息
-      this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
-        console.log('轮训列表更新消息', msg);
-        this.videoStartPush();
-      });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
         if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
@@ -493,7 +507,7 @@
         }
       });
       if (!this.isSpeakOn) {
-        await this.videoStartPush();
+        await this.videoStartPush({ type: 2 });
       }
       this.checkStartPush();
     },
@@ -538,7 +552,8 @@
        * @description: 视频轮巡推流
        * @param arr {Array} 当前参与轮巡的观众流列表
        */
-      async videoStartPush() {
+      async videoStartPush(data) {
+        console.log('videoStartPush-params', data);
         if (this.videoPollingServer.state.isPolling) {
           if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
           if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
@@ -867,7 +882,7 @@
             // 重新推流
             if (param.isRepublishMode) {
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 3 });
               } else {
                 this.isSpeakOn && (await this.startPush());
               }
@@ -875,7 +890,7 @@
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 4 });
               } else {
                 await this.startPush();
               }

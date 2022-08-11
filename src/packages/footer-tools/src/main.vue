@@ -135,6 +135,7 @@
       :close-on-click-modal="true"
       :modal-append-to-body="true"
       custom-class="polling-dialog"
+      @closed="closePollingDialog"
       width="400px"
     >
       <div class="polling-dialog_warp">
@@ -232,6 +233,10 @@
       isVideoPolling() {
         return this.roomBaseServer.state.configList['video_polling'] == 1;
       },
+      // 是否开启视频轮巡
+      hasVideoPollingStart() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.video_polling == 1;
+      },
       // 是否正在直播
       isLiving() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
@@ -312,9 +317,18 @@
     mounted() {
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
         this.pollingVisible = true;
+        sessionStorage.setItem('hasVideoPollingStart', 1);
       });
+      if (+sessionStorage.getItem('hasVideoPollingStart')) return;
+      if (this.hasVideoPollingStart) {
+        this.pollingVisible = true;
+        sessionStorage.setItem('hasVideoPollingStart', 1);
+      }
     },
     methods: {
+      closePollingDialog() {
+        this.videoPollingServer.setAgreeStatus(1);
+      },
       settingShow() {
         if (this.isInteractLive) {
           // 互动直播

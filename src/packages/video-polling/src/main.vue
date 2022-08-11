@@ -2,7 +2,21 @@
   <div class="vmp-video-polling" ref="videoPolling" id="videoPollingWrap">
     <!-- 头部悬浮区 -->
     <div class="vmp-video-polling__tip">
-      <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
+      <span class="vmp-video-polling__tip-txt">
+        视频轮巡视频墙&nbsp;
+        <el-tooltip effect="dark" placement="left-end">
+          <div class="vmp-video-polling__tip-tooltip" slot="content">
+            以下几种情况会导致轮巡画面黑屏：
+            <br />
+            1、用户拒绝了您的轮巡邀请
+            <br />
+            2、用户设备不支持轮训
+            <br />
+            3、用户的网络异常
+          </div>
+          <i class="vmp-video-polling__tip-icon vh-iconfont vh-line-question"></i>
+        </el-tooltip>
+      </span>
       <div class="vmp-video-polling__tip-wrap">
         <span class="vmp-video-polling__tip-auto" v-if="isAutoPolling">
           距离展示下一组 {{ zeroPadding(minute) }}: {{ zeroPadding(second) }}
@@ -403,6 +417,14 @@
         color: #e6e6e6;
         line-height: 24px;
         margin-left: 20px;
+      }
+      &-icon {
+        font-size: 20px;
+        vertical-align: bottom;
+        color: #fff;
+      }
+      &-tooltip {
+        line-height: 18px;
       }
       &-wrap {
         padding-right: 8px;
