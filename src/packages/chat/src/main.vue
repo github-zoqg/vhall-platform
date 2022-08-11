@@ -350,8 +350,11 @@
       if (this.$route.query.assistantType) {
         this.updateHeight();
       }
+      window.addEventListener('resize', this.updateHeight);
     },
-    destroyed() {},
+    destroyed() {
+      window.removeEventListener('resize', this.updateHeight);
+    },
     methods: {
       updateHeight() {
         this.$nextTick(() => {
