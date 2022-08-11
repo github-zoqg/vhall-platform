@@ -589,7 +589,7 @@
                 console.log('跳转报名表单-地址栏啥也没有');
                 queryString = '?isIndependent=0';
               }
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/embedclient/entryform/${this.$route.params.id}${queryString}`;
             } else {
               queryString = this.$route.query.refer
                 ? `?refer=${this.$route.query.refer}&isIndependent=0`
@@ -777,7 +777,7 @@
                 console.log('跳转报名表单-地址栏啥也没有');
                 queryString = '?isIndependent=0';
               }
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/embedclient/lives/entryform/${this.$route.params.id}${queryString}`;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/embedclient/entryform/${this.$route.params.id}${queryString}`;
             } else {
               // 开启了报名表单的时候，需要跳转至报名表单界面，这个时候还没有参会
               queryString = this.$route.query.refer
