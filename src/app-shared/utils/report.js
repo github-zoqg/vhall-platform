@@ -49,3 +49,53 @@ export function logRoomInitFailed(options = { isSend: false, error: {} }) {
     console.log(err);
   }
 }
+
+/**
+ * 观看端上报的公用数据(大部分)
+ * @param watchInitData 参会接口后的domain挂载数据
+ * @param watchInitData 参会接口后的domain挂载数据
+ */
+export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {}, shareId = '') {
+  const params = {
+    s: `${watchInitData?.interact?.paas_app_id}_${
+      watchInitData?.visitor_id
+    }${new Date().getTime()} `,
+    visitor_id: watchInitData?.visitor_id,
+    reg_id: watchInitData?.join_info?.join_id,
+    nickname: encodeURIComponent(watchInitData?.join_info?.nickname),
+    business_uid: watchInitData?.join_info?.third_party_user_id,
+    app_id: watchInitData?.interact?.paas_app_id,
+    webinar_id: watchInitData?.webinar?.id,
+    webinar_name: encodeURIComponent(watchInitData?.webinar?.subject),
+    room_id: watchInitData?.interact?.room_id,
+    inav_id: watchInitData?.interact?.inav_id,
+    channel_id: watchInitData?.interact?.channel_id,
+    switch_id: watchInitData?.switch?.switch_id,
+    record_id: watchInitData?.record?.paas_record_id,
+    webinar_type: watchInitData?.webinar?.mode,
+    file_type: watchInitData?.webinar?.type,
+    role_name: watchInitData?.join_info?.role_name,
+    ua: navigator.userAgent,
+    ref_url: document.referrer,
+    language_type: localStorage.getItem('lang') || 1
+  };
+  if (watchInitData?.join_info?.user_id === 0) {
+    // 未登录
+    params.is_login = 0;
+  } else {
+    params.is_login = 1;
+    params.user_id = watchInitData.join_info.user_id;
+    params.sso_union_id = userInfo?.union_id;
+  }
+  if (shareId) {
+    params.share_id = shareId;
+    const strArr = `${shareId}`.split('-');
+    const sourceChannel = strArr[strArr.length - 1];
+    if (['0', '1', '2', '3', '4'].includes(sourceChannel)) {
+      params.source_channel = sourceChannel;
+    }
+  }
+  console.log('上报数据公共配置:');
+  console.table(params);
+  return params;
+}
