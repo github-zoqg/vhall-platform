@@ -417,7 +417,7 @@
         // margin-left: 5px;
         font-size: 14px;
         line-height: 18px;
-        color: #999999;
+        color: var(--theme-tab-content-qa-onlyMe-font);
       }
     }
   }

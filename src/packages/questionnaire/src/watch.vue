@@ -134,7 +134,7 @@
 </script>
 <style lang="less">
   .el-loading-spinner .path {
-    stroke: #fb3a32;
+    stroke: var(--theme-color) !important;
   }
   .el-loading-spinner .el-loading-text {
     color: #1a1a1a;
@@ -155,7 +155,7 @@
         width: 7px;
         height: 7px;
         border: 1px solid #2a2a2a;
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         border-radius: 50%;
       }
       img {

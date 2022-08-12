@@ -117,9 +117,15 @@
     padding: 8px 10px 8px;
     font-family: PingFangSC-Regular, PingFang SC;
     border-radius: 4px;
+    background-color: var(--theme-tab-content-project-card-bg);
     &:hover {
-      background: #383838;
       cursor: pointer;
+      .vh-chose-active-item__title {
+        color: var(--theme-color);
+      }
+      .cover_pic {
+        transform: scale(1.2);
+      }
     }
     &__cover {
       position: relative;
@@ -127,6 +133,7 @@
       height: 80px;
       margin-right: 12px;
       border-radius: 4px;
+      overflow: hidden;
       img {
         display: inline-block;
         width: 142px;
@@ -206,7 +213,7 @@
       margin: 10px 0px 4px 0px;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--theme-tab-content-project-title-font);
       line-height: 20px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -222,7 +229,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 12px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-project-info-font);
       line-height: 16px;
       text-align: left;
     }

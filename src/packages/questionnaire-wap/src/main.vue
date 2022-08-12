@@ -259,8 +259,8 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    box-shadow: 0px 0px 0px 9px #ff0005;
-    background: #ff0005;
+    box-shadow: 0px 0px 0px 9px var(--theme-component-qa) !important;
+    background: var(--theme-component-qa) !important;
   }
   .question-box {
     position: fixed;

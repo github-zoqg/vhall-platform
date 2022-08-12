@@ -360,6 +360,7 @@
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import skins from '@/app-shared/skins/wap';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
@@ -654,6 +655,7 @@
       this.getWebinarType();
       this.getBaseInfo();
       this.getQuestionList();
+      this.setPageConfig();
     },
     methods: {
       //获取报名独立链接状态
@@ -1528,6 +1530,56 @@
         } else {
           this.errPhone ? this.$refs.verifyphone.focus() : this.$refs.verifycode.focus();
         }
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'blue',
+          5: 'golden'
+        };
+
+        // TODO:暂时注掉，使用写死的值调试
+        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        // TODO:调试代码
+        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
+          style: 1,
+          bgColor: 2
+        };
+
+        // TODO:调试代码
+        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
+        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = 'main';
+        const theme = themeMap[skinInfo?.bgColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(style, theme);
+
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(style, theme) {
+        if (style == 'main' && (theme == 'black' || theme == 'white')) {
+          if (theme == 'black') {
+            document.body.style.background = `#262626`;
+          }
+          if (theme == 'white') {
+            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
+          }
+        } else {
+          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+            style +
+            '_' +
+            theme +
+            '.png')})`;
+          document.body.style.backgroundSize = 'cover';
+        }
       }
     }
   };
@@ -1610,6 +1662,8 @@
           align-items: center;
           justify-content: center;
           font-size: 0.37rem;
+          color: var(--theme-component-sign-up-tab-font);
+          background-color: var(--theme-component-sign-up-tab-bg);
           &:first-child {
             border: 0.02rem solid #d2d2d2;
             border-right: none;
@@ -1627,22 +1681,9 @@
             }
           }
           &.active {
-            color: #fff;
-            &.red {
-              border-color: #fb3a32;
-              background-color: #ffebeb;
-              color: #fb3a32;
-            }
-            &.blue {
-              border-color: #3562fa;
-              background-color: #ebefff;
-              color: #3562fa;
-            }
-            &.purple {
-              border-color: #8d57a4;
-              background-color: #f5bdea;
-              color: #8d57a4;
-            }
+            border-color: var(--theme-color);
+            background-color: var(--theme-color-sub);
+            color: var(--theme-color);
           }
         }
       }
@@ -1883,26 +1924,14 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fb3a32;
-      background-color: #fb3a32;
+      border: 0.024rem solid var(--theme-color);
+      background-color: var(--theme-color);
       font-size: 0.37rem;
       color: #fff;
       outline: none;
       width: 9.07rem;
       height: 80px;
       border-radius: 50px;
-      &.red {
-        border-color: #fb3a32;
-        background-color: #fb3a32;
-      }
-      &.blue {
-        border-color: #3562fa;
-        background-color: #3562fa;
-      }
-      &.purple {
-        border-color: #8d57a4;
-        background-color: #8d57a4;
-      }
     }
     .no-authority-wrap {
       width: 100%;

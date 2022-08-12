@@ -350,7 +350,7 @@
         line-height: 70px;
       }
       .sub-detail .num {
-        color: #fb3a32;
+        color: var(--theme-color);
       }
       .sub-auth {
         vertical-align: top;
@@ -358,7 +358,7 @@
         line-height: 36px;
         min-width: 100px;
         height: 36px;
-        background: #fb3a32;
+        background: var(--theme-color);
         border-radius: 18px;
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;

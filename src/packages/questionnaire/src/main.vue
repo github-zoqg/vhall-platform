@@ -901,13 +901,13 @@
     text-align: right;
     margin-top: 10px;
     .hover_button_cancel:hover {
-      color: #fb3a32;
-      border-color: #fb3a32;
+      color: var(--theme-color) !important;
+      border-color: var(--theme-color) !important;
     }
   }
   .name_set_button {
     margin-right: 8px;
-    color: #3562fa !important;
+    color: var(--theme-color) !important;
   }
 </style>
 <style lang="less">
@@ -948,38 +948,38 @@
   /*复选选中效果重置*/
   .el-checkbox__input.is-checked .el-checkbox__inner,
   .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: #fb3a32 !important;
-    border-color: #fb3a32 !important;
+    background-color: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
   }
   .el-checkbox__inner:hover {
-    border-color: #fb3a32;
+    border-color: var(--theme-color) !important;
   }
   .el-checkbox__input.is-focus .el-checkbox__inner {
     border-color: #dcdfe6;
   }
   .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
-    background-color: #fb3a32;
-    border-color: #fb3a32;
+    background-color: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
   }
 
   /*单选选中效果重置*/
   .el-radio__input.is-checked .el-radio__inner {
-    background-color: #fb3a32;
-    border-color: #fb3a32;
+    background-color: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
   }
   .el-radio__inner:hover {
-    border-color: #fb3a32;
+    border-color: var(--theme-color) !important;
   }
   /* 日期选择效果重置*/
   .el-date-table td.today span {
-    color: #fb3a32;
+    color: var(--theme-color) !important;
   }
   .el-date-table td.available:hover {
-    color: #fb3a32;
+    color: var(--theme-color) !important;
   }
   .el-date-table td.current:not(.disabled) span {
     color: #fff;
-    background-color: #fb3a32 !important;
+    background-color: var(--theme-color) !important;
   }
 
   .el-dropdown-menu {
@@ -1006,7 +1006,7 @@
     width: 160px;
     border: none;
     margin: 40px auto;
-    background-color: #fb3a32;
+    background-color: var(--theme-color) !important;
     color: #fff !important;
   }
 
@@ -1024,14 +1024,14 @@
         color: #1a1a1a;
       }
       .el-checkbox__input.is-checked .el-checkbox__inner {
-        background-color: #fb3a32 !important;
-        border-color: #fb3a32 !important;
+        background-color: var(--theme-color) !important;
+        border-color: var(--theme-color) !important;
       }
       .el-checkbox__input.is-focus .el-checkbox__inner {
-        border-color: #fb3a32;
+        border-color: var(--theme-color) !important;
       }
       .el-checkbox__inner:hover {
-        border-color: #fb3a32;
+        border-color: var(--theme-color) !important;
       }
     }
     .async__footer {
@@ -1044,13 +1044,13 @@
       padding: 4px 30px;
     }
     .el-message-box .el-button--primary {
-      background: #fb3a32 !important;
-      border-color: #fb3a32 !important;
+      background: var(--theme-color) !important;
+      border-color: var(--theme-color) !important;
       &:hover {
-        background: #fc615b !important;
+        background: var(--theme-color) !important;
       }
       &:active {
-        background: #e2332c !important;
+        background: var(--theme-color) !important;
       }
     }
   }
@@ -1092,8 +1092,8 @@
       z-index: 100;
       &:hover {
         color: #fff;
-        border: 1px solid #fb3a32;
-        background-color: #fb3a32;
+        border: 1px solid var(--theme-color) !important;
+        background-color: var(--theme-color) !important;
       }
     }
   }
@@ -1113,7 +1113,7 @@
     &-search {
       .create {
         height: 36px;
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         color: #fff;
         font-size: 14px;
         text-align: center;
@@ -1205,10 +1205,10 @@
         &:hover {
           background: #f7f7f7;
           .item {
-            color: #fb3a32;
+            color: var(--theme-color) !important;
           }
           .colorItem {
-            color: #fb3a32;
+            color: var(--theme-color) !important;
           }
         }
       }
@@ -1293,8 +1293,8 @@
 
     .vhall-question-btn {
       background-color: #fff;
-      border: 1px solid #fb3a32;
-      color: #fb3a32;
+      border: 1px solid var(--theme-color) !important;
+      color: var(--theme-color) !important;
       font-size: 12px;
       width: 100px;
       height: 30px;
@@ -1305,7 +1305,7 @@
       display: inline-block;
       cursor: pointer;
       &:hover {
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         color: #fff;
       }
     }
@@ -1333,7 +1333,7 @@
         height: 36px;
         line-height: 36px;
         border-radius: 20px;
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         color: #fff;
         font-size: 14px;
         text-align: center;

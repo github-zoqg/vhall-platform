@@ -9,7 +9,7 @@
         @click="gotoRoom(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img :src="item.img_url" alt="" />
+          <img class="cover_pic" :src="item.img_url" alt="" />
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
@@ -168,8 +168,13 @@
     border-radius: 4px;
     background-color: var(--theme-tab-content-live-card-bg);
     &:hover {
-      background: var(--theme-color);
       cursor: pointer;
+      .vh-chose-active-item__title {
+        color: var(--theme-color);
+      }
+      .cover_pic {
+        transform: scale(1.2);
+      }
     }
     &__cover {
       position: relative;
@@ -178,6 +183,7 @@
       margin-right: 12px;
       background: #383838;
       border-radius: 4px;
+      overflow: hidden;
       img {
         display: inline-block;
         width: 142px;
