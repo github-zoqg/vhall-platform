@@ -285,7 +285,10 @@
       // 获取专题的初始化信息
       initSubjectAuth() {
         // this.$route.query.visitorId 个人主页点击专题
-        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
+        const visitorId =
+          localStorage.getItem('visitorId') ||
+          sessionStorage.getItem('visitorId') ||
+          this.$route.query.visitorId;
         let params = {
           subject_id: this.$route.query.id,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
