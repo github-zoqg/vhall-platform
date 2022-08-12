@@ -20,6 +20,8 @@
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import skins from '@/app-shared/skins/watch';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   export default {
     name: 'vmpSubscribe',
     data() {
@@ -83,6 +85,9 @@
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
+
+          this.setPageConfig();
+
           console.log('%c---初始化直播房间 完成', 'color:blue');
           this.state = 1;
           // 是否跳转观看页
@@ -200,6 +205,43 @@
             this.errorData.errorPageTitle = 'embed_verify';
             this.errorData.errorPageText = this.$tec(err.code) || err.msg;
         }
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'blue',
+          5: 'golden'
+        };
+
+        const styleMap = {
+          1: 'default', // 传统风格
+          2: 'simple' // 简洁风格
+        };
+        // TODO:暂时注掉，使用写死的值调试
+        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        const skinInfo = {
+          style: 1,
+          bgColor: 1,
+          chatLayout: 1 // 聊天布局 1 上下 2 左右
+        };
+
+        if (skinInfo?.chatLayout == 2) {
+          // 设置聊天组件为左右风格
+          updatePageNode('comChat', 'component', 'VmpFashionChat');
+        }
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skinInfo?.style || 1];
+        const theme = themeMap[skinInfo?.bgColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+
+        // 挂载到window方便调试
+        window.skins = skins;
       }
     }
   };

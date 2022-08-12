@@ -18,8 +18,6 @@
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
-  import { setPage } from '../../page-config/index';
-  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   import skins from '@/app-shared/skins/wap';
   export default {
     name: 'Subcribe',

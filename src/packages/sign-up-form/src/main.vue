@@ -1817,6 +1817,10 @@
     @blueBg: #ebefff;
     @purple: #8d57a4;
     @purpleBg: #f5bdea;
+    .el-button.el-button--primary {
+      background-color: var(--theme-color);
+      border: 1px solid var(--theme-color);
+    }
     .el-dialog {
       margin-top: 0 !important;
       position: absolute;
@@ -1946,6 +1950,8 @@
         text-align: center;
         transition: all 0.2s linear;
         cursor: pointer;
+        color: var(--theme-component-sign-up-tab-font);
+        background-color: var(--theme-component-sign-up-tab-bg);
         &:nth-child(1) {
           border-right: 0 none;
           border-radius: 4px 0 0 4px;
@@ -1955,33 +1961,33 @@
           border-radius: 0 4px 4px 0;
         }
         &.active {
-          border: 1px solid @red;
-          background: @redBg;
-          color: @red;
+          border: 1px solid var(--theme-color);
+          background: var(--theme-color-sub);
+          color: var(--theme-color);
           width: calc(50% - 2px);
         }
       }
-      &.red1 {
-        .active {
-          border: 1px solid @red;
-          background: @redBg;
-          color: @red;
-        }
-      }
-      &.blue1 {
-        .active {
-          border: 1px solid @blue;
-          background: @blueBg;
-          color: @blue;
-        }
-      }
-      &.purple1 {
-        .active {
-          border: 1px solid @purple;
-          background: @purpleBg;
-          color: @purple;
-        }
-      }
+      // &.red1 {
+      //   .active {
+      //     border: 1px solid @red;
+      //     background: @redBg;
+      //     color: @red;
+      //   }
+      // }
+      // &.blue1 {
+      //   .active {
+      //     border: 1px solid @blue;
+      //     background: @blueBg;
+      //     color: @blue;
+      //   }
+      // }
+      // &.purple1 {
+      //   .active {
+      //     border: 1px solid @purple;
+      //     background: @purpleBg;
+      //     color: @purple;
+      //   }
+      // }
     }
     &__main-form {
       .el-radio-group {

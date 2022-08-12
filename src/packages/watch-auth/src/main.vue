@@ -124,6 +124,10 @@
       }
       &-btn {
         text-align: right;
+        .el-button {
+          background-color: var(--theme-color) !important;
+          border: 1px solid var(--theme-color) !important;
+        }
       }
     }
   }

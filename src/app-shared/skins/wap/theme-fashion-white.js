@@ -19,6 +19,9 @@ export default {
   '--theme-chat-msg-reply-after': 'rgba(0, 0, 0, 0.25)',
   '--theme-chat-msg-timeline': 'rgba(0, 0, 0, 0.85)',
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
+  //主题色
+  '--theme-color': '#fb2626',
+  '--theme-color-sub': '#ffd1c9',
   //菜单-内容
   //简介
   '--theme-tab-content-intro-title-font': '#262626',
@@ -78,6 +81,9 @@ export default {
   '--theme-component-subscribe': '#fb2626',
   '--theme-component-subscribe-text': 'rgba(89, 89, 89, 1)',
   '--theme-component-subscribe-num': 'rgba(38, 38, 38, 1)',
+  //报名表单
+  '--theme-component-sign-up-tab-font': 'rgba(0, 0, 0, 0.65)',
+  '--theme-component-sign-up-tab-bg': 'rgba(0, 0, 0, 0.04)',
   //冗余
   '--theme-header-attention-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
