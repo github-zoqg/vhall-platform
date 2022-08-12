@@ -77,6 +77,7 @@ import VmpCameraCheck from '@/packages/camera-check/index';
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
 // 全局注册组件
+// Vue.use(ElementUI);
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
 Vue.use(VmpWatchAsideMenu);

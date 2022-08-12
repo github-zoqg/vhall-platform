@@ -290,6 +290,7 @@
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
   import { boxEventOpitons, isIE } from '@/app-shared/utils/tool.js';
+  const ossimg = '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -391,12 +392,12 @@
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
         if (this.warmUpVideoList.length) {
           return warmup.warmup_img_url
-            ? warmup.warmup_img_url
+            ? warmup.warmup_img_url + ossimg
             : webinar.img_url
-            ? webinar.img_url
+            ? webinar.img_url + ossimg
             : cover;
         } else {
-          return webinar.img_url || cover;
+          return webinar.img_url ? webinar.img_url + ossimg : cover;
         }
       },
       isShowContainer() {

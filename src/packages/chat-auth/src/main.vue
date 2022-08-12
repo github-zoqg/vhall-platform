@@ -441,12 +441,19 @@
         return this.chatAuthServer
           .getChatAuthEnableStatus(params)
           .then(res => {
-            this.enableChatAuth = res && res.data ? Number(res.data.switch) : 1;
-            this.enableAutoHandle = res.data.switch_options + '';
+            if (res.code == 200) {
+              this.enableChatAuth = res?.data?.switch ? Number(res.data.switch) : 1;
+              this.enableAutoHandle = res.data.switch_options + '';
+            } else {
+              this.$message({
+                message: res.msg,
+                type: 'error'
+              });
+            }
           })
-          .catch(res => {
+          .catch(error => {
             this.$message({
-              message: res.msg,
+              message: error,
               type: 'error'
             });
           });

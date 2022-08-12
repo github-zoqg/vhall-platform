@@ -432,7 +432,6 @@
             isRepublishMode: true
           });
         }
-
         return diff;
       },
       /**
@@ -477,12 +476,25 @@
         const { watchInitData } = useRoomBaseServer().state;
 
         if (watchInitData?.join_info?.role_name == '1') {
+          const { audioInput, audioOutput, video, devices } = this.mediaState;
+          console.log(devices);
           // 保存的配置上传服务器
           await this.mediaSettingServer.setStream({
             room_id: watchInitData.interact.room_id,
             definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
             layout: this.mediaState.layout || 0,
-            screen_definition: this.mediaState.screenRate // 桌面共享清晰度
+            screen_definition: this.mediaState.screenRate, // 桌面共享清晰度
+            extend: JSON.stringify({
+              audioInput: devices?.audioInputDevices?.filter(item => {
+                return item.deviceId == audioInput;
+              })[0].label,
+              audioOutput: devices?.audioOutputDevices?.filter(item => {
+                return item.deviceId == audioOutput;
+              })[0].label,
+              video: devices?.videoInputDevices?.filter(item => {
+                return item.deviceId == video;
+              })[0].label
+            })
           });
         }
 
