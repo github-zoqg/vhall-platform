@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 //字体图标样式
-import '../assets/icon-font/iconfont.css';
+// import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
