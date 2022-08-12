@@ -151,8 +151,7 @@
           });
       },
       goUser() {
-        let visitorId = sessionStorage.getItem('visitorId');
-        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}?visitorId=${visitorId}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
       },
       showPublic() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));

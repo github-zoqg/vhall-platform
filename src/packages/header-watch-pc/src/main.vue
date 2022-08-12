@@ -318,8 +318,7 @@
       },
       // 主办方跳转地址
       goUser() {
-        let href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.webinarInfo.userinfo.user_id}`;
-        window.open(href, '_blank');
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.webinarInfo.userinfo.user_id}`;
       },
       // logo跳转
       goLogoUrl() {
