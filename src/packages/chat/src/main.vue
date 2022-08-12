@@ -441,36 +441,36 @@
           msgServer.$onMsg('LEFT', msg => {
             cl_left(msg);
           });
-          msgServer.$onMsg('CHAT', rawMsg => {
-            let temp = Object.assign({}, rawMsg);
+          // msgServer.$onMsg('CHAT', rawMsg => {
+          //   let temp = Object.assign({}, rawMsg);
 
-            if (typeof temp.data !== 'object') {
-              temp.data = JSON.parse(temp.data);
-              temp.context = JSON.parse(temp.context);
-            }
-            const { event_type = '' } = temp.data || {};
-            switch (event_type) {
-              // 计时器暂停
-              case 'free_gift_send': {
-                const nickname = temp.data.gift_user_nickname || temp.data.nickname;
-                const data = {
-                  nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
-                  avatar: temp.data.avatar,
-                  content: {
-                    gift_name: temp.data.gift_name,
-                    gift_url: `${temp.data.gift_image_url || temp.data.gift_url}`,
-                    source_status: temp.data.source_status
-                  },
-                  type: 'gift_send_success',
-                  interactToolsStatus: true
-                };
-                chatServer.addChatToList(data);
-                break;
-              }
-              default:
-                break;
-            }
-          });
+          //   if (typeof temp.data !== 'object') {
+          //     temp.data = JSON.parse(temp.data);
+          //     temp.context = JSON.parse(temp.context);
+          //   }
+          //   const { event_type = '' } = temp.data || {};
+          //   switch (event_type) {
+          //     // 计时器暂停
+          //     case 'free_gift_send': {
+          //       const nickname = temp.data.gift_user_nickname || temp.data.nickname;
+          //       const data = {
+          //         nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+          //         avatar: temp.data.avatar,
+          //         content: {
+          //           gift_name: temp.data.gift_name,
+          //           gift_url: `${temp.data.gift_image_url || temp.data.gift_url}`,
+          //           source_status: temp.data.source_status
+          //         },
+          //         type: 'gift_send_success',
+          //         interactToolsStatus: true
+          //       };
+          //       chatServer.addChatToList(data);
+          //       break;
+          //     }
+          //     default:
+          //       break;
+          //   }
+          // });
           //处理计时器消息
           msgServer.$onMsg('ROOM_MSG', msg => {
             let str = '';
@@ -537,23 +537,23 @@
                 chatServer.addChatToList(data);
                 break;
               }
-              //送礼物
-              case 'gift_send_success': {
-                const nickname = msg.data.gift_user_nickname || msg.data.nickname;
-                const data = {
-                  nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
-                  avatar: msg.data.avatar,
-                  content: {
-                    gift_name: msg.data.gift_name,
-                    gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
-                    source_status: msg.data.source_status
-                  },
-                  type: 'gift_send_success',
-                  interactToolsStatus: true
-                };
-                chatServer.addChatToList(data);
-                break;
-              }
+              // //送礼物
+              // case 'gift_send_success': {
+              //   const nickname = msg.data.gift_user_nickname || msg.data.nickname;
+              //   const data = {
+              //     nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+              //     avatar: msg.data.avatar,
+              //     content: {
+              //       gift_name: msg.data.gift_name,
+              //       gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
+              //       source_status: msg.data.source_status
+              //     },
+              //     type: 'gift_send_success',
+              //     interactToolsStatus: true
+              //   };
+              //   chatServer.addChatToList(data);
+              //   break;
+              // }
               //打赏
               case 'reward_pay_ok': {
                 const data = {
