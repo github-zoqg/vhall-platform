@@ -112,7 +112,9 @@
             </li>
           </a>
         </ul>
-        <div class="null-page" v-if="!(dataList && dataList.length > 0)">
+        <p class="loading-icon"><van-loading size="24" v-if="loading" /></p>
+
+        <div class="null-page" v-if="!loading && !(dataList && dataList.length > 0)">
           <div class="search">
             <img src="./img/no-search@2x.png" class="no-search" />
             <p class="null-info">暂无数据~</p>
@@ -634,6 +636,9 @@
   .home-scroll-list {
     /*  height: calc(100vh - 300px); */
     overflow: hidden;
+  }
+  .loading-icon {
+    text-align: center;
   }
   /* 列表 */
   .v-data-list {
