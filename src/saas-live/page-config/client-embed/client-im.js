@@ -35,7 +35,12 @@ export default {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
+    }
   },
   // 礼物动画组件
   comPcRewardEffect: {
