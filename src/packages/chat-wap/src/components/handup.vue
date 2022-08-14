@@ -118,9 +118,18 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
+        this.toResultsReporting(170005, encodeURIComponent('用户成功上麦'), {
+          event_type: 'message',
+          waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`
+        });
       });
+
+      // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
+        this.toResultsReporting(170003, msg, {
+          event_type: 'meassage'
+        });
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -147,15 +156,20 @@
       offConnect() {
         this.$emit('handupLoading', false);
         this.closeConnectPop();
-        useMicServer().speakOff();
+        window.vhallReportForProduct.toStartReporting(170002, 170003);
+        useMicServer()
+          .speakOff()
+          .then(data => {
+            this.toResultsReporting(170003, data, {
+              event_type: 'interface'
+            });
+          });
       },
-      // / 举手上麦
+      // 举手上麦
       handsUpToConnect() {
         if (this.lowerWheatFun) {
           return;
         }
-        // 申请连麦
-        window?.vhallReportForProduct.report(170004);
         this.mediaCheckClick();
       },
       // 打开连麦弹框
@@ -169,6 +183,7 @@
       // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
       async mediaCheckClick() {
         const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+
         if (device_status == 1) {
           this.applyMic();
         } else if (device_status == 0) {
@@ -178,30 +193,21 @@
               if (flag) {
                 this.applyMic();
               } else {
-                this.$toast(this.$t('interact.interact_1040'));
+                const _tipMsg = this.$t('interact.interact_1040');
+                this.$toast(_tipMsg);
                 this.closeConnectPop();
-                // 设备不支持 上报
-                window?.vhallReportForProduct.report(170005, {
-                  report_extra: {
-                    msg: encodeURIComponent(this.$t('interact.interact_1040'))
-                  }
-                });
               }
             });
         } else {
           this.$toast(this.$t('interact.interact_1040'));
           this.closeConnectPop();
-          // 设备不支持 上报
-          window?.vhallReportForProduct.report(170005, {
-            report_extra: {
-              msg: encodeURIComponent(this.$t('interact.interact_1040'))
-            }
-          });
         }
       },
       // 主动上麦方法
       applyMic() {
         this.btnDisabled = true;
+        // 申请连麦
+        window?.vhallReportForProduct.toStartReporting(170004, 170005);
         useMicServer()
           .userApply()
           .then(res => {
@@ -213,21 +219,18 @@
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );
               }
-              // 席位已满、设备暂不支持上麦 上报
-              window?.vhallReportForProduct.report(170005, {
-                report_extra: {
-                  waiting_time: this.lowerWheatTimer,
-                  failed_reason: res
-                }
-              });
+              // 数据上报，场景：申请连麦接口
+              this.toResultsReporting(170005, res);
               return;
             }
             /*
-              1、更新文案，为倒计时，倒计时结束，主持人拒绝，提示拒绝上麦
-              */
+                1、更新文案，为倒计时，倒计时结束，主持人拒绝，提示拒绝上麦
+                */
             this.lowerWheatTimer = 30;
             this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
             this.$emit('handupLoading', true);
+            // 数据上报，场景：申请连麦接口
+            this.toResultsReporting(170005, res);
             this.lowerWheatFun = setInterval(() => {
               this.lowerWheatTimer--;
               this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
@@ -245,14 +248,8 @@
                   tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
-                // 倒计时自动结束，主持人拒绝 上报
-                window?.vhallReportForProduct.report(170005, {
-                  report_extra: {
-                    waiting_time: this.lowerWheatTimer,
-                    failed_reason: res,
-                    msg: encodeURIComponent(tip)
-                  }
-                });
+                // 数据上报，场景：申请连麦接口
+                this.toResultsReporting(170005, encodeURIComponent(tip));
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
@@ -260,6 +257,8 @@
           })
           .catch(err => {
             this.btnDisabled = false;
+            // 数据上报，场景：申请连麦接口
+            this.toResultsReporting(170005, err);
           });
       },
       async handleClickMuteDevice(deviceType) {
@@ -270,6 +269,19 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+      },
+
+      // 上报_结果
+      toResultsReporting(eventId, res, options = {}) {
+        window.vhallReportForProduct.toResultsReporting(
+          eventId,
+          {
+            ...{ event_type: 'interface', failed_reason: res },
+            ...options
+          }
+          // 返回的key值
+          // todo keyCode
+        );
       }
     }
   };

@@ -79,8 +79,7 @@
 
           this.senderId = temp.sender_id;
           this.isConfirmVisible = true;
-          // 主持人邀请您上麦”弹窗曝光时触发上报
-          window?.vhallReportForProduct.report(170007);
+
           this.waitTime = 30;
           clearInterval(this.waitInterval);
           this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
@@ -95,6 +94,12 @@
               clearInterval(this.waitInterval);
               this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;
+              // 拒绝连麦邀请上报【30s-30s倒计时结束自动拒绝连麦邀请】
+              window.vhallReportForProduct.toResultsReporting(170012, {
+                waiting_time: `wait-for ${30 - this.waitTime}s`,
+                event_type: 'message',
+                reasonTxt: encodeURIComponent(this.$t('interact.interact_1025'))
+              });
             }
           }, 1000);
         }
@@ -146,6 +151,10 @@
         if (this.join_info.role_name == 4) {
           window.vhallReportForProduct?.report(110163);
         }
+        // 接受连麦邀请上报
+        window.vhallReportForProduct.toStartReporting(170009, [170005, 170010], {
+          waiting_time: this.waitTime
+        });
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -159,29 +168,42 @@
               });
             }
             if (res.code !== 200) {
+              let reasonTxt = '';
               if (res.code == 513345) {
-                this.$message.warning(this.$t('interact.interact_1037'));
+                reasonTxt = this.$t('interact.interact_1037');
+                this.$message.warning(reasonTxt);
               } else {
-                this.$message.error(res.msg);
+                reasonTxt = res.msg;
+                this.$message.error(reasonTxt);
               }
+              window.vhallReportForProduct.toResultsReporting(
+                170010,
+                {
+                  event_type: 'interface',
+                  failed_reason: res,
+                  reasonTxt: encodeURIComponent(reasonTxt)
+                }
+                // 返回的key值
+                // todo keyCode
+              );
             } else {
               useMicServer().userSpeakOn();
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             }
-            // 接受连麦邀请上报
-            window?.vhallReportForProduct.report(170009, {
-              report_extra: {
-                waiting_time: this.waitTime
-              }
-            });
 
-            // 接受连麦邀请结果上报
-            window?.vhallReportForProduct.report(170010, {
-              report_extra: res
-            });
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
+            // 数据上报，场景：接受连麦邀请接口
+            window.vhallReportForProduct.toResultsReporting(
+              170010,
+              {
+                event_type: 'interface',
+                failed_reason: res
+              }
+              // 返回的key值
+              // todo keyCode
+            );
           });
       },
       // 拒绝邀请
@@ -189,6 +211,13 @@
         if (this.join_info.role_name == 4) {
           window.vhallReportForProduct?.report(110165);
         }
+
+        // 拒绝连麦邀请上报
+        window.vhallReportForProduct.toStartReporting(170011, 170012, {
+          waiting_time: this.waitTime,
+          rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
+        });
+
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -200,22 +229,20 @@
               window.vhallReportForProduct?.report(110166, {
                 report_extra: res
               });
-            } else if (this.join_info.role_name == 2) {
-              // 拒绝连麦邀请上报
-              window?.vhallReportForProduct.report(170011, {
-                report_extra: {
-                  waiting_time: this.waitTime,
-                  rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
-                }
-              });
-              // 拒绝连麦邀请结果上报
-              window?.vhallReportForProduct.report(170012, {
-                report_extra: res
-              });
             }
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
+            // 数据上报，场景：接受连麦邀请接口
+            window.vhallReportForProduct.toResultsReporting(
+              170012,
+              {
+                event_type: 'interface',
+                failed_reason: res
+              }
+              // 返回的key值
+              // todo keyCode
+            );
           });
       }
     }

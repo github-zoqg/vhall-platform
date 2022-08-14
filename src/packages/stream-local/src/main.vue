@@ -951,6 +951,8 @@
       },
       // 用户下麦接口
       speakOff() {
+        // 用户下麦
+        window.vhallReportForProduct.toStartReporting(170002, 170003);
         return this.micServer.speakOff();
       },
       // 处理上麦失败
