@@ -263,6 +263,8 @@
       },
       authCheck() {
         this.$emit('authFetch');
+        // TODO: 数据埋点,是否所有情况都上报
+        window.vhallReportForWatch?.report(170028);
       }
     }
   };

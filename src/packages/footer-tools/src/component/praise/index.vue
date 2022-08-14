@@ -86,6 +86,10 @@
         const num = this.increment;
         const { watchInitData } = this.roomBaseServer.state;
         window.vhallReport && window.vhallReport.report('PRAISE');
+        // 数据埋点
+        window.vhallReportForWatch?.report(170025, {
+          num
+        });
         this.praiseServer.postPraiseIncrement({
           room_id: watchInitData.interact.room_id,
           num

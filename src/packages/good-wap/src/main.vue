@@ -229,11 +229,22 @@
         this.totalPages = Math.ceil(this.total / this.limit);
       },
       showDetailDialog(goodsItem) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170029, {
+          goods_id: goodsItem.goods_id,
+          goods_name: goodsItem.name
+        });
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
         );
       },
-      handleBuy(url) {
+      handleBuy(good) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: good.goods_id,
+          goods_name: good.name
+        });
+        const url = good.goods_url;
         const { system } = getBrowserType();
         if ('ios' === system) {
           console.log('当前是手机端打开-ios');

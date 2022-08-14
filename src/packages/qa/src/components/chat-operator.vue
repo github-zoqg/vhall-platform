@@ -267,6 +267,10 @@
         if (this.inputStatus.disable) {
           return;
         }
+        // 数据埋点
+        window.vhallReportForWatch?.report(170027, {
+          status: this.inputValue.trim() ? 0 : 1
+        });
         if (this.inputValue.trim() === '') {
           return this.$message({
             message: this.$t('chat.chat_1009'),
