@@ -145,8 +145,8 @@
             new useUserServer().state.userInfo,
             this.$route.query.shareId
           );
-          window.vhallReportForProduct?.injectCommonParams(commonReportForProductParams);
-          window.vhallReportForProduct?.report(170017);
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
+          window.vhallReportForWatch?.report(170017);
           console.log('%c---初始化直播房间 完成', 'color:blue');
           // 如果加密状态为 1 或者 2
           // 并且是点播或者回放
