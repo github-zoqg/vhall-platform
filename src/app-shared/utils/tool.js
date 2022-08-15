@@ -257,3 +257,25 @@ export const handleIntroInfo = str => {
   }
   return strArr.join('');
 };
+
+// 去除不必要的地址栏参数 delUrlParams(window.location.search, ['isIndependent']);
+export function delUrlParams(searchUrl, keyList) {
+  const urlParam = searchUrl.substring(1); //页面参数
+  let nextUrl = '';
+  var arr = new Array();
+  if (urlParam != '') {
+    const urlParamArr = urlParam.split('&'); //将参数按照&符分成数组
+    for (let i = 0; i < urlParamArr.length; i++) {
+      let paramArr = urlParamArr[i].split('='); //将参数键，值拆开
+      //如果键与要删除的不一致，则加入到参数中
+      if (!keyList.includes(paramArr[0])) {
+        arr.push(urlParamArr[i]);
+      }
+    }
+  }
+  if (arr.length > 0) {
+    nextUrl = '?' + arr.join('&');
+  }
+  console.log('当前地址栏结果', nextUrl);
+  return nextUrl;
+}

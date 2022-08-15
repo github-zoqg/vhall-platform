@@ -584,11 +584,13 @@
           case 512525: // 填写表单
             if (this.isEmbed) {
               if (window.location.search) {
-                let searchStr =
+                queryString =
                   window.location.search.indexOf('?') != -1
                     ? window.location.search
                     : window.location.search.replace('&', '?');
-                queryString = searchStr + '&isIndependent=0';
+                if (queryString.indexOf('&isIndependent=') == -1) {
+                  queryString = queryString + '&isIndependent=0';
+                }
               } else {
                 console.log('跳转报名表单-地址栏啥也没有');
                 queryString = '?isIndependent=0';
@@ -772,11 +774,13 @@
           } else if (res.code === 512525) {
             if (this.isEmbed) {
               if (window.location.search) {
-                let searchStr =
+                queryString =
                   window.location.search.indexOf('?') != -1
                     ? window.location.search
                     : window.location.search.replace('&', '?');
-                queryString = searchStr + '&isIndependent=0';
+                if (queryString.indexOf('&isIndependent=') == -1) {
+                  queryString = queryString + '&isIndependent=0';
+                }
               } else {
                 console.log('跳转报名表单-地址栏啥也没有');
                 queryString = '?isIndependent=0';

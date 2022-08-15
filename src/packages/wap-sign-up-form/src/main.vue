@@ -358,7 +358,13 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString, replaceHtml } from '@/app-shared/utils/tool';
+  import {
+    validEmail,
+    validPhone,
+    getQueryString,
+    replaceHtml,
+    delUrlParams
+  } from '@/app-shared/utils/tool';
   import {
     useSignUpFormServer,
     useRoomBaseServer,
@@ -1187,7 +1193,7 @@
               this.startTime = res.data.start_time;
               if (this.isEmbed) {
                 // 如果是嵌入页表单
-                this.queryString = window.location.search;
+                this.queryString = delUrlParams(window.location.search, ['isIndependent']);
               } else {
                 this.queryString = queryString;
               }
@@ -1195,7 +1201,7 @@
             } else {
               if (this.isEmbed) {
                 // 如果是嵌入页表单
-                let queryString = window.location.search;
+                let queryString = delUrlParams(window.location.search, ['isIndependent']);
                 location.replace(
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
