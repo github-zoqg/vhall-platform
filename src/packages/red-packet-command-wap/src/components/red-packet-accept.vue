@@ -51,7 +51,7 @@
     },
     methods: {
       openRedPacket() {
-        window.vhallReportForProduct?.report(170023, {
+        window.vhallReportForWatch?.report(170023, {
           redpacket_id: this.redPacketInfo.red_packet_uuid,
           redpacket_type: 2
         });

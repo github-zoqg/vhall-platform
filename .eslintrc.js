@@ -25,7 +25,7 @@ module.exports = {
     loadjs: true,
     Aegis: true,
     saas_aegis: true,
-    vhallReportForProduct: true
+    vhallReportForWatch: true
   },
   extends: [
     'plugin:vue/essential', // vue2核心的lint的规则

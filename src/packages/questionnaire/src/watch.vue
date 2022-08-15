@@ -26,8 +26,7 @@
         zIndexServerState,
         dialogVisible: false,
         questionLastId: '', // 最后一个问卷id
-        questionnaireId: '', // 问卷Id
-        questionnaireTitle: '' // 问卷标题
+        questionnaireId: '' // 问卷Id
       };
     },
     beforeCreate() {

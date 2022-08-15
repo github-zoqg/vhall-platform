@@ -135,7 +135,7 @@
           });
           window.vhallReport.report('ENTER_WATCH');
           // 产品侧上报需求
-          domain.initVhallReportForProduct({
+          domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
             pf: 7, // 客户端类型  web 网页端用 8
             created_at: currentTime
@@ -146,7 +146,6 @@
             this.$route.query.shareId
           );
           window.vhallReportForProduct?.injectCommonParams(commonReportForProductParams);
-          console.log('CommonParams', vhallReportForProduct.commonParams);
           window.vhallReportForProduct?.report(170017);
           console.log('%c---初始化直播房间 完成', 'color:blue');
           // 如果加密状态为 1 或者 2

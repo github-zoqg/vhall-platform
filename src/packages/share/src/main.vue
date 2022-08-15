@@ -107,7 +107,7 @@
         }
         // 上报分享
         const shareChannelArr = [0, 3, 2, 1, 4]; // 0:复制链接、1:微博、2:QQ、3:微信、4:邀请卡
-        window.vhallReportForProduct?.report(170020, {
+        window.vhallReportForWatch?.report(170020, {
           share_channel: shareChannelArr[index]
         });
       },
@@ -187,7 +187,7 @@
           customClass: 'zdy-info-box'
         });
         // 上报分享
-        window.vhallReportForProduct?.report(170020, {
+        window.vhallReportForWatch?.report(170020, {
           share_channel: 0
         });
       }
