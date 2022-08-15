@@ -78,8 +78,8 @@
               (isEmbed && webinarType != 2) ||
               (isEmbed &&
                 !isEmbedVideo &&
-                subOption.open_reg_form &&
-                (subOption.verify == 0 || subOption.verify == 1))
+                subOption.open_reg_form == 1 &&
+                (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
             "
           >
             <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
@@ -128,8 +128,8 @@
             (subOption.verify == 0 && subOption.hide_subscribe == 1) ||
             (isEmbed &&
               !isEmbedVideo &&
-              subOption.open_reg_form &&
-              (subOption.verify == 0 || subOption.verify == 1))
+              subOption.open_reg_form == 1 &&
+              (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
           "
         >
           <div class="subscribe_into_other" v-if="showSubscribeBtn">
@@ -380,8 +380,10 @@
                 !(
                   this.isEmbed &&
                   !this.isEmbedVideo &&
-                  this.subOption.open_reg_form &&
-                  (this.subOption.verify == 0 || this.subOption.verify == 1)
+                  this.subOption.open_reg_form == 1 &&
+                  (this.subOption.verify == 0 ||
+                    this.subOption.verify == 1 ||
+                    this.subOption.verify == 5)
                 )
               ) {
                 this.showBottomBtn = false;
@@ -467,8 +469,10 @@
             !(
               this.isEmbed &&
               !this.isEmbedVideo &&
-              this.subOption.open_reg_form &&
-              (this.subOption.verify == 0 || this.subOption.verify == 1)
+              this.subOption.open_reg_form == 1 &&
+              (this.subOption.verify == 0 ||
+                this.subOption.verify == 1 ||
+                this.subOption.verify == 5)
             )
           ) {
             this.showBottomBtn = false;
