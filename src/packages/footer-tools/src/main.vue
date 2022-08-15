@@ -164,7 +164,6 @@
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
-  // import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
@@ -315,19 +314,24 @@
       this.throttleHandleShowGift = throttle(this.handleShowGift, 500, { trailing: false });
     },
     mounted() {
+      const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
         this.pollingVisible = true;
-        sessionStorage.setItem('hasVideoPollingStart', 1);
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       });
-      if (+sessionStorage.getItem('hasVideoPollingStart')) return;
+      if (sessionStorage.getItem(`hasVideoPollingStart_${roomId}`) == 1) return;
       if (this.hasVideoPollingStart) {
         this.pollingVisible = true;
-        sessionStorage.setItem('hasVideoPollingStart', 1);
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       }
     },
     methods: {
       closePollingDialog() {
-        this.videoPollingServer.setAgreeStatus(1);
+        sessionStorage.setItem(
+          `pollingAgreeStatus_${this.roomBaseServer.state.watchInitData.webinar.id}`,
+          1
+        );
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClosePollingDialog'));
       },
       settingShow() {
         if (this.isInteractLive) {

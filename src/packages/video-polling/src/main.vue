@@ -239,6 +239,9 @@
         });
         // 直播结束
         this.videoPollingServer.$on('VIDEO_POLLING_OVER', () => {
+          const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
+          sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 0);
+          sessionStorage.setItem(`pollingAgreeStatus_${roomId}`, 0);
           localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
           // 在其他页面通过js脚本打开的标签页，直接 close 是关不掉的
           window.open(location, '_self').close();

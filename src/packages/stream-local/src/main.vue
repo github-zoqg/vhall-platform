@@ -279,7 +279,10 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        }
+        },
+        agreeStatusData: sessionStorage.getItem(
+          `pollingAgreeStatus_${this.roomBaseServer.state.watchInitData.webinar.id}`
+        ) // 观众点击“我知道了”
       };
     },
     components: {
@@ -459,8 +462,9 @@
         return this.$domainStore.state.micServer.isSpeakOn;
       },
       pollingData() {
+        console.log('pollingData-a', this.agreeStatusData);
         return {
-          agreeStatus: this.videoPollingServer.state.agreeStatus,
+          agreeStatus: this.agreeStatusData,
           isPolling: this.videoPollingServer.state.isPolling
         };
       }
@@ -498,6 +502,9 @@
     async mounted() {
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 0);
+        sessionStorage.setItem(`pollingAgreeStatus_${roomId}`, 0);
         if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
           await this.stopPush();
           await this.interactiveServer.destroy();
@@ -521,6 +528,9 @@
       }
     },
     methods: {
+      closePollingDialog() {
+        this.agreeStatusData = 1;
+      },
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
