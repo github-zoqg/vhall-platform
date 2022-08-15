@@ -483,6 +483,12 @@
         this.authCheck(info.type);
       },
       authCheck(type) {
+        if (this.webinarType === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.subOption.verify
+          });
+        }
         if (
           (this.webinarType == 2 && this.subOption.is_subscribe == 1) ||
           this.subOption.type == 3

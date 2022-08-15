@@ -156,12 +156,12 @@
         if (this.showTabType == 3) {
           // 数据埋点--聊天
           window.vhallReportForWatch?.report(170026, {
-            status: inputValue ? 0 : 1
+            is_empty: inputValue ? 0 : 1
           });
         } else if (this.showTabType === 'qa') {
           // 数据埋点--问答
           window.vhallReportForWatch?.report(170027, {
-            status: inputValue ? 0 : 1
+            is_empty: inputValue ? 0 : 1
           });
         }
         if (!inputValue) {
