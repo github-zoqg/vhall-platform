@@ -1,7 +1,7 @@
 <template>
   <section class="vmp-invitation">
     <template v-if="isInviteVisible">
-      <div class="vh-invitation__down-warp">
+      <div v-if="canvasImgUrl" class="vh-invitation__down-warp">
         <img v-show="canvasImgUrl" :src="canvasImgUrl" alt />
       </div>
       <div class="vh-invitation__card-preview-content-download" ref="drawCanvasDom">
