@@ -635,13 +635,13 @@
             display: inline-block;
             margin-top: 4px;
             padding: 4px 6px;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--chat-background-color-secondary);
             border-radius: 15px;
           }
           .info-wrap__nick-name {
             max-width: 126px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--chat-font-color-msg-nickname);
             line-height: 22px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -682,7 +682,7 @@
               top: 4px;
               bottom: 4px;
               border-radius: 6px;
-              background: rgba(255, 255, 255, 0.45);
+              background: var(--chat-font-color-msg-nickname);
             }
           }
           .reply-wrapper__content {
@@ -690,7 +690,7 @@
             margin-left: 7px;
             font-size: 12px;
             line-height: 20px;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--chat-font-color-msg-nickname);
             &.reply-msg {
               margin-top: 0;
             }
@@ -749,7 +749,7 @@
           }
           .normal-msg__content-wrapper {
             font-size: 14px;
-            color: #ffffff;
+            color: var(--chat-font-color-msg-text);
             line-height: 22px;
             word-break: break-word;
             &__mt4 {
@@ -810,7 +810,7 @@
         justify-content: center;
         &-content {
           padding: 3px 8px;
-          background: rgba(255, 255, 255, 0.08);
+          background: var(--chat-background-color-secondary);
           border-radius: 14px;
           font-size: 14px;
           line-height: 22px;
@@ -829,7 +829,7 @@
           text-overflow: ellipsis;
           font-size: 14px;
           line-height: 22px;
-          color: rgba(255, 255, 255, 0.45);
+          color: var(--chat-font-color-msg-nickname);
           margin-right: 4px;
         }
         .interact-content__role-name {
@@ -875,7 +875,7 @@
           /*  margin-top: 20px; TODO: 注释掉内部20间距，外部有20间距设定 */
           line-height: 22px;
           padding: 4px 8px;
-          background-color: rgba(255, 255, 255, 0.08);
+          background-color: var(--chat-background-color-secondary);
           border-radius: 15px;
           color: #ffffff;
           font-size: 14px;
@@ -884,7 +884,7 @@
             //float: left;
           }
           &__nick-name {
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--chat-font-color-msg-nickname);
             padding-right: 4px;
             font-size: 14px;
             line-height: 22px;

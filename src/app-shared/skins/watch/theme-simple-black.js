@@ -27,20 +27,27 @@ const color_background_5 = 'rgba(255, 255, 255, 0.06)';
 const color_background_6 = 'rgba(255, 255, 255, 0.04)';
 const color_background_7 = '#333';
 const color_background_8 = 'rgba(0, 0, 0, 0.04)';
+const color_background_9 = 'rgba(20, 20, 20, 1)';
 
 export default {
   '--theme-background-color': color_background_0,
   // 头部组件 VmpHeaderWatch
-  '--header-background-color-base': color_background_1,
+  '--header-background-color-base': color_background_4,
   '--header-font-color-primary': color_text_primary,
-  '--header-font-color-regular': color_text_regular,
+  '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
+  '--header-font-color-main': color_text_primary,
+  //菜单组件
+  '--tab-menu-bg-border': color_background_9,
   // 聊天组件 VmpChat
   '--chat-font-color-msg-nickname': color_text_secondary,
   '--chat-font-color-msg-text': color_text_primary,
   '--chat-font-color-msg-time': color_text_primary,
   '--chat-background-color-base': color_background_1,
   '--chat-background-color-secondary': color_background_2,
+  '--chat-background-color-input': color_background_5,
+  //footer
+  '--footer-color-font': color_text_secondary,
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
