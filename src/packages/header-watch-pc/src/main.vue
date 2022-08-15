@@ -198,7 +198,7 @@
         this.skinInfo = skinInfo || {}; // 皮肤信息
         this.webinarTag = webinarTag || {}; // 活动标签
         this.setOfficicalInfo(officicalInfo);
-        this.setSkinInfo(this.skinInfo);
+        // this.setSkinInfo(this.skinInfo);
       },
       // 关注状态 从接口拿到是否关注
       attentionStatus() {
@@ -416,6 +416,7 @@
       color: var(--header-font-color-primary);
       .center_title {
         font-size: 18px;
+        color: var(--header-font-color-main);
         .tags {
           padding: 0 8px;
           height: 20px;
@@ -493,7 +494,7 @@
       .right_share {
         padding-right: 24px;
         &_icon {
-          color: var(--header-font-color-primary);
+          color: var(--header-font-color-regular);
           text-align: center;
           cursor: pointer;
           i {
@@ -547,7 +548,7 @@
           span {
             font-size: 14px;
             font-weight: 400;
-            color: #ccc;
+            color: var(--header-font-color-regular);
             line-height: 32px;
           }
         }
@@ -577,7 +578,7 @@
             span {
               font-size: 14px;
               font-weight: 400;
-              color: #ccc;
+              color: var(--header-font-color-regular);
               line-height: 32px;
             }
             &:hover {
@@ -594,7 +595,7 @@
             z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
-            background: #383838;
+            background: var(--header-background-color-base);
             display: none;
             ul {
               list-style: none;
@@ -602,7 +603,7 @@
                 height: 40px;
                 line-height: 40px;
                 text-align: left;
-                color: @font-dark-normal;
+                color: var(--header-font-color-regular);
                 font-size: 14px;
                 cursor: pointer;
                 &:hover {
@@ -612,7 +613,7 @@
                   font-size: 18px;
                   margin-left: 10px;
                   margin-right: 6px;
-                  color: @font-dark-normal;
+                  color: var(--header-font-color-regular);
                   display: inline-block;
                   vertical-align: top;
                 }
@@ -620,6 +621,10 @@
             }
           }
         }
+      }
+      .el-dropdown,
+      .vmp-language-choice {
+        color: var(--header-font-color-regular);
       }
     }
   }

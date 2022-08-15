@@ -327,9 +327,9 @@
         // TODO:暂时注掉，使用写死的值调试
         // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
         const skinInfo = {
-          style: 1,
-          bgColor: 1,
-          chatLayout: 1 // 聊天布局 1 上下 2 左右
+          style: 2,
+          bgColor: 3,
+          chatLayout: 2 // 聊天布局 1 上下 2 左右
         };
 
         if (skinInfo?.chatLayout == 2) {
@@ -344,9 +344,19 @@
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
-
+        this.drawBody(theme);
         // 挂载到window方便调试
         window.skins = skins;
+      },
+      drawBody(theme) {
+        if (theme == 'black') {
+          document.body.style.background = `rgb(26, 26, 26)`;
+        } else {
+          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/watch/theme/skins/' +
+            theme +
+            '.png')})`;
+          document.body.style.backgroundSize = 'cover';
+        }
       }
     }
   };

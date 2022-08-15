@@ -416,8 +416,8 @@
     &.chat-operate-live {
       padding: 10px 10px;
     }
-    border-top: 1px solid @bg-dark-normal;
-    background-color: @bg-dark-section;
+    border-top: 1px solid var(--tab-menu-bg-border);
+    background-color: var(--chat-background-color-base);
     position: absolute;
     box-sizing: border-box;
     left: 0;
