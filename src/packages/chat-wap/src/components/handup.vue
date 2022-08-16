@@ -220,7 +220,9 @@
                 );
               }
               // 数据上报，场景：申请连麦接口
-              this.toResultsReporting(170005, res);
+              this.toResultsReporting(170005, {
+                request_id: res.request_id
+              });
               return;
             }
             /*

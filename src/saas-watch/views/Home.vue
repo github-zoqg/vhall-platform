@@ -28,7 +28,7 @@
 <script>
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
-  import { getQueryString, setReportingBaseAttrs } from '@/app-shared/utils/tool';
+  import { getQueryString } from '@/app-shared/utils/tool';
   import { logRoomInitFailed } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
@@ -143,9 +143,6 @@
             user_id: roomBaseServer.state.watchInitData.join_info.join_id, // C端用户 id（如果是B端用当前用户id）
             webinar_id: this.$route.params.id // 活动 id
           });
-
-          // 扩展产品侧数据埋点基础上报属性
-          setReportingBaseAttrs(roomBaseServer.state);
 
           window.vhallReport.report('ENTER_WATCH');
           console.log('%c---初始化直播房间 完成', 'color:blue');

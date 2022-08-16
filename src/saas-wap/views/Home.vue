@@ -31,12 +31,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
-  import {
-    getQueryString,
-    getVhallReportOs,
-    isWechatCom,
-    setReportingBaseAttrs
-  } from '@/app-shared/utils/tool';
+  import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import { logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
@@ -174,9 +169,6 @@
             user_id: roomBaseServer.state.watchInitData.join_info.join_id, // C端用户 id（如果是B端用当前用户id）
             webinar_id: this.$route.params.id // 活动 id
           });
-
-          // 扩展产品侧数据埋点基础上报属性
-          setReportingBaseAttrs(roomBaseServer.state);
           this.state = 1;
           this.addEventListener();
         } catch (err) {
