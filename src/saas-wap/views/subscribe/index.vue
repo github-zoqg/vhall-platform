@@ -11,13 +11,13 @@
   </div>
 </template>
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   export default {
     name: 'Subcribe',
     components: {
@@ -97,7 +97,7 @@
           } catch (e) {
             console.log('嵌入', e);
           }
-          await this.initReceiveLive(clientType);
+          const domain = await this.initReceiveLive(clientType);
           // 是否跳转预约页
           if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'live') {
             // 如果往观看页跳转，需要清除暖场视频缓存
@@ -124,6 +124,18 @@
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
           this.state = 1;
+          // 观看端上报
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 3, // 客户端类型  web 网页端用 8
+            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });

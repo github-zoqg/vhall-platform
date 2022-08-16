@@ -56,10 +56,15 @@ export function logRoomInitFailed(options = { isSend: false, error: {} }) {
  * @param watchInitData 参会接口后的domain挂载数据
  */
 export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {}, shareId = '') {
+  const cacheKey = '__report__sid__';
+  let sid = sessionStorage.getItem(cacheKey);
+  if (!sid) {
+    const current = new Date().getTime();
+    sid = `${watchInitData?.interact?.paas_app_id}_${watchInitData?.visitor_id}${current}`;
+    sessionStorage.setItem(cacheKey, sid);
+  }
   const params = {
-    s: `${watchInitData?.interact?.paas_app_id}_${
-      watchInitData?.visitor_id
-    }${new Date().getTime()} `,
+    s: sid,
     visitor_id: watchInitData?.visitor_id,
     reg_id: watchInitData?.join_info?.join_id,
     nickname: encodeURIComponent(watchInitData?.join_info?.nickname),

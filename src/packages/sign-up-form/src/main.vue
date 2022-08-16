@@ -1853,7 +1853,8 @@
           }
           // 3. 是否有手机, 组织数据
           if (paramMap.has('phone_number')) {
-            params.phone_number = paramMap.get('phone_number');
+            const id = paramMap.get('phone_number');
+            params.phone_number = this.form[`${id}`];
             paramMap.delete('phone_number');
           }
           // 其余key值组织参数

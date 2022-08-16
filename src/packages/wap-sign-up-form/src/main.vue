@@ -885,6 +885,7 @@
       },
       //提交报名表单
       submit() {
+        this.reportForWatch();
         this.list.forEach(question => {
           // 表单验证
           this.onValidate(question, true);
@@ -1527,6 +1528,94 @@
             });
         } else {
           this.errPhone ? this.$refs.verifyphone.focus() : this.$refs.verifycode.focus();
+        }
+      },
+      // 数据上报
+      reportForWatch() {
+        try {
+          const params = {};
+          const paramMap = new Map();
+          const getReportParamKey = item => {
+            if (item.type === 5) {
+              return 'address';
+            }
+            if (item.default_type) {
+              const defaultTypeArr = [null, 'name', 'phone_number', 'email', 'gender'];
+              return defaultTypeArr[item.default_type];
+            }
+            // 公司与职务没有其他后端字段能判断,只能靠中文标题匹配
+            if (item.subject === '职务' && item.type === 4) {
+              return 'career';
+            }
+            if (item.subject === '公司' && item.type === 1) {
+              return 'company';
+            }
+          };
+          // 1.获取当前题型所包含的key值
+          Array.isArray(this.list) &&
+            this.list.forEach(item => {
+              const key = getReportParamKey(item);
+              key && paramMap.set(key, item.id);
+            });
+          // 2. 是否有address, 如果有,组织address数据
+          if (paramMap.has('address')) {
+            const address = {};
+            address.province = this.cascadeResultList[0]?.value || '';
+            address.city = this.cascadeResultList[1]?.value || '';
+            address.county = this.cascadeResultList[2]?.value || '';
+            params.address = address;
+            paramMap.delete('address');
+          }
+          // 3. 是否有手机, 组织数据
+          if (paramMap.has('phone_number')) {
+            const id = paramMap.get('phone_number');
+            params.phone_number = this.form[`${id}`];
+            paramMap.delete('phone_number');
+          }
+          // 4. 是否有手机, 组织数据
+          if (paramMap.has('career')) {
+            let param = ''; // 默认传空
+            const id = paramMap.get('career');
+            const answerId = this.form[`${id}`];
+            const question = this.list.find(item => id === item.id);
+            if (question && Array.isArray(question.items) && question.items.length) {
+              const selected = question.items.find(answer => answer.id === answerId);
+              if (selected) {
+                param = selected.subject ? encodeURIComponent(selected.subject) : '';
+              }
+            }
+            params.career = param;
+            paramMap.delete('career');
+          }
+          // 其余key值组织参数
+          paramMap.forEach((item, key) => {
+            const value = this.form[`${item}`];
+            const param = value ? encodeURIComponent(value) : '';
+            params[key] = param;
+          });
+          console.log('params:', params);
+          if (!window.vhallReportForWatch) {
+            this.reportFetch(170018, params);
+          } else {
+            window.vhallReportForWatch?.report(170018, params);
+          }
+        } catch (e) {
+          console.warn('报名表单:', e);
+        }
+      },
+      // FIXME: 若直接用url访问或者刷新, 无法获取上报的公用信息,也暂时无法使用上报sdk,待更好的方案
+      reportFetch(k, params) {
+        try {
+          const BASE_URL = ['production', 'pre'].includes(process.env.NODE_ENV)
+            ? 'https://dc.e.vhall.com/prostat'
+            : 'https://t-dc.e.vhall.com:443/prostat';
+          params.webinar_id = this.webinar_id; // 公共参数只能拿到webinar_id
+          const token = window.btoa(JSON.stringify(params));
+          const id = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
+          const url = `${BASE_URL}?k=${k}&id=${id}&token=${token}`;
+          fetch(url);
+        } catch (e) {
+          console.warn('数据上报出错', e);
         }
       }
     }

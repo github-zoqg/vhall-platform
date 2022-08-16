@@ -554,7 +554,10 @@
             }
             // 邀请卡分享
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            // TODO: 重定向改为了路由跳转
+            // const entryformUrl = `/lives/entryform/${this.$route.params.id}${queryString}`;
+            // this.$router.push(entryformUrl);
             break;
           case 512002:
           case 512522:
@@ -729,7 +732,10 @@
             }
             // 邀请卡
             queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-            window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+            // TODO: 重定向改为了路由跳转
+            // const entryformUrl = `/lives/entryform/${this.$route.params.id}${queryString}`;
+            // this.$router.push(entryformUrl);
           } else {
             this.$toast(this.$tec(res.code) || res.msg);
           }
