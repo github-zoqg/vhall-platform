@@ -14,12 +14,12 @@
   </div>
 </template>
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   export default {
     name: 'vmpSubscribe',
     data() {
@@ -75,7 +75,7 @@
           } catch (e) {
             console.log('嵌入', e);
           }
-          await this.initReceiveLive(this.clientType);
+          const domain = await this.initReceiveLive(this.clientType);
           await subscribeState();
           if (this.clientType != 'embed') {
             await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
@@ -96,6 +96,19 @@
             window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(this.clientType);
           }
+          console.log('-------------domain-----------', domain);
+          // 观看端上报
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 7, // 客户端类型  web 网页端用 8
+            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });

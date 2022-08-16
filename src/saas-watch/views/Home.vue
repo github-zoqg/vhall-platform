@@ -121,7 +121,7 @@
           // 如果往观看页跳转，需要清除暖场视频缓存
           window.sessionStorage.removeItem('warm_recordId');
           window.sessionStorage.removeItem('recordIds');
-          const currentTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+          const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
