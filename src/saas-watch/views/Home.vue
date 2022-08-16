@@ -34,6 +34,7 @@
   import ErrorPage from './ErrorPage';
   import skins from '@/app-shared/skins/watch';
   import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+
   export default {
     name: 'Home',
     components: {
@@ -324,24 +325,27 @@
           1: 'default', // 传统风格
           2: 'simple' // 简洁风格
         };
-        // TODO:暂时注掉，使用写死的值调试
-        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        const skinInfo = {
+        let skin_json_pc = {
           style: 2,
-          bgColor: 3,
+          bgColor: 4,
           chatLayout: 2 // 聊天布局 1 上下 2 左右
         };
 
-        if (skinInfo?.chatLayout == 2) {
+        const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        if (skinInfo?.skin_json_pc) {
+          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
+        }
+
+        if (skin_json_pc?.chatLayout == 2) {
           // 设置聊天组件为左右风格
           updatePageNode('comChat', 'component', 'VmpFashionChat');
         }
 
         // 设置主题，如果没有就用传统风格白色
-        const style = styleMap[skinInfo?.style || 1];
-        const theme = themeMap[skinInfo?.bgColor || 2];
+        const style = styleMap[skin_json_pc?.style || 1];
+        const theme = themeMap[skin_json_pc?.bgColor || 2];
 
-        console.log('----设置主题为----', `theme_${style}_${theme}`);
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
         this.drawBody(theme);
