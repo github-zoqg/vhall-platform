@@ -257,44 +257,32 @@
           this.disabled = this.verify == 1;
           return;
         }
+        // 是否嵌入 & 非单视频嵌入 & 开启了报名表单 & 观看限制（无 或 密码 或者 专题观看限制设置为报名表单）
+        const isOpenBtn =
+          this.isEmbed &&
+          !this.isEmbedVideo &&
+          this.open_reg_form == 1 &&
+          [0, 1, 5].includes(this.verify);
         if (this.is_subscribe == 1) {
           this.btnText = this.$t('appointment.appointment_1006');
-          this.disabled = true;
         } else {
-          // 直播中、点播、回放 的时候，按钮文案“立即观看”，预告状态 按钮文案“立即预约”
-          if (this.type == 1 || this.type == 4 || this.type == 5) {
-            if (
-              this.verify == 1 ||
-              (this.isEmbed &&
-                !this.isEmbedVideo &&
-                this.open_reg_form == 1 &&
-                (this.verify == 0 || this.verify == 1 || this.verify == 5))
-            ) {
-              this.btnText = this.$t('player.player_1013');
-              this.disabled = false;
-            } else {
-              this.btnText = '';
-              this.disabled = false;
-            }
+          if ([1, 4, 5].includes(this.type)) {
+            // 直播中、点播、回放 的时候，观看限制=密码或者isOpen场景，按钮文案“立即观看”；否则不展示按钮。
+            this.btnText = this.verify == 1 || isOpenBtn ? this.$t('player.player_1013') : '';
           } else if (this.type == 2) {
-            if (
-              this.isEmbed &&
-              !this.isEmbedVideo &&
-              this.open_reg_form == 1 &&
-              (this.verify == 0 || this.verify == 1 || this.verify == 5)
-            ) {
-              // 嵌入页 但 不是单视频嵌入，并且开启了报名表单，并且观看限制是 “无” 或 "密码", 按钮展示“立即预约”
+            // 预告状态 isOpenBtn按钮文案“立即预约”；其它若观看限制=密码，按钮展示为 “密码活动”；其它情况不展示按钮。
+            if (isOpenBtn) {
               this.btnText = this.$t('appointment.appointment_1017');
-              this.disabled = false;
             } else if (this.verify == 1) {
               this.btnText = this.$t('webinar.webinar_1036');
-              this.disabled = true;
             } else {
               this.btnText = '';
-              this.disabled = false;
             }
           }
         }
+        // 若当前已是预约成功状态， 或者 当前是预告状态&&不是isOpenBtn场景&&观看限制为 密码，此时按钮禁用
+        this.disabled =
+          this.is_subscribe == 1 || (this.type == 2 && !isOpenBtn && this.verify == 1);
       },
       authCheck() {
         this.$emit('authFetch');
@@ -428,6 +416,9 @@
     }
     .disabledBtn {
       background: rgba(251, 58, 50, 0.4);
+      min-width: 100px;
+      padding: 0 18px;
+      width: auto;
       &:hover {
         cursor: auto;
       }
