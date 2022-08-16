@@ -186,7 +186,7 @@
         const style = 'default';
         const theme = 'black';
 
-        console.log('----设置主题为----', `theme_${style}_${theme}`);
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
         this.drawBody(theme);

@@ -294,30 +294,30 @@
           3: 'concise' // 极简风格
         };
 
-        // TODO:暂时注掉，使用写死的值调试
-        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        // TODO:调试代码
-        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
+        let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
           style: 1,
           bgColor: 2
         };
 
-        // TODO:调试代码
-        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
-        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+        const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
+        if (skinInfo?.skin_json_wap) {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
 
-        if (skinInfo?.style == 3) {
+        sessionStorage.setItem('skinInfoWap', JSON.stringify(skin_json_wap));
+
+        if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
-        } else if (skinInfo?.style == 2) {
+        } else if (skin_json_wap?.style == 2) {
           // 设置聊天组件为左右风格
           updatePageNode('comChatWap', 'component', 'VmpChatWapFashion');
         }
         // 设置主题，如果没有就用传统风格白色
-        const style = styleMap[skinInfo?.style || 1];
-        const theme = themeMap[skinInfo?.bgColor || 2];
+        const style = styleMap[skin_json_wap?.style || 1];
+        const theme = themeMap[skin_json_wap?.bgColor || 2];
 
-        console.log('----设置主题为----', `theme_${style}_${theme}`);
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_wap);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
         this.drawBody(style, theme);
