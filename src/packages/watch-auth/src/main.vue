@@ -101,7 +101,8 @@
               }, 1000);
             }
           } else if (res.code === 512525) {
-            // 填写报名表单
+            // 关闭权限验证框，打开报名表单
+            this.closeVisibleDialog();
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
             );

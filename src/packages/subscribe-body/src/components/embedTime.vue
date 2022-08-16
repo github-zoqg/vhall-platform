@@ -72,20 +72,6 @@
         }
         // if (isAgreement && ((!btnText && type == 1) || btnText))
       },
-      // 嵌入页是否支持报名表单展示
-      embedShowRegForm() {
-        // 观看限制 - 无or密码，且当前是完全嵌入页，开启了报名表单，展示按钮。
-        console.log('当前数据情况isEmbed=' + this.isEmbed);
-        console.log('当前数据情况isEmbedVideo=' + this.isEmbedVideo);
-        console.log('当前数据情况verify=' + this.verify);
-        console.log('当前数据情况open_reg_form=' + this.open_reg_form);
-        return (
-          this.isEmbed &&
-          !this.isEmbedVideo &&
-          this.open_reg_form &&
-          (this.verify == 0 || this.verify == 1)
-        );
-      },
       isEmbed() {
         // 是不是嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
@@ -281,8 +267,8 @@
               this.verify == 1 ||
               (this.isEmbed &&
                 !this.isEmbedVideo &&
-                this.open_reg_form &&
-                (this.verify == 0 || this.verify == 1))
+                this.open_reg_form == 1 &&
+                (this.verify == 0 || this.verify == 1 || this.verify == 5))
             ) {
               this.btnText = this.$t('player.player_1013');
               this.disabled = false;
@@ -295,7 +281,7 @@
               this.isEmbed &&
               !this.isEmbedVideo &&
               this.open_reg_form == 1 &&
-              (this.verify == 0 || this.verify == 1)
+              (this.verify == 0 || this.verify == 1 || this.verify == 5)
             ) {
               // 嵌入页 但 不是单视频嵌入，并且开启了报名表单，并且观看限制是 “无” 或 "密码", 按钮展示“立即预约”
               this.btnText = this.$t('appointment.appointment_1017');
