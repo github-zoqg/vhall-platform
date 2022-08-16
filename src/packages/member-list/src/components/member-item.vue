@@ -842,7 +842,7 @@
     font-size: 12px;
     overflow-x: hidden;
     &:hover {
-      background-color: #333;
+      background-color: var(--tab-bg-color-hover);
       .vmp-member-item__control {
         &__more {
           opacity: 1;

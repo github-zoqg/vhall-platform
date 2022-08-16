@@ -279,13 +279,13 @@
       a {
         color: var(--footer-color-font);
         &:hover {
-          color: var(--theme-color);
+          color: #3562fa;
         }
       }
       span {
         cursor: pointer;
         &:hover {
-          color: var(--theme-color);
+          color: #3562fa;
         }
       }
     }

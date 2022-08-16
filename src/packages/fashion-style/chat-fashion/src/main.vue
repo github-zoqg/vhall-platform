@@ -60,7 +60,7 @@
           <span class="vh-iconfont vh-line-arrow-down"></span>
         </div>
       </div>
-      <div class="chat-content__tip-mask"></div>
+      <!-- <div class="chat-content__tip-mask"></div> -->
     </div>
     <div class="chat-operate-bar">
       <chat-operate-bar

@@ -467,7 +467,7 @@
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-dark-second;
+      color: var(--chat-font-color-input);
       line-height: 20px;
       padding: 10px 12px;
       text-align: left;
@@ -483,7 +483,7 @@
         min-height: 20px;
       }
       .textarea-box__textarea {
-        color: @font-dark-second;
+        color: var(--chat-font-color-input);
         &::-webkit-input-placeholder {
           color: @font-dark-second;
         }
@@ -503,7 +503,6 @@
         position: absolute;
         bottom: 9px;
         right: 14px;
-        background-color: var(--chat-background-color-input);
         .textarea-show-limit__current-count {
           color: @font-link;
           &.limited {
@@ -511,7 +510,7 @@
           }
         }
         .textarea-show-limit__total {
-          color: @font-dark-normal;
+          color: var(--header-font-color-regular);
         }
       }
     }
@@ -521,7 +520,7 @@
       &.is-watch {
         width: 264px;
       }
-      background-color: @bg-dark-normal;
+      background-color: var(--chat-background-color-input);
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;

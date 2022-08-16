@@ -1128,7 +1128,7 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #2a2a2a;
+    background-color: var(--header-background-color-base);
     &__group-name {
       display: flex;
       align-items: center;

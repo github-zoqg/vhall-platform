@@ -28,6 +28,11 @@ const color_background_6 = 'rgba(255, 255, 255, 0.04)';
 const color_background_7 = '#333';
 const color_background_8 = 'rgba(0, 0, 0, 0.04)';
 const color_background_9 = 'rgba(20, 20, 20, 1)';
+const color_background_10 = '#444';
+const color_background_11 = '#383838';
+const color_background_12 = '#e6e6e6';
+const color_background_13 = '#999';
+const color_background_14 = '#ccc';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -37,8 +42,13 @@ export default {
   '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
   '--header-font-color-main': color_text_primary,
+  '--header-tab-bg-color-hover': color_background_10,
+  '--header-tab-font-color-hover': color_text_secondary,
+  '--header-tab-item-font-color': color_text_custom,
+  '--header-tab-item-dropdown-color': color_background_11,
   //菜单组件
   '--tab-menu-bg-border': color_background_9,
+  '--tab-bg-color-hover': color_background_7,
   // 聊天组件 VmpChat
   '--chat-font-color-msg-nickname': color_text_secondary,
   '--chat-font-color-msg-text': color_text_primary,
@@ -46,6 +56,12 @@ export default {
   '--chat-background-color-base': color_background_1,
   '--chat-background-color-secondary': color_background_2,
   '--chat-background-color-input': color_background_5,
+  '--chat-font-color-input': color_background_12,
+  '--chat-font-color-filter': color_background_13,
+  '--chat-font-color-filter-checked': color_background_13,
+  '--chat-bg-color-filter-checked': color_background_11,
+  '--chat-bg-color-checkbox': color_background_14,
+  '--chat-bg-color-checkbox-checked': color_text_custom,
   //footer
   '--footer-color-font': color_text_secondary,
   //主题色
