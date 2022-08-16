@@ -583,7 +583,7 @@
             z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
-            background: var(--header-background-color-base);
+            background: var(--header-tab-item-dropdown-bg);
             display: none;
             ul {
               list-style: none;
@@ -591,7 +591,7 @@
                 height: 40px;
                 line-height: 40px;
                 text-align: left;
-                color: var(--header-font-color-regular);
+                color: var(--header-tab-item-dropdown-font);
                 font-size: 14px;
                 cursor: pointer;
                 &:hover {

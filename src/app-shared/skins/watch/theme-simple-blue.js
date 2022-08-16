@@ -42,6 +42,8 @@ export default {
   '--header-tab-font-color-hover': color_background_0,
   '--header-tab-item-font-color': color_text_primary,
   '--header-tab-item-dropdown-color': color_text_primary,
+  '--header-tab-item-dropdown-bg': color_text_primary,
+  '--header-tab-item-dropdown-font': color_text_secondary,
   //菜单组件
   '--tab-menu-bg-border': color_background_7,
   '--tab-bg-color-hover': color_background_8,
