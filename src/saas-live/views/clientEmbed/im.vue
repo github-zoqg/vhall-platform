@@ -1,32 +1,36 @@
 <template>
   <div
-    class="vmp-split-screen-wrap"
+    class="vmp-client-im"
     v-loading="state === 0"
     element-loading-text="加载中..."
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
-    <vmp-air-container v-if="state === 1" cuid="splitScreenRoot"></vmp-air-container>
-    <MsgTip v-else-if="state === 2" :text="errMsg"></MsgTip>
+    <div class="vmp-basic-container" v-if="state === 1">
+      <vmp-air-container cuid="imClientRoot"></vmp-air-container>
+    </div>
+    <tip v-else-if="state === 2" :text="errMsg"></tip>
     <Chrome v-else-if="state === 3"></Chrome>
   </div>
 </template>
 
 <script>
-  import splitScreenState from '../headless/split-screen-state';
-  import MsgTip from './MsgTip';
-  import Chrome from './Chrome';
+  import clientImState from '../../headless/client/client-im-state';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
+  import chrome from '../Chrome.vue';
+  import tip from '../MsgTip.vue';
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
+    components: {
+      chrome,
+      tip
+    },
     data() {
       return {
-        state: 0,
-        errMsg: ''
+        downloadChrome: !browserSupport(),
+        errMsg: '', // info接口返回的错误信息
+        state: 0
       };
-    },
-    components: {
-      MsgTip,
-      Chrome
     },
     async created() {
       try {
@@ -35,7 +39,6 @@
         const domain = await this.initSendLive();
         const roomBaseServer = useRoomBaseServer();
         const watchInitData = roomBaseServer.state.watchInitData;
-
         domain.initVhallReport({
           bu: 0,
           user_id: watchInitData.join_info.join_id,
@@ -47,45 +50,55 @@
           pf: 7,
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });
-
-        // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
-        document.title = watchInitData.webinar.subject;
-
-        const res = await splitScreenState();
-        // 如果浏览器不支持
-        if (res === 'isBrowserNotSupport') {
-          this.state = 3;
-          return;
-        } else if (res === 'splitOpenError') {
-          this.state = 2;
-          this.errMsg = '页面无法打开，请检查分屏页面是否已打开或分屏模式未开启';
-          return;
-        }
-        console.log('%c---初始化直播房间 完成', 'color:blue');
+        console.log(domain);
+        await clientImState();
+        this.initAssistantMsg();
         this.state = 1;
       } catch (err) {
-        //上报日志
-        logRoomInitFailed({ isSend: true, error: err });
-        console.error('---初始化直播房间出现异常--');
-        console.error(err);
-        if (err.code == 510008) {
-          // 未登录
-          location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
-        }
         this.state = 2;
         this.errMsg = err.msg;
+        console.error(err);
       }
     },
     methods: {
+      initAssistantMsg() {
+        window.QtCallFunctionPage = _msg => {
+          let msg = Number(_msg);
+          console.error('展示当前点击的消息转换-------', _msg);
+          // 判断执行对应方法
+          this.handleAssitant(msg);
+        };
+        // 踢出用户回调
+        window.QtCallJsKickOut = (data, type) => {
+          console.log('客户端确认踢出回调', 'color:green');
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons('imClientRoot', 'emitKickout', { data: data.msg, type })
+          );
+        };
+      },
       // 初始化直播房间
       initSendLive() {
         const { id } = this.$route.params;
-        const { token, nickname = '', email = '', liveT = '', live_token = '' } = this.$route.query;
+        let {
+          token,
+          nickname = '',
+          email = '',
+          liveT = '',
+          live_token = '',
+          token_type = '',
+          assistant_token = ''
+        } = this.$route.query;
+        if (token_type === '1' && !liveT && assistant_token) {
+          liveT = assistant_token;
+        }
+        if (token_type === '0' && !token && assistant_token) {
+          token = assistant_token;
+        }
         if (token) {
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'interaction'],
+          plugins: ['chat'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
@@ -94,7 +107,7 @@
           },
           initRoom: {
             webinar_id: id, //活动id
-            clientType: 'send',
+            clientType: 'clientEmbed',
             check_online: 0, // 不检查主持人是否在房间
             nickname,
             email
@@ -107,17 +120,20 @@
           }
         });
       }
-      // 直播结束停止推流事件
-      // handleUnpublishComplate() {
-
-      // }
     }
   };
 </script>
-
 <style lang="less">
-  .vmp-split-screen-wrap {
+  .vmp-client-im {
     width: 100%;
     height: 100%;
+    ::-webkit-scrollbar-thumb {
+      /*滚动条里面小方块*/
+      background: #666;
+    }
+    .vmp-basic-container {
+      width: 100%;
+      height: 100%;
+    }
   }
 </style>
