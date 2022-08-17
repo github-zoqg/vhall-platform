@@ -59,11 +59,16 @@
           <time-down ref="timeDowner"></time-down>
         </template>
         <template v-else>
-          <p class="vod_title">{{ $t('player.player_1026') }}</p>
+          <p class="vod_title" v-if="webinarType != 4">{{ $t('player.player_1026') }}</p>
         </template>
         <template v-if="subOption.needAgreement">
           <div class="subscribe_into_container">
-            <div class="subscribe_into_person subscribe_into_center" @click="showAgreement">
+            <div
+              :class="`subscribe_into_person subscribe_into_center ${
+                webinarType == 4 ? 'is_no_margin' : ''
+              }`"
+              @click="showAgreement"
+            >
               <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
             </div>
           </div>
@@ -82,7 +87,12 @@
                 (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
             "
           >
-            <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+            <div
+              :class="`subscribe_into_other subscribe_into_center ${
+                webinarType == 4 ? 'is_no_margin' : ''
+              }`"
+              v-if="showSubscribeBtn"
+            >
               <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
               <span @click="authCheck(3)">
                 {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
@@ -93,7 +103,8 @@
               :class="[
                 'subscribe_into_person subscribe_into_center',
                 {
-                  'is-subscribe': subOption.is_subscribe == 1
+                  'is-subscribe': subOption.is_subscribe == 1,
+                  is_no_margin: webinarType == 4
                 }
               ]"
               @click="authCheck(subOption.verify)"
@@ -571,48 +582,12 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let params = {};
-        let queryString = '';
-        let open_id = '';
-        let userId = '';
-        let shareId = getQueryString('shareId');
-        let share_id = getQueryString('share_id');
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
             break;
           case 512525: // 填写表单
-            if (this.isEmbed) {
-              if (window.location.search) {
-                queryString =
-                  window.location.search.indexOf('?') != -1
-                    ? window.location.search
-                    : window.location.search.replace('&', '?');
-                if (queryString.indexOf('&isIndependent=') == -1) {
-                  queryString = queryString + '&isIndependent=0';
-                }
-              } else {
-                console.log('跳转报名表单-地址栏啥也没有');
-                queryString = '?isIndependent=0';
-              }
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/embedclient/entryform/${this.$route.params.id}${queryString}`;
-            } else {
-              queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}&isIndependent=0`
-                : '?isIndependent=0';
-              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-              if (queryString.indexOf('?') != -1) {
-                queryString += share_id ? `&share_id=${share_id}` : '';
-                queryString += shareId ? `&shareId=${shareId}` : '';
-              } else if (queryString.indexOf('?') == -1 && share_id) {
-                queryString += share_id ? `?share_id=${share_id}` : '';
-              } else if (queryString.indexOf('?') == -1 && shareId) {
-                queryString += shareId ? `?shareId=${shareId}` : '';
-              }
-              // 邀请卡分享
-              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
-            }
+            this.toSignupPage();
             break;
           case 512002:
           case 512522:
@@ -646,6 +621,43 @@
           default:
             this.$toast(this.$tec(code) || msg);
             break;
+        }
+      },
+      // 跳转报名表单页面
+      toSignupPage() {
+        let queryString = '';
+        let shareId = getQueryString('shareId');
+        let share_id = getQueryString('share_id');
+        if (this.isEmbed) {
+          if (window.location.search) {
+            queryString =
+              window.location.search.indexOf('?') != -1
+                ? window.location.search
+                : window.location.search.replace('&', '?');
+            if (queryString.indexOf('&isIndependent=') == -1) {
+              queryString = queryString + '&isIndependent=0';
+            }
+          } else {
+            console.log('跳转报名表单-地址栏啥也没有');
+            queryString = '?isIndependent=0';
+          }
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/embedclient/entryform/${this.$route.params.id}${queryString}`;
+        } else {
+          queryString = this.$route.query.refer
+            ? `?refer=${this.$route.query.refer}&isIndependent=0`
+            : '?isIndependent=0';
+          //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
+          if (queryString.indexOf('?') != -1) {
+            queryString += share_id ? `&share_id=${share_id}` : '';
+            queryString += shareId ? `&shareId=${shareId}` : '';
+          } else if (queryString.indexOf('?') == -1 && share_id) {
+            queryString += share_id ? `?share_id=${share_id}` : '';
+          } else if (queryString.indexOf('?') == -1 && shareId) {
+            queryString += shareId ? `?shareId=${shareId}` : '';
+          }
+          // 邀请卡分享
+          queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
         }
       },
       webinarPayAuth() {
@@ -740,10 +752,7 @@
           });
       },
       authSubmit() {
-        let queryString = '';
         let type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
-        let share_id = getQueryString('share_id');
-        let shareId = getQueryString('share_id');
         let params = {
           type: type,
           webinar_id: this.webinarId,
@@ -772,38 +781,7 @@
               }, 1000);
             }
           } else if (res.code === 512525) {
-            if (this.isEmbed) {
-              if (window.location.search) {
-                queryString =
-                  window.location.search.indexOf('?') != -1
-                    ? window.location.search
-                    : window.location.search.replace('&', '?');
-                if (queryString.indexOf('&isIndependent=') == -1) {
-                  queryString = queryString + '&isIndependent=0';
-                }
-              } else {
-                console.log('跳转报名表单-地址栏啥也没有');
-                queryString = '?isIndependent=0';
-              }
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/embedclient/entryform/${this.$route.params.id}${queryString}`;
-            } else {
-              // 开启了报名表单的时候，需要跳转至报名表单界面，这个时候还没有参会
-              queryString = this.$route.query.refer
-                ? `?refer=${this.$route.query.refer}&isIndependent=0`
-                : '?isIndependent=0';
-              //  微博分享时携带的入参 - 优化设置了报名表单但是未参会时，调用接口无效,shareId未携带问题。
-              if (queryString.indexOf('?') != -1) {
-                queryString += share_id ? `&share_id=${share_id}` : '';
-                queryString += shareId ? `&shareId=${shareId}` : '';
-              } else if (queryString.indexOf('?') == -1 && share_id) {
-                queryString += share_id ? `?share_id=${share_id}` : '';
-              } else if (queryString.indexOf('?') == -1 && shareId) {
-                queryString += shareId ? `?shareId=${shareId}` : '';
-              }
-              // 邀请卡
-              queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
-            }
+            this.toSignupPage();
           } else {
             this.$toast(this.$tec(res.code) || res.msg);
           }
@@ -1054,6 +1032,9 @@
     }
     .subscribe_into_center {
       margin-top: 32px;
+      &.is_no_margin {
+        margin-top: 0;
+      }
     }
     .subscribe_into_other {
       border-radius: 50px;

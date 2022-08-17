@@ -3,11 +3,13 @@
     <div v-if="type != 1 && type != 2" class="end-pic">
       <img src="../img/live_start.png" alt="" />
     </div>
-    <div v-if="type != 1 && type != 2" class="end-tip">{{ $t('player.player_1017') }}</div>
+    <div v-if="type != 1 && type != 2 && type != 4" class="end-tip">
+      {{ $t('player.player_1017') }}
+    </div>
     <div v-if="(type == 1 || type == 2) && (day || hour || minute || second)" class="live-tip">
       {{ tip }}
     </div>
-    <div v-if="show == 1 && type != 1 && type != 2" class="hot">
+    <div v-if="show == 1 && type != 1 && type != 2 && type != 4" class="hot">
       <span class="hot-icon"></span>
       <span class="pv">{{ num }}</span>
     </div>
