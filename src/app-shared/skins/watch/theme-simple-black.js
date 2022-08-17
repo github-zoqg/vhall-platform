@@ -44,6 +44,8 @@ const color_background_22 = 'rgba(255, 255, 255, 0.9)';
 const color_background_23 = '#34363a';
 const color_background_24 = '#23232d';
 const color_background_25 = '#777';
+const color_background_26 = '#969696';
+const color_background_27 = '#595959';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -91,11 +93,11 @@ export default {
   '--group-online-font-color': color_background_18,
   '--group-online-icon-color': color_background_19,
   '--group-refresh-font-color': color_background_18,
-  '--group-btn-bg-color': color_background_15,
+  '--group-btn-bg-color': color_background_17,
   '--group-btn-font-color': color_background_13,
-  '--group-btn-hover-color': color_background_18,
+  '--group-btn-hover-color': color_background_26,
   '--group-btn-hover-font-color': color_text_primary,
-  '--group-btn-active-color': color_background_19,
+  '--group-btn-active-color': color_background_27,
   '--group-btn-active-font-color': color_background_12,
   '--group-more-mute-font-color': color_background_12,
   '--group-search-font-color': color_background_13,
