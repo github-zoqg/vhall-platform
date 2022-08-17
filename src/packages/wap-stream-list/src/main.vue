@@ -265,6 +265,18 @@
       // 开始推流到成功期间展示默认图
       defaultBg() {
         return this.interactiveServer.state.defaultStreamBg;
+      },
+      // 权限list
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
@@ -284,7 +296,8 @@
         useMediaCheckServer().state.isBrowserNotSupport &&
         (this.roomBaseServer.state.watchInitData.webinar.mode == 3 ||
           this.roomBaseServer.state.watchInitData.webinar.mode == 6) &&
-        this.webinarType == 1
+        this.webinarType == 1 &&
+        !this.hideItem
       ) {
         return this.$toast(this.$t('other.other_1010'));
       }
@@ -315,6 +328,7 @@
           this.mainScreenDom = document.querySelector('.vmp-stream-list__main-screen');
           if (this.mainScreenDom && this.micServer.state.isSpeakOn) {
             this.mainScreenDom.style.left = `${1.02667}rem`;
+            this.mainScreenDom.style.pointerEvents = 'auto';
           }
         });
         const str =

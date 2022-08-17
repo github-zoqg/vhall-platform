@@ -1,8 +1,8 @@
 import Vue from 'vue';
 // element-ui
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-import '../assets/icon-font/iconfont.css';
+// import ElementUI from 'element-ui';
+// import 'element-ui/lib/theme-chalk/index.css';
+// import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -83,7 +83,7 @@ import VmpFashionChat from '@/packages/fashion-style/chat-fashion';
 // ------------------------------【时尚风格】引入组件------end----------
 
 // 全局注册组件
-Vue.use(ElementUI);
+// Vue.use(ElementUI);
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
 Vue.use(VmpWatchAsideMenu);

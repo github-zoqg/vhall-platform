@@ -13,7 +13,7 @@
 
 <script>
   import videoPollingState from '../../headless/video-polling-state';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
@@ -40,10 +40,10 @@
           bu: 0,
           user_id: watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });
@@ -59,8 +59,6 @@
         }
         console.log('%c---初始化直播房间 完成', 'color:blue');
         this.state = 1;
-        //上报日志
-        logRoomInitSuccess({ isSend: true });
       } catch (err) {
         //上报日志
         logRoomInitFailed({ isSend: true, error: err });
@@ -68,9 +66,7 @@
         console.error(err);
         if (err.code == 510008) {
           // 未登录
-          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
-            location.search
-          }`;
+          location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
         }
         this.state = 2;
         this.errMsg = err.msg;

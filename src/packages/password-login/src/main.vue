@@ -240,7 +240,7 @@
       },
       //图片保存的路径
       pathUrl() {
-        return `webinars/join-avatar/${moment().format('YYYYMM')}`;
+        return `webinars/join-avatar/${dayjs().format('YYYYMM')}`;
       }
     },
     beforeCreate() {
@@ -382,19 +382,7 @@
             });
             return;
           }
-          console.log(
-            'window.location.href',
-            window.location.protocol +
-              `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
-                _this.$route.params.id
-              }/${role}?type=code&liveT=${token}&visitorId=${visitorId}`
-          );
-
-          window.location.href =
-            window.location.protocol +
-            `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/chooseWay/${
-              _this.$route.params.id
-            }/${role}?type=code&liveT=${token}`;
+          window.location.href = `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/chooseWay/${_this.$route.params.id}/${role}?type=code&liveT=${token}`;
         }, 300);
       },
       //上传图片

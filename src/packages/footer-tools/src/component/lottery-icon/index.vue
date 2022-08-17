@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-lottery-icon" v-if="lotteryServerState.iconVisible">
-    <span class="vmp-icon-wrap" @click="checkLotteryIcon">
+    <span class="vmp-icon-wrap" @click="throttleCheckLottery">
       <img class="lottery-icon" src="./images/lottery-icon.png" alt="" />
       <i class="vmp-dot" v-if="lotteryServerState.docVisible" />
     </span>
@@ -21,6 +21,7 @@
    */
   import { useLotteryServer } from 'middle-domain';
   import lotteryHistory from './lottery-history.vue';
+  import { throttle } from 'lodash';
   export default {
     name: 'LotteryIcon',
     components: {
@@ -42,6 +43,7 @@
     created() {
       this.lotteryServer.initIconStatus();
       this.initEvent();
+      this.throttleCheckLottery = throttle(this.checkLotteryIcon, 1000, { trailing: false });
     },
     beforeDestroy() {
       this.removeEvent();

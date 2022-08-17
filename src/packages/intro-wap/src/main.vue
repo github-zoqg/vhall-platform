@@ -105,7 +105,7 @@
       },
       // 是否显示版权信息 type:Boolean
       isShowCopyRight() {
-        return this?.webinarTag?.reserved_status === 1;
+        return this?.webinarTag?.reserved_status === 1 && !this.isEmbed;
       },
       // 无延迟 Type:Boolean
       isNoDelay() {

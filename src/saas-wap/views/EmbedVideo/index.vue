@@ -26,7 +26,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../../headless/embed-video-state.js';
   import { getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from '../MsgTip.vue';
 
   export default {
@@ -81,18 +81,16 @@
           bu: 0,
           user_id: roomBaseServer.state.watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: getVhallReportOs(),
           type: 2, //播放平台 2: wap
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 3, // wap
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
         this.addEventListener();
-        //上报日志
-        logRoomInitSuccess();
       } catch (err) {
         //上报日志
         logRoomInitFailed({ error: err });

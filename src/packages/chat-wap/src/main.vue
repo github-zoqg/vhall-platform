@@ -19,11 +19,11 @@
         <virtual-list
           v-if="virtual.showlist"
           ref="chatlist"
-          :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
-          :keeps="20"
+          :style="{ height: chatlistHeight + 'px', overflow: allowScroll ? 'auto' : 'hidden' }"
+          :keeps="50"
           :estimate-size="100"
           :data-key="'count'"
-          :data-sources="chatList"
+          :data-sources="renderList"
           :data-component="msgItem"
           :extra-props="{
             previewImg: previewImg.bind(this),
@@ -33,7 +33,16 @@
           }"
           @totop="onTotop"
           @tobottom="toBottom"
-        ></virtual-list>
+        >
+          <div
+            class="chat_loading"
+            slot="header"
+            v-show="overflow && isLoading"
+            style="height: 20px"
+          >
+            <i class="el-icon-loading"></i>
+          </div>
+        </virtual-list>
         <div
           class="vmp-chat-wap__content__new-msg-tips"
           v-show="
@@ -64,12 +73,19 @@
       @showUserPopup="showUserPopup"
       @login="handleLogin"
       @sendEnd="sendMsgEnd"
+      @filterChat="filterChat"
     ></send-box>
   </div>
 </template>
 
 <script>
   import VirtualList from 'vue-virtual-scroll-list';
+  import { ImagePreview } from 'vh5-ui';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
+  import { isMse } from '@/app-shared/utils/isMse';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import emitter from '@/app-shared/mixins/emitter';
+
   import msgItem from './components/msg-item';
   import sendBox from './components/send-box';
   import {
@@ -80,12 +96,8 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-  import { ImagePreview } from 'vh5-ui';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
-  import { boxEventOpitons } from '@/app-shared/utils/tool';
-  import emitter from '@/app-shared/mixins/emitter';
+
   import EventBus from './js/Events.js';
-  import { isMse } from './js/utils.js';
 
   export default {
     name: 'VmpChatWap',
@@ -150,13 +162,18 @@
         //隐藏拉取历史聊天按钮
         // hideChatHistory: false,
         //回复或@消息id
-        targetId: ''
+        targetId: '',
+        renderList: [],
+        isShieldingEffects: sessionStorage.getItem('isShieldingEffects') == 'true',
+        allowScroll: true
       };
     },
     watch: {
       chatList: function () {
+        this.filterChat(false);
         if (this.isBottom()) {
           this.scrollBottom();
+          this.checkOverflow();
         }
       },
       isWapBodyDocSwitch() {
@@ -305,6 +322,14 @@
           });
         });
       },
+      checkOverflow() {
+        this.$nextTick(() => {
+          const vsl = this.$refs.chatlist;
+          if (vsl) {
+            this.overflow = vsl.getScrollSize() > vsl.getClientSize();
+          }
+        });
+      },
       resizeAndroid() {
         const newInnerHeight = window.innerHeight;
         if (this.innerHeight > newInnerHeight) {
@@ -400,10 +425,12 @@
         //监听切换到当前tab
         this.menuServer.$on('tab-switched', data => {
           this.$nextTick(() => {
-            this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
-            this.virtual.showlist = data.cuid == this.cuid;
-            this.chatlistHeight = this.virtual.contentHeight;
-            this.scrollBottom();
+            if (data.cuid == this.cuid) {
+              this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+              this.virtual.showlist = data.cuid == this.cuid;
+              this.chatlistHeight = this.virtual.contentHeight;
+              this.scrollBottom();
+            }
           });
         });
         msgServer.$onMsg('ROOM_MSG', msg => {
@@ -434,8 +461,10 @@
           this.chatServer.setState('defaultAvatar', defaultAvatar);
         }
         const res = await this.chatServer.getHistoryMsg(data, 'h5');
-        // this.hideChatHistory = true;
-        this.isLoading = false;
+        this.hideChatHistory = true;
+        this.$nextTick(() => {
+          this.isLoading = false;
+        });
         return res;
       },
       //获取第一条有msgid的消息
@@ -548,11 +577,27 @@
         if (this.isLoading) {
           return;
         }
+        this.allowScroll = false;
         const { list } = await this.getHistoryMessage();
+        const IdList = list.map(item => {
+          return item.count.toString();
+        });
         const vsl = this.$refs.chatlist;
+        console.log(IdList);
         this.$nextTick(() => {
-          // alert(this.chatList.length - offsetPos);
-          this.$refs.chatlist.scrollToIndex(list.length);
+          const offset = IdList.reduce((previousValue, currentSid) => {
+            const previousSize =
+              typeof previousValue === 'string'
+                ? vsl.getSize(Number(previousValue))
+                : previousValue;
+            console.log(previousValue);
+            console.log(vsl.getSize(Number(currentSid)));
+            return previousSize + vsl.getSize(Number(currentSid));
+          });
+          vsl.scrollToOffset(offset);
+        });
+        setTimeout(() => {
+          this.allowScroll = true;
         });
       },
       // eventBus监听
@@ -565,6 +610,51 @@
       //关闭遮罩层
       closeOverlay() {
         EventBus.$emit('showSendBox', false);
+      },
+      // 聊天过滤
+      filterChat(data) {
+        console.log(this.chatList, 'this.chatList');
+        if (data) {
+          this.scrollBottom();
+        }
+        // 过滤特效
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitSetHideEffect', [
+            sessionStorage.getItem('isShieldingEffects') == 'true'
+          ])
+        );
+        // 实现主看主办方效果
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') != 'true'
+        ) {
+          console.log('onlyShowSponsor');
+          return (this.renderList = this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName)
+          ));
+        }
+        // 实现主看主办方效果&&仅查看聊天内容
+        if (
+          sessionStorage.getItem('onlyShowSponsor') == 'true' &&
+          sessionStorage.getItem('only_isChat') == 'true'
+        ) {
+          console.log('onlyShowSponsor');
+          return (this.renderList = this.chatList.filter(
+            item => ![2, '2'].includes(item.roleName) && ['text', 'image'].includes(item.type)
+          ));
+        }
+        // 实现仅查看聊天消息
+        if (
+          sessionStorage.getItem('only_isChat') == 'true' &&
+          sessionStorage.getItem('onlyShowSponsor') != 'true'
+        ) {
+          console.log('only_isChat');
+          // undefined为历史聊天消息
+          return (this.renderList = this.chatList.filter(item =>
+            ['text', 'image'].includes(item.type)
+          ));
+        }
+        return (this.renderList = this.chatList);
       }
     }
   };
@@ -592,6 +682,9 @@
       > div:first-of-type {
         padding-top: 24px;
       }
+    }
+    .chat_loading {
+      text-align: center;
     }
     &__content {
       position: absolute;

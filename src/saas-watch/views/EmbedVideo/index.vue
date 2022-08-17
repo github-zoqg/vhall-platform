@@ -20,7 +20,7 @@
   import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../../headless/embed-video-state.js';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   export default {
     name: 'Home',
     components: {
@@ -63,10 +63,10 @@
           bu: 0,
           user_id: roomBaseServer.state.watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });
@@ -91,8 +91,6 @@
         }
         this.state = 1;
         this.addEventListener();
-        //上报日志
-        logRoomInitSuccess();
       } catch (err) {
         //上报日志
         logRoomInitFailed({ error: err });

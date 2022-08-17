@@ -98,22 +98,39 @@ router.beforeEach(async (to, from, next) => {
     window.$serverConfig = pageConfig[to.meta.page];
     window.$serverConfig._page = to.meta.page;
   }
-
-  const res = await grayInit(to);
+  const option = Object.assign({ source: 1 }, to); //source   1:发起端 0:其他端  默认其他端 （其他端不返回版本信息）
+  const res = await grayInit(option);
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
-      //处理灰度
-      // const VUE_MIDDLE_SAAS_LIVE_PC_PROJECT = process.env.VUE_MIDDLE_SAAS_LIVE_PC_PROJECT;
-      // const VUE_APP_WEB_BASE_MIDDLE = process.env.VUE_APP_WEB_BASE_MIDDLE;
-      // let protocol = window.location.protocol;
-      // // 如果是中台用户, 跳转到中台
-      // if (res.data.is_csd_user == 1) {
-      //   if (window.location.origin != `${protocol}${VUE_APP_WEB_BASE_MIDDLE}`) {
-      //     window.location.href = `${protocol}${VUE_APP_WEB_BASE_MIDDLE}/${VUE_MIDDLE_SAAS_LIVE_PC_PROJECT}${window.location.pathname}`;
-      //   }
-      // }
-      next();
+      const VUE_APP_ROUTER_BASE_URL = process.env.VUE_APP_ROUTER_BASE_URL;
+      const VUE_APP_BUILD_VERSION = process.env.VUE_APP_BUILD_VERSION;
+      const VUE_APP_WEB_BASE = process.env.VUE_APP_WEB_BASE; //发起端项目名
+
+      // test
+      // res.data.version = '1.4.8';
+
+      // 如果是B用户配置单独版本
+      if (
+        process.env.NODE_ENV != 'development' &&
+        res.data.version &&
+        res.data.version != VUE_APP_BUILD_VERSION
+      ) {
+        window.location.replace(
+          `${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`
+        );
+      } else {
+        // 版本一致或者没有配置版本
+        if (
+          res.data.version == undefined &&
+          window.location.href.indexOf(VUE_APP_BUILD_VERSION) != -1
+        ) {
+          // 如果没有服务配置版本并且地址栏有版本则跳转到无版本地址
+          window.location.replace(`${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
+        } else {
+          next();
+        }
+      }
     } else {
       next({
         name: 'PageError',

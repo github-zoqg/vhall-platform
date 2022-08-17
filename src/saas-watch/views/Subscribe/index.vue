@@ -19,7 +19,7 @@
   import { getQueryString } from '@/app-shared/utils/tool';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitSuccess, logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import skins from '@/app-shared/skins/watch';
   import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   export default {
@@ -101,8 +101,6 @@
             window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(this.clientType);
           }
-          //上报日志
-          logRoomInitSuccess();
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });
