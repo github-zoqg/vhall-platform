@@ -1823,7 +1823,7 @@
               ...this.setParamsIdByRoute({}),
               phone: this.verifyForm.phone,
               verify_code: this.verifyForm.code,
-              ...this.$router.query
+              ...this.$route.query
             };
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
