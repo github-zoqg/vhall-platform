@@ -1822,7 +1822,8 @@
             const params = {
               ...this.setParamsIdByRoute({}),
               phone: this.verifyForm.phone,
-              verify_code: this.verifyForm.code
+              verify_code: this.verifyForm.code,
+              ...this.$router.query
             };
             const visitorId = sessionStorage.getItem('visitorId');
             if (visitorId) {
