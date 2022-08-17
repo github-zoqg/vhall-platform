@@ -53,7 +53,8 @@ export function logRoomInitFailed(options = { isSend: false, error: {} }) {
 /**
  * 观看端上报的公用数据(大部分)
  * @param watchInitData 参会接口后的domain挂载数据
- * @param watchInitData 参会接口后的domain挂载数据
+ * @param userInfo userServer的state的用户信息
+ * @param shareId url链接上的参数
  */
 export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {}, shareId = '') {
   const cacheKey = '__report__sid__';

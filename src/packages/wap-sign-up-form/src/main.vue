@@ -1572,7 +1572,7 @@
             params.phone_number = this.form[`${id}`];
             paramMap.delete('phone_number');
           }
-          // 4. 是否有手机, 组织数据
+          // 4. 是否有职务, 组织数据
           if (paramMap.has('career')) {
             let param = ''; // 默认传空
             const id = paramMap.get('career');

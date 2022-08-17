@@ -143,7 +143,7 @@
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,
             new useUserServer().state.userInfo,
-            this.$route.query.shareId
+            this.$route.query.shareId || this.$route.query.share_id
           );
           window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
           window.vhallReportForWatch?.report(170017);
