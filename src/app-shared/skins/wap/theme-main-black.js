@@ -24,6 +24,9 @@ export default {
   //主题色
   '--theme-color': '#fb2626',
   '--theme-color-sub': '#ffd1c9',
+  //分组
+  '--theme-group-color': 'rgba(255, 255, 255, 0.65)',
+  '--theme-group-name-color': 'rgba(255, 255, 255, 0.45)',
   //菜单-内容
   //简介
   '--theme-tab-content-intro-title-font': '#fff',
