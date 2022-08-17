@@ -61,7 +61,8 @@ export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {
   let sid = sessionStorage.getItem(cacheKey);
   if (!sid) {
     const current = new Date().getTime();
-    sid = `${watchInitData?.interact?.paas_app_id}_${watchInitData?.visitor_id}${current}`;
+    const visitorId = watchInitData?.visitor_id || watchInitData?.join_info?.third_party_user_id;
+    sid = `${watchInitData?.interact?.paas_app_id}_${visitorId}${current}`;
     sessionStorage.setItem(cacheKey, sid);
   }
   const params = {
