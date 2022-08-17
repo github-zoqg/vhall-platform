@@ -100,7 +100,9 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          needAgreement: false
+          needAgreement: false,
+          open_reg_form: null,
+          save_reg_form: null
         }
       };
     },
