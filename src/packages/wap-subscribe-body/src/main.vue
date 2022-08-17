@@ -74,19 +74,7 @@
           </div>
         </template>
         <template v-else>
-          <div
-            class="subscribe_into_container"
-            v-if="
-              ((subOption.verify != 0 ||
-                (subOption.verify == 0 && subOption.hide_subscribe == 1)) &&
-                !isEmbed) ||
-              (isEmbed && webinarType != 2) ||
-              (isEmbed &&
-                !isEmbedVideo &&
-                subOption.open_reg_form == 1 &&
-                (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
-            "
-          >
+          <div class="subscribe_into_container" v-if="noIsLiveEndShowBtn">
             <div
               :class="`subscribe_into_other subscribe_into_center ${
                 webinarType == 4 ? 'is_no_margin' : ''
@@ -132,17 +120,7 @@
         </div>
       </div>
       <template v-else>
-        <div
-          class="vmp-subscribe-body-auth"
-          v-if="
-            subOption.verify != 0 ||
-            (subOption.verify == 0 && subOption.hide_subscribe == 1) ||
-            (isEmbed &&
-              !isEmbedVideo &&
-              subOption.open_reg_form == 1 &&
-              (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
-          "
-        >
+        <div class="vmp-subscribe-body-auth" v-if="subscribeShowBtn">
           <div class="subscribe_into_other" v-if="showSubscribeBtn">
             <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
             <span @click="authCheck(3)">
@@ -259,7 +237,9 @@
           show: 1,
           num: 0,
           hide_subscribe: 0,
-          needAgreement: false
+          needAgreement: false,
+          open_reg_form: null,
+          save_reg_form: null
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
@@ -353,6 +333,33 @@
       },
       warmUpVideoList() {
         return this.$domainStore.state.roomBaseServer.warmUpVideo.warmup_paas_record_id;
+      },
+      flagRegForm() {
+        // 是嵌入 但不是 单视频嵌入，且开启了报名表单，且观看限制（无 或 密码 或 专题设置为报名表单）
+        let flag =
+          this.isEmbed &&
+          !this.isEmbedVideo &&
+          this.subOption.open_reg_form == 1 &&
+          [0, 1, 5].includes(this.subOption.verify);
+        return flag;
+      },
+      // 不是结束状态下，是否展示预约部分的按钮
+      noIsLiveEndShowBtn() {
+        // 是标品，（观看限制非免费 或者 观看限制是免费但是不隐藏预约按钮）
+        const flag_subscribe =
+          (this.subOption.verify != 0 ||
+            (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1)) &&
+          !this.isEmbed;
+        // 是嵌入，但不是预约页
+        const flag_embed_subscribe = this.isEmbed && this.webinarType != 2;
+        return flag_subscribe || flag_embed_subscribe || this.flagRegForm;
+      },
+      subscribeShowBtn() {
+        // 观看限制非免费 或者 观看限制是免费但不隐藏预约按钮
+        const flag_all_subscribe =
+          this.subOption.verify != 0 ||
+          (this.subOption.verify == 0 && this.subOption.hide_subscribe == 1);
+        return flag_all_subscribe || this.flagRegForm;
       }
     },
     beforeCreate() {
@@ -385,18 +392,7 @@
             let scrollTop = e.target.scrollTop;
             if (scrollTop > offsetTop) {
               this.isScorllTab = true;
-              if (
-                this.webinarType == 2 &&
-                this.isEmbed &&
-                !(
-                  this.isEmbed &&
-                  !this.isEmbedVideo &&
-                  this.subOption.open_reg_form == 1 &&
-                  (this.subOption.verify == 0 ||
-                    this.subOption.verify == 1 ||
-                    this.subOption.verify == 5)
-                )
-              ) {
+              if (this.webinarType == 2 && this.isEmbed && !this.flagRegForm) {
                 this.showBottomBtn = false;
               } else {
                 this.showBottomBtn = true;
@@ -475,17 +471,7 @@
         // 如果是嵌入页并且没有开播 预约按钮不显示
         // 如果不是 （开启报名表单 且观看限制=无或者密码的 非单视频嵌入页） 情况，预约按钮不展示
         if (webinar.type == 2) {
-          if (
-            this.isEmbed &&
-            !(
-              this.isEmbed &&
-              !this.isEmbedVideo &&
-              this.subOption.open_reg_form == 1 &&
-              (this.subOption.verify == 0 ||
-                this.subOption.verify == 1 ||
-                this.subOption.verify == 5)
-            )
-          ) {
+          if (this.isEmbed && !this.flagRegForm) {
             this.showBottomBtn = false;
             return;
           }

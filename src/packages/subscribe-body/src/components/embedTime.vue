@@ -108,7 +108,9 @@
         disabled: false,
         show: 1,
         num: 0,
-        pv: 10
+        pv: 10,
+        save_reg_form: null,
+        open_reg_form: null
       };
     },
     watch: {
