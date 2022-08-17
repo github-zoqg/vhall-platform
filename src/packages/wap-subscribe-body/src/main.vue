@@ -59,11 +59,16 @@
           <time-down ref="timeDowner"></time-down>
         </template>
         <template v-else>
-          <p class="vod_title">{{ $t('player.player_1026') }}</p>
+          <p class="vod_title" v-if="webinarType != 4">{{ $t('player.player_1026') }}</p>
         </template>
         <template v-if="subOption.needAgreement">
           <div class="subscribe_into_container">
-            <div class="subscribe_into_person subscribe_into_center" @click="showAgreement">
+            <div
+              :class="`subscribe_into_person subscribe_into_center ${
+                webinarType == 4 ? 'is_no_margin' : ''
+              }`"
+              @click="showAgreement"
+            >
               <span class="subscribe_btn">{{ $t('appointment.appointment_1025') }}</span>
             </div>
           </div>
@@ -82,7 +87,12 @@
                 (subOption.verify == 0 || subOption.verify == 1 || subOption.verify == 5))
             "
           >
-            <div class="subscribe_into_other subscribe_into_center" v-if="showSubscribeBtn">
+            <div
+              :class="`subscribe_into_other subscribe_into_center ${
+                webinarType == 4 ? 'is_no_margin' : ''
+              }`"
+              v-if="showSubscribeBtn"
+            >
               <span @click="authCheck(4)">{{ $t('appointment.appointment_1011') }}</span>
               <span @click="authCheck(3)">
                 {{ $t('webinar.webinar_1024') }} ¥ {{ subOption.fee }}
@@ -93,7 +103,8 @@
               :class="[
                 'subscribe_into_person subscribe_into_center',
                 {
-                  'is-subscribe': subOption.is_subscribe == 1
+                  'is-subscribe': subOption.is_subscribe == 1,
+                  is_no_margin: webinarType == 4
                 }
               ]"
               @click="authCheck(subOption.verify)"
@@ -1021,6 +1032,9 @@
     }
     .subscribe_into_center {
       margin-top: 32px;
+      &.is_no_margin {
+        margin-top: 0;
+      }
     }
     .subscribe_into_other {
       border-radius: 50px;
