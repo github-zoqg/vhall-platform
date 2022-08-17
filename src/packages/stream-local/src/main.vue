@@ -612,6 +612,7 @@
 
           await this.setBroadCastScreen();
         }
+        // console.log('VhallRTC', VhallRTC['CANVAS_ADAPTIVE_LAYOUT_TILED_MODE']);
       },
       // 自动上麦禁音条件更新
       updateAutoSpeak() {

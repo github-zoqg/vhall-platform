@@ -82,7 +82,7 @@
         >
           <i
             class="vmp-member-item__control__user-icon vh-iconfont vh-a-line-handsup"
-            style="color: #fb3a32; font-size: 15px"
+            style="font-size: 15px"
           ></i>
         </template>
         <!--同意上麦-->
@@ -164,7 +164,7 @@
             ![2, '2'].includes(userInfo.device_status)
           "
           class="vmp-member-item__control__user-icon vh-saas-iconfont vh-saas-a-line-Onthemicrophone1"
-          style="color: #fb3a32; font-size: 15px"
+          style="font-size: 15px"
         ></i>
         <!--设备有问题  仅限视频轮巡活动展示-->
         <i
@@ -174,7 +174,7 @@
             this.mode != 6 &&
             [2, '2'].includes(userInfo.device_status)
           "
-          style="color: #fb3a32; font-size: 15px; vertical-align: middle"
+          style="font-size: 15px; vertical-align: middle"
           class="vh-iconfont vh-full-warning vmp-member-item__control__user-icon"
         ></i>
         <!--被踢出-->
@@ -842,7 +842,7 @@
     font-size: 12px;
     overflow-x: hidden;
     &:hover {
-      background-color: var(--tab-bg-color-hover);
+      background-color: var(--group-item-hover-color);
       .vmp-member-item__control {
         &__more {
           opacity: 1;
@@ -871,6 +871,7 @@
       white-space: nowrap;
       vertical-align: middle;
       margin-left: 9px;
+      color: var(--group-name-font-color);
     }
     &__name-limit {
       max-width: 38px;
@@ -903,13 +904,13 @@
     &__control {
       float: right;
       &__user-icon {
-        color: #ff9446;
+        color: var(--theme-color);
         font-size: 13px;
         vertical-align: middle;
         margin-right: 6px;
       }
       &__device-abnormal {
-        color: #fb3a32;
+        color: var(--theme-color);
         font-size: 15px;
         margin-right: 6px;
         vertical-align: middle;
@@ -922,7 +923,7 @@
         background: rgba(221, 221, 221, 0.15);
         border-radius: 4px;
         margin-right: 6px;
-        color: #ddd;
+        color: var(--group-turnOff-font-color);
         text-align: center;
         vertical-align: middle;
         line-height: 16px;
@@ -942,7 +943,7 @@
         vertical-align: middle;
         margin-left: 3px;
         padding: 2px 4px;
-        color: #ccc;
+        color: var(--group-more-font-color);
         font-size: 12px;
         opacity: 0;
         background: url('../img/more.png') no-repeat center;
@@ -950,7 +951,7 @@
         border-radius: 4px;
         &:hover {
           cursor: pointer;
-          background-color: #434343;
+          background-color: var(--group-more-hover-color);
           color: #ccc;
         }
       }

@@ -10,13 +10,14 @@ const color_text_red = '#fb2626';
 const color_text_custom = '#fb2626';
 const color_text_custom_sub = '#ffd1c9';
 const color_text_black = 'rgba(38, 38, 38, 1)';
-const color_text_1 = 'rgba(0, 0, 0, 1)';
 const color_text_regular = 'rgba(0, 0, 0, 0.65)';
 const color_text_secondary = 'rgba(0, 0, 0, 0.45)';
-const color_text_2 = 'rgba(255, 255, 255, 0.45)';
 const color_text_placeholder = 'rgba(0, 0, 0, 0.35)';
 const color_text_disabled = 'rgba(0, 0, 0, 0.25)';
 const color_text_link = '#3562fa';
+const color_text_1 = 'rgba(0, 0, 0, 1)';
+const color_text_2 = 'rgba(255, 255, 255, 0.45)';
+const color_text_3 = 'rgba(0, 0, 0, 0.85)';
 
 /* 背景颜色
 --------------------- */
@@ -29,6 +30,8 @@ const color_background_5 = 'rgba(0, 0, 0, 0.06)';
 const color_background_6 = 'rgba(0, 0, 0, 0.04)';
 const color_background_7 = '#f5f5f5';
 const color_background_8 = '#f7f7f7';
+const color_background_9 = '#f0f0f0';
+const color_background_10 = 'rgba(0, 0, 0, 0.15)';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -63,8 +66,35 @@ export default {
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
+  '--theme-menu-bg': color_text_primary,
   //footer
   '--footer-color-font': color_text_secondary,
+  //分组
+  '--group-name-icon-font-color': color_text_regular,
+  '--group-name-font-color': color_text_secondary,
+  '--group-item-hover-color': color_background_2,
+  '--group-turnOff-font-color': color_text_3,
+  '--group-more-font-color': color_text_3,
+  '--group-more-hover-color': color_background_9,
+  '--group-online-font-color': color_text_3,
+  '--group-online-icon-color': color_text_3,
+  '--group-refresh-font-color': color_text_secondary,
+  '--group-btn-bg-color': color_background_5,
+  '--group-btn-font-color': color_text_secondary,
+  '--group-btn-hover-color': color_background_10,
+  '--group-btn-hover-font-color': color_text_3,
+  '--group-btn-active-color': color_text_disabled,
+  '--group-btn-active-font-color': color_text_3,
+  '--group-more-mute-font-color': color_text_3,
+  '--group-search-font-color': color_text_3,
+  '--group-search-bg-color': color_text_disabled,
+  '--group-search-placeholder-color': color_text_secondary,
+  '--group-search-input-font-color': color_text_3,
+  '--group-search-input-bg-color': color_background_5,
+  '--group-search-input-bg2-color': color_text_primary,
+  //侧边栏
+  '--menu-item-font-color': color_text_regular,
+  '--menu-item-font-disable-color': color_text_disabled,
   //菜单-内容
   //简介
   '--theme-tab-content-intro-font': color_text_grey,
