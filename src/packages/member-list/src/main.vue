@@ -1426,13 +1426,17 @@
         };
 
         //数据埋点--开启/关闭允许举手
-        window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
+        window.vhallReportForProduct?.toStartReporting(
+          element.target.checked ? 110127 : 110128,
+          element.target.checked ? 110153 : 110154
+        );
         this.micServer
           .setHandsUp(params)
           .then(res => {
-            window.vhallReportForProduct?.report(element.target.checked ? 110153 : 110154, {
-              report_extra: res
-            });
+            window.vhallReportForProduct?.toResultsReporting(
+              element.target.checked ? 110153 : 110154,
+              { event_type: 'interface', res, request_id: res?.request_id }
+            );
             console.log('switch-mic-status', res);
             if (res.code == 200) {
               this.$message.success({ message: '设置成功' });
@@ -1724,12 +1728,14 @@
           type: 1 // 0=邀请上麦|1=邀请演示
         };
         //数据埋点--邀请上麦
-        window.vhallReportForProduct?.report(110130);
+        window.vhallReportForProduct?.toStartReporting(110130, 110155);
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {
-            window.vhallReportForProduct?.report(110155, {
-              report_extra: res
+            window.vhallReportForProduct?.toResultsReporting(110155, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
             });
             if (res.code == 200) {
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {

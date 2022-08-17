@@ -562,7 +562,7 @@
           this.joinInfo.role_name == 1 &&
           (this.stream.roleName == 4 || this.stream.roleName == 2)
         ) {
-          window.vhallReportForProduct?.report(110133);
+          window.vhallReportForProduct?.toStartReporting(110133, 110157);
         }
         const res = await this.micServer.speakOff({
           receive_account_id: this.stream.accountId
@@ -571,7 +571,11 @@
           this.joinInfo.role_name == 1 &&
           (this.stream.roleName == 4 || this.stream.roleName == 2)
         ) {
-          window.vhallReportForProduct?.report(110157, { report_extra: res });
+          window.vhallReportForProduct?.toResultsReporting(110157, {
+            request_id: res?.request_id,
+            event_type: 'interface',
+            res
+          });
         }
       },
       fullScreen() {

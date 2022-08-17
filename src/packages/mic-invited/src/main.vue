@@ -74,7 +74,9 @@
             return;
           }
           if (this.join_info.role_name == 4) {
-            window.vhallReportForProduct?.report(110162);
+            window.vhallReportForProduct?.toResultsReporting(110162, {
+              event_type: 'message'
+            });
           }
 
           this.senderId = temp.sender_id;
@@ -87,19 +89,24 @@
             this.waitTime--;
             this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
-              if (this.join_info.role_name == 4) {
-                window.vhallReportForProduct?.report(110167);
-              }
               this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
               this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;
               // 拒绝连麦邀请上报【30s-30s倒计时结束自动拒绝连麦邀请】
-              window.vhallReportForProduct.toResultsReporting(170012, {
-                waiting_time: `wait-for ${30 - this.waitTime}s`,
-                event_type: 'message',
-                reasonTxt: encodeURIComponent(this.$t('interact.interact_1025'))
-              });
+              if (this.join_info.role_name == 4) {
+                window.vhallReportForProduct?.toResultsReporting(110167, {
+                  waiting_time: `wait-for ${30 - this.waitTime}s`,
+                  event_type: 'message',
+                  reasonTxt: encodeURIComponent(this.$t('interact.interact_1025'))
+                });
+              } else if (this.join_info.role_name == 2) {
+                window.vhallReportForProduct.toResultsReporting(170012, {
+                  waiting_time: `wait-for ${30 - this.waitTime}s`,
+                  event_type: 'message',
+                  reasonTxt: encodeURIComponent(this.$t('interact.interact_1025'))
+                });
+              }
             }
           }, 1000);
         }
@@ -149,12 +156,16 @@
       // 接受邀请
       confirmSave() {
         if (this.join_info.role_name == 4) {
-          window.vhallReportForProduct?.report(110163);
+          window.vhallReportForProduct?.toStartReporting(110163, [110162, 110164], {
+            waiting_time: this.waitTime
+          });
         }
         // 接受连麦邀请上报
-        window.vhallReportForProduct.toStartReporting(170009, [170005, 170010], {
-          waiting_time: this.waitTime
-        });
+        if (this.join_info.role_name == 2) {
+          window.vhallReportForProduct.toStartReporting(170009, [170005, 170010], {
+            waiting_time: this.waitTime
+          });
+        }
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -162,13 +173,8 @@
             extra_params: this.senderId
           })
           .then(res => {
-            if (this.join_info.role_name == 4) {
-              window.vhallReportForProduct?.report(110164, {
-                report_extra: res
-              });
-            }
+            let reasonTxt = '';
             if (res.code !== 200) {
-              let reasonTxt = '';
               if (res.code == 513345) {
                 reasonTxt = this.$t('interact.interact_1037');
                 this.$message.warning(reasonTxt);
@@ -176,47 +182,44 @@
                 reasonTxt = res.msg;
                 this.$message.error(reasonTxt);
               }
-              window.vhallReportForProduct.toResultsReporting(
-                170010,
-                {
-                  event_type: 'interface',
-                  failed_reason: res,
-                  reasonTxt: encodeURIComponent(reasonTxt)
-                }
-                // 返回的key值
-                // todo keyCode
-              );
             } else {
               useMicServer().userSpeakOn();
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             }
-
+            if (this.join_info.role_name == 4) {
+              window.vhallReportForProduct?.toResultsReporting(110164, {
+                event_type: 'interface',
+                request_id: res?.request_id,
+                res,
+                reasonTxt: encodeURIComponent(reasonTxt)
+              });
+            } else if (this.join_info.role_name == 2) {
+              window.vhallReportForProduct.toResultsReporting(170010, {
+                event_type: 'interface',
+                request_id: res?.request_id,
+                failed_reason: res,
+                reasonTxt: encodeURIComponent(reasonTxt)
+              });
+            }
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
-            // 数据上报，场景：接受连麦邀请接口
-            window.vhallReportForProduct.toResultsReporting(
-              170010,
-              {
-                event_type: 'interface',
-                failed_reason: res
-              }
-              // 返回的key值
-              // todo keyCode
-            );
           });
       },
       // 拒绝邀请
       closeConfirm() {
-        if (this.join_info.role_name == 4) {
-          window.vhallReportForProduct?.report(110165);
-        }
-
         // 拒绝连麦邀请上报
-        window.vhallReportForProduct.toStartReporting(170011, 170012, {
-          waiting_time: this.waitTime,
-          rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
-        });
+        if (this.join_info.role_name == 4) {
+          window.vhallReportForProduct?.toStartReporting(110165, 110166, {
+            waiting_time: this.waitTime,
+            rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
+          });
+        } else if (this.join_info.role_name == 2) {
+          window.vhallReportForProduct.toStartReporting(170011, 170012, {
+            waiting_time: this.waitTime,
+            rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
+          });
+        }
 
         useMicServer()
           .userRejectInvite({
@@ -227,22 +230,21 @@
           .then(res => {
             if (this.join_info.role_name == 4) {
               window.vhallReportForProduct?.report(110166, {
-                report_extra: res
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              });
+            } else if (this.join_info.role_name == 2) {
+              // 数据上报，场景：接受连麦邀请接口
+              window.vhallReportForProduct.toResultsReporting(170012, {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                failed_reason: res
               });
             }
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
-            // 数据上报，场景：接受连麦邀请接口
-            window.vhallReportForProduct.toResultsReporting(
-              170012,
-              {
-                event_type: 'interface',
-                failed_reason: res
-              }
-              // 返回的key值
-              // todo keyCode
-            );
           });
       }
     }
