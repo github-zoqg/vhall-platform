@@ -420,7 +420,7 @@
     }
     .disabledBtn {
       background: rgba(251, 58, 50, 0.4);
-      min-width: 100px;
+      min-width: 160px;
       padding: 0 18px;
       width: auto;
       &:hover {
