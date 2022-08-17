@@ -96,6 +96,18 @@
     >
       <main slot="content">{{ alertInfo.text }}</main>
     </saas-alert>
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>{{ PopAlertOffline.text }}</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -128,6 +140,11 @@
         confirmInfo: {
           visible: false, // 是否显示
           text: '' // 确认的内容
+        },
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false,
+          text: ''
         }
       };
     },
@@ -245,6 +262,14 @@
           localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
           // 在其他页面通过js脚本打开的标签页，直接 close 是关不掉的
           window.open(location, '_self').close();
+        });
+
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+
+          this.PopAlertOffline.text = '网络异常导致互动房间连接失败';
+          this.PopAlertOffline.visible = true;
         });
       },
       // 下一组
@@ -394,6 +419,12 @@
       confirmSave() {
         this._confirmCb && typeof this._confirmCb === 'function' && this._confirmCb();
         this.confirmInfo.visible = false;
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
