@@ -241,7 +241,7 @@
         this.prize = {};
         this.updateLotteryUser().then(() => {
           const st = setTimeout(() => {
-            clearInterval(st); // 延迟1秒请求 防止用户数据量太大
+            clearTimeout(st); // 延迟1秒请求 防止用户数据量太大
             this.getLotteryCount();
           }, 1000);
         });
