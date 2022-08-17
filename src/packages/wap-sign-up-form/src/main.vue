@@ -1674,7 +1674,7 @@
           const params = {
             ...this.setParamsIdByRoute({}),
             phone: this.verifyForm.phone,
-            ...this.$router.query,
+            ...this.$route.query,
             refer
           };
           if (!params.refer) {
