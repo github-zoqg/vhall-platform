@@ -328,7 +328,7 @@
             const { code = '', msg = '' } = res || {};
             if ([200, '200'].includes(code)) {
               sessionStorage.setItem('interact_token', res.data.live_token);
-              sessionStorage.setItem('visitorId', res.data.visitor_id);
+              localStorage.setItem('visitorId', res.data.visitor_id);
               this.handleJump(params.type, res.data.live_token, res.data.visitor_id);
             } else {
               this.$message.error(msg);
@@ -341,7 +341,7 @@
       },
       //处理口令登录参数
       handleRoleLoginParams() {
-        const visitorId = sessionStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId');
         let params = {
           webinar_id: this.$route.params.id,
           refer: '',

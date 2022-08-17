@@ -1216,7 +1216,7 @@
       },
       // 初始化专题信息，获取专题访客ID
       async initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
+        const visitorId = localStorage.getItem('visitorId');
         let params = {
           subject_id: this.webinarOrSubjectId,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
@@ -1764,13 +1764,13 @@
             } else {
               this.$route.query.refer && (params.refer = this.$route.query.refer);
             }
-            const visitorId = sessionStorage.getItem('visitorId');
+            const visitorId = localStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }
             this.signUpFormServer.submitSignUpForm(params).then(res => {
               if (res.code == 200) {
-                res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                res.data.visit_id && localStorage.setItem('visitorId', res.data.visit_id);
                 if (this.isSubject) {
                   // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
                   window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
@@ -1825,7 +1825,7 @@
               verify_code: this.verifyForm.code,
               ...this.$route.query
             };
-            const visitorId = sessionStorage.getItem('visitorId');
+            const visitorId = localStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }
