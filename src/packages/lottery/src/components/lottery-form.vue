@@ -240,7 +240,10 @@
         this.needTakeAward = true;
         this.prize = {};
         this.updateLotteryUser().then(() => {
-          this.getLotteryCount();
+          const st = setTimeout(() => {
+            clearInterval(st); // 延迟1秒请求 防止用户数据量太大
+            this.getLotteryCount();
+          }, 1000);
         });
         this.getPrizeList();
       },
