@@ -177,9 +177,9 @@
           params.invite_id = this.$route.query.join_id || this.$route.query.invite_id;
         }
 
-        // 获取屏幕宽高1/2
-        const screen_wid = Math.floor(window.screen.width / 2);
-        const screen_height = Math.floor(window.screen.height / 2);
+        // 获取屏幕宽高
+        const screen_wid = Math.floor(window.screen.width);
+        const screen_height = Math.floor(window.screen.height);
 
         const res = await this.inviteServer.createInvite(params);
         const data = res.data;
