@@ -65,8 +65,9 @@
 
 <script>
   import { getEmojiList } from '@/packages/chat/src/js/emoji';
+  import { isMse } from '@/app-shared/utils/isMse';
   import EventBus from '../js/Events.js';
-  import { isMse } from '../js/utils.js';
+
   export default {
     name: 'VmpChatWapInputModal',
     props: {

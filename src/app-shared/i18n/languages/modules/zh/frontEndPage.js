@@ -274,7 +274,7 @@ export default {
     chat_1010: '发送成功',
     chat_1011: '发送失败',
     chat_1012: '只看主办方',
-    chat_1013: '屏蔽特效',
+    chat_1013: '屏蔽礼物特效',
     chat_1014: '已开启只看主办方',
     chat_1015: '已关闭只看主办方',
     chat_1016: '已屏蔽特效',
@@ -345,7 +345,7 @@ export default {
     chat_1091: '处理时间',
     chat_1092: '直播已结束，当前禁止发言',
     chat_1093: '点击查看',
-    chat_1094: '仅查看聊天内容',
+    chat_1094: '仅看聊天信息',
     chat_1095: '聊天设置',
     chat_1096: '已开启仅查看聊天内容',
     chat_1097: '已关闭仅查看聊天内容',
@@ -439,7 +439,9 @@ export default {
     form_1085: '地址',
     form_1086: '输入关键词/用户昵称',
     form_1087: '提交成功，感谢您的参与',
-    form_1088: '提交成功'
+    form_1088: '提交成功',
+    form_1089: '填写',
+    form_1090: '已填'
   },
   menu: {
     menu_1001: '文档',
@@ -519,9 +521,9 @@ export default {
     interact_tools_1057: '进行中...',
     interact_tools_1058: '免费',
     interact_tools_1059: '咖啡',
-    interact_tools_1060: '赞',
+    interact_tools_1060: '爱心',
     interact_tools_1061: '鼓掌',
-    interact_tools_1062: '鲜花',
+    interact_tools_1062: '玫瑰',
     interact_tools_1063: '礼物赠送成功',
     interact_tools_1064: '请选择礼物',
     interact_tools_1065: '发送口令{n}参与抽奖吧',
@@ -544,7 +546,11 @@ export default {
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
     interact_tools_1085: '领取Top10名单',
-    interact_tools_1086: '公告'
+    interact_tools_1086: '公告',
+    interact_tools_1087: '火箭',
+    interact_tools_1088: '飞机',
+    interact_tools_1089: '礼炮',
+    interact_tools_1090: '汽车'
   },
   setting: {
     setting_1002: '观看设置',

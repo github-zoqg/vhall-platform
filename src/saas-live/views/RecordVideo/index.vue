@@ -42,10 +42,10 @@
           bu: 0,
           user_id: watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
         });
@@ -67,9 +67,7 @@
         console.error(err);
         if (err.code == 510008) {
           // 未登录
-          location.href = `${process.env.VUE_APP_WEB_BASE + process.env.VUE_APP_WEB_KEY}/login?${
-            location.search
-          }`;
+          location.href = `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/login?${location.search}`;
         }
         this.state = 2;
         this.errMsg = err.msg;

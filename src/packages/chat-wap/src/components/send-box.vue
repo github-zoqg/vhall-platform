@@ -25,6 +25,9 @@
             class="content-input__update-chat content-input__placeholder"
             @click="saySomething"
           >
+            <span @click.stop="">
+              <chatSeting @filterChat="filterChat" />
+            </span>
             <span
               v-if="
                 isBanned ||
@@ -99,6 +102,7 @@
 
 <script>
   import chatWapInput from './chatWapInput';
+  import chatSeting from './chatSeting';
   import EventBus from '../js/Events';
   import { emojiToPath } from '@/packages/chat/src/js/emoji';
   import {
@@ -176,7 +180,8 @@
     },
     components: {
       chatWapInput,
-      Handup
+      Handup,
+      chatSeting
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
@@ -333,6 +338,11 @@
       window.chat = this;
     },
     methods: {
+      // 聊天过滤
+      filterChat(val) {
+        console.log(val);
+        this.$emit('filterChat', val);
+      },
       showMyQA() {
         this.isShowMyQA = !this.isShowMyQA;
         this.$emit('showMyQA', this.isShowMyQA);

@@ -122,9 +122,9 @@
     computed: {
       formatDuration() {
         const temp = this.liveDuration * 1000;
-        const hours = moment.duration(temp).hours();
-        const minutes = moment.duration(temp).minutes();
-        const seconds = moment.duration(temp).seconds();
+        const hours = dayjs.duration(temp).hours();
+        const minutes = dayjs.duration(temp).minutes();
+        const seconds = dayjs.duration(temp).seconds();
         return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${
           seconds < 10 ? '0' + seconds : seconds
         }`;

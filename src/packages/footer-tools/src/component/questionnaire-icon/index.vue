@@ -3,7 +3,7 @@
     class="vmp-questionnaire-icon"
     v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
   >
-    <img src="./images/questionnaire.png" alt="" @click="checkQuestionnaireIcon" />
+    <img src="./images/questionnaire.png" alt="" @click="throttleCheckQues" />
     <i class="vmp-dot" v-if="questionnaireServerState.dotVisible" />
     <!-- 问卷列表弹框 -->
     <div class="vmp-questionnaire-list_container" v-if="isShowQuestionList">
@@ -26,9 +26,9 @@
                 </span>
               </p>
               <span class="write write_hover" v-if="item.is_answered == 0" @click="writeQ(item)">
-                填写
+                {{ $t('form.form_1089') }}
               </span>
-              <span v-else class="write write_over">已填</span>
+              <span v-else class="write write_over">{{ $t('form.form_1090') }}</span>
             </div>
           </li>
         </ul>
@@ -42,6 +42,7 @@
    * @description 红包的图标 + 小红点
    */
   import { useQuestionnaireServer } from 'middle-domain';
+  import { throttle } from 'lodash';
   export default {
     name: 'QuestionnaireIcon',
     data() {
@@ -100,6 +101,7 @@
           }
         }
       );
+      this.throttleCheckQues = throttle(this.checkQuestionnaireIcon, 2000, { trailing: false });
     },
     methods: {
       async checkQuestionnaireIcon() {
