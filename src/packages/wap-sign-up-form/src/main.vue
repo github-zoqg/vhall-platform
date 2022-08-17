@@ -703,9 +703,12 @@
         document.title = roomBaseState.languages.curLang.subject;
         let lang = roomBaseState.languages.lang;
         this.$i18n.locale = lang.type;
-        setRequestHeaders({
-          token: localStorage.getItem('token') || ''
-        });
+        if (!this.isEmbed) {
+          // 如果是嵌入的时候，不需要token传入
+          setRequestHeaders({
+            token: localStorage.getItem('token') || ''
+          });
+        }
         // if (localStorage.getItem('lang')) {
         //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
         // } else {
