@@ -118,17 +118,19 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
-        this.toResultsReporting(170005, encodeURIComponent('用户成功上麦'), {
+        this.toResultsReporting(170005, {
           event_type: 'message',
-          waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`
+          waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`,
+          failed_reason: encodeURIComponent('用户成功上麦')
         });
       });
 
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
-        this.toResultsReporting(170003, msg, {
-          event_type: 'meassage'
+        this.toResultsReporting(170003, {
+          event_type: 'meassage',
+          failed_reason: msg
         });
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
@@ -152,6 +154,9 @@
       });
     },
     methods: {
+      // 上报_结果
+      toResultsReporting: window.vhallReportForProduct.toResultsReporting,
+
       // 下麦操作
       offConnect() {
         this.$emit('handupLoading', false);
@@ -159,9 +164,11 @@
         window.vhallReportForProduct.toStartReporting(170002, 170003);
         useMicServer()
           .speakOff()
-          .then(data => {
-            this.toResultsReporting(170003, data, {
-              event_type: 'interface'
+          .then(res => {
+            this.toResultsReporting(170003, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
             });
           });
       },
@@ -221,6 +228,8 @@
               }
               // 数据上报，场景：申请连麦接口
               this.toResultsReporting(170005, {
+                event_type: 'interface',
+                failed_reason: res,
                 request_id: res.request_id
               });
               return;
@@ -260,7 +269,11 @@
           .catch(err => {
             this.btnDisabled = false;
             // 数据上报，场景：申请连麦接口
-            this.toResultsReporting(170005, err);
+            this.toResultsReporting(170005, {
+              event_type: 'interface',
+              failed_reason: err,
+              request_id: err.request_id
+            });
           });
       },
       async handleClickMuteDevice(deviceType) {
@@ -271,19 +284,6 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
-      },
-
-      // 上报_结果
-      toResultsReporting(eventId, res, options = {}) {
-        window.vhallReportForProduct.toResultsReporting(
-          eventId,
-          {
-            ...{ event_type: 'interface', failed_reason: res },
-            ...options
-          }
-          // 返回的key值
-          // todo keyCode
-        );
       }
     }
   };
