@@ -76,7 +76,7 @@
           user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）
           webinar_id: watchInitData.webinar.id, // 活动 id
           webinar_type: watchInitData.webinar.mode, // 直播类型
-          created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           role_name: watchInitData.join_info.role_name, //用户类型
           ua: getBrowserType() // 浏览器信息
         });

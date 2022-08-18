@@ -138,7 +138,7 @@
           domain.initVhallReportForProduct({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
             app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
-            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 8, // 客户端类型  web 网页端用 8
             user_id: roomBaseServer.state.watchInitData.join_info.join_id, // C端用户 id（如果是B端用当前用户id）
             webinar_id: this.$route.params.id // 活动 id
