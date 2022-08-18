@@ -1,3 +1,7 @@
+/*
+  H5时尚模式-蓝色主题
+*/
+
 export default {
   // 菜单
   '--theme-tab-menu-font': 'rgba(0, 0, 0, 0.65)',

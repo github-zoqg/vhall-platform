@@ -313,7 +313,7 @@
       setPageConfig() {
         /*
         {
-            "bgColor": "1", //主题色 按照数字逻辑 前端枚举
+            "backGroundColor": "1", //主题色 按照数字逻辑 前端枚举
             "pageStyle": "#FB3A32", // 页面风格
             "popStyle": "",// 原有字段 预留
             "background": "", //背景图
@@ -336,17 +336,18 @@
           1: 'black',
           2: 'white',
           3: 'red',
-          4: 'blue',
-          5: 'golden'
+          4: 'golden',
+          5: 'blue'
         };
 
         const styleMap = {
           1: 'default', // 传统风格
-          2: 'simple' // 简洁风格
+          2: 'simple', // 简洁风格
+          3: 'fashion' // 时尚风格
         };
         let skin_json_pc = {
           style: 2,
-          bgColor: 1,
+          backGroundColor: 1,
           chatLayout: 2 // 聊天布局 1 上下 2 左右
         };
 
@@ -362,23 +363,28 @@
 
         // 设置主题，如果没有就用传统风格白色
         const style = styleMap[skin_json_pc?.style || 1];
-        const theme = themeMap[skin_json_pc?.bgColor || 2];
+        const theme = themeMap[skin_json_pc?.backGroundColor || 2];
 
         console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
-        this.drawBody(theme);
+        this.drawBody(theme, skin_json_pc);
         // 挂载到window方便调试
         window.skins = skins;
       },
-      drawBody(theme) {
-        if (theme == 'black') {
-          document.body.style.background = `rgb(26, 26, 26)`;
-        } else {
-          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/watch/theme/skins/' +
-            theme +
-            '.png')})`;
+      drawBody(theme, skin) {
+        if (skin?.pcBackground) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
           document.body.style.backgroundSize = 'cover';
+        } else {
+          if (theme == 'black') {
+            document.body.style.background = `rgb(26, 26, 26)`;
+          } else {
+            document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/watch/theme/skins/' +
+              theme +
+              '.png')})`;
+            document.body.style.backgroundSize = 'cover';
+          }
         }
       }
     }

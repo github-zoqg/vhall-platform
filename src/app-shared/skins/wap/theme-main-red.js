@@ -1,3 +1,7 @@
+/*
+  H5传统模式-红色主题
+*/
+
 export default {
   // 菜单
   '--theme-tab-menu-font': 'rgba(0, 0, 0, 0.65)',

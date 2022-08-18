@@ -1,5 +1,5 @@
 /**
- * pc观看端简洁红色主题
+ * pc观看端时尚蓝色主题
  */
 
 /* 字体颜色
@@ -7,15 +7,15 @@
 const color_text_primary = '#FFFFFF';
 const color_text_grey = '#262626';
 const color_text_red = '#fb2626';
-const color_text_custom = '#fb2626';
-const color_text_custom_sub = '#ffd1c9';
-const color_text_black = 'rgba(38, 38, 38, 1)';
+const color_text_custom = '#3552ea';
+const color_text_custom_sub = '#dee8ff';
 const color_text_regular = 'rgba(0, 0, 0, 0.65)';
 const color_text_secondary = 'rgba(0, 0, 0, 0.45)';
+const color_text_placeholder = 'rgba(0, 0, 0, 0.35)';
 const color_text_1 = 'rgba(0, 0, 0, 1)';
 const color_text_2 = 'rgba(255, 255, 255, 0.45)';
 const color_text_3 = 'rgba(0, 0, 0, 0.85)';
-const color_text_placeholder = 'rgba(0, 0, 0, 0.35)';
+const color_text_black = 'rgba(38, 38, 38, 1)';
 const color_text_disabled = 'rgba(0, 0, 0, 0.25)';
 const color_text_link = '#3562fa';
 
@@ -32,7 +32,7 @@ const color_background_7 = '#f5f5f5';
 const color_background_8 = '#f7f7f7';
 const color_background_9 = '#f0f0f0';
 const color_background_10 = 'rgba(0, 0, 0, 0.15)';
-const color_background_11 = '#fff2f0';
+const color_background_11 = '#f0f6ff';
 
 export default {
   '--theme-background-color': color_background_0,
