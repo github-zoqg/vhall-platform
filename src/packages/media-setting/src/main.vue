@@ -9,51 +9,53 @@
       @onClose="cancelMediaSetting"
     >
       <section v-loading="loading" v-show="isShow" class="vmp-media-setting-dialog-body">
-        <!-- 左侧菜单 -->
-        <aside class="vmp-media-setting-menu">
-          <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
-        </aside>
+        <div class="vmp-media-setting-main">
+          <!-- 左侧菜单 -->
+          <aside class="vmp-media-setting-menu">
+            <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
+          </aside>
 
-        <!-- 右侧面板 -->
-        <section class="vmp-media-setting-content">
-          <main class="vmp-media-setting-content-main">
-            <!-- 基础设置 -->
-            <basic-setting v-show="selectedMenuItem === 'basic-setting'" />
-            <!-- 摄像头 -->
-            <video-setting
-              ref="videoSetting"
-              v-show="selectedMenuItem === 'video-setting'"
-              :is-show="isShow"
-              :selected-item="selectedMenuItem"
-            />
-            <!-- 麦克风 -->
-            <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
-            <!-- 扬声器 -->
-            <audio-out-setting
-              ref="audioOutSetting"
-              v-show="selectedMenuItem === 'audio-out-setting'"
-            />
-          </main>
+          <!-- 右侧面板 -->
+          <section class="vmp-media-setting-content">
+            <main class="vmp-media-setting-content-main">
+              <!-- 基础设置 -->
+              <basic-setting v-show="selectedMenuItem === 'basic-setting'" />
+              <!-- 摄像头 -->
+              <video-setting
+                ref="videoSetting"
+                v-show="selectedMenuItem === 'video-setting'"
+                :is-show="isShow"
+                :selected-item="selectedMenuItem"
+              />
+              <!-- 麦克风 -->
+              <audio-in-setting v-show="selectedMenuItem === 'audio-in-setting'" />
+              <!-- 扬声器 -->
+              <audio-out-setting
+                ref="audioOutSetting"
+                v-show="selectedMenuItem === 'audio-out-setting'"
+              />
+            </main>
+          </section>
+        </div>
 
-          <!-- 底部按钮区域 -->
-          <footer class="vmp-media-setting-content-footer">
-            <a
-              class="vmp-media-setting-content-footer__help"
-              href="//www.vhall.com/saas/doc/1722.html"
-              target="_blank"
-            >
-              {{ $t('setting.setting_1029') }}
-            </a>
-            <section>
-              <el-button size="small" round type="primary" @click="saveMediaSetting">
-                {{ $t('account.account_1062') }}
-              </el-button>
-              <el-button @click="cancelMediaSetting" round size="small">
-                {{ $t('account.account_1063') }}
-              </el-button>
-            </section>
-          </footer>
-        </section>
+        <!-- 底部按钮区域 -->
+        <footer class="vmp-media-setting-main-footer">
+          <a
+            class="vmp-media-setting-main-footer__help"
+            href="//www.vhall.com/saas/doc/1722.html"
+            target="_blank"
+          >
+            {{ $t('setting.setting_1029') }}
+          </a>
+          <section>
+            <el-button size="small" round type="primary" @click="saveMediaSetting">
+              {{ $t('account.account_1062') }}
+            </el-button>
+            <el-button @click="cancelMediaSetting" round size="small">
+              {{ $t('account.account_1063') }}
+            </el-button>
+          </section>
+        </footer>
       </section>
     </saas-dialog>
 
@@ -644,75 +646,76 @@
     .el-radio__input.is-checked + .el-radio__label {
       color: #606266;
     }
-
+    height: calc(100% - 68px);
     background: #fff;
-    display: flex;
-    height: 436px;
+    max-height: 436px;
     box-sizing: border-box;
-
-    // 左侧菜单
-    .vmp-media-setting-menu {
-      height: 100%;
-      width: 120px;
-      flex: 0 0 auto;
-    }
-
-    // 右侧正文
-    .vmp-media-setting-content {
-      height: 100%;
-      flex: 1 1 auto;
-      box-sizing: border-box;
-      background-color: #f7f7f7;
+    .vmp-media-setting-main {
       display: flex;
-      flex-direction: column;
-      width: 360px;
-      &-main {
-        flex: 1;
-        overflow: auto;
-        padding: 14px 32px 0px;
+      height: calc(100% - 56px);
+      // 左侧菜单
+      .vmp-media-setting-menu {
+        height: 100%;
+        width: 120px;
+        flex: 0 0 auto;
+      }
 
-        // 复用元素
-        .vmp-media-setting-item {
-          margin-bottom: 16px;
-          display: flex;
+      // 右侧正文
+      .vmp-media-setting-content {
+        height: 100%;
+        flex: 1 1 auto;
+        box-sizing: border-box;
+        background-color: #f7f7f7;
+        display: flex;
+        flex-direction: column;
+        width: 360px;
+        &-main {
+          flex: 1;
+          overflow: auto;
+          padding: 14px 32px 0px;
 
-          &__label {
-            width: 58px;
-            font-size: 14px;
-            flex: 0 0 auto;
-            text-align: left;
-            margin-right: 10px;
+          // 复用元素
+          .vmp-media-setting-item {
+            margin-bottom: 16px;
             display: flex;
-            align-items: center;
-          }
 
-          &__content {
-            flex: 1;
+            &__label {
+              width: 58px;
+              font-size: 14px;
+              flex: 0 0 auto;
+              text-align: left;
+              margin-right: 10px;
+              display: flex;
+              align-items: center;
+            }
 
-            &--column {
-              flex-direction: column;
+            &__content {
+              flex: 1;
+
+              &--column {
+                flex-direction: column;
+              }
             }
           }
-        }
 
-        .vmp-media-setting-tips {
-          padding-top: 16px;
+          .vmp-media-setting-tips {
+            padding-top: 16px;
 
-          &__title {
-            font-size: 14px;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-          }
+            &__title {
+              font-size: 14px;
+              color: #1a1a1a;
+              margin-bottom: 8px;
+            }
 
-          &__content {
-            p {
-              font-size: 13px;
-              color: #666;
+            &__content {
+              p {
+                font-size: 13px;
+                color: #666;
+              }
             }
           }
         }
       }
-
       &-footer {
         display: flex;
         justify-content: space-between;

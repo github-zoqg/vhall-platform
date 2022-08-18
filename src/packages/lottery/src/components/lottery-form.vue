@@ -240,7 +240,10 @@
         this.needTakeAward = true;
         this.prize = {};
         this.updateLotteryUser().then(() => {
-          this.getLotteryCount();
+          const st = setTimeout(() => {
+            clearTimeout(st); // 延迟1秒请求 防止用户数据量太大
+            this.getLotteryCount();
+          }, 1000);
         });
         this.getPrizeList();
       },
@@ -346,8 +349,8 @@
           this.$message.warning('中奖人数不可以大于参与抽奖人员数');
           return;
         }
-        if (this.prizeNum > 1000) {
-          return this.$message.warning('中奖人数不能超过1000');
+        if (this.prizeNum > 2000) {
+          return this.$message.warning('中奖人数不能超过2000');
         }
         console.warn(this.chooseList);
         // 2.组织参数
