@@ -882,7 +882,7 @@
       },
       filterTime() {
         return function (time) {
-          return moment(time).format('HH:mm');
+          return dayjs(time).format('HH:mm');
         };
       },
       isAllChecked() {
