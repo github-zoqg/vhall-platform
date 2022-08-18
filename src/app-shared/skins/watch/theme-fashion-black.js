@@ -1,5 +1,5 @@
 /**
- * pc观看端简洁金色主题
+ * pc观看端时尚黑色主题
  */
 
 /* 字体颜色
@@ -8,15 +8,14 @@ const color_text_primary = '#FFFFFF';
 const color_text_black = '#000';
 const color_text_red = '#fb2626';
 const color_text_grey = '#262626';
-const color_text_custom = '#c99f67';
-const color_text_custom_sub = '#fcf8ed';
+const color_text_custom = '#fb2626';
+const color_text_custom_sub = '#ffd1c9';
 const color_text_regular = 'rgba(255, 255, 255, 0.65)';
 const color_text_secondary = 'rgba(255, 255, 255, 0.45)';
 const color_text_placeholder = 'rgba(255, 255, 255, 0.35)';
 const color_text_disabled = 'rgba(255, 255, 255, 0.25)';
 const color_text_link = '#3562fa';
 const color_text_regular_2 = 'rgba(0, 0, 0, 0.65)';
-const color_text_1 = 'rgba(255, 255, 255, 0.85)';
 /* 背景颜色
 --------------------- */
 const color_background_0 = '#1a1a1a';
@@ -34,17 +33,19 @@ const color_background_11 = '#383838';
 const color_background_12 = '#e6e6e6';
 const color_background_13 = '#999';
 const color_background_14 = '#ccc';
-const color_background_15 = '#434343';
-const color_background_16 = '#ababab';
-const color_background_17 = '#e2e2e2';
-const color_background_18 = '#969696';
-const color_background_19 = '#595959';
+const color_background_15 = '#333';
+const color_background_16 = '#ddd';
+const color_background_17 = '#434343';
+const color_background_18 = '#ababab';
+const color_background_19 = '#e2e2e2';
 const color_background_20 = 'rgb(117, 117, 117)';
 const color_background_21 = '#666';
 const color_background_22 = 'rgba(255, 255, 255, 0.9)';
 const color_background_23 = '#34363a';
 const color_background_24 = '#23232d';
 const color_background_25 = '#777';
+const color_background_26 = '#969696';
+const color_background_27 = '#595959';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -81,22 +82,22 @@ export default {
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
-  '--theme-menu-bg': color_background_24,
+  '--theme-menu-bg': color_text_custom,
   //分组
-  '--group-name-icon-font-color': color_text_regular,
-  '--group-name-font-color': color_text_secondary,
-  '--group-item-hover-color': color_background_6,
-  '--group-turnOff-font-color': color_text_1,
-  '--group-more-font-color': color_text_1,
-  '--group-more-hover-color': color_background_15,
-  '--group-online-font-color': color_background_16,
-  '--group-online-icon-color': color_background_17,
-  '--group-refresh-font-color': color_background_16,
-  '--group-btn-bg-color': color_background_15,
+  '--group-name-icon-font-color': color_background_14,
+  '--group-name-font-color': color_background_13,
+  '--group-item-hover-color': color_background_15,
+  '--group-turnOff-font-color': color_background_16,
+  '--group-more-font-color': color_background_14,
+  '--group-more-hover-color': color_background_17,
+  '--group-online-font-color': color_background_18,
+  '--group-online-icon-color': color_background_19,
+  '--group-refresh-font-color': color_background_18,
+  '--group-btn-bg-color': color_background_17,
   '--group-btn-font-color': color_background_13,
-  '--group-btn-hover-color': color_background_18,
+  '--group-btn-hover-color': color_background_26,
   '--group-btn-hover-font-color': color_text_primary,
-  '--group-btn-active-color': color_background_19,
+  '--group-btn-active-color': color_background_27,
   '--group-btn-active-font-color': color_background_12,
   '--group-more-mute-font-color': color_background_12,
   '--group-search-font-color': color_background_13,
@@ -105,6 +106,7 @@ export default {
   '--group-search-input-font-color': color_background_21,
   '--group-search-input-bg-color': color_background_22,
   '--group-search-input-bg2-color': color_background_23,
+  '--group-search-confirm-font-color': color_background_21,
   //侧边栏
   '--menu-item-font-color': color_background_13,
   '--menu-item-font-disable-color': color_background_25,

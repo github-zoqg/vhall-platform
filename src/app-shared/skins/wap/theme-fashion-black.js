@@ -1,3 +1,7 @@
+/*
+  H5时尚模式-黑色主题
+*/
+
 export default {
   // 菜单
   '--theme-tab-menu-font': 'rgba(255, 255, 255, 0.65)',

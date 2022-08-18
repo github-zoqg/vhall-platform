@@ -55,7 +55,7 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skin_json_wap = {
           style: 1,
-          bgColor: 2
+          backGroundColor: 2
         };
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
           skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
@@ -288,7 +288,7 @@
       setPageConfig() {
         /*
         {
-            "bgColor": "1", //主题色 按照数字逻辑 前端枚举
+            "backGroundColor": "1", //主题色 按照数字逻辑 前端枚举
             "pageStyle": "#FB3A32", // 页面风格
             "popStyle": "",// 原有字段 预留
             "background": "", //背景图
@@ -310,8 +310,8 @@
           1: 'black',
           2: 'white',
           3: 'red',
-          4: 'blue',
-          5: 'golden'
+          4: 'golden',
+          5: 'blue'
         };
 
         const styleMap = {
@@ -322,7 +322,7 @@
 
         let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
           style: 1,
-          bgColor: 2
+          backGroundColor: 2
         };
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
@@ -341,31 +341,36 @@
         }
         // 设置主题，如果没有就用传统风格白色
         const style = styleMap[skin_json_wap?.style || 1];
-        const theme = themeMap[skin_json_wap?.bgColor || 2];
+        const theme = themeMap[skin_json_wap?.backGroundColor || 2];
 
         console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_wap);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
-        this.drawBody(style, theme);
+        this.drawBody(style, theme, skin_json_wap);
 
         // 挂载到window方便调试
         window.skins = skins;
       },
-      drawBody(style, theme) {
-        if (style == 'main' && (theme == 'black' || theme == 'white')) {
-          if (theme == 'black') {
-            document.body.style.background = `#262626`;
-          }
-          if (theme == 'white') {
-            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
-          }
-        } else {
-          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
-            style +
-            '_' +
-            theme +
-            '.png')})`;
+      drawBody(style, theme, skin) {
+        if (skin?.background) {
+          document.body.style.backgroundImage = `url(${skin?.background})`;
           document.body.style.backgroundSize = 'cover';
+        } else {
+          if (style == 'main' && (theme == 'black' || theme == 'white')) {
+            if (theme == 'black') {
+              document.body.style.background = `#262626`;
+            }
+            if (theme == 'white') {
+              document.body.style.background = `rgba(0, 0, 0, 0.06)`;
+            }
+          } else {
+            document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+              style +
+              '_' +
+              theme +
+              '.png')})`;
+            document.body.style.backgroundSize = 'cover';
+          }
         }
       }
     }
