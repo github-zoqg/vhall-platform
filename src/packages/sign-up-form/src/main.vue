@@ -75,6 +75,7 @@
                   <el-form-item
                     v-for="(question, quesIndex) in list"
                     v-show="question.type != 6"
+                    :ref="`formItem_${question.id}`"
                     :key="question.id"
                     :prop="question.id + ''"
                     :label="
@@ -1433,9 +1434,8 @@
                 }
               });
             }
-            if (this.isSubscribe == 1) {
-              this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
-            }
+            // 数据获取完成后，先清空错误提示。
+            this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
             this.list = list;
             //地域 options 格式化处理
             this.list.some(item => {
@@ -1457,6 +1457,15 @@
               this.privacy && this.privacyFormatter();
             }
             list.some(item => item.type === 5) && this.getAreaList();
+
+            this.$nextTick(() => {
+              this.list.forEach(item => {
+                if (item.type == 3) {
+                  // 初始化的时候，清空单选题验证
+                  this.$refs[`formItem_${item.id}`][0].clearValidate();
+                }
+              });
+            });
           })
           .catch(error => {
             this.ajaxListEnd = true;
@@ -1635,8 +1644,8 @@
       },
       //关闭模态窗
       handleClose() {
-        this.visible = false;
         this.resetSignUpForm();
+        this.visible = false;
       },
       resetSignUpForm() {
         // 重置地区选择
@@ -1644,11 +1653,16 @@
         this.city = '';
         this.county = '';
         // 重置表单验证 & 图形码
-        this.$refs.form && this.$refs.form.resetFields();
-        this.resetCaptcha('time');
-
-        this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
-        this.resetCaptcha('verifyTime');
+        if (this.$refs.form) {
+          this.$refs.form.resetFields();
+          this.$refs.form.clearValidate();
+          this.resetCaptcha('time');
+        }
+        if (this.$refs.verifyForm) {
+          this.$refs.verifyForm.resetFields();
+          this.$refs.verifyForm.clearValidate();
+          this.resetCaptcha('verifyTime');
+        }
       },
       // 停止计时器
       stopTime(timeKey) {
@@ -1666,8 +1680,10 @@
         this.showCaptchaVerify = false;
         this.mobileKey = '';
         this.mobileKeyVerify = '';
-        this.$refs.form && this.callCaptcha('#setCaptcha');
-        this.$refs.verifyForm && this.callCaptcha('#setCaptcha1');
+        if (this.isPhoneValidate) {
+          this.$refs.form && this.callCaptcha('#setCaptcha');
+          this.$refs.verifyForm && this.callCaptcha('#setCaptcha1');
+        }
       },
       //切换展开/收起状态
       changeFoldStatus(status) {
