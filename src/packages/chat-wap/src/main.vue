@@ -378,7 +378,12 @@
             this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = false;
             this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+            this.tipMsg = this.$t('chat.chat_1035', {
+              n:
+                this.unReadMessageCount < 100
+                  ? this.unReadMessageCount
+                  : this.unReadMessageCount + '+'
+            });
           }
           this.dispatch('TabContent', 'noticeHint', 3);
         });

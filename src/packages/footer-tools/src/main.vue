@@ -14,14 +14,14 @@
         v-if="roomBaseState.watchInitData.online.show && !isInGroup"
       >
         <i class="vh-iconfont vh-line-user"></i>
-        {{ onlineNum | formatHotNum }}
+        {{ onlineNumTxt | formatHotNum }}
       </div>
       <div
         class="vmp-footer-tools__left-hot"
         v-if="roomBaseState.watchInitData.pv.show && !isInGroup"
       >
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-        {{ hotNum | formatHotNum }}
+        {{ hotNumTxt | formatHotNum }}
       </div>
       <div
         class="vmp-footer-tools__left-language"
@@ -172,6 +172,7 @@
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
   import { throttle } from 'lodash';
+  import alternateStylesheet from 'caniuse-lite/data/features/alternate-stylesheet';
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -201,7 +202,9 @@
         zfQr: '',
         wxQr: '',
         lang: {},
-        languageList: []
+        languageList: [],
+        onlineNumTxt: 0,
+        hotNumTxt: 0
       };
     },
     watch: {
@@ -209,6 +212,12 @@
         if (val) {
           this.roomBaseServer.state.timerInfo = {};
         }
+      },
+      onlineNum(val) {
+        this.updateOnlineNum(val);
+      },
+      hotNum(val) {
+        this.updateHotNum(val);
       }
     },
     computed: {
@@ -287,6 +296,8 @@
       this.videoPollingServer = useVideoPollingServer();
     },
     created() {
+      this.onlineNumTxt = this.onlineNum;
+      this.hotNumTxt = this.hotNum;
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       if (this.isEmbed) {
@@ -315,6 +326,12 @@
       });
     },
     methods: {
+      updateOnlineNum: throttle(function (val) {
+        this.onlineNumTxt = val;
+      }, 500),
+      updateHotNum: throttle(function (val) {
+        this.hotNumTxt = val;
+      }, 500),
       settingShow() {
         if (this.isInteractLive) {
           // 互动直播
