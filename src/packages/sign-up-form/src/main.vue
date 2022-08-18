@@ -1,7 +1,13 @@
 <template>
   <div class="vmp-sign-up-form" :class="[isEntryForm ? 'vmp-sign-up-form--entry-from' : '']">
     <template v-if="!isEntryForm">
-      <el-dialog title="" :visible.sync="visible" width="720px" custom-class="vmp-sign-up-form">
+      <el-dialog
+        title=""
+        :visible.sync="visible"
+        width="720px"
+        custom-class="vmp-sign-up-form"
+        @close="handleClose"
+      >
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
@@ -1216,7 +1222,7 @@
       },
       // 初始化专题信息，获取专题访客ID
       async initSubjectAuth() {
-        const visitorId = localStorage.getItem('visitorId') || this.$route.query.visitorId;
+        const visitorId = localStorage.getItem('visitorId');
         let params = {
           subject_id: this.webinarOrSubjectId,
           visitor_id: !['', null, void 0].includes(visitorId) ? visitorId : undefined,
@@ -1589,6 +1595,11 @@
           return;
         }
         this.activeTab = type;
+        if (this.activeTab == 2) {
+          this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
+        } else {
+          this.$refs.form && this.$refs.form.clearValidate();
+        }
         //重置下云盾
         this.showCaptcha = false;
         this.mobileKey = '';
@@ -1599,6 +1610,13 @@
       //关闭模态窗
       handleClose() {
         this.visible = false;
+        // 重置地区选择
+        this.province = '';
+        this.city = '';
+        this.county = '';
+        // 重置表单验证
+        this.$refs.form && this.$refs.form.resetFields();
+        this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
       },
       //切换展开/收起状态
       changeFoldStatus(status) {
@@ -1764,13 +1782,13 @@
             } else {
               this.$route.query.refer && (params.refer = this.$route.query.refer);
             }
-            const visitorId = sessionStorage.getItem('visitorId');
+            const visitorId = localStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }
             this.signUpFormServer.submitSignUpForm(params).then(res => {
               if (res.code == 200) {
-                res.data.visit_id && sessionStorage.setItem('visitorId', res.data.visit_id);
+                res.data.visit_id && localStorage.setItem('visitorId', res.data.visit_id);
                 if (this.isSubject) {
                   // 若是从专题点击，触发的报名表单弹窗，提交答案后（报名 或者 我已报名，通知专题页修改状态）
                   window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
@@ -1825,7 +1843,7 @@
               verify_code: this.verifyForm.code,
               ...this.$route.query
             };
-            const visitorId = sessionStorage.getItem('visitorId');
+            const visitorId = localStorage.getItem('visitorId');
             if (visitorId) {
               params.visit_id = visitorId;
             }

@@ -771,7 +771,7 @@
         }
         const params = {
           ...this.setParamsIdByRoute({}),
-          visit_id: sessionStorage.getItem('visitorId')
+          visit_id: localStorage.getItem('visitorId')
         };
         return this.signUpFormServer
           .getFormLinkStatus(params)
@@ -1107,14 +1107,14 @@
             params.refer = this.$route.query.refer;
           }
         }
-        if (sessionStorage.getItem('visitorId')) {
-          params.visit_id = sessionStorage.getItem('visitorId');
+        if (localStorage.getItem('visitorId')) {
+          params.visit_id = localStorage.getItem('visitorId');
         }
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
             if (res && [200, '200'].includes(res.code)) {
-              sessionStorage.setItem('visitorId', res.data.visit_id);
+              localStorage.setItem('visitorId', res.data.visit_id);
               // 专题/活动 -- 报名成功后处理
               this.interfaceType === 'subject' ? this.getSubjectStatus() : this.getWebinarStatus();
             } else {
@@ -1685,8 +1685,8 @@
             params.verify_code = this.verifyForm.code;
           }
 
-          if (sessionStorage.getItem('visitorId')) {
-            params.visit_id = sessionStorage.getItem('visitorId');
+          if (localStorage.getItem('visitorId')) {
+            params.visit_id = localStorage.getItem('visitorId');
           }
 
           this.signUpFormServer
@@ -1694,7 +1694,7 @@
             .then(res => {
               // 如果已经报名
               if (res.data.has_registed == 1) {
-                sessionStorage.setItem('visitorId', res.data.visit_id);
+                localStorage.setItem('visitorId', res.data.visit_id);
                 this.$toast(this.$t('form.form_1033'));
                 // 跳转专题详情 还是 活动报名表单详情
                 if (this.interfaceType === 'subject') {
