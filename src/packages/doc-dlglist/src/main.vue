@@ -642,7 +642,7 @@
         const fileObj = {
           file_name: file.name,
           ext: file.name.split('.')[1],
-          created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           page: 1,
           docStatus: 'uploading', // 文档状态:上传中
           uploadPropress: 0, // 上传进度

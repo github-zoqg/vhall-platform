@@ -2,7 +2,7 @@ import { assistantMsg, openUrl } from './client-message.js';
 
 //有人离开房间
 const cl_left = function (params) {
-  assistantMsg('Left', params);
+  assistantMsg('Leave', params);
 };
 //有人加入房间
 const cl_join = function (params) {

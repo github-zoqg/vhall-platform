@@ -24,9 +24,11 @@
       </p>
 
       <virtual-list
+        v-if="virtual.showlist"
         ref="chatlist"
-        style="height: 100%; overflow: auto"
-        :keeps="50"
+        :key="virtual.key"
+        :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
+        :keeps="30"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -108,7 +110,13 @@
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
-  import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useMsgServer,
+    useGroupServer,
+    useMenuServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
@@ -221,7 +229,13 @@
         //隐藏拉取历史聊天按钮
         hideChatHistory: false,
         //回复或@消息id
-        targetId: ''
+        targetId: '',
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0,
+          key: 1
+        }
       };
     },
     computed: {
@@ -308,6 +322,11 @@
       // 聊天免登录的配置项更改，重新计算是否需要登录聊天
       noLoginKey() {
         this.initChatLoginStatus();
+      },
+      ['roomBaseServer.state.miniElement'](oldval, newval) {
+        if (Boolean(oldval) != Boolean(newval)) {
+          this.updateHeight();
+        }
       }
     },
     beforeCreate() {
@@ -328,12 +347,26 @@
       }
       //监听domain层chatServer通知
       this.listenChatServer();
-
       // 展示欢迎语
       this.showWelcome();
+      if (this.$route.query.assistantType) {
+        this.updateHeight();
+      }
+      window.addEventListener('resize', this.updateHeight);
     },
-    destroyed() {},
+    destroyed() {
+      window.removeEventListener('resize', this.updateHeight);
+    },
     methods: {
+      updateHeight() {
+        this.$nextTick(() => {
+          this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+          this.virtual.showlist = true;
+          this.virtual.key++;
+          this.chatlistHeight = this.virtual.contentHeight;
+          this.scrollBottom();
+        });
+      },
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -361,6 +394,7 @@
       listenChatServer() {
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const menuServer = useMenuServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
@@ -631,6 +665,14 @@
             }
           });
         }
+        //监听切换到当前tab
+        menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            if (data.cuid == this.cuid) {
+              this.updateHeight();
+            }
+          });
+        });
       },
       //初始化聊天输入框数据
       initInputStatus() {
@@ -944,7 +986,9 @@
           return item.count.toString();
         });
         const vsl = this.$refs.chatlist;
-        console.log(IdList);
+        if (IdList.length == 0) {
+          return;
+        }
         this.$nextTick(() => {
           const offset = IdList.reduce((previousValue, currentSid) => {
             const previousSize =
