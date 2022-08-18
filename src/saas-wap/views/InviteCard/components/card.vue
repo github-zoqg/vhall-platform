@@ -200,11 +200,11 @@
 
         if (this.webinarInfo.img_type == 0) {
           // 默认
-          this.webinarInfo.showImg = `${data.invite_card.img}`;
+          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/crop,w_${screen_wid},h_${screen_height}`;
         } else {
           this.webinarInfo.showImg = `${
             this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl
-          }?x-oss-process=image/resize,m_fill,w_${screen_wid},h_${screen_height},limit_0`;
+          }?x-oss-process=image/crop,w_${screen_wid},h_${screen_height}`;
         }
 
         this.nickname = padStringWhenTooLang(data.nick_name, '...', 5);
