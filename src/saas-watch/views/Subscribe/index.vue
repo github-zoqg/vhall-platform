@@ -100,8 +100,7 @@
           // 观看端上报
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 7, // 客户端类型  web 网页端用 8
-            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
+            pf: 7 //8：PC 10: wap
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,

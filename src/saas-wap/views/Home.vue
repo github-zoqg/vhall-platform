@@ -151,18 +151,17 @@
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
-            t_start: currentTime,
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             os: getVhallReportOs(),
             type: 2, //播放平台 2: wap
-            entry_time: currentTime,
+            entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 3, // wap
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });
           window.vhallReport.report('ENTER_WATCH');
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 3, // 客户端类型  web 网页端用 8
-            created_at: currentTime
+            pf: 10 // 8：PC 10: wap
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,

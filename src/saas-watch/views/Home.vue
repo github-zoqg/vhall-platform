@@ -121,15 +121,14 @@
           // 如果往观看页跳转，需要清除暖场视频缓存
           window.sessionStorage.removeItem('warm_recordId');
           window.sessionStorage.removeItem('recordIds');
-          const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
-            t_start: currentTime,
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
             type: 4,
-            entry_time: currentTime,
+            entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });
@@ -137,8 +136,7 @@
           // 产品侧上报需求
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 7, // 客户端类型  web 网页端用 8
-            created_at: currentTime
+            pf: 8 //8：PC 10: wap
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,

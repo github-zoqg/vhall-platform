@@ -84,14 +84,15 @@ export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {
     role_name: watchInitData?.join_info?.role_name,
     ua: navigator.userAgent,
     ref_url: document.referrer,
-    language_type: localStorage.getItem('lang') || 1
+    language_type: localStorage.getItem('lang') || 1,
+    created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
   };
   if (watchInitData?.join_info?.user_id === 0) {
     // 未登录
     params.is_login = 0;
   } else {
     params.is_login = 1;
-    params.user_id = watchInitData.join_info.user_id;
+    params.user_id = watchInitData?.join_info?.user_id;
     params.sso_union_id = userInfo?.union_id;
   }
   if (shareId) {
@@ -102,6 +103,7 @@ export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {
       params.source_channel = sourceChannel;
     }
   }
+  // FIXME: 预发布删掉
   console.log('上报数据公共配置:');
   console.table(params);
   return params;
