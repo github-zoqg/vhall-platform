@@ -1433,6 +1433,9 @@
                 }
               });
             }
+            if (this.isSubscribe == 1) {
+              this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
+            }
             this.list = list;
             //地域 options 格式化处理
             this.list.some(item => {
@@ -1633,15 +1636,18 @@
       //关闭模态窗
       handleClose() {
         this.visible = false;
+        this.resetSignUpForm();
+      },
+      resetSignUpForm() {
         // 重置地区选择
         this.province = '';
         this.city = '';
         this.county = '';
-        // 重置表单验证
+        // 重置表单验证 & 图形码
         this.$refs.form && this.$refs.form.resetFields();
-        this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
-        // 重置图形验证码
         this.resetCaptcha('time');
+
+        this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
         this.resetCaptcha('verifyTime');
       },
       // 停止计时器
