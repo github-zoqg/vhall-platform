@@ -178,8 +178,8 @@
         }
 
         // 获取屏幕宽高
-        const screen_wid = Math.floor(window.screen.width * 2);
-        const screen_height = Math.floor(window.screen.height * 2);
+        const screen_wid = Math.floor(window.screen.width);
+        const screen_height = Math.floor(window.screen.height);
 
         const res = await this.inviteServer.createInvite(params);
         const data = res.data;
@@ -200,11 +200,11 @@
 
         if (this.webinarInfo.img_type == 0) {
           // 默认
-          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/crop,w_${screen_wid},h_${screen_height}`;
+          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
         } else {
           this.webinarInfo.showImg = `${
             this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl
-          }?x-oss-process=image/crop,w_${screen_wid},h_${screen_height}`;
+          }?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
         }
 
         this.nickname = padStringWhenTooLang(data.nick_name, '...', 5);
@@ -366,8 +366,6 @@
           height: 100%;
           width: 100%;
           z-index: 1;
-          object-fit: cover;
-          object-position: left top;
         }
         .show-img {
           width: 100%;
