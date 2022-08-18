@@ -339,7 +339,9 @@
                         ></el-input>
                         <el-button
                           :disabled="verifyTime !== 60 || isPreview"
-                          :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                          :class="
+                            showCaptchaVerify && isValidPhoneVerify ? 'isLoginActive' : 'no-border'
+                          "
                           size="mini"
                           class="send-code-btn"
                           @click="verifyTime === 60 && getDyCode(false)"
@@ -698,7 +700,9 @@
                       ></el-input>
                       <el-button
                         :disabled="verifyTime !== 60 || isPreview"
-                        :class="showCaptcha && isValidPhone ? 'isLoginActive' : 'no-border'"
+                        :class="
+                          showCaptchaVerify && isValidPhoneVerify ? 'isLoginActive' : 'no-border'
+                        "
                         size="mini"
                         class="send-code-btn"
                         @click="verifyTime === 60 && getDyCode(false)"
@@ -827,8 +831,10 @@
         isAbroadPhoneValide: false,
         // 云盾key
         captchaKey: 'b7982ef659d64141b7120a6af27e19a0',
-        // 云盾值
+        // 云盾值 - 用户报名
         mobileKey: '',
+        // 云盾值 - 我已报名
+        mobileKeyVerify: '',
         // 云盾实例
         captcha1: null,
         // 云盾实例
@@ -837,10 +843,14 @@
         time: 60,
         //验证表单的倒计时
         verifyTime: 60,
-        // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用
+        // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用 - 用户报名
         showCaptcha: false,
-        //是否是校验手机
+        // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用 - 用户报名
+        showCaptchaVerify: false,
+        //是否是校验手机(表单1)
         isValidPhone: false,
+        // 是否是校验手机（表单2）
+        isValidPhoneVerify: false,
         //联动选项是第几题
         colNum: '',
         //区域选项
@@ -853,7 +863,9 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+        isResetForm: false, // 是否重置表单，停止倒计时
+        isResetFormVerify: false
       };
     },
     watch: {
@@ -875,20 +887,20 @@
         handler(newVal) {
           const _this = this;
           // 根据是否开启短信验证，生成相应的手机号验证规则
-          // if (newVal) {
-          // _this.verifyRules.phone = {
-          //   required: true,
-          //   validator: _this.validPhone,
-          //   trigger: 'blur'
-          // };
-          // } else {
-          //   _this.verifyRules.phone = {
-          //     type: 'number',
-          //     required: true,
-          //     message: _this.$t('account.account_1069'),
-          //     trigger: 'blur'
-          //   };
-          // }
+          if (newVal) {
+            _this.verifyRules.phone = {
+              required: true,
+              validator: _this.validPhone,
+              trigger: 'blur'
+            };
+          } else {
+            _this.verifyRules.phone = {
+              type: 'number',
+              required: true,
+              message: _this.$t('account.account_1069'),
+              trigger: 'blur'
+            };
+          }
           // 云盾实例
           if (newVal) {
             _this.$nextTick(() => {
@@ -1186,6 +1198,8 @@
       },
       //打开模态窗
       async openModal(webinarId = null) {
+        this.isResetForm = false;
+        this.isResetFormVerify = false;
         if (webinarId) {
           // 专题下 点击活动，若有专题报名表单，传递活动ID给本函数。之后本页面中逻辑执行：后端通过活动ID获取是专题报名表单内容 还是 活动的报名表单内容
           this.webinarOrSubjectId = webinarId;
@@ -1265,13 +1279,13 @@
       validPhone(rule, value, callback) {
         const reg = /^1[3|4|5|6|7|8|9]\d{9}$/;
         if (!value) {
-          this.isValidPhone = false;
+          this.activeTab == 2 ? (this.isValidPhoneVerify = false) : (this.isValidPhone = false);
           return callback ? callback(new Error(this.$t('account.account_1025'))) : false;
         } else if (!reg.test(value)) {
-          this.isValidPhone = false;
+          this.activeTab == 2 ? (this.isValidPhoneVerify = false) : (this.isValidPhone = false);
           return callback ? callback(new Error(this.$t('account.account_1069'))) : false;
         } else {
-          this.isValidPhone = true;
+          this.activeTab == 2 ? (this.isValidPhoneVerify = true) : (this.isValidPhone = true);
           if (callback) {
             callback();
           } else {
@@ -1411,10 +1425,11 @@
             !this.isPreview && res.data.phone && (this.verifyForm.phone = Number(res.data.phone));
             if (!_this.isPreview) {
               _this.$refs.verifyForm.validateField('phone', err => {
+                console.log('触发Verify....');
                 if (!err) {
-                  _this.isValidPhone = true;
+                  _this.isValidPhoneVerify = true;
                 } else {
-                  _this.isValidPhone = false;
+                  _this.isValidPhoneVerify = false;
                 }
               });
             }
@@ -1596,15 +1611,23 @@
         }
         this.activeTab = type;
         if (this.activeTab == 2) {
-          this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
+          if (this.verifyTime == 60 && !this.mobileKeyVerify) {
+            //重置下云盾
+            this.showCaptchaVerify = false;
+            this.mobileKeyVerify = '';
+            if (this.isPhoneValidate) {
+              this.callCaptcha('#setCaptcha1');
+            }
+          }
         } else {
-          this.$refs.form && this.$refs.form.clearValidate();
-        }
-        //重置下云盾
-        this.showCaptcha = false;
-        this.mobileKey = '';
-        if (this.isPhoneValidate) {
-          type == 1 ? this.callCaptcha('#setCaptcha') : this.callCaptcha('#setCaptcha1');
+          if (this.time == 60 && !this.mobileKey) {
+            //重置下云盾
+            this.showCaptcha = false;
+            this.mobileKey = '';
+            if (this.isPhoneValidate) {
+              this.callCaptcha('#setCaptcha1');
+            }
+          }
         }
       },
       //关闭模态窗
@@ -1617,6 +1640,28 @@
         // 重置表单验证
         this.$refs.form && this.$refs.form.resetFields();
         this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
+        // 重置图形验证码
+        this.resetCaptcha('time');
+        this.resetCaptcha('verifyTime');
+      },
+      // 停止计时器
+      stopTime(timeKey) {
+        this[timeKey] = 60;
+      },
+      // 重置图形验证码
+      resetCaptcha(timeKey) {
+        if (timeKey == 'verifyTime') {
+          this.isResetFormVerify = true;
+        } else {
+          this.isResetForm = true;
+        }
+        this[timeKey] = 60;
+        this.showCaptcha = false;
+        this.showCaptchaVerify = false;
+        this.mobileKey = '';
+        this.mobileKeyVerify = '';
+        this.$refs.form && this.callCaptcha('#setCaptcha');
+        this.$refs.verifyForm && this.callCaptcha('#setCaptcha1');
       },
       //切换展开/收起状态
       changeFoldStatus(status) {
@@ -1651,24 +1696,35 @@
         } else {
           phone = this.verifyForm.phone;
           this.$refs.verifyForm.validateField('phone', err => {
+            console.log('验证当前表单...', err);
             isPhoneValid = !err;
           });
         }
         if (!isPhoneValid) {
           return false;
+        } else {
+          // 验证通过，重置计时器状态，让其可以执行倒计时
+          isForm ? (this.isResetForm = false) : (this.isResetFormVerify = false);
         }
 
         //获取短信验证码
-        if (this.mobileKey) {
-          let params = {
-            ...this.setParamsIdByRoute({}),
-            phone: phone,
-            captcha: this.mobileKey
-          };
-          this.signUpFormServer.sendVerifyCode(params).then(() => {
-            this.countDown(isForm);
-          });
+        let params = {
+          ...this.setParamsIdByRoute({}),
+          phone: phone
+        };
+        if (isForm && this.mobileKey) {
+          // 用户报名，验证码
+          params.captcha = this.mobileKey;
+        } else if (!isForm && this.mobileKeyVerify) {
+          // 我已报名，验证码
+          params.captcha = this.mobileKeyVerify;
+        } else {
+          // 不符合条件，中断流程
+          return;
         }
+        this.signUpFormServer.sendVerifyCode(params).then(() => {
+          this.countDown(isForm);
+        });
       },
       //多语言翻译
       convertLanguage(title, vo) {
@@ -1688,16 +1744,31 @@
       // 倒计时函数
       countDown(isForm) {
         const key = isForm ? 'time' : 'verifyTime';
+        if (
+          (this.isResetForm && key == 'time') ||
+          (this.isResetFormVerify && key == 'verifyTime')
+        ) {
+          // 中断之前计时器，重置发送验证码按钮
+          this[key] = 60;
+          return;
+        }
         if (this[key]) {
           this[key]--;
           setTimeout(() => {
+            console.log(`${key}自己调用自己...`);
             this.countDown(isForm);
           }, 1000);
         } else {
           this[key] = 60;
-          this.showCaptcha = false;
-          this.mobileKey = '';
-          isForm ? this.callCaptcha('#setCaptcha') : this.callCaptcha('#setCaptcha1');
+          if (isForm) {
+            this.showCaptcha = false;
+            this.mobileKey = '';
+            this.callCaptcha('#setCaptcha');
+          } else {
+            this.showCaptchaVerify = false;
+            this.mobileKeyVerify = '';
+            this.callCaptcha('#setCaptcha1');
+          }
         }
       },
       /**
@@ -1719,8 +1790,15 @@
           onReady() {},
           onVerify(err, data) {
             if (data) {
-              that.mobileKey = data.validate;
-              that.showCaptcha = true;
+              if (captcha === 'captcha1') {
+                // 用户报名
+                that.mobileKey = data.validate;
+                that.showCaptcha = true;
+              } else if (captcha === 'captcha2') {
+                // 我已报名
+                that.mobileKeyVerify = data.validate;
+                that.showCaptchaVerify = true;
+              }
               that.errorMsgShow = '';
             } else {
               that[captcha] = '';
@@ -2231,6 +2309,11 @@
         background: #dedede;
         color: #666;
         cursor: not-allowed;
+        &.is-disabled:hover {
+          background: #dedede;
+          color: #666;
+          cursor: not-allowed;
+        }
         &:hover {
           border: 0;
         }
@@ -2242,6 +2325,11 @@
         background: #fb3a32;
         color: #fff;
         cursor: pointer;
+        &.is-disabled:hover {
+          background: #fb3a32;
+          color: #fff;
+          cursor: not-allowed;
+        }
       }
       // 云盾样式重置,注释部分为设计稿样式，暂时不删除，有备无患
       .captcha {
