@@ -1,7 +1,13 @@
 <template>
   <div class="vmp-sign-up-form" :class="[isEntryForm ? 'vmp-sign-up-form--entry-from' : '']">
     <template v-if="!isEntryForm">
-      <el-dialog title="" :visible.sync="visible" width="720px" custom-class="vmp-sign-up-form">
+      <el-dialog
+        title=""
+        :visible.sync="visible"
+        width="720px"
+        custom-class="vmp-sign-up-form"
+        @close="handleClose"
+      >
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
@@ -1589,6 +1595,11 @@
           return;
         }
         this.activeTab = type;
+        if (this.activeTab == 2) {
+          this.$refs.verifyForm && this.$refs.verifyForm.clearValidate();
+        } else {
+          this.$refs.form && this.$refs.form.clearValidate();
+        }
         //重置下云盾
         this.showCaptcha = false;
         this.mobileKey = '';
@@ -1599,6 +1610,13 @@
       //关闭模态窗
       handleClose() {
         this.visible = false;
+        // 重置地区选择
+        this.province = '';
+        this.city = '';
+        this.county = '';
+        // 重置表单验证
+        this.$refs.form && this.$refs.form.resetFields();
+        this.$refs.verifyForm && this.$refs.verifyForm.resetFields();
       },
       //切换展开/收起状态
       changeFoldStatus(status) {
