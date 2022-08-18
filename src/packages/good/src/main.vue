@@ -372,8 +372,8 @@
           }
         }
         .buy {
-          background: #fb3a32;
-          border: 1px solid #fb3a32;
+          background: var(--theme-color);
+          border: 1px solid var(--theme-color);
         }
       }
     }
@@ -395,8 +395,8 @@
               color: #fb3a32;
             }
             .buy {
-              border: 1px solid #fb3a32;
-              color: #fb3a32;
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
               &:hover {
                 color: #fff;
               }
@@ -478,8 +478,8 @@
               }
             }
             .buy {
-              border: 1px solid #fb3a32;
-              color: #fb3a32;
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
             }
             .discount_price {
               color: @font-light-low;
@@ -490,7 +490,7 @@
               color: #fb3a32;
             } */
             .other-info div .buy {
-              background: #fb3a32;
+              background: var(--theme-color);
               color: #fff;
             }
           }
@@ -501,7 +501,7 @@
           cursor: pointer;
           border: none;
           .vh-goods_item-info .other-info .buy {
-            border: 1px solid #fb3a32;
+            border: 1px solid var(var(--theme-color));
             background: #fff;
           }
         }

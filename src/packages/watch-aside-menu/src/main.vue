@@ -490,7 +490,7 @@
       display: flex;
       width: 60px;
       height: calc(100% - 56px);
-      background: var(--theme-menu-bg);
+      background: var(--menu-item-menu-color);
       overflow: hidden;
       border-radius: 4px 0 0 0;
       flex-direction: column;

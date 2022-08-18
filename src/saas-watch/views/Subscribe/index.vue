@@ -209,37 +209,57 @@
           1: 'black',
           2: 'white',
           3: 'red',
-          4: 'blue',
-          5: 'golden'
+          4: 'golden',
+          5: 'blue'
         };
 
         const styleMap = {
           1: 'default', // 传统风格
-          2: 'simple' // 简洁风格
+          2: 'simple', // 简洁风格
+          3: 'fashion' // 时尚风格
         };
-        // TODO:暂时注掉，使用写死的值调试
-        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        const skinInfo = {
-          style: 1,
-          bgColor: 1,
-          chatLayout: 1 // 聊天布局 1 上下 2 左右
+        let skin_json_pc = {
+          style: 2,
+          backGroundColor: 1,
+          chatLayout: 2 // 聊天布局 1 上下 2 左右
         };
 
-        if (skinInfo?.chatLayout == 2) {
-          // 设置聊天组件为左右风格
-          updatePageNode('comChat', 'component', 'VmpFashionChat');
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
         }
 
-        // 设置主题，如果没有就用传统风格白色
-        const style = styleMap[skinInfo?.style || 1];
-        const theme = themeMap[skinInfo?.bgColor || 2];
+        // if (skin_json_pc?.chatLayout == 2) {
+        //   // 设置聊天组件为左右风格
+        //   updatePageNode('comChat', 'component', 'VmpFashionChat');
+        // }
 
-        console.log('----设置主题为----', `theme_${style}_${theme}`);
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skin_json_pc?.style || 1];
+        const theme = themeMap[skin_json_pc?.backGroundColor || 2];
+
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
 
         skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(theme, skin_json_pc);
 
         // 挂载到window方便调试
         window.skins = skins;
+      },
+      drawBody(theme, skin) {
+        if (skin?.pcBackground) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
+          document.body.style.backgroundSize = 'cover';
+        } else {
+          if (theme == 'black') {
+            document.body.style.background = `rgb(26, 26, 26)`;
+          } else {
+            document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/watch/theme/skins/' +
+              theme +
+              '.png')})`;
+            document.body.style.backgroundSize = 'cover';
+          }
+        }
       }
     }
   };
@@ -250,7 +270,7 @@
     .vmp-basic-container {
       width: 100%;
       height: 100%;
-      background: #1a1a1a;
+      // background: #1a1a1a;
       overflow-y: auto;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;

@@ -120,6 +120,7 @@
     background-color: var(--theme-tab-content-project-card-bg);
     &:hover {
       cursor: pointer;
+      background-color: var(--theme-tab-content-project-card-hover-bg);
       .vh-chose-active-item__title {
         color: var(--theme-color);
       }
@@ -293,7 +294,7 @@
       background: #fff;
       &:hover {
         .vh-chose-active-item__title {
-          color: #fb3a32;
+          color: var(--theme-color);
         }
       }
     }

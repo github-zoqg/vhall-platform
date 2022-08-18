@@ -59,18 +59,18 @@
 <style lang="less" scoped>
   @import '../styles/list.less';
   .invite-wrap {
-    background: #fff;
+    background: var(--theme-tab-content-rank-bg-font);
     width: 94%;
     height: 90%;
     margin: 0px auto;
   }
   .invite-list {
-    background: #fff;
+    background: var(--theme-tab-content-rank-bg-font);
     .invite-item {
       display: flex;
       align-items: center;
       .name {
-        color: #262626;
+        color: var(--theme-tab-content-rank-name-font);
       }
     }
     .rank-icon,

@@ -233,21 +233,21 @@
           1: 'black',
           2: 'white',
           3: 'red',
-          4: 'blue',
-          5: 'golden'
+          4: 'golden',
+          5: 'blue'
         };
 
         // TODO:暂时注掉，使用写死的值调试
         // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
         // TODO:调试代码
-        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
-          style: 1,
-          bgColor: 2
+        const skinInfo = {
+          style: 2,
+          bgColor: 1
         };
 
         // TODO:调试代码
         this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
-        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+        // sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
 
         // 设置主题，如果没有就用传统风格白色
         const style = 'main';

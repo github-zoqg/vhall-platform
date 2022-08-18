@@ -430,7 +430,7 @@
           font-size: 14px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: #fb3a32;
+          color: var(--theme-color);
           // line-height: 16px;
           // opacity: 1;
         }
