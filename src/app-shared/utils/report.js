@@ -70,7 +70,7 @@ export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {
     visitor_id: watchInitData?.visitor_id,
     reg_id: watchInitData?.join_info?.join_id,
     nickname: encodeURIComponent(watchInitData?.join_info?.nickname),
-    business_uid: watchInitData?.join_info?.third_party_user_id,
+    business_uid: watchInitData?.webinar?.userinfo?.user_id,
     app_id: watchInitData?.interact?.paas_app_id,
     webinar_id: watchInitData?.webinar?.id,
     webinar_name: encodeURIComponent(watchInitData?.webinar?.subject),
