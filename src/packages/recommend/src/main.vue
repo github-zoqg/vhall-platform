@@ -238,16 +238,16 @@
           cursor: pointer;
           &:hover {
             p {
-              color: #fb3a32;
+              color: var(--theme-color);
             }
             span {
-              background: #fb3a32;
+              background: var(--theme-color);
               color: #fff;
             }
           }
           p {
             width: 100%;
-            color: #1a1a1a;
+            color: var(--theme-subscribe-tab-content-recommend-buy-font);
             font-size: 16px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -258,8 +258,8 @@
             display: inline-block;
             width: 64px;
             height: 26px;
-            color: #fb3a32;
-            border: 1px solid #fb3a32;
+            color: var(--theme-color);
+            border: 1px solid var(--theme-color);
             text-align: center;
             line-height: 26px;
             position: absolute;
@@ -268,7 +268,7 @@
             border-radius: 15px;
             cursor: pointer;
             &:hover {
-              background: #fb3a32;
+              background: var(--theme-color);
               color: #fff;
             }
           }

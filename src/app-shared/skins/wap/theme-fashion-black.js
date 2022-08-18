@@ -54,16 +54,18 @@ export default {
   '--theme-tab-content-rank-rule-content-bg': 'rgba(255, 255, 255, 0.06)',
   '--theme-tab-content-rank-content-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-rank-bg-font': 'transparent',
+  '--theme-tab-content-rank-name-font': 'rgba(255, 255, 255, 0.85)',
   //图文组件
   '--theme-tab-content-word-font': 'rgba(255, 255, 255, 0.65)',
   //直播
   '--theme-tab-content-live-title-font': '#fff',
   '--theme-tab-content-live-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-live-card-bg': 'transparent',
+  '--theme-tab-content-live-card-bg': '#383838',
   //专题
   '--theme-tab-content-project-title-font': '#fff',
   '--theme-tab-content-project-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-project-card-bg': 'transparent',
+  '--theme-tab-content-project-card-bg': '#383838',
   //自定义菜单
   '--theme-tab-content-title-font': '#fff',
   //推荐
@@ -72,6 +74,7 @@ export default {
   '--theme-tab-content-recommend-buy-border': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-recommend-bg': '#262626',
   '--theme-tab-content-recommend-border': 'rgba(255, 255, 255, 0.06)',
+  '--theme-tab-content-recommend-bg-font': '#fb2626',
   //文档
   '--theme-tab-content-doc-font': 'rgba(255, 255, 255, 0.45)',
   //问答
@@ -96,7 +99,6 @@ export default {
   '--theme-header-attention-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
   '--theme-tab-menu-box-bg': ' ',
-  '--theme-tab-content-recommend-bg-font': ' ',
   '--theme-chat-msg-gift-font': ' ',
   '--theme-header-attention-color': ' ',
   '--theme-chat-msg-interact-bg': ' '

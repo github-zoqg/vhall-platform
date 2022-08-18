@@ -167,6 +167,7 @@
         this.visible = false;
         this.$nextTick(() => {
           this.$refs.textareaChat.blur();
+          this.visible = false;
         });
       },
       //处理失去焦点

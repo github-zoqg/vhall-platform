@@ -299,7 +299,7 @@
     position: absolute;
     bottom: 0px;
     left: 0px;
-    background: rgba(26, 26, 26, 0.6);
+    background: var(--theme-subscribe-tab-bg);
     overflow: hidden;
     width: 100%;
     height: 70px;

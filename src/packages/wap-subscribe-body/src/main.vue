@@ -927,7 +927,7 @@
             position: fixed;
             top: 489px;
             z-index: 10;
-            background: #fff;
+            background: var(--theme-tab-menu-box-bg);
           }
         }
         &.embed_menu {
@@ -935,7 +935,7 @@
             position: fixed;
             top: 418px;
             z-index: 10;
-            background: #fff;
+            background: var(--theme-tab-menu-box-bg);
           }
         }
         .tab-content {

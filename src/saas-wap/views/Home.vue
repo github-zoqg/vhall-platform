@@ -320,17 +320,21 @@
           3: 'concise' // 极简风格
         };
 
-        let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
-          style: 1,
-          backGroundColor: 2
+        let skin_json_wap = {
+          style: 2,
+          backGroundColor: 1
         };
+        // let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
+        //   style: 1,
+        //   backGroundColor: 1
+        // };
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
           skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
         }
 
-        sessionStorage.setItem('skinInfoWap', JSON.stringify(skin_json_wap));
+        // sessionStorage.setItem('skinInfoWap', JSON.stringify(skin_json_wap));
 
         if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
