@@ -28,7 +28,7 @@
         ref="chatlist"
         :key="virtual.key"
         :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
-        :keeps="30"
+        :keeps="25"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -402,7 +402,12 @@
               this.isHasUnreadAtMeMsg = false;
               this.isHasUnreadReplyMsg = false;
               this.unReadMessageCount++;
-              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+              this.tipMsg = this.$t('chat.chat_1035', {
+                n:
+                  this.unReadMessageCount < 1000
+                    ? this.unReadMessageCount
+                    : this.unReadMessageCount + '+'
+              });
             }
           }
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
