@@ -373,8 +373,8 @@
         window.skins = skins;
       },
       drawBody(theme, skin) {
-        if (skin?.background) {
-          document.body.style.backgroundImage = `url(${skin?.background})`;
+        if (skin?.pcBackground) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
           document.body.style.backgroundSize = 'cover';
         } else {
           if (theme == 'black') {

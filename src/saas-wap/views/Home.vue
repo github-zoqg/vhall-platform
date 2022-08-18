@@ -352,8 +352,8 @@
         window.skins = skins;
       },
       drawBody(style, theme, skin) {
-        if (skin?.background) {
-          document.body.style.backgroundImage = `url(${skin?.background})`;
+        if (skin?.wapBackground) {
+          document.body.style.backgroundImage = `url(${skin?.wapBackground})`;
           document.body.style.backgroundSize = 'cover';
         } else {
           if (style == 'main' && (theme == 'black' || theme == 'white')) {
