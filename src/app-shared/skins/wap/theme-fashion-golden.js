@@ -53,6 +53,8 @@ export default {
   '--theme-tab-content-rank-rule-content-bg': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-rank-content-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-rank-bg-font': 'transparent',
+  '--theme-tab-content-rank-name-font': 'rgba(255, 255, 255, 0.85)',
   //图文组件
   '--theme-tab-content-word-font': 'rgba(0, 0, 0, 0.65)',
   //直播

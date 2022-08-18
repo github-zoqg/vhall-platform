@@ -55,6 +55,8 @@ export default {
   '--theme-tab-content-rank-rule-content-bg': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-rank-content-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-rank-bg-font': 'transparent',
+  '--theme-tab-content-rank-name-font': 'rgba(255, 255, 255, 0.85)',
   //图文组件
   '--theme-tab-content-word-font': 'rgba(0, 0, 0, 0.65)',
   //直播
@@ -73,6 +75,7 @@ export default {
   '--theme-tab-content-recommend-buy-border': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-recommend-bg': '#fff',
   '--theme-tab-content-recommend-border': 'rgba(0, 0, 0, 0.06)',
+  '--theme-tab-content-recommend-bg-font': '#fb2626',
   //文档
   '--theme-tab-content-doc-font': 'rgba(0, 0, 0, 0.45)',
   //问答
@@ -94,7 +97,6 @@ export default {
   '--theme-component-sign-up-tab-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-component-sign-up-tab-bg': 'rgba(0, 0, 0, 0.04)',
   //冗余
-  '--theme-tab-content-recommend-bg-font': ' ',
   '--theme-header-attention-bg': ' ',
   '--theme-chat-msg-reply-name-font': ' ',
   '--theme-chat-msg-reply-content': ' ',
