@@ -158,7 +158,8 @@
       },
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url || cover;
+        const img_url = this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+        return img_url ? img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466' : cover;
       },
       // 主持人ID 分组期间使用
       userinfoId() {

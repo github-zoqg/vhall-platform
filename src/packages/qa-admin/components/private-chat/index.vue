@@ -259,7 +259,7 @@
           if (msg.context.to && msg.context.to != '') {
             const time = msg.date_time;
             if (time) {
-              msg.date_time = moment(time).format('HH:mm:ss');
+              msg.date_time = dayjs(time).format('HH:mm:ss');
             }
             this.chatList.push(msg);
             this.scrollBottom();
@@ -420,9 +420,9 @@
             }
           }
           const _data = {
-            created_at: moment(new Date()).format('HH:mm:ss'),
+            created_at: dayjs().format('HH:mm:ss'),
             sender_id: this.userInfo.join_info.third_party_user_id,
-            date_time: moment(new Date()).format('HH:mm:ss'),
+            date_time: dayjs().format('HH:mm:ss'),
             data: {
               text_content: this.emojiToText(this.privateValue)
             },
