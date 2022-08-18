@@ -107,9 +107,10 @@ export default async function () {
 // 获取分屏页面url
 function getSplitScreenPageUrl(webinarId) {
   // quertString
+  const layout = useMediaSettingServer().state.layout || sessionStorage.getItem('layout');
   const search = location.search
-    ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
-    : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+    ? `${location.search}&s=1&layout=${layout}`
+    : `?s=1&layout=${layout}`;
   // location
   const url =
     process.env.NODE_ENV === 'development'

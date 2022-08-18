@@ -257,6 +257,7 @@
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
+    useMediaSettingServer,
     useChatServer,
     useDocServer,
     useMsgServer,
@@ -607,7 +608,9 @@
         } else if (this.joinInfo.role_name == 1) {
           // 主持人不在麦上，但是刷新页面也需要设置一下旁路
           await this.setBroadCastAdaptiveLayoutMode(
-            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+            useMediaSettingServer().state.layout ||
+              VhallRTC[sessionStorage.getItem('layout')] ||
+              VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
           );
 
           await this.setBroadCastScreen();
@@ -1098,7 +1101,10 @@
       // 设置旁路布局
       async setBroadCastAdaptiveLayoutMode(layout) {
         const param = {
-          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')] || layout
+          adaptiveLayoutMode:
+            useMediaSettingServer().state.layout ||
+            VhallRTC[sessionStorage.getItem('layout')] ||
+            layout
         };
         await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
           return Promise.reject('setBroadCastAdaptiveLayoutModeError');
