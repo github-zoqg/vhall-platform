@@ -18,7 +18,7 @@
         'lottery-end',
         { 'lottery-start': !(disabledTime > 0 && disabledTime <= 5) },
         { 'lottery-downTime': disabledTime > 0 && disabledTime <= 5 },
-        { disabled: disabledTime > 0 && disabledTime <= 5 }
+        { disabled: (disabledTime > 0 && disabledTime <= 5) || endLotteryDisable }
       ]"
     >
       结束抽奖
@@ -117,7 +117,8 @@
       return {
         timer: null,
         loading: false,
-        joined: false
+        joined: false,
+        endLotteryDisable: false // 结束抽奖防抖3秒
       };
     },
 
@@ -127,6 +128,11 @@
       },
       endLottery() {
         this.$emit('end');
+        this.endLotteryDisable = true;
+        const st = setTimeout(() => {
+          clearTimeout(st);
+          this.endLotteryDisable = true;
+        }, 3000);
       },
       joinLottery() {
         if (this.needLoginStatus) {

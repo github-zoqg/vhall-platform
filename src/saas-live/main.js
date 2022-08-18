@@ -24,6 +24,7 @@ import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
+dayjs.extend(window.dayjs_plugin_duration);
 Vue.config.productionTip = false;
 if (process.env.NODE_ENV !== 'production') {
   Vue.config.devtools = true;
