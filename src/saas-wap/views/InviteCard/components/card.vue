@@ -200,7 +200,7 @@
 
         if (this.webinarInfo.img_type == 0) {
           // 默认
-          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_fill,w_${screen_wid},h_${screen_height},limit_0`;
+          this.webinarInfo.showImg = `${data.invite_card.img}`;
         } else {
           this.webinarInfo.showImg = `${
             this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl
@@ -366,6 +366,8 @@
           height: 100%;
           width: 100%;
           z-index: 1;
+          object-fit: cover;
+          object-position: left top;
         }
         .show-img {
           width: 100%;
