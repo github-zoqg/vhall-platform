@@ -96,6 +96,7 @@ export default {
   //侧边栏
   '--menu-item-font-color': color_text_regular,
   '--menu-item-font-disable-color': color_text_disabled,
+  '--menu-item-menu-color': color_background_1,
   //菜单-内容
   //简介
   '--theme-tab-content-intro-font': color_text_grey,
@@ -162,5 +163,8 @@ export default {
   '--theme-component-subscribe-num': 'rgba(38, 38, 38, 1)',
   //报名表单
   '--theme-component-sign-up-tab-font': color_text_regular,
-  '--theme-component-sign-up-tab-bg': color_background_6
+  '--theme-component-sign-up-tab-bg': color_background_6,
+  //预约页
+  '--theme-subscribe-tab-bg': color_text_primary,
+  '--theme-subscribe-tab-content-recommend-buy-font': color_text_grey
 };
