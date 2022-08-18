@@ -136,7 +136,7 @@
           // 产品侧上报需求
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 8 //8：PC 10: wap
+            pf: 7 // 7：PC 10: wap
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,

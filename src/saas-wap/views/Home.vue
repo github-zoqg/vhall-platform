@@ -161,7 +161,7 @@
           window.vhallReport.report('ENTER_WATCH');
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 10 // 8：PC 10: wap
+            pf: 10 // 7：PC 10: wap
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,
