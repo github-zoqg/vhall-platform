@@ -143,7 +143,7 @@
         // 数据埋点
         window.vhallReportForWatch?.report(170029, {
           goods_id: goodsItem.goods_id,
-          goods_name: goodsItem.name
+          goods_name: encodeURIComponent(goodsItem.name)
         });
         if (data && data.img_list.length < 4) {
           const defaults = 4 - data.img_list.length;
@@ -163,7 +163,7 @@
         // 数据埋点
         window.vhallReportForWatch?.report(170030, {
           goods_id: good.goods_id,
-          goods_name: good.name
+          goods_name: encodeURIComponent(good.name)
         });
         window.open(good.goods_url);
       },

@@ -55,7 +55,7 @@
                 <span class="price" v-html="good.priceText"></span>
               </div>
               <div>
-                <button class="buy" @click.stop="handleBuy(good.goods_url)">
+                <button class="buy" @click.stop="handleBuy(good)">
                   {{ $t('menu.menu_1007') }}
                 </button>
               </div>
@@ -232,7 +232,7 @@
         // 数据埋点
         window.vhallReportForWatch?.report(170029, {
           goods_id: goodsItem.goods_id,
-          goods_name: goodsItem.name
+          goods_name: encodeURIComponent(goodsItem.name)
         });
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
@@ -242,7 +242,7 @@
         // 数据埋点
         window.vhallReportForWatch?.report(170030, {
           goods_id: good.goods_id,
-          goods_name: good.name
+          goods_name: encodeURIComponent(good.name)
         });
         const url = good.goods_url;
         const { system } = getBrowserType();
