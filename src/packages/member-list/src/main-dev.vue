@@ -581,7 +581,11 @@
       //用户上麦成功
       handleConnectSuccess(msg) {
         if (this.isInteract !== 1 && msg.data.room_role == 1) {
-          this.$message.success({ message: '直播发起成功' });
+          if (this.roomBaseServer.state.isThirdStream) {
+            this.$message.success('正在使用第三方推流');
+          } else {
+            this.$message.success({ message: '直播发起成功' });
+          }
           return;
         }
 

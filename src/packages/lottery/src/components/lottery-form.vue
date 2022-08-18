@@ -59,6 +59,7 @@
           ></el-option>
         </el-select>
         <el-tooltip
+          v-if="!hideItem"
           placement="right"
           :visible-arrow="false"
           popper-class="transfer-box"
@@ -206,6 +207,19 @@
     mounted() {
       this.resetForm();
     },
+    computed: {
+      // 权限配置
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return (
+          this.configList['initiate_embed_function_close'] &&
+          (this.$route.query.liveT || this.$route.query.live_token)
+        );
+      }
+    },
     watch: {
       joinLotteryType() {
         this.getLotteryCount();
@@ -226,7 +240,10 @@
         this.needTakeAward = true;
         this.prize = {};
         this.updateLotteryUser().then(() => {
-          this.getLotteryCount();
+          const st = setTimeout(() => {
+            clearTimeout(st); // 延迟1秒请求 防止用户数据量太大
+            this.getLotteryCount();
+          }, 1000);
         });
         this.getPrizeList();
       },
@@ -332,8 +349,8 @@
           this.$message.warning('中奖人数不可以大于参与抽奖人员数');
           return;
         }
-        if (this.prizeNum > 1000) {
-          return this.$message.warning('中奖人数不能超过1000');
+        if (this.prizeNum > 2000) {
+          return this.$message.warning('中奖人数不能超过2000');
         }
         console.warn(this.chooseList);
         // 2.组织参数

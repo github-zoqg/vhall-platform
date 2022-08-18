@@ -328,11 +328,12 @@
   </div>
 </template>
 <script>
-  import { isMse } from './js/utils';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  const ossimg = '?x-oss-process=image/resize,m_fill,w_828,h_466';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -350,12 +351,12 @@
         const { warmup, webinar } = this.roomBaseState.watchInitData;
         if (warmup && this.warmUpVideoList.length) {
           return warmup.warmup_img_url
-            ? warmup.warmup_img_url
+            ? warmup.warmup_img_url + ossimg
             : webinar.img_url
-            ? webinar.img_url
+            ? webinar.img_url + ossimg
             : cover;
         } else {
-          return webinar.img_url || cover;
+          return webinar.img_url ? webinar.img_url + ossimg : cover;
         }
       },
       // 初始化了第几个
