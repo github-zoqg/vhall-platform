@@ -1460,10 +1460,9 @@
 
             this.$nextTick(() => {
               this.list.forEach(item => {
-                if (item.type == 3) {
-                  // 初始化的时候，清空单选题验证
+                // 初始化的时候，清空单选题验证
+                this.$refs[`formItem_${item.id}`] &&
                   this.$refs[`formItem_${item.id}`][0].clearValidate();
-                }
               });
             });
           })
