@@ -27,7 +27,7 @@
             <span class="price" v-html="good.priceText"></span>
           </div>
           <div>
-            <button class="buy" @click.stop="handleBuy(good.goods_url)">
+            <button class="buy" @click.stop="handleBuy(good)">
               {{ $t('menu.menu_1007') }}
             </button>
           </div>
