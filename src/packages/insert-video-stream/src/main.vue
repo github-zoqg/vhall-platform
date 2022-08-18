@@ -507,7 +507,7 @@
         );
         this.initSlider(); // 初始化播放器控件
         this.play();
-        window.vhallReportForProduct.report(110218);
+        window.vhallReportForProduct.toStartReporting(110218);
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
@@ -625,7 +625,7 @@
           isShowConfirmDialog: false
         }
       ) {
-        window.vhallReportForProduct.report(110203, { report_extra: { type: options.type } });
+        window.vhallReportForProduct.report(110203, { report_extra: { evt_tp: options.type } });
         console.log('----关闭插播----', options.isShowConfirmDialog, options.type);
         // 如果不需要展示确认关闭按钮
         if (!options.isShowConfirmDialog) {
@@ -665,9 +665,13 @@
         }
         // 设置插播状态为 false
         // this.insertFileServer.setInsertFilePushing(false);
-        window.vhallReportForProduct.report(110210);
-        return this.stopPushStream().then(() => {
-          window.vhallReportForProduct.report(110211);
+        window.vhallReportForProduct.toStartReporting(110210, 110211);
+        return this.stopPushStream().then(res => {
+          window.vhallReportForProduct.toResultsReporting(110211, {
+            request_id: res?.request_id,
+            event_type: 'interface',
+            res: res
+          });
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
           // 还原插播状态

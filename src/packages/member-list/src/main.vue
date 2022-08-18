@@ -547,7 +547,10 @@
             case 'vrtc_connect_apply':
               //用户申请上麦
               if (this.roleName == 1) {
-                window.vhallReportForProduct?.report(110179);
+                window.vhallReportForProduct?.toResultsReporting(110179, {
+                  event_type: 'message',
+                  res: rawMsg
+                });
               }
               handleApplyConnect(temp);
               break;
@@ -1036,7 +1039,10 @@
           // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
           if (_this.LocalCatchTarget_id != msg.data.target_id) {
             _this.LocalCatchTarget_id = msg.data.target_id;
-            window.vhallReportForProduct?.report(110180);
+            window.vhallReportForProduct?.toResultsReporting(110180, {
+              event_type: 'message',
+              res: msg
+            });
             if (msg.data.room_role != 2) {
               _this.$message.success({
                 message: _this.$t('interact.interact_1030', { n: msg.data.nick_name })
@@ -1567,10 +1573,12 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
-            window.vhallReportForProduct?.report(110174);
+            window.vhallReportForProduct?.toStartReporting(110174, 110175);
             this.micServer.userSpeakOn().then(res => {
-              window.vhallReportForProduct?.report(110175, {
-                report_extra: res
+              window.vhallReportForProduct?.toResultsReporting(110175, {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
               });
               if (res.code !== 200) {
                 this.$message.error(res.msg);
@@ -1603,7 +1611,7 @@
         };
         if (this.userId == accountId && this.roleName == 1) {
           // 主持人下麦自己
-          window.vhallReportForProduct?.report(110172);
+          window.vhallReportForProduct?.toStartReporting(110172, 110173);
         }
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
@@ -1620,7 +1628,12 @@
                 //todo 埋点上报
                 if (this.userId == accountId && this.roleName == 1) {
                   // 主持人下麦自己
-                  window.vhallReportForProduct?.report(110173);
+                  window.vhallReportForProduct?.toResultsReporting(110173, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    reasonTxt: encodeURIComponent('演示中下麦,演示自动结束'),
+                    res
+                  });
                 }
                 return res;
               })
@@ -1635,7 +1648,11 @@
               //todo 埋点上报
               if (this.userId == accountId && this.roleName == 1) {
                 // 主持人下麦自己
-                window.vhallReportForProduct?.report(110173);
+                window.vhallReportForProduct?.toResultsReporting(110173, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
               }
               return res;
             })
@@ -1696,9 +1713,13 @@
         }
         //设置主讲人
         if (this.userId == accountId) {
-          window.vhallReportForProduct?.report(110176); // 主持人将自己设为主讲人
+          window.vhallReportForProduct?.toStartReporting(110176, 110177, {
+            rejection_method: encodeURIComponent('成员列表主持人将自己设置为主讲人')
+          }); // 主持人将自己设为主讲人
         } else {
-          window.vhallReportForProduct?.report(110169); // 主持人将嘉宾设为主讲人
+          window.vhallReportForProduct?.toStartReporting(110169, 110170, {
+            rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人')
+          }); // 主持人将嘉宾设为主讲人
         }
         return this.interactiveServer
           .setSpeaker({
@@ -1706,7 +1727,9 @@
           })
           .then(res => {
             window.vhallReportForProduct?.report(this.userId == accountId ? 110177 : 110170, {
-              report_extra: res
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
             });
 
             console.log('setSpeaker success ::', res);

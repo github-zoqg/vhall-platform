@@ -665,7 +665,9 @@
         //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
         //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
         // }
-        window.vhallReportForProduct?.report(110169);
+        window.vhallReportForProduct?.toStartReporting(110169, {
+          rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人')
+        });
         if (setMainScreen) {
           this.setMainScreen();
         }
@@ -675,7 +677,9 @@
           })
           .then(res => {
             window.vhallReportForProduct?.report(110170, {
-              report_extra: res
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
             });
             console.log('setSpeaker success ::', res);
           })
