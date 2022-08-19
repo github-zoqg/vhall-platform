@@ -608,7 +608,7 @@
         } else if (this.joinInfo.role_name == 1) {
           // 主持人不在麦上，但是刷新页面也需要设置一下旁路
           await this.setBroadCastAdaptiveLayoutMode(
-            useMediaSettingServer().state.layout ||
+            VhallRTC[useMediaSettingServer().state.layout] ||
               VhallRTC[sessionStorage.getItem('layout')] ||
               VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
           );
@@ -1102,7 +1102,7 @@
       async setBroadCastAdaptiveLayoutMode(layout) {
         const param = {
           adaptiveLayoutMode:
-            useMediaSettingServer().state.layout ||
+            VhallRTC[useMediaSettingServer().state.layout] ||
             VhallRTC[sessionStorage.getItem('layout')] ||
             layout
         };
