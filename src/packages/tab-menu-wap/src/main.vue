@@ -694,7 +694,7 @@
         min-width: 24px;
         text-align: center;
         font-size: 14px;
-        color: var(--theme-chat-msg-reply-name-font);
+        color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
 
@@ -704,9 +704,9 @@
           }
         }
 
-        &:hover {
-          color: #666;
-        }
+        // &:hover {
+        //   color: #666;
+        // }
         .vh-iconfont {
           font-weight: 600;
         }

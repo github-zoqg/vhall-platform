@@ -558,7 +558,7 @@
         height: 100%;
         text-align: center;
         font-size: 14px;
-        color: var(--theme-component-sign-up-tab-font);
+        color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
 
@@ -576,12 +576,12 @@
         &.disabledClick:hover {
           i {
             cursor: pointer;
-            color: @border-lighter-color;
+            color: var(--tab-menu-btn-color-hover);
           }
         }
 
         &:hover {
-          color: #e6e6e6;
+          color: var(--tab-menu-btn-color-hover);
         }
       }
 

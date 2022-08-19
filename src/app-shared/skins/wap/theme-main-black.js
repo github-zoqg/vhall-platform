@@ -21,7 +21,9 @@ export default {
   '--theme-chat-msg-gift-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-chat-msg-bg': 'rgba(0, 0, 0, 0.25)',
   '--theme-chat-msg-font': 'rgba(255, 255, 255, 1)',
+  '--theme-chat-msg-reply-content': 'rgba(255, 255, 255, 1)',
   '--theme-chat-msg-reply-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-chat-msg-reply-name-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-chat-msg-reply-after': 'rgba(255, 255, 255, 0.25)',
   '--theme-chat-msg-interact-bg': 'rgba(0, 0, 0, 0.25)',
   '--theme-chat-sendBox-bg': 'transparent',
@@ -32,6 +34,7 @@ export default {
   '--theme-group-color': 'rgba(255, 255, 255, 0.65)',
   '--theme-group-name-color': 'rgba(255, 255, 255, 0.45)',
   //菜单-内容
+  '--tab-menu-btn-color': 'rgba(255, 255, 255, 0.45)',
   //简介
   '--theme-tab-content-intro-title-font': '#fff',
   '--theme-tab-content-intro-subTitle-font': 'rgba(255, 255, 255, 0.65)',
@@ -57,7 +60,6 @@ export default {
   '--theme-tab-content-rank-content-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-rank-bg-font': 'transparent',
-  '--theme-tab-content-rank-name-font': 'rgba(255, 255, 255, 0.85)',
   //图文组件
   '--theme-tab-content-word-font': 'rgba(255, 255, 255, 0.65)',
   //直播
@@ -99,7 +101,5 @@ export default {
   '--theme-component-sign-up-tab-bg': 'rgba(0, 0, 0, 0.04)',
   //冗余
   '--theme-header-attention-bg': ' ',
-  '--theme-chat-msg-reply-name-font': ' ',
-  '--theme-chat-msg-reply-content': ' ',
   '--theme-header-attention-color': ' '
 };

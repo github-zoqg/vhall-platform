@@ -4,7 +4,7 @@
       <img class="img-box" :src="hostAvatar" @click="skipAction" srcset />
       {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
-    <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+    <span class="tool-box">
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
         class="vh-saas-iconfont vh-saas-line-public1"
@@ -51,7 +51,7 @@
       this.initUserLoginStatus();
 
       //设置品牌皮肤
-      this.setSkinInfo(this.skinInfo);
+      // this.setSkinInfo(this.skinInfo);
     },
     computed: {
       /**
@@ -225,7 +225,7 @@
     .tool-box {
       display: flex;
       justify-content: space-between;
-      color: var(--theme-header-icon-color);
+      color: var(--theme-color);
       i {
         margin-left: 37px;
         font-size: 30px;

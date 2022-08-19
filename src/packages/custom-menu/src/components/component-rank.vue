@@ -612,20 +612,20 @@
       font-size: 14px;
       padding: 5px 0px;
       border-radius: 20px;
-      border: 1px solid var(--theme-tab-content-rank-content-invite-btn-border);
+      // border: 1px solid var(--theme-tab-content-rank-content-invite-btn-border);
       margin: 8px 0px;
-      &:hover {
-        background-color: var(--theme-color);
-        color: var(--theme-tab-content-rank-content-invite-btn-font);
-        border: 1px solid var(--theme-tab-content-rank-content-invite-btn-font);
-      }
+      // &:hover {
+      //   background-color: var(--theme-color);
+      //   color: var(--theme-tab-content-rank-content-invite-btn-font);
+      //   border: 1px solid var(--theme-tab-content-rank-content-invite-btn-font);
+      // }
       span {
         display: inline-block;
         width: 60%;
         height: 100%;
         font-size: 14px;
         font-weight: 400;
-        color: #e6e6e6;
+        color: var(--theme-color);
         line-height: 20px;
         &:hover {
           cursor: pointer;

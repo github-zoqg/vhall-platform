@@ -577,6 +577,11 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
+
     .virtual-content {
       height: 100%;
       overflow: hidden;

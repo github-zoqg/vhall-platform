@@ -24,12 +24,13 @@ export default {
   '--theme-chat-msg-timeline': 'rgba(0, 0, 0, 0.85)',
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
   //主题色
-  '--theme-color': '#fb2626',
+  '--theme-color': '#3552ea',
   '--theme-color-sub': '#ffd1c9',
   //分组
   '--theme-group-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-group-name-color': 'rgba(0, 0, 0, 0.45)',
   //菜单-内容
+  '--tab-menu-btn-color': 'rgba(255, 255, 255, 0.45)',
   //简介
   '--theme-tab-content-intro-title-font': '#262626',
   '--theme-tab-content-intro-subTitle-font': 'rgba(0, 0, 0, 0.65)',
@@ -41,7 +42,7 @@ export default {
   '--theme-tab-content-good-discountPrice-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-good-priceTag-bg': '#fff2f0',
   '--theme-tab-content-good-price-font': '#fb2626',
-  '--theme-tab-content-good-buy-font': 'rgba(0, 0, 0, 0.65)',
+  '--theme-tab-content-good-buy-font': '#3552ea',
   '--theme-tab-content-good-buyBorder-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-good-bg': '#fff',
   '--theme-tab-content-good-split-bg': 'rgba(0, 0, 0, 0.06)',
@@ -49,12 +50,12 @@ export default {
   '--theme-tab-content-rank-title-font': '#262626',
   '--theme-tab-content-rank-rule-active-font': '#3552ea',
   '--theme-tab-content-rank-rule-font': 'rgba(0, 0, 0, 0.65)',
+  '--theme-tab-content-rank-rule-bg': 'rgba(255, 255, 255, 0.06)',
   '--theme-tab-content-rank-rule-content-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-rank-rule-content-bg': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-rank-content-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-rank-noData-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-rank-bg-font': 'transparent',
-  '--theme-tab-content-rank-name-font': 'rgba(255, 255, 255, 0.85)',
   //图文组件
   '--theme-tab-content-word-font': 'rgba(0, 0, 0, 0.65)',
   //直播
@@ -70,9 +71,10 @@ export default {
   //推荐
   '--theme-tab-content-recommend-title-font': '#262626',
   '--theme-tab-content-recommend-buy-font': 'rgba(0, 0, 0, 0.65)',
-  '--theme-tab-content-recommend-buy-border': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-recommend-buy-border': '#3552ea',
   '--theme-tab-content-recommend-bg': '#fff',
   '--theme-tab-content-recommend-border': 'rgba(0, 0, 0, 0.06)',
+  '--theme-tab-content-recommend-bg-font': '#3552ea',
   //文档
   '--theme-tab-content-doc-font': 'rgba(0, 0, 0, 0.45)',
   //问答
@@ -96,8 +98,6 @@ export default {
   //冗余
   '--theme-header-attention-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
-  '--theme-tab-menu-box-bg': ' ',
-  '--theme-tab-content-recommend-bg-font': ' ',
   '--theme-chat-msg-gift-font': ' ',
   '--theme-header-attention-color': ' ',
   '--theme-chat-msg-interact-bg': ' '

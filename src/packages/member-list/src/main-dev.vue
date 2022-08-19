@@ -1128,7 +1128,7 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: var(--header-background-color-base);
+    background-color: var(--theme-menu-bg);
     &__group-name {
       display: flex;
       align-items: center;
@@ -1203,10 +1203,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #2a2a2a;
+      background-color: var(--theme-menu-bg);
       box-sizing: border-box;
       color: #e2e2e2;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid var(--theme-menu-bg);
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;

@@ -205,8 +205,8 @@
           height: 54px;
           line-height: 54px;
           border-radius: 32px;
-          border: 1px solid var(--theme-tab-content-recommend-buy-border);
-          color: var(--theme-tab-content-recommend-bg-font);
+          border: 1px solid var(--theme-color);
+          color: var(--theme-color);
           font-size: 24px;
           text-align: center;
         }
