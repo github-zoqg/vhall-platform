@@ -45,6 +45,7 @@ const color_background_22 = 'rgba(255, 255, 255, 0.9)';
 const color_background_23 = '#34363a';
 const color_background_24 = '#23232d';
 const color_background_25 = '#777';
+const color_background_26 = '#2C2C36';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -61,7 +62,7 @@ export default {
   '--header-tab-item-dropdown-bg': color_background_1,
   '--header-tab-item-dropdown-font': color_text_secondary,
   //菜单组件
-  '--tab-menu-bg-border': color_background_9,
+  '--tab-menu-bg-border': color_background_26,
   '--tab-bg-color-hover': color_background_7,
   // 聊天组件 VmpChat
   '--chat-font-color-msg-nickname': color_text_secondary,

@@ -33,6 +33,8 @@ const color_background_8 = '#f7f7f7';
 const color_background_9 = '#f0f0f0';
 const color_background_10 = 'rgba(0, 0, 0, 0.15)';
 const color_background_11 = '#f0f6ff';
+const color_background_12 = '#f0f5ff';
+const color_background_13 = '#DEE8FF';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -49,13 +51,13 @@ export default {
   '--header-tab-item-dropdown-bg': color_text_primary,
   '--header-tab-item-dropdown-font': color_text_secondary,
   //菜单组件
-  '--tab-menu-bg-border': color_background_7,
+  '--tab-menu-bg-border': color_background_13,
   '--tab-bg-color-hover': color_background_8,
   // 聊天组件 VmpChat
   '--chat-font-color-msg-nickname': color_text_secondary,
   '--chat-font-color-msg-text': color_text_black,
   '--chat-font-color-msg-time': color_text_primary,
-  '--chat-background-color-base': color_text_primary,
+  '--chat-background-color-base': color_background_12,
   '--chat-background-color-secondary': color_background_2,
   '--chat-background-color-input': color_background_5,
   '--chat-font-color-input': color_text_grey,
