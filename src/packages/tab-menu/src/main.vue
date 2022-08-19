@@ -539,7 +539,7 @@
   .vmp-tab-menu {
     height: 100%;
     font-size: 14px;
-
+    background-color: var(--chat-background-color-base);
     &__header {
       flex: 0 0 auto;
       box-sizing: border-box;
