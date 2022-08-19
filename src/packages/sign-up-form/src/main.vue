@@ -276,7 +276,12 @@
                     </el-row>
                   </el-form-item>
                   <!-- 隐私声明 -->
-                  <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                  <el-form-item
+                    v-if="privacy"
+                    class="privacy-item"
+                    :prop="privacy.id + ''"
+                    :ref="`formItem_${privacy.id}`"
+                  >
                     <template>
                       <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
                         <p v-html="privacyText"></p>
@@ -1458,10 +1463,13 @@
             }
             list.some(item => item.type === 5) && this.getAreaList();
 
+            // 数据获取完成后，先清空错误提示。
+            this.$refs.form && this.$refs.form.clearValidate();
             this.$nextTick(() => {
               this.list.forEach(item => {
                 // 初始化的时候，清空单选题验证
                 this.$refs[`formItem_${item.id}`] &&
+                  this.$refs[`formItem_${item.id}`][0] &&
                   this.$refs[`formItem_${item.id}`][0].clearValidate();
               });
             });
