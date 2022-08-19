@@ -237,17 +237,19 @@
           5: 'blue'
         };
 
-        const skinInfo = {
+        let skin_json_wap = {
           style: 1,
           backGroundColor: 2
         };
 
-        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
-        // sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
 
         // 设置主题，如果没有就用传统风格白色
         const style = 'main';
-        const theme = themeMap[skinInfo?.backGroundColor || 2];
+        const theme = themeMap[skin_json_wap?.backGroundColor || 2];
 
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 
