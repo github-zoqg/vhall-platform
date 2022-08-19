@@ -694,7 +694,7 @@
         min-width: 24px;
         text-align: center;
         font-size: 14px;
-        color: #8c8c8c;
+        color: var(--theme-chat-msg-reply-name-font);
         height: 100%;
         cursor: pointer;
 
