@@ -247,12 +247,11 @@
       flex-direction: row;
       cursor: pointer;
       padding: 16px;
-      background-color: var(--theme-tab-content-good-bg);
+      background: var(--theme-tab-content-good-bg);
       &-cover {
         width: 100px;
         height: 100px;
         margin-right: 8px;
-        background: @font-light-normal;
         border-radius: 4px;
         overflow: hidden;
         img {
@@ -308,7 +307,7 @@
           position: absolute;
           bottom: 0px;
           .price {
-            color: var(--theme-tab-content-good-price-font);
+            color: #fb2626;
             line-height: 20px;
             font-size: 16px;
             .remainder {
@@ -316,7 +315,7 @@
             }
           }
           i {
-            color: #fff;
+            color: #fb2626;
             font-size: 12px;
           }
           .price-tip {
@@ -343,6 +342,7 @@
             &:hover {
               background: var(--theme-color);
               border: 1px solid var(--theme-color);
+              color: var(--theme-tab-content-good-buy-font-hover);
             }
           }
         }
@@ -374,6 +374,7 @@
         .buy {
           background: var(--theme-color);
           border: 1px solid var(--theme-color);
+          color: var(--theme-tab-content-good-buy-font-hover);
         }
       }
     }
@@ -385,20 +386,22 @@
       justify-content: center;
       padding: 16px 24px 24px;
       .vh-goods_item {
-        background: #fff;
+        background: var(--theme-tab-content-subscribe-good-bg);
         &-info {
           .other-info {
             i {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .price {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .buy {
               border: 1px solid var(--theme-color);
               color: var(--theme-color);
               &:hover {
-                color: #fff;
+                background: var(--theme-color);
+                border: 1px solid var(--theme-color);
+                color: var(--theme-tab-content-good-buy-font-hover) !important;
               }
             }
           }
@@ -410,7 +413,7 @@
       .subscribe_item {
         width: 458px;
         height: 200px;
-        background: #fff;
+        background: var(--theme-tab-content-subscribe-good-bg);
         padding: 0px;
         padding-right: 24px;
         border-radius: 4px;
@@ -418,7 +421,6 @@
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;
-          background: #f7f7f7;
           border-top-right-radius: 0px;
           border-bottom-right-radius: 0px;
           overflow: hidden;
@@ -470,7 +472,7 @@
             bottom: 24px;
             .price,
             i {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .price {
               ::v-deep > .remainder {
@@ -485,15 +487,6 @@
               color: @font-light-low;
             }
           }
-          &:hover {
-            /*  .name {
-              color: #fb3a32;
-            } */
-            .other-info div .buy {
-              background: var(--theme-color);
-              color: #fff;
-            }
-          }
         }
         &:hover {
           background: #fff;
@@ -501,8 +494,9 @@
           cursor: pointer;
           border: none;
           .vh-goods_item-info .other-info .buy {
-            border: 1px solid var(var(--theme-color));
-            background: #fff;
+            border: 1px solid var(--theme-color);
+            background: var(--theme-color);
+            color: var(--theme-tab-content-good-buy-font-hover);
           }
         }
       }

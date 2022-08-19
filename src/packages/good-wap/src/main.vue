@@ -397,8 +397,8 @@
               height: 54px;
               line-height: 50px;
               border-radius: 32px;
-              border: 1px solid var(--theme-tab-content-good-buyBorder-font);
-              color: var(--theme-tab-content-good-buy-font);
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
               font-size: 24px;
               text-align: center;
               background: transparent;

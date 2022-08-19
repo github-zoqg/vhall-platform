@@ -453,8 +453,8 @@
         pointer-events: initial;
 
         &:hover {
-          background: #fb3a32;
-          border-color: #fb3a32;
+          background: var(--theme-color);
+          border-color: var(--theme-color);
           color: #fff;
         }
       }

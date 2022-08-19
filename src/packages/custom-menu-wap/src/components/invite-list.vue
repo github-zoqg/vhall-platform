@@ -70,7 +70,7 @@
       display: flex;
       align-items: center;
       .name {
-        color: var(--theme-tab-content-rank-name-font);
+        color: var(--theme-tab-content-rank-title-font);
       }
     }
     .rank-icon,

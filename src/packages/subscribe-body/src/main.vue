@@ -530,7 +530,6 @@
       position: relative;
     }
     &-tab {
-      background: #2a2a2a;
       margin: 0px auto;
     }
     .subscribe-img-box-embed {

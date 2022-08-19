@@ -289,7 +289,7 @@
         box-sizing: border-box;
         border-bottom: 1px solid var(--theme-tab-content-recommend-border);
         padding: 16px 5px;
-        background-color: var(--theme-tab-content-recommend-bg);
+        background-color: transparent;
         a {
           display: inline-block;
           margin-bottom: 30px;
@@ -347,6 +347,7 @@
           .check-btn {
             background: var(--theme-color);
             border-color: var(--theme-color);
+            color: var(--theme-tab-content-recommend-buy-font-hover);
           }
         }
       }

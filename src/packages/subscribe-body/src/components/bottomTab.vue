@@ -313,7 +313,7 @@
       font-size: 16px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #f7f7f7;
+      color: var(--theme-subscribe-tab-font);
       span {
         vertical-align: top;
         display: inline-block;
@@ -324,7 +324,6 @@
         font-size: 36px !important;
         font-family: DINAlternate-Bold, DINAlternate;
         font-weight: bold;
-        color: #f7f7f7;
         margin: 0px 4px 0px 12px;
         vertical-align: top;
       }
@@ -346,7 +345,7 @@
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #ffffff;
+        color: var(--theme-subscribe-tab-font);
         line-height: 70px;
       }
       .sub-detail .num {
@@ -387,7 +386,7 @@
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #f7f7f7;
+        color: var(--theme-subscribe-tab-font);
       }
       .end-btn {
         width: 160px;

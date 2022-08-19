@@ -47,6 +47,7 @@ const color_background_25 = '#777';
 const color_background_26 = '#969696';
 const color_background_27 = '#595959';
 const color_background_28 = '#141414';
+const color_background_29 = '#f7f7f7';
 
 export default {
   '--theme-background-color': color_background_0,
@@ -78,12 +79,13 @@ export default {
   '--chat-bg-color-filter-checked': color_background_11,
   '--chat-bg-color-checkbox': color_background_14,
   '--chat-bg-color-checkbox-checked': color_text_custom,
+  '--chat-scrollbar-thumb-bg': color_text_disabled,
   //footer
   '--footer-color-font': color_text_secondary,
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
-  '--theme-menu-bg': color_text_custom,
+  '--theme-menu-bg': color_background_1,
   //分组
   '--group-name-icon-font-color': color_background_14,
   '--group-name-font-color': color_background_13,
@@ -113,6 +115,8 @@ export default {
   '--menu-item-font-disable-color': color_background_25,
   '--menu-item-menu-color': color_background_1,
   //菜单-内容
+  '--tab-menu-btn-color': color_text_secondary,
+  '--tab-menu-btn-color-hover': color_text_regular,
   //简介
   '--theme-tab-content-intro-font': color_text_primary,
   //商品
@@ -123,9 +127,11 @@ export default {
   '--theme-tab-content-good-price-font': color_text_primary,
   '--theme-tab-content-good-buy-font': color_text_primary,
   '--theme-tab-content-good-buyBorder-font': color_text_secondary,
-  '--theme-tab-content-good-bg': color_text_grey,
+  '--theme-tab-content-good-bg': color_background_4,
+  '--theme-tab-content-subscribe-good-bg': color_text_primary,
   '--theme-tab-content-good-hover-bg': color_background_6,
   '--theme-tab-content-good-split-bg': color_background_5,
+  '--theme-tab-content-good-buy-font-hover': color_text_primary,
   //排行榜
   '--theme-tab-content-rank-title-font': color_text_primary,
   '--theme-tab-content-rank-rule-font': color_text_regular,
@@ -143,12 +149,12 @@ export default {
   //直播
   '--theme-tab-content-live-title-font': color_background_12,
   '--theme-tab-content-live-info-font': color_background_13,
-  '--theme-tab-content-live-card-bg': color_background_1,
+  '--theme-tab-content-live-card-bg': color_background_4,
   '--theme-tab-content-live-card-hover-bg': color_background_6,
   //专题
   '--theme-tab-content-project-title-font': color_background_12,
   '--theme-tab-content-project-info-font': color_background_13,
-  '--theme-tab-content-project-card-bg': color_background_1,
+  '--theme-tab-content-project-card-bg': color_background_4,
   '--theme-tab-content-project-card-hover-bg': color_background_6,
   //自定义菜单
   '--theme-tab-content-title-font': color_text_primary,
@@ -158,7 +164,8 @@ export default {
   '--theme-tab-content-recommend-title-font': color_text_primary,
   '--theme-tab-content-recommend-buy-font': color_text_primary,
   '--theme-tab-content-recommend-buy-border': color_text_secondary,
-  '--theme-tab-content-recommend-bg': color_text_grey,
+  '--theme-tab-content-recommend-buy-font-hover': color_text_primary,
+  '--theme-tab-content-recommend-bg': color_background_4,
   '--theme-tab-content-recommend-hover-bg': color_background_6,
   '--theme-tab-content-recommend-border': color_background_5,
   '--theme-tab-content-recommend-noData-font': color_text_disabled,
@@ -183,5 +190,6 @@ export default {
   '--theme-component-sign-up-tab-bg': color_background_8,
   //预约页
   '--theme-subscribe-tab-bg': color_background_1,
+  '--theme-subscribe-tab-font': color_background_29,
   '--theme-subscribe-tab-content-recommend-buy-font': color_text_grey
 };

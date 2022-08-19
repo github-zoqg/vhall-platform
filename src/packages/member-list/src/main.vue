@@ -1861,7 +1861,7 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: var(--header-background-color-base);
+    background-color: var(--theme-menu-bg);
     &__group-name {
       display: flex;
       align-items: center;
@@ -1935,10 +1935,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: var(--header-background-color-base);
+      background-color: var(--theme-menu-bg);
       box-sizing: border-box;
       color: #e2e2e2;
-      border-top: 1px solid var(--header-background-color-base);
+      border-top: 1px solid var(--theme-menu-bg);
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
@@ -2056,8 +2056,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          background-color: var(--group-search-bg-color);
-          color: var(--group-search-font-color);
+          background-color: var(--group-btn-bg-color);
+          color: var(--group-btn-font-color);
         }
       }
       &__search-panel {
