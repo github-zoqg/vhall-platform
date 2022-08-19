@@ -301,7 +301,7 @@ if (['serve', 'build'].includes(cmd)) {
   process.env.VUE_APP_BUILD_HASH = argv.hash;
 
   // 根据参数获取专用配置信息
-  const specialConfig = btool.createSpecialConfig(argv.project);
+  const specialConfig = btool.createSpecialConfig(argv.project, argv.mode);
 
   // 合并配置
   const vueConfig = _.merge(sharedConfig, specialConfig);

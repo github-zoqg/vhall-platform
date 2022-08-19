@@ -49,7 +49,7 @@ module.exports = {
       title: pkg.title,
       version: process.env.VUE_APP_BUILD_VERSION,
       gitlabHash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
-      env: process.env.NODE_ENV, // 环境标识
+      env: process.env.VUE_APP_SAAS_ENV, // 环境标识
       ...htmlConfig
     }
   }
