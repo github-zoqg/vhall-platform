@@ -401,13 +401,18 @@
         }
       },
       isShowContainer() {
-        return (
-          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
-          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-            this.$domainStore.state.micServer.isSpeakOn ||
-            this.isLivingEnd) &&
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
-        );
+        if (this.isSubscribe && this.warmUpVideoList.length > 0) {
+          // 预约页，有暖场视频，一定初始化播放器； 解决无延迟直播开播之后，没有通过观看限制，暖场视频看不了的问题
+          return false;
+        } else {
+          return (
+            !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
+            (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+              this.$domainStore.state.micServer.isSpeakOn ||
+              this.isLivingEnd) &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+          );
+        }
       },
       isVisibleMiniElement() {
         // 添加插播桌面共享后，再添加插播桌面共享场景的处理
