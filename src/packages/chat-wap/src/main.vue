@@ -95,7 +95,7 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-
+  import { throttle } from 'lodash';
   import EventBus from './js/Events.js';
 
   export default {
@@ -307,6 +307,11 @@
       window.removeEventListener('focusout', this.focusoutIOS);
     },
     methods: {
+      updateUnread: throttle(function () {
+        this.tipMsg = this.$t('chat.chat_1035', {
+          n: this.unReadMessageCount < 100 ? this.unReadMessageCount : '99' + '+'
+        });
+      }, 500),
       //初始化eventbus
       initEvent() {
         EventBus.$on('showEmoji', e => {
@@ -378,12 +383,7 @@
             this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = false;
             this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', {
-              n:
-                this.unReadMessageCount < 100
-                  ? this.unReadMessageCount
-                  : this.unReadMessageCount + '+'
-            });
+            this.updateUnread();
           }
           this.dispatch('TabContent', 'noticeHint', 3);
         });
@@ -479,6 +479,7 @@
       },
       //图片预览
       previewImg(img, index = 0, list = []) {
+        const imgList = [...list];
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
@@ -486,15 +487,15 @@
         const clientH = document.body.clientHeight;
         const ratio = 2;
         for (let i = 0; i < list.length; i++) {
-          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
-            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+          if (imgList[i].indexOf('?x-oss-process=image/resize') < 0) {
+            imgList[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
               clientH * ratio
             },m_lfit`;
           }
         }
-        console.log('preview', list);
+        console.log('preview', imgList);
         ImagePreview({
-          images: list,
+          images: imgList,
           startPosition: index,
           lazyLoad: true
         });
@@ -589,15 +590,17 @@
         const vsl = this.$refs.chatlist;
         console.log(IdList);
         this.$nextTick(() => {
-          const offset = IdList.reduce((previousValue, currentSid) => {
-            const previousSize =
-              typeof previousValue === 'string'
-                ? vsl.getSize(Number(previousValue))
-                : previousValue;
-            console.log(previousValue);
-            console.log(vsl.getSize(Number(currentSid)));
-            return previousSize + vsl.getSize(Number(currentSid));
-          });
+          const offset =
+            IdList.length > 0 &&
+            IdList.reduce((previousValue, currentSid) => {
+              const previousSize =
+                typeof previousValue === 'string'
+                  ? vsl.getSize(Number(previousValue))
+                  : previousValue;
+              console.log(previousValue);
+              console.log(vsl.getSize(Number(currentSid)));
+              return previousSize + vsl.getSize(Number(currentSid));
+            });
           vsl.scrollToOffset(offset);
         });
         setTimeout(() => {
