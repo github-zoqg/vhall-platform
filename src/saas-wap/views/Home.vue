@@ -321,8 +321,8 @@
         };
 
         let skin_json_wap = {
-          style: 2,
-          backGroundColor: 1
+          style: 1,
+          backGroundColor: 2
         };
         // let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
         //   style: 1,

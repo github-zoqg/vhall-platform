@@ -71,7 +71,7 @@
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span @click="changePlayerSize(true)">
+            <span v-if="!isConcise" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span>
@@ -458,7 +458,8 @@
         languageList: [],
         isSmallPlayer: false,
         circleSliderVal: 0,
-        initIndex
+        initIndex,
+        isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -560,6 +561,19 @@
         }
       });
       this.setSetingHeight();
+
+      let skin_json_wap = {
+        style: 1
+      };
+      const skinInfo = this.roomBaseState.skinInfo;
+      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      }
+      if (skin_json_wap?.style == 3) {
+        this.isConcise = true;
+      } else {
+        this.isConcise = false;
+      }
     },
     methods: {
       /**

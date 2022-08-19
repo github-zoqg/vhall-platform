@@ -237,21 +237,17 @@
           5: 'blue'
         };
 
-        // TODO:暂时注掉，使用写死的值调试
-        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        // TODO:调试代码
         const skinInfo = {
-          style: 2,
-          bgColor: 1
+          style: 1,
+          backGroundColor: 2
         };
 
-        // TODO:调试代码
         this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
         // sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
 
         // 设置主题，如果没有就用传统风格白色
         const style = 'main';
-        const theme = themeMap[skinInfo?.bgColor || 2];
+        const theme = themeMap[skinInfo?.backGroundColor || 2];
 
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 

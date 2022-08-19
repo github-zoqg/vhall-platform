@@ -219,9 +219,9 @@
           3: 'fashion' // 时尚风格
         };
         let skin_json_pc = {
-          style: 2,
+          style: 1,
           backGroundColor: 1,
-          chatLayout: 2 // 聊天布局 1 上下 2 左右
+          chatLayout: 1 // 聊天布局 1 上下 2 左右
         };
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
@@ -236,7 +236,7 @@
 
         // 设置主题，如果没有就用传统风格白色
         const style = styleMap[skin_json_pc?.style || 1];
-        const theme = themeMap[skin_json_pc?.backGroundColor || 2];
+        const theme = themeMap[skin_json_pc?.backGroundColor || 1];
 
         console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
 
