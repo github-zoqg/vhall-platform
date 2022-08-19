@@ -26,6 +26,7 @@
 
 <script>
   import { useSignServer } from 'middle-domain';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     name: 'SignResult',
     props: {
@@ -50,7 +51,7 @@
       return {
         signImg: require('../img/sign@2x.png'),
         signImgZero: require('../img/sign_zero@2x.png'),
-        defaultAvater: require('../img/avatar.png'),
+        defaultAvatar,
         signTotal: 10,
         signList: []
       };

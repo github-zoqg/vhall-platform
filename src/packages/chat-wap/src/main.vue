@@ -82,7 +82,7 @@
   import { ImagePreview } from 'vh5-ui';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import { isMse } from '@/app-shared/utils/isMse';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   import emitter from '@/app-shared/mixins/emitter';
 
   import msgItem from './components/msg-item';

@@ -31,7 +31,8 @@
 </template>
 
 <script>
-  import defaultAvatar from '../assets/imgs/avatar.png';
+  import defaultAvatar from '@/app-shared/utils/avatar';
+
   export default {
     name: 'inviteList',
     props: {

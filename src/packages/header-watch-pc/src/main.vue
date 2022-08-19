@@ -86,14 +86,13 @@
       <!-- 登录、基础信息 -->
       <div class="right_login">
         <div class="right_login_unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./img/my-dark@2x.png" alt="" /></p>
+          <p><img :src="defaultAvatar" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
         <div class="right_login_user" v-else>
           <div class="right_login_user_dropdown">
             <p>
-              <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./img/my-dark@2x.png" alt="" />
+              <img :src="userInfo.avatar || defaultAvatar" alt="" />
             </p>
             <span>{{ userInfo.nick_name | overHidden(8) }}</span>
             <div class="right_login_user_list">
@@ -121,6 +120,7 @@
 <script>
   import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     name: 'VmpHeaderWatch',
     data() {
@@ -136,7 +136,8 @@
           iconClass: 'icon-default' // icon默认色
         },
         isAttention: false,
-        isLogin: Boolean(window.localStorage.getItem('token'))
+        isLogin: Boolean(window.localStorage.getItem('token')),
+        defaultAvatar
       };
     },
     computed: {

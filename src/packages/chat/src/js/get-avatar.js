@@ -1,7 +1,7 @@
 /**
  * 获取头像
  * */
-import defaultAvatar from '../img/my-dark@2x.png';
+import defaultAvatar from '@/app-shared/utils/avatar';
 function getAvatar(avatar) {
   if (!avatar) {
     return defaultAvatar;

@@ -187,7 +187,7 @@
 
 <script>
   import { uuid } from '@/app-shared/utils/tool';
-  const defaultAvatar = require('@/app-shared/assets/img/my-dark@2x.png');
+  import defaultAvatar from '@/app-shared/utils/avatar';
   import { useRoomBaseServer, useKeyLoginServer } from 'middle-domain';
   export default {
     name: 'VmpPasswordLogin',

@@ -7,8 +7,7 @@
         <ul ref="packetList" class="vhsaas-other__item">
           <li v-for="(item, index) in winners" :key="index">
             <div class="winner-info">
-              <img v-if="item.avatar" :src="item.avatar" alt="" />
-              <img v-else src="../images/avatar_default@2x.png" alt="" />
+              <img :src="item.avatar || defaultAvatar" alt="" />
               <span class="vhsaas-red-packet__item__name">
                 {{ item.nickname | overHidden(8) }}
               </span>
@@ -24,6 +23,7 @@
   </div>
 </template>
 <script>
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     name: 'RedPacketWinners',
     inject: ['redPacketServer'],
@@ -44,7 +44,8 @@
         queryParams: {
           page: 1,
           size: 10 // 分页为10
-        }
+        },
+        defaultAvatar
       };
     },
     methods: {

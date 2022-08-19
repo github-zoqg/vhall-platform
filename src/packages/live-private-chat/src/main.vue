@@ -145,7 +145,7 @@
   import chatList from './components/chat-list';
   import comUpload from '@/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     name: 'VmpLivePrivateChat',
     components: {

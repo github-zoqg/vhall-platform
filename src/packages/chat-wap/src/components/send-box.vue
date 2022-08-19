@@ -115,7 +115,7 @@
   } from 'middle-domain';
   import Handup from './handup.vue';
   import { isWechat } from '@/app-shared/utils/tool';
-
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     props: {
       //当前菜单选中的tab
@@ -282,7 +282,7 @@
       },
       avatar() {
         const avatar = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.avatar;
-        return avatar || require('../img/default_avatar.png');
+        return avatar || defaultAvatar;
       },
       isLogin() {
         const user_id = this.$domainStore.state?.roomBaseServer?.watchInitData?.join_info?.user_id;
@@ -364,11 +364,6 @@
         EventBus.$on('refreshSendBox', () => {
           this.$forceUpdate();
         });
-
-        // 头像更新
-        // this.msgServer.$on('CHAT_AVATAR_CHANGE', avatar => {
-        //   this.avatar = avatar;
-        // });
       },
       saySomething() {
         if (

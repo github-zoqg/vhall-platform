@@ -28,7 +28,7 @@
           <p class="winner-avatar">
             <img
               class="winner-avatar-img"
-              :src="item.lottery_user_avatar || defaultAvatarImg"
+              :src="item.lottery_user_avatar || defaultAvatar"
               alt=""
             />
           </p>
@@ -49,6 +49,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   /**
    * @description 中奖列表(发起端)
    */
@@ -88,7 +89,7 @@
       return {
         // prizeInfo: {}, // 奖品信息
         isScroll: false,
-        defaultAvatarImg: require('../img/avatar.png'),
+        defaultAvatar,
         defaultLotteryImg: require('../img/default-lottery.png')
       };
     },

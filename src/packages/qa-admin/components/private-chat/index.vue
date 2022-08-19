@@ -20,8 +20,7 @@
           @click="selectUser(ite, index)"
         >
           <span class="avatar-img">
-            <img v-if="ite.avatar" class="private-avatar" :src="ite.avatar" alt="" />
-            <img v-else class="private-avatar" src="../../images/answer_default.png" alt="" />
+            <img class="private-avatar" :src="ite.avatar || defaultAvatar" alt="" />
             <span
               v-show="acrivePrivate != index && newMessageIds[ite.account_id]"
               class="red-dot"
@@ -46,7 +45,7 @@
                   alt=""
                 />
                 <img v-else-if="item.context && item.context.avatar" :src="item.context.avatar" />
-                <img v-else src="../../images/answer_default.png" alt="" />
+                <img v-else :src="defaultAvatar" alt="" />
                 <span
                   v-if="hostInfo && hostInfo.third_party_user_id == item.sender_id"
                   class="private-content-li-content-name ellsips"
@@ -120,7 +119,7 @@
   import { useRoomBaseServer, useQaServer } from 'middle-domain';
   import smallEmoji from '@/packages/chat/src/components/emoji.vue';
   import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
-
+  import defaultAvatar from '@/app-shared/utils/avatar';
   import Vue from 'vue';
 
   export default {
@@ -138,7 +137,8 @@
         acrivePrivate: 0, // 当前私聊对象
         activeName: '',
         privateValue: '', // 私聊内容
-        chatList: [] // 获取到
+        chatList: [], // 获取到
+        defaultAvatar
       };
     },
     watch: {

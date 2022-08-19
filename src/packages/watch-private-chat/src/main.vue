@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';

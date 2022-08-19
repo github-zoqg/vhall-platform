@@ -143,7 +143,7 @@
                 <div class="vmp-wrap-cash__avatar">
                   <img
                     v-show="!cashServerState.wxInfo.wechat_profile"
-                    src="./images/my-dark@2x.png"
+                    :src="defaultAvatar"
                     alt=""
                   />
                   <img
@@ -224,6 +224,7 @@
 <script>
   import { useUserServer, useCashServer } from 'middle-domain';
   import NECaptcha from './components/NECaptcha/index.vue';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   export default {
     name: 'VmpCash',
     components: {
@@ -307,7 +308,8 @@
         timer: null, // 倒计时定时器
         countTime: 60, // 倒计时的时间
         pollTimer: null, // 轮询定时器
-        countPoll: 0 // 轮询执行次数
+        countPoll: 0, // 轮询执行次数
+        defaultAvatar
       };
     },
     filters: {

@@ -104,7 +104,7 @@
 </template>
 
 <script>
-  import defaultAvatar from './img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/utils/avatar';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
