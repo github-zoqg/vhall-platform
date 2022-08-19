@@ -95,7 +95,7 @@
     useMenuServer,
     useMsgServer
   } from 'middle-domain';
-
+  import { throttle } from 'lodash';
   import EventBus from './js/Events.js';
 
   export default {
@@ -307,6 +307,11 @@
       window.removeEventListener('focusout', this.focusoutIOS);
     },
     methods: {
+      updateUnread: throttle(function () {
+        this.tipMsg = this.$t('chat.chat_1035', {
+          n: this.unReadMessageCount < 100 ? this.unReadMessageCount : '99' + '+'
+        });
+      }, 500),
       //初始化eventbus
       initEvent() {
         EventBus.$on('showEmoji', e => {
@@ -378,12 +383,7 @@
             this.isHasUnreadAtMeMsg = false;
             this.isHasUnreadReplyMsg = false;
             this.unReadMessageCount++;
-            this.tipMsg = this.$t('chat.chat_1035', {
-              n:
-                this.unReadMessageCount < 100
-                  ? this.unReadMessageCount
-                  : this.unReadMessageCount + '+'
-            });
+            this.updateUnread();
           }
           this.dispatch('TabContent', 'noticeHint', 3);
         });
