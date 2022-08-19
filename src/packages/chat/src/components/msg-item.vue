@@ -805,7 +805,7 @@
           font-size: 14px;
           line-height: 22px;
           padding: 4px 8px;
-          color: #ffffff;
+          color: var(--chat-font-color-msg-text);
           text-align: center;
           > span {
             float: left;
@@ -867,7 +867,7 @@
           padding: 4px 8px;
           background-color: var(--chat-background-color-secondary);
           border-radius: 15px;
-          color: #ffffff;
+          color: var(--chat-font-color-msg-text);
           font-size: 14px;
           text-align: center;
           > span {

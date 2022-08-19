@@ -213,7 +213,7 @@
       padding: 0 6px;
       font-size: 12px;
       color: @font-error-low;
-      border: solid 1px @border-tools-color;
+      // border: solid 1px @border-tools-color;
       white-space: nowrap;
     }
     &-bubble {

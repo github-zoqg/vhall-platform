@@ -558,7 +558,7 @@
         height: 100%;
         text-align: center;
         font-size: 14px;
-        color: var(--header-font-color-regular);
+        color: var(--theme-component-sign-up-tab-font);
         height: 100%;
         cursor: pointer;
 
