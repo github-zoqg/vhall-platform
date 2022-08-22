@@ -219,6 +219,7 @@
       color: @font-error-low;
       border: solid 1px @border-tools-color;
       white-space: nowrap;
+      z-index: 1;
     }
     &-bubble {
       width: 400px;
