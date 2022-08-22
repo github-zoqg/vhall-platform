@@ -131,7 +131,7 @@
           class="info-panel__online-num"
           v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
         >
-          {{ totalNum | formatHotNum }}人在线
+          {{ totalNumTxt | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -269,7 +269,8 @@
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
-        isWatch: false
+        isWatch: false,
+        totalNumTxt: this.totalNum
       };
     },
     beforeCreate() {
@@ -301,6 +302,9 @@
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
+      },
+      totalNum(val) {
+        this.updateTotalNum(val);
       }
     },
     computed: {
@@ -407,6 +411,9 @@
       }
     },
     methods: {
+      updateTotalNum: throttle(val => {
+        this.totalNumTxt = val;
+      }, 5000),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
