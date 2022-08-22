@@ -1593,7 +1593,6 @@
             const param = value ? encodeURIComponent(value) : '';
             params[key] = param;
           });
-          console.log('params:', params);
           if (!window.vhallReportForWatch) {
             this.reportFetch(170018, params);
           } else {

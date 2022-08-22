@@ -96,7 +96,6 @@
             window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(this.clientType);
           }
-          console.log('-------------domain-----------', domain);
           // 观看端上报
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
