@@ -731,7 +731,9 @@
           if (this.isWatch) {
             this.roomBaseServer.setChangeElement('');
           } else {
-            this.roomBaseServer.setChangeElement('stream-list');
+            if (!this.$route.query.assistantType) {
+              this.roomBaseServer.setChangeElement('stream-list');
+            }
           }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
