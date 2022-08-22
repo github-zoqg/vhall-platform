@@ -80,6 +80,11 @@
        * 购买
        */
       handleBuy(url) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: this.info.goods_id,
+          goods_name: encodeURIComponent(this.info.name)
+        });
         if (this.info.tao_password) {
           this.showTaoTip = true;
         } else {
