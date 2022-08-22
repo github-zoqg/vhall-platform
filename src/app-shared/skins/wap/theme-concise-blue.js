@@ -6,6 +6,7 @@ export default {
   '--theme-chat-input-bg': 'rgba(255, 255, 255, 0.1)',
   '--theme-header-attention-bg': 'linear-gradient(280.56deg, #4042FF 9.45%, #336DFF 90.39%)',
   '--theme-header-attention-color': '#fff',
+  '--theme-component-qa': '#3552ea',
   //冗余
   '--theme-tab-menu-font': ' ',
   '--theme-tab-menu-font-active': ' ',
@@ -68,7 +69,6 @@ export default {
   '--theme-tab-content-private-name-font': ' ',
   '--theme-tab-content-private-content-font': ' ',
   '--theme-tab-content-private-time-font': ' ',
-  '--theme-component-qa': ' ',
   '--theme-component-subscribe': ' ',
   '--theme-component-subscribe-text': ' ',
   '--theme-component-subscribe-num': ' ',
