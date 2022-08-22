@@ -519,7 +519,7 @@
     display: flex;
     flex-direction: column;
     // background-color: #f2f2f2;
-    color: var(--theme-tab-content-doc-font);
+    color: #fff;
     position: relative;
     &__top {
       position: fixed;
@@ -543,10 +543,6 @@
       .tools {
         margin-top: -88px !important;
       }
-    }
-
-    .vh-iconfont {
-      color: var(--theme-tab-content-doc-font);
     }
     .vmp-doc-une__content {
       flex: 1;
