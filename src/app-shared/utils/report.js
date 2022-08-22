@@ -103,8 +103,5 @@ export function generateWatchReportCommonParams(watchInitData = {}, userInfo = {
       params.source_channel = sourceChannel;
     }
   }
-  // FIXME: 预发布删掉
-  console.log('上报数据公共配置:');
-  console.table(params);
   return params;
 }
