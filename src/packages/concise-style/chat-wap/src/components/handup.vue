@@ -66,7 +66,7 @@
     name: 'Handup',
     data() {
       return {
-        handText: this.$t('interact.interact_1001'),
+        handText: this.$t('interact.interact_1041'),
         lowerWheat: false, // 用户自己主动上麦等待时间展示
         lowerWheatFun: null,
         showConnectMic: false, // 连麦弹框
@@ -102,7 +102,7 @@
           if (val) {
             this.handText = this.$t('interact.interact_1007');
           } else {
-            this.handText = this.$t('interact.interact_1001');
+            this.handText = this.$t('interact.interact_1041');
           }
         }
       }
@@ -135,7 +135,7 @@
           this.lowerWheatFun && clearInterval(this.lowerWheatFun);
           this.lowerWheatFun = null;
           this.isWaitting = false;
-          this.handText = this.$t('interact.interact_1001');
+          this.handText = this.$t('interact.interact_1041');
           this.showConnectMic = false;
           this.$emit('handupLoading', false);
           this.closeConnectPop();
@@ -215,7 +215,7 @@
                 clearInterval(this.lowerWheatFun);
                 this.lowerWheatFun = null;
                 this.isWaitting = false;
-                this.handText = this.$t('interact.interact_1001');
+                this.handText = this.$t('interact.interact_1041');
                 this.$emit('handupLoading', false);
                 let tip = '';
                 if (this.isInGroup) {

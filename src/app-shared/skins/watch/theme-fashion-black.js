@@ -48,11 +48,13 @@ const color_background_26 = '#969696';
 const color_background_27 = '#595959';
 const color_background_28 = '#141414';
 const color_background_29 = '#f7f7f7';
+const color_background_30 =
+  'linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 100%)';
 
 export default {
   '--theme-background-color': color_background_0,
   // 头部组件 VmpHeaderWatch
-  '--header-background-color-base': color_background_4,
+  '--header-background-color-base': color_background_30,
   '--header-font-color-primary': color_text_primary,
   '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
