@@ -140,6 +140,10 @@
     methods: {
       // 签到
       signLogin() {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170024, {
+          sign_id: this.sign_id
+        });
         this.signServer
           .sign({
             room_id: this.roomId,

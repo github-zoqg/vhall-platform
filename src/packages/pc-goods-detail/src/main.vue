@@ -43,7 +43,7 @@
             ></span>
           </div>
           <div class="bottom-link">
-            <button class="buy" @click.stop="handleBuy(info.goods_url)">
+            <button class="buy" @click.stop="handleBuy(info)">
               {{ $t('menu.menu_1007') }}
             </button>
             <span v-if="info.shop_url" class="link" @click.stop="link(info.shop_url)">
@@ -90,8 +90,13 @@
       /**
        * 购买
        */
-      handleBuy(val) {
-        window.open(val);
+      handleBuy(info) {
+        window.open(info.goods_url);
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: info.goods_id,
+          goods_name: encodeURIComponent(info.name)
+        });
       },
       chooseDefaultImg(index) {
         this.defaultImg = this.info.img_list[index].img_url;
