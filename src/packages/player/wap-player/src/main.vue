@@ -75,7 +75,7 @@
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span>
-              <span class="hot_num">
+              <span class="hot_num hot_num_display">
                 <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                 {{ hotNum | formatHotNum }}
               </span>
@@ -91,7 +91,7 @@
           </template>
           <template v-else>
             <span v-if="isWarnPreview"></span>
-            <span class="hot_num" v-else>
+            <span class="hot_num hot_num_display" v-else>
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
@@ -937,6 +937,7 @@
   };
 </script>
 <style lang="less">
+  @import url(./skins/wap-player.concise.less);
   .vmp-wap-player {
     height: 100%;
     width: 100%;

@@ -31,7 +31,7 @@
           @click="attentionApi"
           class="host-user-info__attention"
         >
-          {{ attentionStatus == 0 ? '关注' : '已关注' }}
+          {{ attentionStatus == 0 ? $t('nav.nav_1004') : $t('nav.nav_1003') }}
         </span>
       </section>
       <section class="vh-concise-header-box__tool-box">
