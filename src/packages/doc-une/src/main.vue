@@ -1024,6 +1024,9 @@
         if (this.isWatch) {
           useRoomBaseServer().setChangeElement('doc');
         } else {
+          if (this.$route.query.assistantType) {
+            return;
+          }
           this.setDisplayMode('normal');
           // 通知默认菜单和工具栏默认为文档
           window.$middleEventSdk?.event?.send(
