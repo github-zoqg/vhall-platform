@@ -161,6 +161,7 @@
     useMicServer,
     useChatServer,
     useGroupServer,
+    useMediaCheckServer,
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
@@ -317,11 +318,13 @@
       const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
         this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       });
       if (sessionStorage.getItem(`hasVideoPollingStart_${roomId}`) == 1) return;
       if (this.hasVideoPollingStart) {
         this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
         sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       }
     },

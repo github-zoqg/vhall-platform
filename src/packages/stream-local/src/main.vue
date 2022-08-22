@@ -279,10 +279,7 @@
         PopAlertOffline: {
           visible: false,
           text: ''
-        },
-        agreeStatusData: sessionStorage.getItem(
-          `pollingAgreeStatus_${this.roomBaseServer.state.watchInitData.webinar.id}`
-        ) // 观众点击“我知道了”
+        }
       };
     },
     components: {
@@ -460,16 +457,18 @@
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
-      },
-      pollingData() {
+      }
+      /**
+       * pollingData() {
         console.log('pollingData-a', this.agreeStatusData);
         return {
           agreeStatus: this.agreeStatusData,
           isPolling: this.videoPollingServer.state.isPolling
         };
-      }
+      }*/
     },
-    watch: {
+    /** 需求反复，代码先做保留【视频轮巡的设备检测机制】
+     * watch: {
       // 视频轮训观众收到轮训消息，点击“我知道了” => 获取设备权限 => 开始视频推流
       pollingData: {
         async handler(val, oldVal) {
@@ -477,15 +476,15 @@
           if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
             if (val.agreeStatus == 1) {
               await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
-              if (val.isPolling) {
-                this.videoStartPush({ type: 1, ...val });
-              }
+            }
+            if (val.isPolling) {
+              this.videoStartPush({ type: 1, ...val });
             }
           }
         },
         deep: true
       }
-    },
+    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -500,6 +499,11 @@
       this.listenEvents();
     },
     async mounted() {
+      // 轮训列表更新消息
+      this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
+        console.log('轮训列表更新消息', msg);
+        this.videoStartPush({ type: 1 });
+      });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
         const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
@@ -528,9 +532,7 @@
       }
     },
     methods: {
-      closePollingDialog() {
-        this.agreeStatusData = 1;
-      },
+      closePollingDialog() {},
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
