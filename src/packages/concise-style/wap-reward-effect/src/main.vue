@@ -24,7 +24,8 @@
               rewardEffectInfo.data.event_type == 'free_gift_send'
             "
           >
-            送出{{ rewardEffectInfo.data.gift_name | overHidden(8) }}
+            {{ $t('chat.chat_1032') }}
+            {{ $tdefault(rewardEffectInfo.data.gift_name) | overHidden(8) }}
           </span>
           <span class="gift-name" v-if="rewardEffectInfo.data.type == 'reward_pay_ok'">
             {{ rewardEffectInfo.data.reward_describe }}

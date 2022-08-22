@@ -34,15 +34,17 @@ const color_background_9 = '#f0f0f0';
 const color_background_10 = 'rgba(0, 0, 0, 0.15)';
 const color_background_11 = '#fff2f0';
 const color_background_12 = '#FFE6E1';
+const color_background_13 =
+  'linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 100%)';
 
 export default {
   '--theme-background-color': color_background_0,
   // 头部组件 VmpHeaderWatch
-  '--header-background-color-base': color_background_4,
+  '--header-background-color-base': color_background_13,
   '--header-font-color-primary': color_text_primary,
-  '--header-font-color-regular': color_text_secondary,
+  '--header-font-color-regular': color_text_2,
   '--header-font-color-link': color_text_link,
-  '--header-font-color-main': color_text_1,
+  '--header-font-color-main': color_text_primary,
   '--header-tab-bg-color-hover': color_background_8,
   '--header-tab-font-color-hover': color_background_0,
   '--header-tab-item-font-color': color_text_primary,

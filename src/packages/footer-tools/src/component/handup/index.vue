@@ -261,5 +261,10 @@
     background: var(--theme-color);
     color: #ffffff;
     border: 1px solid var(--theme-color);
+    &:hover {
+      color: #ffffff;
+      background: var(--theme-color);
+      border: 1px solid var(--theme-color);
+    }
   }
 </style>

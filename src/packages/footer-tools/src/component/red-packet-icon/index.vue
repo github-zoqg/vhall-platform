@@ -63,8 +63,8 @@
       display: inline-block;
       width: 8px;
       height: 8px;
-      background: #fb3a32;
-      border: 1px solid #2a2a2a;
+      background: #fb2626;
+      border: 1px solid #fb2626;
       border-radius: 50%;
       right: -3px;
       position: absolute;
