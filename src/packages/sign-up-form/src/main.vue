@@ -135,7 +135,7 @@
                               {{ radioItem.subject }}
                             </el-radio>
                             <template v-if="radioItem.type === 1">
-                              <el-radio
+                              <el-input
                                 v-show="form[question.id] == radioItem.id"
                                 v-model="form[`${question.id}${radioItem.id}`]"
                                 maxlength="60"
@@ -144,7 +144,7 @@
                                 :placeholder="$t('form.form_1017')"
                                 style="margin-top: 10px"
                                 class="radio-input"
-                              ></el-radio>
+                              ></el-input>
                             </template>
                           </div>
                         </template>

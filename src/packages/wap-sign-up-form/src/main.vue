@@ -96,7 +96,13 @@
                   v-for="radioItem in question.items"
                   :key="radioItem.id"
                 >
-                  <span :class="{ 'radio-value': true, active: radioItem.id == form[question.id] }">
+                  <span
+                    :class="{
+                      'radio-value': true,
+                      active: radioItem.id == form[question.id],
+                      isMultiOther: radioItem.type === 1 && radioItem.id == form[question.id]
+                    }"
+                  >
                     {{ radioItem.subject }}
                   </span>
                   <textarea
@@ -1987,6 +1993,9 @@
         }
         &.active:before {
           border: 0.1rem solid #fb3a32;
+        }
+        &.isMultiOther:before {
+          top: 0.255rem;
         }
       }
       .checkbox-value {
