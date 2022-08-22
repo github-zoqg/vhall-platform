@@ -24,7 +24,7 @@
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
               <i class="vh-iconfont vh-line-user"></i>
-              {{ $t('common.common_1013') }}:{{ personCount | formatHotNum }}
+              {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
             </p>
           </template>
         </main>
@@ -81,11 +81,13 @@
 </template>
 
 <script>
+  import { throttle } from 'lodash';
   export default {
     name: 'VmpIntroWap',
     data() {
       return {
-        type: 'default' // default、subscribe
+        type: 'default', // default、subscribe
+        personCountTxt: 0
       };
     },
     computed: {
@@ -138,6 +140,19 @@
       content() {
         return this.languagesInfo.introduction || '<p></p>';
       }
+    },
+    created() {
+      this.personCountTxt = this.personCount;
+    },
+    watch: {
+      personCount(val) {
+        this.updatePersonCount(val);
+      }
+    },
+    methods: {
+      updatePersonCount: throttle(function (val) {
+        this.personCountTxt = val;
+      }, 1000)
     }
   };
 </script>
