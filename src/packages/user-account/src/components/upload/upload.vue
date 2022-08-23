@@ -25,12 +25,12 @@
             {{ $t('account.account_1067') }}
           </span>
           <span @click="refresh($event)">
-            <i class="el-icon-refresh-left"></i>
+            <i class="vh-iconfont vh-line-refresh-left"></i>
             <br />
             {{ $t('account.account_1004') }}
           </span>
           <span @click.stop.prevent="deletes">
-            <i class="iconfont iconshanchu"></i>
+            <i class="vh-iconfont vh-line-delete"></i>
             <br />
             {{ $t('account.account_1068') }}
           </span>

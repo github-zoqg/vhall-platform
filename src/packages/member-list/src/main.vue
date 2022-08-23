@@ -133,7 +133,7 @@
           class="info-panel__online-num"
           v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
         >
-          {{ totalNum | formatHotNum }}人在线
+          {{ totalNumTxt | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -229,6 +229,7 @@
     useMsgServer,
     useGroupServer
   } from 'middle-domain';
+  import { toSJIS } from 'qrcode/lib/core/utils';
   export default {
     name: 'VmpMemberList',
     components: {
@@ -286,7 +287,8 @@
         //是否是pc观看端功能
         isWatch: false,
         //连麦断开的定时器
-        timer: null
+        timer: null,
+        totalNumTxt: 0
       };
     },
     beforeCreate() {
@@ -296,6 +298,9 @@
       this.memberServer = useMemberServer();
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
+    },
+    created() {
+      this.totalNumTxt = this.totalNum;
     },
     beforeDestroy() {},
     async mounted() {
@@ -316,6 +321,9 @@
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
+      },
+      totalNum(val) {
+        this.updateTotalNum(val);
       }
     },
     computed: {
@@ -406,6 +414,9 @@
       }
     },
     methods: {
+      updateTotalNum: throttle(function (val) {
+        this.totalNumTxt = val;
+      }, 500),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];

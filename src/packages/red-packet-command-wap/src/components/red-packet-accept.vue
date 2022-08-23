@@ -51,6 +51,10 @@
     },
     methods: {
       openRedPacket() {
+        window.vhallReportForWatch?.report(170023, {
+          redpacket_id: this.redPacketInfo.red_packet_uuid,
+          redpacket_type: 2
+        });
         if (this.opening || this.opened) return; // 红包打开中或已打开则拦截
         console.log('clickopenRedPacket');
         if (this.userId == 0) {
