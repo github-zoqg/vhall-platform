@@ -1083,32 +1083,14 @@
       },
       // 推流
       async publishLocalStream() {
-        // 开始推流上报
-        window?.vhallReportForProduct.report(170013);
-        await this.interactiveServer
-          .publishStream()
-          .then(data => {
-            // 开始推流_结果上报
-            window?.vhallReportForProduct.report(170014, {
-              report_extra: {
-                data: data
-              }
-            });
-          })
-          .catch(e => {
-            console.log('paltForm publishLocalStream failed....', e);
-            if (e.code === '611007') {
-              this.handleSpeakOnError('noPermission');
-            } else {
-              this.handleSpeakOnError('publishStreamError');
-            }
-            // 开始推流_结果上报
-            window?.vhallReportForProduct.report(170014, {
-              report_extra: {
-                e: e
-              }
-            });
-          });
+        await this.interactiveServer.publishStream().catch(e => {
+          console.log('paltForm publishLocalStream failed....', e);
+          if (e.code === '611007') {
+            this.handleSpeakOnError('noPermission');
+          } else {
+            this.handleSpeakOnError('publishStreamError');
+          }
+        });
       },
 
       // 设置主屏
@@ -1164,7 +1146,6 @@
             // );
             resolve();
           }
-          window?.vhallReportForProduct.report(170015);
           this.interactiveServer
             .unpublishStream()
             .then(data => {
@@ -1175,11 +1156,9 @@
                   boxEventOpitons(this.cuid, 'emitClickUnpublishComplate')
                 );
               }
-              window?.vhallReportForProduct.report(170016, { report_extra: data });
               resolve();
             })
             .catch(err => {
-              window?.vhallReportForProduct.report(170016, { report_extra: err });
               reject(err);
             });
         });
