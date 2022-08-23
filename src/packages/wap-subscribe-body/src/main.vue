@@ -288,7 +288,9 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
-        return webinar.img_url || cover;
+        return webinar.img_url
+          ? webinar.img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466'
+          : cover;
       },
       isWarmVideo() {
         return this.roomBaseServer.state.watchInitData.warmup.warmup_paas_record_id;
@@ -530,6 +532,12 @@
         this.authCheck(info.type);
       },
       authCheck(type) {
+        if (this.webinarType === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.subOption.verify
+          });
+        }
         if (
           (this.webinarType == 2 && this.subOption.is_subscribe == 1) ||
           this.subOption.type == 3
@@ -643,7 +651,9 @@
           }
           // 邀请卡分享
           queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+          // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+          // TODO: 重定向改为了路由跳转
+          this.$router.push(`/lives/entryform/${this.$route.params.id}${queryString}`);
         }
       },
       webinarPayAuth() {

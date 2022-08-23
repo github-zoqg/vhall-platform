@@ -909,7 +909,6 @@
             .catch(err => {
               console.error('切换失败', err);
             });
-          return;
         }
 
         // 无缝切换视频
@@ -922,7 +921,6 @@
             .catch(err => {
               console.error('切换失败', err);
             });
-          return;
         }
       },
       sleep(time = 1000) {

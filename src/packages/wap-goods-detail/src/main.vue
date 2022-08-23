@@ -80,12 +80,17 @@
        * 购买
        */
       handleBuy(url) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: this.info.goods_id,
+          goods_name: encodeURIComponent(this.info.name)
+        });
         if (this.info.tao_password) {
           this.showTaoTip = true;
         } else {
           if (window.vhallReport) {
             window.vhallReport.report('GOOD_RECOMMEND', {
-              event: moment(new Date()).format('YYYY-MM-DD hh:mm'),
+              event: dayjs().format('YYYY-MM-DD hh:mm'),
               market_tools_id: this.info.goods_id,
               market_tools_status: 1 // 购买
             });

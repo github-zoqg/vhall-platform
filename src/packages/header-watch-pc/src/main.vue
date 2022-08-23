@@ -266,6 +266,7 @@
                     customClass: 'zdy-info-box'
                   });
                   this.isAttention = true;
+                  window.vhallReportForWatch?.report(170019); // 上报关注成功
                 }
               })
               .catch(e => {
@@ -299,7 +300,7 @@
             if (!bottomContent) return;
             // 观看端背景颜色
             if (bottomContent && background) {
-              bottomContent.style.background = `url(${background}) no-repeat`;
+              bottomContent.style.background = `url(${background}?x-oss-process=image/resize,m_fill,w_1528,h_860) no-repeat`;
               bottomContent.style.backgroundSize = 'cover';
               bottomContent.style.backgroundPosition = 'center';
             } else if (bottomContent && bgColor) {
