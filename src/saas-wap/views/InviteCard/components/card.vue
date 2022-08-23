@@ -13,7 +13,7 @@
                 <div class="watch-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="watch-middle-box">
@@ -54,7 +54,7 @@
               <div class="look-avator">
                 <img class="hsrc" :src="webinarInfo.avatar" alt="" />
               </div>
-              <p>{{ webinarInfo.nick_name }}</p>
+              <p class="ellips">{{ webinarInfo.nick_name }}</p>
               <p>{{ $t('nav.nav_1044') }}</p>
             </div>
             <div class="bottom-content">
@@ -83,7 +83,7 @@
                 <div class="show-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="show-middle-box">
@@ -369,6 +369,11 @@
       .vh-invitation__card-preview-content-warp {
         width: 100%;
         height: 100%;
+        .ellips {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .vh-invitation__show-img {
           position: absolute;
           left: 0;
