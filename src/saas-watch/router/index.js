@@ -6,6 +6,7 @@ import entryForm from '../views/Subscribe/entryForm.vue';
 import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import Subject from '../views/Subject/index.vue';
 import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
@@ -63,10 +64,22 @@ const routes = [
     meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
+    path: '/special/entryform/:id',
+    component: entryForm,
+    name: 'entryFormSubject',
+    meta: { title: '独立报名表单', grayType: 'subject' }
+  },
+  {
     path: '/forgetPwd',
     component: forgetPwd,
     name: 'forgetPwd',
     meta: { title: '忘记密码' }
+  },
+  {
+    path: '/special/detail',
+    component: Subject,
+    name: 'Subject',
+    meta: { title: '专题详情', page: 'subject', grayType: 'subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页

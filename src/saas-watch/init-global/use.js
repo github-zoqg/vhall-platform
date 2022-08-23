@@ -78,6 +78,10 @@ import VmpCameraCheck from '@/packages/camera-check/index';
 
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
+// 专题预览页
+import VmpSubjectBody from '@/packages/subject-body/index';
+import VmpSubjectHeader from '@/packages/subject-header/index';
+
 // 全局注册组件
 // Vue.use(ElementUI);
 Vue.use(VmpContainer);
@@ -132,6 +136,10 @@ Vue.use(VmpRedPacketCommandWatch);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpQa);
 Vue.use(VmpQuestionnaireWatch);
+
+// 专题
+Vue.use(VmpSubjectBody);
+Vue.use(VmpSubjectHeader);
 
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);

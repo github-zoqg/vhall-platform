@@ -644,7 +644,11 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: '',
+          isSubject: false
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -662,25 +666,25 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder =
+            placeHolderInfo.placeHolder =
               this.roomBaseServer.state.watchInitData.webinar.verify_tip ||
               this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.authText || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder = this.authText || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.authText || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder = this.authText || this.$t('common.common_1006');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:

@@ -26,14 +26,19 @@
         </span>
       </div>
       <div class="center_host">
-        <a
+        <span class="host_status" @click="goUser">
+          {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
+        </span>
+        <!-- <a
           :href="create_user_url"
           v-if="webinarTag && webinarTag.organizers_status == 1"
           :target="create_user_url == 'javascript:void(0);' ? '_self' : '_blank'"
         >
           {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
-        </a>
-        <span>{{ webinarInfo.start_time && webinarInfo.start_time.slice(0, -3) }}</span>
+        </a> -->
+        <span class="host_time">
+          {{ webinarInfo.start_time && webinarInfo.start_time.slice(0, -3) }}
+        </span>
       </div>
     </div>
     <div class="vmp-header-watch_right">
@@ -141,19 +146,19 @@
     },
     computed: {
       // 主办方跳转地址
-      create_user_url() {
-        const { watchInitData } = this.roomBaseServer.state;
-        if (watchInitData && watchInitData.urls && this.webinarInfo) {
-          const url = watchInitData.urls.web_url || '';
-          if (url.split('')[url.length - 1] == '/') {
-            return watchInitData.urls.web_url + 'user/home/' + this.webinarInfo.userinfo.user_id;
-          } else {
-            return watchInitData.urls.web_url + '/user/home/' + this.webinarInfo.userinfo.user_id;
-          }
-        } else {
-          return 'javascript:void(0);';
-        }
-      },
+      // create_user_url() {
+      //   const { watchInitData } = this.roomBaseServer.state;
+      //   if (watchInitData && watchInitData.urls && this.webinarInfo) {
+      //     const url = watchInitData.urls.web_url || '';
+      //     if (url.split('')[url.length - 1] == '/') {
+      //       return watchInitData.urls.web_url + 'user/home/' + this.webinarInfo.userinfo.user_id;
+      //     } else {
+      //       return watchInitData.urls.web_url + '/user/home/' + this.webinarInfo.userinfo.user_id;
+      //     }
+      //   } else {
+      //     return 'javascript:void(0);';
+      //   }
+      // },
       // 获取嵌入方式
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
@@ -311,6 +316,11 @@
             this.themeClass.iconClass = 'icon-default';
           });
         }
+      },
+      // 主办方跳转地址
+      goUser() {
+        const href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.webinarInfo.userinfo.user_id}`;
+        window.open(href, '_blank');
       },
       // logo跳转
       goLogoUrl() {
@@ -473,13 +483,14 @@
       .center_host {
         font-size: 14px;
         color: @font-dark-low;
-        a {
+        .host_status {
           color: @font-dark-low;
+          cursor: pointer;
           &:hover {
             color: @font-link;
           }
         }
-        span {
+        .host_time {
           padding-left: 8px;
         }
       }

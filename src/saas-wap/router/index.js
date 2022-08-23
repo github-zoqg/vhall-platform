@@ -74,6 +74,12 @@ const routes = [
     component: () => import('@/packages/wap-sign-up-form'),
     meta: { grayType: 'webinar' }
   },
+  {
+    path: '/special/entryform/:id',
+    name: 'signupSubject',
+    component: () => import('@/packages/wap-sign-up-form'),
+    meta: { grayType: 'subject' }
+  },
   // 错误页、升级页
   {
     path: '/upgrading',

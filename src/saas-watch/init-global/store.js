@@ -18,7 +18,8 @@ import {
   useVideoPollingServer,
   useChatServer,
   usePlayerServer,
-  useSubscribeServer
+  useSubscribeServer,
+  useSubjectServer
 } from 'middle-domain';
 
 setBaseUrl({
@@ -52,6 +53,7 @@ export default new DomainStore.Store({
     videoPollingServer: useVideoPollingServer().state,
     chatServer: useChatServer().state,
     playerServer: usePlayerServer().state,
-    subscribeServer: useSubscribeServer().state
+    subscribeServer: useSubscribeServer().state,
+    subjectServer: useSubjectServer().state
   }
 });
