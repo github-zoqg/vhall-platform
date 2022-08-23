@@ -543,17 +543,21 @@
               });
             } else {
               window.vhallReportForProduct?.report(110251);
-              window.vhallReportForProduct?.report(110254);
+              window.vhallReportForProduct?.toStartReporting(110254, 110255);
               this.desktopShareServer
                 .publishDesktopShareStream()
-                .then(() => {
+                .then(res => {
                   // 重新布局旁路
                   console.log('[screen] 桌面共享推流成功');
                   this.interactiveServer.resetLayout();
                   this.docServer.resetLayoutByMiniElement();
 
                   this.setDesktop('1');
-                  window.vhallReportForProduct?.report(110255);
+                  window.vhallReportForProduct?.toResultsReporting(110255, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    res
+                  });
                 })
                 .catch(error => {
                   console.log(error, this.$t('interact.interact_1021'));
@@ -572,7 +576,9 @@
       },
       // 停止共享
       async stopShare(source) {
-        window.vhallReportForProduct?.report(110259, { report_extra: { source: source } });
+        window.vhallReportForProduct?.toStartReporting(110259, 110260, {
+          source
+        });
         await this.desktopShareServer.stopShareScreen();
         this.setDesktop('0');
         this.interactiveServer.resetLayout();

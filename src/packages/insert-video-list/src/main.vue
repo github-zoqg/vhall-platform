@@ -469,7 +469,7 @@
         }
       },
       handleDelete(video) {
-        window.vhallReportForProduct.report(110231);
+        window.vhallReportForProduct.toStartReporting(110231, [110233, 110238, 110234]);
         this.$confirm('删除后将会影响视频的演示和观看，确定删除？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -477,13 +477,17 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
-            window.vhallReportForProduct.report(110233);
+            window.vhallReportForProduct.toStartReporting(110233, 110238);
             this.insertFileServer
               .deleteInsertFile({
                 ids: video.id
               })
               .then(res => {
-                window.vhallReportForProduct.report(110238, { report_extra: res });
+                window.vhallReportForProduct.toResultsReporting(110238, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
                 if (res.code === 200) {
                   this.getTableList({
                     isNeedResetPage: true

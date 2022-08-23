@@ -118,20 +118,11 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
-        window.vhallReportForProduct.toResultsReporting(170032, {
-          event_type: 'message',
-          waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`,
-          failed_reason: encodeURIComponent('用户成功上麦')
-        });
       });
 
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
-        window.vhallReportForProduct.toResultsReporting(170033, {
-          event_type: 'meassage',
-          failed_reason: msg
-        });
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -292,6 +283,13 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        // 110136关闭    110137 开启
+        if (deviceType == 'video') {
+          window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
+        } else {
+          // 110138 关闭    110139 开启
+          window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
+        }
       }
     }
   };

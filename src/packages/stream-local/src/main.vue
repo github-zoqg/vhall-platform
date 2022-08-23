@@ -910,6 +910,9 @@
               type: 'audio'
             })
             .catch(err => {
+              window.vhallReportForProduct.toResultsReporting(110190, {
+                failed_reason: err
+              });
               console.error('切换失败', err);
             });
         }
@@ -922,6 +925,9 @@
               type: 'video'
             })
             .catch(err => {
+              window.vhallReportForProduct.toResultsReporting(110190, {
+                failed_reason: err
+              });
               console.error('切换失败', err);
             });
         }

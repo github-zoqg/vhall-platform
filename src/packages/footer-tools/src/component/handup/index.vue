@@ -96,21 +96,11 @@
           clearInterval(this.waitInterval);
           this.isApplyed = false;
           this.btnText = this.$t('interact.interact_1041');
-          window.vhallReportForProduct.toResultsReporting(170032, {
-            waiting_time: `wait-for ${30 - this.waitTime}s`,
-            event_type: 'message',
-            reasonTxt: encodeURIComponent('用户成功上麦')
-          });
         }
       });
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$message.warning(this.$t('interact.interact_1028'));
-        window.vhallReportForProduct.toResultsReporting(170033, {
-          event_type: 'message',
-          failed_reason: msg,
-          reasonTxt: encodeURIComponent(this.$t('interact.interact_1028'))
-        });
       });
       // 主播端开启 举手按钮
       useMicServer().$on('vrtc_connect_open', msg => {
