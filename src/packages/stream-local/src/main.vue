@@ -496,6 +496,10 @@
         await this.videoStartPush();
       }
       this.checkStartPush();
+      let el = document
+        .getElementById(`vmp-stream-local__${this.joinInfo.third_party_user_id}`)
+        .querySelector('.vmp-alert-wrap');
+      document.body.appendChild(el);
     },
     beforeDestroy() {
       // 清空计时器
