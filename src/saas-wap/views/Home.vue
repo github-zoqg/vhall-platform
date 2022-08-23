@@ -159,7 +159,6 @@
           });
 
           window.vhallReport.report('ENTER_WATCH');
-
           // 产品侧数据埋点初始化
           domain.initVhallReportForProduct({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名

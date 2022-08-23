@@ -118,7 +118,7 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
-        this.toResultsReporting(170032, {
+        window.vhallReportForProduct.toResultsReporting(170032, {
           event_type: 'message',
           waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`,
           failed_reason: encodeURIComponent('用户成功上麦')
@@ -128,7 +128,7 @@
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
-        this.toResultsReporting(170003, {
+        window.vhallReportForProduct.toResultsReporting(170033, {
           event_type: 'meassage',
           failed_reason: msg
         });
@@ -150,13 +150,14 @@
           this.showConnectMic = false;
           this.$emit('handupLoading', false);
           this.closeConnectPop();
+          window.vhallReportForProduct.toResultsReporting(170034, {
+            event_type: 'meassage',
+            failed_reason: msg
+          });
         }
       });
     },
     methods: {
-      // 上报_结果
-      toResultsReporting: window.vhallReportForProduct.toResultsReporting,
-
       // 下麦操作
       offConnect() {
         this.$emit('handupLoading', false);
@@ -165,7 +166,7 @@
         useMicServer()
           .speakOff()
           .then(res => {
-            this.toResultsReporting(170003, {
+            window.vhallReportForProduct.toResultsReporting(170003, {
               event_type: 'interface',
               failed_reason: res,
               request_id: res.request_id
@@ -228,7 +229,7 @@
                 );
               }
               // 数据上报，场景：申请连麦接口 返回失败
-              this.toResultsReporting(170005, {
+              window.vhallReportForProduct.toResultsReporting(170005, {
                 event_type: 'interface',
                 failed_reason: res,
                 request_id: res.request_id
@@ -242,7 +243,7 @@
             this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
             this.$emit('handupLoading', true);
             // 数据上报，场景：申请连麦接口 返回成功
-            this.toResultsReporting(170005, {
+            window.vhallReportForProduct.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: res,
               request_id: res.request_id
@@ -265,7 +266,7 @@
                 }
                 this.$toast(tip);
                 // 数据上报，响应场景：申请连麦拒绝
-                this.toResultsReporting(170005, {
+                window.vhallReportForProduct.toResultsReporting(170005, {
                   failed_reason: encodeURIComponent(tip)
                 });
                 this.closeConnectPop();
@@ -276,7 +277,7 @@
           .catch(err => {
             this.btnDisabled = false;
             // 数据上报，场景：申请连麦接口异常
-            this.toResultsReporting(170005, {
+            window.vhallReportForProduct.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: err,
               request_id: err.request_id
