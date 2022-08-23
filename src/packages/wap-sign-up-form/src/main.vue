@@ -16,7 +16,7 @@
             v-if="formInfo.intro"
             :class="[
               'title-box__intro-text',
-              overflowStatus ? 'title-box__intro-text-ellipsis' : ''
+              overflowStatus ? 'title-box__intro-text-ellipsis' : 'title-box__intro-text-padding'
             ]"
           >
             {{ formInfo.intro }}
@@ -96,7 +96,13 @@
                   v-for="radioItem in question.items"
                   :key="radioItem.id"
                 >
-                  <span :class="{ 'radio-value': true, active: radioItem.id == form[question.id] }">
+                  <span
+                    :class="{
+                      'radio-value': true,
+                      active: radioItem.id == form[question.id],
+                      isMultiOther: radioItem.type === 1 && radioItem.id == form[question.id]
+                    }"
+                  >
                     {{ radioItem.subject }}
                   </span>
                   <textarea
@@ -358,7 +364,13 @@
 
 <script>
   import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
-  import { validEmail, validPhone, getQueryString, replaceHtml } from '@/app-shared/utils/tool';
+  import {
+    validEmail,
+    validPhone,
+    getQueryString,
+    replaceHtml,
+    delUrlParams
+  } from '@/app-shared/utils/tool';
   import {
     useSignUpFormServer,
     useRoomBaseServer,
@@ -500,7 +512,8 @@
         ajaxInfoEnd: false,
         ajaxListEnd: false,
         interfaceType:
-          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar' // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+          window.location.href.indexOf('/special/entryform') != -1 ? 'subject' : 'webinar', // 依据界面路由，确认当前报名表单接口调用类型：subject-专题相应；webinar-活动相应
+        isEmbed: window.location.href.indexOf('/embedclient/') != -1
       };
     },
     computed: {
@@ -696,9 +709,12 @@
         document.title = roomBaseState.languages.curLang.subject;
         let lang = roomBaseState.languages.lang;
         this.$i18n.locale = lang.type;
-        setRequestHeaders({
-          token: localStorage.getItem('token') || ''
-        });
+        if (!this.isEmbed) {
+          // 如果是嵌入的时候，不需要token传入
+          setRequestHeaders({
+            token: localStorage.getItem('token') || ''
+          });
+        }
         // if (localStorage.getItem('lang')) {
         //   this.$i18n.locale = parseInt(localStorage.getItem('lang')) == 1 ? 'zh' : 'en';
         // } else {
@@ -791,18 +807,21 @@
             this.isSubscribe = res.data.webinar_state == 2 ? 1 : 2;
             this.activeTab = res.data.webinar_state == 2 ? 1 : 2;
             this.cascadeResultList = [];
-            const shareInfo = await this.roomBaseServer.getShareSettingInfo({
-              webinarId: res.data.id
-            });
-            if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
-              let title = shareInfo.data.title;
-              title = title.length - 30 > 0 ? title.substring(0, 30) : title;
-              let shareInfo = {
-                title: title,
-                img_url: shareInfo.data.img_url,
-                introduction: replaceHtml(shareInfo.data.introduction, 42)
-              };
-              this.wxShareInfoWebinar(shareInfo);
+            if (!this.isEmbed) {
+              // 如果不是嵌入报名表单的时候 才支持分享
+              const shareInfo = await this.roomBaseServer.getShareSettingInfo({
+                webinarId: res.data.id
+              });
+              if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
+                let title = shareInfo.data.title;
+                title = title.length - 30 > 0 ? title.substring(0, 30) : title;
+                let shareInfo = {
+                  title: title,
+                  img_url: shareInfo.data.img_url,
+                  introduction: replaceHtml(shareInfo.data.introduction, 42)
+                };
+                this.wxShareInfoWebinar(shareInfo);
+              }
             }
           })
           .catch(error => {
@@ -1061,7 +1080,9 @@
           window.location.protocol +
             process.env.VUE_APP_WAP_WATCH +
             process.env.VUE_APP_WEB_KEY +
-            `/lives/watch/${this.webinarOrSubjectId}${this.queryString}`
+            `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${this.webinarOrSubjectId}${
+              this.queryString
+            }`
         );
       },
       //提交表单到服务器
@@ -1069,7 +1090,7 @@
         const phoneItem = this.list.find(item => item.type === 0 && item.default_type === 2);
         const nameItem = this.list.find(item => item.type === 0 && item.default_type === 1);
 
-        const params = {
+        let params = {
           ...this.setParamsIdByRoute({}),
           phone: this.form[phoneItem.id],
           form: JSON.stringify(this.answer),
@@ -1082,15 +1103,20 @@
         if (this.isPhoneValidate) {
           params.verify_code = this.form.code;
         }
-
-        if (this.$route.query.refer) {
-          params.refer = this.$route.query.refer;
+        if (this.isEmbed) {
+          // 如果是嵌入页-报名表单，地址栏有啥就传递啥
+          params = {
+            ...params,
+            ...this.$route.query
+          };
+        } else {
+          if (this.$route.query.refer) {
+            params.refer = this.$route.query.refer;
+          }
         }
-
         if (localStorage.getItem('visitorId')) {
           params.visit_id = localStorage.getItem('visitorId');
         }
-
         return this.signUpFormServer
           .submitSignUpForm(params)
           .then(res => {
@@ -1124,7 +1150,9 @@
                   window.location.protocol +
                     process.env.VUE_APP_WAP_WATCH +
                     process.env.VUE_APP_WEB_KEY +
-                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                    `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                      this.webinarOrSubjectId
+                    }${queryString}`
                 );
               }
             } else {
@@ -1168,18 +1196,36 @@
             is_no_check: 1
           })
           .then(res => {
+            // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+            // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
             const queryString = this.returnQueryString();
             if (res.data.webinar_state == 2) {
               this.startTime = res.data.start_time;
-              this.queryString = queryString;
+              if (this.isEmbed) {
+                // 如果是嵌入页表单
+                this.queryString = delUrlParams(window.location.search, ['isIndependent']);
+              } else {
+                this.queryString = queryString;
+              }
               this.isSubmitSuccess = true;
             } else {
-              location.replace(
-                window.location.protocol +
-                  process.env.VUE_APP_WAP_WATCH +
-                  process.env.VUE_APP_WEB_KEY +
-                  `/lives/watch/${this.webinarOrSubjectId}${queryString}`
-              );
+              if (this.isEmbed) {
+                // 如果是嵌入页表单
+                let queryString = delUrlParams(window.location.search, ['isIndependent']);
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/embedclient/watch/${this.webinarOrSubjectId}${queryString}`
+                );
+              } else {
+                location.replace(
+                  window.location.protocol +
+                    process.env.VUE_APP_WAP_WATCH +
+                    process.env.VUE_APP_WEB_KEY +
+                    `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                );
+              }
             }
           })
           .catch(e => {
@@ -1344,7 +1390,7 @@
           window.location.protocol +
           process.env.VUE_APP_WAP_WATCH +
           process.env.VUE_APP_WEB_KEY +
-          `/lives/entryform/${this.webinarOrSubjectId}`;
+          `${this.isEmbed ? '/embedclient' : ''}/lives/entryform/${this.webinarOrSubjectId}`;
         this.signUpFormServer.getWxShareInfo({ wx_url: wx_url }).then(res => {
           if (res.code == 200 && res.data) {
             const params = {
@@ -1364,7 +1410,9 @@
                 desc,
                 link:
                   window.location.protocol +
-                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}/lives/entryform/${this.webinarOrSubjectId}`,
+                  `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_WEB_KEY}${
+                    this.isEmbed ? '/embedclient' : ''
+                  }/lives/entryform/${this.webinarOrSubjectId}`,
                 imgUrl: info.img_url
               }
             );
@@ -1633,6 +1681,7 @@
           const params = {
             ...this.setParamsIdByRoute({}),
             phone: this.verifyForm.phone,
+            ...this.$route.query,
             refer
           };
           if (!params.refer) {
@@ -1669,7 +1718,9 @@
                     window.location.protocol +
                       process.env.VUE_APP_WAP_WATCH +
                       process.env.VUE_APP_WEB_KEY +
-                      `/lives/watch/${this.webinarOrSubjectId}${queryString}`
+                      `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                        this.webinarOrSubjectId
+                      }${queryString}`
                   );
                 }
               } else {
@@ -1834,6 +1885,9 @@
             -webkit-line-clamp: 2;
             overflow: hidden;
             text-overflow: ellipsis;
+          }
+          &.title-box__intro-text-padding {
+            padding-bottom: 38px;
           }
           .text-tail {
             position: absolute;
@@ -2030,6 +2084,9 @@
         }
         &.active:before {
           border: 0.1rem solid #fb3a32;
+        }
+        &.isMultiOther:before {
+          top: 0.255rem;
         }
       }
       .checkbox-value {

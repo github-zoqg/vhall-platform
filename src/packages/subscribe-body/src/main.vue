@@ -100,7 +100,9 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          needAgreement: false
+          needAgreement: false,
+          open_reg_form: null,
+          save_reg_form: null
         }
       };
     },
@@ -213,6 +215,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        // 报名表单是否已填写
+        this.subOption.save_reg_form = join_info.reg_form;
+        // 报名表单是否已开启
+        this.subOption.open_reg_form = webinar.reg_form;
         if (webinar.type == 3) {
           this.showVideo = false;
           this.isLivingEnd = true;
