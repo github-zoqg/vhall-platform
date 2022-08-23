@@ -118,7 +118,7 @@
           this.isWaitting = false;
           this.handText = this.$t('interact.interact_1007');
         }
-        this.toResultsReporting(170005, {
+        this.toResultsReporting(170032, {
           event_type: 'message',
           waiting_time: `wait-for ${30 - this.lowerWheatTimer}s`,
           failed_reason: encodeURIComponent('用户成功上麦')
@@ -214,7 +214,8 @@
       applyMic() {
         this.btnDisabled = true;
         // 申请连麦
-        window?.vhallReportForProduct.toStartReporting(170004, 170005);
+        window?.vhallReportForProduct.toStartReporting(170004, [170005, 170032]);
+
         useMicServer()
           .userApply()
           .then(res => {
@@ -226,7 +227,7 @@
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );
               }
-              // 数据上报，场景：申请连麦接口
+              // 数据上报，场景：申请连麦接口 返回失败
               this.toResultsReporting(170005, {
                 event_type: 'interface',
                 failed_reason: res,
@@ -240,8 +241,12 @@
             this.lowerWheatTimer = 30;
             this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
             this.$emit('handupLoading', true);
-            // 数据上报，场景：申请连麦接口
-            this.toResultsReporting(170005, res);
+            // 数据上报，场景：申请连麦接口 返回成功
+            this.toResultsReporting(170005, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
+            });
             this.lowerWheatFun = setInterval(() => {
               this.lowerWheatTimer--;
               this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
@@ -259,8 +264,10 @@
                   tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
-                // 数据上报，场景：申请连麦接口
-                this.toResultsReporting(170005, encodeURIComponent(tip));
+                // 数据上报，响应场景：申请连麦拒绝
+                this.toResultsReporting(170005, {
+                  failed_reason: encodeURIComponent(tip)
+                });
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
@@ -268,7 +275,7 @@
           })
           .catch(err => {
             this.btnDisabled = false;
-            // 数据上报，场景：申请连麦接口
+            // 数据上报，场景：申请连麦接口异常
             this.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: err,

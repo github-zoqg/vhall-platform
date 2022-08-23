@@ -96,7 +96,7 @@
           clearInterval(this.waitInterval);
           this.isApplyed = false;
           this.btnText = this.$t('interact.interact_1041');
-          window.vhallReportForProduct.toResultsReporting(170005, {
+          window.vhallReportForProduct.toResultsReporting(170032, {
             waiting_time: `wait-for ${30 - this.waitTime}s`,
             event_type: 'message',
             reasonTxt: encodeURIComponent('用户成功上麦')
@@ -106,7 +106,7 @@
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$message.warning(this.$t('interact.interact_1028'));
-        window.vhallReportForProduct.toResultsReporting(170003, {
+        window.vhallReportForProduct.toResultsReporting(170033, {
           event_type: 'message',
           failed_reason: msg,
           reasonTxt: encodeURIComponent(this.$t('interact.interact_1028'))
@@ -143,6 +143,10 @@
           this.isApplyed = false;
           this.waitInterval && clearInterval(this.waitInterval);
           this.btnText = this.$t('interact.interact_1041');
+          window.vhallReportForProduct.toResultsReporting(170034, {
+            event_type: 'message',
+            failed_reason: msg
+          });
         }
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
@@ -151,41 +155,36 @@
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
         this.btnText = this.$t('interact.interact_1041');
+        window.vhallReportForProduct.toResultsReporting(170034, {
+          event_type: 'message',
+          failed_reason: msg
+        });
       });
     },
     methods: {
       // 下麦
       async speakOff() {
         // 用户下麦
-        window.vhallReportForProduct.toStartReporting(170002, 170003);
+        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033]);
         this.loading = true;
-
         try {
-          const { code, msg } = await useMicServer().speakOff();
-          if (code === 513035) {
-            this.$message.error(msg);
-            window.vhallReportForProduct.toResultsReporting(
-              170003,
-              {
-                event_type: 'interface',
-                failed_reason: msg
-              }
-              // 返回的key值
-              // todo keyCode
-            );
+          const res = await useMicServer().speakOff();
+          if (res.code === 513035) {
+            this.$message.error(res.msg);
           }
-          window.vhallReportForProduct.toResultsReporting(
-            170003,
-            {
-              event_type: 'interface',
-              failed_reason: code
-            }
-            // 返回的key值
-            // todo keyCode
-          );
           this.loading = false;
+          window.vhallReportForProduct.toResultsReporting(170003, {
+            event_type: 'interface',
+            failed_reason: res,
+            request_id: res.request_id
+          });
         } catch (error) {
           this.loading = false;
+          window.vhallReportForProduct.toResultsReporting(170003, {
+            event_type: 'interface',
+            failed_reason: error,
+            request_id: error.request_id
+          });
         }
       },
       // 举手按钮点击事件
@@ -221,7 +220,7 @@
       // 申请上麦
       userApply() {
         // 申请连麦
-        window.vhallReportForProduct.toStartReporting(170004, 170005);
+        window.vhallReportForProduct.toStartReporting(170004, [170005, 170032]);
         useMicServer()
           .userApply()
           .then(res => {
@@ -248,15 +247,11 @@
             this.waitTime = 30;
             this.btnText = `${this.$t('interact.interact_1004')}(${this.waitTime}s)`;
             // 数据上报，场景：申请接口
-            window.vhallReportForProduct.toResultsReporting(
-              170005,
-              {
-                event_type: 'interface',
-                failed_reason: res
-              }
-              // 返回的key值
-              // todo keyCode
-            );
+            window.vhallReportForProduct.toResultsReporting(170005, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
+            });
             this.startWaitInterval();
           })
           .catch(err => {
@@ -265,7 +260,8 @@
             window.vhallReportForProduct.toResultsReporting(170005, {
               waiting_time: '0s',
               failed_reason: err,
-              reasonTxt: encodeURIComponent('捕获到接口catch异常')
+              reasonTxt: encodeURIComponent('捕获到接口catch异常'),
+              request_id: err.request_id
             });
           });
       },
@@ -289,28 +285,20 @@
               customClass: 'zdy-info-box'
             });
             // 数据上报，场景：取消连麦邀请上报接口
-            window.vhallReportForProduct.toResultsReporting(
-              170007,
-              {
-                event_type: 'interface',
-                failed_reason: res
-              }
-              // 返回的key值
-              // todo keyCode
-            );
+            window.vhallReportForProduct.toResultsReporting(170007, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
+            });
           })
           .catch(err => {
             this.loading = false;
             // 数据上报，场景：取消连麦邀请上报接口
-            window.vhallReportForProduct.toResultsReporting(
-              170007,
-              {
-                event_type: 'interface',
-                failed_reason: err
-              }
-              // 返回的key值
-              // todo keyCode
-            );
+            window.vhallReportForProduct.toResultsReporting(170007, {
+              event_type: 'interface',
+              failed_reason: err,
+              request_id: err.request_id
+            });
           });
       },
       // 等待倒计时
@@ -330,16 +318,12 @@
               tip = this.$t('other.other_1006');
             }
             this.$message.warning(tip);
+            useMicServer().userCancelApply();
             // 数据上报，场景：倒计时结束（上麦失败）
             window.vhallReportForProduct.toResultsReporting(170005, {
               waiting_time: `wait-for ${30 - this.waitTime}s`,
               reasonTxt: encodeURIComponent(tip)
             });
-            useMicServer()
-              .userCancelApply()
-              .then(data => {
-                // 数据上报，场景：倒计时结束（上麦失败）
-              });
           }
         }, 1000);
       }
