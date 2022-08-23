@@ -25,7 +25,11 @@
               class="vmp-sign-up-form__introduction"
               v-if="formInfo.intro"
               ref="intro"
-              :class="[overflowStatus ? 'vmp-sign-up-form__introduction-fold' : '']"
+              :class="[
+                overflowStatus
+                  ? 'vmp-sign-up-form__introduction-fold'
+                  : 'vmp-sign-up-form__introduction-padding'
+              ]"
             >
               {{ formInfo.intro }}
               <span
@@ -393,7 +397,11 @@
             class="vmp-sign-up-form__introduction"
             v-if="formInfo.intro"
             ref="intro"
-            :class="[overflowStatus ? 'vmp-sign-up-form__introduction-fold' : '']"
+            :class="[
+              overflowStatus
+                ? 'vmp-sign-up-form__introduction-fold'
+                : 'vmp-sign-up-form__introduction-padding'
+            ]"
           >
             {{ formInfo.intro }}
             <span
@@ -2240,6 +2248,9 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
+    }
+    &__introduction-padding {
+      padding-bottom: 20px;
     }
     &__tab-bar {
       width: 100%;

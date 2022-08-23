@@ -16,7 +16,7 @@
             v-if="formInfo.intro"
             :class="[
               'title-box__intro-text',
-              overflowStatus ? 'title-box__intro-text-ellipsis' : ''
+              overflowStatus ? 'title-box__intro-text-ellipsis' : 'title-box__intro-text-padding'
             ]"
           >
             {{ formInfo.intro }}
@@ -1797,6 +1797,9 @@
             -webkit-line-clamp: 2;
             overflow: hidden;
             text-overflow: ellipsis;
+          }
+          &.title-box__intro-text-padding {
+            padding-bottom: 38px;
           }
           .text-tail {
             position: absolute;
