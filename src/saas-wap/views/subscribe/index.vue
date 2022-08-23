@@ -268,11 +268,13 @@
             document.body.style.background = `rgba(0, 0, 0, 0.06)`;
           }
         } else {
-          document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+          document.body.style.backgroundImage = `url(${
+            '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
             style +
             '_' +
             theme +
-            '.png')})`;
+            '.png'
+          })`;
           document.body.style.backgroundSize = 'cover';
         }
       }
