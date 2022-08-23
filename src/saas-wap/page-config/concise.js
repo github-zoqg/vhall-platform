@@ -184,6 +184,18 @@ export default {
       method: 'open',
       args: ['$0']
     },
+    emitSetHideEffect: [
+      {
+        cuid: 'comWapRewardEffect',
+        method: 'setHideEffect',
+        args: ['$0']
+      },
+      {
+        cuid: 'comWapRewardEffectSVGA',
+        method: 'setHideEffect',
+        args: ['$0']
+      }
+    ],
     children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
     options: {}
   },
