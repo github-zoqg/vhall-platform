@@ -353,7 +353,7 @@
         this.drawBody(style, theme, skin_json_wap);
 
         // 挂载到window方便调试
-        window.skins = skins;
+        // window.skins = skins;
       },
       drawBody(style, theme, skin) {
         if (skin?.wapBackground) {
@@ -368,11 +368,13 @@
               document.body.style.background = `rgba(0, 0, 0, 0.06)`;
             }
           } else {
-            document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/wap/theme/skins/' +
+            document.body.style.backgroundImage = `url(${
+              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
               style +
               '_' +
               theme +
-              '.png')})`;
+              '.png'
+            })`;
             document.body.style.backgroundSize = 'cover';
           }
         }

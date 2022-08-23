@@ -380,9 +380,11 @@
           if (theme == 'black') {
             document.body.style.background = `rgb(26, 26, 26)`;
           } else {
-            document.body.style.backgroundImage = `url(${require('@/app-shared/assets/img/watch/theme/skins/' +
+            document.body.style.backgroundImage = `url(${
+              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-watch/theme/skins/' +
               theme +
-              '.png')})`;
+              '.png'
+            })`;
             document.body.style.backgroundSize = 'cover';
           }
         }
