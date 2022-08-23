@@ -163,7 +163,8 @@ export default {
     nav_1049: 'Ubicación',
     nav_1050: 'Anchor aún no ha activado la invitación',
     nav_1051: '',
-    nav_1052: ''
+    nav_1052: '',
+    nav_1053: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',

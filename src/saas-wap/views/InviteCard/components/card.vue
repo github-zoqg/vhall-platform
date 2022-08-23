@@ -23,7 +23,11 @@
                     <p v-if="webinarInfo.desciption">{{ webinarInfo.desciption }}</p>
                   </div>
                   <div class="watch-time">
-                    <p v-show="webinarInfo.date"><i class="iconfont icontime_icon"></i></p>
+                    <p v-show="webinarInfo.company"><i class="iconfont icontime_icon"></i></p>
+                    <p>{{ webinarInfo.company }}</p>
+                    <p class="location-icon" v-show="webinarInfo.date">
+                      <i class="iconfont icontime_icon"></i>
+                    </p>
                     <p>{{ webinarInfo.date }}</p>
                     <p class="location-icon" v-show="webinarInfo.location">
                       <i class="iconfont iconplace_icon"></i>
@@ -63,6 +67,7 @@
                   <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="look-action">
+                  <p>{{ webinarInfo.company }}</p>
                   <p>{{ webinarInfo.date }}</p>
                   <p>{{ webinarInfo.location }}</p>
                 </div>
@@ -86,6 +91,11 @@
                   <div class="show-text" v-if="webinarInfo.title || webinarInfo.desciption">
                     <h1>{{ webinarInfo.title }}</h1>
                     <p>{{ webinarInfo.desciption }}</p>
+                  </div>
+                  <div v-if="webinarInfo.company" class="show-time">
+                    <p class="top-border"></p>
+                    <p class="show-time-item no-padding-bottom">{{ $t('nav.nav_1053') }}</p>
+                    <p class="show-time-item no-padding-top">{{ webinarInfo.company }}</p>
                   </div>
                   <div v-if="webinarInfo.date" class="show-time">
                     <p class="top-border"></p>
@@ -717,6 +727,7 @@
             height: 600px;
             position: absolute;
             bottom: 0;
+            left: 0;
             background: #ffffff;
             z-index: 2;
           }
