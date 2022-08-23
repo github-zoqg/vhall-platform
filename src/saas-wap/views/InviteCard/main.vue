@@ -48,7 +48,7 @@
 <style lang="less">
   .inviteWrap {
     position: relative;
-    height: 100vh;
+    height: 100%;
     .webinarEntrance {
       position: absolute;
       top: 45px;
