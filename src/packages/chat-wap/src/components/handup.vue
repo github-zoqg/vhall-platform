@@ -150,7 +150,7 @@
           this.showConnectMic = false;
           this.$emit('handupLoading', false);
           this.closeConnectPop();
-          window.vhallReportForProduct.toResultsReporting(170034, {
+          window.vhallReportForProduct.toResultsReporting(170008, {
             event_type: 'meassage',
             failed_reason: msg
           });

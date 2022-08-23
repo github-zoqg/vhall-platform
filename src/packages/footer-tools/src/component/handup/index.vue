@@ -143,7 +143,7 @@
           this.isApplyed = false;
           this.waitInterval && clearInterval(this.waitInterval);
           this.btnText = this.$t('interact.interact_1041');
-          window.vhallReportForProduct.toResultsReporting(170034, {
+          window.vhallReportForProduct.toResultsReporting(170008, {
             event_type: 'message',
             failed_reason: msg
           });
@@ -155,7 +155,7 @@
         this.isApplyed = false;
         this.waitInterval && clearInterval(this.waitInterval);
         this.btnText = this.$t('interact.interact_1041');
-        window.vhallReportForProduct.toResultsReporting(170034, {
+        window.vhallReportForProduct.toResultsReporting(170008, {
           event_type: 'message',
           failed_reason: msg
         });
