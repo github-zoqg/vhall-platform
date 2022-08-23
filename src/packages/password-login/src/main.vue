@@ -240,7 +240,7 @@
       },
       //图片保存的路径
       pathUrl() {
-        return `webinars/join-avatar/${moment().format('YYYYMM')}`;
+        return `webinars/join-avatar/${dayjs().format('YYYYMM')}`;
       }
     },
     beforeCreate() {

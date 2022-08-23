@@ -115,7 +115,9 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
-        return webinar.img_url || cover;
+        return webinar.img_url
+          ? webinar.img_url + '?x-oss-process=image/resize,m_fill,w_1920,h_1080'
+          : cover;
       },
       isWarmVideo() {
         return this.roomBaseServer.state.watchInitData.warmup.warmup_paas_record_id;

@@ -39,7 +39,7 @@
     computed: {
       signTime() {
         return function (val) {
-          return moment(val).format('HH:mm');
+          return dayjs(val).format('HH:mm');
         };
       }
     },

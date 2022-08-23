@@ -316,6 +316,10 @@
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170026, {
+          is_empty: this.inputValue.trim() ? 0 : 1
+        });
         //如果没有登录，则不能发消息
         if (this.chatLoginStatus) {
           return;

@@ -153,6 +153,17 @@
       //点击发送按钮
       send() {
         const inputValue = this.inputValue.trim();
+        if (this.showTabType == 3) {
+          // 数据埋点--聊天
+          window.vhallReportForWatch?.report(170026, {
+            is_empty: inputValue ? 0 : 1
+          });
+        } else if (this.showTabType === 'qa') {
+          // 数据埋点--问答
+          window.vhallReportForWatch?.report(170027, {
+            is_empty: inputValue ? 0 : 1
+          });
+        }
         if (!inputValue) {
           // this.$message(this.$t('chat.chat_1057'));
           return;
@@ -186,18 +197,18 @@
         // this.doSmFix();
       },
       /*  doSmFix() {
-        const this_p = this.$parent.$parent;
-        let sendBoxEL = this_p.$refs.sendBox.$el.getBoundingClientRect();
-        let chatWapEL = this_p.$refs[this.refName].getBoundingClientRect();
-        if (sendBoxEL.top < chatWapEL.top) {
-          this_p.smFix = true;
-          this.smFix = true;
-        } else {
-          this_p.smFix = false;
-          this.smFix = false;
-        }
-        console.log('-------------------', sendBoxEL.top, chatWapEL.top);
-      }, */
+          const this_p = this.$parent.$parent;
+          let sendBoxEL = this_p.$refs.sendBox.$el.getBoundingClientRect();
+          let chatWapEL = this_p.$refs[this.refName].getBoundingClientRect();
+          if (sendBoxEL.top < chatWapEL.top) {
+            this_p.smFix = true;
+            this.smFix = true;
+          } else {
+            this_p.smFix = false;
+            this.smFix = false;
+          }
+          console.log('-------------------', sendBoxEL.top, chatWapEL.top);
+        }, */
       //选中表情
       inputEmoji(item = {}) {
         // 添加表情之后如果会超出 140 ，就不输入了

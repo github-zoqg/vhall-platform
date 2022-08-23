@@ -290,6 +290,12 @@
       },
       authCheck() {
         this.$emit('authFetch');
+        if (this.type === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.verify
+          });
+        }
       }
     }
   };
