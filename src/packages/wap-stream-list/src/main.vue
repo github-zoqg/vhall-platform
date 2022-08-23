@@ -332,7 +332,9 @@
           }
         });
         const str =
-          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+          msg.data.type == 'vrtc_speaker_switch'
+            ? this.$t('interact.interact_1034')
+            : this.$t('interact.interact_1033');
         this.$toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
