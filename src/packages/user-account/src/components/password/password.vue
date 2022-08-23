@@ -39,13 +39,13 @@
                   v-show="pwdCaptVo.old_pwd_show"
                   slot="suffix"
                   style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconyincang-copy"
+                  class="vh-iconfont vh-line-hidden"
                 ></i>
                 <i
                   v-show="!pwdCaptVo.old_pwd_show"
                   slot="suffix"
-                  style="display: inline-block; font-size: 12px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconxianshi"
+                  style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
+                  class="vh-iconfont vh-line-view"
                 ></i>
               </span>
             </PwdInput>
@@ -74,13 +74,13 @@
                   v-show="pwdCaptVo.pwd_show"
                   slot="suffix"
                   style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconyincang-copy"
+                  class="vh-iconfont vh-line-hidden"
                 ></i>
                 <i
                   v-show="!pwdCaptVo.pwd_show"
                   slot="suffix"
-                  style="display: inline-block; font-size: 12px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconxianshi"
+                  style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
+                  class="vh-iconfont vh-line-view"
                 ></i>
               </span>
             </PwdInput>
@@ -109,13 +109,13 @@
                   v-show="pwdCaptVo.new_pwd_show"
                   slot="suffix"
                   style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconyincang-copy"
+                  class="vh-iconfont vh-line-hidden"
                 ></i>
                 <i
                   v-show="!pwdCaptVo.new_pwd_show"
                   slot="suffix"
-                  style="display: inline-block; font-size: 12px; margin-right: 5px; cursor: pointer"
-                  class="iconfont iconxianshi"
+                  style="display: inline-block; font-size: 14px; margin-right: 5px; cursor: pointer"
+                  class="vh-iconfont vh-line-view"
                 ></i>
               </span>
             </PwdInput>

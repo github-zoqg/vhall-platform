@@ -23,10 +23,10 @@
                     <p v-if="webinarInfo.desciption">{{ webinarInfo.desciption }}</p>
                   </div>
                   <div class="watch-time">
-                    <p v-show="webinarInfo.date"><i class="iconfont icontime_icon"></i></p>
+                    <p v-show="webinarInfo.date"><i class="vh-iconfont vh-line-time"></i></p>
                     <p>{{ webinarInfo.date }}</p>
                     <p class="location-icon" v-show="webinarInfo.location">
-                      <i class="iconfont iconplace_icon"></i>
+                      <i class="vh-iconfont vh-line-location-outline"></i>
                     </p>
                     <p>{{ webinarInfo.location }}</p>
                   </div>

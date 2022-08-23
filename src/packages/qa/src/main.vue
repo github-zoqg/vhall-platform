@@ -26,7 +26,7 @@
           @click="scrollToTarget"
         >
           {{ tipMsg }}
-          <span class="iconfont iconyourennijiantou"></span>
+          <span class="vh-iconfont vh-line-arrow-down"></span>
         </div>
       </div>
     </div>
