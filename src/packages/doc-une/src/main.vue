@@ -684,10 +684,10 @@
 
       listenKeydown(e) {
         if (!this.hasPager) return;
-        if (e.keyCode === 38) {
+        if ([33, 37, 38].includes(e.keyCode)) {
           // 向上翻页
           this.handlePage('prevStep');
-        } else if (e.keyCode === 40) {
+        } else if ([34, 39, 40].includes(e.keyCode)) {
           // 向下翻页
           this.handlePage('nextStep');
         }
