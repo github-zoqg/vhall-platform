@@ -187,6 +187,7 @@
               console.log('attention-------->', res);
               this.$toast(this.$t('nav.nav_1030'));
               this.attentionStatus = 1;
+              window.vhallReportForWatch?.report(170019);
             });
         }
       }

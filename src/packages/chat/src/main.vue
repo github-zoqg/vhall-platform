@@ -28,7 +28,7 @@
         ref="chatlist"
         :key="virtual.key"
         :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
-        :keeps="30"
+        :keeps="25"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -119,6 +119,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
+  import { throttle } from 'lodash';
   //消息提示定时器
   let tipMsgTimer;
   export default {
@@ -365,6 +366,11 @@
           this.scrollBottom();
         });
       },
+      updateUnread: throttle(function () {
+        this.tipMsg = this.$t('chat.chat_1035', {
+          n: this.unReadMessageCount < 100 ? this.unReadMessageCount : '99' + '+'
+        });
+      }, 500),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -402,7 +408,7 @@
               this.isHasUnreadAtMeMsg = false;
               this.isHasUnreadReplyMsg = false;
               this.unReadMessageCount++;
-              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+              this.updateUnread();
             }
           }
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
