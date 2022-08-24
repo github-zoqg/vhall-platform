@@ -105,11 +105,11 @@
       :knowText="'知道了'"
       :confirmText="'确定'"
       :cancelText="'取消'"
-      @onSubmit="handleSetDefaultRecord"
+      @onSubmit="doConfirm"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
     >
-      <main slot="content">{{ popAlert.text }}</main>
+      <main slot="content" class="space">{{ popAlert.text }}</main>
     </saas-alert>
     <!-- 非默认回放暂存时间提示 -->
     <saas-alert
@@ -154,7 +154,8 @@
           // 设为默认回放的弹窗
           text: '',
           visible: false,
-          confirm: true
+          confirm: true,
+          level: false //优先级 彩排中 <30s 需要用户自己控制关闭，添加此标识
         },
         noDefaultPopAlert: {
           // 非默认回放暂存时间提示
@@ -525,8 +526,14 @@
           // 如果是回放录制页面
           this.handleSaveVodInRecord();
         } else {
-          // 如果是直播页面
-          this.handleSaveVodInLive();
+          if (!this.is_rehearsal) {
+            // 如果是直播页面
+            this.handleSaveVodInLive();
+          } else {
+            if (!this.popAlert.level) {
+              this.popAlert.visible = false;
+            }
+          }
         }
         this.liveStep = 1;
       },
@@ -608,10 +615,24 @@
         } else {
           //彩排弹框确认
           if (this.is_rehearsal) {
-            this.popAlert.text =
-              '点击确定后，直播彩排结束。\n彩排结束生成带有“彩排回放”标识的视频。';
-            this.popAlert.visible = true;
-            this.popAlert.confirm = true;
+            if (this.liveDuration < 30) {
+              window.clearInterval(this._durationInterval);
+              const { watchInitData } = this.roomBaseServer.state;
+              this.liveDuration = 0;
+              const type = watchInitData.webinar.mode == 1 ? '音频' : '视频';
+              this.popAlert.text = `${type}时长过短，不支持生成回放`;
+              this.popAlert.visible = true;
+              this.popAlert.confirm = false;
+              this.popAlert.level = true;
+
+              this.handleEndClickInLive();
+            } else {
+              this.popAlert.text =
+                '点击确定后，直播彩排结束。\n彩排结束生成带有“彩排回放”标识的视频。';
+              this.popAlert.visible = true;
+              this.popAlert.confirm = true;
+              this.popAlert.level = false;
+            }
           } else {
             this.handleEndClickInLive();
           }
@@ -670,6 +691,7 @@
           this.popAlert.text = `录制时长过短，不支持生成回放`;
           this.popAlert.visible = true;
           this.popAlert.confirm = false;
+          this.popAlert.level = false;
         } else {
           this.liveDuration = 0;
           // 如果是录制结束,并且录制时长大于30秒,展示录制结束组件
@@ -688,6 +710,7 @@
           this.popAlert.text = `${type}时长过短，不支持生成回放`;
           this.popAlert.visible = true;
           this.popAlert.confirm = false;
+          this.popAlert.level = false;
         } else {
           this.liveDuration = 0;
           // 直播结束生成回放
@@ -696,15 +719,29 @@
             live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
           });
           // 如果是直播并且开启生成回放的提示,展示弹窗
-          if (res.code == 200 && watchInitData.record_tip == 1 && !this.isRecord) {
+          if (
+            res.code == 200 &&
+            watchInitData.record_tip == 1 &&
+            !this.isRecord &&
+            !this.is_rehearsal
+          ) {
             this.popAlert.text = '自动生成回放成功，是否设置为默认回放？';
             this.popAlert.visible = true;
             this.popAlert.confirm = true;
             this.popAlert._recordId = res.data.record_id;
+            this.popAlert.level = false;
           }
         }
       },
 
+      //兼容 直播和彩排的确认框
+      doConfirm() {
+        if (this.is_rehearsal) {
+          this.handleEndClickInLive();
+        } else {
+          this.handleSetDefaultRecord();
+        }
+      },
       // 设置默认回放
       async handleSetDefaultRecord() {
         try {
@@ -725,6 +762,10 @@
       // 关闭弹窗
       closeConfirm() {
         this.popAlert.visible = false;
+        if (this.is_rehearsal) {
+          return;
+        }
+
         window.vhallReportForProduct?.report(110141);
         // 如果是关闭设置默认回放的弹窗，需要给出暂存时间提示，否则直接return
         if (!this.popAlert.confirm) return;
@@ -788,6 +829,9 @@
       // 派发推流事件
       clickStartLive() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        if (this.is_rehearsal) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
+        }
       }
     }
   };
@@ -795,6 +839,9 @@
 
 <style lang="less">
   .vmp-header-right {
+    .space {
+      white-space: pre-wrap;
+    }
     .vmp-header-right_btn-box {
       float: right;
       display: flex;
