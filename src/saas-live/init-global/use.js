@@ -27,7 +27,6 @@ import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';

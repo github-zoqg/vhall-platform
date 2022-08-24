@@ -300,7 +300,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
   import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
-  import _ from 'lodash';
+  import { throttle } from 'lodash';
 
   export default {
     name: 'VmpDocDlglist',
@@ -359,8 +359,8 @@
       }
     },
     mounted() {
-      this.handleThrottleDocSearch = _.throttle(this.handleDocSearch, 300, { trailing: false });
-      this.handleThrottleDoclibSearch = _.throttle(this.handleDoclibSearch, 300, {
+      this.handleThrottleDocSearch = throttle(this.handleDocSearch, 300, { trailing: false });
+      this.handleThrottleDoclibSearch = throttle(this.handleDoclibSearch, 300, {
         trailing: false
       });
 

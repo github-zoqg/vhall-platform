@@ -132,7 +132,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });

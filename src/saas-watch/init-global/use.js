@@ -1,7 +1,6 @@
 import Vue from 'vue';
-// element-ui
-// import ElementUI from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
+
+//字体图标样式
 // import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
@@ -48,7 +47,6 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpLivingEnd from '@/packages/living-end-pc';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';

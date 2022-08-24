@@ -86,7 +86,7 @@
           type: 2, //播放平台 2: wap
           entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 3, // wap
-          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         });
         window.vhallReport.report('ENTER_WATCH');
         this.state = 1;
@@ -129,7 +129,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });

@@ -148,6 +148,8 @@
 <script>
   import VmpDocToolbar from './toolbar/main.vue';
   import screenfull from 'screenfull';
+  import { throttle } from 'lodash';
+  import elementResizeDetectorMaker from 'element-resize-detector';
   import {
     useRoomBaseServer,
     useDocServer,
@@ -160,8 +162,8 @@
     usePlayerServer,
     useMicServer
   } from 'middle-domain';
-  import elementResizeDetectorMaker from 'element-resize-detector';
-  import { throttle, boxEventOpitons } from '@/app-shared/utils/tool';
+
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpDocUne',

@@ -74,7 +74,6 @@ export default class TaskQueue {
     const queueTaskItem = this.queue.shift();
     console.log('this.queue.queueTaskItem-------->', queueTaskItem);
     if (queueTaskItem) {
-      // await this.sleep(this.minTaskTime * this.running);
       this.running++;
       await queueTaskItem.playRewardEffect();
       await this.sleep(this.minTaskTime * this.running);

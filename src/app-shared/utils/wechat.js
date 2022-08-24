@@ -317,7 +317,7 @@ export async function wxAuthCheck(to, next) {
       });
       await roomBaseServer.getDegradationConfig({
         staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+        environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
         systemKey: 2
       });
 
