@@ -29,7 +29,7 @@
             v-if="liveStep == 1"
             class="vmp-header-right_btn rehearsal"
             :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
-            @click="handleStartClick($event, false, true)"
+            @click="doStartClick($event, true)"
           >
             开始彩排
             <!-- 提示 -->
@@ -42,7 +42,7 @@
             v-if="liveStep == 1"
             class="vmp-header-right_btn"
             :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
-            @click="handleStartClick"
+            @click="doStartClick"
           >
             开始直播
           </div>
@@ -561,9 +561,12 @@
           live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
       },
-      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   rehearsal:是否彩排
-      async handleStartClick(event, thirdPullStreamvalidate = false, rehearsal = false) {
+      doStartClick(event, rehearsal = false) {
         this.roomBaseServer.state.rehearsal = rehearsal;
+        this.handleStartClick();
+      },
+      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   rehearsal:是否彩排
+      async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
         //mode2  需要校验url，调用单独接口
@@ -573,6 +576,9 @@
         }
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
+          if (this.is_rehearsal) {
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
+          }
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
           this.handlePublishComplate();
         } else {
