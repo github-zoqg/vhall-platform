@@ -258,7 +258,7 @@
           }
           // 分组直播 没有结束讨论 直接结束直播
           if (msg.data.type == 'group_switch_end') {
-            if (msg.data.over_live) {
+            if (msg.data.over_type) {
               this.isLivingEnd = true;
             }
           }

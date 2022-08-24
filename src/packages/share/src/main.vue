@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-share">
     <el-dialog
-      :title="is_rehearsal ? $t('nav.nav_1013') + '彩排观看地址' : $t('nav.nav_1013')"
+      :title="isRehearsal ? $t('nav.nav_1013') + '彩排观看地址' : $t('nav.nav_1013')"
       :visible.sync="shareVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
@@ -82,15 +82,15 @@
     },
     computed: {
       // 是否是彩排
-      is_rehearsal() {
-        return this.$domainStore.state.roomBaseServer.rehearsal;
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
       }
     },
     methods: {
       // 事件驱动打开分享弹窗
       openShareDialog() {
         this.shareVisible = true;
-        if (this.is_rehearsal) {
+        if (this.isRehearsal) {
           this.watchWebUrl = getUrl(this.watchWebUrl, { rehearsal: 1 });
         }
         if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡

@@ -2,9 +2,9 @@
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
       <record-control
-        v-if="configList['cut_record'] && !isInGroup && !is_rehearsal"
+        v-if="configList['cut_record'] && !isInGroup && !isRehearsal"
       ></record-control>
-      <div class="rehearsalStatus" v-if="is_rehearsal && rehearsal_type == 1">
+      <div class="rehearsalStatus" v-if="isRehearsal && isLiving">
         <i class="dot"></i>
         彩排中
       </div>
@@ -49,28 +49,16 @@
         </template>
         <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
 
-        <template v-if="isRecord">
-          <div
-            v-if="liveStep == 3 && configList['ui.hide_live_end']"
-            class="vmp-header-right_btn vmp-header-right_duration"
-            @click="handleEndClick"
-          >
-            <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
-            <span class="vmp-header-right_duration-end">结束录制</span>
-          </div>
-        </template>
-        <template v-else>
-          <div
-            v-if="liveStep == 3 && configList['ui.hide_live_end']"
-            class="vmp-header-right_btn vmp-header-right_duration"
-            @click="handleEndClick"
-          >
-            <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
-            <span class="vmp-header-right_duration-end">
-              {{ is_rehearsal ? '结束彩排' : '结束直播' }}
-            </span>
-          </div>
-        </template>
+        <div
+          v-if="liveStep == 3 && configList['ui.hide_live_end']"
+          class="vmp-header-right_btn vmp-header-right_duration"
+          @click="handleEndClick"
+        >
+          <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
+          <span class="vmp-header-right_duration-end">
+            {{ isRecord ? '结束录制' : isRehearsal ? '结束彩排' : '结束直播' }}
+          </span>
+        </div>
 
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
@@ -180,12 +168,8 @@
         return this.$domainStore.state.roomBaseServer.clientType == 'record';
       },
       // 是否是彩排
-      is_rehearsal() {
-        return this.$domainStore.state.roomBaseServer.rehearsal;
-      },
-      // 彩排状态
-      rehearsal_type() {
-        return this.$domainStore.state.roomBaseServer.rehearsal_type;
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
@@ -525,15 +509,12 @@
         if (this.isRecord) {
           // 如果是回放录制页面
           this.handleSaveVodInRecord();
-        } else {
-          if (!this.is_rehearsal) {
-            // 如果是直播页面
-            this.handleSaveVodInLive();
-          } else {
-            if (!this.popAlert.level) {
-              this.popAlert.visible = false;
-            }
-          }
+        } else if (!this.isRehearsal) {
+          // 如果是直播页面
+          this.handleSaveVodInLive();
+        } else if (!this.popAlert.level) {
+          // 如果是彩排
+          this.popAlert.visible = false;
         }
         this.liveStep = 1;
       },
@@ -550,7 +531,7 @@
         return this.roomBaseServer.startLive({
           webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
           start_type: this.roomBaseServer.state.interactToolStatus.start_type,
-          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
+          live_type: this.isRehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
       },
       // 调开始直播接口- 第三方
@@ -558,14 +539,17 @@
         return this.roomBaseServer.startLiveThird({
           webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
           dest_url: this.roomBaseServer.state.thirdPullStreamUrl,
-          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
+          live_type: this.isRehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
       },
-      doStartClick(event, rehearsal = false) {
-        this.roomBaseServer.state.rehearsal = rehearsal;
+      doStartClick(event, isRehearsal = false) {
+        // 如果是开始彩排，将场次类型改为 2
+        if (isRehearsal) {
+          this.roomBaseServer.state.watchInitData.live_type = 2;
+        }
         this.handleStartClick();
       },
-      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   rehearsal:是否彩排
+      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   isRehearsal:是否彩排
       async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
@@ -576,7 +560,7 @@
         }
         this.liveStep = 2;
         if (this.isThirdStream || this.isStreamYun) {
-          if (this.is_rehearsal) {
+          if (this.isRehearsal) {
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
           }
           // 若是选择第三方发起，则直接进行调用接口更改liveStep状态 || 云导播无需推流 直接调用开播接口即可
@@ -620,7 +604,7 @@
           this.handleEndClickInRecord();
         } else {
           //彩排弹框确认
-          if (this.is_rehearsal) {
+          if (this.isRehearsal) {
             if (this.liveDuration < 30) {
               window.clearInterval(this._durationInterval);
               const { watchInitData } = this.roomBaseServer.state;
@@ -662,7 +646,7 @@
         const res = await this.roomBaseServer.endLive({
           webinar_id: watchInitData.webinar.id,
           end_type: interactToolStatus.start_type,
-          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
+          live_type: this.isRehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
@@ -722,14 +706,14 @@
           // 直播结束生成回放
           const res = await this.roomBaseServer.createRecordInLive({
             webinar_id: watchInitData.webinar.id,
-            live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
+            live_type: this.isRehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
           });
           // 如果是直播并且开启生成回放的提示,展示弹窗
           if (
             res.code == 200 &&
             watchInitData.record_tip == 1 &&
             !this.isRecord &&
-            !this.is_rehearsal
+            !this.isRehearsal
           ) {
             this.popAlert.text = '自动生成回放成功，是否设置为默认回放？';
             this.popAlert.visible = true;
@@ -742,7 +726,7 @@
 
       //兼容 直播和彩排的确认框
       doConfirm() {
-        if (this.is_rehearsal) {
+        if (this.isRehearsal) {
           this.handleEndClickInLive();
         } else {
           this.handleSetDefaultRecord();
@@ -768,7 +752,7 @@
       // 关闭弹窗
       closeConfirm() {
         this.popAlert.visible = false;
-        if (this.is_rehearsal) {
+        if (this.isRehearsal) {
           return;
         }
 
@@ -835,7 +819,7 @@
       // 派发推流事件
       clickStartLive() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
-        if (this.is_rehearsal) {
+        if (this.isRehearsal) {
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
         }
       }

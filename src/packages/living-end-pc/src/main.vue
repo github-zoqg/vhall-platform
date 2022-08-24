@@ -72,7 +72,7 @@
           this.isLivingEnd = true;
         }
         if (msg.data.type == 'group_switch_end') {
-          if (msg.data.over_live) {
+          if (msg.data.over_type) {
             this.isLivingEnd = true;
           }
         }
