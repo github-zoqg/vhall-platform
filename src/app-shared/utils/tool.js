@@ -233,3 +233,61 @@ export const getCookie = name => {
     return '';
   }
 };
+
+/**
+ * 将 queryString 转换成 key-value 形式
+ * @param {String} url url地址
+ * @returns object
+ */
+export const parseQueryString = url => {
+  return [...new URL(url).searchParams].reduce(
+    (cur, [key, value]) => ((cur[key] = value), cur),
+    {}
+  );
+};
+
+/**
+ * 将oss图片地址中的图片处理参数解析成 key-value 的形式
+ * @param {String} imgUrl 图片地址
+ * @returns Object
+ */
+export const parseImgOssQueryString = imgUrl => {
+  const queryObj = parseQueryString(imgUrl);
+  let result = {};
+
+  if (!queryObj['x-oss-process']) {
+    return queryObj;
+  } else {
+    result = { ...queryObj };
+    delete result['x-oss-process'];
+  }
+
+  const xOssProcessStr = queryObj['x-oss-process'];
+  const xOssProcessArr = xOssProcessStr.split(/image\/|x-oss-process=image\/|\//);
+
+  // 解析最外层参数，blur  bright  crop等
+  return xOssProcessArr.reduce((currentObj, item) => {
+    if (!item) return currentObj;
+    const resultKey = item.substring(0, item.indexOf(','));
+    let resultVal = null;
+    let itemVal = item.substring(item.indexOf(',') + 1);
+    if (
+      // 亮度、对比度、锐化、渐进显示、旋转、自适应方向、格式转换，直接就是值，不需要再做第二层解析
+      ['bright', 'contrast', 'sharpen', 'interlace', 'rotate', 'auto-orient', 'format'].includes(
+        resultKey
+      )
+    ) {
+      resultVal = itemVal;
+    } else {
+      // 解析每个参数具体的值，blur  bright  crop等对应的具体的值
+      resultVal = itemVal.split(',').reduce((cur, itemStr) => {
+        if (!itemStr) return cur;
+        const itemArr = itemStr.split('_');
+        cur[itemArr[0]] = itemArr[1];
+        return cur;
+      }, {});
+    }
+    currentObj[resultKey] = resultVal;
+    return currentObj;
+  }, result);
+};
