@@ -56,6 +56,7 @@
           environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
           systemKey: 2
         });
+        // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
         domain.initVhallReport({
           bu: 0,
           user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -71,7 +72,7 @@
         domain.initVhallReportForProduct({
           env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
           app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
-          pf: 8, // 客户端类型  web 网页端用 8
+          pf: 7,
           business_uid: watchInitData.join_info.third_party_user_id, // B端客户 id
           user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）
           webinar_id: watchInitData.webinar.id // 活动 id

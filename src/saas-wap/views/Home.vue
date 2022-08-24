@@ -145,8 +145,8 @@
           window.sessionStorage.removeItem('recordIds');
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
-          // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
           const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+          // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -155,13 +155,13 @@
             os: getVhallReportOs(),
             type: 2, //播放平台 2: wap
             entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            pf: 3, // wap
+            pf: 10,
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });
           window.vhallReport.report('ENTER_WATCH');
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 10 // 7：PC 10: wap
+            pf: 10
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,
