@@ -25,7 +25,7 @@
         />
       </div> -->
       <!-- 邀请卡 -->
-      <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box">
+      <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box" @click="report">
         <a
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
@@ -107,6 +107,11 @@
       openReward() {
         console.log('showReward');
         this.$refs.reward.showReward();
+      },
+      report() {
+        window.vhallReportForWatch?.report(170020, {
+          share_channel: 4
+        });
       }
     }
   };

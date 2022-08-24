@@ -35,7 +35,7 @@ const htmlConfig = {
     ElementUi: '//s3.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     iconfontCommon:
       '//s3.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.8/iconfont.min.css',
+    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
     overlayscrollbarsCss:
       '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css'
   }

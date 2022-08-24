@@ -261,6 +261,7 @@
                     customClass: 'zdy-info-box'
                   });
                   this.isAttention = true;
+                  window.vhallReportForWatch?.report(170019); // 上报关注成功
                 }
               })
               .catch(e => {
