@@ -197,10 +197,14 @@
           videoNode // 远端流显示容器， 必填
           // dual: this.mainScreen == this.accountId ? 1 : 0 // 双流订阅选项， 0 为小流 ， 1 为大流  选填。 默认为 1
         };
+        window.vhallReportForProduct?.toStartReporting(110198, 110199, {
+          opt
+        });
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.warn('订阅成功---------', e);
+            window.vhallReportForProduct?.toResultsReporting(110199, { res: e });
             try {
               if (document.querySelector(`#stream${e.streamId}`)) {
                 document.querySelector(`#stream${e.streamId}`).play();
@@ -214,6 +218,7 @@
             this.getLevel();
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110199, { res: e });
             console.error('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },

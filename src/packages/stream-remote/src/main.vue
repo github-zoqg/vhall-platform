@@ -524,10 +524,14 @@
         };
 
         console.log('订阅参数', opt, this.stream);
+        window.vhallReportForProduct?.toStartReporting(110198, 110199, {
+          opt
+        });
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            window.vhallReportForProduct?.toResultsReporting(110199, { res: e });
             if (this.joinInfo.role_name === 1) {
               this.interactiveServer.resetLayout();
             }
@@ -538,6 +542,7 @@
             this.getLevel();
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110199, { res: e });
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
