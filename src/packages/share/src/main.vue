@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-share">
     <el-dialog
-      :title="$t('nav.nav_1013')"
+      :title="is_rehearsal ? $t('nav.nav_1013') + '彩排观看地址' : $t('nav.nav_1013')"
       :visible.sync="shareVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
@@ -60,6 +60,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { getUrl } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpShare',
     data() {
@@ -79,10 +80,19 @@
     created() {
       this.roomBaseState = this.roomBaseServer.state;
     },
+    computed: {
+      // 是否是彩排
+      is_rehearsal() {
+        return this.$domainStore.state.roomBaseServer.rehearsal;
+      }
+    },
     methods: {
       // 事件驱动打开分享弹窗
       openShareDialog() {
         this.shareVisible = true;
+        if (this.is_rehearsal) {
+          this.watchWebUrl = getUrl(this.watchWebUrl, { rehearsal: 1 });
+        }
         if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡
         if (this.roomBaseState.inviteCard.status == '1') {
           this.isWatchInvite = true;
@@ -110,16 +120,18 @@
       openWeixinDialog() {
         this.shareOtherVisible = true;
         const shareId = `${this.roomBaseState.watchInitData.share_id}-3`;
-        const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
+        let url = getUrl(this.watchWebUrl, { shareId: shareId });
         this.shareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
       },
       // 打开qq分享 - 2
       openQqDialog() {
+        let urlStr = getUrl(this.watchWebUrl, {
+          shareId: this.roomBaseState.watchInitData.share_id + '-2'
+        });
+
         const p = {
           /* 获取URL，可加上来自分享到QQ标识，方便统计 */
-          url: `${this.watchWebUrl}?shareId=${encodeURIComponent(
-            this.roomBaseState.watchInitData.share_id + '-2'
-          )}`,
+          url: urlStr,
           desc: '',
           /* 分享标题(可选) */
           title: this.$t('nav.nav_1026'),
@@ -143,7 +155,7 @@
       // 打开微博 - 1
       openWeiboDialog() {
         const shareId = `${this.roomBaseState.watchInitData.share_id}-1`;
-        const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
+        let url = getUrl(this.watchWebUrl, { shareId: shareId });
         const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
         const p = {
           url: weiboShareUrl,

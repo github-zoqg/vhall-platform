@@ -72,6 +72,12 @@ export default {
         cuid: 'comThirdStream',
         method: 'validatePullUrl'
       }
+    ],
+    emitOpenShare: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
     ]
   },
   // 中间主区域容器

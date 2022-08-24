@@ -233,3 +233,22 @@ export const getCookie = name => {
     return '';
   }
 };
+
+/**
+ * @description 拼接地址栏参数
+ */
+export const getUrl = (url, data) => {
+  return (url += (url.indexOf('?') < 0 ? '?' : '&') + getParam(data));
+};
+
+/**
+ * @description 传入对象返回url参数
+ */
+export const getParam = data => {
+  let url = '';
+  for (let k in data) {
+    let value = data[k] !== undefined ? data[k] : '';
+    url += `&${k}=${encodeURIComponent(value)}`;
+  }
+  return url ? url.substring(1) : '';
+};

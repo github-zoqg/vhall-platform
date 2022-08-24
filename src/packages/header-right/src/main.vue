@@ -1,32 +1,77 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <record-control v-if="configList['cut_record'] && !isInGroup"></record-control>
+      <record-control
+        v-if="configList['cut_record'] && !isInGroup && !is_rehearsal"
+      ></record-control>
+      <div class="rehearsalStatus" v-if="is_rehearsal && rehearsal_type == 1">
+        <i class="dot"></i>
+        彩排中
+      </div>
       <!-- 查看saas-v3-lives 增加 非助理 ： 设备不可用 + 非助理 + 非第三方发起-->
       <template v-if="deviceStatus == 2 && !isThirdStream && roleName != 3 && !isStreamYun">
         <div class="vmp-header-right_btn" @click="handleRecheck">重新检测</div>
       </template>
       <!-- 主持人显示开始结束直播按钮 -->
       <template v-else-if="roleName == 1 && !isInGroup">
-        <div
-          v-if="liveStep == 1"
-          class="vmp-header-right_btn"
-          :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
-          @click="handleStartClick"
-        >
-          {{ isRecord ? '开始录制' : '开始直播' }}
-        </div>
+        <template v-if="isRecord">
+          <div
+            v-if="liveStep == 1"
+            class="vmp-header-right_btn"
+            :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+            @click="handleStartClick"
+          >
+            开始录制
+          </div>
+        </template>
+        <template v-else>
+          <div
+            v-if="liveStep == 1"
+            class="vmp-header-right_btn rehearsal"
+            :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+            @click="handleStartClick($event, false, true)"
+          >
+            开始彩排
+            <!-- 提示 -->
+            <div class="audience-tip">
+              <div class="audience-tip__arrow"></div>
+              开启彩排后，生存测试观众地址。正式观众 地址依然有效，但看不到彩排内容。
+            </div>
+          </div>
+          <div
+            v-if="liveStep == 1"
+            class="vmp-header-right_btn"
+            :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+            @click="handleStartClick"
+          >
+            开始直播
+          </div>
+        </template>
         <div v-if="liveStep == 2" class="vmp-header-right_btn">正在启动...</div>
-        <div
-          v-if="liveStep == 3 && configList['ui.hide_live_end']"
-          class="vmp-header-right_btn vmp-header-right_duration"
-          @click="handleEndClick"
-        >
-          <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
-          <span class="vmp-header-right_duration-end">
-            {{ isRecord ? '结束录制' : '结束直播' }}
-          </span>
-        </div>
+
+        <template v-if="isRecord">
+          <div
+            v-if="liveStep == 3 && configList['ui.hide_live_end']"
+            class="vmp-header-right_btn vmp-header-right_duration"
+            @click="handleEndClick"
+          >
+            <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
+            <span class="vmp-header-right_duration-end">结束录制</span>
+          </div>
+        </template>
+        <template v-else>
+          <div
+            v-if="liveStep == 3 && configList['ui.hide_live_end']"
+            class="vmp-header-right_btn vmp-header-right_duration"
+            @click="handleEndClick"
+          >
+            <span class="vmp-header-right_duration-text">{{ formatDuration }}</span>
+            <span class="vmp-header-right_duration-end">
+              {{ is_rehearsal ? '结束彩排' : '结束直播' }}
+            </span>
+          </div>
+        </template>
+
         <div v-if="liveStep == 4" class="vmp-header-right_btn">正在结束...</div>
       </template>
       <!-- 嘉宾显示申请上麦按钮 -->
@@ -60,11 +105,11 @@
       :knowText="'知道了'"
       :confirmText="'确定'"
       :cancelText="'取消'"
-      @onSubmit="handleSetDefaultRecord"
+      @onSubmit="doConfirm"
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
     >
-      <main slot="content">{{ popAlert.text }}</main>
+      <main slot="content" class="space">{{ popAlert.text }}</main>
     </saas-alert>
     <!-- 非默认回放暂存时间提示 -->
     <saas-alert
@@ -109,7 +154,8 @@
           // 设为默认回放的弹窗
           text: '',
           visible: false,
-          confirm: true
+          confirm: true,
+          level: false //优先级 彩排中 <30s 需要用户自己控制关闭，添加此标识
         },
         noDefaultPopAlert: {
           // 非默认回放暂存时间提示
@@ -132,6 +178,14 @@
       // 是否是录制
       isRecord() {
         return this.$domainStore.state.roomBaseServer.clientType == 'record';
+      },
+      // 是否是彩排
+      is_rehearsal() {
+        return this.$domainStore.state.roomBaseServer.rehearsal;
+      },
+      // 彩排状态
+      rehearsal_type() {
+        return this.$domainStore.state.roomBaseServer.rehearsal_type;
       },
       configList() {
         return this.$domainStore.state.roomBaseServer.configList;
@@ -472,8 +526,14 @@
           // 如果是回放录制页面
           this.handleSaveVodInRecord();
         } else {
-          // 如果是直播页面
-          this.handleSaveVodInLive();
+          if (!this.is_rehearsal) {
+            // 如果是直播页面
+            this.handleSaveVodInLive();
+          } else {
+            if (!this.popAlert.level) {
+              this.popAlert.visible = false;
+            }
+          }
         }
         this.liveStep = 1;
       },
@@ -489,18 +549,21 @@
       postStartLive() {
         return this.roomBaseServer.startLive({
           webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
-          start_type: this.roomBaseServer.state.interactToolStatus.start_type
+          start_type: this.roomBaseServer.state.interactToolStatus.start_type,
+          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
       },
       // 调开始直播接口- 第三方
       postStartLiveThird() {
         return this.roomBaseServer.startLiveThird({
           webinar_id: this.roomBaseServer.state.watchInitData.webinar.id,
-          dest_url: this.roomBaseServer.state.thirdPullStreamUrl
+          dest_url: this.roomBaseServer.state.thirdPullStreamUrl,
+          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
       },
-      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验
-      async handleStartClick(event, thirdPullStreamvalidate = false) {
+      // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   rehearsal:是否彩排
+      async handleStartClick(event, thirdPullStreamvalidate = false, rehearsal = false) {
+        this.roomBaseServer.state.rehearsal = rehearsal;
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
         //mode2  需要校验url，调用单独接口
@@ -550,7 +613,29 @@
         if (this.isRecord) {
           this.handleEndClickInRecord();
         } else {
-          this.handleEndClickInLive();
+          //彩排弹框确认
+          if (this.is_rehearsal) {
+            if (this.liveDuration < 30) {
+              window.clearInterval(this._durationInterval);
+              const { watchInitData } = this.roomBaseServer.state;
+              this.liveDuration = 0;
+              const type = watchInitData.webinar.mode == 1 ? '音频' : '视频';
+              this.popAlert.text = `${type}时长过短，不支持生成回放`;
+              this.popAlert.visible = true;
+              this.popAlert.confirm = false;
+              this.popAlert.level = true;
+
+              this.handleEndClickInLive();
+            } else {
+              this.popAlert.text =
+                '点击确定后，直播彩排结束。\n彩排结束生成带有“彩排回放”标识的视频。';
+              this.popAlert.visible = true;
+              this.popAlert.confirm = true;
+              this.popAlert.level = false;
+            }
+          } else {
+            this.handleEndClickInLive();
+          }
         }
       },
       // 直播页 点击结束直播
@@ -570,7 +655,8 @@
 
         const res = await this.roomBaseServer.endLive({
           webinar_id: watchInitData.webinar.id,
-          end_type: interactToolStatus.start_type
+          end_type: interactToolStatus.start_type,
+          live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
         });
         // 如果开启了分屏
         if (this.splitScreenServer.state.isOpenSplitScreen) {
@@ -605,6 +691,7 @@
           this.popAlert.text = `录制时长过短，不支持生成回放`;
           this.popAlert.visible = true;
           this.popAlert.confirm = false;
+          this.popAlert.level = false;
         } else {
           this.liveDuration = 0;
           // 如果是录制结束,并且录制时长大于30秒,展示录制结束组件
@@ -623,22 +710,38 @@
           this.popAlert.text = `${type}时长过短，不支持生成回放`;
           this.popAlert.visible = true;
           this.popAlert.confirm = false;
+          this.popAlert.level = false;
         } else {
           this.liveDuration = 0;
           // 直播结束生成回放
           const res = await this.roomBaseServer.createRecordInLive({
-            webinar_id: watchInitData.webinar.id
+            webinar_id: watchInitData.webinar.id,
+            live_type: this.is_rehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
           });
           // 如果是直播并且开启生成回放的提示,展示弹窗
-          if (res.code == 200 && watchInitData.record_tip == 1 && !this.isRecord) {
+          if (
+            res.code == 200 &&
+            watchInitData.record_tip == 1 &&
+            !this.isRecord &&
+            !this.is_rehearsal
+          ) {
             this.popAlert.text = '自动生成回放成功，是否设置为默认回放？';
             this.popAlert.visible = true;
             this.popAlert.confirm = true;
             this.popAlert._recordId = res.data.record_id;
+            this.popAlert.level = false;
           }
         }
       },
 
+      //兼容 直播和彩排的确认框
+      doConfirm() {
+        if (this.is_rehearsal) {
+          this.handleEndClickInLive();
+        } else {
+          this.handleSetDefaultRecord();
+        }
+      },
       // 设置默认回放
       async handleSetDefaultRecord() {
         try {
@@ -659,6 +762,10 @@
       // 关闭弹窗
       closeConfirm() {
         this.popAlert.visible = false;
+        if (this.is_rehearsal) {
+          return;
+        }
+
         window.vhallReportForProduct?.report(110141);
         // 如果是关闭设置默认回放的弹窗，需要给出暂存时间提示，否则直接return
         if (!this.popAlert.confirm) return;
@@ -722,6 +829,9 @@
       // 派发推流事件
       clickStartLive() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStartLive'));
+        if (this.is_rehearsal) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenShare'));
+        }
       }
     }
   };
@@ -729,11 +839,33 @@
 
 <style lang="less">
   .vmp-header-right {
+    .space {
+      white-space: pre-wrap;
+    }
     .vmp-header-right_btn-box {
       float: right;
       display: flex;
       height: 100%;
       align-items: center;
+      position: relative;
+      .rehearsalStatus {
+        color: #fb3a32;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        margin-right: 12px;
+        position: relative;
+        .dot {
+          position: absolute;
+          top: 6px;
+          left: -12px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #fb3a32;
+          content: '';
+        }
+      }
     }
     .vmp-header-right_btn {
       width: 80px;
@@ -746,6 +878,49 @@
       padding: 0 10px;
       cursor: pointer;
       background-color: @bg-error-light;
+      &.rehearsal {
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        background-color: transparent;
+        margin-right: 12px;
+        box-sizing: border-box;
+        width: 100px;
+        &:hover {
+          border: 1px solid #fb3a32;
+          background-color: #fb3a32;
+          .audience-tip {
+            display: block;
+          }
+        }
+        .audience-tip {
+          display: none;
+          position: absolute;
+          top: 51px;
+          left: -217px;
+          width: 290px;
+          word-break: break-all;
+          background: #ff9b00;
+          border-radius: 4px;
+          line-height: 20px;
+          padding: 10px 12px;
+          color: #fff;
+          box-sizing: border-box;
+          user-select: none;
+          font-size: 14px;
+          text-align: left;
+
+          .audience-tip__arrow {
+            position: absolute;
+            display: block;
+            width: 0;
+            height: 0;
+            border-width: 0 8px 8px;
+            border-style: solid;
+            border-color: transparent transparent #ff9b00;
+            top: -8px;
+            right: 14px;
+          }
+        }
+      }
     }
     .right_btn_dis {
       background: #fc5659;
