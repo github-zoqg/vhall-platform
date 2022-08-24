@@ -1546,9 +1546,17 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
+        window.vhallReportForProduct?.toStartReporting(110194, 110195, {
+          params
+        });
         this.micServer
           .hostAgreeApply(params)
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res,
+              event_type: 'interface',
+              request_id: res?.request_id
+            });
             if (res.code !== 200) {
               this.$message.error(res.msg);
               return;
@@ -1556,6 +1564,9 @@
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res: err
+            });
             console.log('allow speak fail ::', err);
           });
       },
