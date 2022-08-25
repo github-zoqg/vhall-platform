@@ -463,7 +463,7 @@
 
 <style lang="less">
   .vmp-chat-operate-container {
-    @active-color: #fc5659;
+    @active-color: var(--theme-color);
     @font-error: #fb3a32;
     display: flex;
     flex-direction: column;
