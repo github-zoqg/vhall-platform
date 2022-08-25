@@ -282,8 +282,13 @@
         }
       },
       authCheck() {
-        console.log(55555);
         this.$emit('authFetch');
+        if (this.type === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.verify
+          });
+        }
       },
       payMore() {
         this.$emit('payMore', { type: 3 });

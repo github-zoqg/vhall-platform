@@ -178,13 +178,12 @@ Vue.filter('transformWatchPraise', num => {
   num = Number(num);
   if (num < 10000) {
     return num;
-  } else if (num >= 10000 && num < 1000000) {
-    const n = Math.floor(num / 10000);
-    let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
-    l = l === 0 ? '' : '.' + l;
-    return (num = n + l + 'w');
   } else {
-    return (num = '999w');
+    const n = (num / 10000).toFixed(1);
+    if (n > 999.9) {
+      return '999.9w';
+    }
+    return n + 'w';
   }
 });
 
