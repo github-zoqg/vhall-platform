@@ -785,6 +785,10 @@
     height: 100%;
     position: relative;
 
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
+
     .vmp-chat-welcome {
       width: 100%;
       display: flex;

@@ -267,6 +267,11 @@
     position: relative;
     width: 100%;
     height: 100%;
+
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
+
     .private-chat-content {
       position: relative;
       &:last-child {
