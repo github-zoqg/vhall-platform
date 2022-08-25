@@ -768,9 +768,10 @@
     setRequestBody,
     setRequestHeaders
   } from 'middle-domain';
+  import { debounce } from 'lodash';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
   import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import { debounce, getQueryString } from '@/app-shared/utils/tool';
+  import { getQueryString } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
     name: 'VmpQaAdmin',

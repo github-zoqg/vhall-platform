@@ -2,7 +2,21 @@
   <div class="vmp-video-polling" ref="videoPolling" id="videoPollingWrap">
     <!-- 头部悬浮区 -->
     <div class="vmp-video-polling__tip">
-      <span class="vmp-video-polling__tip-txt">视频轮巡视频墙</span>
+      <span class="vmp-video-polling__tip-txt">
+        视频轮巡视频墙&nbsp;
+        <el-tooltip effect="dark" placement="left-end">
+          <div class="vmp-video-polling__tip-tooltip" slot="content">
+            以下几种情况会导致轮巡画面黑屏：
+            <br />
+            1、用户拒绝了您的轮巡邀请
+            <br />
+            2、用户设备不支持轮训
+            <br />
+            3、用户的网络异常
+          </div>
+          <i class="vmp-video-polling__tip-icon vh-iconfont vh-line-question"></i>
+        </el-tooltip>
+      </span>
       <div class="vmp-video-polling__tip-wrap">
         <span class="vmp-video-polling__tip-auto" v-if="isAutoPolling">
           距离展示下一组 {{ zeroPadding(minute) }}: {{ zeroPadding(second) }}
@@ -42,7 +56,10 @@
               :key="speaker.accountId"
             >
               <div class="vmp-video-polling__stream-container-box">
-                <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
+                <vmp-stream-polling-remote
+                  :key="speaker.streamId ? speaker.streamId : speaker.accountId"
+                  :stream="speaker"
+                ></vmp-stream-polling-remote>
               </div>
             </div>
           </div>
@@ -82,6 +99,18 @@
     >
       <main slot="content">{{ alertInfo.text }}</main>
     </saas-alert>
+    <!-- 异常弹窗 -->
+    <saas-alert
+      :visible="PopAlertOffline.visible"
+      :retry="'点击重试'"
+      :isShowClose="false"
+      @onClose="PopAlertOfflineClose"
+      @onSubmit="PopAlertOfflineConfirm"
+    >
+      <div slot="content">
+        <span>{{ PopAlertOffline.text }}</span>
+      </div>
+    </saas-alert>
   </div>
 </template>
 
@@ -114,6 +143,11 @@
         confirmInfo: {
           visible: false, // 是否显示
           text: '' // 确认的内容
+        },
+        // 网络异常弹窗状态
+        PopAlertOffline: {
+          visible: false,
+          text: ''
         }
       };
     },
@@ -225,9 +259,20 @@
         });
         // 直播结束
         this.videoPollingServer.$on('VIDEO_POLLING_OVER', () => {
+          const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
+          sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 0);
+          sessionStorage.setItem(`pollingAgreeStatus_${roomId}`, 0);
           localStorage.removeItem(`isVideoPolling_${this.$route.params.id}`);
           // 在其他页面通过js脚本打开的标签页，直接 close 是关不掉的
           window.open(location, '_self').close();
+        });
+
+        // 房间信令异常断开事件
+        this.interactiveServer.$on('EVENT_ROOM_EXCDISCONNECTED', msg => {
+          console.log('网络异常断开', msg);
+
+          this.PopAlertOffline.text = '网络异常导致互动房间连接失败';
+          this.PopAlertOffline.visible = true;
         });
       },
       // 下一组
@@ -377,6 +422,12 @@
       confirmSave() {
         this._confirmCb && typeof this._confirmCb === 'function' && this._confirmCb();
         this.confirmInfo.visible = false;
+      },
+      PopAlertOfflineClose() {
+        this.PopAlertOffline.visible = false;
+      },
+      PopAlertOfflineConfirm() {
+        window.location.reload();
       }
     }
   };
@@ -403,6 +454,14 @@
         color: #e6e6e6;
         line-height: 24px;
         margin-left: 20px;
+      }
+      &-icon {
+        font-size: 20px;
+        vertical-align: bottom;
+        color: #fff;
+      }
+      &-tooltip {
+        line-height: 18px;
       }
       &-wrap {
         padding-right: 8px;

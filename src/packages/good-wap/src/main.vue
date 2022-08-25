@@ -358,6 +358,11 @@
             -webkit-line-clamp: 2; /** 显示的行数 **/
             overflow: hidden; /** 隐藏超出的内容 **/
             text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            /* autoprefixer: ignore next */
+            -webkit-box-orient: vertical;
             text-align: left;
           }
           .describe {

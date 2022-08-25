@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import DomainStore from '@/app-shared/domain-store/index';
+import { bu_appId } from './businessData';
+
 import {
   setBaseUrl,
   setRequestHeaders,
@@ -30,7 +32,7 @@ setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: localStorage.getItem('token') || '',
   'biz-id': 2, //业务线标识 saas: 2 知客: 4
-  'biz-application-id': 'fd8d3653' //paas应用id saas: fd8d3653 知客: 02391153
+  'biz-application-id': bu_appId[process.env.VUE_APP_SAAS_ENV]
 });
 
 // 平台标识

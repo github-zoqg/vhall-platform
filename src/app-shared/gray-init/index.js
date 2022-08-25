@@ -27,7 +27,8 @@ export default function grayInit(options) {
     } else if (options.meta.grayType == 'subject') {
       roomSubjectApi.subject
         .subjectInitBefore({
-          subject_id: options.query.id
+          subject_id:
+            options.path.indexOf('/special/entryform/') != -1 ? options.params.id : options.query.id
         })
         .then(res => {
           const grayUserId = (res.code == 200 && res.data && res.data.user_id) || null;
