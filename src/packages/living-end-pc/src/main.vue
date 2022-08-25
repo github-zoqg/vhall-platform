@@ -14,12 +14,21 @@
       <div class="end_img">
         <img src="../src/img/liveEnd.png" alt="" />
       </div>
-      <h1>{{ $t('player.player_1017') }}</h1>
+      <h1>{{ isRehearsal ? $t('player.player_1027') : $t('player.player_1017') }}</h1>
       <p v-if="isEmbedVideo">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </p>
     </div>
+    <section class="vmp-living-end-to" v-if="isShowLiveStartNotice">
+      <section class="vmp-living-end-to-start">
+        <section class="vmp-living-end-cover"></section>
+        <span>{{ $t('player.player_1018') }}</span>
+        <button class="vmp-living-end__btn" @click="reloadPage">
+          {{ $t('player.player_1013') }}
+        </button>
+      </section>
+    </section>
   </div>
 </template>
 <script>
@@ -27,6 +36,10 @@
   export default {
     name: 'VmpLivingEnd',
     computed: {
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
@@ -53,6 +66,7 @@
     },
     data() {
       return {
+        isShowLiveStartNotice: false,
         isLivingEnd: false
       };
     },
@@ -67,6 +81,10 @@
     },
     mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
+        // live_start 开始直播
+        if (msg.data.type == 'live_start' && this.isRehearsal) {
+          this.isShowLiveStartNotice = true;
+        }
         // live_over 结束直播
         if (msg.data.type == 'live_over') {
           this.isLivingEnd = true;
@@ -77,6 +95,11 @@
           }
         }
       });
+    },
+    methods: {
+      reloadPage() {
+        location.reload();
+      }
     }
   };
 </script>
@@ -133,6 +156,60 @@
       color: #999;
       padding-left: 38px;
       font-weight: 400;
+    }
+    &-to {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 35;
+      &-start {
+        width: 400px;
+        height: 260px;
+        background: #ffffff;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        color: #333333;
+        line-height: 20px;
+        text-align: center;
+        padding-top: 54px;
+        box-sizing: border-box;
+        margin: 20vh auto 0px auto;
+        .vmp-living-end-cover {
+          display: block;
+          width: 80px;
+          height: 80px;
+          margin: 0px auto;
+          margin-bottom: 10px;
+          background: url('./img/live_start.png') no-repeat;
+          background-size: 100%;
+          background-position: center;
+        }
+        span {
+          display: block;
+          text-align: center;
+          margin-bottom: 18px;
+          height: 20px;
+          line-height: 20px;
+        }
+        .vmp-living-end__btn {
+          width: 160px;
+          height: 40px;
+          background: #fb3a32;
+          border-radius: 20px;
+          font-size: 14px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: #ffffff;
+          line-height: 40px;
+          border: none;
+          outline: none;
+        }
+      }
     }
   }
 </style>

@@ -35,7 +35,7 @@
             <!-- 提示 -->
             <div class="audience-tip">
               <div class="audience-tip__arrow"></div>
-              开启彩排后，生存测试观众地址。正式观众 地址依然有效，但看不到彩排内容。
+              开启彩排后，生成测试观众地址。正式观众地址依然有效，但看不到彩排内容。
             </div>
           </div>
           <div
@@ -239,6 +239,7 @@
       }
       const { watchInitData } = this.roomBaseServer.state;
       if (watchInitData.webinar.type == 1 || watchInitData?.record?.is_recording == 1) {
+        this._tempLiveType = watchInitData.live_type;
         if (watchInitData?.record?.is_recording == 1) {
           this.liveDuration = watchInitData.record.record_time;
         } else {
@@ -509,7 +510,8 @@
         if (this.isRecord) {
           // 如果是回放录制页面
           this.handleSaveVodInRecord();
-        } else if (!this.isRehearsal) {
+        } else if (this._tempLiveType !== 2) {
+          // 注意：此时直播已经结束，live_type已经重制，所以不能用live_type判断
           // 如果是直播页面
           this.handleSaveVodInLive();
         } else if (!this.popAlert.level) {
@@ -546,6 +548,8 @@
         // 如果是开始彩排，将场次类型改为 2
         if (isRehearsal) {
           this.roomBaseServer.state.watchInitData.live_type = 2;
+          // 由于 live_type 在结束直播之后会重制，所以需要记录一个状态，用于在结束直播之后生成回放的时候，判断是否是彩排的回放
+          this._tempLiveType = 2;
         }
         this.handleStartClick();
       },
@@ -704,17 +708,15 @@
         } else {
           this.liveDuration = 0;
           // 直播结束生成回放
+          // 注意：此时直播已经结束，live_type已经重制，所以不能用live_type判断
           const res = await this.roomBaseServer.createRecordInLive({
             webinar_id: watchInitData.webinar.id,
-            live_type: this.isRehearsal ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
+            live_type: this._tempLiveType ? 2 : 0 //开播类型：0-正式直播（默认）；2-彩排
           });
+          // 如果是彩排，不需要设置默认回放
+          if (this._tempLiveType == 2) return;
           // 如果是直播并且开启生成回放的提示,展示弹窗
-          if (
-            res.code == 200 &&
-            watchInitData.record_tip == 1 &&
-            !this.isRecord &&
-            !this.isRehearsal
-          ) {
+          if (res.code == 200 && watchInitData.record_tip == 1 && !this.isRecord) {
             this.popAlert.text = '自动生成回放成功，是否设置为默认回放？';
             this.popAlert.visible = true;
             this.popAlert.confirm = true;

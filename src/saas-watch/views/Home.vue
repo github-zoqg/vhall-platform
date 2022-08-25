@@ -108,6 +108,7 @@
           await roomState();
           // 是否跳转预约页
           if (
+            roomBaseServer.state.watchInitData.live_type != 2 &&
             this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
             !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
           ) {
@@ -168,6 +169,7 @@
       },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
+        const { rehearsal } = this.$route.query;
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
@@ -176,6 +178,7 @@
           initRoom: {
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
+            live_type: rehearsal == 1 ? 2 : 0, // 2 彩排   0 正式
             ...this.$route.query // 第三方地址栏传参
           },
           // 日志上报的参数

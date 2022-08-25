@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-share">
     <el-dialog
-      :title="isRehearsal ? $t('nav.nav_1013') + '彩排观看地址' : $t('nav.nav_1013')"
+      :title="isRehearsal ? $t('nav.nav_1054') : $t('nav.nav_1013')"
       :visible.sync="shareVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
