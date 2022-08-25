@@ -56,7 +56,10 @@
               :key="speaker.accountId"
             >
               <div class="vmp-video-polling__stream-container-box">
-                <vmp-stream-polling-remote :stream="speaker"></vmp-stream-polling-remote>
+                <vmp-stream-polling-remote
+                  :key="speaker.streamId ? speaker.streamId : speaker.accountId"
+                  :stream="speaker"
+                ></vmp-stream-polling-remote>
               </div>
             </div>
           </div>
