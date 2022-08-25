@@ -125,6 +125,12 @@ const routes = [
     name: 'PageError',
     component: () => import(/* webpackChunkName: "PageError" */ '../views/ErrorPage/error.vue'),
     meta: { title: '系统异常' }
+  },
+  {
+    path: '/lives/question', // app-sdk内嵌问卷页
+    name: 'appQuestion',
+    component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedQuestion'),
+    meta: { grayType: '' }
   }
 ];
 

@@ -60,10 +60,22 @@ const routes = [
     meta: { title: '视频轮询', grayType: 'webinar', page: 'video-polling' }
   },
   {
-    path: '/lives/client/:il_id', // 客户端嵌入
-    name: 'Client',
-    component: () => import(/* webpackChunkName: "Client" */ '@/saas-live/views/clientEmbed/index'),
-    meta: { page: 'client-embed' }
+    path: '/lives/clientembed/doc/:id', // 客户端嵌入文档
+    name: 'ClientDoc',
+    component: () => import('@/saas-live/views/clientEmbed/doc'),
+    meta: { page: 'client-doc', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/clientembed/chat/:id', // 客户端嵌入聊天
+    name: 'ClientIm',
+    component: () => import('@/saas-live/views/clientEmbed/im'),
+    meta: { page: 'client-im', grayType: 'webinar' }
+  },
+  {
+    path: '/lives/clientembed/tools/:id', // 客户端嵌入互动
+    name: 'ClientInteract',
+    component: () => import('@/saas-live/views/clientEmbed/interact'),
+    meta: { page: 'client-interact', grayType: 'webinar' }
   },
   {
     path: '/lives/yun/:id', // 云导播

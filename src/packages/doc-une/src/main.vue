@@ -10,6 +10,8 @@
       { 'has-stream-list': hasStreamList },
       { 'no-delay-layout': isUseNoDelayLayout }
     ]"
+    @mouseenter="mouseEnterDoc(true)"
+    @mouseleave="mouseEnterDoc(false)"
     v-show="show"
     ref="docWrapper"
   >
@@ -162,9 +164,12 @@
     usePlayerServer,
     useMicServer
   } from 'middle-domain';
-
   import { boxEventOpitons } from '@/app-shared/utils/tool';
-
+  import {
+    cl_handleScreen,
+    cl_setDocMenu,
+    cl_moveToDoc
+  } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpDocUne',
     components: { VmpDocToolbar },
@@ -465,7 +470,12 @@
        * 全屏切换
        */
       fullscreen() {
-        screenfull.toggle(this.$refs.docWrapper);
+        if (this.$route?.query.assistantType) {
+          this.displayMode = this.displayMode == 'fullscreen' ? 'normal' : 'fullscreen';
+          cl_handleScreen(this.displayMode);
+        } else {
+          screenfull.toggle(this.$refs.docWrapper);
+        }
       },
       /**
        * 缩略图列表展开与折叠
@@ -734,9 +744,13 @@
 
         if (this.roomBaseServer.state.watchInitData.join_info.role_name != 2) {
           const fileType = this.currentType || 'document';
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
-          );
+          if (this.$route.query.assistantType) {
+            cl_setDocMenu(fileType == 'document' ? 1 : 0);
+          } else {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitSwitchTo', [fileType])
+            );
+          }
         }
       },
       /**
@@ -1011,6 +1025,9 @@
         if (this.isWatch) {
           useRoomBaseServer().setChangeElement('doc');
         } else {
+          if (this.$route.query.assistantType) {
+            return;
+          }
           this.setDisplayMode('normal');
           // 通知默认菜单和工具栏默认为文档
           window.$middleEventSdk?.event?.send(
@@ -1018,6 +1035,13 @@
           );
         }
         this.hasStreamList = false;
+      },
+
+      mouseEnterDoc(status) {
+        console.log(111111);
+        if (this.$route.query.assistantType) {
+          cl_moveToDoc(status);
+        }
       }
     },
     mounted() {

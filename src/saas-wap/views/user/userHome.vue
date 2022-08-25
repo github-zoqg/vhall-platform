@@ -560,6 +560,7 @@
         display: -moz-inline-box;
         -webkit-line-clamp: 1;
         line-clamp: 1;
+        /* autoprefixer: ignore next */
         -webkit-box-orient: vertical;
         word-break: break-all;
       }
@@ -595,6 +596,7 @@
       display: -webkit-box;
       -webkit-line-clamp: 1;
       line-clamp: 1;
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       word-break: break-all;
     }

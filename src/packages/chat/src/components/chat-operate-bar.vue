@@ -165,10 +165,12 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useGroupServer, useChatServer } from 'middle-domain';
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
+  import { cl_openChatFilterUrl, cl_toast } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -327,7 +329,11 @@
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         if (this.liveStatus !== 1) {
-          this.$message.error('直播未开始禁止调用');
+          if (this.$route.query.assistantType) {
+            cl_toast('error', '直播未开始禁止调用');
+          } else {
+            this.$message.error('直播未开始禁止调用');
+          }
           return;
         }
         this.setAllBanned(val);
@@ -352,7 +358,12 @@
             ''
           );
         }
-        window.open(url, '_blank');
+        if (this.$route.query.assistantType) {
+          //客户端嵌入通知客户端打开聊天审核页面
+          cl_openChatFilterUrl(url);
+        } else {
+          window.open(url, '_blank');
+        }
       },
       //唤起登录
       handleLogin() {
@@ -366,7 +377,11 @@
         }
 
         if (this.inputStatus.disable) {
-          this.$message.warning(this.$t('chat.chat_1006'));
+          if (this.$route.query.assistantType) {
+            cl_toast('warning', this.$t('chat.chat_1006'));
+          } else {
+            this.$message.warning(this.$t('chat.chat_1006'));
+          }
           return;
         }
         this.$refs.emoji.toggleShow();
@@ -394,8 +409,11 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        this.$message.success(message);
-
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
         sessionStorage.setItem('filterStatus_isOnlyShowSponsor', status);
         this.filterStatus.onlyShowSponsor = status;
 
@@ -404,17 +422,23 @@
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        this.$message.success(message);
-
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
         sessionStorage.setItem('filterStatus_isShieldingEffects', status);
         this.filterStatus.isShieldingEffects = status;
-
         this.$emit('onSwitchShowSpecialEffects', status);
       },
       // 仅查看聊天内容
       onClickChat(status) {
         let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
-        this.$message.success(message);
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
 
         this.$emit('onSwitchShowIsChat', status);
         sessionStorage.setItem('filterStatus_isChat', status);

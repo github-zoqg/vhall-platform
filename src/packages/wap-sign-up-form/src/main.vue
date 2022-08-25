@@ -1881,6 +1881,7 @@
             white-space: nowrap;
             word-break: break-all;
             display: -webkit-box;
+            /* autoprefixer: ignore next */
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             overflow: hidden;

@@ -308,6 +308,12 @@
         this.initPage();
         this.dialogVisible = true;
       },
+      close() {
+        this.dialogVisible = false;
+      },
+      handleQu(flag) {
+        flag ? this.open() : this.close();
+      },
       initPage() {
         this.firstLoad = false;
         this.showTip = false;
