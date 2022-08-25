@@ -28,12 +28,12 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
   import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
 
   export default {
@@ -146,6 +146,7 @@
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
+          const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -158,6 +159,17 @@
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
           });
           window.vhallReport.report('ENTER_WATCH');
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 10 // 7：PC 10: wap
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId || this.$route.query.share_id
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
+          window.vhallReportForWatch?.report(170017);
           this.state = 1;
           this.addEventListener();
         } catch (err) {
