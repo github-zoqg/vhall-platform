@@ -151,7 +151,7 @@
       // 同意邀请上麦
       customAgreeConnect() {
         this.btnDisabled = true;
-        window?.vhallReportForProduct.toStartReporting(170009, [170010, 170005]);
+        window?.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110191, 110183]);
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,

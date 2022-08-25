@@ -155,7 +155,7 @@
       // 下麦
       async speakOff() {
         // 用户下麦
-        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033]);
+        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
         this.loading = true;
         try {
           const res = await useMicServer().speakOff();
@@ -210,7 +210,7 @@
       // 申请上麦
       userApply() {
         // 申请连麦
-        window.vhallReportForProduct.toStartReporting(170004, [170005, 170032]);
+        window.vhallReportForProduct.toStartReporting(170004, [170005, 170032, 110191, 110183]);
         useMicServer()
           .userApply()
           .then(res => {

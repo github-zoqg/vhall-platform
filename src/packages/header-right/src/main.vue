@@ -244,7 +244,7 @@
       },
       // 嘉宾点击申请上麦
       handleApplyClick() {
-        window.vhallReportForProduct?.toStartReporting(110131, 110158);
+        window.vhallReportForProduct?.toStartReporting(110131, [110158, 170032, 110191, 110183]);
         this._applyInterval && clearInterval(this._applyInterval);
         useMicServer()
           .userApply()
@@ -305,7 +305,7 @@
       },
       // 嘉宾下麦
       async handleSpeakOffClick() {
-        window.vhallReportForProduct?.toStartReporting(110132, 110156);
+        window.vhallReportForProduct?.toStartReporting(110132, [110156, 170033, 110193, 110185]);
         // 下麦接口停止推流，成功之后执行下面的逻辑
         const { code, msg, request_id } = await useMicServer().speakOff();
         window.vhallReportForProduct?.toResultsReporting(110156, {

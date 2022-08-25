@@ -153,7 +153,7 @@
       offConnect() {
         this.$emit('handupLoading', false);
         this.closeConnectPop();
-        window.vhallReportForProduct.toStartReporting(170002, 170003);
+        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
         useMicServer()
           .speakOff()
           .then(res => {
@@ -206,7 +206,7 @@
       applyMic() {
         this.btnDisabled = true;
         // 申请连麦
-        window?.vhallReportForProduct.toStartReporting(170004, [170005, 170032]);
+        window?.vhallReportForProduct.toStartReporting(170004, [170005, 170032, 110191, 110183]);
 
         useMicServer()
           .userApply()

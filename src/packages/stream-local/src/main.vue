@@ -957,7 +957,7 @@
       // 用户下麦接口
       speakOff() {
         // 用户下麦
-        window.vhallReportForProduct?.toStartReporting(170002, 170003);
+        window.vhallReportForProduct?.toStartReporting(170002, [170003, 170033, 110193, 110185]);
         return this.micServer.speakOff();
       },
       // 处理上麦失败
@@ -1060,7 +1060,7 @@
       async createLocalStream(opt) {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
-          window.vhallReportForProduct?.toStartReporting(110191, 110192, {
+          window.vhallReportForProduct?.toResultsReporting(110191, {
             videoType: 'camera',
             ...opt
           });
@@ -1085,7 +1085,7 @@
           if (!videoTracks) {
             throw 'getCanvasStreamError';
           }
-          window.vhallReportForProduct?.toStartReporting(110191, 110192, {
+          window.vhallReportForProduct?.toResultsReporting(110191, {
             videoType: 'img',
             ...opt
           });
@@ -1104,7 +1104,7 @@
       },
       // 推流
       async publishLocalStream(type) {
-        window.vhallReportForProduct?.toStartReporting(110183, 110184, {
+        window.vhallReportForProduct?.toResultsReporting(110183, {
           pubTyle: type
         });
         await this.interactiveServer.publishStream().catch(e => {
@@ -1173,7 +1173,7 @@
             // );
             resolve();
           }
-          window.vhallReportForProduct?.toStartReporting(110193, [110185, 110186], {
+          window.vhallReportForProduct?.toResultsReporting(110193, {
             ev_type: { ...options }
           });
 

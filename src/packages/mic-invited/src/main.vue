@@ -148,7 +148,7 @@
       // 接受邀请
       confirmSave() {
         // 接受连麦邀请上报
-        window.vhallReportForProduct.toStartReporting(170009, [170005, 170010], {
+        window.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110191, 110183], {
           waiting_time: this.waitTime
         });
 

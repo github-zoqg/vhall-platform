@@ -430,7 +430,7 @@
       },
       // 创建本地流
       async createLocalStream(opt) {
-        window.vhallReportForProduct?.toStartReporting(110191, 110192, {
+        window.vhallReportForProduct?.toResultsReporting(110191, {
           videoType: 'camera',
           ...opt
         });
@@ -451,7 +451,7 @@
       },
       // 推流
       async publishLocalStream(type) {
-        window.vhallReportForProduct?.toStartReporting(110183, 110184, {
+        window.vhallReportForProduct?.toResultsReporting(110183, {
           pubTyle: type
         });
         await this.interactiveServer
@@ -478,7 +478,7 @@
             resolve();
             return;
           }
-          window.vhallReportForProduct?.toStartReporting(110193, [110185, 110186], {
+          window.vhallReportForProduct?.toResultsReporting(110193, {
             ev_type: { ...options }
           });
           this.interactiveServer
