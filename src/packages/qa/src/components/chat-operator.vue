@@ -360,8 +360,8 @@
   .vhsaas-chat-operator {
     width: calc(100% - 48px);
     padding: 10px 24px;
-    background: @bg-dark-section;
-    border-top: 1px solid @bg-dark-normal;
+    border-top: 1px solid var(--tab-menu-bg-border);
+    background-color: var(--chat-background-color-base);
     position: absolute;
     bottom: 0;
   }
@@ -375,7 +375,7 @@
       font-size: 18px;
       color: #999999;
       &:hover {
-        color: @font-dark-normal;
+        color: var(--theme-color);
       }
     }
     .vhsaas-chat-operator__only-mine {
@@ -438,11 +438,11 @@
     align-items: flex-end;
     .vhsaas-chat-operator__textarea-box {
       width: 240px;
-      background-color: @bg-dark-normal;
+      background-color: var(--chat-background-color-input);
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--chat-font-color-input);
       line-height: 20px;
       padding: 10px 12px;
       text-align: left;
@@ -514,14 +514,14 @@
         width: 40px;
         height: 40px;
         border-radius: 20px;
-        background-color: @bg-dark-normal;
+        background-color: var(--chat-background-color-input);
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         .vh-line-send {
           font-size: 18px;
-          color: @font-dark-normal;
+          color: var(--chat-font-color-msg-nickname);
         }
         &.disable {
           cursor: default;
