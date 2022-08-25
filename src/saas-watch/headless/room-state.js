@@ -84,11 +84,6 @@ export default async function () {
   const liveMode = roomBaseServer.state.watchInitData.webinar.mode;
   // 1-音频 2-视频 3-互动 6-分组
   const liveType = roomBaseServer.state.watchInitData.webinar.type;
-  // 视频直播并且开启了视频轮巡权限
-  if (liveType == 1 && liveMode != 6 && roomBaseServer.state.configList['video_polling'] == 1) {
-    // 获取媒体许可，设置设备状态
-    promiseList.push(mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false }));
-  }
 
   await Promise.all(promiseList);
   console.log('%c------黄金链路请求配置项完成', 'color:pink');

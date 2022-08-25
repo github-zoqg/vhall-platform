@@ -454,15 +454,37 @@
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
-      // 是否开启视频轮巡
-      isVideoPolling() {
-        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
-      },
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
       }
+      /**
+       * pollingData() {
+        console.log('pollingData-a', this.agreeStatusData);
+        return {
+          agreeStatus: this.agreeStatusData,
+          isPolling: this.videoPollingServer.state.isPolling
+        };
+      }*/
     },
+    /** 需求反复，代码先做保留【视频轮巡的设备检测机制】
+     * watch: {
+      // 视频轮训观众收到轮训消息，点击“我知道了” => 获取设备权限 => 开始视频推流
+      pollingData: {
+        async handler(val, oldVal) {
+          console.log('pollingData-', val, oldVal);
+          if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
+            if (val.agreeStatus == 1) {
+              await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+            }
+            if (val.isPolling) {
+              this.videoStartPush({ type: 1, ...val });
+            }
+          }
+        },
+        deep: true
+      }
+    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -480,10 +502,13 @@
       // 轮训列表更新消息
       this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
         console.log('轮训列表更新消息', msg);
-        this.videoStartPush();
+        this.videoStartPush({ type: 1 });
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 0);
+        sessionStorage.setItem(`pollingAgreeStatus_${roomId}`, 0);
         if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
           await this.stopPush();
           await this.interactiveServer.destroy();
@@ -493,7 +518,7 @@
         }
       });
       if (!this.isSpeakOn) {
-        await this.videoStartPush();
+        await this.videoStartPush({ type: 2 });
       }
       this.checkStartPush();
       let el = document
@@ -511,6 +536,7 @@
       }
     },
     methods: {
+      closePollingDialog() {},
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
@@ -542,7 +568,8 @@
        * @description: 视频轮巡推流
        * @param arr {Array} 当前参与轮巡的观众流列表
        */
-      async videoStartPush() {
+      async videoStartPush(data) {
+        console.log('videoStartPush-params', data);
         if (this.videoPollingServer.state.isPolling) {
           if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
           if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
@@ -873,7 +900,7 @@
             // 重新推流
             if (param.isRepublishMode) {
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 3 });
               } else {
                 this.isSpeakOn && (await this.startPush());
               }
@@ -881,7 +908,7 @@
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 4 });
               } else {
                 await this.startPush();
               }
