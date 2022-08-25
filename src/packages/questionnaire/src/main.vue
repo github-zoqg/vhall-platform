@@ -216,7 +216,7 @@
 </template>
 <script>
   import { useQuestionnaireServer, useChatServer } from 'middle-domain';
-
+  import { cl_openUrl } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpQuestionnaire',
     provide() {
@@ -717,6 +717,12 @@
       goDetail(questionnaireItem) {
         const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
         const { webinar, interact } = watchInitData;
+        if (this.$route.query.assistantType) {
+          cl_openUrl(
+            `https:${process.env.VUE_APP_WEB_BASE}/v3/live/lookSingleQuestion/${webinar.id}?surveyId=${questionnaireItem.question_id}&subject=${questionnaireItem.title}&roomId=${interact.room_id}`
+          );
+          return;
+        }
         window.open(
           `/v3/live/lookSingleQuestion/${webinar.id}?surveyId=${questionnaireItem.question_id}&subject=${questionnaireItem.title}&roomId=${interact.room_id}`
         );
