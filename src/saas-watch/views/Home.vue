@@ -121,6 +121,7 @@
           // 如果往观看页跳转，需要清除暖场视频缓存
           window.sessionStorage.removeItem('warm_recordId');
           window.sessionStorage.removeItem('recordIds');
+          // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -138,7 +139,7 @@
           // 产品侧上报需求
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 7 // 7：PC 10: wap
+            pf: 7
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,
