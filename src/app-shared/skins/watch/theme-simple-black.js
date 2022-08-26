@@ -12,6 +12,7 @@ const color_text_custom = '#fb2626';
 const color_text_custom_sub = '#ffd1c9';
 const color_text_regular = 'rgba(255, 255, 255, 0.65)';
 const color_text_secondary = 'rgba(255, 255, 255, 0.45)';
+const color_text_2 = 'rgba(255, 255, 255, 0.45)';
 const color_text_placeholder = 'rgba(255, 255, 255, 0.35)';
 const color_text_disabled = 'rgba(255, 255, 255, 0.25)';
 const color_text_link = '#3562fa';
@@ -54,7 +55,7 @@ export default {
   // 头部组件 VmpHeaderWatch
   '--header-background-color-base': color_background_4,
   '--header-font-color-primary': color_text_primary,
-  '--header-font-color-regular': color_text_secondary,
+  '--header-font-color-regular': color_text_2,
   '--header-font-color-link': color_text_link,
   '--header-font-color-main': color_text_primary,
   '--header-tab-bg-color-hover': color_background_10,

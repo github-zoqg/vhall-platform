@@ -40,9 +40,9 @@ export default {
   // 头部组件 VmpHeaderWatch
   '--header-background-color-base': color_background_4,
   '--header-font-color-primary': color_text_primary,
-  '--header-font-color-regular': color_text_secondary,
+  '--header-font-color-regular': color_text_2,
   '--header-font-color-link': color_text_link,
-  '--header-font-color-main': color_text_1,
+  '--header-font-color-main': color_text_primary,
   '--header-tab-bg-color-hover': color_background_8,
   '--header-tab-font-color-hover': color_background_0,
   '--header-tab-item-font-color': color_text_primary,
