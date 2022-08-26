@@ -80,7 +80,7 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import alertBox from '@/saas-wap/views/components/confirm.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpWapBody',
     components: {
