@@ -100,7 +100,7 @@
     },
     methods: {
       restart() {
-        window?.vhallReport?.report(120001); // 埋点-重新检测
+        window?.vhallReport?.report(110013); // 埋点-重新检测
         this.$emit('next', { result: 'fail' });
       },
       finish() {

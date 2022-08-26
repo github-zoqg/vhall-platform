@@ -192,8 +192,11 @@ const sharedConfig = {
       // moment: 'moment',
       'element-ui': 'ELEMENT',
       'middle-domain': 'middleDomain',
-      vant: 'vant',
-      lodash: '_'
+      // vant: 'vant',
+      'vh5-ui': 'vant',
+      lodash: '_',
+      html2canvas: 'html2canvas',
+      overlayscrollbars: 'OverlayScrollbars'
     },
     // 插件
     plugins: getPlugins()
@@ -298,7 +301,7 @@ if (['serve', 'build'].includes(cmd)) {
   process.env.VUE_APP_BUILD_HASH = argv.hash;
 
   // 根据参数获取专用配置信息
-  const specialConfig = btool.createSpecialConfig(argv.project);
+  const specialConfig = btool.createSpecialConfig(argv.project, argv.mode);
 
   // 合并配置
   const vueConfig = _.merge(sharedConfig, specialConfig);

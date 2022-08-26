@@ -19,39 +19,6 @@ export const sleep = function (ms) {
   });
 };
 
-//防抖
-export function debounce(fn, t = 300) {
-  let lastTime;
-  return function () {
-    window.clearTimeout(lastTime);
-    const [that, args] = [this, arguments];
-    lastTime = window.setTimeout(() => {
-      fn.apply(that, args);
-    }, t);
-  };
-}
-
-// 节流
-export function throttle(fn, t = 300) {
-  let last;
-  let timer;
-  return function () {
-    let th = this;
-    let args = arguments;
-    let now = +new Date();
-    if (last && now - last < t) {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(function () {
-        last = now;
-        fn.apply(th, args);
-      }, t);
-    } else {
-      last = now;
-      fn.apply(th, args);
-    }
-  };
-}
-
 /**
  * 封装使用事件驱动需要的参数
  * @param cuid 当前组件的唯一标识
@@ -181,7 +148,7 @@ export const validEmail = (required, value, vueThis) => {
  * @param {*} value
  * @returns
  */
-export const replaceHtml = str => {
+export const replaceHtml = (str, length = 42) => {
   let desc = null;
   desc = str.replace(/&nbsp;/g, '');
   desc = desc
@@ -189,7 +156,7 @@ export const replaceHtml = str => {
     .replace(/&(lt|gt|nbsp|amp|quot|middot);/gi, '')
     .replace(/(\r\n)|(\n)/g, '');
   desc = desc.replace(/<[^>]+>/g, ''); // 截取html标签
-  desc = desc.length > 42 ? `${desc.trim().substring(0, 42)}...` : desc.trim();
+  desc = desc.length > length ? `${desc.trim().substring(0, length)}...` : desc.trim();
   return desc;
 };
 
@@ -234,60 +201,54 @@ export const getCookie = name => {
   }
 };
 
-/**
- * 将 queryString 转换成 key-value 形式
- * @param {String} url url地址
- * @returns object
- */
-export const parseQueryString = url => {
-  return [...new URL(url).searchParams].reduce(
-    (cur, [key, value]) => ((cur[key] = value), cur),
-    {}
-  );
-};
-
-/**
- * 将oss图片地址中的图片处理参数解析成 key-value 的形式
- * @param {String} imgUrl 图片地址
- * @returns Object
- */
-export const parseImgOssQueryString = imgUrl => {
-  const queryObj = parseQueryString(imgUrl);
-  let result = {};
-
-  if (!queryObj['x-oss-process']) {
-    return queryObj;
-  } else {
-    result = { ...queryObj };
-    delete result['x-oss-process'];
-  }
-
-  const xOssProcessStr = queryObj['x-oss-process'];
-  const xOssProcessArr = xOssProcessStr.split(/image\/|x-oss-process=image\/|\//);
-
-  // 解析最外层参数，blur  bright  crop等
-  return xOssProcessArr.reduce((currentObj, item) => {
-    if (!item) return currentObj;
-    const resultKey = item.substring(0, item.indexOf(','));
-    let resultVal = null;
-    let itemVal = item.substring(item.indexOf(',') + 1);
-    if (
-      // 亮度、对比度、锐化、渐进显示、旋转、自适应方向、格式转换，直接就是值，不需要再做第二层解析
-      ['bright', 'contrast', 'sharpen', 'interlace', 'rotate', 'auto-orient', 'format'].includes(
-        resultKey
-      )
-    ) {
-      resultVal = itemVal;
-    } else {
-      // 解析每个参数具体的值，blur  bright  crop等对应的具体的值
-      resultVal = itemVal.split(',').reduce((cur, itemStr) => {
-        if (!itemStr) return cur;
-        const itemArr = itemStr.split('_');
-        cur[itemArr[0]] = itemArr[1];
-        return cur;
-      }, {});
+export const handleIntroInfo = str => {
+  if (!str) return '';
+  const regImg = /<img.*?(?:>|\/>)/g;
+  const imgArr = str.match(regImg);
+  const strArr = str.split(regImg);
+  const regUrl =
+    /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-.,@?^=%&:/~+#]*[\w\-@?^=%&/~+#])?/g;
+  strArr.forEach((item, index) => {
+    const tempStr = item.replace(regUrl, function (match) {
+      return `<a class='show-link' href='${match}' target='_blank'>${match}</a>`;
+    });
+    strArr[index] = tempStr;
+  });
+  if (imgArr) {
+    const imgArrLength = imgArr.length;
+    let imgIndex = 0;
+    for (let strIndex = 0; strIndex < imgArrLength; ++strIndex) {
+      strArr.splice(strIndex + imgIndex + 1, 0, imgArr[imgIndex]);
+      imgIndex++;
     }
-    currentObj[resultKey] = resultVal;
-    return currentObj;
-  }, result);
+  }
+  return strArr.join('');
 };
+
+// 去除不必要的地址栏参数 delUrlParams(window.location.search, ['isIndependent']);
+export function delUrlParams(searchUrl, keyList) {
+  const urlParam = searchUrl.substring(1); //页面参数
+  let nextUrl = '';
+  var arr = new Array();
+  if (urlParam != '') {
+    const urlParamArr = urlParam.split('&'); //将参数按照&符分成数组
+    for (let i = 0; i < urlParamArr.length; i++) {
+      let paramArr = urlParamArr[i].split('='); //将参数键，值拆开
+      //如果键与要删除的不一致，则加入到参数中
+      if (!keyList.includes(paramArr[0])) {
+        arr.push(urlParamArr[i]);
+      }
+    }
+  }
+  if (arr.length > 0) {
+    nextUrl = '?' + arr.join('&');
+  }
+  console.log('当前地址栏结果', nextUrl);
+  return nextUrl;
+}
+// 判断是否IE
+export function isIE() {
+  return (
+    !!window.ActiveXObject || 'ActiveXObject' in window || navigator.userAgent.indexOf('Edge') > -1
+  );
+}

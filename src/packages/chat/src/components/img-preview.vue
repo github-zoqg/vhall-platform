@@ -4,7 +4,7 @@
       <swiper ref="mySwiper" :options="swiperOptions">
         <swiper-slide v-for="(img, index) in images" :key="index">
           <div class="preview-img__box">
-            <img :src="img + '?x-oss-process=image/resize,w_1600,h_900,m_lfit'" alt="" />
+            <img :src="resizeImg(img, { type: 'm_lfit', width: 1600, height: 900 })" alt="" />
           </div>
         </swiper-slide>
         <div slot="pagination" class="preview-img__pagination"></div>
@@ -29,7 +29,7 @@
 <script>
   import 'swiper/dist/css/swiper.css';
   import { swiper, swiperSlide } from 'vue-awesome-swiper';
-
+  import { resizeImg } from '@/app-shared/utils/common.js';
   export default {
     name: 'VmpImgPreview',
     components: {
@@ -67,6 +67,7 @@
       this.init();
     },
     methods: {
+      resizeImg,
       init() {
         //保存当前的swiper实例引用
         this.swiper = this.$refs.mySwiper.swiper;

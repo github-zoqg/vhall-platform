@@ -38,7 +38,7 @@
 </template>
 <script>
   import { useNoticeServer } from 'middle-domain';
-  import _ from 'lodash';
+  import { throttle } from 'lodash';
 
   export default {
     name: 'VmpGroupNotice',
@@ -63,7 +63,7 @@
       }
     },
     mounted() {
-      this.handleThrottleSubmit = _.throttle(this.handleSubmit, 300, { trailing: false });
+      this.handleThrottleSubmit = throttle(this.handleSubmit, 300, { trailing: false });
     },
     methods: {
       handlOpen() {

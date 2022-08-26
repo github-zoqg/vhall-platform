@@ -101,10 +101,16 @@
       }
     },
     methods: {
+      handleRedPacket(flag) {
+        flag ? this.open() : this.close();
+      },
       open() {
         this.sendDialogVisible = true;
         this.restForm();
         this.redPacketServer.getRedpacketTotal();
+      },
+      close() {
+        this.sendDialogVisible = false;
       },
       // 发起红包页面表单参数重置
       restForm() {

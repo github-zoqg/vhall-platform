@@ -45,7 +45,7 @@
           type: 4,
           entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
-          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         });
 
         // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
@@ -112,7 +112,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
