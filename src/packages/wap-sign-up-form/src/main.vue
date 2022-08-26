@@ -109,7 +109,7 @@
                     v-model="form[`${question.id}${radioItem.id}`]"
                     v-if="radioItem.type === 1 && radioItem.id == form[question.id]"
                     maxlength="60"
-                    :placeholder="$t('form.form_1080')"
+                    :placeholder="$t('form.form_1017')"
                     type="text"
                   ></textarea>
                 </div>
