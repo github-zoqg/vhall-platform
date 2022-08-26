@@ -269,6 +269,7 @@ export const parseQueryString = url => {
  * @description 拼接地址栏参数，自带去重
  */
 export const getUrl = (url = '', data = {}) => {
+  const qsObj = parseQueryString(url);
   // 截取除去queryString的部分
   const indexOfSeparator = url.indexOf('?');
   if (indexOfSeparator > -1) {
@@ -279,7 +280,7 @@ export const getUrl = (url = '', data = {}) => {
     url +
     '?' +
     getParam({
-      ...parseQueryString(url),
+      ...qsObj,
       ...data
     })
   );
