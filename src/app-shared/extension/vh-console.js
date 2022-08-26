@@ -6,7 +6,7 @@
  * 2、地址链接中有debug=true
  * 3、非生产环境默认开启日志
  */
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.VUE_APP_SAAS_ENV === 'production';
 const cacheKey = '__openDebug__';
 let debugStatusCache = sessionStorage.getItem(cacheKey);
 const debugSwitch = window.location.search.indexOf('debug=true') > -1;

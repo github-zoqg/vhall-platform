@@ -30,7 +30,7 @@
           type: 4,
           entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
-          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         },
         {
           namespace: 'saas', //业务线

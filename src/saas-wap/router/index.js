@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
+// import Home from '../views/Home.vue';
 import grayInit from '@/app-shared/gray-init';
-import Subscribe from '../views/subscribe/index.vue';
+// import Subscribe from '../views/subscribe/index.vue';
 import { wxAuthCheck } from '@/app-shared/utils/wechat';
 import pageConfig from '../page-config/index';
 
@@ -11,14 +11,14 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/lives/watch/:id',
-    component: Home,
     name: 'LiveRoom',
+    component: () => import(/* webpackChunkName: "LiveRoom" */ '../views/Home.vue'),
     meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclient/watch/:id',
-    component: Home,
     name: 'LiveEmbedclientRoom',
+    component: () => import(/* webpackChunkName: "LiveEmbedclientRoom" */ '../views/Home.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' },
     redirect: to => {
       if (to.query.embed === 'video') {
@@ -32,85 +32,105 @@ const routes = [
   },
   {
     path: '/lives/embedclientfull/watch/:id', //完全嵌入观看页
-    component: Home,
     name: 'LiveEmbedFullRoom',
+    component: () => import(/* webpackChunkName: "LiveEmbedFullRoom" */ '../views/Home.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclientvideo/watch/:id', //单视频嵌入观看页
-    component: () => import('../views/EmbedVideo/index.vue'),
     name: 'LiveEmbedVideoRoom',
+    component: () =>
+      import(/* webpackChunkName: "LiveEmbedVideoRoom" */ '../views/EmbedVideo/index.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'embed-video' }
   },
   {
     path: '/lives/subscribe/:id',
-    component: Subscribe,
     name: 'SubcribeRoom',
+    component: () => import(/* webpackChunkName: "SubcribeRoom" */ '../views/subscribe/index.vue'),
     meta: { title: '预约页', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/embedclient/subscribe/:id',
-    component: Subscribe,
     name: 'SubcribeEmbedclientRoom',
+    component: () =>
+      import(/* webpackChunkName: "SubcribeEmbedclientRoom" */ '../views/subscribe/index.vue'),
     meta: { title: '预约嵌入页', grayType: 'webinar', page: 'subscribe' }
   },
   // 专题
   {
     path: '/special/detail',
     name: 'subject',
-    component: () => import('../views/Subject/main.vue'),
+    component: () => import(/* webpackChunkName: "subject" */ '../views/Subject/main.vue'),
     meta: { title: '专题详情页', grayType: 'subject' }
   },
   // 邀请卡
   {
     path: '/lives/invite/:id',
     name: 'inviteCard',
-    component: () => import('../views/InviteCard/main.vue'),
+    component: () => import(/* webpackChunkName: "inviteCard" */ '../views/InviteCard/main.vue'),
     meta: { title: '邀请卡', grayType: 'webinar' }
   },
   {
     path: '/lives/entryform/:id',
     name: 'signup',
+    component: () => import(/* webpackChunkName: "signup" */ '@/packages/wap-sign-up-form'),
+    meta: { grayType: 'webinar' }
+  },
+  {
+    path: '/lives/embedclient/entryform/:id',
+    name: 'signupEmbed',
     component: () => import('@/packages/wap-sign-up-form'),
     meta: { grayType: 'webinar' }
+  },
+  {
+    path: '/special/entryform/:id',
+    name: 'signupSubject',
+    component: () => import('@/packages/wap-sign-up-form'),
+    meta: { grayType: 'subject' }
   },
   // 错误页、升级页
   {
     path: '/upgrading',
     name: 'upgrading',
-    component: () => import('../views/Upgrading.vue'),
+    component: () => import(/* webpackChunkName: "upgrading" */ '../views/Upgrading.vue'),
     meta: { grayType: '' }
   },
   {
     path: '/lives/bind/:id',
     name: 'bind',
-    component: () => import('../views/bind'),
+    component: () => import(/* webpackChunkName: "bind" */ '../views/bind'),
     meta: { grayType: '' }
   },
   {
     path: '/lives/bindB/:id',
     name: 'bind',
-    component: () => import('../views/bind'),
+    component: () => import(/* webpackChunkName: "bindB" */ '../views/bind'),
     meta: { grayType: '' }
   },
   // 独立报名表单
   // {
   //   path: '/lives/entryform/:id',
   //   name: 'entryform',
-  //   component: () => import('../views/entryform/index.vue'),
+  //   component: () => import(/* webpackChunkName: "entryform" */ '../views/entryform/index.vue'),
   //   meta: { grayType: 'webinar' }
   // },
   {
     path: '/user/home/:id', // 个人主页
     name: 'userHome',
-    component: () => import('../views/user/userHome.vue'),
+    component: () => import(/* webpackChunkName: "userHome" */ '../views/user/userHome.vue'),
     meta: { grayType: 'user' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
-    meta: { title: '系统异常' },
-    component: () => import('../views/ErrorPage/error.vue')
+    component: () => import(/* webpackChunkName: "PageError" */ '../views/ErrorPage/error.vue'),
+    meta: { title: '系统异常' }
+  },
+  {
+    path: '/lives/question', // app-sdk内嵌问卷页
+    name: 'appQuestion',
+    component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedQuestion'),
+    meta: { grayType: '' }
   }
 ];
 

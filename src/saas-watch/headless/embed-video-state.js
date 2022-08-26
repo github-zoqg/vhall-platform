@@ -16,7 +16,7 @@ export default async function () {
       //黄金链路
       await roomBaseServer.startGetDegradationInterval({
         staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.NODE_ENV != 'production' ? 'test' : 'product',
+        environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
         systemKey: 2
       });
     }),

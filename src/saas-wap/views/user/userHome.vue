@@ -112,7 +112,9 @@
             </li>
           </a>
         </ul>
-        <div class="null-page" v-if="!(dataList && dataList.length > 0)">
+        <p class="loading-icon"><van-loading size="24" v-if="loading" /></p>
+
+        <div class="null-page" v-if="!loading && !(dataList && dataList.length > 0)">
           <div class="search">
             <img src="./img/no-search@2x.png" class="no-search" />
             <p class="null-info">暂无数据~</p>
@@ -208,8 +210,8 @@
       toPage(item) {
         window.location.href =
           this.tabType === 'live'
-            ? `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${item.webinar_id}`
-            : `//${process.env.VUE_APP_WEB_BASE}${
+            ? `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${item.webinar_id}`
+            : `//${process.env.VUE_APP_WAP_WATCH}${
                 process.env.VUE_APP_ROUTER_BASE_URL
               }/special/detail?id=${item.id}&delay=${this.hasDelayPermission ? 1 : 0}`;
       },
@@ -558,6 +560,7 @@
         display: -moz-inline-box;
         -webkit-line-clamp: 1;
         line-clamp: 1;
+        /* autoprefixer: ignore next */
         -webkit-box-orient: vertical;
         word-break: break-all;
       }
@@ -593,6 +596,7 @@
       display: -webkit-box;
       -webkit-line-clamp: 1;
       line-clamp: 1;
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       word-break: break-all;
     }
@@ -634,6 +638,9 @@
   .home-scroll-list {
     /*  height: calc(100vh - 300px); */
     overflow: hidden;
+  }
+  .loading-icon {
+    text-align: center;
   }
   /* 列表 */
   .v-data-list {

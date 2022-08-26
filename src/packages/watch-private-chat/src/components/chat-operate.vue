@@ -357,10 +357,6 @@
         &.pic-disabled {
           pointer-events: none;
         }
-        &.icontupianliaotian {
-          font-size: 18px;
-        }
-
         margin-left: 10px;
       }
       .vh-line-expression {

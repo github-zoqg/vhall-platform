@@ -86,18 +86,13 @@
     "src/app-shared/i18n/languages/modules",
     "src/app-shared/i18n/languages/modules"
   ],
-  "i18n-ally.enabledParsers": [
-    "json",
-    "js"
-  ],
-  "i18n-ally.enabledFrameworks": [
-    "vue"
-  ],
+  "i18n-ally.enabledParsers": ["json", "js"],
+  "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.displayLanguage": "zh",
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
   "i18n-ally.keystyle": "nested",
-  "vue-i18n.i18nPaths": "",
+  "vue-i18n.i18nPaths": "src/app-shared/i18n",
   "i18n-ally.sourceLanguage": "zh"
 }

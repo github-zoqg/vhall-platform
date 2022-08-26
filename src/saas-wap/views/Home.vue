@@ -145,8 +145,8 @@
           window.sessionStorage.removeItem('recordIds');
           // 初始化数据上报
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
-          // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
           const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+          // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -155,13 +155,15 @@
             os: getVhallReportOs(),
             type: 2, //播放平台 2: wap
             entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            pf: 3, // wap
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+            pf: 10, // wap
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test'
           });
           window.vhallReport.report('ENTER_WATCH');
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 10 // 7：PC 10: wap
+            pf: 10
           });
           const commonReportForProductParams = generateWatchReportCommonParams(
             roomBaseServer.state.watchInitData,
@@ -200,7 +202,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
@@ -228,6 +232,10 @@
       },
       handleErrorCode(err) {
         let currentQuery = location.search;
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         if (err.code == 512522) {
           this.liveErrorTip = this.$t('message.message_1009');
         } else if (err.code == 512541) {
@@ -250,9 +258,9 @@
               _embedQuery.indexOf('record_id=') > -1
                 ? _embedQuery.replace('record_id=', 'rid=')
                 : _embedQuery;
-            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+            window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
           } else {
-            window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+            window.location.href = `${origin}/${this.$route.params.id}`;
           }
         } else if (err.code == 512534) {
           // 第三方k值校验失败 跳转指定地址

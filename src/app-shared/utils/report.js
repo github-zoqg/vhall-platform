@@ -7,7 +7,7 @@ import { _toString } from '@/app-shared/utils/toString';
 export function getReceiveCommonLogData() {
   return {
     ua: navigator.userAgent,
-    visitorId: sessionStorage.getItem('visitorId'),
+    visitorId: localStorage.getItem('visitorId'),
     interact_token: sessionStorage.getItem('interact_token'),
     kickId: sessionStorage.getItem('kickId'),
     kickMark: sessionStorage.getItem('kickMark'),
@@ -24,7 +24,7 @@ export function getSendCommonLogData() {
   return {
     ua: navigator.userAgent,
     token: localStorage.getItem('token'),
-    visitorId: sessionStorage.getItem('visitorId'),
+    visitorId: localStorage.getItem('visitorId'),
     interact_token: sessionStorage.getItem('interact_token'),
     kickMark: sessionStorage.getItem('kickMark'),
     initGrayId: sessionStorage.getItem('initGrayId')
