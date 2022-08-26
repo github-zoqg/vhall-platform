@@ -38,7 +38,7 @@ const cmdOption = cmdArgs.join(' ');
 const cmd = _[0];
 // 获取各种环境
 const vueMode = btool.getVueMode(cmd, mode);
-const nodeEnv = btool.getNodeEnv(vueMode);
+const nodeEnv = btool.getEnv(vueMode, 'NODE_ENV');
 process.env.NODE_ENV = nodeEnv;
 // 开启提示文字
 btool.bootstripTip({
@@ -49,18 +49,19 @@ btool.bootstripTip({
 });
 
 (async () => {
-  if (cmd === 'build') {
-    spinner.info(`${chalk.magenta('准备构建项目')}${chalk.magenta.bold(project)}\r\n`);
-    // 进度开始
-    spinner.start(`正在检查domain资源\n`);
-    const { status } = await btool.checkDomainRes(project);
-    if (status === 1) {
-      spinner.succeed(chalk.green(`domain资源存在\n`));
-    } else {
-      spinner.fail(chalk.redBright('domain资源检查未通过'));
-      process.exit(1);
-    }
-  }
+  // if (cmd === 'build') {
+  //   spinner.info(`${chalk.magenta('准备构建项目')}${chalk.magenta.bold(project)}\r\n`);
+  //   // 进度开始
+  //   spinner.start(`正在检查domain资源\n`);
+  //   const vueMode = btool.getVueMode(cmd, mode);
+  //   const { status } = await btool.checkDomainRes(project, vueMode);
+  //   if (status === 1) {
+  //     spinner.succeed(chalk.green(`domain资源存在\n`));
+  //   } else {
+  //     spinner.fail(chalk.redBright('domain资源检查未通过'));
+  //     process.exit(1);
+  //   }
+  // }
   // 组织编译命令
   const cmdStr = `node_modules${path.sep}.bin${path.sep}vue-cli-service ${cmdOption}`;
   // cLog('cmdStr:', cmdStr);

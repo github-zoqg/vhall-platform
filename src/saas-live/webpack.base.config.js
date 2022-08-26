@@ -16,22 +16,26 @@ const htmlConfig = {
     // Moment: '//s1.e.vhall.com/common-static/middle/moment/2.24.0/moment.min.js',
     VueI18n: '//s1.e.vhall.com/common-static/middle/vue-i18n/8.26.7/vue-i18n.min.js',
     loadJs: '//s1.e.vhall.com/common-static/middle/loadjs/4.2.0/loadjs.min.js',
-    ElementUi: '//s1.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    // 通过s2域名加载
+    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/index.js',
+    html2canvas: '//s2.e.vhall.com/common-static/middle/html2canvas/1.0.0-rc.4/html2canvas.min.js',
+    overlayscrollbars:
+      '//s2.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/js/OverlayScrollbars.min.js',
     dayjs: '//s2.e.vhall.com/common-static/middle/dayjs/1.10.8/dayjs.min.js',
     duration: '//s2.e.vhall.com/common-static/middle/dayjs/1.10.8/plugins/duration.js',
 
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: '' //空值，用于占位,具体环境中需配置覆盖此项
-
-    // vhallReport: '//s2.e.vhall.com/common-static/middle/middle-log/1.0.0/index.min.js'
   },
   // cdn css
   cdnCss: {
-    ElementUi: '//s2.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
+    ElementUi: '//s3.e.vhall.com/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css',
     iconfontCommon:
-      '//s2.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
-    iconfont: '//s2.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.8/iconfont.min.css'
+      '//s3.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
+    iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
+    overlayscrollbarsCss:
+      '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css'
   }
 };
 
@@ -45,7 +49,7 @@ module.exports = {
       title: pkg.title,
       version: process.env.VUE_APP_BUILD_VERSION,
       gitlabHash: process.env.VUE_APP_BUILD_HASH, //gitlab jenkins对应的项目hash
-      env: process.env.NODE_ENV, // 环境标识
+      env: process.env.VUE_APP_SAAS_ENV, // 环境标识
       ...htmlConfig
     }
   }

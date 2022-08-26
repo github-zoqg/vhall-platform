@@ -241,6 +241,11 @@ export default {
       cuid: ['comQuestionnaire'],
       method: 'open',
       args: ['$0']
+    },
+    // 关闭视频轮训弹窗
+    emitClosePollingDialog: {
+      cuid: 'comStreamLocal',
+      method: 'closePollingDialog'
     }
   },
 

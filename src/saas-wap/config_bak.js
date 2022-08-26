@@ -579,7 +579,12 @@ export const serverConfig = {
   // 礼物动画组件-SVGAA
   comWapRewardEffectSVGA: {
     component: 'VmpWapRewardEffectFullScreen'
+  },
+  // *******app问卷嵌入页面****开始
+  appEmbedQuestionLayerRoot: {
+    component: 'VmpAirContainer'
   }
+  // *******app问卷嵌入页面****结束
 };
 
 export default {

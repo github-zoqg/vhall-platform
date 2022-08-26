@@ -176,6 +176,15 @@
         }
       };
     },
+    computed: {
+      // 是否改变聊天区-昵称/头像(若开启报名表单 或 开启白名单情况下，不改变聊天区等昵称/头像)
+      noChangeChatUserInfo() {
+        const webinarInfo = this.$domainStore.state.roomBaseServer.watchInitData.webinar;
+        // reg_form 是否开启报名表单
+        // verify 验证类别，0 无验证，1 密码，2 白名单，3 付费活动, 4 F码, 6 F码+付费
+        return (webinarInfo.verify == 5 && webinarInfo.reg_form == 1) || webinarInfo.verify == 2;
+      }
+    },
     created() {
       this.userServer = useUserServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -201,7 +210,10 @@
                   type: 'success',
                   customClass: 'zdy-info-box'
                 });
-                this.roomBaseServer.setChangeUserInfo(1, { avatar: domain_url });
+                if (!this.noChangeChatUserInfo) {
+                  // 非白名单 和 报名表单情况下，修改聊天区域昵称或头像
+                  this.roomBaseServer.setChangeUserInfo(1, { avatar: domain_url });
+                }
                 this.userServer.getUserInfo({ scene_id: 2 });
               } else {
                 this.$message({
@@ -277,7 +289,10 @@
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
-              this.roomBaseServer.setChangeUserInfo(1, { avatar: '' });
+              if (!this.noChangeChatUserInfo) {
+                // 非白名单 和 报名表单情况下，修改聊天区域昵称或头像
+                this.roomBaseServer.setChangeUserInfo(1, { avatar: '' });
+              }
               this.userServer.getUserInfo({ scene_id: 2 });
             } else {
               this.$message({
@@ -331,7 +346,11 @@
                   });
                   // 触发保存接口
                   this.isNickNameEdit = false;
-                  this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
+                  // 消息通知，修改nickName内容
+                  if (!this.noChangeChatUserInfo) {
+                    // 非白名单 和 报名表单情况下，修改聊天区域昵称或头像
+                    this.roomBaseServer.setChangeUserInfo(2, { nick_name: this.nickName });
+                  }
                   // 用户信息接口更新
                   this.userServer.getUserInfo({ scene_id: 2 });
                 } else {

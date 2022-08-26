@@ -239,11 +239,10 @@ export default {
         method: 'open'
       }
     ],
-    emitHandleQa: [
+    emitHandleQA: [
       {
-        cuid: ['comTabMenu'],
-        method: 'setVisible',
-        args: ['$0']
+        cuid: ['comQa'],
+        method: 'handleQAPopup'
       }
     ]
   },
