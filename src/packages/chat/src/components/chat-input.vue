@@ -275,6 +275,10 @@
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
+          if (this.$route.query.assistantType) {
+            //如果是客户端嵌入直接return
+            return;
+          }
           return this.$message.warning(this.$t('chat.chat_1009'));
         }
         const curmsg = useChatServer().createCurMsg();
@@ -316,6 +320,10 @@
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170026, {
+          is_empty: this.inputValue.trim() ? 0 : 1
+        });
         //如果没有登录，则不能发消息
         if (this.chatLoginStatus) {
           return;

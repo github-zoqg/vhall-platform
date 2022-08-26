@@ -22,12 +22,14 @@
         }
       }
       return widgets.map(item => {
+        console.log(props)
         return createElement(
           item.component,
           {
             props: {
               cuid: item.cuid,
-            }
+            },
+            ref:props.cref?props.cref:undefined
           }
         )
       })
@@ -45,6 +47,12 @@
         type: Boolean,
         default() {
           return false
+        }
+      },
+      cref:{
+        type: String,
+        default() {
+          return ''
         }
       }
     }

@@ -1,3 +1,8 @@
+/**
+ * 录制时间格式转换
+ * @param {*} val
+ * @returns
+ */
 export function computeRecordTime(val) {
   const s = val; // 秒
   let m = 0; // 分
@@ -7,20 +12,10 @@ export function computeRecordTime(val) {
   return parseInt(m);
 }
 
-export function sleep(ms = 0) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
-
-export function isIE() {
-  return (
-    !!window.ActiveXObject || 'ActiveXObject' in window || navigator.userAgent.indexOf('Edge') > -1
-  );
-}
-
+/**
+ * 获取window系统版本
+ * @returns version
+ */
 export function windowVersion() {
   const version = navigator.userAgent;
   if (version.indexOf('Windows') != -1) {
@@ -33,16 +28,5 @@ export function windowVersion() {
     }
   } else {
     return 'ios';
-  }
-}
-
-export function resize() {
-  if (isIE()) {
-    var evt = window.document.createEvent('UIEvents');
-    evt.initUIEvent('resize', true, false, window, 0);
-    window.dispatchEvent(evt);
-  } else {
-    const resizeEvent = new Event('resize');
-    window.dispatchEvent(resizeEvent);
   }
 }

@@ -13,7 +13,7 @@
                 <div class="watch-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="watch-middle-box">
@@ -23,7 +23,11 @@
                     <p v-if="webinarInfo.desciption">{{ webinarInfo.desciption }}</p>
                   </div>
                   <div class="watch-time">
-                    <p v-show="webinarInfo.date"><i class="iconfont icontime_icon"></i></p>
+                    <p v-show="webinarInfo.company"><i class="iconfont icontime_icon"></i></p>
+                    <p>{{ webinarInfo.company }}</p>
+                    <p class="location-icon" v-show="webinarInfo.date">
+                      <i class="iconfont icontime_icon"></i>
+                    </p>
                     <p>{{ webinarInfo.date }}</p>
                     <p class="location-icon" v-show="webinarInfo.location">
                       <i class="iconfont iconplace_icon"></i>
@@ -50,7 +54,7 @@
               <div class="look-avator">
                 <img class="hsrc" :src="webinarInfo.avatar" alt="" />
               </div>
-              <p>{{ webinarInfo.nick_name }}</p>
+              <p class="ellips">{{ webinarInfo.nick_name }}</p>
               <p>{{ $t('nav.nav_1044') }}</p>
             </div>
             <div class="bottom-content">
@@ -63,6 +67,7 @@
                   <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="look-action">
+                  <p>{{ webinarInfo.company }}</p>
                   <p>{{ webinarInfo.date }}</p>
                   <p>{{ webinarInfo.location }}</p>
                 </div>
@@ -78,7 +83,7 @@
                 <div class="show-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="show-middle-box">
@@ -86,6 +91,11 @@
                   <div class="show-text" v-if="webinarInfo.title || webinarInfo.desciption">
                     <h1>{{ webinarInfo.title }}</h1>
                     <p>{{ webinarInfo.desciption }}</p>
+                  </div>
+                  <div v-if="webinarInfo.company" class="show-time">
+                    <p class="top-border"></p>
+                    <p class="show-time-item no-padding-bottom">{{ $t('nav.nav_1053') }}</p>
+                    <p class="show-time-item no-padding-top">{{ webinarInfo.company }}</p>
                   </div>
                   <div v-if="webinarInfo.date" class="show-time">
                     <p class="top-border"></p>
@@ -177,9 +187,9 @@
           params.invite_id = this.$route.query.join_id || this.$route.query.invite_id;
         }
 
-        // 获取屏幕宽高1/2
-        const screen_wid = Math.floor(window.screen.width / 2);
-        const screen_height = Math.floor(window.screen.height / 2);
+        // 获取屏幕宽高
+        const screen_wid = Math.floor(window.screen.width);
+        const screen_height = Math.floor(window.screen.height);
 
         const res = await this.inviteServer.createInvite(params);
         const data = res.data;
@@ -200,11 +210,11 @@
 
         if (this.webinarInfo.img_type == 0) {
           // 默认
-          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_fill,w_${screen_wid},h_${screen_height},limit_0`;
+          this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
         } else {
           this.webinarInfo.showImg = `${
             this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl
-          }?x-oss-process=image/resize,m_fill,w_${screen_wid},h_${screen_height},limit_0`;
+          }?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
         }
 
         this.nickname = padStringWhenTooLang(data.nick_name, '...', 5);
@@ -359,6 +369,11 @@
       .vh-invitation__card-preview-content-warp {
         width: 100%;
         height: 100%;
+        .ellips {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .vh-invitation__show-img {
           position: absolute;
           left: 0;
@@ -717,6 +732,7 @@
             height: 600px;
             position: absolute;
             bottom: 0;
+            left: 0;
             background: #ffffff;
             z-index: 2;
           }

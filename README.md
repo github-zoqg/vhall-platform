@@ -154,7 +154,7 @@ export const globalConfig = {
 };
 ```
 
-(3) 样式中不要使用 deep, 尽量遵守 `<a href="http://getbem.com/">`BEM`</a>` 样式规范。
+(3) 样式中不要使用 deep, 尽量遵守 <a href="http://getbem.com/">BEM</a> 样式规范。
 
 ---
 
@@ -165,7 +165,7 @@ export const globalConfig = {
 1、根目录下的 vue.config.js 是全局共用配置，里面定义了全局共用配置内容。
 2、每个项目的专有配置都在项目自己的根目录下，形如 webpack.[env].config.js。
 3、默认支持多页面，所有配置参数可参考官方文档：
-`<a href="https://cli.vuejs.org/zh/config/">`Vue Cli Config`</a>`。
+<a href="https://cli.vuejs.org/zh/config/">Vue Cli Config</a>。
 4、每个项目最终配置，都是 全局共用配置+ 专有个性配置 合并而成。
 合并采用方式：不同配置增量合并，对于相同子项，后面的配置会覆盖前面的配置。
 
@@ -175,7 +175,7 @@ export const globalConfig = {
 
 ## 插件安装
 
-#### <font color=blue size=3 >1、代码风格 eslint + prettier`</font>`
+#### <font color=blue size=3 >1、代码风格 eslint + prettier</font>
 
 问题 1：eslint 也可以自动修复/格式化代码，为什么要使用 Prettier？
 原因：https://github.com/prettier/prettier-eslint/issues/101
@@ -190,11 +190,11 @@ export const globalConfig = {
 
 eslint 检查集成了 prettier 规则，通常只需要在 prettier.config.js 文件中配置格式化规则即可。
 
-#### <font color=blue size=3 >2、路径跟踪插件 Path Intellisense`</font>`
+#### <font color=blue size=3 >2、路径跟踪插件 Path Intellisense</font>
 
 <font color=#A52A2A size=3 >vscode 搜索并安装 Path Intellisense 插件，用于处理使用别名后可以路径提示问题。</font>
 
-#### <font color=blue size=3 >3、文档查看编辑插件 Draw.io Integration`</font>`
+#### <font color=blue size=3 >3、文档查看编辑插件 Draw.io Integration</font>
 
 <font color=#A52A2A size=3 >vscode 搜索 Drawio 并安装 Draw.io Integration 插件。</font>
 

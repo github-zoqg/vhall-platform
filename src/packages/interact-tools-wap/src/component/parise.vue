@@ -97,6 +97,10 @@
       praise() {
         window.vhallReport && window.vhallReport.report('PRAISE');
         const num = this.timess;
+        // 数据埋点
+        window.vhallReportForWatch?.report(170025, {
+          num
+        });
         this.praiseServer
           .postPraiseIncrement({
             room_id: this.localRoomInfo.roomId,

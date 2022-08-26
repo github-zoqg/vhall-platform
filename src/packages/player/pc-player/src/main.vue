@@ -286,10 +286,11 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
-  import { computeRecordTime, isIE, windowVersion } from './js/utils';
+  import { computeRecordTime, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, isIE } from '@/app-shared/utils/tool.js';
+  import swfList from './js/swf-list.js';
   const ossimg = '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
   export default {
     name: 'VmpPcPlayer',
@@ -401,13 +402,18 @@
         }
       },
       isShowContainer() {
-        return (
-          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
-          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-            this.$domainStore.state.micServer.isSpeakOn ||
-            this.isLivingEnd) &&
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
-        );
+        if (this.isSubscribe && this.warmUpVideoList.length > 0) {
+          // 预约页，有暖场视频，一定初始化播放器； 解决无延迟直播开播之后，没有通过观看限制，暖场视频看不了的问题
+          return false;
+        } else {
+          return (
+            !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
+            (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+              this.$domainStore.state.micServer.isSpeakOn ||
+              this.isLivingEnd) &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+          );
+        }
       },
       isVisibleMiniElement() {
         // 添加插播桌面共享后，再添加插播桌面共享场景的处理
@@ -639,7 +645,11 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: '',
+          isSubject: false
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -657,25 +667,25 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder =
+            placeHolderInfo.placeHolder =
               this.roomBaseServer.state.watchInitData.webinar.verify_tip ||
               this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.authText || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder = this.authText || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.authText || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder = this.authText || this.$t('common.common_1006');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:
@@ -842,6 +852,10 @@
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
         const winVersion = windowVersion();
+        const ua = window.navigator.userAgent;
+        const swf = swfList.some(item => {
+          return ua.includes(item);
+        });
         // 直播
         this.playerServer.setType(type);
         if (type === 'live') {
@@ -856,16 +870,18 @@
           };
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         } else {
           this.vodOption.recordId = id;
           this.liveOption = {};
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         }
         if (this.isWarnPreview) {

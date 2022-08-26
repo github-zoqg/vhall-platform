@@ -260,6 +260,8 @@
                   : this.$t('webinar.webinar_1041', { n: `￥${this.fee}` });
             } else if (this.verify == 4) {
               ret = this.handleTypeText();
+            } else if (this.verify == 5) {
+              ret = this.handleTypeText();
             } else if (this.verify == 6) {
               ret = this.$t('appointment.appointment_1011');
               this.addText =
@@ -282,8 +284,13 @@
         }
       },
       authCheck() {
-        console.log(55555);
         this.$emit('authFetch');
+        if (this.type === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.verify
+          });
+        }
       },
       payMore() {
         this.$emit('payMore', { type: 3 });
