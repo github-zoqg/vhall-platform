@@ -27,7 +27,7 @@
             <span class="price" v-html="good.priceText"></span>
           </div>
           <div>
-            <button class="buy" @click.stop="handleBuy(good.goods_url)">
+            <button class="buy" @click.stop="handleBuy(good)">
               {{ $t('menu.menu_1007') }}
             </button>
           </div>
@@ -140,6 +140,11 @@
        */
       showDetailDialog(goodsItem) {
         const data = goodsItem;
+        // 数据埋点
+        window.vhallReportForWatch?.report(170029, {
+          goods_id: goodsItem.goods_id,
+          goods_name: encodeURIComponent(goodsItem.name)
+        });
         if (data && data.img_list.length < 4) {
           const defaults = 4 - data.img_list.length;
           for (let i = 0; i < defaults; i++) {
@@ -154,8 +159,13 @@
         // 事件通知
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitShowDetail', [data]));
       },
-      handleBuy(val) {
-        window.open(val);
+      handleBuy(good) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: good.goods_id,
+          goods_name: encodeURIComponent(good.name)
+        });
+        window.open(good.goods_url);
       },
       queryGoodsList() {
         if (this.pageLock || this.pos + this.limit >= this.total) {

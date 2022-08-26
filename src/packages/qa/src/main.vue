@@ -1,53 +1,111 @@
 <template>
   <div ref="chat" class="vhsaas-chat">
-    <div
-      class="vhsaas-chat__body-wrapper"
-      :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
-    >
-      <virtual-list
-        ref="qalist"
-        style="height: 100%; overflow: auto"
-        :keeps="15"
-        :estimate-size="100"
-        :data-key="'msgId'"
-        :data-sources="qaList"
-        :data-component="MsgItem"
-        :extra-props="{
-          isOnlyMine,
-          joinId,
-          roleName
-        }"
-        @tobottom="tobottom"
-      ></virtual-list>
-      <div class="vhsaas-chat__body__bottom-tip-box">
-        <div
-          v-show="unReadMessageCount !== 0"
-          class="vhsaas-chat__body__bottom-tip"
-          @click="scrollToTarget"
-        >
-          {{ tipMsg }}
-          <span class="vh-iconfont vh-line-arrow-down"></span>
+    <template v-if="!assistantType">
+      <div
+        class="vhsaas-chat__body-wrapper"
+        :style="{ height: 'calc(100% - ' + operatorHeight + 'px)' }"
+      >
+        <virtual-list
+          ref="qalist"
+          style="height: 100%; overflow: auto"
+          :keeps="15"
+          :estimate-size="100"
+          :data-key="'msgId'"
+          :data-sources="qaList"
+          :data-component="MsgItem"
+          :extra-props="{
+            isOnlyMine,
+            joinId,
+            roleName
+          }"
+          @tobottom="tobottom"
+        ></virtual-list>
+        <div class="vhsaas-chat__body__bottom-tip-box">
+          <div
+            v-show="unReadMessageCount !== 0"
+            class="vhsaas-chat__body__bottom-tip"
+            @click="scrollToTarget"
+          >
+            {{ tipMsg }}
+            <span class="iconfont iconyourennijiantou"></span>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-if="roleName != 2" class="button-container">
-      <p @click="openQa">问答管理</p>
-    </div>
-    <chat-operator
-      v-else
-      ref="chatQaOperator"
-      :chat-list="qaList"
-      :chat-login-status="chatLoginStatus"
-      :input-status="inputStatus"
-      @chatTextareaHeightChange="chatTextareaHeightChange"
-      @onOnlyMine="onOnlyMine"
-      @onInputStatus="onInputStatus"
-      @needLogin="handleLogin"
-    ></chat-operator>
+      <div v-if="roleName != 2" class="button-container">
+        <p @click="openQa">问答管理</p>
+      </div>
+      <chat-operator
+        v-else
+        ref="chatQaOperator"
+        :chat-list="qaList"
+        :chat-login-status="chatLoginStatus"
+        :input-status="inputStatus"
+        @chatTextareaHeightChange="chatTextareaHeightChange"
+        @onOnlyMine="onOnlyMine"
+        @onInputStatus="onInputStatus"
+        @needLogin="handleLogin"
+      ></chat-operator>
+    </template>
+
+    <!-- 问答 -->
+    <el-dialog title="问答" :visible.sync="qaVisible" width="400px" class="qa_modal" append-to-body>
+      <div class="qa_content" v-if="qaVisible">
+        <template>
+          <div v-if="!isQAEnabled">
+            <p class="qa_content_txt">
+              1、开启后，右侧互动区会增加“问答”模块，可进入右下角「问答管理」处理提问。
+            </p>
+            <p class="qa_content_txt">
+              2、支持修改「问答」的显示名称，如改成「提问」「投票」等，修改后的名称在用户观看时生效。
+            </p>
+            <el-form class="qa_content_form" inline>
+              <el-form-item label="显示名称" class="qa_name_item">
+                <el-input
+                  class="form-input qa_name"
+                  maxlength="8"
+                  placeholder="请输入名称"
+                  show-word-limit
+                  v-model="QAName"
+                ></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+          <p class="qa_content_txt" v-if="isQAEnabled">
+            该功能已开启，是否关闭？ 当前已收集问题：{{ qaCount }} 个
+          </p>
+          <el-form inline class="qa_content_form" v-if="isQAEnabled">
+            <el-form-item label="显示名称" class="qa_name_item">
+              <el-input
+                class="form-input qa_name"
+                maxlength="8"
+                show-word-limit
+                v-model="QAName"
+                :disabled="isQAEnabled"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </template>
+        <!-- <template v-else>
+          <p class="qa_content_txt" v-if="!isQAEnabled">
+            点击后打开“问答管理”页面，观众端显示“问答”。
+          </p>
+          <p class="qa_content_txt" v-if="isQAEnabled">
+            问答关闭后，观众端将不能提问。 当前已收集问题：{{ qaCount }}
+            个
+          </p>
+        </template> -->
+      </div>
+      <div class="enable_qa_btn" slot="footer">
+        <el-button type="primary" round @click="handleQASubmit" v-if="qaVisible">
+          {{ !isQAEnabled ? '开启' : '关闭' }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import { debounce } from 'lodash';
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
   // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
@@ -56,9 +114,11 @@
     useQaServer,
     useChatServer,
     useGroupServer,
+    useMsgServer,
     useMenuServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
+  import { cl_openQAAdmin } from '@/app-shared/client/client-methods.js';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
   export default {
@@ -71,6 +131,10 @@
     data() {
       return {
         MsgItem,
+        isQAEnabled: useRoomBaseServer().state.interactToolStatus.question_status ? true : false,
+        qaVisible: false,
+        qaCount: 0,
+        QAName: '问答',
         qaList: useQaServer().state.qaList,
         inputValue: '',
         inputStatus: {
@@ -101,7 +165,9 @@
         isBanned: useChatServer().state.banned, //true禁言，false未禁言
         allBanned: useChatServer().state.allBanned, //true全体禁言，false未禁言
         qa_allBanned_status: useChatServer().state.allBannedModuleList.qa_status, //全体禁言对问答是否生效
-        watchInitData: useRoomBaseServer().state.watchInitData
+        watchInitData: useRoomBaseServer().state.watchInitData,
+        //客户端嵌入参数
+        assistantType: this.$route.query.assistantType
       };
     },
     computed: {
@@ -136,6 +202,11 @@
       },
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      //互动工具状态
+      interactToolStatus() {
+        const { interactToolStatus = {} } = this.$domainStore.state.roomBaseServer;
+        return interactToolStatus;
       }
     },
     watch: {
@@ -162,6 +233,7 @@
     methods: {
       listenEvents() {
         const chatServer = useChatServer();
+        const msgServer = useMsgServer();
         const menuServer = useMenuServer();
         const qaServer = useQaServer();
         //监听新建问答消息
@@ -199,6 +271,19 @@
             this.qa_allBanned_status = msg.qa_status == 1 ? true : false;
           }
           this.initInputStatus();
+        });
+        msgServer.$on('live_over', () => {
+          this.isQAEnabled = false;
+          this.qaVisible = false;
+        });
+        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
+          this.isQAEnabled = true;
+        });
+        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
+          this.isQAEnabled = false;
+        });
+        qaServer.$on(qaServer.Events.QA_SET, msg => {
+          this.QAName = msg.name;
         });
         useGroupServer().$on('ROOM_CHANNEL_CHANGE', () => {
           if (!this.isInGroup) {
@@ -266,9 +351,12 @@
         this.isOnlyMine = status;
       },
       openQa() {
-        const base = process.env.NODE_ENV === 'development' ? '/' : '/v3/';
-        if (location.search == '') {
-          window.open(`${base}lives/qa/${this.webinarId}`);
+        const base = process.env.NODE_ENV === 'development' ? '/v3/' : '/v3/';
+        const url = location.search
+          ? `${base}lives/qa/${this.webinarId}`
+          : `${base}lives/qa/${this.webinarId}`;
+        if (this.$route.query.assistantType) {
+          cl_openQAAdmin(process.env.VUE_APP_WAP_WATCH + url);
         } else {
           window.open(`${base}lives/qa/${this.webinarId}${location.search}`);
         }
@@ -302,7 +390,87 @@
       //处理唤起登录
       handleLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
-      }
+      },
+      handleQa(flag) {
+        flag ? this.handleQAPopup() : this.close();
+      },
+      close() {
+        this.qaVisible = false;
+      },
+      handleQAPopup() {
+        window.vhallReportForProduct && window.vhallReportForProduct.report(110061);
+        if (!this.qaVisible && this.isQAEnabled) {
+          useQaServer()
+            .getCurrentPlayQuestionNum()
+            .then(res => {
+              if (res.code == 200) {
+                this.qaCount = res.data.num;
+              } else {
+                this.$message.error(res.msg);
+              }
+            });
+        }
+        this.qaVisible = !this.qaVisible;
+        // 点开问答的时候，获取qaName数据
+        useQaServer()
+          .getQaName()
+          .then(res => {
+            this.QAName = res.code == 200 ? res.data.name || '问答' : '问答';
+          })
+          .catch(res => {
+            this.QAName = '问答';
+          });
+      },
+      handleQASubmit() {
+        if (this.isQAEnabled) {
+          this.closeQA();
+        } else {
+          this.enableQA();
+        }
+      },
+      enableQA: debounce(function (flag) {
+        useQaServer()
+          .qaEnable({ name: this.QAName })
+          .then(res => {
+            if (res.code == 200) {
+              window.vhallReportForProduct?.report(110052);
+              this.isQAEnabled = true;
+              this.qaVisible = false;
+              if (this.$route.query.assistantType) {
+                this.openQa();
+              }
+              this.$message({
+                message: '开启问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '开启问答失败',
+                type: 'error'
+              });
+            }
+          });
+      }, 500),
+      closeQA: debounce(function (flag) {
+        useQaServer()
+          .qaDisable()
+          .then(res => {
+            if (res.code == 200) {
+              this.qaVisible = false;
+              this.isQAEnabled = true;
+              window.vhallReportForProduct?.report(110053);
+              this.$message({
+                message: '关闭问答成功',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '关闭问答失败',
+                type: 'error'
+              });
+            }
+          });
+      }, 500)
     }
   };
 </script>

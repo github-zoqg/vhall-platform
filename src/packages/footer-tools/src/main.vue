@@ -135,6 +135,7 @@
       :close-on-click-modal="true"
       :modal-append-to-body="true"
       custom-class="polling-dialog"
+      @closed="closePollingDialog"
       width="400px"
     >
       <div class="polling-dialog_warp">
@@ -160,10 +161,10 @@
     useMicServer,
     useChatServer,
     useGroupServer,
+    useMediaCheckServer,
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
-  // import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
@@ -240,6 +241,10 @@
       // 是否开启视频轮巡
       isVideoPolling() {
         return this.roomBaseServer.state.configList['video_polling'] == 1;
+      },
+      // 是否开启视频轮巡
+      hasVideoPollingStart() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.video_polling == 1;
       },
       // 是否正在直播
       isLiving() {
@@ -321,9 +326,18 @@
       this.throttleHandleShowGift = throttle(this.handleShowGift, 500, { trailing: false });
     },
     mounted() {
+      const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
         this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       });
+      if (sessionStorage.getItem(`hasVideoPollingStart_${roomId}`) == 1) return;
+      if (this.hasVideoPollingStart) {
+        this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
+      }
     },
     methods: {
       updateOnlineNum: throttle(function (val) {
@@ -332,6 +346,13 @@
       updateHotNum: throttle(function (val) {
         this.hotNumTxt = val;
       }, 500),
+      closePollingDialog() {
+        sessionStorage.setItem(
+          `pollingAgreeStatus_${this.roomBaseServer.state.watchInitData.webinar.id}`,
+          1
+        );
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClosePollingDialog'));
+      },
       settingShow() {
         if (this.isInteractLive) {
           // 互动直播

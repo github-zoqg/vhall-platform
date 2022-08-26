@@ -75,45 +75,7 @@ Vue.filter('fmtDeposit', deposit => {
  * 时间过滤器
  */
 Vue.filter('fmtTimeByExp', (time, exp) => {
-  let date = null;
-  let relt = '-';
-  if (time instanceof Date) {
-    date = time;
-  } else if (typeof time === 'string') {
-    date = new Date(time.replace(new RegExp(/-/gm), '/'));
-  } else {
-    return relt;
-  }
-  const padZerp = num => {
-    return `${num}`.padStart(2, '0');
-  };
-  const yy = date.getFullYear();
-  const MM = padZerp(date.getMonth() + 1);
-  const dd = padZerp(date.getDate());
-  const hh = padZerp(date.getHours());
-  const mm = padZerp(date.getMinutes());
-  const ss = padZerp(date.getSeconds());
-  switch (exp) {
-    case 'hh:mm:ss':
-      relt = `${hh}:${mm}:${ss}`;
-      break;
-    case 'hh:mm':
-      relt = `${hh}:${mm}`;
-      break;
-    case 'yy-MM-dd hh:mm':
-      relt = `${yy}-${MM}-${dd} ${hh}:${mm}`;
-      break;
-    case 'MM-dd hh:mm':
-      relt = `${MM}-${dd} ${hh}:${mm}`;
-      break;
-    case '年月日时分':
-      relt = `${yy}年${MM}月${dd}日 ${hh}:${mm}`;
-      break;
-    default:
-      relt = `${yy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
-      break;
-  }
-  return relt;
+  return dayjs(time).format(exp);
 });
 
 // 热度、在线人数过滤器
@@ -178,13 +140,12 @@ Vue.filter('transformWatchPraise', num => {
   num = Number(num);
   if (num < 10000) {
     return num;
-  } else if (num >= 10000 && num < 1000000) {
-    const n = Math.floor(num / 10000);
-    let l = Math.floor((num % 10000) / 1000); // eslint-disable-line
-    l = l === 0 ? '' : '.' + l;
-    return (num = n + l + 'w');
   } else {
-    return (num = '999w');
+    const n = (num / 10000).toFixed(1);
+    if (n > 999.9) {
+      return '999.9w';
+    }
+    return n + 'w';
   }
 });
 

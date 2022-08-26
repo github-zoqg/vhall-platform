@@ -9,6 +9,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const lineByLine = require('n-readlines');
 const pathConfig = require('./path-config');
+const { Module } = require('module');
 const CMDLIST = ['serve', 'build', 'inspect', 'lint', 'help'];
 const cLog = console.log;
 
@@ -73,12 +74,10 @@ const checkValidArgs = argv => {
   return true;
 };
 
-function getShortEnv() {
-  return process.env.NODE_ENV === 'production'
-    ? 'prod'
-    : process.env.NODE_ENV === 'development'
-    ? 'dev'
-    : process.env.NODE_ENV;
+function getShortEnv(mode) {
+  console.log('---', mode);
+  const saasEnv = getEnv(mode, 'VUE_APP_SAAS_ENV');
+  return saasEnv === 'production' ? 'prod' : saasEnv === 'development' ? 'dev' : saasEnv;
 }
 
 /**
@@ -86,8 +85,8 @@ function getShortEnv() {
  * @param {*} project 项目
  * @returns
  */
-const createSpecialConfig = project => {
-  let env = getShortEnv();
+const createSpecialConfig = (project, mode) => {
+  let env = getShortEnv(mode);
   const bizConfigPath = path.join(pathConfig.SRC, project, `webpack.${env}.config.js`);
   if (!fs.existsSync(bizConfigPath)) {
     cLog(chalk.red(`${bizConfigPath} 配置文件缺失，请检查`));
@@ -104,7 +103,7 @@ const getVueMode = (cmd, mode) => {
   return mode;
 };
 
-const getNodeEnv = mode => {
+const getEnv = (mode, type) => {
   const envFile = path.join(pathConfig.ROOT, `.env.${mode}`);
   if (!fs.existsSync(envFile)) {
     cLog(chalk.redBright('文件不存在，请检查'));
@@ -114,7 +113,7 @@ const getNodeEnv = mode => {
   let line;
   while ((line = liner.next())) {
     line = line.toString('utf-8');
-    if (line.startsWith('NODE_ENV')) {
+    if (line.startsWith(type)) {
       break;
     }
   }
@@ -150,9 +149,9 @@ async function checkRes(url) {
   }
 }
 
-async function checkDomainRes(project) {
+async function checkDomainRes(project, mode) {
   try {
-    const vConfig = this.createSpecialConfig(project);
+    const vConfig = this.createSpecialConfig(project, mode);
     let domainUrl = vConfig.pages.index.cdnJs['MiddleDomain'];
     if (domainUrl.startsWith('//')) {
       domainUrl = `https:${domainUrl}`;
@@ -184,7 +183,7 @@ module.exports = {
   checkValidArgs,
   createSpecialConfig,
   getVueMode,
-  getNodeEnv,
+  getEnv,
   checkRes,
   checkDomainRes
 };

@@ -160,7 +160,8 @@ export default {
     nav_1049: 'Place',
     nav_1050: "The host hasn't opened the invitation yet",
     nav_1051: 'Alipay',
-    nav_1052: 'Copy failed'
+    nav_1052: 'Copy failed',
+    nav_1053: 'Sponsor'
   },
   login: {
     login_1001: 'Account login',

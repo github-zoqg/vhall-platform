@@ -58,10 +58,7 @@
 </template>
 
 <script>
-  // import { debounce } from 'lodash';
-  import { boxEventOpitons, isWechat, isWechatCom } from '@/app-shared/utils/tool.js';
-  import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
-  import { A } from 'caniuse-lite/data/features/css-shapes';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',

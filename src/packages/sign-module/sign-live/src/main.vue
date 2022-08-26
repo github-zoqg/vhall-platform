@@ -114,9 +114,15 @@
       });
     },
     methods: {
+      handleSign(flag) {
+        flag ? this.openSign() : this.closeSign();
+      },
       openSign() {
         // 是否发起了签到
         this.getSignInfo();
+      },
+      closeSign() {
+        this.signVisible = false;
       },
       getSignInfo() {
         this.signServer

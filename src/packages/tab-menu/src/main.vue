@@ -315,7 +315,6 @@
        */
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
-
         // 发起端逻辑
         if (!this.isWatch) {
           this.addItem({

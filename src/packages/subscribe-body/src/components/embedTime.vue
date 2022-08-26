@@ -3,11 +3,13 @@
     <div v-if="type != 1 && type != 2" class="end-pic">
       <img src="../img/live_start.png" alt="" />
     </div>
-    <div v-if="type != 1 && type != 2" class="end-tip">{{ $t('player.player_1017') }}</div>
+    <div v-if="type != 1 && type != 2 && type != 4" class="end-tip">
+      {{ $t('player.player_1017') }}
+    </div>
     <div v-if="(type == 1 || type == 2) && (day || hour || minute || second)" class="live-tip">
       {{ tip }}
     </div>
-    <div v-if="show == 1 && type != 1 && type != 2" class="hot">
+    <div v-if="show == 1 && type != 1 && type != 2 && type != 4" class="hot">
       <span class="hot-icon"></span>
       <span class="pv">{{ num }}</span>
     </div>
@@ -31,8 +33,8 @@
       <button
         v-if="btnText"
         class="sub-auth"
-        :class="{ disabledBtn: btnText == $t('webinar.webinar_1036') }"
-        :disabled="btnText == $t('webinar.webinar_1036')"
+        :class="{ disabledBtn: disabled }"
+        :disabled="disabled"
         @click="authCheck"
       >
         {{ btnText }}
@@ -65,11 +67,20 @@
         const isEmbedVideo = this.roomBaseServer.state.embedObj.embedVideo;
         const isLive = this.webinarType != 2 && this.webinarType != 3;
         if (isAgreement && isLive && !isEmbedVideo) {
+          // 观看协议验证通过，并且当前活动状态不是 预约和结束，且不是单视频嵌入的时候，展示观看验证按钮。
           return true;
         } else {
           return false;
         }
         // if (isAgreement && ((!btnText && type == 1) || btnText))
+      },
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     data() {
@@ -97,7 +108,9 @@
         disabled: false,
         show: 1,
         num: 0,
-        pv: 10
+        pv: 10,
+        save_reg_form: null,
+        open_reg_form: null
       };
     },
     watch: {
@@ -111,6 +124,8 @@
             this.is_subscribe = val.is_subscribe;
             this.actual_start_time = val.actual_start_time;
             this.show = val.show;
+            this.save_reg_form = val.save_reg_form;
+            this.open_reg_form = val.open_reg_form;
             // this.num = val.num
             console.log('>>>>>>1', val);
             // if (val.is_subscribe == 1) this.disabled = true
@@ -132,10 +147,15 @@
       agreement() {
         this.$emit('agreement');
       },
+      // 获取预约页状态进度等
       handleSubscribeProcess() {
+        // 清除历史计时器
         this.clearTimer();
+        // 时间提示文案： 已开播/距离开播
         this.handleTips();
+        // 处理当前界面展示文案 及 按钮状态
         this.handleBtnText();
+        // 根据开播时间等，启动具体的计时器（1秒间隔）
         this.timer = setInterval(() => {
           this.remainTimes();
         }, 1 * 1000);
@@ -235,34 +255,47 @@
         this.btnText = this.$t('player.player_1013');
       },
       handleBtnText() {
-        if (this.type == 1) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.type == 3 || this.type == 2) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('webinar.webinar_1036');
-            this.disabled = true;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
-          }
-        } else if (this.type == 4 || this.type == 5) {
-          if (this.verify == 1) {
-            this.btnText = this.$t('player.player_1013');
-            this.disabled = false;
-          } else {
-            this.btnText = '';
-            this.disabled = false;
+        if (this.type == 3) {
+          // 活动已结束，观看限制为密码时，展示按钮“密码活动”，按钮不可点击
+          this.btnText = this.verify == 1 ? this.$t('webinar.webinar_1036') : '';
+          this.disabled = this.verify == 1;
+          return;
+        }
+        // 是否嵌入 & 非单视频嵌入 & 开启了报名表单 & 观看限制（无 或 密码 或者 专题观看限制设置为报名表单）
+        const isOpenBtn =
+          this.isEmbed &&
+          !this.isEmbedVideo &&
+          this.open_reg_form == 1 &&
+          [0, 1, 5].includes(this.verify);
+        if (this.is_subscribe == 1) {
+          this.btnText = this.$t('appointment.appointment_1006');
+        } else {
+          if ([1, 4, 5].includes(this.type)) {
+            // 直播中、点播、回放 的时候，观看限制=密码或者isOpen场景，按钮文案“立即观看”；否则不展示按钮。
+            this.btnText = this.verify == 1 || isOpenBtn ? this.$t('player.player_1013') : '';
+          } else if (this.type == 2) {
+            // 预告状态 isOpenBtn按钮文案“立即预约”；其它若观看限制=密码，按钮展示为 “密码活动”；其它情况不展示按钮。
+            if (isOpenBtn) {
+              this.btnText = this.$t('appointment.appointment_1017');
+            } else if (this.verify == 1) {
+              this.btnText = this.$t('webinar.webinar_1036');
+            } else {
+              this.btnText = '';
+            }
           }
         }
+        // 若当前已是预约成功状态， 或者 当前是预告状态&&不是isOpenBtn场景&&观看限制为 密码，此时按钮禁用
+        this.disabled =
+          this.is_subscribe == 1 || (this.type == 2 && !isOpenBtn && this.verify == 1);
       },
       authCheck() {
         this.$emit('authFetch');
+        if (this.type === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.verify
+          });
+        }
       }
     }
   };
@@ -393,6 +426,9 @@
     }
     .disabledBtn {
       background: rgba(251, 58, 50, 0.4);
+      min-width: 160px;
+      padding: 0 18px;
+      width: auto;
       &:hover {
         cursor: auto;
       }

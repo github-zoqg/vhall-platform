@@ -20,14 +20,8 @@ export const sessionOrLocal = {
     window[saveType].clear();
   }
 };
-window.testSess = sessionOrLocal;
-// 判断是否IE
-export function isIE() {
-  return (
-    !!window.ActiveXObject || 'ActiveXObject' in window || navigator.userAgent.indexOf('Edge') > -1
-  );
-}
 
+/*
 export function browserDetect() {
   const chromeReg = /Chrome\/(\d{2})[.\d]+\sSafari\/[.\d]+$/gi;
   const chromeResult = chromeReg.exec(navigator.userAgent);
@@ -41,27 +35,7 @@ export function browserDetect() {
         parseInt(safariResult[1].split('.').join('')) < 121
       );
 }
-
-// 尺寸重置
-export function resize() {
-  if (isIE()) {
-    const evt = window.document.createEvent('UIEvents');
-    evt.initUIEvent('resize', true, false, window, 0);
-    window.dispatchEvent(evt);
-  } else {
-    const resizeEvent = new Event('resize');
-    window.dispatchEvent(resizeEvent);
-  }
-}
-
-// 防抖
-export const debounce = (function () {
-  let timer = 0;
-  return function (callback, ms) {
-    clearTimeout(timer);
-    timer = setTimeout(callback, ms);
-  };
-})();
+*/
 
 export function calculateAudioLevel(level) {
   let audioLevelValue = 1;
@@ -93,6 +67,9 @@ export function calculateNetworkStatus(status) {
   return netWorkStatus;
 }
 
+/**
+ * 文本拷贝
+ */
 export function copy(text) {
   return new Promise((resolve, reject) => {
     const inputEl = document.createElement('input');
@@ -190,6 +167,7 @@ export function parseURL(url) {
  * @param type 类型
  * @returns {Boolean} 验证通过还是失败
  */
+/*
 export function checkUploadType(file, that, type = 1) {
   const typeList = type === 1 ? ['png', 'jpeg', 'gif', 'bmp'] : [];
   console.log(file.type.toLowerCase());
@@ -216,3 +194,4 @@ export function checkUploadType(file, that, type = 1) {
   };
   return isType && isLt2M;
 }
+*/

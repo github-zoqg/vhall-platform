@@ -151,7 +151,7 @@
           });
       },
       goUser() {
-        window.location.href = `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
       },
       showPublic() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
@@ -187,6 +187,7 @@
               console.log('attention-------->', res);
               this.$toast(this.$t('nav.nav_1030'));
               this.attentionStatus = 1;
+              window.vhallReportForWatch?.report(170019);
             });
         }
       }

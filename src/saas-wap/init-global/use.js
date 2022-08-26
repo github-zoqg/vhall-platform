@@ -34,7 +34,6 @@ import VmpGoodListWap from '@/packages/good-wap';
 import VmpChatWap from '@/packages/chat-wap';
 import VmpGoodsDetail from '@/packages/wap-goods-detail';
 
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 
 //wap互动工具box

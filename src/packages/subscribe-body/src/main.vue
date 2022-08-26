@@ -100,7 +100,9 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          needAgreement: false
+          needAgreement: false,
+          open_reg_form: null,
+          save_reg_form: null
         }
       };
     },
@@ -213,6 +215,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        // 报名表单是否已填写
+        this.subOption.save_reg_form = join_info.reg_form;
+        // 报名表单是否已开启
+        this.subOption.open_reg_form = webinar.reg_form;
         if (webinar.type == 3) {
           this.showVideo = false;
           this.isLivingEnd = true;
@@ -296,7 +302,11 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: '',
+          isSubject: false
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -314,23 +324,26 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1024');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('common.common_1006');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:

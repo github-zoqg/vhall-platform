@@ -26,10 +26,10 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useMsgServer, useUserServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   import skins from '@/app-shared/skins/watch';
@@ -127,7 +127,7 @@
           // 如果往观看页跳转，需要清除暖场视频缓存
           window.sessionStorage.removeItem('warm_recordId');
           window.sessionStorage.removeItem('recordIds');
-
+          // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
@@ -137,9 +137,23 @@
             type: 4,
             entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test'
           });
           window.vhallReport.report('ENTER_WATCH');
+          // 产品侧上报需求
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 7
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId || this.$route.query.share_id
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
+          window.vhallReportForWatch?.report(170017);
           console.log('%c---初始化直播房间 完成', 'color:blue');
           // 如果加密状态为 1 或者 2
           // 并且是点播或者回放
@@ -187,7 +201,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
@@ -239,6 +255,10 @@
         }
       },
       handleErrorCode(err) {
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -255,9 +275,10 @@
                 _embedQuery.indexOf('record_id=') > -1
                   ? _embedQuery.replace('record_id=', 'rid=')
                   : _embedQuery;
-              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+
+              window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
             } else {
-              window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+              window.location.href = `${origin}/${this.$route.params.id}`;
             }
             break;
           case 512002:

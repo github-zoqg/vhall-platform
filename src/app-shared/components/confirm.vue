@@ -10,7 +10,7 @@
       <div class="content">
         <slot name="content"></slot>
       </div>
-      <div class="footer" :style="`width: ${width}`" @click.stop="sure">
+      <div class="footer" :style="`width: ${width}`" @click="sure">
         {{ titleBtn || $t('account.account_1062') }}
       </div>
     </div>
@@ -39,7 +39,7 @@
     },
     methods: {
       sure() {
-        this.$emit('authSubmit', this.textAuth);
+        this.$emit('authSubmit');
       },
       close() {
         this.$emit('authClose');
