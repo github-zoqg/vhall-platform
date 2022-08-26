@@ -4,7 +4,12 @@
     v-if="screenShow && useRoomBaseServer.state.screenPosterInfo.img"
     @click="handleLink"
   >
-    <el-image class="vmp-screen-post-img" :src="screenPosterInfo_img" fit="cover" lazy></el-image>
+    <el-image
+      class="vmp-screen-post-img"
+      :src="screenPosterInfo_img"
+      :fit="imageShowMode"
+      lazy
+    ></el-image>
     <div
       class="vmp-screen-post-close-tip"
       :class="{ time: useRoomBaseServer.state.screenPosterInfo.shutdown_type }"
@@ -18,6 +23,8 @@
 
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpScreenPost',
     data() {
@@ -25,6 +32,7 @@
         useRoomBaseServer: {},
         timer: null,
         time: 5,
+        imageShowMode: 'fill',
         screenShow: false,
         screenWidth: 1920, //默认是pc设计稿
         screenHeight: 1080
@@ -35,7 +43,13 @@
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
       screenPosterInfo_img() {
-        return `${this.useRoomBaseServer.state.screenPosterInfo.img}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
+        let url = this.useRoomBaseServer.state.screenPosterInfo.img;
+        if (cropperImage(url)) {
+          this.handlerImageInfo(url);
+          return url;
+        } else {
+          return `${url}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
+        }
       }
     },
     created() {
@@ -59,7 +73,16 @@
         const url = this.useRoomBaseServer.state.screenPosterInfo.url;
         url && window.open(url);
       },
-
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageShowMode = 'fill';
+        if (Number(obj.mode) == 2) {
+          this.imageShowMode = 'cover';
+        } else if (Number(obj.mode) == 3) {
+          this.imageShowMode = 'scale-down';
+        }
+      },
       // 自动关闭
       handleAutoClose() {
         if (this.timer) clearInterval(this.timer);

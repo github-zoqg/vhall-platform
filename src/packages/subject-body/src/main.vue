@@ -4,7 +4,7 @@
       <div class="vmp-subject-body_main">
         <div class="subject_left">
           <div class="subject_left_main">
-            <img :src="subjectDetailInfo.cover || defaultImages" />
+            <img :class="`subject_img subject_bg_${imageCropperMode}`" :src="subjectImage" />
           </div>
           <div class="subject_left_detail">
             <p>
@@ -68,12 +68,18 @@
 </template>
 <script>
   import { useSubjectServer } from 'middle-domain';
-  import { boxEventOpitons, handleIntroInfo } from '@/app-shared/utils/tool.js';
+  import {
+    boxEventOpitons,
+    handleIntroInfo,
+    parseImgOssQueryString
+  } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSubjectBody',
     data() {
       return {
         webinarId: '',
+        imageCropperMode: 1,
         defaultImages: 'https://cnstatic01.e.vhall.com/static/img/v35-subject.png'
       };
     },
@@ -93,6 +99,16 @@
       webinarList() {
         return this.$domainStore.state.subjectServer.webinarList;
       },
+      subjectImage() {
+        let url = this.defaultImages;
+        if (this.subjectDetailInfo.cover) {
+          if (cropperImage(this.subjectDetailInfo.cover)) {
+            this.handlerImageInfo(url);
+          }
+          url = this.subjectDetailInfo.cover;
+        }
+        return url;
+      },
       subjectIntroInfo() {
         return handleIntroInfo(this.subjectDetailInfo.intro);
       }
@@ -110,6 +126,12 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
@@ -235,10 +257,17 @@
           border-radius: 4px;
           background-color: #1a1a1a;
           flex: 1;
-          img {
+          .subject_img {
             width: 100%;
             height: 100%;
+            object-fit: fill;
             border-radius: 4px 4px 0 0;
+            &.subject_bg_2 {
+              object-fit: cover;
+            }
+            &.subject_bg_3 {
+              object-fit: scale-down;
+            }
           }
         }
         &_detail {

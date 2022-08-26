@@ -17,8 +17,8 @@
     </van-loading>
     <div v-if="state === 1">
       <div class="subject-poster">
-        <img class="poster-image" :src="detailInfo.cover" alt="" v-if="detailInfo.cover" />
-        <img class="poster-image" :src="defaultImages" alt="" v-else />
+        <img :class="`poster-image subject_bg_${imageCropperMode}`" :src="subjectImage" alt="" />
+        <!-- <img class="poster-image" :src="defaultImages" alt="" v-else /> -->
       </div>
       <section class="subject-header">
         <h2 class="subject-title">{{ detailInfo.title }}</h2>
@@ -129,10 +129,15 @@
 <script>
   import { useSubjectServer, useUserServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
-  import { getQueryString } from '@/app-shared/utils/tool.js';
-  import { handleIntroInfo, replaceHtml } from '@/app-shared/utils/tool.js';
+  import {
+    getQueryString,
+    handleIntroInfo,
+    replaceHtml,
+    parseImgOssQueryString
+  } from '@/app-shared/utils/tool.js';
   import loginWap from '@/packages/reg-login-wap/src/main.vue';
   import confirmAuth from '@/app-shared/components/confirm.vue';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     data() {
       return {
@@ -182,6 +187,7 @@
           }
         ],
         loading: true,
+        imageCropperMode: 1,
         query: {
           pos: 0,
           limit: 12,
@@ -211,6 +217,16 @@
     computed: {
       subjectAuthInfo() {
         return this.subjectServer.state.subjectAuthInfo;
+      },
+      subjectImage() {
+        let url = this.defaultImages;
+        if (this.detailInfo.cover) {
+          if (cropperImage(this.detailInfo.cover)) {
+            this.handlerImageInfo(url);
+          }
+          url = this.detailInfo.cover;
+        }
+        return url;
       }
     },
     mounted() {
@@ -230,6 +246,12 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
       },
       async getDetail() {
         try {
@@ -502,9 +524,17 @@
     height: 100%;
     .subject-poster {
       width: 100%;
+      height: 420px;
       .poster-image {
         width: 100%;
-        height: 420px;
+        height: 100%;
+        object-fit: fill;
+        &.subject_bg_2 {
+          object-fit: cover;
+        }
+        &.subject_bg_3 {
+          object-fit: scale-down;
+        }
       }
     }
     .subject-header {

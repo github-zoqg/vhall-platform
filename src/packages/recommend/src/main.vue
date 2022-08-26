@@ -10,7 +10,7 @@
             @click="goto(item.url)"
           >
             <div class="subscribe-wrap-item_cover">
-              <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
+              <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" alt="" />
             </div>
             <div class="subscribe-wrap-item_info">
               <p>{{ item.subject }}</p>
@@ -28,7 +28,7 @@
           >
             <div class="recommend-item">
               <div class="banner">
-                <img :src="item.img_url ? item.img_url : defaultBanner" />
+                <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" />
               </div>
               <div class="info">
                 <h4 class="title ellipsis">{{ item.subject }}</h4>
@@ -47,7 +47,8 @@
 </template>
 <script>
   import { useRoomBaseServer, useRecommendServer, useMenuServer } from 'middle-domain';
-
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpRecommend',
     data() {
@@ -135,6 +136,7 @@
       setDefaultAdvs() {
         this.advs = [...this.roomBaseServer.state.advDefault.adv_list];
         this.total = this.roomBaseServer.state.advDefault.total;
+        this.handlerAdvsInfo(this.advs);
       },
       onScrollStop() {
         if (!this.$refs.scroll) return;
@@ -157,6 +159,15 @@
 
         this.getAdsInfo();
       },
+      handlerAdvsInfo(list) {
+        list.map(item => {
+          if (cropperImage(item.img_url)) {
+            item.imageMode = this.handlerImageInfo(item.img_url);
+          } else {
+            item.imageMode = 3;
+          }
+        });
+      },
       async getAdsInfo() {
         this.loading = true;
 
@@ -166,13 +177,25 @@
             pos: this.pos + this.limit,
             limit: 10
           });
-
+          this.handlerAdvsInfo(res.data.adv_list);
           const data = this.advs;
           this.advs = data.concat(res.data.adv_list);
           this.total = res.data.total;
           this.pos = res.data.pos;
         } finally {
           this.loading = false;
+        }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        console.log(url, '??!23guangao');
+        let obj = parseImgOssQueryString(url);
+        if (Number(obj.mode) == 2) {
+          return 2;
+        } else if (Number(obj.mode) == 3) {
+          return 3;
+        } else {
+          return 1;
         }
       },
       goto(url) {
@@ -216,11 +239,17 @@
           border-top-right-radius: 4px;
           overflow: hidden;
           cursor: pointer;
-          img {
+          .ad_img {
             width: 100%;
             height: 100%;
             object-fit: scale-down;
             transition: all 0.4s;
+            &.ad_bg_1 {
+              object-fit: fill;
+            }
+            &.ad_bg_2 {
+              object-fit: cover;
+            }
             &:hover {
               transform: scale(1.2);
             }
@@ -304,10 +333,16 @@
           flex: 0 0 auto;
           max-width: 180px;
 
-          img {
+          .ad_img {
             height: 100%;
             width: 100%;
             object-fit: scale-down;
+            &.ad_bg_1 {
+              object-fit: fill;
+            }
+            &.ad_bg_2 {
+              object-fit: cover;
+            }
           }
         }
         .title {
