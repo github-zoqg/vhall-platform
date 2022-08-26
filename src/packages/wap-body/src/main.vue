@@ -50,13 +50,22 @@
        -->
     </div>
     <masksliding></masksliding>
-    <div class="living-start" v-if="isShowLiveStartNotice">
-      <span class="living-img">
-        <img src="./img/live_start.png" alt="" />
-      </span>
-      <p class="living-text">{{ $t('player.player_1027') }}</p>
-      <p class="footer" @click="startWatch">{{ $t('player.player_1013') }}</p>
-    </div>
+    <!-- 弹出直播提醒 -->
+    <alertBox
+      v-if="isShowLiveStartNotice"
+      :title="''"
+      :isShowClose="false"
+      :titleBtn="$t('player.player_1013')"
+      @authClose="startWatch"
+      @authSubmit="startWatch"
+    >
+      <div slot="content" class="vmp-wap-body_living">
+        <span class="living-img">
+          <img src="./img/live_start.png" alt="" />
+        </span>
+        <p class="living-text">{{ $t('appointment.appointment_1033') }}</p>
+      </div>
+    </alertBox>
   </div>
 </template>
 <script>
@@ -71,8 +80,13 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
+  import alertBox from '@/saas-wap/views/components/confirm.vue';
   export default {
     name: 'VmpWapBody',
+    components: {
+      alertBox,
+      masksliding
+    },
     mixins: [move],
     data() {
       return {
@@ -180,9 +194,6 @@
         return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
       }
     },
-    components: {
-      masksliding
-    },
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
@@ -215,6 +226,9 @@
       this.listenEvents();
     },
     methods: {
+      startWatch() {
+        location.reload();
+      },
       questionnaireVisible(flag) {
         this.mini = flag;
       },
@@ -472,14 +486,13 @@
         display: none;
       }
     }
-    .living-start {
+    &_living {
       width: 100%;
-      margin-top: 32px;
       background: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       .living-img {
         display: inline-block;
         width: 160px;
@@ -491,13 +504,10 @@
         }
       }
       .living-text {
-        padding: 20px 0 40px;
+        padding-top: 20px;
         color: #262626;
         font-size: 28px;
         line-height: 40px;
-      }
-      .footer {
-        width: 340px;
       }
     }
   }

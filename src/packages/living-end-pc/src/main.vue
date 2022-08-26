@@ -23,7 +23,7 @@
     <section class="vmp-living-end-to" v-if="isShowLiveStartNotice">
       <section class="vmp-living-end-to-start">
         <section class="vmp-living-end-cover"></section>
-        <span>{{ $t('player.player_1018') }}</span>
+        <span>{{ $t('appointment.appointment_1033') }}</span>
         <button class="vmp-living-end__btn" @click="reloadPage">
           {{ $t('player.player_1013') }}
         </button>
