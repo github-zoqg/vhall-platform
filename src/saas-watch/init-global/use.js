@@ -1,7 +1,6 @@
 import Vue from 'vue';
-// element-ui
-// import ElementUI from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
+
+//字体图标样式
 // import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
@@ -48,7 +47,6 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpLivingEnd from '@/packages/living-end-pc';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';
@@ -77,6 +75,10 @@ import VmpMicInvited from '@/packages/mic-invited/index';
 import VmpCameraCheck from '@/packages/camera-check/index';
 
 import VmpViewRestriction from '@/packages/view-restriction/index';
+
+// 专题预览页
+import VmpSubjectBody from '@/packages/subject-body/index';
+import VmpSubjectHeader from '@/packages/subject-header/index';
 
 // 全局注册组件
 // Vue.use(ElementUI);
@@ -132,6 +134,10 @@ Vue.use(VmpRedPacketCommandWatch);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpQa);
 Vue.use(VmpQuestionnaireWatch);
+
+// 专题
+Vue.use(VmpSubjectBody);
+Vue.use(VmpSubjectHeader);
 
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);

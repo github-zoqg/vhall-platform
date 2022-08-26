@@ -87,7 +87,7 @@
         //是否屏蔽特效
         hideEffect: sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true',
         rewardEffectList: [],
-        showEffectStatus: false, //是否显示礼物动画, 如果当前tab为聊天时才显示
+        showEffectStatus: this.$route.query.assistantType ? true : false, //是否显示礼物动画, 如果当前tab为聊天时才显示
         taskQueue: null // 飘窗列队
       };
     },

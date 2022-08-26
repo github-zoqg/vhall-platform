@@ -13,7 +13,7 @@
               </span>
             </div>
             <span class="vhsaas-red-packet__time">
-              {{ item.created_at | fmtTimeByExp('hh:mm:ss') }}
+              {{ item.created_at | fmtTimeByExp('HH:mm:ss') }}
             </span>
           </li>
         </ul>

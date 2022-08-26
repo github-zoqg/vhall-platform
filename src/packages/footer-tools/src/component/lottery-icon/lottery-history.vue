@@ -27,7 +27,7 @@
                 </span>
               </div>
               <div class="vmp-lottery-content__bottom">
-                {{ lottery.created_at | fmtTimeByExp('MM-dd hh:mm') }}
+                {{ lottery.created_at | fmtTimeByExp('MM-DD HH:mm') }}
               </div>
             </section>
           </div>

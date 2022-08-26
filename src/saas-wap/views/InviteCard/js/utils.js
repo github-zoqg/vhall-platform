@@ -13,7 +13,7 @@ export function getBase64Image(img) {
 export function padStringWhenTooLang(originString, padString = '', length) {
   if (originString.length <= length) return originString;
 
-  return originString.splice(0, length - 1) + padString;
+  return originString.substr(0, length - 1) + padString;
 }
 
 /**
