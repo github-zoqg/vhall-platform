@@ -371,7 +371,9 @@
         padding: 0px 18px;
       }
       .disableClick {
-        background: rgba(251, 58, 50, 0.6);
+        background: var(--theme-color);
+        opacity: 0.6;
+        filter: alpha(opacity=60); //filter 过滤器   兼容IE678
         &:hover {
           cursor: auto;
         }
