@@ -3,7 +3,17 @@
     <!-- 时间显示区 -->
     <div v-show="timerVisible" v-drag class="bgimg">
       <el-row class="time_number">
-        <el-col class="ft12">
+        <el-col
+          :class="
+            status == 'pause'
+              ? 'stop'
+              : status == 'end'
+              ? 'endColor'
+              : time < 0
+              ? 'timeout_font_color'
+              : ''
+          "
+        >
           <div v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
           <div v-else>
             {{ timeComputed }}
@@ -13,24 +23,24 @@
       <span class="close ps" @click="onClose">
         <i class="vh-iconfont vh-line-close"></i>
       </span>
-      <div class="num_box">
-        <el-row class="num_base pr font_zdy">
+      <div>
+        <el-row class="num_base pr">
           <div class="black_line ps"></div>
 
           <div class="timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
+            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
           </div>
-          <div class="timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</span>
+          <div class="timerbg item_left">
+            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ mon }}</span>
           </div>
 
-          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
+          <span class="pr ft28" :class="time < 0 ? 'timeout_font_color' : ''">:</span>
 
           <div class="timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
+            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
           </div>
-          <div class="timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</span>
+          <div class="timerbg item_left">
+            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ sec }}</span>
           </div>
         </el-row>
       </div>
@@ -294,7 +304,7 @@
 </script>
 
 <style lang="less">
-  @import url(./style.less);
+  @import url(./font_family/numberFont.less);
   .vmp-watch-timer {
     .pr {
       position: relative;
@@ -303,9 +313,9 @@
       position: absolute;
     }
     .time_number {
-      color: #fff;
+      color: #0fbb5a;
       font-size: 14px;
-      line-height: 32px;
+      line-height: 20px;
     }
     .vhsaas-timer-box {
       margin-left: 16px;
@@ -326,102 +336,79 @@
     }
     @media screen and (max-width: 1366px) {
       .bgimg {
-        width: 266px;
-        height: 160px;
-        position: fixed;
-        z-index: 21;
-        padding: 10px 24px 24px;
-        top: 200px;
         left: 50%;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        color: #fff;
-        // background-image: linear-gradient(#FFFAEE, #FFF6D5);
-        background-image: url('./img/basebg.png');
-        background-size: contain;
-        border-radius: 20px;
       }
     }
     @media screen and (min-width: 1367px) and (max-width: 1705px) {
       .bgimg {
-        width: 266px;
-        height: 160px;
-        position: fixed;
-        z-index: 21;
-        padding: 10px 24px 24px;
-        top: 200px;
         left: 58%;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        color: #fff;
-        // background-image: linear-gradient(#FFFAEE, #FFF6D5);
-        background-image: url('./img/basebg.png');
-        background-size: contain;
-        border-radius: 20px;
       }
     }
     @media screen and (min-width: 1706px) {
       .bgimg {
-        width: 266px;
-        height: 160px;
-        position: fixed;
-        z-index: 21;
-        padding: 10px 24px 24px;
-        top: 200px;
         left: 65%;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        color: #fff;
-        // background-image: linear-gradient(#FFFAEE, #FFF6D5);
-        background-image: url('./img/basebg.png');
-        background-size: contain;
-        border-radius: 20px;
       }
     }
     .bgimg {
+      width: 272px;
+      position: fixed;
+      z-index: 21;
+      padding: 20px 20px 16px;
+      top: 200px;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
       box-sizing: border-box;
+      .stop {
+        color: #fc9600;
+      }
+      .endColor {
+        color: #666;
+      }
+      .item_left {
+        margin-left: 4px;
+      }
       .timerbg {
         display: inline-block;
         background: url('./img/timerbg.png') no-repeat;
-        background-size: contain;
-        height: 68px;
-        width: 43px;
+        background-size: 100% 100%;
+        height: 62px;
+        width: 50px;
         box-sizing: border-box;
-        margin: 6px 4px;
         position: relative;
+        text-align: center;
+        color: #262626;
         & > :first-child {
           font-weight: bold;
-          font-size: 38px;
-          position: absolute;
-          top: 4px;
-          left: 11px;
-          .font_zdy;
+          font-size: 44px;
+          line-height: 60px;
+          .custom-font-barlow;
         }
       }
       .ft14 {
         font-size: 13px;
       }
       .black_line {
-        border-top: 3px solid #000;
-        top: 35px;
+        border: 1px solid #d9d9d9;
+        top: 50%;
         z-index: 999;
-        width: 100%;
+        width: 95%;
       }
       .num_base {
-        margin-top: 10px;
-        background: #000;
-        border-radius: 4px;
-        height: 74px;
+        margin-top: 16px;
+        background: #d9d9d9;
+        border-radius: 8px;
+        height: 78px;
+        padding: 8px;
         .ft28 {
           font-size: 28px;
-          top: -37px;
+          top: -8px;
         }
       }
       .timeout_font_color {
         color: #fb3a32;
-      }
-      .num_box {
-        padding: 0 3px;
       }
       .close {
         margin-right: 11px;
@@ -429,13 +416,12 @@
         cursor: pointer;
         width: 20px;
         height: 20px;
-        opacity: 0.8;
         position: absolute;
         right: 15px;
         top: 6px;
-        color: #ffffff;
+        color: #666;
         & > i {
-          font-size: 10px;
+          font-size: 14px;
           float: right;
           line-height: 20px;
         }

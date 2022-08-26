@@ -3,16 +3,16 @@
     <!-- 时间显示区 -->
     <div v-show="timerVisible" class="bgimg" id="timer" v-drag>
       <div>
-        <div class="ft12">
-          <div class="ml16" v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
-          <div class="ml16" v-else>{{ timeStatus }}</div>
+        <div class="ft24">
+          <div v-if="time < 0">{{ $t('interact_tools.interact_tools_1053') }}</div>
+          <div v-else>{{ timeStatus }}</div>
         </div>
       </div>
       <span class="close ps" @click="onClose">
-        <i class="vh-iconfont vh-line-close"></i>
+        <i class="vh-iconfont vh-full-error"></i>
       </span>
       <div align="center">
-        <div class="timer_base pr font_zdy">
+        <div class="timer_base font_zdy">
           <div class="timerbg">
             <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
               {{ ten_mon }}
@@ -24,7 +24,8 @@
             </span>
           </div>
 
-          <span class="pr ft28 fontWeight">:</span>
+          <div class="w_inline"></div>
+          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
           <div class="timerbg">
             <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
@@ -316,7 +317,7 @@
 </script>
 
 <style lang="less">
-  @import url(./style.less);
+  @import url(./font_family/numberFont.less);
   .vmp-wap-timer {
     .pr {
       position: relative;
@@ -324,75 +325,75 @@
     .ps {
       position: absolute;
     }
-    .ft12 {
-      font-size: 16px;
+    .ft24 {
+      font-size: 24px;
+      line-height: 34px;
     }
     .fontWeight {
       font-weight: bold;
     }
-    .ml16 {
-      margin-left: 32px;
-    }
     .bgimg {
-      width: 322px;
+      width: 372px;
       // width: 4.47rem;
       position: fixed;
       z-index: 305; //文档全屏301
-      padding: 0.266667rem 0px;
-      top: 200px;
-      left: 74%;
+      padding: 24px;
+      top: 48%;
+      left: 70%;
       transform: translate(-50%, -50%);
       color: #fff;
-      // background-image: linear-gradient(#fffaee, #fff6d5);
-      background-image: url('./image/basebg.png');
-      background-size: 101% 105%;
+      background: #595959;
       border-radius: 20px;
       .timerbg {
         display: inline-block;
-        background-size: 100%;
-        height: 1.093333rem;
-        width: 0.773333rem;
-        position: relative;
-        background: linear-gradient(180deg, #323136 0%, #0b0b0b 100%);
-        border-radius: 4px;
+        height: 91px;
+        width: 70px;
         box-sizing: border-box;
-        margin: 4px;
-        & > :first-child {
-          font-size: 38px;
-          position: absolute;
-          top: 24px;
-          left: 18px;
+        font-size: 72px;
+        font-weight: 700;
+        margin-left: 4px;
+        .custom-font-barlow;
+        &:first-child {
+          margin-left: 0;
         }
       }
       .timer_base {
-        margin-top: 0.17rem;
-        border-radius: 4px;
-        height: 1.2rem;
+        margin-top: 12px;
+        background: #3d3d3d;
+        height: 108px;
+        border-radius: 8px;
+        padding: 8px;
+        .pr;
+        span {
+          line-height: 87px;
+        }
+        .w_inline {
+          position: absolute;
+          border: 1px solid #3d3d3d;
+          top: 50%;
+          width: 95%;
+        }
         .ft28 {
-          color: #1d1c1f;
           font-size: 38px;
-          top: -40px;
+          margin-left: 4px;
+          line-height: initial;
+          top: -16px;
         }
       }
       .timeout_font_color {
         color: #fb3a32;
       }
       .close {
-        margin-right: 11px;
-        margin-top: 11px;
         cursor: pointer;
-        width: 20px;
-        height: 20px;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #fff;
+        border-radius: 50%;
         // opacity: 0.8;
         position: absolute;
-        right: 15px;
-        top: 5px;
-        color: #fff;
-        & > i {
-          font-size: 10px;
-          float: right;
-          line-height: 20px;
-        }
+        right: -25px;
+        top: -40px;
+        color: #262626;
       }
     }
   }
