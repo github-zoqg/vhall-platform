@@ -65,7 +65,7 @@ export default {
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   //footer
-  '--footer-color-font': color_text_2,
+  '--footer-color-font': color_text_secondary,
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
