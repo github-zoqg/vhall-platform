@@ -4,7 +4,11 @@
       <record-control
         v-if="configList['cut_record'] && !isInGroup && !isRehearsal"
       ></record-control>
-      <div class="rehearsalStatus" v-if="isRehearsal && isLiving">
+      <div
+        class="rehearsalStatus"
+        :class="roleName == 3 ? 'assistant' : ''"
+        v-if="isRehearsal && isLiving"
+      >
         <i class="dot"></i>
         彩排中
       </div>
@@ -510,13 +514,10 @@
         if (this.isRecord) {
           // 如果是回放录制页面
           this.handleSaveVodInRecord();
-        } else if (this._tempLiveType !== 2) {
-          // 注意：此时直播已经结束，live_type已经重制，所以不能用live_type判断
+        } else if (this._tempLiveType !== 2 || (this._tempLiveType == 2 && !this.popAlert.level)) {
           // 如果是直播页面
+          // 注意：此时直播已经结束，live_type已经重制，所以不能用live_type判断
           this.handleSaveVodInLive();
-        } else if (!this.popAlert.level) {
-          // 如果是彩排
-          this.popAlert.visible = false;
         }
         this.liveStep = 1;
       },
@@ -634,6 +635,9 @@
       },
       // 直播页 点击结束直播
       async handleEndClickInLive() {
+        if (this._tempLiveType == 2 && !this.popAlert.level) {
+          this.popAlert.visible = false;
+        }
         const { watchInitData, interactToolStatus } = this.roomBaseServer.state;
 
         this.liveStep = 4;
@@ -847,6 +851,9 @@
         line-height: 20px;
         margin-right: 12px;
         position: relative;
+        &.assistant {
+          margin-right: 4px;
+        }
         .dot {
           position: absolute;
           top: 6px;

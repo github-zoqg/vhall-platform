@@ -10,7 +10,9 @@
         <div class="vmp-wap-body-ending-box-img">
           <img src="./img/livingEnd@2x.png" alt="" />
         </div>
-        <h1 class="vmp-wap-body-ending-box-text">{{ $t('player.player_1017') }}</h1>
+        <h1 class="vmp-wap-body-ending-box-text">
+          {{ isRehearsal ? $t('player.player_1027') : $t('player.player_1017') }}
+        </h1>
       </div>
     </div>
     <div
@@ -48,6 +50,13 @@
        -->
     </div>
     <masksliding></masksliding>
+    <div class="living-start" v-if="isShowLiveStartNotice">
+      <span class="living-img">
+        <img src="./img/live_start.png" alt="" />
+      </span>
+      <p class="living-text">{{ $t('player.player_1027') }}</p>
+      <p class="footer" @click="startWatch">{{ $t('player.player_1013') }}</p>
+    </div>
   </div>
 </template>
 <script>
@@ -69,10 +78,15 @@
       return {
         childrenComp: [],
         isLivingEnd: false,
-        mini: false
+        mini: false,
+        isShowLiveStartNotice: false
       };
     },
     computed: {
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       // 选中的自定义菜单的 type
       menuSelectedType() {
         return this.$domainStore.state.menuServer.selectedType;
@@ -177,6 +191,9 @@
       this.menuServer = useMenuServer();
     },
     async created() {
+      if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3) {
+        this.isLivingEnd = true;
+      }
       if (
         this.$domainStore.state.interactiveServer.mobileOnWheat &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
@@ -251,6 +268,10 @@
 
         // 监听消息移动
         this.msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_start 开始直播
+          if (msg.data.type == 'live_start' && this.isRehearsal) {
+            this.isShowLiveStartNotice = true;
+          }
           // live_over 结束直播
           if (msg.data.type == 'live_over') {
             this.isLivingEnd = true;
@@ -449,6 +470,34 @@
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
       .vmp-wap-stream-wrap-mask-screen {
         display: none;
+      }
+    }
+    .living-start {
+      width: 100%;
+      margin-top: 32px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      .living-img {
+        display: inline-block;
+        width: 160px;
+        height: 160px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+        }
+      }
+      .living-text {
+        padding: 20px 0 40px;
+        color: #262626;
+        font-size: 28px;
+        line-height: 40px;
+      }
+      .footer {
+        width: 340px;
       }
     }
   }

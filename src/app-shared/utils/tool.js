@@ -235,10 +235,35 @@ export const getCookie = name => {
 };
 
 /**
- * @description 拼接地址栏参数
+ * 将 queryString 转换成 key-value 形式
+ * @param {String} url url地址
+ * @returns object
  */
-export const getUrl = (url, data) => {
-  return (url += (url.indexOf('?') < 0 ? '?' : '&') + getParam(data));
+export const parseQueryString = url => {
+  return [...new URL(url).searchParams].reduce(
+    (cur, [key, value]) => ((cur[key] = value), cur),
+    {}
+  );
+};
+
+/**
+ * @description 拼接地址栏参数，自带去重
+ */
+export const getUrl = (url = '', data = {}) => {
+  // 截取除去queryString的部分
+  const indexOfSeparator = url.indexOf('?');
+  if (indexOfSeparator > -1) {
+    url = url.substring(0, indexOfSeparator);
+  }
+  // 去重拼接
+  return (
+    url +
+    '?' +
+    getParam({
+      ...parseQueryString(url),
+      ...data
+    })
+  );
 };
 
 /**
