@@ -90,6 +90,7 @@
     methods: {
       // 事件驱动打开分享弹窗
       openShareDialog(id) {
+        this.watchWebUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
         this.shareVisible = true;
         if (id && this.isSubjectShare) {
           this.watchWebUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${id}`;

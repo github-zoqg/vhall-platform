@@ -551,6 +551,8 @@
           this.roomBaseServer.state.watchInitData.live_type = 2;
           // 由于 live_type 在结束直播之后会重制，所以需要记录一个状态，用于在结束直播之后生成回放的时候，判断是否是彩排的回放
           this._tempLiveType = 2;
+        } else {
+          this._tempLiveType = 0;
         }
         this.handleStartClick();
       },
