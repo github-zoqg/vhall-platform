@@ -1038,7 +1038,6 @@
       },
 
       mouseEnterDoc(status) {
-        console.log(111111);
         if (this.$route.query.assistantType) {
           cl_moveToDoc(status);
         }
