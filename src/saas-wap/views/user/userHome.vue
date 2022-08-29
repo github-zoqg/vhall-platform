@@ -35,12 +35,12 @@
             {{ userHomeVo && userHomeVo.title ? userHomeVo.title : '' }}
           </h1>
           <span class="user__open" @click="showBtnChange" v-if="userHomeVo && userHomeVo.content">
-            <img src="./img/icon_arrow_down.png" alt="" v-if="open_hide" />
-            <img src="./img/icon_arrow_up.png" alt="" v-else />
+            <img src="./img/icon_arrow_down.png" alt="" v-if="open_hide && showToggle" />
+            <img src="./img/icon_arrow_up.png" alt="" v-if="!open_hide && showToggle" />
           </span>
         </div>
         <div class="user__remark__layout" v-if="userHomeVo && userHomeVo.content">
-          <p :class="open_hide ? 'open_hide user__remark' : 'user__remark'">
+          <p ref="intro" :class="open_hide ? 'open_hide user__remark' : 'user__remark'">
             {{ userHomeVo.content }}
           </p>
         </div>
@@ -140,7 +140,8 @@
         follow: 0,
         avatarImgUrl: '',
         userInfo: null,
-        open_hide: true,
+        open_hide: false,
+        showToggle: false,
         tabType: null,
         hasDelayPermission: false,
         query: {
@@ -326,6 +327,16 @@
       showBtnChange() {
         this.open_hide = !this.open_hide;
       },
+      //计算简介文字是否过长
+      calculateText() {
+        const txtDom = this.$refs.intro;
+        if (!txtDom) return false;
+        const twoHeight = 30;
+        const curHeight = txtDom.offsetHeight;
+        if (curHeight > twoHeight) {
+          this.showToggle = true;
+        }
+      },
       homeInfoGet() {
         this.homePageServer
           .getUserHomeInfo({ home_user_id: this.$route.params.id })
@@ -446,6 +457,10 @@
               };
               let desc = null;
               desc = this.userHomeVo.content.replace(/&nbsp;/g, '');
+
+              this.$nextTick(() => {
+                this.calculateText();
+              });
               desc = desc.replace(/<[^>]+>|&[^>]+;/g, '');
               desc = desc.length > 32 ? `${desc.trim().substring(0, 30)}...` : desc.trim();
               console.log(9191, desc);
