@@ -3,7 +3,7 @@
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd"
-      class="vmp-wap-body-ending"
+      :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
       <div class="vmp-wap-body-ending-box">
@@ -62,12 +62,15 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpWapBody',
     mixins: [move],
     data() {
       return {
         childrenComp: [],
+        imageCropperMode: 1,
         isLivingEnd: false,
         mini: false
       };
@@ -157,9 +160,18 @@
         );
       },
       webinarsBgImg() {
-        const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
+        const cover = 'https://cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         const img_url = this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
-        return img_url ? img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466' : cover;
+        if (img_url) {
+          if (cropperImage(img_url)) {
+            this.handlerImageInfo(img_url);
+            return img_url;
+          } else {
+            return `${img_url}?x-oss-process=image/resize,m_fill,w_828,h_466`;
+          }
+        } else {
+          return cover;
+        }
       },
       // 主持人ID 分组期间使用
       userinfoId() {
@@ -280,6 +292,11 @@
           this.$toast(this.$t('interact.interact_1040'));
         }
       },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+      },
       // 重置互动SDK实例
       async resetInteractive() {
         await this.interactiveServer.destroy();
@@ -373,6 +390,12 @@
       top: 0;
       left: 0;
       z-index: 20;
+      &.ending_bg_2 {
+        background-size: cover;
+      }
+      &.ending_bg_3 {
+        background-size: contain;
+      }
       &-box {
         width: 100%;
         height: 100%;
