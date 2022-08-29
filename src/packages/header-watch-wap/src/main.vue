@@ -245,7 +245,7 @@
         font-weight: 400;
         font-size: 24px;
         line-height: 24px;
-        margin-right: 19px;
+        margin-right: -8px;
         position: relative;
         .dot {
           position: absolute;
