@@ -16,7 +16,11 @@
             v-if="formInfo.intro"
             :class="[
               'title-box__intro-text',
-              overflowStatus ? 'title-box__intro-text-ellipsis' : 'title-box__intro-text-padding'
+              overflowStatus
+                ? 'title-box__intro-text-ellipsis'
+                : showToggle && !overflowStatus
+                ? 'title-box__intro-text-padding'
+                : ''
             ]"
           >
             {{ formInfo.intro }}
