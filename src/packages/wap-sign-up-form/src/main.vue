@@ -1873,6 +1873,7 @@
           object-fit: fill;
           &.form_bg_2 {
             object-fit: cover;
+            object-position: left top;
           }
           &.form_bg_3 {
             object-fit: scale-down;

@@ -1077,6 +1077,7 @@
         z-index: 3;
         &.player_bg_2 {
           object-fit: cover;
+          object-position: left top;
         }
         &.player_bg_3 {
           object-fit: scale-down;
@@ -1121,6 +1122,7 @@
       }
       &.ending_bg_2 {
         background-size: cover;
+        background-position: left top;
       }
       &-box {
         width: 100%;

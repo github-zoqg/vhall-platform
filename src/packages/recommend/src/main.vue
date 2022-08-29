@@ -243,6 +243,7 @@
             }
             &.ad_bg_2 {
               object-fit: cover;
+              object-position: left top;
             }
             &:hover {
               transform: scale(1.2);
@@ -336,6 +337,7 @@
             }
             &.ad_bg_2 {
               object-fit: cover;
+              object-position: left top;
             }
           }
         }

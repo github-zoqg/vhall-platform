@@ -1056,6 +1056,7 @@
         }
         &.background_2 {
           background-size: cover;
+          background-position: left top;
         }
       }
       &-btn {

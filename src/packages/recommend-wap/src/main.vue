@@ -204,6 +204,7 @@
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: left top;
           border-radius: 12px;
           &.ad_bg_1 {
             object-fit: fill;

@@ -897,6 +897,7 @@
           object-fit: fill;
           &.subscribe_bg_2 {
             object-fit: cover;
+            object-position: left top;
           }
           &.subscribe_bg_3 {
             object-fit: scale-down;

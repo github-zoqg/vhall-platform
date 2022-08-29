@@ -531,6 +531,7 @@
         object-fit: fill;
         &.subject_bg_2 {
           object-fit: cover;
+          object-position: left top;
         }
         &.subject_bg_3 {
           object-fit: scale-down;

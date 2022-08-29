@@ -439,6 +439,7 @@
           border-radius: 4px 4px 0 0;
           &.subscribe_bg_2 {
             object-fit: cover;
+            object-position: left top;
           }
           &.subscribe_bg_3 {
             object-fit: scale-down;

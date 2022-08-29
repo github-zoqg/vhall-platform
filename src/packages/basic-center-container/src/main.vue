@@ -133,6 +133,7 @@
       }
       &-2 {
         object-fit: cover;
+        object-position: left top;
       }
       &-icon {
         background: rgba(0, 0, 0, 0.4);

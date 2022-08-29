@@ -417,6 +417,7 @@
             object-fit: fill;
             &.invitation_bg_2 {
               object-fit: cover;
+              object-position: left top;
             }
             &.invitation_bg_3 {
               object-fit: scale-down;

@@ -982,6 +982,7 @@
       }
       &-2 {
         object-fit: cover;
+        object-position: left top;
       }
       &-3 {
         object-fit: scale-down;

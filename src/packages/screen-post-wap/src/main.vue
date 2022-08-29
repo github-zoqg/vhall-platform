@@ -8,6 +8,7 @@
       class="vmp-screen-post-wap-img"
       :src="screenPosterInfo_m_img"
       :fit="imageShowMode"
+      :class="imageShowMode == 2 ? 'lt' : ''"
       lazy
     ></el-image>
     <div class="vmp-screen-post-wap-close-tip" @click.stop="screenPostClose">
@@ -117,6 +118,11 @@
     .vmp-screen-post-wap-img {
       width: 100%;
       height: 100%;
+      &.lt {
+        img {
+          object-position: left top;
+        }
+      }
     }
 
     .vmp-screen-post-wap-close-tip {

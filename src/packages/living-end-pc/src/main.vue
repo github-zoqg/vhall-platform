@@ -106,6 +106,7 @@
     background-repeat: no-repeat;
     &.ending_bg_2 {
       background-size: cover;
+      background-position: left top;
     }
     &.ending_bg_3 {
       background-size: contain;
