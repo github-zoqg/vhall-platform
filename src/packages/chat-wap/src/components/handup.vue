@@ -258,7 +258,7 @@
                 this.$toast(tip);
                 // 数据上报，响应场景：申请连麦拒绝
                 window.vhallReportForProduct.toResultsReporting(170005, {
-                  failed_reason: encodeURIComponent(tip)
+                  failed_reason: tip
                 });
                 this.closeConnectPop();
                 useMicServer().userCancelApply();

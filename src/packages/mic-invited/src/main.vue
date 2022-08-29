@@ -97,7 +97,7 @@
               window.vhallReportForProduct.toResultsReporting(170012, {
                 waiting_time: `wait-for ${30 - this.waitTime}s`,
                 event_type: 'message',
-                reasonTxt: encodeURIComponent(this.$t('interact.interact_1025'))
+                reasonTxt: this.$t('interact.interact_1025')
               });
             }
           }, 1000);
@@ -177,7 +177,7 @@
               event_type: 'interface',
               request_id: res?.request_id,
               failed_reason: res,
-              reasonTxt: encodeURIComponent(reasonTxt)
+              reasonTxt: reasonTxt
             });
 
             clearInterval(this.waitInterval);

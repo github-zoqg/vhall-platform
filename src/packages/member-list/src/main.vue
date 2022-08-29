@@ -1653,7 +1653,7 @@
                   window.vhallReportForProduct?.toResultsReporting(110173, {
                     request_id: res?.request_id,
                     event_type: 'interface',
-                    reasonTxt: encodeURIComponent('演示中下麦,演示自动结束'),
+                    reasonTxt: '演示中下麦,演示自动结束',
                     res
                   });
                 }

@@ -229,7 +229,7 @@
               window.vhallReportForProduct.toResultsReporting(170005, {
                 waiting_time: '0s',
                 failed_reason: res,
-                reasonTxt: encodeURIComponent(failed_reason)
+                reasonTxt: failed_reason
               });
               return;
             }
@@ -250,7 +250,7 @@
             window.vhallReportForProduct.toResultsReporting(170005, {
               waiting_time: '0s',
               failed_reason: err,
-              reasonTxt: encodeURIComponent('捕获到接口catch异常'),
+              reasonTxt: '捕获到接口catch异常',
               request_id: err.request_id
             });
           });
@@ -312,7 +312,7 @@
             // 数据上报，场景：倒计时结束（上麦失败）
             window.vhallReportForProduct.toResultsReporting(170005, {
               waiting_time: `wait-for ${30 - this.waitTime}s`,
-              reasonTxt: encodeURIComponent(tip)
+              reasonTxt: tip
             });
           }
         }, 1000);
