@@ -244,7 +244,7 @@
       },
       // 嘉宾点击申请上麦
       handleApplyClick() {
-        window.vhallReportForProduct?.toStartReporting(110131, [110158, 170032, 110191, 110183]);
+        window.vhallReportForProduct?.toStartReporting(110131, [110158, 170032, 110187, 110183]);
         this._applyInterval && clearInterval(this._applyInterval);
         useMicServer()
           .userApply()

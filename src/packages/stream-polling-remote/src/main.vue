@@ -182,20 +182,20 @@
           videoNode // 远端流显示容器， 必填
         };
 
-        window.vhallReportForProduct?.toStartReporting(110196, 110197, {
+        window.vhallReportForProduct?.toStartReporting(110196, 110165, {
           opt
         });
         this.interactiveServer
           .subscribe(opt)
           .then(res => {
-            window.vhallReportForProduct?.toResultsReporting(110197, { res });
+            window.vhallReportForProduct?.toResultsReporting(110165, { res });
             setTimeout(() => {
               this.replayPlay();
             }, 2000);
             this.getLevel();
           })
           .catch(e => {
-            window.vhallReportForProduct?.toResultsReporting(110197, { res: e });
+            window.vhallReportForProduct?.toResultsReporting(110165, { res: e });
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },

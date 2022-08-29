@@ -430,7 +430,7 @@
       },
       // 创建本地流
       async createLocalStream(opt) {
-        window.vhallReportForProduct?.toResultsReporting(110191, {
+        window.vhallReportForProduct?.toResultsReporting(110187, {
           videoType: 'camera',
           ...opt
         });
@@ -439,7 +439,7 @@
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
           .catch(e => {
-            window.vhallReportForProduct?.toResultsReporting(110192, {
+            window.vhallReportForProduct?.toResultsReporting(110188, {
               failed_reason: e
             });
             if (e && e?.name == 'NotAllowed') {

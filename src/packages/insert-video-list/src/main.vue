@@ -213,7 +213,7 @@
       // 显示插播列表 dialog
       openInsertFileDialog() {
         // 检查是否可以插播文件
-        window.vhallReportForProduct.report(110189);
+        window.vhallReportForProduct.report(110163);
         const isCanInsert = this.checkInsertFileProcess();
         window.vhallReportForProduct.report(110190, { report_extra: { isCanInsert } });
         if (isCanInsert) {

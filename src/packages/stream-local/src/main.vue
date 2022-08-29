@@ -944,7 +944,7 @@
               type: 'audio'
             })
             .catch(err => {
-              window.vhallReportForProduct?.toResultsReporting(110190, {
+              window.vhallReportForProduct?.toResultsReporting(110164, {
                 failed_reason: err
               });
               console.error('切换失败', err);
@@ -959,7 +959,7 @@
               type: 'video'
             })
             .catch(err => {
-              window.vhallReportForProduct?.toResultsReporting(110190, {
+              window.vhallReportForProduct?.toResultsReporting(110164, {
                 failed_reason: err
               });
               console.error('切换失败', err);
@@ -1093,7 +1093,7 @@
       async createLocalStream(opt) {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
-          window.vhallReportForProduct?.toResultsReporting(110191, {
+          window.vhallReportForProduct?.toResultsReporting(110187, {
             videoType: 'camera',
             ...opt
           });
@@ -1102,7 +1102,7 @@
               videoNode: `stream-${this.joinInfo.third_party_user_id}`
             })
             .catch(e => {
-              window.vhallReportForProduct?.toResultsReporting(110192, {
+              window.vhallReportForProduct?.toResultsReporting(110188, {
                 failed_reason: e
               });
               if (e && e?.name == 'NotAllowed') {
@@ -1118,7 +1118,7 @@
           if (!videoTracks) {
             throw 'getCanvasStreamError';
           }
-          window.vhallReportForProduct?.toResultsReporting(110191, {
+          window.vhallReportForProduct?.toResultsReporting(110187, {
             videoType: 'img',
             ...opt
           });
@@ -1128,7 +1128,7 @@
               videoTrack: videoTracks
             })
             .catch(err => {
-              window.vhallReportForProduct?.toResultsReporting(110192, {
+              window.vhallReportForProduct?.toResultsReporting(110188, {
                 failed_reason: err
               });
               return Promise.reject('createLocalPhotoStreamError');

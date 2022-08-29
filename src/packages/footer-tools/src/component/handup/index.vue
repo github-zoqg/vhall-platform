@@ -210,7 +210,7 @@
       // 申请上麦
       userApply() {
         // 申请连麦
-        window.vhallReportForProduct.toStartReporting(170004, [170005, 170032, 110191, 110183]);
+        window.vhallReportForProduct.toStartReporting(170004, [170005, 170032, 110187, 110183]);
         useMicServer()
           .userApply()
           .then(res => {
