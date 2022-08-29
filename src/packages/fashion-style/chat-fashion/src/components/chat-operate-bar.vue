@@ -36,7 +36,7 @@
             v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
             class="operate-container__tool-bar__chat-filter-wrap"
           >
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.onlyShowSponsor }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickOnlyShowSponsor"
@@ -45,13 +45,22 @@
                 {{ $t('chat.chat_1012') }}
               </el-checkbox>
             </li>
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isShieldingEffects }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickShieldingEffects"
                 v-model="filterStatus.isShieldingEffects"
               >
                 {{ $t('chat.chat_1013') }}
+              </el-checkbox>
+            </li>
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isChat }]">
+              <el-checkbox
+                class="filter-item__checkbox"
+                @change="onClickChat"
+                v-model="filterStatus.isChat"
+              >
+                {{ $t('chat.chat_1094') }}
               </el-checkbox>
             </li>
           </ul>
@@ -146,6 +155,7 @@
   import Emoji from './emoji.vue';
   import ChatImgUpload from './chat-img-upload';
   import ChatInput from './chat-input';
+  import { cl_toast } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -250,9 +260,11 @@
         //过滤状态集合
         filterStatus: {
           //只看主办方
-          onlyShowSponsor: false,
+          onlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
           //屏蔽特效
-          isShieldingEffects: false
+          isShieldingEffects: sessionStorage.getItem('filterStatus_isShieldingEffects') == 'true',
+          // 仅查看聊天内容
+          isChat: sessionStorage.getItem('filterStatus_isChat') == 'true'
         },
         //聊天审核链接
         chatFilterUrl: `${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}`,
@@ -364,6 +376,20 @@
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
         this.$message.success(message);
         this.$emit('onSwitchShowSpecialEffects', status);
+      },
+
+      // 仅查看聊天内容
+      onClickChat(status) {
+        let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
+        if (this.$route.query.assistantType) {
+          cl_toast('success', message);
+        } else {
+          this.$message.success(message);
+        }
+
+        this.$emit('onSwitchShowIsChat', status);
+        sessionStorage.setItem('filterStatus_isChat', status);
+        this.filterStatus.isChat = status;
       },
       //点击筛选
       onClickFilterSetting() {
@@ -546,7 +572,7 @@
       }
       &__chat-filter-wrap {
         // width: 120px;
-        height: 80px;
+        // height: 80px;
         padding: 4px 0;
         background-color: var(--header-tab-item-dropdown-color);
         box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
@@ -562,6 +588,9 @@
           display: flex;
           align-items: center;
           cursor: pointer;
+          &.is-checkbox {
+            background-color: var(--chat-bg-color-filter-checked);
+          }
           &:hover {
             .filter-item__label {
               color: #e6e6e6;

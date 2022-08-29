@@ -36,7 +36,7 @@
             v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
             class="operate-container__tool-bar__chat-filter-wrap"
           >
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.onlyShowSponsor }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickOnlyShowSponsor"
@@ -45,7 +45,7 @@
                 {{ $t('chat.chat_1012') }}
               </el-checkbox>
             </li>
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isShieldingEffects }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickShieldingEffects"
@@ -54,7 +54,7 @@
                 {{ $t('chat.chat_1013') }}
               </el-checkbox>
             </li>
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isChat }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickChat"
