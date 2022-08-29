@@ -796,18 +796,35 @@
             this.formOpenLinkStatus = 2;
           });
       },
-      //获取活动类型
-      getWebinarType() {
-        const params = {
-          webinar_id: this.webinar_id
-        };
-        return this.signUpFormServer
-          .getWebinarType(params)
-          .then(res => {
-            this.isSubscribe = res.data.webinar.type == 2 ? 1 : 2;
-            this.activeTab = res.data.webinar.type == 2 ? 1 : 2;
+      // 获取活动信息 及 分享信息
+      getWebinarInfo() {
+        return this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
+          })
+          .then(async res => {
+            // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+            // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
+            this.isSubscribe = res.data.webinar_state == 2 ? 1 : 2;
+            this.activeTab = res.data.webinar_state == 2 ? 1 : 2;
             this.cascadeResultList = [];
-            this.wxShareInfo(res.data.webinar);
+            if (!this.isEmbed) {
+              // 如果不是嵌入报名表单的时候 才支持分享
+              const shareInfo = await this.roomBaseServer.getShareSettingInfo({
+                webinarId: res.data.id
+              });
+              if (shareInfo && shareInfo.code == 200 && shareInfo.data) {
+                let title = shareInfo.data.title;
+                title = title.length - 30 > 0 ? title.substring(0, 30) : title;
+                let shareInfo = {
+                  title: title,
+                  img_url: shareInfo.data.img_url,
+                  introduction: replaceHtml(shareInfo.data.introduction, 42)
+                };
+                this.wxShareInfoWebinar(shareInfo);
+              }
+            }
           })
           .catch(error => {
             if (error.code == 512503 || error.code == 512502) {
