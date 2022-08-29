@@ -528,6 +528,7 @@
       object-fit: fill;
       &.home_bg_2 {
         object-fit: cover;
+        object-position: left top;
       }
       &.home_bg_3 {
         object-fit: scale-down;
@@ -546,15 +547,17 @@
     top: -90px;
     left: 30px;
     z-index: 10;
+    background: #fff;
     &_img {
       width: 100%;
       height: 100%;
       object-fit: fill;
       border-radius: 50%;
-      &.home_avatar__2 {
+      &.home_avator_2 {
         object-fit: cover;
+        object-position: left top;
       }
-      &.home_avatar__3 {
+      &.home_avator_3 {
         object-fit: scale-down;
       }
     }

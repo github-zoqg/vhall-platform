@@ -190,13 +190,7 @@
       handlerImageInfo(url) {
         console.log(url, '??!23guangao');
         let obj = parseImgOssQueryString(url);
-        if (Number(obj.mode) == 2) {
-          return 2;
-        } else if (Number(obj.mode) == 3) {
-          return 3;
-        } else {
-          return 1;
-        }
+        return Number(obj.mode) || 1;
       },
       goto(url) {
         window.open(url, '_blank');

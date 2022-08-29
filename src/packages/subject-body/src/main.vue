@@ -102,10 +102,10 @@
       subjectImage() {
         let url = this.defaultImages;
         if (this.subjectDetailInfo.cover) {
+          url = this.subjectDetailInfo.cover;
           if (cropperImage(this.subjectDetailInfo.cover)) {
             this.handlerImageInfo(url);
           }
-          url = this.subjectDetailInfo.cover;
         }
         return url;
       },
@@ -130,7 +130,7 @@
       // 解析图片地址
       handlerImageInfo(url) {
         let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
+        this.imageCropperMode = Number(obj.mode) || 1;
         console.log(this.imageCropperMode, '???mode');
       },
       toDetail(item) {
