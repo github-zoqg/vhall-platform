@@ -548,6 +548,7 @@
     @font-dark-normal: #e6e6e6;
     @bg-dark-normal: #1a1a1a;
     @font-link: #3562fa;
+    @font-click-detail: #0a7ff5;
     pointer-events: auto;
 
     &__showtime {
@@ -850,7 +851,7 @@
           float: left;
         }
         .interact-content__click-detail {
-          color: @font-link;
+          color: @font-click-detail;
           cursor: pointer;
           user-select: none;
           margin-left: 4px;
