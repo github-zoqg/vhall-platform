@@ -20,14 +20,18 @@
             ]"
           >
             {{ formInfo.intro }}
-            <span @click="changeFoldStatus(false)" class="text-tail" v-show="overflowStatus">
+            <span
+              @click="changeFoldStatus(false)"
+              class="text-tail"
+              v-show="overflowStatus && showToggle"
+            >
               <span class="is-ellipsis">...</span>
               {{ $t('form.form_1011') }}
             </span>
             <span
               @click="changeFoldStatus(true)"
               class="text-tail text-tail-2"
-              v-show="!overflowStatus"
+              v-show="!overflowStatus && showToggle"
             >
               <span class="is-ellipsis"></span>
               {{ $t('form.form_1012') }}
@@ -410,6 +414,7 @@
         isSubscribe: 0,
         //简介文字是否超长
         overflowStatus: false,
+        showToggle: false,
         //当前激活的tab
         activeTab: 1,
         // 手机短信验证是都开启
@@ -870,7 +875,7 @@
         const twoHeight = this.$refs.noVisible.offsetHeight;
         const curHeight = txtDom.offsetHeight;
         if (curHeight > twoHeight) {
-          this.overflowStatus = true;
+          this.showToggle = true;
         }
       },
       //获取问题列表
