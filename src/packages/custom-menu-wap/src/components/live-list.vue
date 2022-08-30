@@ -9,7 +9,7 @@
         @click="gotoRoom(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img :src="item.img_url" alt="" />
+          <img :class="`img_box_bg box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
@@ -46,7 +46,8 @@
 </template>
 <script>
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
-
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -136,9 +137,23 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list;
+            this.activeList = res.data.list.map(item => {
+              let mode = 1;
+              if (cropperImage(item.img_url)) {
+                mode = this.handlerImageInfo(item.img_url);
+              }
+              return {
+                ...item,
+                itemMode: mode
+              };
+            });
           }
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        return Number(obj.mode);
       }
     }
   };
@@ -180,13 +195,23 @@
       background-size: 400% 400%;
       background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
       animation: gradientBG 15s ease infinite;
-      img {
+      .img_box_bg {
         display: inline-block;
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.box_bg_3 {
+          object-fit: scale-down;
+        }
       }
 
       &-status {

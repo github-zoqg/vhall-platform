@@ -9,7 +9,7 @@
         @click="linkSubject(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img class="cover_pic" :src="item.cover" alt="" />
+          <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <div class="vh-chose-active-item__cover-hots__content">
               <!-- <i class="saasicon_redu"></i> -->
@@ -32,7 +32,8 @@
 </template>
 <script>
   import { useCustomMenuServer } from 'middle-domain';
-
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -86,9 +87,23 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list;
+            this.activeList = res.data.list.map(item => {
+              let mode = 1;
+              if (cropperImage(item.cover)) {
+                mode = this.handlerImageInfo(item.cover);
+              }
+              return {
+                ...item,
+                itemMode: mode
+              };
+            });
           }
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        return Number(obj.mode);
       }
     }
   };
@@ -127,11 +142,19 @@
       height: 80px;
       margin-right: 12px;
       border-radius: 4px;
-      img {
+      .cover_pic {
         display: inline-block;
-        width: 142px;
-        height: 80px;
+        width: 100%;
+        height: 100%;
         border-radius: 4px;
+        object-fit: scale-down;
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
       }
       &-status {
         position: absolute;
@@ -256,7 +279,7 @@
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
       overflow: hidden;
-      img {
+      .cover_pic {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -266,6 +289,16 @@
         transition: all 0.3s;
         &:hover {
           transform: scale(1.2);
+        }
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.box_bg_3 {
+          object-fit: scale-down;
         }
       }
       &-hots {

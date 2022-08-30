@@ -49,7 +49,9 @@
                 {{ liveTag(item) }}
                 <span v-if="item.webinar_type != 6 && item.no_delay_webinar == 1">| 无延迟</span>
               </span>
-              <div class="living_box"><img :src="item.img_url || defaultImages" alt="" /></div>
+              <div class="living_box">
+                <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
+              </div>
             </div>
             <div class="living_bottom">
               <div>
@@ -97,14 +99,23 @@
         return this.subjectServer.state.subjectAuthInfo;
       },
       webinarList() {
-        return this.$domainStore.state.subjectServer.webinarList;
+        return this.$domainStore.state.subjectServer.webinarList.map(item => {
+          let mode = 3;
+          if (cropperImage(item.img_url)) {
+            mode = this.handlerImageInfo(item.img_url, 2);
+          }
+          return {
+            ...item,
+            itemMode: mode
+          };
+        });
       },
       subjectImage() {
         let url = this.defaultImages;
         if (this.subjectDetailInfo.cover) {
           url = this.subjectDetailInfo.cover;
           if (cropperImage(this.subjectDetailInfo.cover)) {
-            this.handlerImageInfo(url);
+            this.handlerImageInfo(url, 1);
           }
         }
         return url;
@@ -128,10 +139,13 @@
         return str;
       },
       // 解析图片地址
-      handlerImageInfo(url) {
+      handlerImageInfo(url, index) {
         let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode) || 1;
-        console.log(this.imageCropperMode, '???mode');
+        if (index == 1) {
+          this.imageCropperMode = Number(obj.mode) || 1;
+        } else {
+          return Number(obj.mode) || 3;
+        }
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
@@ -390,12 +404,19 @@
             left: 0;
             overflow: hidden;
             border-radius: 4px 4px 0 0;
-            img {
+            .cover_pic {
               width: 100%;
               height: 100%;
               object-fit: scale-down;
               cursor: pointer;
               border-radius: 4px 4px 0 0;
+              &.box_bg_1 {
+                object-fit: fill;
+              }
+              &.box_bg_2 {
+                object-fit: cover;
+                object-position: left top;
+              }
             }
           }
           .living_bottom {

@@ -66,7 +66,7 @@
           class="subject-menu_item clearfix"
         >
           <div class="subject-menu_item-left">
-            <img :src="item.img_url" alt="" class="item-poster" />
+            <img :class="`item-poster box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
             <span
               class="item-status"
               :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
@@ -248,10 +248,13 @@
         return str;
       },
       // 解析图片地址
-      handlerImageInfo(url) {
+      handlerImageInfo(url, index) {
         let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode) || 1;
-        console.log(this.imageCropperMode, '???mode');
+        if (index == 1) {
+          this.imageCropperMode = Number(obj.mode) || 1;
+        } else {
+          return Number(obj.mode) || 1;
+        }
       },
       async getDetail() {
         try {
@@ -288,7 +291,16 @@
             if (res.code === 200) {
               if (res.data.list.length > 0) {
                 // this.webinarList.unshift(...list)
-                this.webinarList = this.webinarList.concat(res.data.list);
+                this.webinarList = this.webinarList.concat(res.data.list).map(item => {
+                  let mode = 1;
+                  if (cropperImage(item.img_url)) {
+                    mode = this.handlerImageInfo(item.img_url, 2);
+                  }
+                  return {
+                    ...item,
+                    itemMode: mode
+                  };
+                });
                 console.log('每次打印出来的活动个数' + this.webinarList.length);
                 this.isPullingDown = true;
               } else {
@@ -634,10 +646,21 @@
         width: 280px;
         position: relative;
         float: left;
-        img {
+        .item-poster {
           width: 100%;
-          height: 160px;
-          border: none;
+          height: 100%;
+          cursor: pointer;
+          border-radius: 4px 4px 0 0;
+          &.box_bg_1 {
+            object-fit: fill;
+          }
+          &.box_bg_2 {
+            object-fit: cover;
+            object-position: left top;
+          }
+          &.box_bg_3 {
+            object-fit: scale-down;
+          }
         }
         .item-status {
           position: absolute;
