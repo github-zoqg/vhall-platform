@@ -222,6 +222,7 @@
               // 数据上报，场景：申请连麦接口 返回失败
               window.vhallReportForProduct.toResultsReporting(170005, {
                 event_type: 'interface',
+                waiting_time: this.lowerWheatTimer,
                 failed_reason: res,
                 request_id: res.request_id
               });
@@ -237,6 +238,7 @@
             window.vhallReportForProduct.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: res,
+              waiting_time: this.lowerWheatTimer,
               request_id: res.request_id
             });
             this.lowerWheatFun = setInterval(() => {
@@ -258,7 +260,8 @@
                 this.$toast(tip);
                 // 数据上报，响应场景：申请连麦拒绝
                 window.vhallReportForProduct.toResultsReporting(170005, {
-                  failed_reason: tip
+                  failed_reason: tip,
+                  waiting_time: this.lowerWheatTimer
                 });
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
@@ -271,6 +274,7 @@
             window.vhallReportForProduct.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: err,
+              waiting_time: this.lowerWheatTimer,
               request_id: err.request_id
             });
           });

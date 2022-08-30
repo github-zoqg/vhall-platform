@@ -95,9 +95,9 @@
               this.isConfirmVisible = false;
               // 拒绝连麦邀请上报【30s-30s倒计时结束自动拒绝连麦邀请】
               window.vhallReportForProduct.toResultsReporting(170012, {
-                waiting_time: `wait-for ${30 - this.waitTime}s`,
+                waiting_time: this.waitTime,
                 event_type: 'message',
-                reasonTxt: this.$t('interact.interact_1025')
+                rejection_method: this.$t('interact.interact_1025')
               });
             }
           }, 1000);
@@ -190,7 +190,7 @@
         // 拒绝连麦邀请上报
         window.vhallReportForProduct.toStartReporting(170011, 170012, {
           waiting_time: this.waitTime,
-          rejection_method: encodeURIComponent('点击了按钮或关闭弹窗')
+          rejection_method: '点击了按钮或关闭弹窗'
         });
 
         useMicServer()
@@ -203,8 +203,9 @@
             // 数据上报，场景：接受连麦邀请接口
             window.vhallReportForProduct.toResultsReporting(170012, {
               request_id: res?.request_id,
+              waiting_time: this.waitTime,
               event_type: 'interface',
-              failed_reason: res
+              rejection_method: res
             });
 
             clearInterval(this.waitInterval);

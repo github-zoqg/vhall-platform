@@ -227,7 +227,7 @@
 
               // 数据上报，场景：申请接口 上麦失败
               window.vhallReportForProduct.toResultsReporting(170005, {
-                waiting_time: '0s',
+                waiting_time: this.waitTime,
                 failed_reason: res,
                 reasonTxt: failed_reason
               });
@@ -240,6 +240,7 @@
             window.vhallReportForProduct.toResultsReporting(170005, {
               event_type: 'interface',
               failed_reason: res,
+              waiting_time: this.waitTime,
               request_id: res.request_id
             });
             this.startWaitInterval();
@@ -248,7 +249,7 @@
             this.loading = false;
             // 数据上报，场景：申请接口 上麦失败
             window.vhallReportForProduct.toResultsReporting(170005, {
-              waiting_time: '0s',
+              waiting_time: this.waitTime,
               failed_reason: err,
               reasonTxt: '捕获到接口catch异常',
               request_id: err.request_id
@@ -311,7 +312,8 @@
             useMicServer().userCancelApply();
             // 数据上报，场景：倒计时结束（上麦失败）
             window.vhallReportForProduct.toResultsReporting(170005, {
-              waiting_time: `wait-for ${30 - this.waitTime}s`,
+              waiting_time: this.waitTime,
+              failed_reason: {},
               reasonTxt: tip
             });
           }

@@ -151,7 +151,9 @@
       // 同意邀请上麦
       customAgreeConnect() {
         this.btnDisabled = true;
-        window?.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110187, 110183]);
+        window?.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110187, 110183], {
+          waiting_time: this.inviteTime
+        });
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -189,7 +191,10 @@
       // 拒绝上麦
       refuseInviteConnect() {
         this.btnDisabled = true;
-        window?.vhallReportForProduct.toStartReporting(170011, 170012);
+        window?.vhallReportForProduct.toStartReporting(170011, 170012, {
+          waiting_time: this.inviteTime,
+          rejection_method: '点击了按钮或关闭弹窗'
+        });
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -197,9 +202,11 @@
             extra_params: this.senderId
           })
           .then(res => {
-            this.toResultsReporting(170012, res, {
+            this.toResultsReporting(170012, {
               event_type: 'interface',
-              waiting_time: `wait-for ${30 - this.inviteTime}s`
+              waiting_time: this.inviteTime,
+              rejection_method: res,
+              request_id: res?.request_id
             });
             this.btnDisabled = false;
             clearInterval(this.inviteFun);
@@ -211,8 +218,10 @@
           .catch(err => {
             // 拒绝失败
             console.log(err);
-            this.toResultsReporting(170012, err, {
-              event_type: 'interface'
+            this.toResultsReporting(170012, {
+              event_type: 'interface',
+              waiting_time: this.inviteTime,
+              rejection_method: err
             });
             this.btnDisabled = false;
           });
