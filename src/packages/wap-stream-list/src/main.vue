@@ -77,7 +77,7 @@
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
-        <img src="./../img/load.gif" />
+        <van-loading color="#ffffff" />
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -630,8 +630,8 @@
         z-index: 1;
         background: #000;
         img {
-          width: 88px;
-          height: 88px;
+          width: 66px;
+          height: 66px;
         }
       }
       .opcity-flase {

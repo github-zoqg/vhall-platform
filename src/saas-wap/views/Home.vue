@@ -376,26 +376,32 @@
         // window.skins = skins;
       },
       drawBody(style, theme, skin) {
+        let app = null;
+        if (style == 'main') {
+          app = document.getElementById('app');
+        } else {
+          app = document.body;
+        }
         if (skin?.wapBackground) {
-          document.body.style.backgroundImage = `url(${skin?.wapBackground})`;
-          document.body.style.backgroundSize = 'cover';
+          app.style.backgroundImage = `url(${skin?.wapBackground})`;
+          app.style.backgroundSize = 'cover';
         } else {
           if (style == 'main' && (theme == 'black' || theme == 'white')) {
             if (theme == 'black') {
-              document.body.style.background = `#262626`;
+              document.body.style.background = `#262626`; // 黑色
             }
             if (theme == 'white') {
-              document.body.style.background = `rgba(0, 0, 0, 0.06)`;
+              app.style.background = `rgba(0, 0, 0, 0.06)`;
             }
           } else {
-            document.body.style.backgroundImage = `url(${
+            app.style.backgroundImage = `url(${
               '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
               style +
               '_' +
               theme +
               '.png'
             })`;
-            document.body.style.backgroundSize = 'cover';
+            app.style.backgroundSize = 'cover';
           }
         }
       }

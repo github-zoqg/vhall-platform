@@ -33,7 +33,7 @@
       <span
         v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
-        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
         @click="next"
       >
         <i class="vh-iconfont vh-line-arrow-right" />
@@ -572,10 +572,13 @@
           cursor: pointer;
         }
 
-        &.disabledClick:hover {
-          i {
-            cursor: pointer;
-            color: var(--tab-menu-btn-color-hover);
+        &.disabledClick {
+          cursor: default;
+          &:hover {
+            i {
+              cursor: default;
+              color: var(--tab-menu-btn-color-hover);
+            }
           }
         }
 

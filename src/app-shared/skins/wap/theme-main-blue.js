@@ -15,7 +15,7 @@ export default {
   '--theme-header-font-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-header-icon-color': 'rgba(0, 0, 0, 0.45)',
   // 聊天区域
-  '--theme-chat-msg-bg': '#fff',
+  '--theme-chat-msg-bg': 'rgba(255, 255, 255, 0.85)',
   '--theme-chat-msg-name-font': '#8c8c8c',
   '--theme-chat-msg-timeline': '#595959',
   '--theme-chat-msg-gift-font': '#595959',
@@ -32,7 +32,7 @@ export default {
   '--theme-group-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-group-name-color': 'rgba(0, 0, 0, 0.45)',
   //菜单-内容
-  '--tab-menu-btn-color': 'rgba(255, 255, 255, 0.45)',
+  '--tab-menu-btn-color': 'rgba(0, 0, 0, 0.45)',
   //简介
   '--theme-tab-content-intro-title-font': '#262626',
   '--theme-tab-content-intro-subTitle-font': 'rgba(0, 0, 0, 0.65)',

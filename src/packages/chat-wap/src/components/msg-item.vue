@@ -282,7 +282,7 @@
                     !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
                   "
                 >
-                  <span class="reply-color"></span>
+                  <!-- <span class="reply-color"></span> -->
                   <span
                     v-html="msgContent"
                     class="chat-text"

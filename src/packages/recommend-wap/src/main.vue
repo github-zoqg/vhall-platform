@@ -126,7 +126,7 @@
 <style lang="less">
   .vmp-recommend {
     // background: #fff;
-    padding: 0px 32px;
+    // padding: 0px 32px;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -213,9 +213,9 @@
       }
     }
     .van-cell {
+      padding: 0px 32px;
       position: relative;
       line-height: 30px;
-      padding: 0;
       &::after {
         content: '';
         display: none;

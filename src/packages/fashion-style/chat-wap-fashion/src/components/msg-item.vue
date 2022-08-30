@@ -136,7 +136,7 @@
                   />
                   <span>&nbsp;</span>
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
-                  <template v-if="!!!source.replyMsg.content.text_content">
+                  <!-- <template v-if="!!!source.replyMsg.content.text_content">
                     <div
                       @click="previewImg(img, index, source.replyMsg.content.image_urls)"
                       class="msg-content_chat-img"
@@ -147,9 +147,9 @@
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
-                  </template>
+                  </template> -->
                 </div>
-                <div v-if="!!source.replyMsg.content.text_content" class="imgs">
+                <div class="imgs">
                   <div
                     @click="previewImg(img, index, source.replyMsg.content.image_urls)"
                     class="img"
@@ -164,7 +164,7 @@
               </div>
               <div class="reply-msg-content">
                 <div
-                  class="textInfo"
+                  class="textInfo clearfix"
                   :class="
                     !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
                   "
@@ -179,7 +179,7 @@
                   </span>
                   <span class="nickname">{{ source.nickname | overHidden(8) }}&nbsp;</span>
                   <span v-html="msgContent" class="chat-text"></span>
-                  <template v-if="!!!msgContent">
+                  <!-- <template v-if="!!!msgContent">
                     <div
                       @click="previewImg(img, index, source.content.image_urls)"
                       class="msg-content_chat-img"
@@ -190,9 +190,9 @@
                       }')`"
                       :alt="$t('chat.chat_1065')"
                     ></div>
-                  </template>
+                  </template> -->
                 </div>
-                <div v-if="!!msgContent" class="imgs">
+                <div class="imgs">
                   <div
                     @click="previewImg(img, index, source.content.image_urls)"
                     class="img"

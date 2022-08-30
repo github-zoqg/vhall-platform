@@ -716,6 +716,7 @@
             }
           }
           .reply-wrapper__img-wrapper__img-box {
+            display: inline-block;
             width: 40px;
             height: 40px;
             &.is-watch {

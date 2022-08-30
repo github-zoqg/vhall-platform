@@ -19,7 +19,7 @@ export default {
   '--theme-chat-msg-name-font': '#8c8c8c',
   '--theme-chat-msg-timeline': '#595959',
   '--theme-chat-msg-gift-font': '#595959',
-  '--theme-chat-msg-bg': '#fff',
+  '--theme-chat-msg-bg': 'rgba(255, 255, 255, 0.85)',
   '--theme-chat-msg-font': '#262626',
   '--theme-chat-msg-reply-font': '#999',
   '--theme-chat-msg-reply-after': '#bfbfbf',
