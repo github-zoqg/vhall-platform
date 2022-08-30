@@ -128,7 +128,7 @@
                 <span class="color1a1a1a">观众可见</span>
                 <el-tooltip
                   placement="top-start"
-                  offset="80"
+                  offset="70"
                   :visible-arrow="false"
                   popper-class="timer_form_transfer-box"
                 >
@@ -155,7 +155,7 @@
                 <span class="color1a1a1a">可超时</span>
                 <el-tooltip
                   placement="top-end"
-                  offset="-50"
+                  offset="-40"
                   :visible-arrow="false"
                   popper-class="timer_form_transfer-box"
                 >
@@ -298,6 +298,7 @@
   @import url(./font_family/numberFont.less);
   .timer_form_transfer-box {
     width: 246px;
+    box-sizing: border-box;
   }
   .timer-base {
     .timer-base-padding {
@@ -321,14 +322,18 @@
     .el-switch.is-checked .el-switch__core::after {
       margin-left: -13px;
     }
+    @font-high-light-normal: #fb2626;
     .w120 {
       margin-top: 24px;
-      padding: 7px 24px !important;
-      border: 1px solid #fb3a32 !important;
-      color: #fb3a32 !important;
+      border: 1px solid @font-high-light-normal !important;
+      color: @font-high-light-normal !important;
       &:hover {
         color: white !important;
-        background: #fb3a32 !important;
+        background: @font-high-light-normal !important;
+      }
+      &:active {
+        color: white !important;
+        background: @active-normal !important;
       }
     }
     .margin10 {
@@ -378,7 +383,7 @@
         border: 0;
         height: 62px;
         background: transparent;
-        color: black;
+        color: #262626;
       }
       .el-input__inner {
         .custom-font-barlow;

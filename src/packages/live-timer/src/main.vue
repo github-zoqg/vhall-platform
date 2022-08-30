@@ -157,7 +157,7 @@
        */
       permissionFlag() {
         //是否在分组里
-        if (this.userInfo.role_name == 3) {
+        if ([1, 3].includes(this.userInfo.role_name)) {
           return true;
         }
         if (this.userInfo.third_party_user_id == this.doc_permission) {
@@ -324,7 +324,6 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           customClass: 'zdy-message-box ',
-          confirmButtonClass: 'zdy-confirm-sure_timer',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
@@ -394,7 +393,6 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           customClass: 'zdy-message-box',
-          confirmButtonClass: 'zdy-confirm-sure_timer',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
@@ -434,36 +432,37 @@
     font-size: 14px;
   }
   .vmp-live-timer {
-    .button_width {
-      padding: 7px 32px !important;
-    }
+    @font-high-light-normal: #fb2626;
     .button_timeout {
       border: 1px solid #595959 !important;
       color: #595959 !important;
+      &:hover {
+        border: 1px solid @font-high-light-normal !important;
+        background: @font-high-light-normal;
+        color: white !important;
+      }
+      &:active {
+        border: 1px solid @active-normal !important;
+        background: @active-normal;
+        color: white !important;
+      }
     }
-    .button_timeout:hover {
-      border: 1px solid @font-high-light-normal !important;
+    .el-button.is-disabled:hover {
       background: @font-high-light-normal;
-      color: white !important;
-    }
-    .button_timeout:active {
-      border: 1px solid @active-normal !important;
-      background: @active-normal;
-      color: white !important;
     }
     .button_reset {
       border: 1px solid @font-high-light-normal !important;
       color: @font-high-light-normal !important;
-    }
-    .button_reset:hover {
-      border: 1px solid @active-normal !important;
-      background: @active-normal;
-      color: white !important;
-    }
-    .button_reset:active {
-      border: 1px solid @active-color-normal !important;
-      background: @active-color-normal;
-      color: white !important;
+      &:hover {
+        border: 1px solid @font-high-light-normal !important;
+        background: @font-high-light-normal;
+        color: white !important;
+      }
+      &:active {
+        border: 1px solid @active-normal !important;
+        background: @active-normal;
+        color: white !important;
+      }
     }
     .start_font_color {
       color: #0fbb5a;
@@ -492,7 +491,7 @@
       top: 15vh;
       left: 50vw;
       transform: translate(-50%, 0);
-      color: black;
+      color: #262626;
       background: white;
       border-radius: 8px;
     }
@@ -544,9 +543,5 @@
     .pr {
       position: relative;
     }
-  }
-  .zdy-confirm-cancel,
-  .zdy-confirm-sure_timer {
-    padding: 7px 31px !important;
   }
 </style>
