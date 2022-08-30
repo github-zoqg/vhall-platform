@@ -289,7 +289,9 @@
       },
       // 嘉宾取消申请
       handleApplyCancleClick() {
-        window.vhallReportForProduct?.toStartReporting(110152, 110159);
+        window.vhallReportForProduct?.toStartReporting(110152, 110159, {
+          waiting_time: this.applyTime
+        });
         useMicServer()
           .userCancelApply()
           .then(res => {

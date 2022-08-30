@@ -1773,7 +1773,10 @@
           type: 1 // 0=邀请上麦|1=邀请演示
         };
         //数据埋点--邀请上麦
-        window.vhallReportForProduct?.toStartReporting(110130, 110155);
+        window.vhallReportForProduct?.toStartReporting(110130, 110155, {
+          invitee_role: this.roleName,
+          invitee_info: 'itc: --user_id、visit_id、guest_name(嘉宾昵称)（当前无法定位嘉宾账号信息'
+        });
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {

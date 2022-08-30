@@ -567,7 +567,11 @@
           this.joinInfo.role_name == 1 &&
           (this.stream.roleName == 4 || this.stream.roleName == 2)
         ) {
-          window.vhallReportForProduct?.toStartReporting(110133, 110157);
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: this.stream.roleName,
+            info_of_expelleds:
+              'itc: --user_id、visit_id、guest_name(嘉宾昵称)（当前无法定位嘉宾账号信息'
+          });
         }
         const res = await this.micServer.speakOff({
           receive_account_id: this.stream.accountId
