@@ -1,13 +1,5 @@
 <template>
-  <div
-    class="vmp-fashion-chat-msg-item"
-    v-if="
-      !(
-        isOnlyShowSponsor &&
-        (source.roleName == 2 || ['gift_send_success', 'free_gift_send'].includes(source.type))
-      )
-    "
-  >
+  <div class="vmp-fashion-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName == 2)">
     <!--消息发送时间-->
     <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
