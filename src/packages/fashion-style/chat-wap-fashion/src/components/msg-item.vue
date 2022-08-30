@@ -46,7 +46,7 @@
         >
           {{ source.content.text_content }}
           <template v-if="source.content.Show">
-            {{ $t('common.common_1030') }}
+            <!-- {{ $t('common.common_1030') }} -->
             <span class="highlight">{{ $t('chat.chat_1031') }}</span>
           </template>
         </div>
