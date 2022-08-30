@@ -226,7 +226,7 @@
     .tool-box {
       display: flex;
       justify-content: space-between;
-      color: var(--theme-color);
+      color: var(--theme-header-icon-color);
       i {
         margin-left: 37px;
         font-size: 30px;

@@ -2198,6 +2198,10 @@
     .el-button.el-button--primary {
       background-color: var(--theme-color);
       border: 1px solid var(--theme-color);
+      &:hover {
+        background-color: var(--theme-color);
+        border: 1px solid var(--theme-color);
+      }
     }
     .el-dialog {
       margin-top: 0 !important;
