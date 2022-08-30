@@ -236,11 +236,15 @@
         justify-content: space-between;
         align-items: center;
         color: var(--theme-tab-content-intro-subTitle-font);
+        margin-top: 2px;
         p {
           i {
             margin-right: 8px;
           }
-
+          .vh-line-user {
+            font-size: 12px;
+            line-height: 40px;
+          }
           height: 40px;
           font-size: 28px;
           font-family: Arial;
