@@ -1607,12 +1607,25 @@
               }
             });
           } else {
+            //数据埋点--邀请上麦
+            const cUser = this.onlineUsers.filter(el => {
+              return el.account_id == accountId;
+            });
+            window.vhallReportForProduct?.toStartReporting(110130, 110155, {
+              invitee_role: cUser[0].role_name,
+              invitee_info: { ...cUser[0] }
+            });
             this.micServer
               .inviteMic({
                 room_id: this.roomId,
                 receive_account_id: accountId
               })
               .then(res => {
+                window.vhallReportForProduct?.toResultsReporting(110155, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
                 if (res.code == 200) {
                   this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
@@ -1631,9 +1644,17 @@
           room_id: this.roomId,
           receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
+        const cUser = this.onlineUsers.filter(el => {
+          return el.account_id == accountId;
+        });
         if (this.userId == accountId && this.roleName == 1) {
           // 主持人下麦自己
           window.vhallReportForProduct?.toStartReporting(110172, 110173);
+        } else {
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: cUser[0].role_name,
+            info_of_expelleds: { ...cUser[0] }
+          });
         }
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
@@ -1656,6 +1677,12 @@
                     reasonTxt: '演示中下麦,演示自动结束',
                     res
                   });
+                } else {
+                  window.vhallReportForProduct?.toResultsReporting(110157, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    res
+                  });
                 }
                 return res;
               })
@@ -1671,6 +1698,12 @@
               if (this.userId == accountId && this.roleName == 1) {
                 // 主持人下麦自己
                 window.vhallReportForProduct?.toResultsReporting(110173, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
+              } else {
+                window.vhallReportForProduct?.toResultsReporting(110157, {
                   request_id: res?.request_id,
                   event_type: 'interface',
                   res
@@ -1772,19 +1805,9 @@
           receive_account_id: accountId,
           type: 1 // 0=邀请上麦|1=邀请演示
         };
-        //数据埋点--邀请上麦
-        window.vhallReportForProduct?.toStartReporting(110130, 110155, {
-          invitee_role: this.roleName,
-          invitee_info: 'itc: --user_id、visit_id、guest_name(嘉宾昵称)（当前无法定位嘉宾账号信息'
-        });
         return this.memberServer
           .inviteUserToInteract(params)
           .then(res => {
-            window.vhallReportForProduct?.toResultsReporting(110155, {
-              request_id: res?.request_id,
-              event_type: 'interface',
-              res
-            });
             if (res.code == 200) {
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')

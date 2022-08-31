@@ -569,8 +569,7 @@
         ) {
           window.vhallReportForProduct?.toStartReporting(110133, 110157, {
             expelled_role: this.stream.roleName,
-            info_of_expelleds:
-              'itc: --user_id、visit_id、guest_name(嘉宾昵称)（当前无法定位嘉宾账号信息'
+            info_of_expelleds: { ...this.stream }
           });
         }
         const res = await this.micServer.speakOff({
