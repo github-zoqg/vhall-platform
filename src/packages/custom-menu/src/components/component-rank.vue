@@ -455,7 +455,7 @@
 
     .rank-band {
       text-align: center;
-      height: 570px;
+      height: 100%;
       overflow-y: auto;
 
       &::-webkit-scrollbar {
