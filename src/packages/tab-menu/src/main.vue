@@ -620,7 +620,7 @@
           }
           .tips {
             position: absolute;
-            right: 10px;
+            right: 13px;
             top: 10px;
             width: 6px;
             height: 6px;
