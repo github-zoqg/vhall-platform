@@ -746,11 +746,13 @@
           border-radius: 40px;
         }
         .role {
-          border-radius: 16px;
-          padding: 0 6px;
+          float: left;
+          border-radius: 50px;
+          padding: 0 10px;
           margin-right: 8px;
-          font-size: 22px;
-          line-height: 22px;
+          margin-top: 4px;
+          line-height: 34px;
+          font-size: 20px;
           &.host {
             color: rgba(251, 38, 38, 1);
             background-color: rgba(251, 38, 38, 0.15);
