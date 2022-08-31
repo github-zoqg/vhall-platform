@@ -51,7 +51,9 @@
         this.entryformServer
           .verifyOpenLink({
             subject_id: this.webinarOrSubjectId,
-            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
+            visit_id:
+              this.roomBaseServer.state.watchInitData.visitor_id ||
+              localStorage.getItem('visitorId')
           })
           .then(res => {
             // 如果当前 visitor_id 已经报名，跳转到专题页
@@ -84,7 +86,9 @@
         this.entryformServer
           .verifyOpenLink({
             webinar_id: this.webinarOrSubjectId,
-            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
+            visit_id:
+              this.roomBaseServer.state.watchInitData.visitor_id ||
+              localStorage.getItem('visitorId')
           })
           .then(res => {
             if (res.code == 200) {

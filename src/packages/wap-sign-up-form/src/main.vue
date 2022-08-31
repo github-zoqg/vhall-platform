@@ -793,7 +793,10 @@
           .then(res => {
             if (res.code == 200) {
               // 如果独立链接无效，显示无效页
-              this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
+              this.formOpenLinkStatus = !res.data.has_registed && res.data.available == 0 ? 2 : 1;
+              if (res.data.has_registed) {
+                this.jumpPage();
+              }
             } else {
               this.formOpenLinkStatus = 2;
             }
@@ -1713,25 +1716,7 @@
                 localStorage.setItem('visitorId', res.data.visit_id);
                 this.$toast(this.$t('form.form_1033'));
                 // 跳转专题详情 还是 活动报名表单详情
-                if (this.interfaceType === 'subject') {
-                  const queryString = this.returnQueryString('subject');
-                  location.replace(
-                    window.location.protocol +
-                      process.env.VUE_APP_WAP_WATCH +
-                      process.env.VUE_APP_WEB_KEY +
-                      `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
-                  );
-                } else {
-                  const queryString = this.returnQueryString();
-                  location.replace(
-                    window.location.protocol +
-                      process.env.VUE_APP_WAP_WATCH +
-                      process.env.VUE_APP_WEB_KEY +
-                      `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
-                        this.webinarOrSubjectId
-                      }${queryString}`
-                  );
-                }
+                this.jumpPage();
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
@@ -1840,6 +1825,28 @@
           fetch(url);
         } catch (e) {
           console.warn('数据上报出错', e);
+        }
+      },
+      // 跳转对应页面
+      jumpPage() {
+        if (this.interfaceType === 'subject') {
+          const queryString = this.returnQueryString('subject');
+          location.replace(
+            window.location.protocol +
+              process.env.VUE_APP_WAP_WATCH +
+              process.env.VUE_APP_WEB_KEY +
+              `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
+          );
+        } else {
+          const queryString = this.returnQueryString();
+          location.replace(
+            window.location.protocol +
+              process.env.VUE_APP_WAP_WATCH +
+              process.env.VUE_APP_WEB_KEY +
+              `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                this.webinarOrSubjectId
+              }${queryString}`
+          );
         }
       }
     }
