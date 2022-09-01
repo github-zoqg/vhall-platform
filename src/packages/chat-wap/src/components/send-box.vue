@@ -40,7 +40,7 @@
               {{ $t('chat.chat_1079') }}
             </span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>
+            <span class="content-input__placeholder-say" v-else>
               {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1021') }}
             </span>
           </div>
@@ -510,6 +510,20 @@
           .login-btn {
             padding-left: 10px;
             color: #007aff;
+          }
+
+          .icon-wrap-chat_set {
+            float: left;
+            height: 60px;
+            line-height: 60px;
+            width: auto;
+          }
+
+          &-say {
+            float: left;
+            height: 60px;
+            line-height: 60px;
+            padding-left: 12px;
           }
         }
       }

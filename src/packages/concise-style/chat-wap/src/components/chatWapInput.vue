@@ -366,7 +366,7 @@
           font-size: 28px !important;
         }
         .el-textarea__inner {
-          line-height: 40px;
+          line-height: 50px;
         }
       }
     }
