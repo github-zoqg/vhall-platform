@@ -26,6 +26,13 @@
       <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
       </button>
+      <!-- 隐私合规（嵌入不展示） -->
+      <vmp-privacy-compliance
+        scene="lottery"
+        clientType="mobile"
+        compType="2"
+        v-if="!isEmbed"
+      ></vmp-privacy-compliance>
     </div>
   </div>
 </template>
@@ -45,6 +52,9 @@
     computed: {
       title() {
         return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
+      },
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     filters: {
@@ -113,7 +123,6 @@
       },
       submit() {
         if (!this.verify()) return false;
-
         const failure = err => {
           this.$toast(this.$t(err.msg));
         };
