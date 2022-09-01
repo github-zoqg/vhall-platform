@@ -194,5 +194,11 @@ export default {
   //预约页
   '--theme-subscribe-tab-bg': color_background_24,
   '--theme-subscribe-tab-font': color_background_29,
-  '--theme-subscribe-tab-content-recommend-buy-font': color_text_grey
+  '--theme-subscribe-tab-content-recommend-buy-font': color_text_grey,
+  // 章节
+  '--chapter-list-bg': '#262626',
+  '--chapter-font-color-title': '#ffffff',
+  '--chapter-font-color-time': 'rgba(255,255,255,0.45)',
+  '--chapter-list-item-bg-active': 'rgba(255,255,255,0.06)',
+  '--chapter-font-color-active': '#c99f67'
 };

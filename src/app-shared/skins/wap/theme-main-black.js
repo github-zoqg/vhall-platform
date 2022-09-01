@@ -101,5 +101,10 @@ export default {
   '--theme-component-sign-up-tab-bg': 'rgba(0, 0, 0, 0.04)',
   //冗余
   '--theme-header-attention-bg': ' ',
-  '--theme-header-attention-color': ' '
+  '--theme-header-attention-color': ' ',
+  // 章节
+  '--theme-chapter-list-bg': '#262626',
+  '--theme-chapter-font-color-title': '#ffffff',
+  '--theme-chapter-font-color-time': 'rgba(255,255,255,0.45)',
+  '--theme-chapter-font-color-active': '#fb2626'
 };

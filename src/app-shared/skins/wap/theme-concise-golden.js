@@ -74,5 +74,9 @@ export default {
   '--theme-component-subscribe-num': ' ',
   '--theme-tab-content-recommend-bg-font': ' ',
   '--theme-chat-msg-reply-name-font': ' ',
-  '--theme-chat-msg-reply-content': ' '
+  '--theme-chat-msg-reply-content': ' ',
+  '--theme-chapter-list-bg': ' ',
+  '--theme-chapter-font-color-title': ' ',
+  '--theme-chapter-font-color-time': ' ',
+  '--theme-chapter-font-color-active': ' '
 };

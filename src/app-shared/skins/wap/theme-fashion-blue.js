@@ -100,5 +100,10 @@ export default {
   '--theme-chat-sendBox-bg': ' ',
   '--theme-chat-msg-gift-font': ' ',
   '--theme-header-attention-color': ' ',
-  '--theme-chat-msg-interact-bg': ' '
+  '--theme-chat-msg-interact-bg': ' ',
+  // 章节
+  '--theme-chapter-list-bg': '#ffffff',
+  '--theme-chapter-font-color-title': 'rgba(0,0,0,0.85)',
+  '--theme-chapter-font-color-time': 'rgba(0,0,0,0.45)',
+  '--theme-chapter-font-color-active': '#3552EA'
 };

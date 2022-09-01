@@ -101,5 +101,10 @@ export default {
   '--theme-header-attention-bg': ' ',
   '--theme-chat-msg-reply-name-font': ' ',
   '--theme-chat-msg-reply-content': ' ',
-  '--theme-header-attention-color': ' '
+  '--theme-header-attention-color': ' ',
+  // 章节
+  '--theme-chapter-list-bg': '#ffffff',
+  '--theme-chapter-font-color-title': 'rgba(0,0,0,0.85)',
+  '--theme-chapter-font-color-time': 'rgba(0,0,0,0.45)',
+  '--theme-chapter-font-color-active': '#fb2626'
 };
