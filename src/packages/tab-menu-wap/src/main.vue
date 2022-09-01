@@ -362,14 +362,14 @@
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
           // 如果文档播放器互换位置，不需要切换自定义菜单
-          if (this.isWapBodyDocSwitch) return;
+          if (val && this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_status', val => {
           console.log('dispatch_doc_switch_status', val);
           // 如果文档播放器互换位置，不需要切换自定义菜单
-          if (this.isWapBodyDocSwitch) return;
+          if (val && this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         //监听进出子房间消息
