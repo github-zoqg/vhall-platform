@@ -70,7 +70,7 @@
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
         <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
-      <li>
+      <li v-if="isLiving">
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
@@ -79,7 +79,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" @takeAward="takeAward" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="!isEmbed">
+      <li v-if="!isEmbed && isLiving">
         <red-packet-icon @clickIcon="checkredPacketIcon" />
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
