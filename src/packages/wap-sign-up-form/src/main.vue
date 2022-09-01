@@ -287,6 +287,14 @@
               {{ $t('form.form_1019') }}
             </button>
           </li>
+          <li v-if="!isEmbed">
+            <!-- 隐私合规（嵌入不支持） -->
+            <vmp-privacy-compliance
+              scene="signForm"
+              clientType="mobile"
+              compType="2"
+            ></vmp-privacy-compliance>
+          </li>
         </ul>
         <!--验证码表单-->
         <ul v-show="activeTab === 2" class="vmp-wap-sign-up-form__content__tab-content">
@@ -337,6 +345,14 @@
             <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1082') }}
             </button>
+          </li>
+          <li v-if="!isEmbed">
+            <!-- 隐私合规（嵌入不支持） -->
+            <vmp-privacy-compliance
+              scene="signForm"
+              clientType="mobile"
+              compType="2"
+            ></vmp-privacy-compliance>
           </li>
         </ul>
       </div>

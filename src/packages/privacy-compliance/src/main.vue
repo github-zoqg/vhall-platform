@@ -121,6 +121,13 @@
       margin-bottom: 16px;
       padding: 0 10px;
     }
+    /* 报名表单 */
+    &.scene_signForm {
+      display: block;
+      text-align: left;
+      align-items: unset;
+      justify-content: unset;
+    }
     /* 手机端样式设置 */
     &.client_mobile {
       a {
@@ -134,6 +141,11 @@
       &.scene_auth {
         margin-top: 32px;
         margin-bottom: 10px;
+      }
+      &.scene_signForm {
+        text-align: left;
+        margin-top: 32px;
+        margin-bottom: 0;
       }
     }
     /* PC端样式设置 */
@@ -153,6 +165,11 @@
           font-size: 12px;
           line-height: 17px;
         }
+      }
+      &.scene_signForm {
+        text-align: center;
+        margin-top: 12px;
+        margin-bottom: 0;
       }
     }
   }
