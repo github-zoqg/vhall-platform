@@ -937,6 +937,6 @@ export default {
     privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
     privacy_1003: 'VHALL User Protection Agreement',
     privacy_1004: 'VHALL Privacy Policy',
-    privacy_1005: 'Please check the agreement first'
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
   }
 };
