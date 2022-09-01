@@ -276,7 +276,7 @@
 
         console.log('----设置主题为----', `theme_${style}_${theme}`);
 
-        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        skins.setTheme(skins.themes[`theme_main_${theme}`]);
         this.drawBody(style, theme);
 
         // 挂载到window方便调试
