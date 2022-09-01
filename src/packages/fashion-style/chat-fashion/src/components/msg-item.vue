@@ -610,7 +610,7 @@
           height: 24px;
           border-radius: 14px;
           position: absolute;
-          top: 3px;
+          top: 4px;
           .normal-msg__avatar-img {
             width: 100%;
             height: 100%;
