@@ -90,31 +90,13 @@
       >
         {{ $t('register.register_1013') }}
       </el-button>
-      <div class="vmp-reg-login__register__checked" v-if="!isMobile">
-        <el-checkbox v-model="agreementChecked">
-          {{ $t('register.register_1008') }}
-          <a
-            href="https://t.e.vhall.com/home/vhallapi/serviceterms"
-            target="_blank"
-            class="vmp-register__to__link"
-            rel="noopener noreferrer"
-          >
-            {{ $t('register.register_1011') }}
-          </a>
-        </el-checkbox>
-      </div>
-      <div class="vmp-reg-login__register__checked" v-else>
-        <el-checkbox v-model="agreementChecked">
-          {{ $t('login.login_1030') }}
-          <a
-            href="https://t.e.vhall.com/home/vhallapi/serviceterms"
-            target="_blank"
-            class="vmp-register__to__link"
-            rel="noopener noreferrer"
-          >
-            {{ $t('login.login_1031') }}
-          </a>
-        </el-checkbox>
+      <div class="vmp-reg-login__register__checked">
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="register"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
       </div>
     </el-form>
   </div>
@@ -181,7 +163,7 @@
           password: [{ required: false, validator: validRegPwd, trigger: 'blur' }]
         },
         regPwdShow: false, // 注册 - 密码框的显示
-        agreementChecked: false, // 是否勾选注册协议
+        registerChecked: false,
         loginKeyVo: null,
         btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
       };
@@ -242,18 +224,18 @@
       handleRegister() {
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
-            if (!this.captchaReady) {
+            if (!this.registerChecked) {
               this.$message({
-                message: this.$t('login.login_1023'),
+                message: this.$t('privacy.privacy_1005'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
               });
               return;
             }
-            if (!this.agreementChecked) {
+            if (!this.captchaReady) {
               this.$message({
-                message: this.$t('register.register_1003'),
+                message: this.$t('login.login_1023'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -314,6 +296,10 @@
               });
           }
         });
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     async mounted() {

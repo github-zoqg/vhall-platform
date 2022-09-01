@@ -77,6 +77,14 @@
   };
 </script>
 <style lang="less">
+  .vmp-third-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .vmp-third-remark {
+      margin-right: 16px;
+    }
+  }
   .vmp-third-remark {
     text-align: center;
     height: 17px;

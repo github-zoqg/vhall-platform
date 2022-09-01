@@ -63,6 +63,12 @@
         >
           {{ $t('nav.nav_1005') }}
         </el-button>
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="login"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
         <a
           href="javascript:void(0)"
           class="vmp-reg-login__reg__link"
@@ -122,7 +128,8 @@
         isLoginPwdFocus: false, // handleFocus / handleBlur 会更改此参
         autoLoginStatus: false, // 账户的自动登录
         forgetUrl: 'javascript:void(0);', // 忘记密码链接入口
-        isMaxHeight: false // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
+        isMaxHeight: false, // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
+        loginChecked: false // 登录(账号密码登录)——默认未选中
       };
     },
     watch: {
@@ -153,6 +160,15 @@
       },
       // 密码登录
       async handlePwdLogin() {
+        if (!this.loginChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
         if (this.captchaIsShow && !this.captchaReady) {
           // 开启了图片验证码展示，但是当前未选择图形码
           this.$message({
@@ -254,6 +270,10 @@
             customClass: 'zdy-info-box'
           });
         }
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     created() {
