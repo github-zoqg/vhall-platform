@@ -577,7 +577,7 @@
           &:hover {
             i {
               cursor: default;
-              color: var(--tab-menu-btn-color-hover);
+              color: var(--tab-menu-btn-color);
             }
           }
         }

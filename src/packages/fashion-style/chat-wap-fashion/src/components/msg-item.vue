@@ -564,14 +564,15 @@
           > .normal-msg {
             > .textInfo {
               line-height: 38px;
-              span {
-                word-break: break-word;
-              }
+              // span {
+              //   word-break: break-word;
+              // }
               .nickname {
                 color: var(--theme-chat-msg-name-font);
               }
               .chat-text {
                 color: var(--theme-chat-msg-font);
+                word-break: break-word;
               }
             }
             > .imgs {
