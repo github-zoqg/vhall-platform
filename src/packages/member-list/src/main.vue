@@ -1772,8 +1772,12 @@
             rejection_method: encodeURIComponent('成员列表主持人将自己设置为主讲人')
           }); // 主持人将自己设为主讲人
         } else {
+          let cUser = this.onlineUsers.filter(el => {
+            return el.account_id == accountId;
+          });
           window.vhallReportForProduct?.toStartReporting(110169, 110170, {
-            rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人')
+            rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人'),
+            guest_info: cUser[0]
           }); // 主持人将嘉宾设为主讲人
         }
         return this.interactiveServer

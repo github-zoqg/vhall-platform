@@ -673,8 +673,9 @@
         //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
         //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
         // }
-        window.vhallReportForProduct?.toStartReporting(110169, {
-          rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人')
+        window.vhallReportForProduct?.toStartReporting(110169, 110170, {
+          rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人'),
+          guest_info: this.stream
         });
         if (setMainScreen) {
           this.setMainScreen();
