@@ -34,7 +34,7 @@
             >
               {{ formInfo.intro }}
               <span
-                v-show="overflowStatus"
+                v-show="overflowStatus && showToggle"
                 class="vmp-sign-up-form__introduction__detail"
                 @click="changeFoldStatus(false)"
               >
@@ -42,7 +42,7 @@
                 {{ $t('form.form_1011') }}
               </span>
               <span
-                v-show="!overflowStatus"
+                v-show="!overflowStatus && showToggle"
                 class="vmp-sign-up-form__introduction__detail"
                 @click="changeFoldStatus(true)"
               >
@@ -775,6 +775,8 @@
         },
         //简介内容是否超长
         overflowStatus: false,
+        //简介内容是否超长
+        showToggle: false,
         //模态窗是否可见
         visible: false,
         //当前登陆人的电话号码
@@ -1431,7 +1433,7 @@
         const twoHeight = 40;
         const curHeight = txtDom.offsetHeight;
         if (curHeight > twoHeight) {
-          this.overflowStatus = true;
+          this.showToggle = true;
         }
       },
       //初始化表单问题信息
