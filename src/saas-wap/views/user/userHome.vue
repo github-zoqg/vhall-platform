@@ -74,7 +74,7 @@
                   </span>
                 </span>
                 <img
-                  class="bg-cover"
+                  :class="`bg-cover bg-cover_${item.itemMode}`"
                   :src="tabType === 'live' ? item.img_url : item.cover"
                   alt=""
                 />
@@ -201,8 +201,10 @@
         let obj = parseImgOssQueryString(url);
         if (index == 1) {
           this.imageBgMode = Number(obj.mode);
-        } else {
+        } else if (index == 2) {
           this.imagAvatarMode = Number(obj.mode);
+        } else {
+          return Number(obj.mode);
         }
       },
       pullingDown() {
@@ -282,6 +284,11 @@
                   (process.env.VUE_APP_WAP_WATCH || '') +
                   process.env.VUE_APP_ROUTER_BASE_URL
                 }/lives/watch/${item.webinar_id}`;
+                if (cropperImage(item.img_url)) {
+                  item.itemMode = this.handlerImageInfo(item.img_url, 3);
+                } else {
+                  item.itemMode = 3;
+                }
               });
               if (list.length > 0) {
                 // this.dataList.unshift(...list)
@@ -330,6 +337,11 @@
                   (process.env.VUE_APP_WAP_WATCH || '') +
                   process.env.VUE_APP_ROUTER_BASE_URL
                 }/special/detail?id=${item.id}`;
+                if (cropperImage(item.cover)) {
+                  item.itemMode = this.handlerImageInfo(item.cover, 3);
+                } else {
+                  item.itemMode = 3;
+                }
               });
               if (list.length > 0) {
                 // this.dataList.unshift(...list);
@@ -733,6 +745,13 @@
         width: 100%;
         height: 100%;
         object-fit: scale-down;
+        &.bg-cover_1 {
+          object-fit: fill;
+        }
+        &.bg-cover_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
       }
       .liveTag {
         position: absolute;
