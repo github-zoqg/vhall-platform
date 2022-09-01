@@ -304,6 +304,12 @@
                       {{ $t('form.form_1019') }}
                     </el-button>
                   </div>
+                  <!-- 隐私合规（嵌入不支持） -->
+                  <vmp-privacy-compliance
+                    scene="signForm"
+                    clientType="pc"
+                    compType="2"
+                  ></vmp-privacy-compliance>
                 </el-form>
               </template>
             </div>
@@ -372,6 +378,12 @@
                       {{ $t('interact_tools.interact_tools_1019') }}
                     </el-button>
                   </div>
+                  <!-- 隐私合规（嵌入不支持） -->
+                  <vmp-privacy-compliance
+                    scene="signForm"
+                    clientType="pc"
+                    compType="2"
+                  ></vmp-privacy-compliance>
                 </el-form>
               </template>
             </div>
@@ -669,6 +681,12 @@
                     {{ $t('form.form_1019') }}
                   </el-button>
                 </div>
+                <!-- 隐私合规（嵌入不支持） -->
+                <vmp-privacy-compliance
+                  scene="signForm"
+                  clientType="pc"
+                  compType="2"
+                ></vmp-privacy-compliance>
               </el-form>
             </template>
           </div>
@@ -737,6 +755,12 @@
                     {{ $t('interact_tools.interact_tools_1019') }}
                   </el-button>
                 </div>
+                <!-- 隐私合规（嵌入不支持） -->
+                <vmp-privacy-compliance
+                  scene="signForm"
+                  clientType="pc"
+                  compType="2"
+                ></vmp-privacy-compliance>
               </el-form>
             </template>
           </div>

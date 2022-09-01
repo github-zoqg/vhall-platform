@@ -80,6 +80,12 @@
         >
           {{ $t('nav.nav_1005') }}
         </el-button>
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="loginDynamic"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
         <a
           href="javascript:void(0)"
           class="vmp-reg-login__reg__link"
@@ -136,7 +142,8 @@
         },
         autoLoginStatus: false, // 账户的自动登录
         isMaxHeight: false, // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
-        btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
+        btnDisabled: true, // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
+        loginDynamicChecked: false // 登录(快捷短信登录)——默认未选中
       };
     },
     watch: {
@@ -192,6 +199,15 @@
       async handleCodeLogin() {
         const valid = await this.$refs.ruleForm.validate();
         if (!valid) return false;
+        if (!this.loginDynamicChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
         const params = {
           way: 2, // 手机号验证码登录
           phone: this.ruleForm.phone,
@@ -215,6 +231,10 @@
             });
           }
         });
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     async mounted() {

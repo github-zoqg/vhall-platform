@@ -71,7 +71,8 @@ export default {
     player_1023: 'Failed to adjust the playback time',
     player_1024: 'Failed to set the time. Please try again later',
     player_1025: 'normal',
-    player_1026: 'replaying'
+    player_1026: 'replaying',
+    player_1027: 'There is no rehearsal now, please come again next time'
   },
   appointment: {
     appointment_1001: 'Whitelist verification',
@@ -106,7 +107,8 @@ export default {
     appointment_1029: 'S',
     appointment_1030: 'The event organizer set up a trial',
     appointment_1031: 'Please be patient',
-    appointment_1032: 'Whitelist'
+    appointment_1032: 'Whitelist',
+    appointment_1033: 'The rehearsal has started, please watch it live'
   },
   nav: {
     nav_1001: 'Sponsor',
@@ -129,7 +131,7 @@ export default {
     nav_1018: 'QQ',
     nav_1019: 'Scan on WeChat',
     nav_1020: 'Scan on WeChat to follow the official account',
-    nav_1021: 'Long press the QR Code',
+    nav_1021: 'Long press',
     nav_1022: 'You can share the activity to friends or WeChat Moments',
     nav_1023: 'Get and forward your own exclusive invitation card',
     nav_1024: 'Copy successfully',
@@ -139,7 +141,7 @@ export default {
     nav_1028: 'Withdrawal',
     nav_1029: 'Unsubscribe',
     nav_1030: 'Followed',
-    nav_1031: 'Long press and save',
+    nav_1031: 'Long press',
     nav_1032: 'Top Inviters',
     nav_1033: 'Top Spenders',
     nav_1034: 'Rules',
@@ -161,7 +163,9 @@ export default {
     nav_1050: "The host hasn't opened the invitation yet",
     nav_1051: 'Alipay',
     nav_1052: 'Copy failed',
-    nav_1053: 'Sponsor'
+    nav_1053: 'Sponsor',
+    nav_1054: 'Share the rehearsal viewing address',
+    nav_1055: ''
   },
   login: {
     login_1001: 'Account login',
@@ -347,7 +351,7 @@ export default {
     chat_1091: '',
     chat_1092: 'You have been muted',
     chat_1093: 'Click for details',
-    chat_1094: 'Chat only',
+    chat_1094: 'Chat only',
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
     chat_1097: 'Chat only off',
@@ -799,7 +803,7 @@ export default {
     interact_1030: '{n} microphone off',
     interact_1031: '{n} invites you to open the microphone',
     interact_1032: '',
-    interact_1033: '主画面',
+    interact_1033: 'home screen',
     interact_1034: 'presenter',
     interact_1035: 'Opposite party network exception',
     interact_1036:
@@ -927,5 +931,12 @@ export default {
     other_1018: 'Refuse',
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+  },
+  privacy: {
+    privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
+    privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
+    privacy_1003: 'VHALL User Protection Agreement',
+    privacy_1004: 'VHALL Privacy Policy',
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
   }
 };
