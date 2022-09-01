@@ -162,6 +162,14 @@
           @click="isHidden = !isHidden"
         ></i>
       </div>
+      <div slot="privacy" v-if="isWhiteCheck">
+        <!-- 隐私合规（嵌入不支持） -->
+        <vmp-privacy-compliance
+          scene="auth"
+          clientType="mobile"
+          compType="2"
+        ></vmp-privacy-compliance>
+      </div>
     </alertBox>
     <!-- 弹出直播提醒 -->
     <alertBox
@@ -243,7 +251,8 @@
         },
         isOpenlang: false, // 是否打开多语言弹窗
         lang: {},
-        languageList: []
+        languageList: [],
+        isWhiteCheck: false
       };
     },
     components: {
@@ -576,6 +585,7 @@
         });
       },
       handleAuthErrorCode(code, msg) {
+        this.isWhiteCheck = false; // 是否白名单验证
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -608,6 +618,7 @@
             // this.authInfo.title = this.$t('appointment.appointment_1032');
             this.authInfo.placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
             this.isSubscribeShow = true;
+            this.isWhiteCheck = true;
             break;
           case 512523:
             this.webinarPayAuth();

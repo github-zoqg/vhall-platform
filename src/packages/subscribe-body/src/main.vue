@@ -305,7 +305,8 @@
         let placeHolderInfo = {
           placeHolder: '',
           webinarId: '',
-          isSubject: false
+          isSubject: false,
+          isWhiteCheck: false // 是否开启了白名单验证
         };
         switch (code) {
           case 510008: // 未登录
@@ -342,6 +343,7 @@
             //白名单
             placeHolderInfo.placeHolder =
               this.subOption.verify_tip || this.$t('common.common_1006');
+            placeHolderInfo.isWhiteCheck = true;
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );

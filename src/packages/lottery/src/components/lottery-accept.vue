@@ -2,19 +2,14 @@
   <div
     :class="[
       'lottery-winner-info',
-      isEmbed && !isEmbedVideo ? 'lottery-winner-embed-info' : '',
+      isEmbed ? 'lottery-winner-embed-info' : '',
       longForm ? 'big' : ''
     ]"
   >
     <lottery-header :prizeInfo="prizeInfo" />
     <el-form ref="forms" class="winner-info-form">
       <!-- 隐私合规（嵌入不展示） -->
-      <vmp-privacy-compliance
-        scene="lottery"
-        clientType="pc"
-        compType="2"
-        v-if="!isEmbed"
-      ></vmp-privacy-compliance>
+      <vmp-privacy-compliance scene="lottery" clientType="pc" compType="2"></vmp-privacy-compliance>
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
         <span v-if="item.is_required == 1" class="required-flag">*</span>
         <el-input
@@ -76,12 +71,7 @@
       isEmbed() {
         // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
         const { embedObj } = this.roomBaseServer.state;
-        return embedObj.embed;
-      },
-      isEmbedVideo() {
-        // 是不是单视频嵌入
-        const { embedObj } = this.roomBaseServer.state;
-        return embedObj.embedVideo;
+        return embedObj.embed && !embedObj.embedVideo;
       },
       longForm() {
         return this.stepHtmlList.length > 3;

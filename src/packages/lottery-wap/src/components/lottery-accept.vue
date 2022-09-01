@@ -31,7 +31,6 @@
         scene="lottery"
         clientType="mobile"
         compType="2"
-        v-if="!isEmbed"
       ></vmp-privacy-compliance>
     </div>
   </div>
@@ -52,9 +51,6 @@
     computed: {
       title() {
         return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
-      },
-      isEmbed() {
-        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     filters: {

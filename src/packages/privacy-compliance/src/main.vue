@@ -1,5 +1,5 @@
 <template>
-  <div :class="`vmp-privacy-compliance scene_${scene} client_${clientType}`">
+  <div :class="`vmp-privacy-compliance scene_${scene} client_${clientType}`" v-if="!isEmbed">
     <el-checkbox
       v-if="compType == 1"
       v-model.trim="isCheck"
@@ -28,6 +28,11 @@
         privacyUrl: `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/privacyPolicy`,
         privacyUPoUrl: `${window.location.protocol}${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_WEB_KEY}/privacyUPo`
       };
+    },
+    computed: {
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
     },
     props: {
       scene: {
@@ -68,6 +73,7 @@
       font-size: 14px;
       line-height: 16px;
       color: #8c8c8c;
+      word-break: break-word;
     }
     /deep/.el-checkbox {
       margin-right: 8px;
@@ -106,6 +112,15 @@
       align-items: unset;
       justify-content: unset;
     }
+    /* 鉴权 */
+    &.scene_auth {
+      display: block;
+      text-align: left;
+      align-items: unset;
+      justify-content: unset;
+      margin-bottom: 16px;
+      padding: 0 10px;
+    }
     /* 手机端样式设置 */
     &.client_mobile {
       a {
@@ -115,6 +130,10 @@
       &.scene_lottery {
         width: 626px;
         margin: 32px auto 0 auto;
+      }
+      &.scene_auth {
+        margin-top: 32px;
+        margin-bottom: 10px;
       }
     }
     /* PC端样式设置 */

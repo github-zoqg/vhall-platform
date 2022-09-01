@@ -13,6 +13,9 @@
       <div class="footer" :style="`width: ${width}`" @click="sure">
         {{ titleBtn || $t('account.account_1062') }}
       </div>
+      <div class="privacy">
+        <slot name="privacy"></slot>
+      </div>
     </div>
   </section>
 </template>
