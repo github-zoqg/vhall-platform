@@ -37,7 +37,7 @@
     },
     computed: {
       screenPosterInfo_m_img() {
-        let url = this.useRoomBaseServer.state.screenPosterInfo.img;
+        let url = this.useRoomBaseServer.state.screenPosterInfo.m_img;
         if (cropperImage(url)) {
           this.handlerImageInfo(url);
           return url;
