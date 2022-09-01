@@ -246,6 +246,12 @@
         }
       },
       setPageConfig() {
+        const styleMap = {
+          1: 'main', // 传统风格
+          2: 'fashion', // 时尚风格
+          3: 'fashion' // 极简风格预约页使用时尚风格背景
+        };
+
         const themeMap = {
           1: 'black',
           2: 'white',
@@ -265,7 +271,7 @@
         }
 
         // 设置主题，如果没有就用传统风格白色
-        const style = 'main';
+        const style = styleMap[skin_json_wap?.style || 1];
         const theme = themeMap[skin_json_wap?.backGroundColor || 2];
 
         console.log('----设置主题为----', `theme_${style}_${theme}`);
