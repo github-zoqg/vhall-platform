@@ -34,7 +34,7 @@
             <div :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</div>
           </div>
 
-          <span class="pr ft24" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
+          <span class="pr ft22" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
           <div class="timerbg">
             <div :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</div>
@@ -514,9 +514,10 @@
       border-radius: 8px;
       padding: 8px;
       background: #d9d9d9;
-      .ft24 {
-        font-size: 24px;
-        top: -8px;
+      .ft22 {
+        .custom-font-barlow;
+        font-size: 22px;
+        top: -10px;
         font-weight: bold;
       }
     }

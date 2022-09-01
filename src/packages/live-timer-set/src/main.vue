@@ -44,7 +44,7 @@
           </div>
 
           <!-- 时间显示区 -->
-          <el-col class="margin10 bg000 pr custom-font-barlow">
+          <el-col class="margin10 bg000 pr">
             <div class="line_weight ps"></div>
             <span class="close ps" @click="onClose">
               <i class="vh-iconfont vh-line-close"></i>
@@ -66,7 +66,7 @@
               ></el-input>
             </div>
 
-            <strong class="pr ft42">:</strong>
+            <strong class="pr ft22 custom-font-barlow">:</strong>
 
             <div class="timerbg">
               <el-input
@@ -344,8 +344,8 @@
     .bg000 {
       background: #d9d9d9;
     }
-    .ft42 {
-      font-size: 20px;
+    .ft22 {
+      font-size: 22px;
       top: -11px;
     }
     .line_weight {

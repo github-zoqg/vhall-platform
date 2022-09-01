@@ -25,7 +25,7 @@
           </div>
 
           <div class="w_inline"></div>
-          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
+          <span class="pr ft34" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
           <div class="timerbg">
             <span :class="time < 1 ? 'timeout_font_color' : ''" class="fontWeight">
@@ -373,8 +373,9 @@
           top: 50%;
           width: 95%;
         }
-        .ft28 {
-          font-size: 38px;
+        .ft34 {
+          .custom-font-barlow;
+          font-size: 34px;
           margin-left: 4px;
           line-height: initial;
           top: -16px;

@@ -28,19 +28,19 @@
           <div class="black_line ps"></div>
 
           <div class="timerbg">
-            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
           </div>
           <div class="timerbg item_left">
-            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ mon }}</span>
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</span>
           </div>
 
-          <span class="pr ft28" :class="time < 0 ? 'timeout_font_color' : ''">:</span>
+          <span class="pr ft22" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
           <div class="timerbg">
-            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
           </div>
           <div class="timerbg item_left">
-            <span :class="time < 0 ? 'timeout_font_color' : ''">{{ sec }}</span>
+            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</span>
           </div>
         </el-row>
       </div>
@@ -402,9 +402,11 @@
         border-radius: 8px;
         height: 78px;
         padding: 8px;
-        .ft28 {
-          font-size: 28px;
-          top: -8px;
+        color: #262626;
+        .ft22 {
+          .custom-font-barlow;
+          font-size: 22px;
+          top: -10px;
         }
       }
       .timeout_font_color {
