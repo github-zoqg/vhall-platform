@@ -688,7 +688,7 @@
             .reply-wrapper__content__nick-name {
               margin-right: 4px;
               line-height: 20px;
-              color: rgba(255, 255, 255, 0.35);
+              color: var(--chat-font-color-reply-name);
             }
             .reply-msg__label {
               color: #fa9a32;

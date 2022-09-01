@@ -83,6 +83,7 @@ export default {
   '--chat-bg-color-checkbox': color_background_14,
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
+  '--chat-font-color-reply-name': 'rgba(255, 255, 255, 0.45)',
   //footer
   '--footer-color-font': color_text_secondary,
   //主题色
