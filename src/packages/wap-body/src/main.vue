@@ -192,6 +192,10 @@
       // 主持人ID 分组期间使用
       userinfoId() {
         return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       }
     },
     beforeCreate() {
@@ -216,7 +220,7 @@
         });
         await this.checkMediaPermission('isUseMic');
       }
-      if (this.isInGroup) {
+      if (this.isInGroup && this.webinarType == 1) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
         this.gobackHome(1, this.groupServer.state.groupInitData.name, { sender_id: report_data });
       }
