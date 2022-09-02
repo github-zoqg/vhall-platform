@@ -428,7 +428,7 @@
       }
       .input-bar__textarea-box__textarea-placeholder {
         width: 264px;
-        background-color: @bg-dark-normal;
+        background-color: var(--chat-background-color-input);
         font-size: 14px;
         color: @font-dark-normal;
         line-height: 20px;
