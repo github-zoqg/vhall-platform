@@ -1029,7 +1029,7 @@
         font-size: 32px;
       }
       &.is-subscribe {
-        background: #fff;
+        background: var(--theme-component-subscribe-success-bg);
         border: 1px solid var(--theme-component-subscribe);
         color: var(--theme-component-subscribe);
       }

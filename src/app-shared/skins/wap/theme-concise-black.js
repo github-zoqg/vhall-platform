@@ -70,6 +70,7 @@ export default {
   '--theme-tab-content-private-content-font': ' ',
   '--theme-tab-content-private-time-font': ' ',
   '--theme-component-subscribe': '#fb2626',
+  '--theme-component-subscribe-success-bg': '#333333',
   '--theme-component-subscribe-text': 'rgba(255, 255, 255, 0.65)',
   '--theme-component-subscribe-num': 'rgba(255, 255, 255, 1)',
   '--theme-tab-content-recommend-bg-font': ' ',
