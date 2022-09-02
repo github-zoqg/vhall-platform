@@ -572,7 +572,7 @@
               }
               .chat-text {
                 color: var(--theme-chat-msg-font);
-                word-break: break-word;
+                // word-break: break-word;
               }
             }
             > .imgs {

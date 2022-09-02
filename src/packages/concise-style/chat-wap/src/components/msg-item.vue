@@ -522,7 +522,7 @@
               }
               .chat-text {
                 color: rgba(255, 255, 255, 1);
-                word-break: break-word;
+                // word-break: break-word;
               }
             }
             > .imgs {
