@@ -20,7 +20,7 @@
     min-height: 30px;
     font-size: 14px;
     font-weight: 400;
-    color: @font-dark-normal;
+    color: var(--theme-tab-content-word-font);
     overflow: hidden;
     padding: 0 24px;
     box-sizing: border-box;

@@ -4,7 +4,7 @@
       <img class="img-box" :src="hostAvatar" @click="skipAction" srcset />
       {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
-    <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+    <span class="tool-box">
       <span class="rehearsalStatus" v-if="isRehearsal && isLiving">
         <span class="dot"></span>
         {{ $t('nav.nav_1055') }}
@@ -55,7 +55,7 @@
       this.initUserLoginStatus();
 
       //设置品牌皮肤
-      this.setSkinInfo(this.skinInfo);
+      // this.setSkinInfo(this.skinInfo);
     },
     computed: {
       // 直播中
@@ -210,12 +210,14 @@
 <style lang="less">
   .vh-header-box {
     height: 71px;
-    background: rgba(255, 255, 255, 1);
+    background: var(--theme-header-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
+
     .host-user-info {
+      color: var(--theme-header-font-color);
       .ellipsis();
       font-size: 28px;
       line-height: 71px;
@@ -236,6 +238,7 @@
     .tool-box {
       display: flex;
       justify-content: space-between;
+      color: var(--theme-header-icon-color);
       i {
         margin-left: 37px;
         font-size: 30px;

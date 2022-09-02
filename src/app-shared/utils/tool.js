@@ -201,6 +201,10 @@ export const getCookie = name => {
   }
 };
 
+export const isFunction = val => {
+  return typeof val === 'function';
+};
+
 export const handleIntroInfo = str => {
   if (!str) return '';
   const regImg = /<img.*?(?:>|\/>)/g;

@@ -4,6 +4,7 @@
       <p class="tab">
         <span
           v-if="showInviteList"
+          class="title"
           :class="{ active: currentTab == 1 }"
           @click="showAwardsList ? (currentTab = 1) : null"
         >
@@ -18,7 +19,7 @@
           {{ $t('nav.nav_1033') }}
         </span>
       </p>
-      <p class="rule-icon" @click="showRule = !showRule">
+      <p class="rule-icon" :class="{ active: showRule }" @click="showRule = !showRule">
         {{ $t('nav.nav_1034') }}
         <i class="vh-iconfont vh-line-arrow-down" v-show="!showRule"></i>
         <i class="vh-iconfont vh-line-arrow-up" v-show="showRule"></i>
@@ -114,6 +115,9 @@
     background-size: 100% 100%;
     background-position: cover;
     padding-bottom: 30px;
+    .title {
+      color: var(--theme-tab-content-rank-title-font);
+    }
   }
   header {
     position: relative;
@@ -161,8 +165,11 @@
     }
     .rule-icon {
       line-height: 36px;
-      color: #666666;
       font-size: 26px;
+      color: var(--theme-tab-content-rank-rule-font);
+      &.active {
+        color: var(--theme-tab-content-rank-rule-active-font);
+      }
       i {
         color: #666666;
         font-size: 14px !important;
@@ -177,8 +184,8 @@
     word-break: break-all;
     padding: 0 30px;
     line-height: 1.4;
-    color: rgba(68, 68, 68, 1);
-    background: #fff;
+    color: var(--theme-tab-content-rank-rule-content-font);
+    background: var(--theme-tab-content-rank-rule-content-bg);
     min-height: 30px;
     border-radius: 4px;
   }

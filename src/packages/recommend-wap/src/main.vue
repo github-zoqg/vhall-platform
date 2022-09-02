@@ -125,8 +125,8 @@
 </script>
 <style lang="less">
   .vmp-recommend {
-    background: #fff;
-    padding: 0px 32px;
+    // background: #fff;
+    // padding: 0px 32px;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -169,7 +169,8 @@
     .recommend-item__content {
       display: flex;
       padding: 24px 0;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--theme-tab-content-recommend-border);
+      background-color: var(--theme-tab-content-recommend-bg);
       &__cover {
         width: 240px;
         height: 135px;
@@ -189,7 +190,7 @@
         justify-content: space-between;
         padding-left: 24px;
         &-title {
-          color: #262626;
+          color: var(--theme-tab-content-recommend-title-font);
           font-size: 28px;
           line-height: 38px;
           display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
@@ -204,17 +205,17 @@
           height: 54px;
           line-height: 54px;
           border-radius: 32px;
-          border: 1px solid #8c8c8c;
-          color: #595959;
+          border: 1px solid var(--theme-color);
+          color: var(--theme-color);
           font-size: 24px;
           text-align: center;
         }
       }
     }
     .van-cell {
+      padding: 0px 32px;
       position: relative;
       line-height: 30px;
-      padding: 0;
       &::after {
         content: '';
         display: none;

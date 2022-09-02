@@ -46,8 +46,6 @@
                 :class="statePaly ? 'vh-a-line-videopause' : 'vh-line-video-play'"
                 @click="videoPlayBtn"
               ></i>
-              <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
-              <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i> -->
               <div class="vmp-center-box" :class="isVod ? '' : 'vmp-center-box__hidden'">
                 <span>
                   {{ currentTime | secondToDate }}

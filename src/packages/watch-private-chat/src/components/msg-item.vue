@@ -150,7 +150,7 @@
       &__nick-name {
         max-width: 126px;
         font-size: 14px;
-        color: #999;
+        color: var(--theme-tab-content-private-name-font);
         line-height: 16px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -164,27 +164,27 @@
         background-color: rgba(251, 58, 50, 0.2);
         border-radius: 9px;
         &.host {
-          background: rgba(251, 58, 50, 0.2);
-          color: #fb3a32;
+          color: rgba(251, 38, 38, 1);
+          background-color: rgba(251, 38, 38, 0.15);
         }
         &.assistant {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
         }
         &.guest {
-          background-color: rgba(53, 98, 250, 0.2);
-          color: #3562fa;
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
         }
       }
       &__time {
         align-self: self-end;
         font-size: 14px;
-        color: #999999;
+        color: var(--theme-tab-content-private-time-font);
       }
       &__content-text {
         margin-top: 4px;
         font-size: 14px;
-        color: #e6e6e6;
+        color: var(--theme-tab-content-private-content-font);
       }
       &__content-link {
         color: #3562fa;

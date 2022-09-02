@@ -51,11 +51,7 @@
 
       <!-- 公众号 -->
       <div class="right_officical" v-if="officialImg">
-        <div
-          :class="'right_officical_icon ' + themeClass.iconClass"
-          :style="{ color: themeClass.pageBg }"
-          @click="goOfficical"
-        >
+        <div :class="'right_officical_icon ' + themeClass.iconClass" @click="goOfficical">
           <i class="vh-saas-iconfont vh-saas-line-public"></i>
           <p>{{ $t('nav.nav_1002') }}</p>
         </div>
@@ -66,11 +62,7 @@
         class="right_attention"
         v-if="webinarTag && webinarTag.organizers_status == 1 && webinarInfo.mode != 6"
       >
-        <div
-          :class="'right_attention_icon ' + themeClass.iconClass"
-          :style="{ color: themeClass.pageBg }"
-          @click="attentionHandler"
-        >
+        <div :class="'right_attention_icon ' + themeClass.iconClass" @click="attentionHandler">
           <i
             :class="`vh-iconfont ${
               isAttention ? 'vh-a-line-collectionsuccess' : 'vh-line-collection'
@@ -82,11 +74,7 @@
 
       <!-- 分享 -->
       <div class="right_share" v-if="isShowShare">
-        <div
-          :class="'right_share_icon ' + themeClass.iconClass"
-          :style="{ color: themeClass.pageBg }"
-          @click="goShare"
-        >
+        <div :class="'right_share_icon ' + themeClass.iconClass" @click="goShare">
           <i class="vh-iconfont vh-line-share"></i>
           <p>{{ $t('nav.nav_1013') }}</p>
         </div>
@@ -219,7 +207,7 @@
         this.skinInfo = skinInfo || {}; // 皮肤信息
         this.webinarTag = webinarTag || {}; // 活动标签
         this.setOfficicalInfo(officicalInfo);
-        this.setSkinInfo(this.skinInfo);
+        // this.setSkinInfo(this.skinInfo);
       },
       // 关注状态 从接口拿到是否关注
       attentionStatus() {
@@ -418,7 +406,7 @@
     height: 72px;
     width: 100%;
     margin-bottom: 20px;
-    background: #2a2a2a;
+    background: var(--header-background-color-base);
     &.vmp-basic-hd {
       display: none;
     }
@@ -440,9 +428,10 @@
     &_center {
       text-align: left;
       flex: 1;
-      color: @font-dark-normal;
+      color: var(--header-font-color-primary);
       .center_title {
         font-size: 18px;
+        color: var(--header-font-color-main);
         .tags {
           padding: 0 8px;
           height: 20px;
@@ -498,12 +487,12 @@
       }
       .center_host {
         font-size: 14px;
-        color: @font-dark-low;
+        color: var(--header-font-color-regular);
         .host_status {
-          color: @font-dark-low;
+          color: var(--header-font-color-regular);
           cursor: pointer;
           &:hover {
-            color: @font-link;
+            color: var(--header-font-color-link);
           }
         }
         .host_time {
@@ -539,6 +528,7 @@
       .right_share {
         padding-right: 24px;
         &_icon {
+          color: var(--header-font-color-regular);
           text-align: center;
           cursor: pointer;
           i {
@@ -556,20 +546,20 @@
             i,
             p {
               cursor: pointer;
-              color: @font-high-light-normal !important;
+              color: var(--header-tab-item-font-color) !important;
             }
           }
         }
-        .icon-revert {
-          &:hover {
-            cursor: pointer;
-            i,
-            p {
-              cursor: pointer;
-              color: @font-dark-second !important;
-            }
-          }
-        }
+        // .icon-revert {
+        //   &:hover {
+        //     cursor: pointer;
+        //     i,
+        //     p {
+        //       cursor: pointer;
+        //       color: @font-dark-second !important;
+        //     }
+        //   }
+        // }
       }
       .right_login {
         &_unuser {
@@ -592,7 +582,7 @@
           span {
             font-size: 14px;
             font-weight: 400;
-            color: #ccc;
+            color: var(--header-font-color-regular);
             line-height: 32px;
           }
         }
@@ -622,7 +612,7 @@
             span {
               font-size: 14px;
               font-weight: 400;
-              color: #ccc;
+              color: var(--header-font-color-regular);
               line-height: 32px;
             }
             &:hover {
@@ -639,7 +629,7 @@
             z-index: 11;
             border-radius: 4px;
             padding: 4px 0;
-            background: #383838;
+            background: var(--header-tab-item-dropdown-bg);
             display: none;
             ul {
               list-style: none;
@@ -647,17 +637,18 @@
                 height: 40px;
                 line-height: 40px;
                 text-align: left;
-                color: @font-dark-normal;
+                color: var(--header-tab-item-dropdown-font);
                 font-size: 14px;
                 cursor: pointer;
                 &:hover {
-                  background: #444;
+                  background: var(--header-tab-bg-color-hover);
+                  color: var(--header-tab-font-color-hover);
                 }
                 .vh-iconfont {
                   font-size: 18px;
                   margin-left: 10px;
                   margin-right: 6px;
-                  color: @font-dark-normal;
+                  color: var(--header-font-color-regular);
                   display: inline-block;
                   vertical-align: top;
                 }
@@ -665,6 +656,19 @@
             }
           }
         }
+      }
+      .el-dropdown,
+      .vmp-language-choice {
+        color: var(--header-font-color-regular);
+      }
+    }
+  }
+  .el-dropdown-menu {
+    background-color: var(--header-tab-item-dropdown-color) !important;
+    > .el-dropdown-menu__item:hover {
+      background-color: var(--header-tab-bg-color-hover) !important;
+      span {
+        color: var(--header-tab-font-color-hover) !important;
       }
     }
   }

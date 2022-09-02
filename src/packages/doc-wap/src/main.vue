@@ -347,7 +347,7 @@
           this.setRight();
         });
 
-        // 所有文档加载完成
+        // 当前文档加载完成
         this.docServer.$on('dispatch_doc_load_complete', val => {
           console.log('dispatch_doc_load_complete', val);
           this.setRight();
@@ -518,7 +518,7 @@
     min-height: 400px;
     display: flex;
     flex-direction: column;
-    background-color: #f2f2f2;
+    // background-color: #f2f2f2;
     color: #fff;
     position: relative;
     &__top {
@@ -544,7 +544,6 @@
         margin-top: -88px !important;
       }
     }
-
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
@@ -605,7 +604,6 @@
       transform: translateX(-50%);
       top: 100%;
       margin-top: 40px;
-      color: #fff;
       min-width: 90px;
       height: 40px;
       padding: 0 24px;
@@ -647,12 +645,6 @@
         .vh-iconfont {
           margin-top: 2px;
         }
-      }
-
-      .btn-doc-restore {
-      }
-
-      .btn-doc-rotate {
       }
     }
 

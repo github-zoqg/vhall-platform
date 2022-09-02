@@ -453,7 +453,7 @@
 <style lang="less">
   .vmp-footer-tools {
     height: 56px;
-    background: @bg-dark-section;
+    background: var(--chat-background-color-base);
     line-height: 56px;
     display: flex;
     justify-content: space-between;
@@ -465,7 +465,7 @@
     &__left {
       display: flex;
       align-items: center;
-      color: @font-dark-normal;
+      color: var(--chat-font-color-msg-nickname);
       font-size: 14px;
       > div {
         margin-right: 16px;

@@ -490,7 +490,7 @@
       display: flex;
       width: 60px;
       height: calc(100% - 56px);
-      background: rgba(42, 42, 42, 0.9);
+      background: var(--menu-item-menu-color);
       overflow: hidden;
       border-radius: 4px 0 0 0;
       flex-direction: column;
@@ -499,7 +499,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        color: #999;
+        color: var(--menu-item-font-color);
         font-size: 12px;
         padding: 10px 0;
         span {
@@ -507,23 +507,23 @@
         }
 
         &:not(.disable):hover {
-          color: #fb3a32;
+          color: var(--theme-color);
           cursor: pointer;
         }
 
         &.highlight {
-          color: #fb3a32;
+          color: var(--theme-color);
           cursor: pointer;
         }
 
         &.selected {
-          color: #fb3a32;
+          color: var(--theme-color);
           cursor: pointer;
         }
 
         &.selected.disable,
         &.disable {
-          color: #777777;
+          color: var(--menu-item-font-disable-color);
           cursor: not-allowed;
         }
       }
