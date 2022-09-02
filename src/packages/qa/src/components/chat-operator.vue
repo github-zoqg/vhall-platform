@@ -495,7 +495,7 @@
     }
     .vhsaas-chat-operator__textarea-placeholder {
       width: 240px;
-      background-color: @bg-dark-normal;
+      background-color: var(--chat-background-color-input);
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
