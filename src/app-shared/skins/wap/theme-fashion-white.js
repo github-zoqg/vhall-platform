@@ -90,6 +90,7 @@ export default {
   //组件
   '--theme-component-qa': '#fb2626',
   '--theme-component-subscribe': '#fb2626',
+  '--theme-component-subscribe-success-bg': '#fff',
   '--theme-component-subscribe-text': 'rgba(89, 89, 89, 1)',
   '--theme-component-subscribe-num': 'rgba(38, 38, 38, 1)',
   //报名表单
