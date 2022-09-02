@@ -908,6 +908,7 @@
     .msg-item__content-body__content-link {
       color: #3562fa;
       text-decoration: underline #3562fa !important;
+      word-break: break-all;
     }
   }
 </style>

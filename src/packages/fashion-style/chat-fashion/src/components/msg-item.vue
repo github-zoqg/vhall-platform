@@ -753,7 +753,7 @@
             font-size: 14px;
             color: var(--chat-font-color-msg-text);
             line-height: 22px;
-            // word-break: break-word;
+            word-break: break-word;
             &__mt4 {
               margin-top: 4px;
             }
@@ -918,6 +918,7 @@
     .msg-item__content-body__content-link {
       color: #3562fa;
       text-decoration: underline #3562fa !important;
+      word-break: break-all;
     }
   }
 </style>
