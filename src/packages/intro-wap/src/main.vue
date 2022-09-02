@@ -25,7 +25,7 @@
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
-              <i class="vh-iconfont vh-line-user"></i>
+              <!-- <i class="vh-iconfont vh-line-user"></i> -->
               {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
             </p>
           </template>
@@ -238,13 +238,13 @@
         color: var(--theme-tab-content-intro-subTitle-font);
         margin-top: 2px;
         p {
-          i {
-            margin-right: 8px;
-          }
-          .vh-line-user {
-            font-size: 12px;
-            line-height: 40px;
-          }
+          // i {
+          //   margin-right: 8px;
+          // }
+          // .vh-line-user {
+          //   font-size: 12px;
+          //   line-height: 40px;
+          // }
           height: 40px;
           font-size: 28px;
           font-family: Arial;
