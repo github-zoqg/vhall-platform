@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
       source: {

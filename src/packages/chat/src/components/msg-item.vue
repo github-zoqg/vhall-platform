@@ -296,7 +296,7 @@
 </template>
 <script>
   import EventBus from '../js/Events.js';
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
   export default {
