@@ -560,7 +560,7 @@
               if (this.roleName == 1) {
                 window.vhallReportForProduct?.toResultsReporting(110179, {
                   event_type: 'message',
-                  res: rawMsg
+                  ...rawMsg
                 });
               }
               handleApplyConnect(temp);
@@ -1052,7 +1052,7 @@
             _this.LocalCatchTarget_id = msg.data.target_id;
             window.vhallReportForProduct?.toResultsReporting(110180, {
               event_type: 'message',
-              res: msg
+              ...msg
             });
             if (msg.data.room_role != 2) {
               _this.$message.success({
@@ -1775,7 +1775,7 @@
           let cUser = this.onlineUsers.filter(el => {
             return el.account_id == accountId;
           });
-          window.vhallReportForProduct?.toStartReporting(110169, 110170, {
+          window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
             rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人'),
             guest_info: cUser[0]
           }); // 主持人将嘉宾设为主讲人
@@ -1785,11 +1785,14 @@
             receive_account_id: accountId
           })
           .then(res => {
-            window.vhallReportForProduct?.report(this.userId == accountId ? 110177 : 110170, {
-              request_id: res?.request_id,
-              event_type: 'interface',
-              res
-            });
+            window.vhallReportForProduct?.toResultsReporting(
+              this.userId == accountId ? 110177 : 110170,
+              {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              }
+            );
 
             console.log('setSpeaker success ::', res);
           })

@@ -698,9 +698,12 @@
           }
         });
         // 下麦成功
-        this.micServer.$on('vrtc_disconnect_success', async () => {
+        this.micServer.$on('vrtc_disconnect_success', async msg => {
           if (this.joinInfo.role_name == 4) {
-            window.vhallReportForProduct?.report(110182);
+            window.vhallReportForProduct?.toResultsReporting(110182, {
+              event_type: 'message',
+              ...msg
+            });
           }
           await this.stopPush({ type: 'vrtc_disconnect_success' });
 
@@ -832,6 +835,13 @@
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_speaker_switch', msg => {
+          if (this.joinInfo.role_name == 4) {
+            // 嘉宾被设为主讲人埋点
+            window.vhallReportForProduct?.toResultsReporting(110171, {
+              event_type: 'meassage',
+              ...msg
+            });
+          }
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
           const m =
@@ -1340,14 +1350,16 @@
         if (setMainScreen) {
           this.setMainScreen();
         }
-        window.vhallReportForProduct?.report(110176);
+        window.vhallReportForProduct?.toStartReporting(110176, 110177);
         this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId || this.joinInfo.third_party_user_id
           })
           .then(res => {
-            window.vhallReportForProduct?.report(110177, {
-              report_extra: res
+            window.vhallReportForProduct?.toResultsReporting(110177, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
             });
             console.log('setSpeaker success ::', res);
           })

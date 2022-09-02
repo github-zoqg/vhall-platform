@@ -213,13 +213,18 @@
       // 显示插播列表 dialog
       openInsertFileDialog() {
         // 检查是否可以插播文件
-        window.vhallReportForProduct.report(110163);
+        window.vhallReportForProduct.toStartReporting(110189, [110190, 110191]);
         const isCanInsert = this.checkInsertFileProcess();
-        window.vhallReportForProduct.report(110190, { report_extra: { isCanInsert } });
+        window.vhallReportForProduct.toResultsReporting(110190, {
+          event_type: 'static',
+          isCanInsert
+        });
         if (isCanInsert) {
           // 显示插播列表
           this.insertVideoVisible = true;
-          window.vhallReportForProduct.report(110191);
+          window.vhallReportForProduct.toResultsReporting(110191, {
+            event_type: 'static'
+          });
           this.getTableList({
             isNeedResetPage: true,
             isInvokeInCreated: true
@@ -296,7 +301,7 @@
       },
       // 选择本地文件插播
       selectLocalVideo() {
-        window.vhallReportForProduct?.report(110216);
+        window.vhallReportForProduct?.toReport(110216);
         // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
         if (!this.checkInsertFileProcess() || this.isShareScreen) {
           if (this.isShareScreen && this.desktopShareInfo) {
@@ -355,7 +360,7 @@
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-        window.vhallReportForProduct?.report(110217);
+        window.vhallReportForProduct?.toReport(110217);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
         );
@@ -431,7 +436,7 @@
       }, 300),
       // 云插播开始播放
       handlePlay(video) {
-        window.vhallReportForProduct.report(110197);
+        window.vhallReportForProduct?.toReport(110197);
         const insertFileServer = useInsertFileServer();
         const insertFileServerState = insertFileServer.state;
         const { watchInitData } = useRoomBaseServer().state;
@@ -477,13 +482,15 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
-            window.vhallReportForProduct.toStartReporting(110233, 110238);
+            window.vhallReportForProduct?.toResultsReporting(110233, {
+              event_type: 'static'
+            });
             this.insertFileServer
               .deleteInsertFile({
                 ids: video.id
               })
               .then(res => {
-                window.vhallReportForProduct.toResultsReporting(110238, {
+                window.vhallReportForProduct?.toResultsReporting(110238, {
                   request_id: res?.request_id,
                   event_type: 'interface',
                   res
@@ -501,7 +508,9 @@
                 }
               })
               .catch(res => {
-                window.vhallReportForProduct.report(110234);
+                window.vhallReportForProduct?.toResultsReporting(110234, {
+                  event_type: 'static'
+                });
                 this.$message({
                   message: res.msg || '删除失败',
                   showClose: true,
@@ -515,7 +524,7 @@
       // 预览页面
       handlePreview(video) {
         this.previewDialog = true;
-        window.vhallReportForProduct.report(110192);
+        window.vhallReportForProduct.toReport(110192);
         if (video.transcode_status == 1) {
           this.videoParam = {
             autoplay: true,

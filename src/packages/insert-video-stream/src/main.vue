@@ -361,7 +361,7 @@
           this.initLocalInsertFile();
         } else {
           // 云插播
-          window.vhallReportForProduct.report(110199);
+          window.vhallReportForProduct?.toReport(110199);
           this.initRemoteInsertFile();
         }
       },
@@ -507,7 +507,7 @@
         );
         this.initSlider(); // 初始化播放器控件
         this.play();
-        window.vhallReportForProduct.toStartReporting(110218);
+        window.vhallReportForProduct?.toReport(110218);
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
@@ -625,7 +625,9 @@
           isShowConfirmDialog: false
         }
       ) {
-        window.vhallReportForProduct.report(110203, { report_extra: { evt_tp: options.type } });
+        window.vhallReportForProduct?.toStartReporting(110203, [110206, 110209, 110207], {
+          evt_tp: options.type
+        });
         console.log('----关闭插播----', options.isShowConfirmDialog, options.type);
         // 如果不需要展示确认关闭按钮
         if (!options.isShowConfirmDialog) {
@@ -636,7 +638,9 @@
         if (this.isFullScreen) {
           this.exitFullScreen();
         }
-        window.vhallReportForProduct.report(110206);
+        window.vhallReportForProduct?.toResultsReporting(110206, {
+          event_type: 'static'
+        });
         this.$confirm('确认关闭插播文件，并退出插播页面吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -644,7 +648,9 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
-            window.vhallReportForProduct.report(110209);
+            window.vhallReportForProduct?.toResultsReporting(110209, {
+              event_type: 'static'
+            });
             // 关闭插播列表弹窗
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
@@ -652,7 +658,9 @@
             this.closeInsertvideoHandler();
           })
           .catch(() => {
-            window.vhallReportForProduct.report(110207);
+            window.vhallReportForProduct?.toResultsReporting(110207, {
+              event_type: 'static'
+            });
           });
       },
       // 关闭插播，还原插播状态 isliveStart 是否是开始直播调用的关闭插播的方法
@@ -1019,7 +1027,9 @@
         console.log(this.conctorObj.sliderVal, '快进');
         this._localFileVideoElement.currentTime = time;
         this.play();
-        window.vhallReportForProduct.report(110213, { report_extra: { currentTime: time } });
+        window.vhallReportForProduct?.toStartReporting(110213, 110213, {
+          currentTime: time
+        });
       },
       // 本地插播video暂停
       pause() {
