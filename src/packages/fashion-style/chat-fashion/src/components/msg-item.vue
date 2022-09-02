@@ -753,7 +753,7 @@
             font-size: 14px;
             color: var(--chat-font-color-msg-text);
             line-height: 22px;
-            word-break: break-word;
+            // word-break: break-word;
             &__mt4 {
               margin-top: 4px;
             }
