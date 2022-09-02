@@ -8,7 +8,7 @@ export default {
   '--theme-tab-menu-font-active': 'rgba(0, 0, 0, 0.85)',
   '--theme-tab-menu-tip': 'rgba(224, 185, 110, 1)',
   '--theme-tab-menu-bg': 'transparent',
-  '--theme-tab-menu-border': 'none',
+  '--theme-tab-menu-border': '1px solid rgba(255, 255, 255, 0.6)',
   // 头部
   '--theme-header-bg': 'transparent',
   '--theme-header-font-color': 'rgba(0, 0, 0, 0.65)',
