@@ -1,5 +1,9 @@
 <template>
   <div id="header" class="vh-concise-header-box">
+    <span class="rehearsalStatus" v-if="isRehearsal && isLiving">
+      <span class="dot"></span>
+      {{ $t('nav.nav_1055') }}
+    </span>
     <section class="vh-concise-header-box__1" v-if="showHeader">
       <section class="host-user-info">
         <!-- 头像 -->
@@ -99,6 +103,14 @@
       this.setSkinInfo(this.skinInfo);
     },
     computed: {
+      // 直播中
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       // 是否在小组中
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
@@ -261,6 +273,7 @@
 <style lang="less">
   .vh-concise-header-box {
     padding: 16px 24px 0 24px;
+    position: relative;
     &__1 {
       display: flex;
       justify-content: space-between;
@@ -314,6 +327,26 @@
       }
       p span {
         margin-left: 6px;
+      }
+    }
+    .rehearsalStatus {
+      color: #fb2626;
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 24px;
+      margin-right: -8px;
+      position: absolute;
+      right: 32px;
+      bottom: -34px;
+      .dot {
+        position: absolute;
+        top: 6px;
+        left: -18px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #fb2626;
+        content: '';
       }
     }
     &__tool-box {
