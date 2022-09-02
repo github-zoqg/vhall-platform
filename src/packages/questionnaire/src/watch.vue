@@ -134,7 +134,7 @@
 </script>
 <style lang="less">
   .el-loading-spinner .path {
-    stroke: var(--theme-color) !important;
+    stroke: #fb3a32;
   }
   .el-loading-spinner .el-loading-text {
     color: #1a1a1a;
