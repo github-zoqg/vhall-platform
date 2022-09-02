@@ -19,7 +19,7 @@
     box-sizing: border-box;
     .line {
       width: 100%;
-      border: 1px dashed #999;
+      border: 1px dashed var(--theme-tab-content-split-bg);
     }
   }
 </style>

@@ -23,7 +23,7 @@
       margin: 20px 0px;
       font-size: 14px;
       font-weight: 400;
-      color: #f7f7f7;
+      color: var(--theme-tab-content-title-font);
       line-height: 22px;
       text-align: center;
       padding: 0px 24px;

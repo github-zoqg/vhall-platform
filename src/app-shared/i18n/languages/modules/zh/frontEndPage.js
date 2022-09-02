@@ -71,7 +71,8 @@ export default {
     player_1023: '调整播放时间失败',
     player_1024: '设置当前时间失败,请稍后重试',
     player_1025: '正常',
-    player_1026: '直播回放中'
+    player_1026: '直播回放中',
+    player_1027: '现在没有进行彩排，下次再来参与吧'
   },
   appointment: {
     appointment_1001: '白名单验证',
@@ -105,7 +106,8 @@ export default {
     appointment_1029: '秒',
     appointment_1030: '活动主办方设置了试看',
     appointment_1031: '请耐心等待',
-    appointment_1032: '白名单'
+    appointment_1032: '白名单',
+    appointment_1033: '彩排已开始，请观看直播吧'
   },
   nav: {
     nav_1001: '主办方',
@@ -160,7 +162,9 @@ export default {
     nav_1050: '主播还未开启邀请哦',
     nav_1051: '支付宝',
     nav_1052: '复制失败',
-    nav_1053: '主办方'
+    nav_1053: '主办方',
+    nav_1054: '分享彩排观看地址',
+    nav_1055: '彩排中'
   },
   login: {
     login_1001: '账号登录',
@@ -275,7 +279,7 @@ export default {
     chat_1010: '发送成功',
     chat_1011: '发送失败',
     chat_1012: '只看主办方',
-    chat_1013: '屏蔽礼物特效',
+    chat_1013: '屏蔽特效',
     chat_1014: '已开启只看主办方',
     chat_1015: '已关闭只看主办方',
     chat_1016: '已屏蔽特效',
@@ -346,7 +350,7 @@ export default {
     chat_1091: '处理时间',
     chat_1092: '直播已结束，当前禁止发言',
     chat_1093: '点击查看',
-    chat_1094: '仅看聊天信息',
+    chat_1094: '仅查看聊天内容',
     chat_1095: '聊天设置',
     chat_1096: '已开启仅查看聊天内容',
     chat_1097: '已关闭仅查看聊天内容',

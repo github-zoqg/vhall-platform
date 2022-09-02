@@ -248,7 +248,7 @@
         width: 152px;
         height: 40px;
         text-align: center;
-        background: #fb3a32;
+        background: var(--theme-color);
         border-radius: 20px;
         border: none;
         font-weight: 400;

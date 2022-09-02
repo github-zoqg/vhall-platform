@@ -148,6 +148,7 @@
     height: 100%;
     box-sizing: border-box;
     padding: 20px;
+    background: var(--theme-chapter-list-bg);
     ul {
       display: block;
       width: 100%;
@@ -159,7 +160,6 @@
       font-size: 30px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #555;
     }
     li {
       display: block;
@@ -167,7 +167,12 @@
       min-height: 80px;
 
       .active {
-        color: #fb3a32;
+        .title {
+          color: var(--theme-chapter-font-color-active);
+        }
+        .time {
+          color: var(--theme-chapter-font-color-active);
+        }
       }
       div {
         height: 100%;
@@ -188,10 +193,12 @@
       overflow: hidden;
       word-break: break-all;
       vertical-align: middle;
+      color: var(--theme-chapter-font-color-title);
     }
     .time {
       display: inline-block;
       width: 20%;
+      color: var(--theme-chapter-font-color-time);
     }
     .step-info {
       margin-left: 25px;
