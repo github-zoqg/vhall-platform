@@ -492,7 +492,7 @@ export default {
     interact_tools_1020: 'List of winners',
     interact_tools_1021: 'Lottery is in progress',
     interact_tools_1022: 'Unfortunately, you did not win a prize!',
-    interact_tools_1023: 'Congratulations on your winning!',
+    interact_tools_1023: 'Congratulations!',
     interact_tools_1024: 'Sign in',
     interact_tools_1025: 'Host initiates sign-in...',
     interact_tools_1026: 'Sign in now',

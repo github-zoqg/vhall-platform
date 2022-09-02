@@ -16,18 +16,26 @@
             v-if="formInfo.intro"
             :class="[
               'title-box__intro-text',
-              overflowStatus ? 'title-box__intro-text-ellipsis' : 'title-box__intro-text-padding'
+              overflowStatus
+                ? 'title-box__intro-text-ellipsis'
+                : showToggle && !overflowStatus
+                ? 'title-box__intro-text-padding'
+                : ''
             ]"
           >
             {{ formInfo.intro }}
-            <span @click="changeFoldStatus(false)" class="text-tail" v-show="overflowStatus">
+            <span
+              @click="changeFoldStatus(false)"
+              class="text-tail"
+              v-show="overflowStatus && showToggle"
+            >
               <span class="is-ellipsis">...</span>
               {{ $t('form.form_1011') }}
             </span>
             <span
               @click="changeFoldStatus(true)"
               class="text-tail text-tail-2"
-              v-show="!overflowStatus"
+              v-show="!overflowStatus && showToggle"
             >
               <span class="is-ellipsis"></span>
               {{ $t('form.form_1012') }}
@@ -109,7 +117,7 @@
                     v-model="form[`${question.id}${radioItem.id}`]"
                     v-if="radioItem.type === 1 && radioItem.id == form[question.id]"
                     maxlength="60"
-                    :placeholder="$t('form.form_1080')"
+                    :placeholder="$t('form.form_1017')"
                     type="text"
                   ></textarea>
                 </div>
@@ -410,6 +418,7 @@
         isSubscribe: 0,
         //简介文字是否超长
         overflowStatus: false,
+        showToggle: false,
         //当前激活的tab
         activeTab: 1,
         // 手机短信验证是都开启
@@ -784,7 +793,10 @@
           .then(res => {
             if (res.code == 200) {
               // 如果独立链接无效，显示无效页
-              this.formOpenLinkStatus = res.data.available == 0 ? 2 : 1;
+              this.formOpenLinkStatus = !res.data.has_registed && res.data.available == 0 ? 2 : 1;
+              if (res.data.has_registed) {
+                this.jumpPage();
+              }
             } else {
               this.formOpenLinkStatus = 2;
             }
@@ -870,7 +882,7 @@
         const twoHeight = this.$refs.noVisible.offsetHeight;
         const curHeight = txtDom.offsetHeight;
         if (curHeight > twoHeight) {
-          this.overflowStatus = true;
+          this.showToggle = true;
         }
       },
       //获取问题列表
@@ -1704,25 +1716,7 @@
                 localStorage.setItem('visitorId', res.data.visit_id);
                 this.$toast(this.$t('form.form_1033'));
                 // 跳转专题详情 还是 活动报名表单详情
-                if (this.interfaceType === 'subject') {
-                  const queryString = this.returnQueryString('subject');
-                  location.replace(
-                    window.location.protocol +
-                      process.env.VUE_APP_WAP_WATCH +
-                      process.env.VUE_APP_WEB_KEY +
-                      `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
-                  );
-                } else {
-                  const queryString = this.returnQueryString();
-                  location.replace(
-                    window.location.protocol +
-                      process.env.VUE_APP_WAP_WATCH +
-                      process.env.VUE_APP_WEB_KEY +
-                      `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
-                        this.webinarOrSubjectId
-                      }${queryString}`
-                  );
-                }
+                this.jumpPage();
               } else {
                 this.$toast(this.$t('form.form_1034'));
                 this.activeTab = 1;
@@ -1831,6 +1825,28 @@
           fetch(url);
         } catch (e) {
           console.warn('数据上报出错', e);
+        }
+      },
+      // 跳转对应页面
+      jumpPage() {
+        if (this.interfaceType === 'subject') {
+          const queryString = this.returnQueryString('subject');
+          location.replace(
+            window.location.protocol +
+              process.env.VUE_APP_WAP_WATCH +
+              process.env.VUE_APP_WEB_KEY +
+              `/special/detail?id=${this.webinarOrSubjectId}${queryString}`
+          );
+        } else {
+          const queryString = this.returnQueryString();
+          location.replace(
+            window.location.protocol +
+              process.env.VUE_APP_WAP_WATCH +
+              process.env.VUE_APP_WEB_KEY +
+              `/lives${this.isEmbed ? '/embedclient' : ''}/watch/${
+                this.webinarOrSubjectId
+              }${queryString}`
+          );
         }
       }
     }

@@ -135,7 +135,11 @@
     data() {
       return {
         defaultLogoUrl: require('./img/logo-red@2x.png'),
-        webinarInfo: {}, //活动的信息
+        webinarInfo: {
+          userinfo: {
+            nickname: ''
+          }
+        }, //活动的信息
         skinInfo: {}, //皮肤的信息
         webinarTag: {}, // 活动标识
         officialImg: '',
