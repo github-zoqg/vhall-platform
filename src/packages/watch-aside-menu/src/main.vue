@@ -192,7 +192,7 @@
           this.selectedMenu = 'document';
         }
       }
-      if (this.groupServer.state.groupInitData.isInGroup) {
+      if (this.groupServer.state.groupInitData.isInGroup && this.webinarType == 1) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
         this.grouAlert(
           `${

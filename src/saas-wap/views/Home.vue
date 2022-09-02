@@ -124,7 +124,10 @@
             console.log('嵌入', e);
           }
           const domain = await this.initReceiveLive(clientType);
-          if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          if (
+            roomBaseServer.state.watchInitData.live_type != 2 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
+          ) {
             // 是否跳转预约页
             this.goSubscribePage(clientType);
             return;
@@ -185,7 +188,7 @@
       },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
-        const { token } = this.$route.query;
+        const { token, rehearsal } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
@@ -197,6 +200,7 @@
           initRoom: {
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
+            live_type: rehearsal == 1 ? 2 : 0, // 2 彩排   0 正式
             ...this.$route.query // 第三方地址栏传参
           },
           // 日志上报的参数

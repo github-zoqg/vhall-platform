@@ -31,47 +31,50 @@ if (openLog) {
   }
 }
 
-// 重写console.log
-console.log = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.log);
+// 只有生产环境才重写console方法
+if (isProd) {
+  // 重写console.log
+  console.log = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.log);
 
-// 重写console.info
-console.info = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.info);
+  // 重写console.info
+  console.info = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.info);
 
-// 重写console.warn
-console.warn = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.warn);
+  // 重写console.warn
+  console.warn = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.warn);
 
-// 重写console.error
-console.error = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.error);
+  // 重写console.error
+  console.error = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.error);
 
-// 重写console.table
-console.table = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.table);
+  // 重写console.table
+  console.table = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.table);
+}

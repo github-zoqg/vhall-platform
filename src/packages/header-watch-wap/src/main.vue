@@ -5,6 +5,10 @@
       {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
     <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+      <span class="rehearsalStatus" v-if="isRehearsal && isLiving">
+        <span class="dot"></span>
+        {{ $t('nav.nav_1055') }}
+      </span>
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
         class="vh-saas-iconfont vh-saas-line-public1"
@@ -54,6 +58,14 @@
       this.setSkinInfo(this.skinInfo);
     },
     computed: {
+      // 直播中
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       /**
        * 是否显示头部
        */
@@ -227,6 +239,24 @@
       i {
         margin-left: 37px;
         font-size: 30px;
+      }
+      .rehearsalStatus {
+        color: #fb2626;
+        font-weight: 400;
+        font-size: 24px;
+        line-height: 24px;
+        margin-right: -8px;
+        position: relative;
+        .dot {
+          position: absolute;
+          top: 6px;
+          left: -18px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background-color: #fb2626;
+          content: '';
+        }
       }
     }
     .icon-default {

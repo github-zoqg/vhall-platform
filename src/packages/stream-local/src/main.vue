@@ -798,7 +798,7 @@
             }
 
             // 由于结束直播导致的结束讨论
-            if (msg.data.over_live == 1) {
+            if (msg.data.over_type) {
               // 此处仅处理非主持人的角色
               if (this.joinInfo.role_name != 1) {
                 await this.stopPush();

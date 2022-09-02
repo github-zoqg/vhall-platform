@@ -73,7 +73,8 @@ export default {
     player_1023: 'Ajustar el tiempo de reproducción falló',
     player_1024: 'El tiempo de configuración falló, inténtelo de nuevo más tarde',
     player_1025: '',
-    player_1026: 'replaying'
+    player_1026: 'replaying',
+    player_1027: 'There is no rehearsal now, please come again next time'
   },
   appointment: {
     appointment_1001: 'Verificación de lista blanca',
@@ -109,7 +110,8 @@ export default {
     appointment_1029: 'Segundo',
     appointment_1030: 'El patrocinador de la actividad configuró una prueba de video',
     appointment_1031: 'Por favor sea paciente',
-    appointment_1032: 'Lista blanca'
+    appointment_1032: 'Lista blanca',
+    appointment_1033: 'The rehearsal has started, please watch it live'
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -164,7 +166,9 @@ export default {
     nav_1050: 'Anchor aún no ha activado la invitación',
     nav_1051: '',
     nav_1052: '',
-    nav_1053: ''
+    nav_1053: '',
+    nav_1054: 'Share the rehearsal viewing address',
+    nav_1055: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',

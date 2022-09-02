@@ -42,6 +42,10 @@
       </div>
     </div>
     <div class="vmp-header-watch_right">
+      <div class="rehearsalStatus" v-if="isRehearsal && isLiving">
+        <i class="dot"></i>
+        {{ $t('nav.nav_1055') }}
+      </div>
       <!-- 多语言 -->
       <vmp-air-container :cuid="cuid"></vmp-air-container>
 
@@ -149,6 +153,14 @@
       };
     },
     computed: {
+      // 直播中
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       // 主办方跳转地址
       // create_user_url() {
       //   const { watchInitData } = this.roomBaseServer.state;
@@ -504,6 +516,24 @@
       padding-right: 32px;
       align-items: center;
       justify-content: center;
+      .rehearsalStatus {
+        color: #fb3a32;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        margin-right: 19px;
+        position: relative;
+        .dot {
+          position: absolute;
+          top: 6px;
+          left: -12px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #fb3a32;
+          content: '';
+        }
+      }
       .right_officical,
       .right_attention,
       .right_share {
