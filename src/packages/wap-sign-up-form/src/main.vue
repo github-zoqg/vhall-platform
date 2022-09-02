@@ -1852,56 +1852,8 @@
         }
       },
       setPageConfig() {
-        const themeMap = {
-          1: 'black',
-          2: 'white',
-          3: 'red',
-          4: 'blue',
-          5: 'golden'
-        };
-
-        // TODO:暂时注掉，使用写死的值调试
-        // const skinInfo = this.$domainStore.state.roomBaseServer.watchInitData.skinInfo;
-        // TODO:调试代码
-        const skinInfo = JSON.parse(sessionStorage.getItem('skinInfo')) || {
-          style: 1,
-          bgColor: 2
-        };
-
-        // TODO:调试代码
-        this.$domainStore.state.roomBaseServer.watchInitData.skinInfo = skinInfo;
-        sessionStorage.setItem('skinInfo', JSON.stringify(skinInfo));
-
-        // 设置主题，如果没有就用传统风格白色
-        const style = 'main';
-        const theme = themeMap[skinInfo?.bgColor || 2];
-
-        console.log('----设置主题为----', `theme_${style}_${theme}`);
-
-        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
-        this.drawBody(style, theme);
-
-        // 挂载到window方便调试
         window.skins = skins;
-      },
-      drawBody(style, theme) {
-        if (style == 'main' && (theme == 'black' || theme == 'white')) {
-          if (theme == 'black') {
-            document.body.style.background = `#262626`;
-          }
-          if (theme == 'white') {
-            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
-          }
-        } else {
-          document.body.style.backgroundImage = `url(${
-            '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
-            style +
-            '_' +
-            theme +
-            '.png'
-          })`;
-          document.body.style.backgroundSize = 'cover';
-        }
+        skins.setTheme(skins.themes.theme_main_white);
       }
     }
   };

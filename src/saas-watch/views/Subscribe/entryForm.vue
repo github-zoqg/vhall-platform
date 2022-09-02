@@ -10,6 +10,7 @@
 <script>
   import { useEntryformServer, useRoomBaseServer } from 'middle-domain';
   import errorPage from '../ErrorPage/index.vue';
+  import skins from '@/app-shared/skins/watch';
   export default {
     name: 'Entryform',
     components: {
@@ -30,8 +31,13 @@
     },
     async created() {
       this.interfaceType === 'webinar' ? this.initWebinarInfo() : this.initSubjectInfo();
+      this.setPageConfig();
     },
     methods: {
+      setPageConfig() {
+        window.skins = skins;
+        skins.setTheme(skins.themes.theme_default_black);
+      },
       async initWebinarInfo() {
         // await this.getGrayConfig();
         this.getFormOpenLinkStatus();
