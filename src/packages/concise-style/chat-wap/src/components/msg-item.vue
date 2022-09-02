@@ -514,14 +514,15 @@
           > .normal-msg {
             > .textInfo {
               line-height: 38px;
-              span {
-                word-break: break-word;
-              }
+              // span {
+              //   word-break: break-word;
+              // }
               .nickname {
                 color: rgba(255, 255, 255, 0.65);
               }
               .chat-text {
                 color: rgba(255, 255, 255, 1);
+                word-break: break-word;
               }
             }
             > .imgs {
