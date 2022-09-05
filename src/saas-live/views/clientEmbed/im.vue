@@ -20,6 +20,7 @@
   import chrome from '../Chrome.vue';
   import tip from '../MsgTip.vue';
   import { Domain, useRoomBaseServer } from 'middle-domain';
+  import skins from '@/app-shared/skins/watch';
   export default {
     components: {
       chrome,
@@ -52,6 +53,7 @@
         });
         console.log(domain);
         await clientImState();
+        this.setPageConfig();
         this.initAssistantMsg();
         this.state = 1;
       } catch (err) {
@@ -121,6 +123,12 @@
             method: 'post' // 上报方式
           }
         });
+      },
+      setPageConfig() {
+        const style = 'default';
+        const theme = 'black';
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        document.body.style.background = `rgb(26, 26, 26)`;
       }
     }
   };
