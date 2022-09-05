@@ -216,6 +216,7 @@
       padding: 0px 32px;
       position: relative;
       line-height: 30px;
+      background-color: var(--theme-tab-content-recommend-bg);
       &::after {
         content: '';
         display: none;
