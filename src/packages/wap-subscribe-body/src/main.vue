@@ -651,9 +651,10 @@
           }
           // 邀请卡分享
           queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-          // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
-          // TODO: 重定向改为了路由跳转
-          this.$router.push(`/lives/entryform/${this.$route.params.id}${queryString}`);
+          // 界面跳转（此功能跳转，报名表单数据收集的时候，已没有init接口拿取参会信息，数据埋点上报跟之前反馈给产品的一样，走上报中设定的兼容逻辑）
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+          // TODO: 重定向改为了路由跳转（不能用$router.push跳转，有可能导致多个Serve被创建。）
+          // this.$router.push(`/lives/entryform/${this.$route.params.id}${queryString}`);
         }
       },
       webinarPayAuth() {
