@@ -491,6 +491,7 @@
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
+          window.vhallReportForProduct?.toReport(110241);
           window.vhallReportForProduct?.toReport(110247);
         } else {
           window.vhallReportForProduct?.toReport(110256);
@@ -543,7 +544,7 @@
                 streamId: this.isShareScreen
               });
             } else {
-              window.vhallReportForProduct?.report(110251);
+              window.vhallReportForProduct?.toReport(110251);
               window.vhallReportForProduct?.toStartReporting(110254, 110255);
               this.desktopShareServer
                 .publishDesktopShareStream()
@@ -567,7 +568,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            window.vhallReportForProduct?.report(110252);
+            window.vhallReportForProduct?.toReport(110252);
             if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;

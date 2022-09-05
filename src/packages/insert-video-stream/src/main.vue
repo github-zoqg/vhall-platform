@@ -999,6 +999,7 @@
         }
         window.vhallReportForProduct.toReport(110212, {
           report_extra: {
+            type: 'localInsert',
             file_info: '',
             pre_status: ispaused ? 'pause' : 'playing',
             after_atatus: ispaused ? 'playing' : 'pause'

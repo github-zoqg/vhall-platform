@@ -231,6 +231,16 @@
       },
       videoPlayBtn() {
         this.statePaly ? this.playerServer.pause() : this.playerServer.play();
+        if (this.isInsertVideoPreview) {
+          window.vhallReportForProduct.toReport(110212, {
+            report_extra: {
+              type: 'yunInsert',
+              file_info: '',
+              pre_status: this.statePaly ? 'playing' : 'pause',
+              after_atatus: this.statePaly ? 'pause' : 'playing'
+            }
+          });
+        }
       },
       setVideo() {
         const time = (this.sliderVal / 100) * this.totalTime; // 快进
