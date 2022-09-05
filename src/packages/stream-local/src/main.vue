@@ -563,6 +563,42 @@
         this.startPushStreamOnce = true;
         this.startPush();
       },
+      // 取消订阅当前所有互动流
+      unSubscribeAll() {
+        const speakStreamId = this.micServer.state.speakerList.map(el => {
+          return el.streamId;
+        });
+        console.log('上麦列表-as', speakStreamId);
+        return new Promise((resolve, reject) => {
+          const promiseResults = [];
+          let iteratorIndex = 0;
+          // 已完成的数量，用于最终的返回，不能直接用完成数量作为iteratorIndex
+          // 输出顺序和完成顺序是两码事
+          let fullCount = 0;
+          // 用于迭代iterator数据
+          for (const item of speakStreamId) {
+            let resultIndex = iteratorIndex;
+            iteratorIndex += 1;
+            this.interactiveServer
+              .unSubscribeStream(item)
+              .then(res => {
+                console.log('resultIndex', resultIndex, res);
+                promiseResults[resultIndex] = res;
+                fullCount += 1;
+                if (fullCount === iteratorIndex) {
+                  resolve(promiseResults);
+                }
+              })
+              .catch(err => {
+                reject(err);
+              });
+          }
+          // 处理空 iterator 的情况
+          if (iteratorIndex === 0) {
+            resolve(promiseResults);
+          }
+        });
+      },
       /**
        *
        * @description: 视频轮巡推流
@@ -577,6 +613,9 @@
           try {
             if (this.$domainStore.state.interactiveServer.isInstanceInit) {
               // 如果存在互动实例需要销毁，重新初始化
+              await sleep(1000);
+              const unsub = await this.unSubscribeAll();
+              console.log('unSubscribeAll', unsub);
               await this.interactiveServer.destroy();
             }
             await this.interactiveServer.init({ videoPolling: true });
