@@ -69,7 +69,7 @@ export default {
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(0, 0, 0, 0.45)',
   //footer
-  '--footer-color-font': color_text_2,
+  '--footer-color-font': 'rgba(0, 0, 0, 0.45)',
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,
