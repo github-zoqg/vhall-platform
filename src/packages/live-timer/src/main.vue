@@ -415,8 +415,8 @@
             action_type: status,
             duration: this.totalTimeNum || this.time,
             remain_time: this.time,
-            is_all_show: this.is_all_show ? 1 : 0,
-            is_timeout: this.is_timeout ? 1 : 0
+            is_all_show: this.is_all_show == 0 ? 0 : 1,
+            is_timeout: this.is_timeout == 0 ? 0 : 1
           })
           .then(res => {
             console.log(res);
