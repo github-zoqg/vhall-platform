@@ -25,7 +25,7 @@
           <img :src="noDelayIconUrl" alt="" />
         </span>
       </div>
-      <div class="center_host">
+      <div class="center_host" v-if="webinarTag && webinarTag.organizers_status == 1">
         <span class="host_status" @click="goUser">
           {{ $t('nav.nav_1001') }}：{{ webinarInfo.userinfo.nickname }}
         </span>
