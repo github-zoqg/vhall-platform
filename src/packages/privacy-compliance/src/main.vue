@@ -155,7 +155,12 @@
         line-height: 20px;
       }
       &.scene_lottery {
-        margin-bottom: 8px;
+        position: absolute;
+        bottom: 34px;
+        padding: 0 0;
+        margin: 0 0;
+        width: 300px;
+        text-align: center;
         span {
           font-size: 12px;
           line-height: 17px;
