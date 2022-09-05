@@ -71,7 +71,7 @@
               <span class="nickname">{{ item.nick_name | overHidden(8) }}</span>
               <span class="num">
                 <i18n path="nav.nav_1037">
-                  <span style="color: #fb3a32" place="n">
+                  <span class="n" place="n">
                     &nbsp;{{ item.invites | filterInvitePeople }}&nbsp;
                   </span>
                 </i18n>
@@ -116,9 +116,7 @@
               <span class="nickname">{{ item.nickname | overHidden(8) }}</span>
               <span class="num">
                 <i18n path="interact_tools.interact_tools_1073">
-                  <span style="color: #fb3a32" place="n">
-                    ¥{{ item.reward_amount | filterAmount }}
-                  </span>
+                  <span class="n" place="n">¥{{ item.reward_amount | filterAmount }}</span>
                 </i18n>
                 <!-- 打赏
                 <span style="color: #fc5659">{{ item.reward_amount | filterAmount }}</span>
@@ -404,7 +402,7 @@
   .rank-previewbox {
     .ranking-title {
       font-size: 14px;
-      color: #fff;
+      color: var(--theme-tab-content-rank-title-font);
       line-height: 20px;
       height: 20px;
       // margin: 0 10px;
@@ -432,7 +430,7 @@
           font-size: 14px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: #fb3a32;
+          color: var(--theme-color);
           // line-height: 16px;
           // opacity: 1;
         }
@@ -442,7 +440,7 @@
         right: -10px;
         top: 0;
         font-size: 12px;
-        color: @font-dark-low;
+        color: var(--theme-tab-content-rank-rule-font);
         &:hover {
           cursor: pointer;
         }
@@ -457,7 +455,7 @@
 
     .rank-band {
       text-align: center;
-      height: 570px;
+      height: 100%;
       overflow-y: auto;
 
       &::-webkit-scrollbar {
@@ -483,7 +481,7 @@
         text-align: center;
         font-size: 14px;
         font-weight: 400;
-        color: #999999;
+        color: var(--theme-tab-content-rank-finish-font);
         line-height: 20px;
         margin-top: 10px;
       }
@@ -503,7 +501,7 @@
         font-size: 14px;
         color: #e6e6e6;
         text-align: left;
-        border-bottom: 1px solid #444444;
+        border-bottom: 1px solid var(--theme-tab-content-rank-split-bg);
         position: relative;
         &:after {
           clear: both;
@@ -578,11 +576,16 @@
           width: 60%;
           text-align: left;
           vertical-align: top;
+          color: var(--theme-tab-content-rank-content-font);
         }
         .num {
           // float: right;
           position: absolute;
           right: 0px;
+          color: var(--theme-tab-content-rank-content-invite-font);
+          .n {
+            color: var(--theme-color);
+          }
         }
       }
       .default-icon {
@@ -593,7 +596,7 @@
       }
       .default-tip {
         font-size: 12px;
-        color: #6f6f6f;
+        color: var(--theme-tab-content-rank-noData-font);
         display: inline-block;
         width: 100%;
         text-align: center;
@@ -605,20 +608,24 @@
       height: 30px;
       line-height: 30px;
       text-align: center;
-      color: #4da1ff;
       text-align: center;
       font-size: 14px;
       padding: 5px 0px;
       border-radius: 20px;
-      border: 1px solid #666666;
+      // border: 1px solid var(--theme-tab-content-rank-content-invite-btn-border);
       margin: 8px 0px;
+      // &:hover {
+      //   background-color: var(--theme-color);
+      //   color: var(--theme-tab-content-rank-content-invite-btn-font);
+      //   border: 1px solid var(--theme-tab-content-rank-content-invite-btn-font);
+      // }
       span {
         display: inline-block;
         width: 60%;
         height: 100%;
         font-size: 14px;
         font-weight: 400;
-        color: #e6e6e6;
+        color: var(--theme-color);
         line-height: 20px;
         &:hover {
           cursor: pointer;
@@ -631,7 +638,7 @@
       left: 0px;
       width: 100%;
       height: 184px;
-      background: rgba(51, 51, 51, 0.95);
+      background: var(--theme-tab-content-rank-rule-content-bg);
       padding: 12px 24px;
       box-sizing: border-box;
       overflow-y: scroll;
@@ -649,7 +656,7 @@
         height: 100%;
       }
       .rank-con {
-        color: #e6e6e6;
+        color: var(--theme-tab-content-rank-rule-content-font);
         width: 100%;
       }
       .center {

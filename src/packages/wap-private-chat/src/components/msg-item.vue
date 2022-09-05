@@ -167,7 +167,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: #666;
+            color: var(--theme-tab-content-private-name-font);
             max-width: 300px;
             height: 26px;
             line-height: 26px;
@@ -179,29 +179,29 @@
             border-radius: 50px;
             font-size: 20px;
             &.host {
-              background-color: rgba(252, 86, 89, 0.2);
-              color: #fb3a32;
+              color: rgba(251, 38, 38, 1);
+              background-color: rgba(251, 38, 38, 0.15);
             }
             &.assistant {
-              background-color: rgba(166, 166, 166, 0.2);
-              color: #a6a6a6;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
             &.guest {
-              background-color: rgba(77, 161, 255, 0.2);
-              color: #4da1ff;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
           }
           .send_time {
             font-size: 24px;
             font-weight: 400;
-            color: #8c8c8c;
+            color: var(--theme-tab-content-private-time-font);
           }
         }
         .msg-content_body {
           display: inline-block;
           margin-top: 5px;
           padding: 18px 20px;
-          color: #444;
+          color: var(--theme-tab-content-private-content-font);
           line-height: 36px;
           background-color: #f7f7f7;
           width: fit-content;

@@ -24,7 +24,7 @@
           >
             <span class="item-text">{{ $tdefault(item.name) }}</span>
             <i v-show="item.tipsVisible" class="tips"></i>
-            <hr class="bottom-line" :style="themeBgColor" />
+            <hr class="bottom-line" />
           </li>
         </ul>
       </div>
@@ -33,7 +33,7 @@
       <span
         v-if="isToggleBtnVisible"
         class="vmp-tab-menu-page-btn next-btn"
-        :class="{ disabledClick: selectedIndex === menu.length - 1 }"
+        :class="{ disabledClick: selectedIndex === visibleMenu.length - 1 }"
         @click="next"
       >
         <i class="vh-iconfont vh-line-arrow-right" />
@@ -81,11 +81,11 @@
       };
     },
     computed: {
-      themeBgColor() {
-        return {
-          'background-color': this.themeClass.pageBg
-        };
-      },
+      // themeBgColor() {
+      //   return {
+      //     'background-color': this.themeClass.pageBg
+      //   };
+      // },
       // 是否观看端
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
@@ -159,24 +159,24 @@
     },
     async mounted() {
       await this.$nextTick(0);
-      this.setSkinInfo();
+      // this.setSkinInfo();
       this.selectDefault();
     },
     methods: {
-      async setSkinInfo() {
-        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+      // async setSkinInfo() {
+      //   const { skinInfo } = this.$domainStore.state.roomBaseServer;
 
-        // 默认皮肤
-        if (!skinInfo || !skinInfo.skin_json_pc || skinInfo.status != 1) {
-          this.themeClass.pageBg = '#fb3a32';
-          return;
-        }
+      //   // 默认皮肤
+      //   if (!skinInfo || !skinInfo.skin_json_pc || skinInfo.status != 1) {
+      //     this.themeClass.pageBg = '#fb3a32';
+      //     return;
+      //   }
 
-        // 自定义皮肤
-        await this.$nextTick();
-        const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
-        this.themeClass.pageBg = pageStyle;
-      },
+      //   // 自定义皮肤
+      //   await this.$nextTick();
+      //   const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
+      //   this.themeClass.pageBg = pageStyle;
+      // },
       updateAuth() {
         const configList = this.roomBaseServer.state.configList;
         this.auth.member = configList.members_manager;
@@ -538,15 +538,15 @@
   .vmp-tab-menu {
     height: 100%;
     font-size: 14px;
-
+    background-color: var(--chat-background-color-base);
     &__header {
       flex: 0 0 auto;
       box-sizing: border-box;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid var(--tab-menu-bg-border);
       display: flex;
       height: 45px;
       user-select: none;
-
+      background-color: var(--chat-background-color-base);
       .vmp-tab-menu-page-btn {
         position: relative;
         display: inline-flex;
@@ -557,24 +557,33 @@
         height: 100%;
         text-align: center;
         font-size: 14px;
-        color: #999;
+        color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
 
+        &.next-btn {
+          background: linear-gradient(270deg, rgba(0, 0, 0, 0.0625) 34.44%, rgba(0, 0, 0, 0) 100%);
+        }
+        &.prev-btn {
+          background: linear-gradient(270deg, rgba(0, 0, 0, 0) 34.44%, rgba(0, 0, 0, 0.0625) 100%);
+        }
         i {
           font-size: 14px;
           cursor: pointer;
         }
 
-        &.disabledClick:hover {
-          i {
-            cursor: pointer;
-            color: @border-lighter-color;
+        &.disabledClick {
+          cursor: default;
+          &:hover {
+            i {
+              cursor: default;
+              color: var(--tab-menu-btn-color);
+            }
           }
         }
 
         &:hover {
-          color: #e6e6e6;
+          color: var(--tab-menu-btn-color-hover);
         }
       }
 
@@ -611,16 +620,17 @@
           }
           .tips {
             position: absolute;
-            right: 10px;
+            right: 13px;
             top: 10px;
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background-color: #fb3a32;
+            background-color: var(--theme-color);
           }
           .bottom-line {
             display: none;
             position: absolute;
+            background-color: var(--theme-color);
             border: none;
             border-radius: 2px 2px 0 0;
             bottom: 1px;
@@ -637,7 +647,7 @@
           }
 
           &__active {
-            color: #ccc;
+            color: var(--theme-color);
 
             .item-text {
               position: relative;
@@ -654,6 +664,7 @@
     &__main {
       height: calc(100% - 46px);
       overflow: hidden;
+      background-color: var(--chat-background-color-base);
     }
 
     /*滚动条*/

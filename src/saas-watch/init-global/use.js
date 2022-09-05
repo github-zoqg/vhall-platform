@@ -80,6 +80,10 @@ import VmpViewRestriction from '@/packages/view-restriction/index';
 import VmpSubjectBody from '@/packages/subject-body/index';
 import VmpSubjectHeader from '@/packages/subject-header/index';
 
+// ------------------------------【时尚风格】引入组件------start----------
+import VmpFashionChat from '@/packages/fashion-style/chat-fashion';
+// ------------------------------【时尚风格】引入组件------end----------
+
 // 全局注册组件
 // Vue.use(ElementUI);
 Vue.use(VmpContainer);
@@ -146,3 +150,7 @@ Vue.use(VmpInsertStream);
 Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
+
+// ------------------------------【时尚风格】注册组件------start----------
+Vue.use(VmpFashionChat);
+// ------------------------------【时尚风格】注册组件------end----------

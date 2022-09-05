@@ -77,7 +77,7 @@
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
-        <img src="./../img/load.gif" />
+        <van-loading color="#ffffff" />
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -332,7 +332,9 @@
           }
         });
         const str =
-          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+          msg.data.type == 'vrtc_speaker_switch'
+            ? this.$t('interact.interact_1034')
+            : this.$t('interact.interact_1033');
         this.$toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
@@ -628,8 +630,8 @@
         z-index: 1;
         background: #000;
         img {
-          width: 88px;
-          height: 88px;
+          width: 66px;
+          height: 66px;
         }
       }
       .opcity-flase {

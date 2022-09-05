@@ -192,7 +192,7 @@
       display: inline-block;
       width: 320px;
       height: 90px;
-      background: #fb2626;
+      background: var(--theme-component-subscribe);
       border-radius: 50px;
       border: none;
       font-weight: 400;

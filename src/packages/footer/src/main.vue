@@ -270,14 +270,14 @@
 </script>
 <style lang="less">
   .vmp-footer {
-    color: #666;
+    color: var(--footer-color-font);
     width: 100%;
     padding: 24px 0;
     &_text {
       font-size: 14px;
       text-align: center;
       a {
-        color: #666;
+        color: var(--footer-color-font);
         &:hover {
           color: #3562fa;
         }

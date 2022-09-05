@@ -389,6 +389,7 @@
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/app-shared/components/confirm.vue';
+  import skins from '@/app-shared/skins/wap';
   export default {
     name: 'VmpWapSignUpForm',
     components: {
@@ -700,6 +701,7 @@
         this.roomBaseServer = useRoomBaseServer();
       }
       this.interfaceType === 'subject' ? this.initSubjectInfo() : this.initWebinarInfo();
+      this.setPageConfig();
     },
     methods: {
       // 设置接口入参，是活动维度 还是 专题维度
@@ -1848,6 +1850,10 @@
               }${queryString}`
           );
         }
+      },
+      setPageConfig() {
+        window.skins = skins;
+        skins.setTheme(skins.themes.theme_main_white);
       }
     }
   };
@@ -1934,6 +1940,8 @@
           align-items: center;
           justify-content: center;
           font-size: 0.37rem;
+          color: var(--theme-component-sign-up-tab-font);
+          background-color: var(--theme-component-sign-up-tab-bg);
           &:first-child {
             border: 0.02rem solid #d2d2d2;
             border-right: none;
@@ -1951,22 +1959,9 @@
             }
           }
           &.active {
-            color: #fff;
-            &.red {
-              border-color: #fb3a32;
-              background-color: #ffebeb;
-              color: #fb3a32;
-            }
-            &.blue {
-              border-color: #3562fa;
-              background-color: #ebefff;
-              color: #3562fa;
-            }
-            &.purple {
-              border-color: #8d57a4;
-              background-color: #f5bdea;
-              color: #8d57a4;
-            }
+            border-color: var(--theme-color);
+            background-color: var(--theme-color-sub);
+            color: var(--theme-color);
           }
         }
       }
@@ -2210,26 +2205,14 @@
       }
     }
     .submit-btn {
-      border: 0.024rem solid #fb3a32;
-      background-color: #fb3a32;
+      border: 0.024rem solid var(--theme-color);
+      background-color: var(--theme-color);
       font-size: 0.37rem;
       color: #fff;
       outline: none;
       width: 9.07rem;
       height: 80px;
       border-radius: 50px;
-      &.red {
-        border-color: #fb3a32;
-        background-color: #fb3a32;
-      }
-      &.blue {
-        border-color: #3562fa;
-        background-color: #3562fa;
-      }
-      &.purple {
-        border-color: #8d57a4;
-        background-color: #8d57a4;
-      }
     }
     .no-authority-wrap {
       width: 100%;

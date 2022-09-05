@@ -36,7 +36,7 @@
           >
             <span class="item-text">{{ $tdefault(item.name) }}</span>
             <i class="tips" v-show="item.tipsVisible"></i>
-            <hr v-show="selectedId === item.id" class="bottom-line" :style="themeBgColor" />
+            <hr v-show="selectedId === item.id" class="bottom-line" />
           </li>
         </ul>
 
@@ -96,11 +96,11 @@
       };
     },
     computed: {
-      themeBgColor() {
-        return {
-          'background-color': this.themeClass.pageBg
-        };
-      },
+      // themeBgColor() {
+      //   return {
+      //     'background-color': this.themeClass.pageBg
+      //   };
+      // },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -362,14 +362,14 @@
         this.docServer.$on('dispatch_doc_switch_change', val => {
           console.log('dispatch_doc_switch_change', val);
           // 如果文档播放器互换位置，不需要切换自定义菜单
-          if (this.isWapBodyDocSwitch) return;
+          if (val && this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         // 设置观看端文档是否可见
         this.docServer.$on('dispatch_doc_switch_status', val => {
           console.log('dispatch_doc_switch_status', val);
           // 如果文档播放器互换位置，不需要切换自定义菜单
-          if (this.isWapBodyDocSwitch) return;
+          if (val && this.isWapBodyDocSwitch) return;
           this.changeDocStatus(val);
         });
         //监听进出子房间消息
@@ -636,7 +636,7 @@
   .vmp-tab-menu {
     height: 100%;
     position: relative;
-    background: #fff;
+    background: var(--theme-tab-menu-bg);
     font-size: 28px;
     display: flex;
     flex-direction: column;
@@ -665,6 +665,7 @@
     }
     .tab_box {
       height: 80px;
+      background: var(--theme-tab-menu-box-bg);
     }
     &__header {
       position: relative;
@@ -674,7 +675,7 @@
       flex: 0 0 auto;
       display: flex;
       justify-content: space-around;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: var(--theme-tab-menu-border);
 
       /*  &::before {
         content: '';
@@ -693,7 +694,7 @@
         min-width: 24px;
         text-align: center;
         font-size: 14px;
-        color: #8c8c8c;
+        color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
 
@@ -703,9 +704,9 @@
           }
         }
 
-        &:hover {
-          color: #666;
-        }
+        // &:hover {
+        //   color: #666;
+        // }
         .vh-iconfont {
           font-weight: 600;
         }
@@ -738,7 +739,7 @@
         justify-content: center;
         align-items: center;
         padding: 0 32px;
-        color: #595959;
+        color: var(--theme-tab-menu-font);
         cursor: pointer;
         user-select: none;
         &_subscrbe {
@@ -759,8 +760,8 @@
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: #ff0005;
-          border: 9px solid #ff0005;
+          background: var(--theme-tab-menu-tip);
+          border: 9px solid var(--theme-tab-menu-tip);
           right: 18px;
           top: 10px;
         }
@@ -773,6 +774,7 @@
           width: 40px;
           height: 5px;
           border-radius: 3px;
+          background: var(--theme-tab-menu-tip);
         }
 
         &:hover {
@@ -782,7 +784,7 @@
         }
 
         &__active {
-          color: #262626;
+          color: var(--theme-tab-menu-font-active);
           position: relative;
 
           .bottom-line {

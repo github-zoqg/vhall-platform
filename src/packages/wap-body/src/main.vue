@@ -10,7 +10,9 @@
         <div class="vmp-wap-body-ending-box-img">
           <img src="./img/livingEnd@2x.png" alt="" />
         </div>
-        <h1 class="vmp-wap-body-ending-box-text">{{ $t('player.player_1017') }}</h1>
+        <h1 class="vmp-wap-body-ending-box-text">
+          {{ isRehearsal ? $t('player.player_1027') : $t('player.player_1017') }}
+        </h1>
       </div>
     </div>
     <div
@@ -48,6 +50,22 @@
        -->
     </div>
     <masksliding></masksliding>
+    <!-- 弹出直播提醒 -->
+    <alertBox
+      v-if="isShowLiveStartNotice"
+      :title="''"
+      :isShowClose="false"
+      :titleBtn="$t('player.player_1013')"
+      @authClose="startWatch"
+      @authSubmit="startWatch"
+    >
+      <div slot="content" class="vmp-wap-body_living">
+        <span class="living-img">
+          <img src="./img/live_start.png" alt="" />
+        </span>
+        <p class="living-text">{{ $t('appointment.appointment_1033') }}</p>
+      </div>
+    </alertBox>
   </div>
 </template>
 <script>
@@ -62,17 +80,27 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
+  import alertBox from '@/app-shared/components/confirm.vue';
   export default {
     name: 'VmpWapBody',
+    components: {
+      alertBox,
+      masksliding
+    },
     mixins: [move],
     data() {
       return {
         childrenComp: [],
         isLivingEnd: false,
-        mini: false
+        mini: false,
+        isShowLiveStartNotice: false
       };
     },
     computed: {
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       // 选中的自定义菜单的 type
       menuSelectedType() {
         return this.$domainStore.state.menuServer.selectedType;
@@ -164,10 +192,11 @@
       // 主持人ID 分组期间使用
       userinfoId() {
         return this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.userinfo.user_id;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       }
-    },
-    components: {
-      masksliding
     },
     beforeCreate() {
       this.msgServer = useMsgServer();
@@ -177,6 +206,9 @@
       this.menuServer = useMenuServer();
     },
     async created() {
+      if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3) {
+        this.isLivingEnd = true;
+      }
       if (
         this.$domainStore.state.interactiveServer.mobileOnWheat &&
         this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
@@ -188,7 +220,7 @@
         });
         await this.checkMediaPermission('isUseMic');
       }
-      if (this.isInGroup) {
+      if (this.isInGroup && this.webinarType == 1) {
         let report_data = this.roomBaseServer.state.watchInitData.report_data.vid;
         this.gobackHome(1, this.groupServer.state.groupInitData.name, { sender_id: report_data });
       }
@@ -198,6 +230,9 @@
       this.listenEvents();
     },
     methods: {
+      startWatch() {
+        location.reload();
+      },
       questionnaireVisible(flag) {
         this.mini = flag;
       },
@@ -251,6 +286,10 @@
 
         // 监听消息移动
         this.msgServer.$onMsg('ROOM_MSG', msg => {
+          // live_start 开始直播
+          if (msg.data.type == 'live_start' && this.isRehearsal) {
+            this.isShowLiveStartNotice = true;
+          }
           // live_over 结束直播
           if (msg.data.type == 'live_over') {
             this.isLivingEnd = true;
@@ -258,7 +297,7 @@
           }
           // 分组直播 没有结束讨论 直接结束直播
           if (msg.data.type == 'group_switch_end') {
-            if (msg.data.over_live) {
+            if (msg.data.over_type) {
               this.isLivingEnd = true;
             }
           }
@@ -363,6 +402,7 @@
     }
     &__hide {
       z-index: -1;
+      opacity: 0;
     }
     &-ending {
       background-repeat: no-repeat;
@@ -449,6 +489,30 @@
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
       .vmp-wap-stream-wrap-mask-screen {
         display: none;
+      }
+    }
+    &_living {
+      width: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .living-img {
+        display: inline-block;
+        width: 160px;
+        height: 160px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+        }
+      }
+      .living-text {
+        padding-top: 20px;
+        color: #262626;
+        font-size: 28px;
+        line-height: 40px;
       }
     }
   }
