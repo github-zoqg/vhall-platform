@@ -57,6 +57,7 @@ export default {
   '--header-font-color-primary': color_text_primary,
   '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
+  '--header-font-color-rehearsal': '#E0B96E',
   '--header-font-color-main': color_text_primary,
   '--header-tab-bg-color-hover': color_background_10,
   '--header-tab-font-color-hover': color_text_secondary,

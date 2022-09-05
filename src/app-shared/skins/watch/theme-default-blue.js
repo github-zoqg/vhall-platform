@@ -43,6 +43,7 @@ export default {
   '--header-font-color-primary': color_text_primary,
   '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
+  '--header-font-color-rehearsal': '#3552EA',
   '--header-font-color-main': color_text_1,
   '--header-tab-bg-color-hover': color_background_8,
   '--header-tab-font-color-hover': color_background_0,
