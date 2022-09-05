@@ -1,9 +1,9 @@
 <template>
   <div id="header" class="vh-concise-header-box">
-    <span class="rehearsalStatus" v-if="isRehearsal && isLiving">
+    <section class="vh-concise-header-box__rehearsal" v-if="isRehearsal && isLiving">
       <span class="dot"></span>
       {{ $t('nav.nav_1055') }}
-    </span>
+    </section>
     <section class="vh-concise-header-box__1" v-if="showHeader">
       <section class="host-user-info">
         <!-- 头像 -->
@@ -329,23 +329,28 @@
         margin-left: 6px;
       }
     }
-    .rehearsalStatus {
-      color: #fb2626;
+    &__rehearsal {
+      position: absolute;
+      width: 122px;
+      height: 42px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 100px;
+      right: 24px;
+      bottom: -58px;
+      color: var(--theme-header-icon-rehearsal-color);
       font-weight: 400;
       font-size: 24px;
-      line-height: 24px;
-      margin-right: -8px;
-      position: absolute;
-      right: 32px;
-      bottom: -34px;
+      line-height: 34px;
+      display: flex;
+      align-items: center;
       .dot {
-        position: absolute;
-        top: 6px;
-        left: -18px;
+        display: block;
+        margin-left: 16px;
+        margin-right: 6px;
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background-color: #fb2626;
+        background-color: var(--theme-header-icon-rehearsal-color);
         content: '';
       }
     }

@@ -14,6 +14,7 @@ export default {
   '--theme-header-bg': 'rgba(255, 255, 255, 1)',
   '--theme-header-font-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-header-icon-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-header-icon-rehearsal-color': '#3552EA',
   // 聊天区域
   '--theme-chat-msg-bg': 'rgba(255, 255, 255, 0.85)',
   '--theme-chat-msg-name-font': '#8c8c8c',

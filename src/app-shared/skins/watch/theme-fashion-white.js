@@ -42,6 +42,7 @@ export default {
   '--header-font-color-primary': color_text_primary,
   '--header-font-color-regular': color_text_secondary,
   '--header-font-color-link': color_text_link,
+  '--header-font-color-rehearsal': '#FB3A32',
   '--header-font-color-main': color_text_black,
   '--header-tab-bg-color-hover': color_background_8,
   '--header-tab-font-color-hover': color_background_0,
@@ -68,7 +69,7 @@ export default {
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(0, 0, 0, 0.45)',
   //footer
-  '--footer-color-font': color_text_2,
+  '--footer-color-font': 'rgba(0, 0, 0, 0.45)',
   //主题色
   '--theme-color': color_text_custom,
   '--theme-color-sub': color_text_custom_sub,

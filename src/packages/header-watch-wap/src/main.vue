@@ -244,20 +244,19 @@
         font-size: 30px;
       }
       .rehearsalStatus {
-        color: #fb2626;
+        color: var(--theme-header-icon-rehearsal-color);
         font-weight: 400;
         font-size: 24px;
         line-height: 24px;
         margin-right: -8px;
-        position: relative;
+        display: flex;
+        align-items: center;
         .dot {
-          position: absolute;
-          top: 6px;
-          left: -18px;
+          margin-right: 6px;
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background-color: #fb2626;
+          background-color: var(--theme-header-icon-rehearsal-color);
           content: '';
         }
       }

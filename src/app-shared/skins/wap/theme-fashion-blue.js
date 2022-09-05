@@ -13,6 +13,7 @@ export default {
   '--theme-header-bg': 'transparent',
   '--theme-header-font-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-header-icon-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-header-icon-rehearsal-color': '#3552EA',
   // 聊天区域
   '--theme-chat-msg-bg': 'rgba(255, 255, 255, 0.85)',
   '--theme-chat-msg-font': 'rgba(0, 0, 0, 0.85)',
@@ -99,6 +100,7 @@ export default {
   //冗余
   '--theme-header-attention-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
+  '--theme-tab-menu-box-bg': ' ',
   '--theme-chat-msg-gift-font': ' ',
   '--theme-header-attention-color': ' ',
   '--theme-chat-msg-interact-bg': ' ',

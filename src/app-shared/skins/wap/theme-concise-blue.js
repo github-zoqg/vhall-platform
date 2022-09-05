@@ -17,6 +17,7 @@ export default {
   '--theme-header-bg': ' ',
   '--theme-header-font-color': ' ',
   '--theme-header-icon-color': ' ',
+  '--theme-header-icon-rehearsal-color': ' ',
   '--theme-chat-msg-name-font': ' ',
   '--theme-chat-msg-timeline': ' ',
   '--theme-chat-msg-gift-font': ' ',

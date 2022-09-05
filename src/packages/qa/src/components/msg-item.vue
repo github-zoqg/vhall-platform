@@ -263,7 +263,7 @@
     ::v-deep .msg-item__qa-flag {
       color: #fc9600;
       &.color-e6e {
-        color: #e6e6e6;
+        color: var(--theme-tab-content-qa-replyText-font);
       }
     }
   }

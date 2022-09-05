@@ -13,6 +13,7 @@ export default {
   '--theme-header-bg': 'transparent',
   '--theme-header-font-color': 'rgba(255, 255, 255, 0.65)',
   '--theme-header-icon-color': 'rgba(255, 255, 255, 0.45)',
+  '--theme-header-icon-rehearsal-color': '#fb2626',
   // 聊天区域
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
   '--theme-chat-msg-name-font': 'rgba(255, 255, 255, 0.65)',
@@ -101,6 +102,7 @@ export default {
   '--theme-component-sign-up-tab-bg': 'rgba(0, 0, 0, 0.04)',
   //冗余
   '--theme-header-attention-bg': ' ',
+  '--theme-tab-menu-box-bg': ' ',
   '--theme-header-attention-color': ' ',
   // 章节
   '--theme-chapter-list-bg': '#262626',

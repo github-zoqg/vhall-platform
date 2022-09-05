@@ -506,7 +506,7 @@
       align-items: center;
       justify-content: center;
       .rehearsalStatus {
-        color: #fb3a32;
+        color: var(--header-font-color-rehearsal);
         font-weight: 400;
         font-size: 14px;
         line-height: 20px;
@@ -519,7 +519,7 @@
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background-color: #fb3a32;
+          background-color: var(--header-font-color-rehearsal);
           content: '';
         }
       }
