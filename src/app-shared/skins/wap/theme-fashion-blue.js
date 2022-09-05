@@ -100,6 +100,7 @@ export default {
   //冗余
   '--theme-header-attention-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
+  '--theme-tab-menu-box-bg': ' ',
   '--theme-chat-msg-gift-font': ' ',
   '--theme-header-attention-color': ' ',
   '--theme-chat-msg-interact-bg': ' ',
