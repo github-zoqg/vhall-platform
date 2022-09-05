@@ -17,6 +17,8 @@
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { bu_appId } from '@/saas-live/init-global/businessData';
+  import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     data() {
       return {
@@ -48,6 +50,19 @@
           env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         });
 
+        // 产品侧数据埋点初始化（只有发起端用）
+        domain.initVhallReportForProduct({
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+          app_id: bu_appId[process.env.VUE_APP_SAAS_ENV], // 产品 app id
+          pf: 7, // 客户端类型  web 网页端用 8
+          business_uid: watchInitData.join_info.third_party_user_id, // B端客户 id
+          user_id: watchInitData.join_info.third_party_user_id, // C端用户 id（如果是B端用当前用户id）
+          webinar_id: watchInitData.webinar.id, // 活动 id
+          webinar_type: watchInitData.webinar.mode, // 直播类型
+          created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          role_name: watchInitData.join_info.role_name, //用户类型
+          ua: getBrowserType() // 浏览器信息
+        });
         // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
         document.title = watchInitData.webinar.subject;
 

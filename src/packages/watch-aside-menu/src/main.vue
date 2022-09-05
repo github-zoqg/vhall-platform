@@ -452,9 +452,6 @@
             });
         } else if (kind === 'desktopShare') {
           // 点击桌面共享
-          this.isShareScreen
-            ? window.vhallReportForProduct?.report(110256)
-            : window.vhallReportForProduct?.report(110241);
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'handleClickDesktopScreen', [this.isShareScreen])
           );

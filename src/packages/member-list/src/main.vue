@@ -1624,6 +1624,7 @@
                 window.vhallReportForProduct?.toResultsReporting(110155, {
                   request_id: res?.request_id,
                   event_type: 'interface',
+                  receive_account_id: accountId,
                   res
                 });
                 if (res.code == 200) {

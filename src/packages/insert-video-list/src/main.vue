@@ -436,7 +436,7 @@
       }, 300),
       // 云插播开始播放
       handlePlay(video) {
-        window.vhallReportForProduct?.toReport(110197);
+        window.vhallReportForProduct?.toReport(110197, { report_extra: { file_info: video } });
         const insertFileServer = useInsertFileServer();
         const insertFileServerState = insertFileServer.state;
         const { watchInitData } = useRoomBaseServer().state;
@@ -524,7 +524,7 @@
       // 预览页面
       handlePreview(video) {
         this.previewDialog = true;
-        window.vhallReportForProduct.toReport(110192);
+        window.vhallReportForProduct.toReport(110192, { report_extra: { file_info: video } });
         if (video.transcode_status == 1) {
           this.videoParam = {
             autoplay: true,

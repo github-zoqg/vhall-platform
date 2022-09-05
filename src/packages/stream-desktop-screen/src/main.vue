@@ -491,8 +491,9 @@
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
-          window.vhallReportForProduct?.report(110247);
+          window.vhallReportForProduct?.toReport(110247);
         } else {
+          window.vhallReportForProduct?.toReport(110256);
           this.stopShare('live_over');
         }
       },

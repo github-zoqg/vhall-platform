@@ -361,7 +361,7 @@
           this.initLocalInsertFile();
         } else {
           // 云插播
-          window.vhallReportForProduct?.toReport(110199);
+          window.vhallReportForProduct?.toReport(110199, { report_extra: { file_info: '' } });
           this.initRemoteInsertFile();
         }
       },
@@ -626,7 +626,8 @@
         }
       ) {
         window.vhallReportForProduct?.toStartReporting(110203, [110206, 110209, 110207], {
-          evt_tp: options.type
+          evt_tp: options.type,
+          file_info: ''
         });
         console.log('----关闭插播----', options.isShowConfirmDialog, options.type);
         // 如果不需要展示确认关闭按钮
@@ -639,7 +640,8 @@
           this.exitFullScreen();
         }
         window.vhallReportForProduct?.toResultsReporting(110206, {
-          event_type: 'static'
+          event_type: 'static',
+          file_info: ''
         });
         this.$confirm('确认关闭插播文件，并退出插播页面吗？', '提示', {
           confirmButtonText: '确定',
@@ -649,7 +651,8 @@
         })
           .then(() => {
             window.vhallReportForProduct?.toResultsReporting(110209, {
-              event_type: 'static'
+              event_type: 'static',
+              file_info: ''
             });
             // 关闭插播列表弹窗
             window.$middleEventSdk?.event?.send(
@@ -659,7 +662,8 @@
           })
           .catch(() => {
             window.vhallReportForProduct?.toResultsReporting(110207, {
-              event_type: 'static'
+              event_type: 'static',
+              file_info: ''
             });
           });
       },
@@ -993,7 +997,13 @@
         } else {
           this.pause();
         }
-        window.vhallReportForProduct.report(110212, { report_extra: { status: ispaused } });
+        window.vhallReportForProduct.toReport(110212, {
+          report_extra: {
+            file_info: '',
+            pre_status: ispaused ? 'pause' : 'playing',
+            after_atatus: ispaused ? 'playing' : 'pause'
+          }
+        });
       },
       // 大小窗切换
       exchange() {
