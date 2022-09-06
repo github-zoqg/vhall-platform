@@ -222,17 +222,17 @@
       },
       // 注册
       handleRegister() {
+        if (!this.registerChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          return;
+        }
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
-            if (!this.registerChecked) {
-              this.$message({
-                message: this.$t('privacy.privacy_1005'),
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
-              return;
-            }
             if (!this.captchaReady) {
               this.$message({
                 message: this.$t('login.login_1023'),

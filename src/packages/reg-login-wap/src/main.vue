@@ -341,18 +341,22 @@
        * 账号登录不需要校验手机，只需校验是否为空即可，有可能用邮箱登录    showMobileLogin  为true  手机登录      false 账号登录
        */
       loginFun() {
-        if (!this.checkMobile()) return false;
+        // 先验证隐私协议
         if (this.showMobileLogin) {
           if (!this.loginDynamicChecked) {
             this.$toast(this.$t('privacy.privacy_1005'));
             return;
           }
-          this.codeLogin();
         } else {
           if (!this.loginChecked) {
             this.$toast(this.$t('privacy.privacy_1005'));
             return;
           }
+        }
+        if (!this.checkMobile()) return false;
+        if (this.showMobileLogin) {
+          this.codeLogin();
+        } else {
           this.pwdLogin();
         }
       },
