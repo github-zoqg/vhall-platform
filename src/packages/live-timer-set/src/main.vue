@@ -2,48 +2,54 @@
   <div class="timer-base">
     <el-dialog
       :visible.sync="timerVisible"
-      width="342px"
+      width="296px"
       center
       class="bgimg"
       :before-close="onClose"
     >
-      <el-row class="padding45">
+      <el-row class="timer-base-padding">
         <el-row>
           <!-- 时间增 -->
-          <div class="button_top">
+          <div class="ml8 button_top">
             <img
-              v-if="ten_mon != 5"
+              :class="{ opacity: ten_mon == 5 }"
               src="./img/add.png"
               alt=""
-              @click="operationTime('ten_mon', 'add')"
+              @click="ten_mon != 5 && operationTime('ten_mon', 'add')"
             />
-            <img v-else src="./img/addDis.png" alt="" />
           </div>
-          <div class="button_top">
-            <img v-if="mon != 9" src="./img/add.png" alt="" @click="operationTime('mon', 'add')" />
-            <img v-else src="./img/addDis.png" alt="" />
-          </div>
-          <div class="ml10 button_top">
+          <div class="button_top ml4">
             <img
-              v-if="ten_sec != 5"
+              :class="{ opacity: mon == 9 }"
               src="./img/add.png"
               alt=""
-              @click="operationTime('ten_sec', 'add')"
+              @click="mon != 9 && operationTime('mon', 'add')"
             />
-            <img v-else src="./img/addDis.png" alt="" />
           </div>
-          <div class="button_top">
-            <img v-if="sec != 9" src="./img/add.png" alt="" @click="operationTime('sec', 'add')" />
-            <img v-else src="./img/addDis.png" alt="" />
+          <div class="ml6 button_top">
+            <img
+              :class="{ opacity: ten_sec == 5 }"
+              src="./img/add.png"
+              alt=""
+              @click="ten_sec != 5 && operationTime('ten_sec', 'add')"
+            />
+          </div>
+          <div class="button_top ml4">
+            <img
+              :class="{ opacity: sec == 9 }"
+              src="./img/add.png"
+              alt=""
+              @click="sec != 9 && operationTime('sec', 'add')"
+            />
           </div>
 
           <!-- 时间显示区 -->
-          <el-col class="margin10 bg000 ft42 pr font_zdy">
-            <div class="border4 ps"></div>
+          <el-col class="margin10 bg000 pr">
+            <div class="line_weight ps"></div>
             <span class="close ps" @click="onClose">
               <i class="vh-iconfont vh-line-close"></i>
             </span>
-            <div class="margin5 timerbg">
+            <div class="timerbg">
               <el-input
                 maxlength="1"
                 v-model="ten_mon"
@@ -51,7 +57,7 @@
                 @blur="testing('ten_mon')"
               ></el-input>
             </div>
-            <div class="margin5 timerbg">
+            <div class="timerbg marl4">
               <el-input
                 maxlength="1"
                 v-model="mon"
@@ -60,9 +66,9 @@
               ></el-input>
             </div>
 
-            <strong class="pr ft28">:</strong>
+            <strong class="pr ft22 custom-font-barlow">:</strong>
 
-            <div class="margin5 timerbg">
+            <div class="timerbg">
               <el-input
                 maxlength="1"
                 v-model="ten_sec"
@@ -70,7 +76,7 @@
                 @blur="testing('ten_sec')"
               ></el-input>
             </div>
-            <div class="margin5 timerbg">
+            <div class="timerbg marl4">
               <el-input
                 maxlength="1"
                 v-model="sec"
@@ -81,44 +87,50 @@
           </el-col>
 
           <!-- 时间减 -->
-          <div class="button_top">
+          <div class="ml8 button_top">
             <img
-              v-if="ten_mon != 0"
+              :class="{ opacity: ten_mon == 0 }"
               src="./img/down.png"
               alt=""
               @click="operationTime('ten_mon')"
             />
-            <img v-else src="./img/downDis.png" alt="" />
           </div>
-          <div class="button_top">
-            <img v-if="mon != 0" src="./img/down.png" alt="" @click="operationTime('mon')" />
-            <img v-else src="./img/downDis.png" alt="" />
-          </div>
-          <div class="ml10 button_top">
+          <div class="button_top ml4">
             <img
-              v-if="ten_sec != 0"
+              :class="{ opacity: mon == 0 }"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('mon')"
+            />
+          </div>
+          <div class="ml6 button_top">
+            <img
+              :class="{ opacity: ten_sec == 0 }"
               src="./img/down.png"
               alt=""
               @click="operationTime('ten_sec')"
             />
-            <img v-else src="./img/downDis.png" alt="" />
           </div>
-          <div class="button_top">
-            <img v-if="sec != 0" src="./img/down.png" alt="" @click="operationTime('sec')" />
-            <img v-else src="./img/downDis.png" alt="" />
+          <div class="button_top ml4">
+            <img
+              :class="{ opacity: sec == 0 }"
+              src="./img/down.png"
+              alt=""
+              @click="operationTime('sec')"
+            />
           </div>
         </el-row>
         <!-- 表单部分 -->
-        <el-row class="mt20">
+        <el-row class="time_form">
           <el-col :span="13">
             <span>
               <span class="pr top3">
                 <span class="color1a1a1a">观众可见</span>
                 <el-tooltip
-                  placement="right"
+                  placement="top-start"
+                  offset="70"
                   :visible-arrow="false"
-                  popper-class="transfer-box"
-                  style="margin-left: 4px"
+                  popper-class="timer_form_transfer-box"
                 >
                   <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
@@ -142,10 +154,10 @@
               <span class="pr top3">
                 <span class="color1a1a1a">可超时</span>
                 <el-tooltip
-                  placement="right"
+                  placement="top-end"
+                  offset="-40"
                   :visible-arrow="false"
-                  popper-class="transfer-box"
-                  style="margin-left: 4px"
+                  popper-class="timer_form_transfer-box"
                 >
                   <i class="vh-iconfont vh-line-question pr5" style="color: #666"></i>
                   <div slot="content">
@@ -165,7 +177,7 @@
           </el-col>
         </el-row>
         <el-col align="center" class="mt20">
-          <el-button round type="primary" @click="onSubmit" class="w120">开始计时</el-button>
+          <el-button round plain @click="onSubmit" class="w120">开始计时</el-button>
         </el-col>
       </el-row>
     </el-dialog>
@@ -251,6 +263,7 @@
       },
       // 时间操作
       operationTime(data, status) {
+        if (!status && this[data] == 0) return;
         status == 'add' ? this[data]++ : this[data]--;
       },
       // input检查
@@ -282,136 +295,150 @@
 </script>
 
 <style lang="less">
-  @import url(./style.less);
-  .timer-base{
-    .padding45{
-      padding: 0 45px;
+  @import url(./font_family/numberFont.less);
+  .timer_form_transfer-box {
+    width: 246px;
+    box-sizing: border-box;
+  }
+  .timer-base {
+    .timer-base-padding {
+      padding: 48px 32px 26px;
       user-select: none;
+      & > :first-child {
+        font-size: 0;
+      }
     }
-    .color1a1a1a{
+    .color1a1a1a {
       color: #1a1a1a;
     }
-    .el-switch__core{
+    .el-switch__core {
       margin-top: 2px;
       height: 16px;
     }
-    .el-switch__core::after{
+    .el-switch__core::after {
       height: 12px;
       width: 12px;
     }
-    .el-switch.is-checked .el-switch__core::after{
+    .el-switch.is-checked .el-switch__core::after {
       margin-left: -13px;
     }
-    .w120{
-      padding: 9px 32px !important;
-      border: 1px solid #fb3a32 !important;
-      color: #fff !important;
-      background: #fb3a32;
-    }
-    .margin10{
-      border-radius: 4px;
-      height: 83px;
-      text-align: center;
-    }
-    .bg000{
-      background: #000000;
-      .ft28{
-        font-size: 28px;
-        top: -4px;
+    @font-high-light-normal: #fb2626;
+    .w120 {
+      margin-top: 24px;
+      border: 1px solid @font-high-light-normal !important;
+      color: @font-high-light-normal !important;
+      &:hover {
+        color: white !important;
+        background: @font-high-light-normal !important;
+      }
+      &:active {
+        color: white !important;
+        background: @active-normal !important;
       }
     }
-    .ft42{
-      font-size: 20px;
-      color: white;
+    .margin10 {
+      border-radius: 4px;
+      text-align: center;
+      padding: 8px;
     }
-    .margin5{
-      box-sizing: border-box;
-      margin: 4px 3px;
+    .bg000 {
+      background: #d9d9d9;
     }
-    .border4{
-      border-top: 4px solid #000;
-      top: 40px;
+    .ft22 {
+      font-size: 22px;
+      top: -11px;
+    }
+    .line_weight {
+      border: 1px solid #d9d9d9;
+      top: 49%;
       z-index: 999;
-      width: 100%;
+      width: 95%;
     }
-    .ps{
+    .ps {
       position: absolute;
     }
-    .pr{
+    .pr {
       position: relative;
     }
-    .top10{
+    .top10 {
       top: 11px;
     }
-    .bgimg .el-dialog{
-      background-image: linear-gradient(#fffaee, #fff6d5);
-          border-radius: 20px
-      // background: url('./img/timerset.png');
+    .bgimg .el-dialog {
+      background: #fff;
+      border-radius: 8px;
     }
-    .bgimg .el-dialog--center .el-dialog__body{
-      padding: 25px 0;
+    .bgimg .el-dialog--center .el-dialog__body {
+      padding: 0;
     }
-    .bgimg .el-dialog__header{
+    .bgimg .el-dialog__header {
       display: none;
     }
-    .timerbg{
+    .timerbg {
       display: inline-block;
       background: url('./img/timerbg.png');
-      height: 75px;
-      width: 53px;
-      .el-input__inner{
+      background-size: 100% 100%;
+      height: 62px;
+      width: 50px;
+      .el-input__inner {
         border: 0;
-        height: 74px;
+        height: 62px;
         background: transparent;
-        color: #fff;
+        color: #262626;
       }
-      .el-input__inner{
-        font-family: 'Gilroy';
-        font-size: 38px;
-        font-weight: bold;
+      .el-input__inner {
+        .custom-font-barlow;
+        font-size: 44px;
+        font-weight: 700;
         text-align: center;
       }
     }
-    .mt20{
-      margin-top: 20px;
+    .marl4 {
+      margin-left: 4px;
+    }
+    .time_form {
+      margin-top: 12px;
     }
 
     .close {
-      margin-right: 11px;
-      margin-top: 11px;
       cursor: pointer;
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
       position: absolute;
-      right: -35px;
-      top: -25px;
-      color: #1a1a1a;
+      right: 0;
+      top: -42px;
+      color: #666;
       & > i {
-        font-size: 10px;
-        float: right;
         line-height: 20px;
+        font-size: 10px;
       }
     }
-    .button_top{
+    .button_top {
       display: inline-block;
-      width: 60px;
+      width: 50px;
       text-align: center;
       cursor: pointer;
       user-select: none;
+      height: 10px;
+      line-height: 10px;
       img {
-        padding: 3px 10px
+        padding: 0 10px;
+      }
+      .opacity {
+        opacity: 0.4;
       }
     }
-    .ml10{
-      margin-left: 10px;
+    .ml6 {
+      margin-left: 6px;
     }
-    .top3{
+    .ml8 {
+      margin-left: 8px;
+    }
+    .ml4 {
+      margin-left: 4px;
+    }
+    .top3 {
       top: 3px;
     }
-    .pr5{
-      padding-right: 5px;
-      margin-left: 1px !important;
+    .pr5 {
+      padding: 0 5px;
     }
   }
 </style>

@@ -36,7 +36,7 @@
             v-show="chatOptions && chatOptions.hasChatFilterBtn && isFilterShow"
             class="operate-container__tool-bar__chat-filter-wrap"
           >
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.onlyShowSponsor }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickOnlyShowSponsor"
@@ -45,7 +45,7 @@
                 {{ $t('chat.chat_1012') }}
               </el-checkbox>
             </li>
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isShieldingEffects }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickShieldingEffects"
@@ -54,7 +54,7 @@
                 {{ $t('chat.chat_1013') }}
               </el-checkbox>
             </li>
-            <li class="filter-item">
+            <li :class="['filter-item', { 'is-checkbox': filterStatus.isChat }]">
               <el-checkbox
                 class="filter-item__checkbox"
                 @change="onClickChat"
@@ -487,7 +487,7 @@
 
 <style lang="less">
   .vmp-chat-operate-container {
-    @active-color: #fc5659;
+    @active-color: var(--theme-color);
     @font-error: #fb3a32;
     display: flex;
     flex-direction: column;
@@ -495,8 +495,8 @@
     &.chat-operate-live {
       padding: 10px 10px;
     }
-    border-top: 1px solid @bg-dark-normal;
-    background-color: @bg-dark-section;
+    border-top: 1px solid var(--tab-menu-bg-border);
+    background-color: var(--chat-background-color-base);
     position: absolute;
     box-sizing: border-box;
     left: 0;
@@ -651,7 +651,7 @@
         // width: 120px;
         // height: 80px;
         padding: 4px 0;
-        background-color: #383838;
+        background-color: var(--header-tab-item-dropdown-color);
         box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
         border-radius: 4px;
         position: absolute;
@@ -670,21 +670,33 @@
               color: #e6e6e6;
             }
           }
+          .el-checkbox {
+            &.is-checked {
+              background-color: var(--chat-bg-color-filter-checked);
+              .el-checkbox__label {
+                color: var(--chat-font-color-filter-checked);
+              }
+              .el-checkbox__inner {
+                background-color: var(--chat-bg-color-checkbox-checked);
+                border-color: var(--chat-bg-color-checkbox-checked);
+              }
+            }
+          }
         }
         .filter-item__checkbox {
           display: inline-block;
           margin-right: 8px;
           position: relative;
-          color: #999999;
+          color: var(--chat-font-color-filter);
           font-size: 14px;
         }
         .el-checkbox__label {
           font-size: 14px;
-          color: #999999;
+          color: var(--chat-font-color-filter);
         }
 
         .el-checkbox__inner {
-          border: 1px solid #ccc;
+          border: 1px solid var(--chat-bg-color-checkbox);
         }
       }
       .vh-iconfont {

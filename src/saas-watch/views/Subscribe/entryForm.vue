@@ -10,6 +10,7 @@
 <script>
   import { useEntryformServer, useRoomBaseServer } from 'middle-domain';
   import errorPage from '../ErrorPage/index.vue';
+  import skins from '@/app-shared/skins/watch';
   export default {
     name: 'Entryform',
     components: {
@@ -30,8 +31,13 @@
     },
     async created() {
       this.interfaceType === 'webinar' ? this.initWebinarInfo() : this.initSubjectInfo();
+      this.setPageConfig();
     },
     methods: {
+      setPageConfig() {
+        window.skins = skins;
+        skins.setTheme(skins.themes.theme_default_black);
+      },
       async initWebinarInfo() {
         // await this.getGrayConfig();
         this.getFormOpenLinkStatus();
@@ -51,7 +57,9 @@
         this.entryformServer
           .verifyOpenLink({
             subject_id: this.webinarOrSubjectId,
-            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
+            visit_id:
+              this.roomBaseServer.state.watchInitData.visitor_id ||
+              localStorage.getItem('visitorId')
           })
           .then(res => {
             // 如果当前 visitor_id 已经报名，跳转到专题页
@@ -84,7 +92,9 @@
         this.entryformServer
           .verifyOpenLink({
             webinar_id: this.webinarOrSubjectId,
-            visit_id: this.roomBaseServer.state.watchInitData.visitor_id
+            visit_id:
+              this.roomBaseServer.state.watchInitData.visitor_id ||
+              localStorage.getItem('visitorId')
           })
           .then(res => {
             if (res.code == 200) {

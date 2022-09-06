@@ -2,11 +2,6 @@
   <div class="vmp-chat-auth">
     <!--聊天审核头部栏-->
     <div class="vmp-chat-auth__header-bar">
-      <!--活动标题-->
-      <!--      <div class="header-bar__title">-->
-      <!--        <i class="iconfont iconzhibo"></i>-->
-      <!--        {{ activityTitle }}-->
-      <!--      </div>-->
       <div class="header-bar__operate-bar">
         <div class="switch-box">
           <span class="switch-title">聊天审核</span>

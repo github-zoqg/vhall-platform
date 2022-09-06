@@ -4,16 +4,24 @@
       <!-- 问卷 -->
       <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <!-- 签到 -->
-      <div class="icon-wrap" @click="handleSign" v-show="showSign">
+      <div class="icon-wrap" @click="handleSign" v-show="showSign && webinarType == 1">
         <div class="have"></div>
         <img src="./image/icon.png" />
       </div>
       <!-- 抽奖 -->
-      <lottery-icon v-if="!isVod" class="icon-wrap" @clickIcon="checkLotteryIcon" />
+      <lottery-icon
+        v-if="webinarType == 1 || webinarType == 3"
+        class="icon-wrap"
+        @clickIcon="checkLotteryIcon"
+      />
       <!-- 红包 -->
-      <red-packet-icon class="icon-wrap" v-if="!isEmbed" @clickIcon="handleRedPacket" />
+      <red-packet-icon
+        class="icon-wrap"
+        v-if="!isEmbed && webinarType == 1"
+        @clickIcon="handleRedPacket"
+      />
       <!-- 计时器 -->
-      <div class="icon-wrap" @click="handleTimer" v-show="showTimer">
+      <div class="icon-wrap" @click="handleTimer" v-show="showTimer && webinarType == 1">
         <div :class="!timerVisible ? 'have' : ''"></div>
         <img src="./image/timer.png" />
       </div>
@@ -53,6 +61,10 @@
       },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 是否正在直播
+      webinarType() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
       isVod() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 5;
