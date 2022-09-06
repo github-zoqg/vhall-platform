@@ -186,7 +186,7 @@
     margin: 20px 14px;
     border-radius: 6px;
     overflow: hidden;
-    background: #f7f7f7;
+    background: var(--theme-tab-content-live-card-bg);
 
     &__cover {
       position: relative;
@@ -300,7 +300,7 @@
       font-size: 28px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #1a1a1a;
+      color: var(--theme-tab-content-live-title-font);
       line-height: 36px;
       margin-top: 4px;
       box-sizing: border-box;
@@ -312,7 +312,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 24px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-live-info-font);
       line-height: 42px;
       text-align: left;
       padding: 0px 8px;

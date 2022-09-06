@@ -6,14 +6,15 @@
     <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
     <div class="vmp-chat-wap__content" ref="chatContentMain">
       <!-- 如果开启观众手动加载聊天历史配置项，并且聊天列表为空的时候显示加载历史消息按钮 -->
-      <p
+      <!-- 此功能后台在5.20日已被去掉，前端暂时注释，以备后用 -->
+      <!-- <p
         v-if="isShowChatHistoryBtn && !hideChatHistory && overflow"
         class="vmp-chat-wap__content__get-list-btn-container"
       >
         <span @click="getHistoryMessage" class="vmp-chat-wap__content__get-list-btn">
           {{ $t('chat.chat_1058') }}
         </span>
-      </p>
+      </p> -->
       <div ref="chatContent" class="virtual-content">
         <virtual-list
           v-if="virtual.showlist"
@@ -159,7 +160,7 @@
         //小屏适配
         smFix: false,
         //隐藏拉取历史聊天按钮
-        hideChatHistory: false,
+        // hideChatHistory: false,
         //回复或@消息id
         targetId: '',
         renderList: [],
@@ -181,9 +182,9 @@
     },
     computed: {
       //是否开启手动加载聊天历史记录
-      isShowChatHistoryBtn() {
-        return [1, '1'].includes(this.configList['ui.hide_chat_history']);
-      },
+      // isShowChatHistoryBtn() {
+      //   return [1, '1'].includes(this.configList['ui.hide_chat_history']);
+      // },
       //当前登录人信息
       joinInfo() {
         const { watchInitData = {} } = this.roomBaseServer.state;
@@ -286,9 +287,9 @@
     mounted() {
       this.listenChatServer();
       this.showWelcomeTxt();
-      if (!this.isShowChatHistoryBtn) {
-        this.getHistoryMessage(true);
-      }
+      // if (!this.isShowChatHistoryBtn) {
+      this.getHistoryMessage(true);
+      // }
       const IsMse = isMse();
       if (IsMse.os === 'android') {
         this.innerHeight = window.innerHeight;
@@ -679,7 +680,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
-      background-color: #f7f7f7;
+      // background-color: #f7f7f7;
 
       .virtual-list {
         height: 100%;

@@ -252,16 +252,16 @@
 
     .vh-goods_item {
       height: 100px;
-      border-bottom: 1px solid @border-bormal;
+      border-bottom: 1px solid var(--theme-tab-content-good-split-bg);
       display: flex;
       flex-direction: row;
       cursor: pointer;
       padding: 16px;
+      background: var(--theme-tab-content-good-bg);
       &-cover {
         width: 100px;
         height: 100px;
         margin-right: 8px;
-        background: @font-light-normal;
         border-radius: 4px;
         overflow: hidden;
         img {
@@ -282,7 +282,7 @@
           display: block;
           width: 100%;
           font-size: 14px;
-          color: @font-dark-normal;
+          color: var(--theme-tab-content-good-name-font);
           line-height: 20px;
           overflow: hidden;
           text-align: left;
@@ -292,7 +292,7 @@
           height: 18px;
           line-height: 20px;
           font-size: 12px;
-          color: #999999;
+          color: var(--theme-tab-content-good-describe-font);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -300,7 +300,7 @@
         .discount_price {
           display: inline-block;
           width: 100%;
-          color: @font-light-low;
+          color: var(--theme-tab-content-good-discountPrice-font);
           line-height: 16px;
           text-decoration: line-through;
           text-align: left;
@@ -317,7 +317,7 @@
           position: absolute;
           bottom: 0px;
           .price {
-            color: @font-dark-normal;
+            color: #fb2626;
             line-height: 20px;
             font-size: 16px;
             .remainder {
@@ -325,7 +325,7 @@
             }
           }
           i {
-            color: #fff;
+            color: #fb2626;
             font-size: 12px;
           }
           .price-tip {
@@ -333,25 +333,26 @@
             width: 36px;
             height: 17px;
             padding: 0px 4px;
-            background: #fff0f0;
+            background: var(--theme-tab-content-good-priceTag-bg);
             border-radius: 2px;
             line-height: 18px;
             font-size: 10px;
-            color: #fb3a32;
+            color: #fb2626;
             margin-right: 2px;
           }
           .buy {
             display: inline-block;
             width: 52px;
             border-radius: 20px;
-            border: 1px solid #cccccc;
+            border: 1px solid var(--theme-tab-content-good-buyBorder-font);
             background: transparent;
-            color: #fff;
+            color: var(--theme-tab-content-good-buy-font);
             padding: 4px 0;
             cursor: pointer;
             &:hover {
-              background: #fb3a32;
-              border: 1px solid #fb3a32;
+              background: var(--theme-color);
+              border: 1px solid var(--theme-color);
+              color: var(--theme-tab-content-good-buy-font-hover);
             }
           }
         }
@@ -371,8 +372,8 @@
         }
       }
       &:hover {
-        background: #3c3c3c;
-        border-bottom: 1px solid @bg-dark-section;
+        background: var(--theme-tab-content-good-hover-bg);
+        border-bottom: 1px solid var(--theme-tab-content-good-split-bg);
         .vh-goods_item {
           &-info {
             .showEllipse::after {
@@ -381,8 +382,9 @@
           }
         }
         .buy {
-          background: #fb3a32;
-          border: 1px solid #fb3a32;
+          background: var(--theme-color);
+          border: 1px solid var(--theme-color);
+          color: var(--theme-tab-content-good-buy-font-hover);
         }
       }
     }
@@ -394,20 +396,22 @@
       justify-content: center;
       padding: 16px 24px 24px;
       .vh-goods_item {
-        background: #fff;
+        background: var(--theme-tab-content-subscribe-good-bg);
         &-info {
           .other-info {
             i {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .price {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .buy {
-              border: 1px solid #fb3a32;
-              color: #fb3a32;
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
               &:hover {
-                color: #fff;
+                background: var(--theme-color);
+                border: 1px solid var(--theme-color);
+                color: var(--theme-tab-content-good-buy-font-hover) !important;
               }
             }
           }
@@ -419,7 +423,7 @@
       .subscribe_item {
         width: 458px;
         height: 200px;
-        background: #fff;
+        background: var(--theme-tab-content-subscribe-good-bg);
         padding: 0px;
         padding-right: 24px;
         border-radius: 4px;
@@ -427,7 +431,6 @@
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;
-          background: #f7f7f7;
           border-top-right-radius: 0px;
           border-bottom-right-radius: 0px;
           overflow: hidden;
@@ -479,7 +482,7 @@
             bottom: 24px;
             .price,
             i {
-              color: #fb3a32;
+              color: #fb2626;
             }
             .price {
               ::v-deep > .remainder {
@@ -487,20 +490,11 @@
               }
             }
             .buy {
-              border: 1px solid #fb3a32;
-              color: #fb3a32;
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
             }
             .discount_price {
               color: @font-light-low;
-            }
-          }
-          &:hover {
-            /*  .name {
-              color: #fb3a32;
-            } */
-            .other-info div .buy {
-              background: #fb3a32;
-              color: #fff;
             }
           }
         }
@@ -510,8 +504,9 @@
           cursor: pointer;
           border: none;
           .vh-goods_item-info .other-info .buy {
-            border: 1px solid #fb3a32;
-            background: #fff;
+            border: 1px solid var(--theme-color);
+            background: var(--theme-color);
+            color: var(--theme-tab-content-good-buy-font-hover);
           }
         }
       }

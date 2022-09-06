@@ -6,7 +6,6 @@
       :text="announcement.content"
       :scrollable="true"
       color="#80511B"
-      background="#FDE2AD"
       mode="closeable"
       v-if="announcement.isShow"
       @close="closeAnnouncement"
@@ -149,19 +148,17 @@
 </script>
 
 <style lang="less">
+  @import url(./skins/notice.concise.less);
   .vmp-notice-wap {
     .notice {
       position: absolute;
       top: 80px;
       left: 0px;
       width: 100%;
-      background: linear-gradient(59.32deg, #ffebe9 0%, #edecff 107.06%) !important;
+      background: linear-gradient(59.32deg, #ffebe9 0%, #edecff 107.06%);
       .van-notice-bar__content {
         color: #262626;
       }
-    }
-    .van-notice-bar {
-      box-sizing: border-box;
     }
     &__bottom {
       position: fixed;

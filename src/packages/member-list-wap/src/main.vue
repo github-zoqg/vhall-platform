@@ -412,7 +412,7 @@
       vertical-align: middle;
       font-size: 30px;
       font-weight: 400;
-      color: #8c8c8c;
+      color: var(--theme-group-name-color);
       line-height: 30px;
     }
     .info-role {
@@ -443,6 +443,7 @@
       color: #ffffff;
     }
     .vmp-member-list-wap__group-title {
+      color: var(--theme-group-color);
       padding: 30px 45px 10px;
       .vh-iconfont {
         font-size: 40px;

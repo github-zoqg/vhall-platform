@@ -104,7 +104,7 @@
         background: transparent;
         font-size: 14px;
         font-weight: 400;
-        color: #e6e6e6;
+        color: var(--theme-tab-content-intro-font);
         word-break: break-word;
         overflow: hidden;
 

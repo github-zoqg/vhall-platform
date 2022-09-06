@@ -74,11 +74,11 @@
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span @click="changePlayerSize(true)">
+            <span v-if="!isConcise" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span>
-              <span class="hot_num">
+              <span class="hot_num hot_num_display">
                 <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                 {{ hotNum | formatHotNum }}
               </span>
@@ -94,7 +94,7 @@
           </template>
           <template v-else>
             <span v-if="isWarnPreview"></span>
-            <span class="hot_num" v-else>
+            <span class="hot_num hot_num_display" v-else>
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
@@ -477,7 +477,8 @@
         isSmallPlayer: false,
         imageCropperMode: 1,
         circleSliderVal: 0,
-        initIndex
+        initIndex,
+        isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -579,6 +580,19 @@
         }
       });
       this.setSetingHeight();
+
+      let skin_json_wap = {
+        style: 1
+      };
+      const skinInfo = this.roomBaseState.skinInfo;
+      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      }
+      if (skin_json_wap?.style == 3) {
+        this.isConcise = true;
+      } else {
+        this.isConcise = false;
+      }
     },
     methods: {
       /**
@@ -948,6 +962,7 @@
   };
 </script>
 <style lang="less">
+  @import url(./skins/wap-player.concise.less);
   .vmp-wap-player {
     height: 100%;
     width: 100%;

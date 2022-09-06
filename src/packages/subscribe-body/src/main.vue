@@ -522,7 +522,7 @@
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #333333;
+        color: #262626;
         line-height: 20px;
         text-align: center;
         padding-top: 54px;
@@ -548,12 +548,12 @@
         .subscribe-start {
           width: 160px;
           height: 40px;
-          background: #fb3a32;
+          background: var(--theme-color);
           border-radius: 20px;
           font-size: 14px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: #ffffff;
+          color: #fff;
           line-height: 40px;
           border: none;
           outline: none;
@@ -565,7 +565,6 @@
       position: relative;
     }
     &-tab {
-      background: #2a2a2a;
       margin: 0px auto;
     }
     .subscribe-img-box-embed {

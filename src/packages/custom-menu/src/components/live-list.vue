@@ -9,7 +9,12 @@
         @click="gotoRoom(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img :class="`img_box_bg box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
+          <img
+            class="cover_pic"
+            :class="`img_box_bg box_bg_${item.itemMode}`"
+            :src="item.img_url"
+            alt=""
+          />
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
@@ -27,7 +32,7 @@
           </div>
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <div class="vh-chose-active-item__cover-hots__content">
-              <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
+              <i class="vh-saas-iconfont vh-saas-line-heat icon_heart_css"></i>
               <i>{{ item.pv }}</i>
             </div>
           </div>
@@ -181,9 +186,16 @@
     height: 80px;
     padding: 8px 10px 8px;
     border-radius: 4px;
+    background-color: var(--theme-tab-content-live-card-bg);
     &:hover {
-      background: #383838;
       cursor: pointer;
+      background-color: var(--theme-tab-content-live-card-hover-bg);
+      .vh-chose-active-item__title {
+        color: var(--theme-color);
+      }
+      .cover_pic {
+        transform: scale(1.2);
+      }
     }
     &__cover {
       position: relative;
@@ -192,6 +204,7 @@
       margin-right: 12px;
       background: #383838;
       border-radius: 4px;
+      overflow: hidden;
       .img_box_bg {
         display: inline-block;
         width: 100%;
@@ -241,7 +254,7 @@
           line-height: 20px;
           z-index: 4;
         }
-        .saasicon_redu {
+        .icon_heart_css {
           &:before {
             display: inline-block;
             width: 14px !important;
@@ -275,7 +288,7 @@
       margin: 10px 0 4px 0;
       font-size: 14px;
       font-weight: 400;
-      color: #e6e6e6;
+      color: var(--theme-tab-content-live-title-font);
       line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -292,7 +305,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 12px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-live-info-font);
       line-height: 16px;
       text-align: left;
     }
@@ -382,7 +395,7 @@
       background: #fff;
       &:hover {
         .vh-chose-active-item__title {
-          color: #fb3a32;
+          color: var(--theme-color);
         }
       }
     }

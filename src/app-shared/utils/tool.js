@@ -201,6 +201,10 @@ export const getCookie = name => {
   }
 };
 
+export const isFunction = val => {
+  return typeof val === 'function';
+};
+
 export const handleIntroInfo = str => {
   if (!str) return '';
   const regImg = /<img.*?(?:>|\/>)/g;
@@ -309,4 +313,37 @@ export const parseImgOssQueryString = imgUrl => {
     currentObj[resultKey] = resultVal;
     return currentObj;
   }, result);
+};
+
+/**
+ * @description 拼接地址栏参数，自带去重
+ */
+export const getUrl = (url = '', data = {}) => {
+  const qsObj = parseQueryString(url);
+  // 截取除去queryString的部分
+  const indexOfSeparator = url.indexOf('?');
+  if (indexOfSeparator > -1) {
+    url = url.substring(0, indexOfSeparator);
+  }
+  // 去重拼接
+  return (
+    url +
+    '?' +
+    getParam({
+      ...qsObj,
+      ...data
+    })
+  );
+};
+
+/**
+ * @description 传入对象返回url参数
+ */
+export const getParam = data => {
+  let url = '';
+  for (let k in data) {
+    let value = data[k] !== undefined ? data[k] : '';
+    url += `&${k}=${encodeURIComponent(value)}`;
+  }
+  return url ? url.substring(1) : '';
 };
