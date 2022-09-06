@@ -411,7 +411,7 @@
     .sub-auth {
       width: 160px;
       height: 40px;
-      background: #fb3a32;
+      background: var(--theme-color);
       border-radius: 20px;
       margin: 32px auto 0px auto;
       display: block;

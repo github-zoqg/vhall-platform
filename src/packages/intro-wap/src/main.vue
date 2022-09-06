@@ -13,17 +13,19 @@
             <!-- <i class="vh-iconfont vh-line-time" /> -->
             {{ startTime }}
           </p>
+          <!-- 预约人数 -->
           <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p v-if="watchInitData.subscribe.show">
+            <p class="num" v-if="watchInitData.subscribe.show">
               <i18n path="appointment.appointment_1018">
                 <span place="n">{{ watchInitData.subscribe.num }}</span>
               </i18n>
             </p>
           </template>
+          <!-- 在线人数 -->
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
-              <i class="vh-iconfont vh-line-user"></i>
+              <!-- <i class="vh-iconfont vh-line-user"></i> -->
               {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
             </p>
           </template>
@@ -159,7 +161,7 @@
 
 <style lang="less">
   .vmp-intro {
-    background-color: #f2f2f2;
+    background-color: var(--theme-tab-content-intro-introLink-bg);
     height: 100%;
     overflow-y: auto;
     position: relative;
@@ -168,7 +170,7 @@
 
     .vmp-intro-block {
       padding: 32px 24px 0 24px;
-      background-color: #fff;
+      background-color: var(--theme-tab-content-intro-introLink-bg);
       position: relative;
 
       // &:not(:first-child) {
@@ -193,7 +195,7 @@
         word-break: break-all;
         font-weight: 500;
         line-height: 48px;
-        color: #262626;
+        color: var(--theme-tab-content-intro-title-font);
         .delay-icon {
           display: inline-block;
           width: 116px;
@@ -233,11 +235,16 @@
         width: 100%;
         justify-content: space-between;
         align-items: center;
+        color: var(--theme-tab-content-intro-subTitle-font);
+        margin-top: 2px;
         p {
-          i {
-            margin-right: 8px;
-          }
-
+          // i {
+          //   margin-right: 8px;
+          // }
+          // .vh-line-user {
+          //   font-size: 12px;
+          //   line-height: 40px;
+          // }
           height: 40px;
           font-size: 28px;
           font-family: Arial;
@@ -248,11 +255,14 @@
           display: flex;
           align-items: center;
         }
+        .num {
+          color: var(--theme-component-subscribe);
+        }
       }
 
       &__content-main {
         padding-bottom: 24px;
-        color: #595959;
+        color: var(--theme-tab-content-intro-subTitle-font);
         word-break: break-all;
         line-height: 1.4;
         p {
@@ -295,7 +305,7 @@
         height: 100px;
         font-size: 28px;
         font-weight: 400;
-        color: rgba(129, 129, 129, 1);
+        color: var(--theme-tab-content-intro-introLink-font);
         line-height: 100px;
         text-align: center;
         display: block;

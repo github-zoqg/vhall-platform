@@ -13,7 +13,7 @@
             <span style="color: #1a1a1a">｜</span>
             {{ virtualText }} {{ person.pv }}&nbsp;&nbsp;
             <el-tooltip effect="dark" placement="right">
-              <i class="iconfont iconicon_help_m"></i>
+              <i class="vh-iconfont vh-line-question"></i>
               <div slot="content">
                 1.人数：当前活动在线人数
                 <br />
@@ -314,7 +314,7 @@
         span {
           color: @font-error-low;
         }
-        .iconfont {
+        .vh-iconfont {
           color: @font-light-low;
           font-size: 16px;
         }

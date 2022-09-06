@@ -70,7 +70,7 @@
       </div>
     </template>
     <!-- 打赏 -->
-    <template v-else-if="source.type == 'reward_pay_ok'">
+    <!-- <template v-else-if="source.type == 'reward_pay_ok'">
       <div class="msg-item new-gift reward_pay_ok">
         <div class="interact-gift-box">
           <div>
@@ -92,7 +92,7 @@
           </div>
         </div>
       </div>
-    </template>
+    </template> -->
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
@@ -170,36 +170,91 @@
               "
             >
               <div class="msg-content_body">
-                <p class="reply-msg">
-                  <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
-                  ：
-                  <span v-html="source.replyMsg.content.text_content" />
-                </p>
-                <p class="reply-msg-content">
-                  <span class="reply-color">
-                    {{ $t('chat.chat_1036') }}
-                  </span>
-                  <span v-html="msgContent" class="chat-text" style="display: inline-block"></span>
-                </p>
-                <div class="imgs">
+                <div class="reply-msg">
                   <div
-                    @click="previewImg(img, index, source.content.image_urls)"
-                    class="msg-content_chat-img"
-                    v-for="(img, index) in source.content.image_urls"
-                    :key="index"
-                    :style="`backgroundImage: url('${
-                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                    }')`"
-                    :alt="$t('chat.chat_1065')"
-                  ></div>
+                    class="textInfo"
+                    :class="
+                      !!!source.replyMsg.content.text_content &&
+                      source.replyMsg.content.image_urls.length != 0
+                        ? 'existSimpleImg'
+                        : ''
+                    "
+                  >
+                    <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                    ：
+                    <span v-html="source.replyMsg.content.text_content" />
+                    <template v-if="!!!source.replyMsg.content.text_content">
+                      <div
+                        @click="previewImg(img, index, source.replyMsg.content.image_urls)"
+                        class="msg-content_chat-img"
+                        v-for="(img, index) in source.replyMsg.content.image_urls"
+                        :key="index"
+                        :style="`backgroundImage: url('${
+                          img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                        }')`"
+                        :alt="$t('chat.chat_1065')"
+                      ></div>
+                    </template>
+                  </div>
+                  <div v-if="!!source.replyMsg.content.text_content" class="imgs">
+                    <div
+                      @click="previewImg(img, index, source.replyMsg.content.image_urls)"
+                      class="img"
+                      v-for="(img, index) in source.replyMsg.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </div>
                 </div>
-                <img class="jian-left" :src="jiantou" alt />
+                <div class="reply-msg-content">
+                  <div
+                    class="textInfo"
+                    :class="
+                      !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
+                    "
+                  >
+                    <span class="reply-color">
+                      {{ $t('chat.chat_1036') }}
+                    </span>
+                    <span v-html="msgContent" class="chat-text"></span>
+                    <template v-if="!!!msgContent">
+                      <div
+                        @click="previewImg(img, index, source.content.image_urls)"
+                        class="msg-content_chat-img"
+                        v-for="(img, index) in source.content.image_urls"
+                        :key="index"
+                        :style="`backgroundImage: url('${
+                          img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                        }')`"
+                        :alt="$t('chat.chat_1065')"
+                      ></div>
+                    </template>
+                  </div>
+                  <div v-if="!!msgContent" class="imgs">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </div>
+                </div>
+                <!-- <img class="jian-left" :src="jiantou" alt /> -->
               </div>
             </template>
             <!-- @消息 -->
             <template v-if="source.atList && source.atList.length !== 0">
               <div class="msg-content_body">
-                <span v-html="msgContent" class="chat-text"></span>
+                <div class="textInfo">
+                  <span v-html="msgContent" class="chat-text"></span>
+                </div>
                 <div
                   @click="previewImg(img, index, source.content.image_urls)"
                   class="msg-content_chat-img"
@@ -210,7 +265,7 @@
                   }')`"
                   :alt="$t('chat.chat_1065')"
                 ></div>
-                <img class="jian-left" :src="jiantou" alt />
+                <!-- <img class="jian-left" :src="jiantou" alt /> -->
               </div>
             </template>
             <!-- 正常消息 -->
@@ -221,29 +276,50 @@
               "
             >
               <div class="msg-content_body">
-                <span class="reply-color"></span>
-                <span
-                  v-html="msgContent"
-                  class="chat-text"
-                  :class="
-                    !!msgContent &&
-                    source.content.image_urls &&
-                    source.content.image_urls.length != 0
-                      ? 'existImg'
-                      : ''
-                  "
-                ></span>
                 <div
-                  @click="previewImg(img, index, source.content.image_urls)"
-                  class="msg-content_chat-img"
-                  v-for="(img, index) in source.content.image_urls"
-                  :key="index"
-                  :style="`backgroundImage: url('${
-                    img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  :alt="$t('chat.chat_1065')"
-                ></div>
-                <img class="jian-left" :src="jiantou" alt />
+                  class="textInfo"
+                  :class="
+                    !!!msgContent && source.content.image_urls.length != 0 ? 'existSimpleImg' : ''
+                  "
+                >
+                  <!-- <span class="reply-color"></span> -->
+                  <span
+                    v-html="msgContent"
+                    class="chat-text"
+                    :class="
+                      !!msgContent &&
+                      source.content.image_urls &&
+                      source.content.image_urls.length != 0
+                        ? 'existImg'
+                        : ''
+                    "
+                  ></span>
+                  <template v-if="!!!msgContent">
+                    <div
+                      @click="previewImg(img, index, source.content.image_urls)"
+                      class="msg-content_chat-img"
+                      v-for="(img, index) in source.content.image_urls"
+                      :key="index"
+                      :style="`backgroundImage: url('${
+                        img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                      }')`"
+                      :alt="$t('chat.chat_1065')"
+                    ></div>
+                  </template>
+                </div>
+                <div v-if="!!msgContent" class="imgs">
+                  <div
+                    @click="previewImg(img, index, source.content.image_urls)"
+                    class="img"
+                    v-for="(img, index) in source.content.image_urls"
+                    :key="index"
+                    :style="`backgroundImage: url('${
+                      img + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                    }')`"
+                    :alt="$t('chat.chat_1065')"
+                  ></div>
+                </div>
+                <!-- <img class="jian-left" :src="jiantou" alt /> -->
               </div>
             </template>
           </div>
@@ -254,7 +330,7 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
-  import { handleChatShowTime } from '../js/handle-time.js';
+  import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
   export default {
     props: {
       source: {
@@ -285,8 +361,8 @@
     data() {
       return {
         msgContent: '',
-        defaultAvatar: defaultAvatar,
-        jiantou: require('../img/jiantou.png')
+        defaultAvatar: defaultAvatar
+        // jiantou: require('../img/jiantou.png')
       };
     },
     filters: {
@@ -329,6 +405,9 @@
       //   }
       // },
       showTime() {
+        if (this.source.showTime || this.source.isHistoryMsg) {
+          return this.source.showTime;
+        }
         if (!this.source.sendTime) {
           return '';
         }
@@ -443,7 +522,7 @@
     .msg-showtime {
       padding: 8px 0 24px;
       font-size: 24px;
-      color: #595959;
+      color: var(--theme-chat-msg-timeline);
       text-align: center;
     }
     .msg-item {
@@ -483,15 +562,10 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: #8c8c8c;
+            color: var(--theme-chat-msg-name-font);
             max-width: 300px;
             line-height: 34px;
             margin-right: 8px;
-          }
-          .send_time {
-            font-size: 24px;
-            font-weight: 400;
-            color: #8c8c8c;
           }
           .role {
             margin-right: 10px;
@@ -500,35 +574,27 @@
             border-radius: 50px;
             font-size: 20px;
             &.host {
-              background-color: #ffd1c9;
-              color: #fb2626;
+              color: rgba(251, 38, 38, 1);
+              background-color: rgba(251, 38, 38, 0.15);
             }
             &.assistant {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
             &.guest {
-              background-color: rgba(173, 225, 255, 0.5);
-              color: #0a7ff5;
+              color: rgba(10, 127, 245, 1);
+              background-color: rgba(10, 127, 245, 0.15);
             }
           }
         }
         .msg-content_body_pre {
           position: relative;
-          .jian-left {
-            width: 11px;
-            height: 18px;
-            position: absolute;
-            left: -11px;
-            top: 14px;
-          }
-          // &.multi {
-          //   .msg-content_body {
-          //     padding: 12px;
-          //     .chat-text {
-          //       line-height: 39px;
-          //     }
-          //   }
+          // .jian-left {
+          //   width: 11px;
+          //   height: 18px;
+          //   position: absolute;
+          //   left: -11px;
+          //   top: 14px;
           // }
         }
         .reply-color {
@@ -539,19 +605,38 @@
         }
         .reply-msg-content {
           word-break: break-word;
-          display: flex;
           .reply-color {
             min-width: 60px;
+          }
+          > .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0 !important;
+              }
+            }
+          }
+          .existSimpleImg {
+            padding-top: 0;
           }
         }
         .reply-msg {
           line-height: 40px;
           margin: 8px 0;
-          color: #999;
+          color: var(--theme-chat-msg-reply-font);
           padding-left: 18px;
           position: relative;
+          .textInfo {
+            position: relative;
+          }
           .chat-text {
-            display: inline-block;
             line-height: 1.4;
           }
           &::after {
@@ -561,8 +646,37 @@
             position: absolute;
             top: 0;
             left: 0;
-            background: #bfbfbf;
+            background: var(--theme-chat-msg-reply-after);
             border-radius: 3px;
+          }
+          > .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0 !important;
+              }
+            }
+          }
+          .existSimpleImg .msg-content_chat-img {
+            margin-bottom: 0;
+          }
+        }
+        .msg-content_chat-img {
+          vertical-align: text-top;
+          display: inline-block;
+          border-radius: 4px;
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
+          &:nth-last-child(1) {
+            margin-right: 0 !important;
           }
         }
         .msg-content_body {
@@ -570,20 +684,23 @@
           display: inline-block;
           padding: 16px;
           word-break: break-all;
-          color: #262626;
+          color: var(--theme-chat-msg-font);
           // line-height: 1.4;
           // line-height: 40px;
           font-size: 28px;
-          background-color: #fff;
+          background-color: var(--theme-chat-msg-bg);
           border-radius: 0 8px 8px 8px;
           span {
             word-break: break-word;
           }
           .chat-text {
-            display: block;
             line-height: 1.4;
             &.existImg {
               margin-bottom: 8px;
+            }
+            img {
+              width: 40px;
+              height: 40px;
             }
           }
           .msg-content_chat-img {
@@ -596,8 +713,20 @@
             background-repeat: no-repeat;
             background-position: center;
           }
-          & :nth-last-child(2) {
-            margin-right: 0;
+          .imgs {
+            .img {
+              display: inline-block;
+              margin: 8px 8px 0 0;
+              width: 84px;
+              height: 86px;
+              border-radius: 4px;
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+              &:nth-last-child(1) {
+                margin-right: 0;
+              }
+            }
           }
         }
         .emoji-img {
@@ -613,26 +742,28 @@
         margin: 0 auto;
         width: fit-content;
         > div {
-          background: rgba(255, 209, 201, 0.2);
+          background: var(--theme-chat-msg-interact-bg);
           border-radius: 40px;
         }
         .role {
-          border-radius: 16px;
-          padding: 0 6px;
+          float: left;
+          border-radius: 50px;
+          padding: 0 10px;
           margin-right: 8px;
-          font-size: 22px;
-          line-height: 22px;
+          margin-top: 4px;
+          line-height: 34px;
+          font-size: 20px;
           &.host {
-            background: rgba(251, 38, 38, 0.1);
-            color: #fb2626;
+            color: rgba(251, 38, 38, 1);
+            background-color: rgba(251, 38, 38, 0.15);
           }
           &.assistant {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+            color: rgba(10, 127, 245, 1);
+            background-color: rgba(10, 127, 245, 0.15);
           }
           &.guest {
-            background-color: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
+            color: rgba(10, 127, 245, 1);
+            background-color: rgba(10, 127, 245, 0.15);
           }
         }
       }
@@ -642,32 +773,12 @@
         border-width: 0;
         height: 48px;
         line-height: 40px;
+        color: var(--theme-chat-msg-font);
+
         &.pwd_red_envelope_ok {
           display: flex;
           align-items: center;
           padding-left: 84px;
-        }
-        .interact-content__role-name {
-          color: @font-link;
-          background-color: rgba(53, 98, 250, 0.2);
-          border-radius: 9px;
-          padding: 4px 8px;
-          font-size: 22px;
-          line-height: 16px;
-          margin: 2px 4px 0;
-          border-radius: 500px;
-          &.host {
-            background: rgba(251, 38, 38, 0.1);
-            color: #fb2626;
-          }
-          &.assistant {
-            background: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
-          }
-          &.guest {
-            background: rgba(173, 225, 255, 0.5);
-            color: #0a7ff5;
-          }
         }
         input {
           background-color: transparent;
@@ -686,7 +797,7 @@
           box-sizing: border-box;
           border-radius: 500px;
         }
-        color: #262626;
+
         p {
           text-align: center;
           line-height: 1;
@@ -717,12 +828,6 @@
       &.interact {
         justify-content: unset;
       }
-      &.purpose {
-        background: linear-gradient(221deg, rgba(184, 58, 244, 0) 0%, #6950fb 100%);
-      }
-      &.red {
-        background: linear-gradient(227deg, rgba(255, 137, 96, 0) 0%, #ff6267 100%);
-      }
 
       .interact-gift-box {
         padding: 0 84px 0 24px;
@@ -737,20 +842,20 @@
         &.zdy {
           padding-right: 90px;
         }
-        p {
-          text-align: left;
-          font-weight: 400;
-          color: #fff;
-        }
+        // p {
+        //   text-align: left;
+        //   font-weight: 400;
+        //   color: #fff;
+        // }
         .new-gift-name {
           font-size: 28px;
           margin-right: 8px;
-          color: #595959;
+          color: var(--theme-chat-msg-gift-font);
         }
         .new-gift-content {
           font-size: 28px;
           // transform: scale(0.9);
-          color: #262626;
+          color: var(--theme-chat-msg-font);
         }
         .flex-box {
           display: flex;
@@ -763,22 +868,22 @@
           border-radius: 50%;
           position: absolute;
           right: 24px;
-          background-color: white;
+          background-color: var(--theme-chat-msg-bg);
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center;
         }
       }
-      &.reward_pay_ok {
-        .interact-gift-box {
-          height: 88px;
-          padding: 0 74px 0 24px;
-          .reward_txt {
-            line-height: 1;
-            margin-top: 4px;
-          }
-        }
-      }
+      // &.reward_pay_ok {
+      //   .interact-gift-box {
+      //     height: 88px;
+      //     padding: 0 74px 0 24px;
+      //     .reward_txt {
+      //       line-height: 1;
+      //       margin-top: 4px;
+      //     }
+      //   }
+      // }
       .new-gift-img,
       .new-award-img {
         width: 60px;
@@ -796,15 +901,10 @@
       text-align: center;
       margin: 10px 0;
     }
-    .sign-msg {
-      background: #aaa;
-      display: inline-block;
-      padding: 2px 30px;
-      border-radius: 20px;
-    }
     .msg-item__content-body__content-link {
       color: #3562fa;
       text-decoration: underline #3562fa !important;
+      word-break: break-all;
     }
   }
 </style>

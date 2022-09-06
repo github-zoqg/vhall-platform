@@ -165,7 +165,7 @@ export default {
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
     nav_1054: 'Share the rehearsal viewing address',
-    nav_1055: ''
+    nav_1055: 'in rehearsal'
   },
   login: {
     login_1001: 'Account login',

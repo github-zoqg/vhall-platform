@@ -104,7 +104,7 @@
         font-weight: 400;
         color: #fff;
         line-height: 80px;
-        background: #fb2626;
+        background: var(--theme-component-subscribe);
         border-radius: 40px;
         text-align: center;
         margin: 0 auto;

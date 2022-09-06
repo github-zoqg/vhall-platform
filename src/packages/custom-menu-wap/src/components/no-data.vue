@@ -39,7 +39,7 @@
       text-align: center;
       font-size: 28px;
       font-weight: 400;
-      color: rgba(153, 153, 153, 1);
+      color: var(--theme-tab-content-rank-noData-font);
     }
   }
 </style>

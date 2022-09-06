@@ -40,7 +40,7 @@
           <div class="vhsaas-chat-msg-item__avatar">
             <img class="msg-item__avatar-img" :src="source.avatar || defaultAvatar" alt />
           </div>
-          <div class="vhsaas-chat-msg-item__content">
+          <div class="vhsaas-chat-msg-item__content reply">
             <!-- 昵称和角色 -->
             <p class="msg-item__content-name clearfix">
               <span class="msg-item_content-name-nick">{{ source.nick_name }}</span>
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   export default {
     props: {
       source: {
@@ -198,12 +198,15 @@
     flex: 1;
     padding-left: 10px;
     word-break: break-all;
+    &.reply .msg-item__content-body__content {
+      color: var(--theme-tab-content-qa-text-font);
+    }
   }
   .msg-item_content-name-nick {
     float: left;
     max-width: 126px;
     font-size: 14px;
-    color: @font-dark-low;
+    color: var(--theme-tab-content-qa-text-font);
     line-height: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -218,22 +221,22 @@
     background-color: rgba(251, 58, 50, 0.2);
     border-radius: 9px;
     &.host {
-      background: rgba(251, 58, 50, 0.2);
-      color: #fb3a32;
+      color: rgba(251, 38, 38, 1);
+      background-color: rgba(251, 38, 38, 0.15);
     }
     &.assistant {
-      background-color: rgba(53, 98, 250, 0.2);
-      color: #3562fa;
+      color: rgba(10, 127, 245, 1);
+      background-color: rgba(10, 127, 245, 0.15);
     }
     &.guest {
-      background-color: rgba(53, 98, 250, 0.2);
-      color: #3562fa;
+      color: rgba(10, 127, 245, 1);
+      background-color: rgba(10, 127, 245, 0.15);
     }
   }
   .msg-item__content-time {
     float: right;
     font-size: 14px;
-    color: #999999;
+    color: var(--theme-tab-content-qa-text-font);
     line-height: 16px;
   }
   .msg-item__content-body__content-wrapper {
@@ -245,7 +248,7 @@
   .msg-item__content-body__content {
     margin-top: 4px;
     font-size: 14px;
-    color: @font-dark-normal;
+    color: var(--theme-tab-content-qa-replyText-font);
     line-height: 20px;
     word-break: break-all;
     &.reply-msg {
@@ -255,12 +258,12 @@
       color: @font-dark-low;
     }
     &::v-deep .reply-msg__label {
-      color: #fa9a32;
+      color: #fc9600;
     }
     ::v-deep .msg-item__qa-flag {
-      color: #fa9a32;
+      color: #fc9600;
       &.color-e6e {
-        color: #e6e6e6;
+        color: var(--theme-tab-content-qa-replyText-font);
       }
     }
   }
@@ -276,7 +279,7 @@
   }
   .vhsaas-msg-item__qa-content {
     display: flex;
-    background: #222222;
+    background: var(--theme-tab-content-qa-replyText-bg);
     border-radius: 4px;
     padding: 6px;
     clear: left;
