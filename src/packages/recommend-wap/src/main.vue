@@ -211,7 +211,8 @@
             object-fit: fill;
           }
           &.ad_bg_3 {
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
           }
         }
       }

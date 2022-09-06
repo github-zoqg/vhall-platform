@@ -135,6 +135,10 @@
         object-fit: cover;
         object-position: left top;
       }
+      &-3 {
+        object-fit: contain;
+        object-position: center;
+      }
       &-icon {
         background: rgba(0, 0, 0, 0.4);
         border-radius: 50%;

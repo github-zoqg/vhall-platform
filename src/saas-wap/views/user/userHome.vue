@@ -558,7 +558,8 @@
         object-position: left top;
       }
       &.home_bg_3 {
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
       }
     }
   }
@@ -585,7 +586,8 @@
         object-position: left top;
       }
       &.home_avator_3 {
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
       }
     }
   }
@@ -759,7 +761,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
         &.bg-cover_1 {
           object-fit: fill;
         }

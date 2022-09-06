@@ -546,7 +546,8 @@
           object-position: left top;
         }
         &.subject_bg_3 {
-          object-fit: scale-down;
+          object-fit: contain;
+          object-position: center;
         }
       }
     }
@@ -659,7 +660,8 @@
             object-position: left top;
           }
           &.box_bg_3 {
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
           }
         }
         .item-status {

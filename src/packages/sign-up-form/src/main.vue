@@ -2296,7 +2296,8 @@
           object-position: left top;
         }
         &.form_bg_3 {
-          object-fit: scale-down;
+          object-fit: contain;
+          object-position: center;
         }
       }
     }

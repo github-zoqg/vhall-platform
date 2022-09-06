@@ -442,7 +442,8 @@
             object-position: left top;
           }
           &.subscribe_bg_3 {
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
           }
         }
         .subscribe-img_end {

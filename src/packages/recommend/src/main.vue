@@ -236,7 +236,8 @@
           .ad_img {
             width: 100%;
             height: 100%;
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
             transition: all 0.4s;
             &.ad_bg_1 {
               object-fit: fill;
@@ -331,7 +332,8 @@
           .ad_img {
             height: 100%;
             width: 100%;
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
             &.ad_bg_1 {
               object-fit: fill;
             }
