@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-live-timer">
     <div v-if="timerVisible && !groupInitData.isInGroup" class="background-img" v-drag>
-      <el-row class="padding45">
+      <el-row>
         <el-row
           :class="
             status == 'timeout'
@@ -24,56 +24,48 @@
           </span>
         </el-row>
         <!-- 时间显示区 -->
-        <el-row class="margin10 number_bg pr mt24 font_zdy">
+        <el-row class="number_base pr mt20">
           <div class="block-line ps"></div>
 
-          <div class="number_mar timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</span>
+          <div class="timerbg">
+            <div :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_mon }}</div>
           </div>
-          <div class="number_mar timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</span>
+          <div class="timerbg ml4">
+            <div :class="time < 1 ? 'timeout_font_color' : ''">{{ mon }}</div>
           </div>
 
-          <span class="pr ft28" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
+          <span class="pr ft22" :class="time < 1 ? 'timeout_font_color' : ''">:</span>
 
-          <div class="number_mar timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</span>
+          <div class="timerbg">
+            <div :class="time < 1 ? 'timeout_font_color' : ''">{{ ten_sec }}</div>
           </div>
-          <div class="number_mar timerbg">
-            <span :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</span>
+          <div class="timerbg ml4">
+            <div :class="time < 1 ? 'timeout_font_color' : ''">{{ sec }}</div>
           </div>
         </el-row>
 
         <el-row v-if="permissionFlag">
-          <el-col align="center" class="mt20">
+          <el-col align="center" class="mt16">
             <el-button
               round
+              plain
               v-if="status == 'timeout'"
-              type="primary"
               @click="goOn(5)"
-              size="mini"
               class="button_width button_timeout"
             >
               继续
             </el-button>
             <el-button
               round
+              plain
               v-else
               :disabled="(time == 0 && is_timeout == 0) || time == -3599"
-              type="primary"
               @click="goOn(4)"
-              size="mini"
               class="button_width button_timeout"
             >
               暂停
             </el-button>
-            <el-button
-              round
-              type="primary"
-              @click="resetTimer"
-              size="mini"
-              class="button_width button_reset"
-            >
+            <el-button round plain @click="resetTimer" class="button_width button_reset">
               重置
             </el-button>
           </el-col>
@@ -165,7 +157,7 @@
        */
       permissionFlag() {
         //是否在分组里
-        if (this.userInfo.role_name == 3) {
+        if ([1, 3].includes(this.userInfo.role_name)) {
           return true;
         }
         if (this.userInfo.third_party_user_id == this.doc_permission) {
@@ -331,7 +323,7 @@
         this.$confirm('是否关闭计时器', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
+          customClass: 'zdy-message-box ',
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
@@ -423,8 +415,8 @@
             action_type: status,
             duration: this.totalTimeNum || this.time,
             remain_time: this.time,
-            is_all_show: this.is_all_show ? 1 : 0,
-            is_timeout: this.is_timeout ? 1 : 0
+            is_all_show: this.is_all_show == 0 ? 0 : 1,
+            is_timeout: this.is_timeout == 0 ? 0 : 1
           })
           .then(res => {
             console.log(res);
@@ -435,23 +427,42 @@
 </script>
 
 <style lang="less">
-  @import url(./style.less);
+  @import url(./font_family/numberFont.less);
   .ft14 {
     font-size: 14px;
   }
   .vmp-live-timer {
-    .button_width {
-      padding: 9px 34px !important;
-      color: #fff;
-    }
-    .button_timeout,
-    .button_timeout:hover {
+    @font-high-light-normal: #fb2626;
+    .button_timeout {
       border: 1px solid #595959 !important;
-      background: #595959 !important;
+      color: #595959 !important;
+      &:hover {
+        border: 1px solid @font-high-light-normal !important;
+        background: @font-high-light-normal;
+        color: white !important;
+      }
+      &:active {
+        border: 1px solid @active-normal !important;
+        background: @active-normal;
+        color: white !important;
+      }
+    }
+    .el-button.is-disabled:hover {
+      background: @font-high-light-normal;
     }
     .button_reset {
-      border: 1px solid @font-high-light-normal;
-      background: @font-high-light-normal;
+      border: 1px solid @font-high-light-normal !important;
+      color: @font-high-light-normal !important;
+      &:hover {
+        border: 1px solid @font-high-light-normal !important;
+        background: @font-high-light-normal;
+        color: white !important;
+      }
+      &:active {
+        border: 1px solid @active-normal !important;
+        background: @active-normal;
+        color: white !important;
+      }
     }
     .start_font_color {
       color: #0fbb5a;
@@ -462,83 +473,73 @@
     .timeout_font_color {
       color: @font-high-light-normal;
     }
+    .mt16 {
+      margin-top: 16px;
+    }
     .mt20 {
       margin-top: 20px;
     }
-    .mt24 {
-      margin-top: 24px;
+    .ml4 {
+      margin-left: 4px;
     }
     .background-img {
-      width: 292px;
+      width: 296px;
+      box-sizing: border-box;
       position: fixed;
       z-index: 102;
-      padding: 24px 20px;
+      padding: 24px 32px;
       top: 15vh;
       left: 50vw;
       transform: translate(-50%, 0);
-      color: #fff;
-      background-image: linear-gradient(#fffaee, #fff6d5);
-      border-radius: 20px;
+      color: #262626;
+      background: white;
+      border-radius: 8px;
     }
     .timerbg {
       display: inline-block;
-      background: url('./img/timerbg.png');
-      height: 75px;
-      width: 53px;
+      background: url('./img/timerbg.png') no-repeat;
+      background-size: 100% 100%;
+      height: 62px;
+      width: 50px;
       position: relative;
+      text-align: center;
       & > :first-child {
-        font-size: 38px;
-        position: absolute;
+        .custom-font-barlow;
+        font-size: 44px;
         font-weight: bold;
-        top: 15px;
-        left: 14px;
+        line-height: 58px;
       }
     }
-    .padding45 {
-      padding: 0 20px;
-    }
-    .margin10 {
-      border-radius: 4px;
-      height: 83px;
-      text-align: center;
+    .number_base {
+      border-radius: 8px;
+      padding: 8px;
+      background: #d9d9d9;
+      .ft22 {
+        .custom-font-barlow;
+        font-size: 22px;
+        top: -10px;
+        font-weight: bold;
+      }
     }
     .ps {
       position: absolute;
     }
     .block-line {
-      border-top: 4px solid #000;
-      top: 40px;
+      border: 1px solid #d9d9d9;
+      top: 48%;
       z-index: 999;
-      width: 100%;
-    }
-    .number_bg {
-      background: #000;
-      .ft28 {
-        font-size: 28px;
-        top: -33px;
-        font-weight: bold;
-      }
+      width: 95%;
     }
     .close {
-      margin-right: 11px;
-      margin-top: 11px;
       cursor: pointer;
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
       position: absolute;
-      right: -35px;
-      top: -10px;
+      right: 0;
       color: #666;
       & > i {
         font-size: 10px;
         float: right;
         line-height: 20px;
       }
-    }
-    .number_mar {
-      box-sizing: border-box;
-      margin: 4px 3px;
     }
     .pr {
       position: relative;

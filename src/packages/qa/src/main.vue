@@ -480,6 +480,9 @@
     width: 100%;
     height: 100%;
     position: relative;
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
   }
   .vhsaas-chat__body-wrapper {
     position: relative;

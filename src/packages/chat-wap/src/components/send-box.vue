@@ -40,7 +40,7 @@
               {{ $t('chat.chat_1079') }}
             </span>
             <!-- 你已被禁言  /  全体禁言中  -->
-            <span v-else>
+            <span class="content-input__placeholder-say" v-else>
               {{ currentTab == 'qa' ? $t('chat.chat_1003') : $t('chat.chat_1021') }}
             </span>
           </div>
@@ -463,8 +463,8 @@
 </script>
 <style lang="less" scoped>
   .vmp-send-box {
-    background-color: #fff;
-    box-shadow: 0px -1px 1px #f1f1f1;
+    background-color: var(--theme-chat-sendBox-bg);
+    // box-shadow: 0px -1px 1px #f1f1f1;
     // &::after {
     //   content: '';
     //   position: absolute;
@@ -499,8 +499,8 @@
         align-items: center;
 
         .content-input__placeholder {
-          background-color: #f5f5f5;
-          color: #8c8c8c;
+          background-color: var(--theme-chat-input-bg);
+          color: #bfbfbf;
           border-radius: 40px;
           width: 100%;
           height: 60px;
@@ -510,6 +510,20 @@
           .login-btn {
             padding-left: 10px;
             color: #007aff;
+          }
+
+          .icon-wrap-chat_set {
+            float: left;
+            height: 60px;
+            line-height: 60px;
+            width: auto;
+          }
+
+          &-say {
+            float: left;
+            height: 60px;
+            line-height: 60px;
+            padding-left: 12px;
           }
         }
       }
@@ -586,6 +600,7 @@
       }
       .only-my-default {
         margin-left: 16px;
+        color: var(--theme-tab-content-qa-onlyMe-font);
       }
     }
   }

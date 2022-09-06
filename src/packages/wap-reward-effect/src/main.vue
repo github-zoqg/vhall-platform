@@ -16,7 +16,7 @@
         <div class="content">
           <!-- <span class="money-img cover-img" v-if="rewardEffectInfo.type == 'reward'"></span> -->
           <span class="nick-name">
-            {{ gift_user_nickname(rewardEffectInfo) | overHidden(7) }}
+            {{ gift_user_nickname(rewardEffectInfo) | overHidden(8) }}
           </span>
           <!-- <span v-if="rewardEffectInfo.type == 'reward'">
             打赏
@@ -146,7 +146,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 2000,
+        minTaskTime: 3000,
         maxQueueLen: 2
       });
 

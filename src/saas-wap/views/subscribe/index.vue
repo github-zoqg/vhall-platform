@@ -18,6 +18,7 @@
   import bindWeiXin from '../../headless/bindWeixin.js';
   import MsgTip from '../MsgTip.vue';
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
+  import skins from '@/app-shared/skins/wap';
   export default {
     name: 'Subcribe',
     components: {
@@ -107,6 +108,9 @@
             return;
           }
           await subscribeState();
+
+          this.setPageConfig();
+
           bindWeiXin();
           console.log('%c---初始化直播房间 完成', 'color:blue');
           if (
@@ -239,6 +243,62 @@
           this.showBottom = true;
         } else {
           this.showBottom = false;
+        }
+      },
+      setPageConfig() {
+        const styleMap = {
+          1: 'main', // 传统风格
+          2: 'fashion', // 时尚风格
+          3: 'fashion' // 极简风格预约页使用时尚风格背景
+        };
+
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+
+        let skin_json_wap = {
+          style: 1,
+          backGroundColor: 2
+        };
+
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skin_json_wap?.style || 1];
+        const theme = themeMap[skin_json_wap?.backGroundColor || 2];
+
+        console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+        skins.setTheme(skins.themes[`theme_main_${theme}`]);
+        this.drawBody(style, theme);
+
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(style, theme) {
+        if (style == 'main' && (theme == 'black' || theme == 'white')) {
+          if (theme == 'black') {
+            document.body.style.background = `#262626`;
+          }
+          if (theme == 'white') {
+            document.body.style.background = `rgba(0, 0, 0, 0.06)`;
+          }
+        } else {
+          document.body.style.backgroundImage = `url(${
+            '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
+            style +
+            '_' +
+            theme +
+            '.png'
+          })`;
+          document.body.style.backgroundSize = 'cover';
         }
       }
     }
