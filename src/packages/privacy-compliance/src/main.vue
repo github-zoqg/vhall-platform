@@ -1,5 +1,10 @@
 <template>
-  <div :class="`vmp-privacy-compliance scene_${scene} client_${clientType}`" v-if="!isEmbed">
+  <div
+    :class="`vmp-privacy-compliance scene_${scene} client_${clientType} ${
+      $i18n.locale == 'en' ? 'language__en' : ''
+    }`"
+    v-if="!isEmbed"
+  >
     <el-checkbox
       v-if="compType == 1"
       v-model.trim="isCheck"
@@ -70,7 +75,7 @@
     a {
       font-style: normal;
       font-weight: 400;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 16px;
       color: #8c8c8c;
       word-break: break-word;
@@ -80,7 +85,6 @@
     }
     a {
       text-decoration: none;
-      font-style: italic;
       font-weight: 400;
       color: #3562fa;
       transform: matrix(0.99, 0, -0.14, 1, 0, 0);
@@ -173,6 +177,11 @@
       &.scene_signForm {
         margin-top: 12px;
         margin-bottom: 0;
+      }
+    }
+    &.language__en {
+      a {
+        font-style: italic;
       }
     }
   }

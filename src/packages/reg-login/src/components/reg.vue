@@ -12,7 +12,7 @@
       class="vmp-login__form__common"
     >
       <!-- 手机号 -->
-      <el-form-item prop="phone">
+      <el-form-item prop="phone" class="common_mg3">
         <el-input
           v-model.trim="ruleForm.phone"
           :placeholder="$t('account.account_1025')"
@@ -23,11 +23,11 @@
         ></el-input>
       </el-form-item>
       <!-- 验证码 -->
-      <el-form-item>
+      <el-form-item class="common_mg3">
         <div id="regCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code common_mg3">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -60,7 +60,7 @@
           }}
         </span>
       </el-form-item>
-      <el-form-item prop="password" class="vmp-register__pwd__box">
+      <el-form-item prop="password" class="vmp-register__pwd__box common_mg3">
         <el-input
           :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
@@ -82,14 +82,16 @@
           {{ $t('nav.nav_1005') }}
         </a>
       </el-form-item>
-      <el-button
-        type="primary"
-        round
-        class="length-max vmp-reg-login__register__btn"
-        @click="handleRegister"
-      >
-        {{ $t('register.register_1013') }}
-      </el-button>
+      <div class="common_mg3">
+        <el-button
+          type="primary"
+          round
+          class="length-max vmp-reg-login__register__btn"
+          @click="handleRegister"
+        >
+          {{ $t('register.register_1013') }}
+        </el-button>
+      </div>
       <div class="vmp-reg-login__register__checked">
         <!-- 隐私合规 -->
         <vmp-privacy-compliance
@@ -310,7 +312,11 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-register {
-    padding: 0 32px 24px 32px;
+    padding: 0 29px 24px 29px;
+    .common_mg3 {
+      margin-right: 3px;
+      margin-left: 3px;
+    }
   }
   .vmp-register__pwd__box {
     position: relative;
