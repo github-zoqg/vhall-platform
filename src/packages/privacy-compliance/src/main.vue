@@ -124,7 +124,7 @@
     /* 报名表单 */
     &.scene_signForm {
       display: block;
-      text-align: left;
+      text-align: center;
       align-items: unset;
       justify-content: unset;
     }
@@ -143,7 +143,6 @@
         margin-bottom: 10px;
       }
       &.scene_signForm {
-        text-align: left;
         margin-top: 32px;
         margin-bottom: 0;
       }
@@ -172,7 +171,6 @@
         }
       }
       &.scene_signForm {
-        text-align: center;
         margin-top: 12px;
         margin-bottom: 0;
       }
