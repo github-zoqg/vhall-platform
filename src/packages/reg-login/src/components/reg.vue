@@ -226,7 +226,7 @@
           this.$message({
             message: this.$t('privacy.privacy_1005'),
             showClose: true,
-            type: 'error',
+            type: 'warning',
             customClass: 'zdy-info-box'
           });
           return;
