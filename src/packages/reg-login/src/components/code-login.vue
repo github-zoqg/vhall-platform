@@ -197,8 +197,6 @@
       },
       // 点击登录 - 验证码登录
       async handleCodeLogin() {
-        const valid = await this.$refs.ruleForm.validate();
-        if (!valid) return false;
         if (!this.loginDynamicChecked) {
           this.$message({
             message: this.$t('privacy.privacy_1005'),
@@ -208,6 +206,8 @@
           });
           return false;
         }
+        const valid = await this.$refs.ruleForm.validate();
+        if (!valid) return false;
         const params = {
           way: 2, // 手机号验证码登录
           phone: this.ruleForm.phone,
