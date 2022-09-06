@@ -151,7 +151,7 @@
   .vmp-chapter {
     width: 100%;
     height: 100%;
-    background: #2a2a2a;
+    background: var(--chapter-list-bg);
     .chapter-info,
     .step-info {
       height: 40px;
@@ -160,7 +160,7 @@
       padding: 0 4px;
       margin: 0 20px;
       font-family: PingFangSC-Regular, PingFang SC;
-      color: #cccccc;
+      color: var(--chapter-font-color-title);
       font-size: 12px;
       cursor: pointer;
       .title {
@@ -168,6 +168,7 @@
         float: left;
       }
       .time {
+        color: var(--chapter-font-color-time);
         float: right;
       }
       .active-img {
@@ -187,13 +188,16 @@
         word-break: break-all;
       }
       &:hover {
-        background: #1a1a1a;
-        color: #fb3a32;
+        background: var(--chapter-list-item-bg-active);
+        color: var(--chapter-font-color-active);
         line-height: 40px;
+        .time {
+          color: var(--chapter-font-color-active);
+        }
       }
       &.active {
-        background: #1a1a1a;
-        color: #fb3a32;
+        background: var(--chapter-list-item-bg-active);
+        color: var(--chapter-font-color-active);
         .title-label {
           float: left;
           width: 250px;
@@ -205,6 +209,9 @@
         }
         .active-img {
           display: block;
+        }
+        .time {
+          color: var(--chapter-font-color-active);
         }
       }
     }

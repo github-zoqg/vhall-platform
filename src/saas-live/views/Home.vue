@@ -29,6 +29,7 @@
     useInteractiveServer,
     useMicServer
   } from 'middle-domain';
+  import skins from '@/app-shared/skins/watch';
   export default {
     name: 'Home',
     components: {
@@ -86,6 +87,7 @@
         window.vhallReport.report('ENTER_WATCH');
         await roomState();
 
+        this.setPageConfig();
         // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
         document.title = watchInitData.webinar.subject;
 
@@ -184,6 +186,20 @@
         thirdBackground.style.background = `url(${process.env.VUE_APP_STATIC_BASE}/common-static/images/thirdDefault.png) no-repeat`;
         thirdBackground.style.backgroundSize = '100% 100%';
         thirdBackground.style.backgroundPosition = 'center';
+      },
+      setPageConfig() {
+        const style = 'default';
+        const theme = 'black';
+
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(theme);
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(theme) {
+        document.body.style.background = `rgb(26, 26, 26)`;
       }
     }
   };

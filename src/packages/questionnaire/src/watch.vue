@@ -155,7 +155,7 @@
         width: 7px;
         height: 7px;
         border: 1px solid #2a2a2a;
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         border-radius: 50%;
       }
       img {

@@ -1,9 +1,9 @@
 <template>
   <div
-    class="vmp-basic-layout"
-    :class="{
-      'vmp-basic-layout__noHeader': !showHeader
-    }"
+    :class="[
+      { 'vmp-basic-layout__noHeader': !showHeader },
+      isConcise ? 'vmp-concise-layout' : 'vmp-basic-layout'
+    ]"
   >
     <van-loading
       v-show="state === 0"
@@ -35,6 +35,9 @@
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
+  import { setPage } from '../page-config/index';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+  import skins from '@/app-shared/skins/wap';
 
   export default {
     name: 'Home',
@@ -48,6 +51,17 @@
       };
     },
     computed: {
+      isConcise() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skin_json_wap = {
+          style: 1,
+          backGroundColor: 2
+        };
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return skin_json_wap.style == 3;
+      },
       /**
        * 是否显示头部
        */
@@ -124,12 +138,18 @@
             console.log('嵌入', e);
           }
           const domain = await this.initReceiveLive(clientType);
-          if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
+          if (
+            roomBaseServer.state.watchInitData.live_type != 2 &&
+            this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe'
+          ) {
             // 是否跳转预约页
             this.goSubscribePage(clientType);
             return;
           }
+
           await roomState();
+
+          this.setPageConfig();
 
           //微信相关设置
           bindWeiXin();
@@ -184,7 +204,7 @@
       },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
-        const { token } = this.$route.query;
+        const { token, rehearsal } = this.$route.query;
         if (token) {
           localStorage.setItem('token', token);
         }
@@ -196,6 +216,7 @@
           initRoom: {
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
+            live_type: rehearsal == 1 ? 2 : 0, // 2 彩排   0 正式
             ...this.$route.query // 第三方地址栏传参
           },
           // 日志上报的参数
@@ -286,6 +307,106 @@
         window.location.replace(
           `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/subscribe/${this.$route.params.id}${window.location.search}`
         );
+      },
+      setPageConfig() {
+        /*
+        {
+            "backGroundColor": "1", //主题色 按照数字逻辑 前端枚举
+            "pageStyle": "#FB3A32", // 页面风格
+            "popStyle": "",// 原有字段 预留
+            "background": "", //背景图
+            "backgroundSize": "", //背景图大小字符串
+            "blurryDegree": "0", // 模糊程度
+            "lightDegree": "10",// 光亮程度
+            "style": "1",// 风格 按照数字逻辑 前端枚举
+            "inavLayout": "CANVAS_ADAPTIVE_LAYOUT_TILED_MODE", //连麦布局
+            "inavDocumentLayout": "1", //连麦+演示布局 1 上下 2 左右
+            "videoColor": "#1A1A1A",  //视频底色
+            "videoBackGround": "", // 视频背景图
+            "videoBlurryDegree": "0",  //视频模糊程度
+            "videoLightDegree": "10",//视频亮度
+            "videoBackGroundSize": "", //视频图片裁剪大小对象
+            "chatLayout": "1" //聊天布局 1 上下 2 左右
+          }
+        */
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+
+        const styleMap = {
+          1: 'main', // 传统风格
+          2: 'fashion', // 时尚风格
+          3: 'concise' // 极简风格
+        };
+
+        let skin_json_wap = {
+          style: 1,
+          backGroundColor: 2
+        };
+        // let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
+        //   style: 1,
+        //   backGroundColor: 1
+        // };
+
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+
+        // sessionStorage.setItem('skinInfoWap', JSON.stringify(skin_json_wap));
+
+        if (skin_json_wap?.style == 3) {
+          // 设置极简风格页面
+          setPage('concise');
+        } else if (skin_json_wap?.style == 2) {
+          // 设置聊天组件为左右风格
+          updatePageNode('comChatWap', 'component', 'VmpChatWapFashion');
+        }
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skin_json_wap?.style || 1];
+        const theme = themeMap[skin_json_wap?.backGroundColor || 2];
+
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_wap);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(style, theme, skin_json_wap);
+
+        // 挂载到window方便调试
+        // window.skins = skins;
+      },
+      drawBody(style, theme, skin) {
+        let app = null;
+        if (style == 'main') {
+          app = document.getElementById('app');
+        } else {
+          app = document.body;
+        }
+        if (skin?.wapBackground) {
+          app.style.backgroundImage = `url(${skin?.wapBackground})`;
+          app.style.backgroundSize = 'cover';
+        } else {
+          if (style == 'main' && (theme == 'black' || theme == 'white')) {
+            if (theme == 'black') {
+              document.body.style.background = `#262626`; // 黑色
+            }
+            if (theme == 'white') {
+              app.style.background = `rgba(0, 0, 0, 0.06)`;
+            }
+          } else {
+            app.style.backgroundImage = `url(${
+              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
+              style +
+              '_' +
+              theme +
+              '.png'
+            })`;
+            app.style.backgroundSize = 'cover';
+          }
+        }
       }
     }
   };

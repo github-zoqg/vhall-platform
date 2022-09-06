@@ -257,6 +257,7 @@
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
+    useMediaSettingServer,
     useChatServer,
     useDocServer,
     useMsgServer,
@@ -638,11 +639,14 @@
         } else if (this.joinInfo.role_name == 1) {
           // 主持人不在麦上，但是刷新页面也需要设置一下旁路
           await this.setBroadCastAdaptiveLayoutMode(
-            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+            VhallRTC[useMediaSettingServer().state.layout] ||
+              VhallRTC[sessionStorage.getItem('layout')] ||
+              VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
           );
 
           await this.setBroadCastScreen();
         }
+        // console.log('VhallRTC', VhallRTC['CANVAS_ADAPTIVE_LAYOUT_TILED_MODE']);
       },
       // 自动上麦禁音条件更新
       updateAutoSpeak() {
@@ -804,7 +808,7 @@
             }
 
             // 由于结束直播导致的结束讨论
-            if (msg.data.over_live == 1) {
+            if (msg.data.over_type) {
               // 此处仅处理非主持人的角色
               if (this.joinInfo.role_name != 1) {
                 await this.stopPush({ type: 'group_switch_end_stop' });
@@ -829,7 +833,10 @@
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
           this.$message.success(
-            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: '主画面' })
+            this.$t('interact.interact_1012', {
+              n: msg.data.nick_name,
+              m: this.$t('interact.interact_1033')
+            })
           );
         });
 
@@ -846,7 +853,7 @@
           if (msg.data.is_start_live == 1) return;
           const m =
             this.roomBaseServer.state.watchInitData.webinar.mode == 6
-              ? '主画面'
+              ? this.$t('interact.interact_1033')
               : this.$t('interact.interact_1034');
           this.$message.success(
             this.$t('interact.interact_1012', {
@@ -1173,7 +1180,10 @@
       // 设置旁路布局
       async setBroadCastAdaptiveLayoutMode(layout) {
         const param = {
-          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')] || layout
+          adaptiveLayoutMode:
+            VhallRTC[useMediaSettingServer().state.layout] ||
+            VhallRTC[sessionStorage.getItem('layout')] ||
+            layout
         };
         await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
           return Promise.reject('setBroadCastAdaptiveLayoutModeError');

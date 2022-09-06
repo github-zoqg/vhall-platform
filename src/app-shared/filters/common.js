@@ -119,7 +119,6 @@ Vue.filter('filterAmount', val => {
 
 // 播放器回放时间转化
 Vue.filter('secondToDate', (val, type) => {
-  console.log(val);
   // type= 1 :表示章节
   let time = dayjs.duration(val, 'seconds');
   let hours = time.hours();
