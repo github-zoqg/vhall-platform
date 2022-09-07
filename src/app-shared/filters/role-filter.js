@@ -15,7 +15,6 @@ function getRoleName(value) {
   switch (value) {
     case 1:
     case 'host':
-      console.log(customRoleName[1]);
       ret = Vue.prototype.$tdefault.call(window.i18n, customRoleName[1]);
       break;
     case 2:

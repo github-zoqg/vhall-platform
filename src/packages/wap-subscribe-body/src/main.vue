@@ -671,9 +671,10 @@
           }
           // 邀请卡分享
           queryString += this.$route.query.invite ? `&invite=${this.$route.query.invite}` : '';
-          // window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
-          // TODO: 重定向改为了路由跳转
-          this.$router.push(`/lives/entryform/${this.$route.params.id}${queryString}`);
+          // 界面跳转（此功能跳转，报名表单数据收集的时候，已没有init接口拿取参会信息，数据埋点上报跟之前反馈给产品的一样，走上报中设定的兼容逻辑）
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/entryform/${this.$route.params.id}${queryString}`;
+          // TODO: 重定向改为了路由跳转（不能用$router.push跳转，有可能导致多个Serve被创建。）
+          // this.$router.push(`/lives/entryform/${this.$route.params.id}${queryString}`);
         }
       },
       webinarPayAuth() {
@@ -900,7 +901,8 @@
             object-position: left top;
           }
           &.subscribe_bg_3 {
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
           }
         }
         .subscribe-type {
@@ -980,9 +982,9 @@
       overflow-y: auto;
       width: 100%;
       position: relative;
-      background: #f2f2f2;
+      // background: #f2f2f2;
       .subscribe_into {
-        background: #fff;
+        background: var(--theme-tab-menu-box-bg);
         padding: 40px 0;
         margin-bottom: 16px;
         .vod_title {
@@ -993,6 +995,14 @@
           color: #262626;
           font-size: 36px;
         }
+        .subscribe_into_down {
+          span {
+            color: var(--theme-component-subscribe-text);
+          }
+          .des {
+            color: var(--theme-component-subscribe-num);
+          }
+        }
       }
       .subscribe_tabs {
         &.top_menu {
@@ -1000,7 +1010,7 @@
             position: fixed;
             top: 489px;
             z-index: 10;
-            background: #fff;
+            background: var(--theme-tab-menu-box-bg);
           }
         }
         &.embed_menu {
@@ -1008,7 +1018,7 @@
             position: fixed;
             top: 418px;
             z-index: 10;
-            background: #fff;
+            background: var(--theme-tab-menu-box-bg);
           }
         }
         .tab-content {
@@ -1039,7 +1049,7 @@
       width: 520px;
       margin: 0 auto;
       height: 80px;
-      background: #fb3a32;
+      background: var(--theme-component-subscribe);
       border-radius: 50px;
       color: #fff;
       text-align: center;
@@ -1048,9 +1058,9 @@
         font-size: 32px;
       }
       &.is-subscribe {
-        background: #fff;
-        border: 1px solid #fb3a32;
-        color: #fb3a32;
+        background: var(--theme-component-subscribe-success-bg);
+        border: 1px solid var(--theme-component-subscribe);
+        color: var(--theme-component-subscribe);
       }
     }
     .subscribe_into_center {
@@ -1074,7 +1084,7 @@
         line-height: 80px;
         text-align: center;
         border-radius: 50px;
-        background: #fb3a32;
+        background: var(--theme-component-subscribe);
       }
     }
     &-auth {

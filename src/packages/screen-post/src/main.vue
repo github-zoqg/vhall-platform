@@ -81,7 +81,7 @@
         if (Number(obj.mode) == 2) {
           this.imageShowMode = 'cover';
         } else if (Number(obj.mode) == 3) {
-          this.imageShowMode = 'scale-down';
+          this.imageShowMode = 'contain';
         }
       },
       // 自动关闭

@@ -28,7 +28,7 @@
       padding-left: 20px;
       line-height: 1.2;
       border-left: 2px solid #fb3a32;
-      color: #333;
+      color: var(--theme-tab-content-title-font);
       font-weight: 500;
     }
   }

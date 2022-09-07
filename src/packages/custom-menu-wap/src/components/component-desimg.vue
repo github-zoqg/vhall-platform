@@ -20,7 +20,7 @@
     font-size: 28px;
     line-height: 40px;
     font-weight: 400;
-    color: #1a1a1a;
+    color: var(--theme-tab-content-word-font);
     overflow-x: hidden;
     img {
       width: 100%;

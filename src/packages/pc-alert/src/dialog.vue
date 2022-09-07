@@ -4,7 +4,7 @@
       <template v-if="showDefault">
         <div class="header" v-if="headerShow" :style="{ background: headerBackgroundColor }">
           <span class="returnPage" @click="onReturn" v-if="isReturn">
-            <i class="iconfont iconzuofanye"></i>
+            <i class="vh-iconfont vh-line-arrow-left"></i>
           </span>
           <h3>{{ title }}</h3>
           <span class="close" @click="onClose" v-if="isClose">

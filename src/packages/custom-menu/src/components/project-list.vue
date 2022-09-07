@@ -12,8 +12,7 @@
           <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <div class="vh-chose-active-item__cover-hots__content">
-              <!-- <i class="saasicon_redu"></i> -->
-              <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
+              <i class="vh-saas-iconfont vh-saas-line-heat icon_heart_css"></i>
               <i>{{ item.pv }}</i>
             </div>
           </div>
@@ -132,9 +131,16 @@
     padding: 8px 10px 8px;
     font-family: PingFangSC-Regular, PingFang SC;
     border-radius: 4px;
+    background-color: var(--theme-tab-content-project-card-bg);
     &:hover {
-      background: #383838;
       cursor: pointer;
+      background-color: var(--theme-tab-content-project-card-hover-bg);
+      .vh-chose-active-item__title {
+        color: var(--theme-color);
+      }
+      .cover_pic {
+        transform: scale(1.2);
+      }
     }
     &__cover {
       position: relative;
@@ -142,12 +148,14 @@
       height: 80px;
       margin-right: 12px;
       border-radius: 4px;
+      overflow: hidden;
       .cover_pic {
         display: inline-block;
         width: 100%;
         height: 100%;
         border-radius: 4px;
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
         &.box_bg_1 {
           object-fit: fill;
         }
@@ -192,7 +200,7 @@
           line-height: 20px;
           z-index: 4;
         }
-        .saasicon_redu {
+        .icon_heart_css {
           &:before {
             display: inline-block;
             width: 14px !important;
@@ -229,7 +237,7 @@
       margin: 10px 0px 4px 0px;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--theme-tab-content-project-title-font);
       line-height: 20px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -245,7 +253,7 @@
       word-break: keep-all;
       white-space: nowrap;
       font-size: 12px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-project-info-font);
       line-height: 16px;
       text-align: left;
     }
@@ -298,7 +306,8 @@
           object-position: left top;
         }
         &.box_bg_3 {
-          object-fit: scale-down;
+          object-fit: contain;
+          object-position: center;
         }
       }
       &-hots {
@@ -319,7 +328,7 @@
       background: #fff;
       &:hover {
         .vh-chose-active-item__title {
-          color: #fb3a32;
+          color: var(--theme-color);
         }
       }
     }

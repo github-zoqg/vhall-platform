@@ -4,12 +4,9 @@
     <el-dropdown @command="handleChangeLang" placement="bottom">
       <div :class="'vmp-language-choice-lang ' + themeClass.iconClass">
         <span class="vmp-language-choice-lang-icon">
-          <i
-            class="vh-saas-iconfont vh-saas-line-multilingual"
-            :style="{ color: themeClass.pageBg }"
-          ></i>
+          <i class="vh-saas-iconfont vh-saas-line-multilingual"></i>
         </span>
-        <p :style="{ color: themeClass.pageBg }">{{ lang.label }}</p>
+        <p>{{ lang.label }}</p>
       </div>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item
@@ -18,7 +15,7 @@
           :class="{ active: item.key == lang.key }"
           v-for="(item, index) in languageList"
         >
-          {{ item.label }}
+          <span>{{ item.label }}</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -44,7 +41,7 @@
     },
     created() {
       const roomBaseServer = useRoomBaseServer();
-      this.setSkinInfo(roomBaseServer.state.skinInfo);
+      // this.setSkinInfo(roomBaseServer.state.skinInfo);
       // 语言列表
       this.languageList = roomBaseServer.state.languages.langList;
       // 当前语言
@@ -121,7 +118,7 @@
           i,
           p {
             cursor: pointer;
-            color: @font-high-light-normal !important;
+            color: var(--header-tab-item-font-color) !important;
           }
         }
       }

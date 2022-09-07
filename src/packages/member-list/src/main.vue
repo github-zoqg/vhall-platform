@@ -1861,17 +1861,23 @@
 </script>
 
 <style lang="less">
+  .vmp-member-dropdown-menu.el-dropdown-menu {
+    background-color: var(--header-tab-item-dropdown-color) !important;
+    .el-dropdown-menu__item:hover {
+      color: var(--group-more-mute-font-color) !important;
+    }
+  }
   .vmp-member-list {
     height: 100%;
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #2a2a2a;
+    background-color: var(--theme-menu-bg);
     &__group-name {
       display: flex;
       align-items: center;
       padding: 18px 20px 5px;
-      color: #ccc;
+      color: var(--group-name-icon-font-color);
       .pr_top {
         margin-left: 10px;
         font-size: 14px;
@@ -1940,27 +1946,28 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #2a2a2a;
+      background-color: var(--theme-menu-bg);
       box-sizing: border-box;
       color: #e2e2e2;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid var(--theme-menu-bg);
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
         margin-right: 4px;
+        color: var(--group-online-icon-color);
       }
       .info-panel__online-num {
         display: inline-block;
         margin-left: 6px;
-        color: #ababab;
+        color: var(--group-online-font-color);
       }
       .info-panel__refresh-btn {
         display: inline-block;
         margin-left: 6px;
-        color: #ababab;
+        color: var(--group-refresh-font-color);
         cursor: pointer;
         &:hover {
-          color: #4da1ff;
+          color: var(--theme-color);
         }
       }
       .info-panel__allow-raise-hand {
@@ -2022,23 +2029,23 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #434343;
-          color: #999;
+          background-color: var(--group-btn-bg-color);
+          color: var(--group-btn-font-color);
           float: left;
           cursor: pointer;
           position: relative;
           margin-right: 1px;
           &:hover {
-            background-color: #969696;
-            color: #fff;
+            background-color: var(--group-btn-hover-color);
+            color: var(--group-btn-hover-font-color);
           }
           &.active {
-            background-color: #595959;
-            color: #e6e6e6;
-            &:hover {
-              color: #e6e6e6;
-              background-color: #595959;
-            }
+            background-color: var(--group-btn-active-color);
+            color: var(--group-btn-active-font-color);
+            // &:hover {
+            //   color: #e6e6e6;
+            //   background-color: #595959;
+            // }
           }
           &.raise-hand {
             &::before {
@@ -2049,7 +2056,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fb3a32;
+              background-color: var(--theme-color);
             }
           }
         }
@@ -2060,8 +2067,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #999;
-          background-color: #434343;
+          background-color: var(--group-btn-bg-color);
+          color: var(--group-btn-font-color);
         }
       }
       &__search-panel {
@@ -2071,7 +2078,7 @@
         position: absolute;
         top: 4px;
         left: 10px;
-        background-color: #34363a;
+        background-color: var(--group-search-input-bg2-color);
         border-radius: 4px;
         overflow: hidden;
 
@@ -2079,10 +2086,19 @@
           box-sizing: border-box;
           width: 100%;
           height: 100%;
-          background-color: hsla(0, 0%, 100%, 0.9);
+          background-color: var(--group-search-input-bg-color);
           padding: 0 75px 0 10px;
           border: none;
-          color: #666;
+          color: var(--group-search-input-font-color);
+          &::-webkit-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
+          &::-moz-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
+          &::-ms-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
         }
         .search-panel__clear-btn {
           width: 15px;
@@ -2101,8 +2117,8 @@
           line-height: 30px;
           border-radius: 0 4px 4px 0;
           text-align: center;
-          background-color: #a6a6a8;
-          color: #fff;
+          background-color: var(--group-search-bg-color);
+          color: var(--group-search-font-color);
           position: absolute;
           top: 0;
           right: 0;

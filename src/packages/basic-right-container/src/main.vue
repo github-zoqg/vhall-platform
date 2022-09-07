@@ -73,7 +73,7 @@
       padding-top: 56.25%;
     }
     .vmp-basic-right-bd {
-      background: #2a2a2a;
+      // background: #2a2a2a;
       flex: 1;
       height: 1px;
     }

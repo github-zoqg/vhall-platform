@@ -985,7 +985,8 @@
         object-position: left top;
       }
       &-3 {
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
       }
       p {
         width: 72px;
