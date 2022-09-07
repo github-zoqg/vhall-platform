@@ -10,17 +10,9 @@
       v-model.trim="isCheck"
       @change="emitCheckboxVal"
     ></el-checkbox>
+    <!--a 不能格式化，格式化会多空格 -->
     <i18n :path="compType == 1 ? 'privacy.privacy_1001' : 'privacy.privacy_1002'">
-      <span place="n">
-        <a :href="privacyUrl" target="_blank" rel="noopener noreferrer">
-          {{ $t('privacy.privacy_1004') }}
-        </a>
-      </span>
-      <span place="n1">
-        <a :href="privacyUPoUrl" target="_blank" rel="noopener noreferrer">
-          {{ $t('privacy.privacy_1003') }}
-        </a>
-      </span>
+      <span place="n"><a :href="privacyUrl" target="_blank" rel="noopener noreferrer">{{ $t('privacy.privacy_1004') }}</a></span><span place="n1"><a :href="privacyUPoUrl" target="_blank" rel="noopener noreferrer">{{ $t('privacy.privacy_1003') }}</a></span>
     </i18n>
   </div>
 </template>
@@ -144,27 +136,33 @@
     /* 手机端样式设置 */
     &.client_mobile {
       span {
-        font-size: 20px;
+        font-size: 24px;
       }
       a {
-        font-size: 20px;
+        font-size: 24px;
         line-height: 40px;
       }
       &.scene_lottery {
         width: 626px;
         margin: 32px auto 0 auto;
+        text-align: left;
       }
       &.scene_auth {
         margin-top: 32px;
         margin-bottom: 10px;
+        padding: 0 0;
+        span {
+          font-size: 24px;
+        }
+        a {
+          font-size: 24px;
+          line-height: 44px;
+        }
       }
       &.scene_signForm {
         margin-top: 32px;
         margin-bottom: 0;
         text-align: left;
-        &.language__en {
-          text-align: center;
-        }
       }
     }
     /* PC端样式设置 */
@@ -176,13 +174,17 @@
         font-size: 12px;
         line-height: 20px;
       }
+      &.scene_auth {
+        padding: 0 0;
+      }
       &.scene_lottery {
         position: absolute;
-        bottom: 34px;
         padding: 0 0;
         margin: 0 0;
         width: 300px;
+        bottom: 53px;
         text-align: center;
+        padding-left: 6px;
         span {
           font-size: 12px;
           line-height: 17px;
@@ -201,6 +203,37 @@
     &.language__en {
       a {
         font-style: italic;
+      }
+      &.client_pc {
+        &.scene_lottery {
+          width: 278px;
+          bottom: 34px;
+          padding-left: 0;
+        }
+      }
+      &.client_mobile {
+        &.scene_lottery {
+          &.language__en {
+            text-align: center;
+          }
+        }
+        &.scene_signForm {
+          &.language__en {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+  @media (min-width: 375px) {
+    .vmp-privacy-compliance {
+      &.client_mobile {
+        &.scene_lottery {
+          text-align: center;
+        }
+        &.scene_signForm {
+          text-align: center;
+        }
       }
     }
   }

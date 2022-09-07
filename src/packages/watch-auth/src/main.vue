@@ -7,7 +7,7 @@
       width="400px"
     >
       <div class="vmp-auth-wrap">
-        <div class="vmp-auth-wrap-text">
+        <div :class="['vmp-auth-wrap-text', isWhiteCheck ? 'auth__privacy' : '']">
           <el-input
             :type="isHideEye ? 'text' : 'password'"
             v-model="authTitle"
@@ -173,6 +173,9 @@
         }
         .el-input__inner {
           padding-right: 40px;
+        }
+        &.auth__privacy {
+          padding-bottom: 4px;
         }
       }
       &-btn {
