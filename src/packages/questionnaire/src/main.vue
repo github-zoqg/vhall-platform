@@ -143,6 +143,7 @@
             scene="liveQuestion"
             clientType="pc"
             compType="2"
+            v-if="prevQuestionnaireId"
           ></vmp-privacy-compliance>
         </section>
       </section>
