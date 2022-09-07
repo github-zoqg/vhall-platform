@@ -8,6 +8,7 @@
       class="vmp-screen-post-img"
       :src="screenPosterInfo_img"
       :fit="imageShowMode"
+      :class="{ obj_pos: screenPosterInfo_img.includes('mode=2') }"
       lazy
     ></el-image>
     <div
@@ -125,6 +126,9 @@
     .vmp-screen-post-img {
       width: 100%;
       height: 100%;
+    }
+    .obj_pos img {
+      object-position: left top;
     }
 
     .vmp-screen-post-close-tip {

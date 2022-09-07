@@ -335,7 +335,7 @@
     &__cover {
       width: 100%;
       height: 160px;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background: #000;
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
       overflow: hidden;
