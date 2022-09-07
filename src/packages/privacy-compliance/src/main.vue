@@ -92,7 +92,7 @@
         color: #3562fa;
       }
     }
-    /* 登录：展开其它登录方式 */
+    /* 观看端-登录：展开其它登录方式 */
     &.scene_login {
       line-height: 16px;
       margin-top: 12px;
@@ -105,18 +105,18 @@
       align-items: baseline;
       padding-bottom: 2px;
     }
-    /* 注册 */
+    /* 观看端-注册 */
     &.scene_register {
       margin-top: 38px;
     }
-    /* 抽奖 */
+    /* 观看端-抽奖 */
     &.scene_lottery {
       display: block;
       text-align: left;
       align-items: unset;
       justify-content: unset;
     }
-    /* 鉴权 */
+    /* 观看端-鉴权白名单 */
     &.scene_auth {
       display: block;
       text-align: left;
@@ -125,8 +125,17 @@
       margin-bottom: 16px;
       padding: 0 10px;
     }
-    /* 报名表单 */
+    /* 观看端-报名表单 */
     &.scene_signForm {
+      display: block;
+      text-align: center;
+      align-items: unset;
+      justify-content: unset;
+    }
+    /* 发起端-问卷 */
+    &.scene_liveQuestion {
+      margin: 12px auto 0 auto;
+      padding-bottom: 60px;
       display: block;
       text-align: center;
       align-items: unset;
@@ -134,6 +143,9 @@
     }
     /* 手机端样式设置 */
     &.client_mobile {
+      span {
+        font-size: 20px;
+      }
       a {
         font-size: 20px;
         line-height: 40px;
@@ -149,10 +161,17 @@
       &.scene_signForm {
         margin-top: 32px;
         margin-bottom: 0;
+        text-align: left;
+        &.language__en {
+          text-align: center;
+        }
       }
     }
     /* PC端样式设置 */
     &.client_pc {
+      span {
+        font-size: 12px;
+      }
       a {
         font-size: 12px;
         line-height: 20px;
