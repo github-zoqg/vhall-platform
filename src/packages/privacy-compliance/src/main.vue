@@ -12,7 +12,16 @@
     ></el-checkbox>
     <!--a 不能格式化，格式化会多空格 -->
     <i18n :path="compType == 1 ? 'privacy.privacy_1001' : 'privacy.privacy_1002'">
-      <span place="n"><a :href="privacyUrl" target="_blank" rel="noopener noreferrer">{{ $t('privacy.privacy_1004') }}</a></span><span place="n1"><a :href="privacyUPoUrl" target="_blank" rel="noopener noreferrer">{{ $t('privacy.privacy_1003') }}</a></span>
+      <span place="n">
+        <a :href="privacyUrl" target="_blank" rel="noopener noreferrer">
+          {{ $t('privacy.privacy_1004') }}
+        </a>
+      </span>
+      <span place="n1">
+        <a :href="privacyUPoUrl" target="_blank" rel="noopener noreferrer">
+          {{ $t('privacy.privacy_1003') }}
+        </a>
+      </span>
     </i18n>
   </div>
 </template>
