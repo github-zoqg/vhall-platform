@@ -224,6 +224,7 @@
       text-align: left;
       /**autoprefixer: ignore next */
       -webkit-box-orient: vertical;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;

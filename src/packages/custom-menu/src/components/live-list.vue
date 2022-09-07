@@ -274,6 +274,7 @@
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       max-height: 200px;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;
