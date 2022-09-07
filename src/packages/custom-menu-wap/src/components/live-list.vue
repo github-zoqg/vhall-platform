@@ -193,7 +193,7 @@
       width: 100%;
       height: 180px;
       background-size: 400% 400%;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background: #000;
       animation: gradientBG 15s ease infinite;
       .img_box_bg {
         display: inline-block;
