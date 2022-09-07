@@ -469,7 +469,6 @@
        * 注册
        */
       async register() {
-        debugger;
         // 勾选协议
         if (!this.registerChecked) {
           return this.$toast(this.$t('privacy.privacy_1005'));
