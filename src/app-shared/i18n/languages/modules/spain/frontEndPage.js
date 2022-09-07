@@ -857,7 +857,8 @@ export default {
     doc_1025: '',
     doc_1026: '',
     doc_1027: '',
-    doc_1028: ''
+    doc_1028: '',
+    doc_1029: ''
   },
   webinar: {
     webinar_1001: 'Apagar',
