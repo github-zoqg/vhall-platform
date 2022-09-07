@@ -105,7 +105,7 @@
             ref="loginPrivacyCompliance"
           ></vmp-privacy-compliance>
           <div class="registerNow">
-            <button @click="showLoginCard = false" class="login">
+            <button @click="resetLoginTab(3)" class="login">
               {{ $t('register.register_1005') }}
             </button>
           </div>
@@ -174,7 +174,7 @@
             <p :class="['error-tip', { error: errorMsgShow.password }]">
               {{ errorMsgShow.password ? $t('login.login_1024') : '' }}
             </p>
-            <span class="go-login" @click="showLoginCard = true">{{ $t('login.login_1026') }}</span>
+            <span class="go-login" @click="resetLoginTab(4)">{{ $t('login.login_1026') }}</span>
           </li>
         </ul>
         <footer>
@@ -189,6 +189,7 @@
               scene="register"
               clientType="mobile"
               @check="checkResult"
+              ref="registerPrivacyCompliance"
             ></vmp-privacy-compliance>
           </li>
           <p :class="['error-tip', { error: loginErrorMsg != '' }]">{{ loginErrorMsg }}</p>
@@ -264,16 +265,31 @@
         this.reloadCaptha();
       },
       resetLoginTab(type) {
-        if (this.type == 1) {
+        if (type == 1) {
           this.showMobileLogin = !this.showMobileLogin;
           this.errorMsgShow.mobile = false;
-        } else {
-          this.showMobileLogin = !this.showMobileLogin;
-          this.errorMsgShow.mobile = false;
+          // 去填写 验证码登录，重置 验证吗登录 状态
           this.loginDynamicChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
+        } else if (type == 2) {
+          this.showMobileLogin = !this.showMobileLogin;
+          this.errorMsgShow.mobile = false;
+          // 去填写 密码登录，重置 密码登录状态
+          this.loginChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
+        } else if (type == 3) {
+          this.showLoginCard = false;
+          // 去注册，重置注册面板状态
+          this.registerChecked = false;
+          this.$refs.registerPrivacyCompliance &&
+            this.$refs.registerPrivacyCompliance.resetChecked();
+        } else {
+          this.showLoginCard = true;
+          // 去登录，重置面板状态。
+          this.loginChecked = false;
+          this.loginDynamicChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
         }
-        // 重置选中状态
-        this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
       },
       reloadCaptha() {
         if (this.captchaReady) {
@@ -453,10 +469,10 @@
        * 注册
        */
       async register() {
+        debugger;
         // 勾选协议
         if (!this.registerChecked) {
-          this.$toast(this.$t('privacy.privacy_1005'));
-          return;
+          return this.$toast(this.$t('privacy.privacy_1005'));
         }
         if (!this.captchaReady) return (this.errorMsgShow.mobileKey = true);
         if (!this.checkPassWord()) return (this.errorMsgShow.password = true);
