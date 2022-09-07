@@ -11,19 +11,11 @@
       <div v-show="showLoginCard" key="login">
         <header>
           <div class="login-menu">
-            <p
-              class="span one"
-              :class="{ active: showMobileLogin }"
-              @click="(showMobileLogin = !showMobileLogin), (errorMsgShow.mobile = false)"
-            >
+            <p class="span one" :class="{ active: showMobileLogin }" @click="resetLoginTab(1)">
               {{ $t('login.login_1003') }}
               <span class="span line" v-show="showMobileLogin"></span>
             </p>
-            <p
-              class="span"
-              :class="{ active: !showMobileLogin }"
-              @click="(showMobileLogin = !showMobileLogin), (errorMsgShow.mobile = false)"
-            >
+            <p class="span" :class="{ active: !showMobileLogin }" @click="resetLoginTab(2)">
               {{ $t('login.login_1004') }}
               <span class="span line" v-show="!showMobileLogin"></span>
             </p>
@@ -110,6 +102,7 @@
             :scene="showMobileLogin ? 'loginDynamic' : 'login'"
             clientType="mobile"
             @check="checkResult"
+            ref="loginPrivacyCompliance"
           ></vmp-privacy-compliance>
           <div class="registerNow">
             <button @click="showLoginCard = false" class="login">
@@ -269,6 +262,18 @@
         this.popupVisible = true;
         await this.$nextTick();
         this.reloadCaptha();
+      },
+      resetLoginTab(type) {
+        if (this.type == 1) {
+          this.showMobileLogin = !this.showMobileLogin;
+          this.errorMsgShow.mobile = false;
+        } else {
+          this.showMobileLogin = !this.showMobileLogin;
+          this.errorMsgShow.mobile = false;
+          this.loginDynamicChecked = false;
+        }
+        // 重置选中状态
+        this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
       },
       reloadCaptha() {
         if (this.captchaReady) {
