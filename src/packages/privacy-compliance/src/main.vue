@@ -134,6 +134,9 @@
     }
     /* 手机端样式设置 */
     &.client_mobile {
+      span {
+        font-size: 20px;
+      }
       a {
         font-size: 20px;
         line-height: 40px;
@@ -149,10 +152,17 @@
       &.scene_signForm {
         margin-top: 32px;
         margin-bottom: 0;
+        text-align: left;
+        &.language__en {
+          text-align: center;
+        }
       }
     }
     /* PC端样式设置 */
     &.client_pc {
+      span {
+        font-size: 12px;
+      }
       a {
         font-size: 12px;
         line-height: 20px;
