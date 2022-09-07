@@ -256,6 +256,9 @@
         margin: 4px 10px 0px 0px;
       }
     }
+    &__titleInfo {
+      flex: 1;
+    }
     &__title {
       margin: 10px 0 4px 0;
       font-size: 14px;

@@ -208,6 +208,7 @@
     }
     &__titleInfo {
       height: 55px;
+      flex: 1;
     }
     &__title {
       margin: 10px 0px 4px 0px;
