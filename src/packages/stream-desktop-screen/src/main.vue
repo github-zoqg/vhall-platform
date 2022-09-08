@@ -369,7 +369,7 @@
             this.isShareScreen &&
             this.accountId == this.desktopShareInfo.accountId
           ) {
-            this.stopShare();
+            this.stopShare('ENTER_GROUP_FROM_MAIN');
           }
         });
         useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -383,7 +383,7 @@
               this.accountId == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.accountId
             ) {
-              this.stopShare();
+              this.stopShare('vrtc_speaker_switch');
             }
           }
           // 演示着变更
@@ -394,7 +394,7 @@
               this.accountId == this.desktopShareInfo.accountId &&
               msg.data.target_id != this.accountId
             ) {
-              this.stopShare();
+              this.stopShare('vrtc_presentation_screen_set');
             }
           }
           if (
@@ -422,7 +422,7 @@
               this.isShareScreen &&
               this.accountId == this.desktopShareInfo.accountId
             ) {
-              this.stopShare();
+              this.stopShare(msg.data.type);
             }
           }
 
@@ -491,8 +491,11 @@
       showConfirm() {
         if (!this.isShareScreen) {
           this.popAlert.visible = true;
+          window.vhallReportForProduct?.toReport(110241);
+          window.vhallReportForProduct?.toReport(110247);
         } else {
-          this.stopShare();
+          window.vhallReportForProduct?.toReport(110256);
+          this.stopShare('live_over');
         }
       },
       // 提示xxx正在插播文件，请稍后重试
@@ -541,15 +544,22 @@
                 streamId: this.isShareScreen
               });
             } else {
+              window.vhallReportForProduct?.toReport(110251);
+              window.vhallReportForProduct?.toStartReporting(110254, 110255);
               this.desktopShareServer
                 .publishDesktopShareStream()
-                .then(() => {
+                .then(res => {
                   // 重新布局旁路
                   console.log('[screen] 桌面共享推流成功');
                   this.interactiveServer.resetLayout();
                   this.docServer.resetLayoutByMiniElement();
 
                   this.setDesktop('1');
+                  window.vhallReportForProduct?.toResultsReporting(110255, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    res
+                  });
                 })
                 .catch(error => {
                   console.log(error, this.$t('interact.interact_1021'));
@@ -558,6 +568,7 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
+            window.vhallReportForProduct?.toReport(110252);
             if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
@@ -566,7 +577,10 @@
           });
       },
       // 停止共享
-      async stopShare() {
+      async stopShare(source) {
+        window.vhallReportForProduct?.toStartReporting(110259, 110260, {
+          source
+        });
         await this.desktopShareServer.stopShareScreen();
         this.setDesktop('0');
         this.interactiveServer.resetLayout();

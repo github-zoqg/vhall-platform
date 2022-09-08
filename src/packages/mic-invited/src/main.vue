@@ -73,8 +73,15 @@
           if (this.join_info.third_party_user_id !== temp.data.room_join_id) {
             return;
           }
+
+          window.vhallReportForProduct?.toResultsReporting(110162, {
+            event_type: 'message',
+            res: rawMsg
+          });
+
           this.senderId = temp.sender_id;
           this.isConfirmVisible = true;
+
           this.waitTime = 30;
           clearInterval(this.waitInterval);
           this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
@@ -86,6 +93,12 @@
               clearInterval(this.waitInterval);
               this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;
+              // 拒绝连麦邀请上报【30s-30s倒计时结束自动拒绝连麦邀请】
+              window.vhallReportForProduct.toResultsReporting(170012, {
+                waiting_time: this.waitTime,
+                event_type: 'message',
+                rejection_method: this.$t('interact.interact_1025')
+              });
             }
           }, 1000);
         }
@@ -134,6 +147,11 @@
       },
       // 接受邀请
       confirmSave() {
+        // 接受连麦邀请上报
+        window.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110187, 110183], {
+          waiting_time: this.waitTime
+        });
+
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -141,16 +159,27 @@
             extra_params: this.senderId
           })
           .then(res => {
+            let reasonTxt = '';
             if (res.code !== 200) {
               if (res.code == 513345) {
-                this.$message.warning(this.$t('interact.interact_1037'));
+                reasonTxt = this.$t('interact.interact_1037');
+                this.$message.warning(reasonTxt);
               } else {
-                this.$message.error(res.msg);
+                reasonTxt = res.msg;
+                this.$message.error(reasonTxt);
               }
             } else {
               useMicServer().userSpeakOn();
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
             }
+
+            window.vhallReportForProduct.toResultsReporting(170010, {
+              event_type: 'interface',
+              request_id: res?.request_id,
+              failed_reason: res,
+              reasonTxt: reasonTxt
+            });
+
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;
@@ -158,6 +187,12 @@
       },
       // 拒绝邀请
       closeConfirm() {
+        // 拒绝连麦邀请上报
+        window.vhallReportForProduct.toStartReporting(170011, 170012, {
+          waiting_time: this.waitTime,
+          rejection_method: '点击了按钮或关闭弹窗'
+        });
+
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -165,6 +200,14 @@
             extra_params: this.senderId
           })
           .then(res => {
+            // 数据上报，场景：接受连麦邀请接口
+            window.vhallReportForProduct.toResultsReporting(170012, {
+              request_id: res?.request_id,
+              waiting_time: this.waitTime,
+              event_type: 'interface',
+              rejection_method: res
+            });
+
             clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1010');
             this.isConfirmVisible = false;

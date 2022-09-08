@@ -524,10 +524,14 @@
         };
 
         console.log('订阅参数', opt, this.stream);
+        window.vhallReportForProduct?.toStartReporting(110198, 110166, {
+          opt
+        });
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            window.vhallReportForProduct?.toResultsReporting(110166, { res: e });
             if (this.joinInfo.role_name === 1) {
               this.interactiveServer.resetLayout();
             }
@@ -538,6 +542,7 @@
             this.getLevel();
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110166, { res: e });
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
@@ -557,13 +562,28 @@
           window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
         }
       },
-      speakOff() {
-        this.micServer.speakOff({
+      async speakOff() {
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: this.stream.roleName,
+            info_of_expelleds: { ...this.stream }
+          });
+        }
+        const res = await this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
-
-        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
-          window.vhallReportForProduct?.report(110133);
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.toResultsReporting(110157, {
+            request_id: res?.request_id,
+            event_type: 'interface',
+            res
+          });
         }
       },
       fullScreen() {
@@ -653,6 +673,10 @@
         //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
         //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
         // }
+        window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
+          rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人'),
+          guest_info: this.stream
+        });
         if (setMainScreen) {
           this.setMainScreen();
         }
@@ -661,6 +685,11 @@
             receive_account_id: accountId || this.stream.accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110170, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
+            });
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {

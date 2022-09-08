@@ -80,7 +80,7 @@
         @openInsert="handleOpenInsertFileDialog"
         @handleRemoteInsertVideoPlay="handleRemoteInsertVideoPlay"
         @handleRemoteInsertVideoPause="handleRemoteInsertVideoPause"
-        @closeInsertvideo="closeInsertvideo"
+        @closeInsertvideo="closeInsertvideo({ type: 'remote' })"
         v-if="insertFileType == 'remote' && isCurrentRoleInsert"
       ></video-preview>
     </div>
@@ -146,7 +146,8 @@
             <i
               @click="
                 closeInsertvideo({
-                  isShowConfirmDialog: true
+                  isShowConfirmDialog: true,
+                  type: 'btn_close'
                 })
               "
               class="vh-iconfont vh-line-close"
@@ -360,6 +361,7 @@
           this.initLocalInsertFile();
         } else {
           // 云插播
+          window.vhallReportForProduct?.toReport(110199, { report_extra: { file_info: '' } });
           this.initRemoteInsertFile();
         }
       },
@@ -505,6 +507,7 @@
         );
         this.initSlider(); // 初始化播放器控件
         this.play();
+        window.vhallReportForProduct?.toReport(110218);
         this.pushLocalStream(); // 推流
       },
       // 创建本地插播流
@@ -523,7 +526,8 @@
             .catch(() => {
               console.log('创建插播本地流失败');
               this.closeInsertvideo({
-                isShowConfirmDialog: false
+                isShowConfirmDialog: false,
+                type: 'created_field'
               });
               reject(new Error('创建插播本地流失败'));
               this.$message.warning('插播创建失败，请重新选择');
@@ -621,7 +625,11 @@
           isShowConfirmDialog: false
         }
       ) {
-        console.log('----关闭插播----', options.isShowConfirmDialog);
+        window.vhallReportForProduct?.toStartReporting(110203, [110206, 110209, 110207], {
+          evt_tp: options.type,
+          file_info: ''
+        });
+        console.log('----关闭插播----', options.isShowConfirmDialog, options.type);
         // 如果不需要展示确认关闭按钮
         if (!options.isShowConfirmDialog) {
           await this.closeInsertvideoHandler();
@@ -631,6 +639,10 @@
         if (this.isFullScreen) {
           this.exitFullScreen();
         }
+        window.vhallReportForProduct?.toResultsReporting(110206, {
+          event_type: 'static',
+          file_info: ''
+        });
         this.$confirm('确认关闭插播文件，并退出插播页面吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -638,13 +650,22 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
+            window.vhallReportForProduct?.toResultsReporting(110209, {
+              event_type: 'static',
+              file_info: ''
+            });
             // 关闭插播列表弹窗
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitCloseInsertFileDialog')
             );
             this.closeInsertvideoHandler();
           })
-          .catch(() => {});
+          .catch(() => {
+            window.vhallReportForProduct?.toResultsReporting(110207, {
+              event_type: 'static',
+              file_info: ''
+            });
+          });
       },
       // 关闭插播，还原插播状态 isliveStart 是否是开始直播调用的关闭插播的方法
       // 如果是开始直播触发的关闭插播,不需要更改对端的麦克风状态
@@ -656,7 +677,13 @@
         }
         // 设置插播状态为 false
         // this.insertFileServer.setInsertFilePushing(false);
-        return this.stopPushStream().then(() => {
+        window.vhallReportForProduct.toStartReporting(110210, 110211);
+        return this.stopPushStream().then(res => {
+          window.vhallReportForProduct.toResultsReporting(110211, {
+            request_id: res?.request_id,
+            event_type: 'interface',
+            res: res
+          });
           console.log('---插播流停止成功----');
           interactiveServer.resetLayout();
           // 还原插播状态
@@ -970,6 +997,14 @@
         } else {
           this.pause();
         }
+        window.vhallReportForProduct.toReport(110212, {
+          report_extra: {
+            type: 'localInsert',
+            file_info: '',
+            pre_status: ispaused ? 'pause' : 'playing',
+            after_atatus: ispaused ? 'playing' : 'pause'
+          }
+        });
       },
       // 大小窗切换
       exchange() {
@@ -1003,6 +1038,9 @@
         console.log(this.conctorObj.sliderVal, '快进');
         this._localFileVideoElement.currentTime = time;
         this.play();
+        window.vhallReportForProduct?.toStartReporting(110213, 110213, {
+          currentTime: time
+        });
       },
       // 本地插播video暂停
       pause() {

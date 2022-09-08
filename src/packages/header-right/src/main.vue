@@ -287,11 +287,16 @@
       },
       // 嘉宾点击申请上麦
       handleApplyClick() {
-        window.vhallReportForProduct?.report(110131);
+        window.vhallReportForProduct?.toStartReporting(110131, [110158, 170032, 110187, 110183]);
         this._applyInterval && clearInterval(this._applyInterval);
         useMicServer()
           .userApply()
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110158, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
+            });
             if (+res.code !== 200) {
               if (res.code == 513025) {
                 this.$message.error(
@@ -310,7 +315,14 @@
                 this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
                 clearInterval(this._applyInterval);
                 this.isApplying = false;
-                const { code, msg } = await useMicServer().speakOff();
+                window.vhallReportForProduct?.toStartReporting(110160, 110161);
+                const { code, msg, request_id } = await useMicServer().speakOff();
+                window.vhallReportForProduct?.toResultsReporting(110161, {
+                  request_id,
+                  event_type: 'interface',
+                  code,
+                  msg
+                });
                 if (code === 513035) {
                   this.$message.error(msg);
                 }
@@ -320,10 +332,17 @@
       },
       // 嘉宾取消申请
       handleApplyCancleClick() {
-        window.vhallReportForProduct?.report(110152);
+        window.vhallReportForProduct?.toStartReporting(110152, 110159, {
+          waiting_time: this.applyTime
+        });
         useMicServer()
           .userCancelApply()
-          .then(() => {
+          .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110159, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
+            });
             this.isApplying = false;
             this.applyTime = 30;
             clearInterval(this._applyInterval);
@@ -331,9 +350,15 @@
       },
       // 嘉宾下麦
       async handleSpeakOffClick() {
-        window.vhallReportForProduct?.report(110132);
+        window.vhallReportForProduct?.toStartReporting(110132, [110156, 170033, 110193, 110185]);
         // 下麦接口停止推流，成功之后执行下面的逻辑
-        const { code, msg } = await useMicServer().speakOff();
+        const { code, msg, request_id } = await useMicServer().speakOff();
+        window.vhallReportForProduct?.toResultsReporting(110156, {
+          request_id,
+          event_type: 'interface',
+          code,
+          msg
+        });
         if (parseInt(this.roleName) !== 4) {
           if (code !== 200) {
             this.$message.error(msg);
