@@ -256,6 +256,9 @@
         margin: 4px 10px 0px 0px;
       }
     }
+    &__titleInfo {
+      flex: 1;
+    }
     &__title {
       margin: 10px 0 4px 0;
       font-size: 14px;
@@ -271,6 +274,7 @@
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       max-height: 200px;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;
