@@ -113,7 +113,8 @@ router.beforeEach(async (to, from, next) => {
     await ssoAutoLogin(); // sso自动登录置换token
   }
   console.log('---grayInit---', res);
-  if (to.name == 'Subject') {
+  // 专题页未登录进行三方登录时
+  if (to.name == 'Subject' && !localStorage.getItem('token')) {
     initCheckAuth.methods.initCheckAuth.call({ $route: to });
   }
   if (res) {
