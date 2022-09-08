@@ -208,6 +208,7 @@
     }
     &__titleInfo {
       height: 55px;
+      flex: 1;
     }
     &__title {
       margin: 10px 0px 4px 0px;
@@ -223,6 +224,7 @@
       text-align: left;
       /**autoprefixer: ignore next */
       -webkit-box-orient: vertical;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;
