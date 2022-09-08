@@ -1,6 +1,6 @@
 <template>
-  <div class="vmp-handup" v-if="isInteractLive && !isBanned && !allBanned">
-    <div>
+  <div class="vmp-handup">
+    <div v-if="isInteractLive && !isBanned && !allBanned">
       <el-button
         @click="handleHandClick"
         type="primary"
