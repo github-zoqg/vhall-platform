@@ -7,7 +7,7 @@
       width="400px"
     >
       <div class="vmp-auth-wrap">
-        <div class="vmp-auth-wrap-text">
+        <div :class="['vmp-auth-wrap-text', isWhiteCheck ? 'auth__privacy' : '']">
           <el-input
             :type="isHideEye ? 'text' : 'password'"
             v-model="authTitle"
@@ -20,6 +20,13 @@
             ></i>
           </el-input>
         </div>
+        <!-- 隐私合规（嵌入不支持） -->
+        <vmp-privacy-compliance
+          scene="auth"
+          clientType="pc"
+          compType="2"
+          v-if="isWhiteCheck"
+        ></vmp-privacy-compliance>
         <div class="vmp-auth-wrap-btn">
           <el-button type="primary" round @click="authSubmit">
             {{ $t('account.account_1062') }}
@@ -41,7 +48,8 @@
         isSubject: false,
         webinarId: '',
         placeholder: '',
-        authTitle: ''
+        authTitle: '',
+        isWhiteCheck: false
       };
     },
     beforeCreate() {
@@ -56,6 +64,7 @@
         this.webinarId = info.webinarId;
         this.authVisible = true;
         this.placeholder = info.placeHolder;
+        this.isWhiteCheck = info.isWhiteCheck; // 是否开启了白名单验证
       },
       hideEye() {
         this.isHideEye = !this.isHideEye;
@@ -164,6 +173,9 @@
         }
         .el-input__inner {
           padding-right: 40px;
+        }
+        &.auth__privacy {
+          padding-bottom: 4px;
         }
       }
       &-btn {

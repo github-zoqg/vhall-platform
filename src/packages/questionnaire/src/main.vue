@@ -138,6 +138,13 @@
           >
             发布
           </el-button>
+          <!-- 隐私合规（嵌入不展示） -->
+          <vmp-privacy-compliance
+            scene="liveQuestion"
+            clientType="pc"
+            compType="2"
+            v-if="prevQuestionnaireId"
+          ></vmp-privacy-compliance>
         </section>
       </section>
     </el-dialog>
@@ -1017,7 +1024,7 @@
     display: block;
     width: 160px;
     border: none;
-    margin: 40px auto;
+    margin: 40px auto 0 auto;
     background-color: var(--theme-color) !important;
     color: #fff !important;
   }

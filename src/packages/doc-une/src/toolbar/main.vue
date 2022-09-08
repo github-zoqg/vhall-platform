@@ -407,6 +407,8 @@
       // 画布清除确认
       confirmSave() {
         this.isConfirmVisible = false;
+        // 取消缩放、移动模式,拿到编辑权限否则无法清除
+        this.docServer.cancelZoom();
         this.docServer.clear();
         // 还需要重设当前画笔
         this.changeTool(this.currentBrush);

@@ -11,11 +11,12 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <el-image
+            <img :class="`form_img form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+            <!-- <el-image
               v-if="formInfo && formInfo.cover != 1"
               :src="formInfo.cover ? coverPic : defaultHeader"
               fit="cover"
-            ></el-image>
+            ></el-image> -->
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
@@ -304,6 +305,12 @@
                       {{ $t('form.form_1019') }}
                     </el-button>
                   </div>
+                  <!-- 隐私合规（嵌入不支持） -->
+                  <vmp-privacy-compliance
+                    scene="signForm"
+                    clientType="pc"
+                    compType="2"
+                  ></vmp-privacy-compliance>
                 </el-form>
               </template>
             </div>
@@ -372,6 +379,12 @@
                       {{ $t('interact_tools.interact_tools_1019') }}
                     </el-button>
                   </div>
+                  <!-- 隐私合规（嵌入不支持） -->
+                  <vmp-privacy-compliance
+                    scene="signForm"
+                    clientType="pc"
+                    compType="2"
+                  ></vmp-privacy-compliance>
                 </el-form>
               </template>
             </div>
@@ -383,11 +396,12 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <el-image
+          <img :class="`form_img form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+          <!-- <el-image
             v-if="formInfo && formInfo.cover != 1"
             :src="formInfo.cover ? coverPic : defaultHeader"
             fit="cover"
-          ></el-image>
+          ></el-image> -->
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
@@ -669,6 +683,12 @@
                     {{ $t('form.form_1019') }}
                   </el-button>
                 </div>
+                <!-- 隐私合规（嵌入不支持） -->
+                <vmp-privacy-compliance
+                  scene="signForm"
+                  clientType="pc"
+                  compType="2"
+                ></vmp-privacy-compliance>
               </el-form>
             </template>
           </div>
@@ -737,6 +757,12 @@
                     {{ $t('interact_tools.interact_tools_1019') }}
                   </el-button>
                 </div>
+                <!-- 隐私合规（嵌入不支持） -->
+                <vmp-privacy-compliance
+                  scene="signForm"
+                  clientType="pc"
+                  compType="2"
+                ></vmp-privacy-compliance>
               </el-form>
             </template>
           </div>
@@ -747,17 +773,20 @@
 </template>
 
 <script>
-  import defaultHeader from './img/formHeader.png';
+  // import defaultHeader from './img/formHeader.png';
   import { useRoomBaseServer, useSignUpFormServer, useSubjectServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSignUpForm',
     data() {
       return {
+        imageCropperMode: 1,
         //默认的兜底的banner图
-        defaultHeader,
+        defaultHeader:
+          'https://cnstatic01.e.vhall.com/common-static/middle/images/platform-common/form_up.png',
         //上传的基础地址
-        baseUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
+        baseUrl: `https:${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
         // 是否是独立表单
         isEntryForm: this.$route.path.indexOf('/entryform') !== -1,
         //是否是预览
@@ -1094,10 +1123,16 @@
       // },
       // 广告头图
       coverPic() {
-        if (this.formInfo.cover != 1) {
-          return `${this.baseUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover) {
+          let cover = `${this.baseUrl}${this.formInfo.cover}`;
+          if (cropperImage(cover)) {
+            this.handlerImageInfo(cover);
+            return cover;
+          } else {
+            return cover + '?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0';
+          }
         } else {
-          return '';
+          return this.defaultHeader;
         }
       },
       //输入提示的多语言转换
@@ -1211,6 +1246,12 @@
           params.subject_id = this.webinarOrSubjectId;
         }
         return params;
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
       },
       //打开模态窗
       async openModal(webinarId = null) {
@@ -2270,6 +2311,19 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      .form_img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        &.form_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.form_bg_3 {
+          object-fit: contain;
+          object-position: center;
+        }
+      }
     }
     &__content {
       padding: 0 75px 87px;

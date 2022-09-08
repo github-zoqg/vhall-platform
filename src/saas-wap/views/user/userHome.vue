@@ -1,31 +1,18 @@
 <template>
   <section id="homePage">
     <div class="v-home-bg">
-      <img
-        :src="`${
-          userHomeVo && userHomeVo.img_url && userHomeVo.img_url !== '0'
-            ? userHomeVo.img_url ||
-              'https://t-alistatic01.e.vhall.com/upload/common/static-imgs/dc/d2/dcd284bd60054e12a1eefebc804a7802.png'
-            : 'https://t-alistatic01.e.vhall.com/upload/common/static-imgs/dc/d2/dcd284bd60054e12a1eefebc804a7802.png'
-        }`"
-        alt=""
-      />
+      <img :src="home_bg_user" :class="`home_img home_bg_${imageBgMode}`" alt="" />
     </div>
     <div class="v-content">
-      <img
-        :src="
-          userHomeVo && userHomeVo.homepage_avatar && userHomeVo.homepage_avatar != '0'
-            ? userHomeVo.homepage_avatar || avatarImgUrl
-            : avatarImgUrl
-        "
-        alt=""
-        class="v-avatar"
-        v-if="
-          (userHomeVo && userHomeVo.homepage_avatar && userHomeVo.homepage_avatar != '0') ||
-          avatarImgUrl
-        "
-      />
-      <img src="./img/head_mobile.png" alt="主页头像" class="v-avatar" v-else />
+      <span class="v-avatar">
+        <img
+          :src="home_avatar_user"
+          alt=""
+          :class="`v-avatar_img home_avator_${imagAvatarMode}`"
+          v-if="home_avatar_user"
+        />
+        <img src="./img/head_mobile.png" alt="主页头像" class="v-avatar_img" v-else />
+      </span>
       <div class="v-bg-content"></div>
     </div>
     <div class="v-userinfo-content">
@@ -87,7 +74,7 @@
                   </span>
                 </span>
                 <img
-                  class="bg-cover"
+                  :class="`bg-cover bg-cover_${item.itemMode}`"
                   :src="tabType === 'live' ? item.img_url : item.cover"
                   alt=""
                 />
@@ -129,6 +116,8 @@
 <script>
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useHomepageServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'userHome',
     data() {
@@ -154,12 +143,41 @@
         vsQuanxian: [],
         dataList: [],
         vo: {},
+        imageBgMode: 1,
+        imagAvatarMode: 1,
         heightAuto: 200,
         isBool: true // 是否触发下一页加载
       };
     },
     beforeCreate() {
       this.homePageServer = useHomepageServer();
+    },
+    computed: {
+      home_bg_user() {
+        let defaultImage =
+          'https://t-alistatic01.e.vhall.com/upload/common/static-imgs/dc/d2/dcd284bd60054e12a1eefebc804a7802.png';
+        let url = this.userHomeVo.img_url;
+        if (url) {
+          if (cropperImage(url)) {
+            this.handlerImageInfo(url, 1);
+          }
+          return url;
+        } else {
+          return defaultImage;
+        }
+      },
+      home_avatar_user() {
+        let url = this.userHomeVo.homepage_avatar || this.avatarImgUrl;
+        if (!url) return '';
+        if (url) {
+          if (cropperImage(url)) {
+            this.handlerImageInfo(url, 2);
+          }
+          return url;
+        } else {
+          return '';
+        }
+      }
     },
     created() {
       // 非控制台个人主页，单独调用权限信息页
@@ -178,6 +196,17 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
+      },
+      // 解析图片地址
+      handlerImageInfo(url, index) {
+        let obj = parseImgOssQueryString(url);
+        if (index == 1) {
+          this.imageBgMode = Number(obj.mode);
+        } else if (index == 2) {
+          this.imagAvatarMode = Number(obj.mode);
+        } else {
+          return Number(obj.mode);
+        }
       },
       pullingDown() {
         this.query.pageNumber++;
@@ -256,6 +285,11 @@
                   (process.env.VUE_APP_WAP_WATCH || '') +
                   process.env.VUE_APP_ROUTER_BASE_URL
                 }/lives/watch/${item.webinar_id}`;
+                if (cropperImage(item.img_url)) {
+                  item.itemMode = this.handlerImageInfo(item.img_url, 3);
+                } else {
+                  item.itemMode = 3;
+                }
               });
               if (list.length > 0) {
                 // this.dataList.unshift(...list)
@@ -304,6 +338,11 @@
                   (process.env.VUE_APP_WAP_WATCH || '') +
                   process.env.VUE_APP_ROUTER_BASE_URL
                 }/special/detail?id=${item.id}`;
+                if (cropperImage(item.cover)) {
+                  item.itemMode = this.handlerImageInfo(item.cover, 3);
+                } else {
+                  item.itemMode = 3;
+                }
               });
               if (list.length > 0) {
                 // this.dataList.unshift(...list);
@@ -473,7 +512,7 @@
                   link:
                     window.location.protocol +
                     `${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.$route.params.id}`,
-                  imgUrl: this.avatarImgUrl
+                  imgUrl: this.home_avatar_user
                 }
               );
             }
@@ -510,10 +549,18 @@
   .v-home-bg {
     width: 100%;
     height: 246px;
-    img {
+    .home_img {
       width: 100%;
       height: 100%;
       object-fit: fill;
+      &.home_bg_2 {
+        object-fit: cover;
+        object-position: left top;
+      }
+      &.home_bg_3 {
+        object-fit: contain;
+        object-position: center;
+      }
     }
   }
   .v-content {
@@ -528,6 +575,21 @@
     top: -90px;
     left: 30px;
     z-index: 10;
+    background: #fff;
+    &_img {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      border-radius: 50%;
+      &.home_avator_2 {
+        object-fit: cover;
+        object-position: left top;
+      }
+      &.home_avator_3 {
+        object-fit: contain;
+        object-position: center;
+      }
+    }
   }
   .user-top {
     padding: 0 30px 40px 30px;
@@ -699,7 +761,15 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: scale-down;
+        object-fit: contain;
+        object-position: center;
+        &.bg-cover_1 {
+          object-fit: fill;
+        }
+        &.bg-cover_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
       }
       .liveTag {
         position: absolute;

@@ -4,7 +4,7 @@
       <div class="vmp-subject-body_main">
         <div class="subject_left">
           <div class="subject_left_main">
-            <img :src="subjectDetailInfo.cover || defaultImages" />
+            <img :class="`subject_img subject_bg_${imageCropperMode}`" :src="subjectImage" />
           </div>
           <div class="subject_left_detail">
             <p>
@@ -49,7 +49,9 @@
                 {{ liveTag(item) }}
                 <span v-if="item.webinar_type != 6 && item.no_delay_webinar == 1">| 无延迟</span>
               </span>
-              <div class="living_box"><img :src="item.img_url || defaultImages" alt="" /></div>
+              <div class="living_box">
+                <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
+              </div>
             </div>
             <div class="living_bottom">
               <div>
@@ -68,12 +70,18 @@
 </template>
 <script>
   import { useSubjectServer } from 'middle-domain';
-  import { boxEventOpitons, handleIntroInfo } from '@/app-shared/utils/tool.js';
+  import {
+    boxEventOpitons,
+    handleIntroInfo,
+    parseImgOssQueryString
+  } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSubjectBody',
     data() {
       return {
         webinarId: '',
+        imageCropperMode: 1,
         defaultImages: 'https://cnstatic01.e.vhall.com/static/img/v35-subject.png'
       };
     },
@@ -91,7 +99,26 @@
         return this.subjectServer.state.subjectAuthInfo;
       },
       webinarList() {
-        return this.$domainStore.state.subjectServer.webinarList;
+        return this.$domainStore.state.subjectServer.webinarList.map(item => {
+          let mode = 3;
+          if (cropperImage(item.img_url)) {
+            mode = this.handlerImageInfo(item.img_url, 2);
+          }
+          return {
+            ...item,
+            itemMode: mode
+          };
+        });
+      },
+      subjectImage() {
+        let url = this.defaultImages;
+        if (this.subjectDetailInfo.cover) {
+          url = this.subjectDetailInfo.cover;
+          if (cropperImage(this.subjectDetailInfo.cover)) {
+            this.handlerImageInfo(url, 1);
+          }
+        }
+        return url;
       },
       subjectIntroInfo() {
         return handleIntroInfo(this.subjectDetailInfo.intro);
@@ -110,6 +137,15 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
+      },
+      // 解析图片地址
+      handlerImageInfo(url, index) {
+        let obj = parseImgOssQueryString(url);
+        if (index == 1) {
+          this.imageCropperMode = Number(obj.mode) || 1;
+        } else {
+          return Number(obj.mode) || 3;
+        }
       },
       toDetail(item) {
         this.webinarId = item.webinar_id;
@@ -158,7 +194,8 @@
         let placeHolderInfo = {
           placeHolder: '',
           webinarId: this.webinarId,
-          isSubject: true
+          isSubject: true,
+          isWhiteCheck: false // 是否开启了白名单验证
         };
         switch (code) {
           case 510008: // 未登录
@@ -195,6 +232,7 @@
             //白名单
             placeHolderInfo.placeHolder =
               this.subjectAuthInfo.white_verify || this.$t('common.common_1006');
+            placeHolderInfo.isWhiteCheck = true;
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
@@ -235,10 +273,19 @@
           border-radius: 4px;
           background-color: #1a1a1a;
           flex: 1;
-          img {
+          .subject_img {
             width: 100%;
             height: 100%;
+            object-fit: fill;
             border-radius: 4px 4px 0 0;
+            &.subject_bg_2 {
+              object-fit: cover;
+              object-position: left top;
+            }
+            &.subject_bg_3 {
+              object-fit: contain;
+              object-position: center;
+            }
           }
         }
         &_detail {
@@ -360,12 +407,20 @@
             left: 0;
             overflow: hidden;
             border-radius: 4px 4px 0 0;
-            img {
+            .cover_pic {
               width: 100%;
               height: 100%;
-              object-fit: scale-down;
+              object-fit: contain;
+              object-position: center;
               cursor: pointer;
               border-radius: 4px 4px 0 0;
+              &.box_bg_1 {
+                object-fit: fill;
+              }
+              &.box_bg_2 {
+                object-fit: cover;
+                object-position: left top;
+              }
             }
           }
           .living_bottom {

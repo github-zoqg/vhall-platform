@@ -9,6 +9,7 @@ import VmpWapStreamList from '@/packages/wap-stream-list';
 import VmpWapStreamLocal from '@/packages/wap-stream-local';
 import VmpWapStreamRemote from '@/packages/wap-stream-remote';
 import VmpRegLoginWap from '@/packages/reg-login-wap';
+import VmpPrivacyCompliance from '@/packages/privacy-compliance'; // 隐私合规
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
@@ -150,6 +151,7 @@ Vue.use(VmpWapDesktopScreen);
 Vue.use(VmpWapInsertFIle);
 Vue.use(VmpInviteHandup);
 Vue.use(VmpViewRestrictionWap);
+Vue.use(VmpPrivacyCompliance);
 // ------------------------------【极简风格】注册组件------start----------
 Vue.use(VmpConciseChatWap);
 Vue.use(VmpConciseBodyBlockWap);

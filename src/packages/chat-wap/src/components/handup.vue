@@ -119,6 +119,8 @@
           this.handText = this.$t('interact.interact_1007');
         }
       });
+
+      // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
         this.$toast(this.$t('interact.interact_1028'));
       });
@@ -139,6 +141,10 @@
           this.showConnectMic = false;
           this.$emit('handupLoading', false);
           this.closeConnectPop();
+          window.vhallReportForProduct.toResultsReporting(170008, {
+            event_type: 'meassage',
+            failed_reason: msg
+          });
         }
       });
     },
@@ -147,9 +153,18 @@
       offConnect() {
         this.$emit('handupLoading', false);
         this.closeConnectPop();
-        useMicServer().speakOff();
+        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
+        useMicServer()
+          .speakOff()
+          .then(res => {
+            window.vhallReportForProduct.toResultsReporting(170003, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
+            });
+          });
       },
-      // / 举手上麦
+      // 举手上麦
       handsUpToConnect() {
         if (this.lowerWheatFun) {
           return;
@@ -167,6 +182,7 @@
       // 上麦前进行媒体检测  device_status 0未检测 1 设备OK   2设备不支持
       async mediaCheckClick() {
         const device_status = useMediaCheckServer().state.deviceInfo.device_status;
+
         if (device_status == 1) {
           this.applyMic();
         } else if (device_status == 0) {
@@ -176,7 +192,8 @@
               if (flag) {
                 this.applyMic();
               } else {
-                this.$toast(this.$t('interact.interact_1040'));
+                const _tipMsg = this.$t('interact.interact_1040');
+                this.$toast(_tipMsg);
                 this.closeConnectPop();
               }
             });
@@ -188,6 +205,9 @@
       // 主动上麦方法
       applyMic() {
         this.btnDisabled = true;
+        // 申请连麦
+        window?.vhallReportForProduct.toStartReporting(170004, [170005, 170032, 110187, 110183]);
+
         useMicServer()
           .userApply()
           .then(res => {
@@ -199,14 +219,28 @@
                   this.$t('interact.interact_1029', { n: res.data.replace_data[0] })
                 );
               }
+              // 数据上报，场景：申请连麦接口 返回失败
+              window.vhallReportForProduct.toResultsReporting(170005, {
+                event_type: 'interface',
+                waiting_time: this.lowerWheatTimer,
+                failed_reason: res,
+                request_id: res.request_id
+              });
               return;
             }
             /*
-              1、更新文案，为倒计时，倒计时结束，主持人拒绝，提示拒绝上麦
-              */
+                1、更新文案，为倒计时，倒计时结束，主持人拒绝，提示拒绝上麦
+                */
             this.lowerWheatTimer = 30;
             this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
             this.$emit('handupLoading', true);
+            // 数据上报，场景：申请连麦接口 返回成功
+            window.vhallReportForProduct.toResultsReporting(170005, {
+              event_type: 'interface',
+              failed_reason: res,
+              waiting_time: this.lowerWheatTimer,
+              request_id: res.request_id
+            });
             this.lowerWheatFun = setInterval(() => {
               this.lowerWheatTimer--;
               this.handText = `${this.$t('interact.interact_1004')}...(${this.lowerWheatTimer}s)`;
@@ -224,7 +258,11 @@
                   tip = this.$t('other.other_1006');
                 }
                 this.$toast(tip);
-
+                // 数据上报，响应场景：申请连麦拒绝
+                window.vhallReportForProduct.toResultsReporting(170005, {
+                  failed_reason: tip,
+                  waiting_time: this.lowerWheatTimer
+                });
                 this.closeConnectPop();
                 useMicServer().userCancelApply();
               }
@@ -232,6 +270,13 @@
           })
           .catch(err => {
             this.btnDisabled = false;
+            // 数据上报，场景：申请连麦接口异常
+            window.vhallReportForProduct.toResultsReporting(170005, {
+              event_type: 'interface',
+              failed_reason: err,
+              waiting_time: this.lowerWheatTimer,
+              request_id: err.request_id
+            });
           });
       },
       async handleClickMuteDevice(deviceType) {
@@ -242,6 +287,13 @@
           status,
           receive_account_id: this.joinInfo.third_party_user_id
         });
+        // 110136关闭    110137 开启
+        if (deviceType == 'video') {
+          window.vhallReportForProduct?.report(status == 1 ? 110137 : 110136);
+        } else {
+          // 110138 关闭    110139 开启
+          window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
+        }
       }
     }
   };

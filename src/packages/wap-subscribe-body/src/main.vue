@@ -9,7 +9,11 @@
       <template v-else>
         <template v-if="!showVideo">
           <div class="subscribe-bg">
-            <img :src="webinarsBgImg" alt="" />
+            <img
+              :class="`subscribe-image subscribe_bg_${imageCropperMode}`"
+              :src="webinarsBgImg"
+              alt=""
+            />
             <div class="living_end" v-if="isLiveEnd">
               <div class="living_end_img">
                 <img src="./img/livingEnd@2x.png" alt="" />
@@ -162,6 +166,14 @@
           @click="isHidden = !isHidden"
         ></i>
       </div>
+      <div slot="privacy" v-if="isWhiteCheck">
+        <!-- 隐私合规（嵌入不支持） -->
+        <vmp-privacy-compliance
+          scene="auth"
+          clientType="mobile"
+          compType="2"
+        ></vmp-privacy-compliance>
+      </div>
     </alertBox>
     <!-- 弹出直播提醒 -->
     <alertBox
@@ -207,11 +219,13 @@
     boxEventOpitons,
     isWechat,
     isWechatCom,
-    getQueryString
+    getQueryString,
+    parseImgOssQueryString
   } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
   import alertBox from '@/app-shared/components/confirm.vue';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -242,8 +256,10 @@
           save_reg_form: null
         },
         isOpenlang: false, // 是否打开多语言弹窗
+        imageCropperMode: 1,
         lang: {},
-        languageList: []
+        languageList: [],
+        isWhiteCheck: false
       };
     },
     components: {
@@ -288,9 +304,16 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
-        return webinar.img_url
-          ? webinar.img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466'
-          : cover;
+        let webinarUrl = cover;
+        if (webinar.img_url) {
+          if (cropperImage(webinar.img_url)) {
+            webinarUrl = webinar.img_url;
+            this.handlerImageInfo(webinar.img_url);
+          } else {
+            webinarUrl = webinar.img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466';
+          }
+        }
+        return webinarUrl;
       },
       isWarmVideo() {
         return this.roomBaseServer.state.watchInitData.warmup.warmup_paas_record_id;
@@ -531,6 +554,12 @@
       playerAuthCheck(info) {
         this.authCheck(info.type);
       },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
+      },
       authCheck(type) {
         if (this.webinarType === 2) {
           // 数据埋点
@@ -576,6 +605,7 @@
         });
       },
       handleAuthErrorCode(code, msg) {
+        this.isWhiteCheck = false; // 是否白名单验证
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -608,6 +638,7 @@
             // this.authInfo.title = this.$t('appointment.appointment_1032');
             this.authInfo.placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
             this.isSubscribeShow = true;
+            this.isWhiteCheck = true;
             break;
           case 512523:
             this.webinarPayAuth();
@@ -872,10 +903,18 @@
       .subscribe-bg {
         width: 100%;
         height: 100%;
-        img {
+        .subscribe-image {
           width: 100%;
           height: 100%;
           object-fit: fill;
+          &.subscribe_bg_2 {
+            object-fit: cover;
+            object-position: left top;
+          }
+          &.subscribe_bg_3 {
+            object-fit: contain;
+            object-position: center;
+          }
         }
         .subscribe-type {
           position: absolute;

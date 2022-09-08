@@ -334,8 +334,6 @@
 
         const _this = this;
         const observer = new MutationObserver(function () {
-          console.log('监听到streamWrapper变动了', _this.$refs.streamWrapper.offsetWidth);
-
           _this.handleControlArrowShow();
         });
         observer.observe(this.$refs.streamWrapper, {

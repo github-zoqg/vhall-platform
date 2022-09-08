@@ -45,7 +45,7 @@
     },
     data() {
       return {
-        roomId: this.$route.params.id,
+        roomId: this.$route.params.id || this.$route.query.id,
         options: {}
       };
     },
@@ -61,7 +61,10 @@
       init() {
         // 第三方登录后 回调地址 - 待确定如何书写
         // 前端回传地址
-        const jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
+        let jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
+        if (this.$route.name == 'Subject') {
+          jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail${location.search}`;
+        }
         // 第三方登录地址
         this.options.wxPath =
           `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +
@@ -77,6 +80,14 @@
   };
 </script>
 <style lang="less">
+  .vmp-third-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .vmp-third-remark {
+      margin-right: 16px;
+    }
+  }
   .vmp-third-remark {
     text-align: center;
     height: 17px;
