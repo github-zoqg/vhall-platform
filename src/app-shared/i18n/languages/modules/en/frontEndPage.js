@@ -846,7 +846,8 @@ export default {
     doc_1025: '',
     doc_1026: '',
     doc_1027: '',
-    doc_1028: 'Cancel Move'
+    doc_1028: 'Cancel Move',
+    doc_1029: ''
   },
   webinar: {
     webinar_1001: 'Close',
@@ -931,5 +932,12 @@ export default {
     other_1018: 'Refuse',
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+  },
+  privacy: {
+    privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
+    privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
+    privacy_1003: 'VHALL User Protection Agreement',
+    privacy_1004: 'VHALL Privacy Policy',
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
   }
 };

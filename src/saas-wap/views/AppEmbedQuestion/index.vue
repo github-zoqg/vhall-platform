@@ -106,7 +106,8 @@
             access_token: this.params.paas_access_token // paas的授权token,必填
           },
           uploadUrl: process.env.VUE_APP_BASE_URL,
-          notify: false // 是否开启消息提示，非必填,默认是true
+          notify: false, // 是否开启消息提示，非必填,默认是true
+          showVhPrivacy: false
         });
         this.sdkFlag = true;
         this.questionSdk.$on(window.VHall_Questionnaire_Const.EVENT.READY, data => {

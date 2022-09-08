@@ -11,19 +11,11 @@
       <div v-show="showLoginCard" key="login">
         <header>
           <div class="login-menu">
-            <p
-              class="span one"
-              :class="{ active: showMobileLogin }"
-              @click="(showMobileLogin = !showMobileLogin), (errorMsgShow.mobile = false)"
-            >
+            <p class="span one" :class="{ active: showMobileLogin }" @click="resetLoginTab(1)">
               {{ $t('login.login_1003') }}
               <span class="span line" v-show="showMobileLogin"></span>
             </p>
-            <p
-              class="span"
-              :class="{ active: !showMobileLogin }"
-              @click="(showMobileLogin = !showMobileLogin), (errorMsgShow.mobile = false)"
-            >
+            <p class="span" :class="{ active: !showMobileLogin }" @click="resetLoginTab(2)">
               {{ $t('login.login_1004') }}
               <span class="span line" v-show="!showMobileLogin"></span>
             </p>
@@ -105,8 +97,15 @@
               {{ $t('nav.nav_1005') }}
             </button>
           </div>
+          <!-- 隐私合规 -->
+          <vmp-privacy-compliance
+            :scene="showMobileLogin ? 'loginDynamic' : 'login'"
+            clientType="mobile"
+            @check="checkResult"
+            ref="loginPrivacyCompliance"
+          ></vmp-privacy-compliance>
           <div class="registerNow">
-            <button @click="showLoginCard = false" class="login">
+            <button @click="resetLoginTab(3)" class="login">
               {{ $t('register.register_1005') }}
             </button>
           </div>
@@ -175,7 +174,7 @@
             <p :class="['error-tip', { error: errorMsgShow.password }]">
               {{ errorMsgShow.password ? $t('login.login_1024') : '' }}
             </p>
-            <span class="go-login" @click="showLoginCard = true">{{ $t('login.login_1026') }}</span>
+            <span class="go-login" @click="resetLoginTab(4)">{{ $t('login.login_1026') }}</span>
           </li>
         </ul>
         <footer>
@@ -185,16 +184,13 @@
             </button>
           </div>
           <li class="switch">
-            <div>
-              <van-checkbox
-                v-model="checked"
-                checked-color="#FB3A32"
-                shape="square"
-                icon-size="14px"
-              ></van-checkbox>
-            </div>
-            <span @click="checked = !checked">{{ $t('login.login_1030') }}</span>
-            <a href="/home/vhallapi/serviceterms">{{ $t('login.login_1031') }}</a>
+            <!-- 隐私合规 -->
+            <vmp-privacy-compliance
+              scene="register"
+              clientType="mobile"
+              @check="checkResult"
+              ref="registerPrivacyCompliance"
+            ></vmp-privacy-compliance>
           </li>
           <p :class="['error-tip', { error: loginErrorMsg != '' }]">{{ loginErrorMsg }}</p>
         </footer>
@@ -215,7 +211,6 @@
         showMobileLogin: true, // true - 手机登录  false - 账号密码登录
         showLoginCard: true, // true - 登录  false - 注册
         showCaptcha: false, // 专门用于 校验登录次数 接口返回 需要显示图形验证码时使用(密码登录可能关闭)
-        checked: false,
         mobile: '', // 输入的手机号
         smsCode: '', // 输入的验证码
         password: '', // 输入的密码
@@ -226,7 +221,10 @@
           password: false, // 密码
           mobileText: '' // 手机号的错误提示
         },
-        loginErrorMsg: ''
+        loginErrorMsg: '',
+        loginChecked: false, // 登录(账号密码登录)——默认未选中
+        loginDynamicChecked: false, // 登录(快捷短信登录)——默认未选中
+        registerChecked: false // 注册——默认未选中
       };
     },
     computed: {
@@ -240,7 +238,8 @@
     watch: {
       async showLoginCard() {
         this.loginErrorMsg = '';
-        this.mobile = this.smsCode = this.password = this.checked = '';
+        this.mobile = this.smsCode = this.password = '';
+        this.registerChecked = false;
         for (const key in this.errorMsgShow) {
           if (Object.prototype.hasOwnProperty.call(this.errorMsgShow, key)) {
             this.errorMsgShow[key] = false;
@@ -264,6 +263,33 @@
         this.popupVisible = true;
         await this.$nextTick();
         this.reloadCaptha();
+      },
+      resetLoginTab(type) {
+        if (type == 1) {
+          this.showMobileLogin = !this.showMobileLogin;
+          this.errorMsgShow.mobile = false;
+          // 去填写 验证码登录，重置 验证吗登录 状态
+          this.loginDynamicChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
+        } else if (type == 2) {
+          this.showMobileLogin = !this.showMobileLogin;
+          this.errorMsgShow.mobile = false;
+          // 去填写 密码登录，重置 密码登录状态
+          this.loginChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
+        } else if (type == 3) {
+          this.showLoginCard = false;
+          // 去注册，重置注册面板状态
+          this.registerChecked = false;
+          this.$refs.registerPrivacyCompliance &&
+            this.$refs.registerPrivacyCompliance.resetChecked();
+        } else {
+          this.showLoginCard = true;
+          // 去登录，重置面板状态。
+          this.loginChecked = false;
+          this.loginDynamicChecked = false;
+          this.$refs.loginPrivacyCompliance && this.$refs.loginPrivacyCompliance.resetChecked();
+        }
       },
       reloadCaptha() {
         if (this.captchaReady) {
@@ -336,6 +362,18 @@
        * 账号登录不需要校验手机，只需校验是否为空即可，有可能用邮箱登录    showMobileLogin  为true  手机登录      false 账号登录
        */
       loginFun() {
+        // 先验证隐私协议
+        if (this.showMobileLogin) {
+          if (!this.loginDynamicChecked) {
+            this.$toast(this.$t('privacy.privacy_1005'));
+            return;
+          }
+        } else {
+          if (!this.loginChecked) {
+            this.$toast(this.$t('privacy.privacy_1005'));
+            return;
+          }
+        }
         if (!this.checkMobile()) return false;
         if (this.showMobileLogin) {
           this.codeLogin();
@@ -432,7 +470,9 @@
        */
       async register() {
         // 勾选协议
-        if (!this.checked) return this.$toast(this.$t('register.register_1012'));
+        if (!this.registerChecked) {
+          return this.$toast(this.$t('privacy.privacy_1005'));
+        }
         if (!this.captchaReady) return (this.errorMsgShow.mobileKey = true);
         if (!this.checkPassWord()) return (this.errorMsgShow.password = true);
         if (this.checkMobile()) {
@@ -476,6 +516,11 @@
       },
       checkPassWord() {
         return /^([0-9a-zA-Z_`!~@#$%^*+=,.?;'":)(}{/\\|<>&[-]|]){6,30}$/.test(this.password);
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${['login', 'login_normal'].includes(obj.scene) ? 'login' : obj.scene}Checked`] =
+          obj.checked;
       }
     }
   };
