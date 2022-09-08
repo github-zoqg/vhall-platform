@@ -67,6 +67,8 @@ export default {
               let url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/${watchPageType}/${this.$route.params.id}`;
               if (this.$route.name == 'Subject') {
                 url = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail${location.search}`;
+                location.replace(url);
+                return false;
               }
               window.location.href = url;
             }
