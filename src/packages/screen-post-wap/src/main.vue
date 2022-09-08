@@ -8,7 +8,7 @@
       class="vmp-screen-post-wap-img"
       :src="screenPosterInfo_m_img"
       :fit="imageShowMode"
-      :class="imageShowMode == 2 ? 'lt' : ''"
+      :class="imageShowMode == 'cover' ? 'lt' : ''"
       lazy
     ></el-image>
     <div class="vmp-screen-post-wap-close-tip" @click.stop="screenPostClose">
