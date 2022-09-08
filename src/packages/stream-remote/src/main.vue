@@ -243,7 +243,7 @@
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
     <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
-      <img :src="coverImgUrl" alt />
+      <img :src="coverImgUrl" :class="`vmp-stream-remote__pause-${coverImageMode}`" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -259,6 +259,8 @@
     useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpStreamRemote',
     data() {
@@ -412,6 +414,7 @@
           this.isShowNetError = true;
         }
       }, 5000);
+      this.handlerImageInfo();
     },
     mounted() {},
     beforeDestroy() {
@@ -427,6 +430,15 @@
       useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      // 解析图片地址
+      handlerImageInfo() {
+        if (cropperImage(this.coverImgUrl)) {
+          let obj = parseImgOssQueryString(this.coverImgUrl);
+          this.coverImageMode = Number(obj.mode) || 3;
+        } else {
+          this.coverImageMode = 3;
+        }
+      },
       listenEvents() {
         this.micServer.$on('live_over', () => {
           clearInterval(this._audioLeveInterval);
@@ -993,6 +1005,17 @@
         width: 100%;
         height: 100%;
         z-index: -1;
+      }
+      &-1 {
+        object-fit: fill;
+      }
+      &-2 {
+        object-fit: cover;
+        object-position: left top;
+      }
+      &-3 {
+        object-fit: contain;
+        object-position: center;
       }
       p {
         width: 72px;

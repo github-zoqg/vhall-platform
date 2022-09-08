@@ -2,11 +2,8 @@
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
-        <el-image
-          v-if="formInfo && formInfo.cover != 1"
-          :src="formInfo.cover ? coverPic : defaultHeader"
-          fit="cover"
-        ></el-image>
+        <img :class="`form_cover form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+        <!-- <img :src="coverPic"/></img> -->
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
@@ -371,13 +368,14 @@
 </template>
 
 <script>
-  import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
+  // import defaultHeader from '@/packages/sign-up-form/src/img/formHeader.png';
   import {
     validEmail,
     validPhone,
     getQueryString,
     replaceHtml,
-    delUrlParams
+    delUrlParams,
+    parseImgOssQueryString
   } from '@/app-shared/utils/tool';
   import {
     useSignUpFormServer,
@@ -389,6 +387,7 @@
   import customSelectPicker from './components/customSelectPicker';
   import customCascade from './components/customCascade';
   import alertBox from '@/app-shared/components/confirm.vue';
+  import { cropperImage } from '@/app-shared/utils/common';
   import skins from '@/app-shared/skins/wap';
   export default {
     name: 'VmpWapSignUpForm',
@@ -404,7 +403,7 @@
         //报名表单独立链接是否有效
         formOpenLinkStatus: 0,
         //默认的图片前缀地址
-        defaultImgUrl: `${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
+        defaultImgUrl: `https:${process.env.VUE_APP_PUBLIC_PATH}/upload/`,
         //基础信息
         formInfo: {
           cover: 1
@@ -413,8 +412,7 @@
         form: {},
         //地域的级联选择器保存的值
         cascadeResultList: [],
-        //默认的banner图
-        defaultHeader: defaultHeader,
+
         //初始化的活动类型
         isSubscribe: 0,
         //简介文字是否超长
@@ -516,6 +514,10 @@
         captcha2: null, // 云盾实例
         //是第一次验证
         isFirstChange: true,
+        //默认的banner图
+        defaultHeader:
+          'https://cnstatic01.e.vhall.com/common-static/middle/images/platform-common/form_up.png',
+        imageCropperMode: 1,
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
@@ -533,10 +535,16 @@
       },
       // 广告头图
       coverPic() {
-        if (this.formInfo.cover != 1) {
-          return `${this.defaultImgUrl}${this.formInfo.cover}?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0`;
+        if (this.formInfo.cover) {
+          let cover = `${this.defaultImgUrl}${this.formInfo.cover}`;
+          if (cropperImage(cover)) {
+            this.handlerImageInfo(cover);
+            return cover;
+          } else {
+            return cover + '?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0';
+          }
         } else {
-          return '';
+          return this.defaultHeader;
         }
       },
       //当前的城市列表
@@ -876,6 +884,12 @@
           .catch(e => {
             this.ajaxInfoEnd = true;
           });
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
       },
       //计算简介文字是否过长
       calculateText() {
@@ -1875,6 +1889,19 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        .form_cover {
+          width: 100%;
+          height: 100%;
+          object-fit: fill;
+          &.form_bg_2 {
+            object-fit: cover;
+            object-position: left top;
+          }
+          &.form_bg_3 {
+            object-fit: contain;
+            object-position: center;
+          }
+        }
       }
     }
     &__content {

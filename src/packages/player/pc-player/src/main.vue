@@ -24,7 +24,13 @@
         <!-- 背景图片 -->
         <div
           v-if="isShowPoster"
-          class="vmp-player-living-background"
+          :class="[
+            'vmp-player-living-background',
+            {
+              background_3: imageCropperMode == 3,
+              background_2: imageCropperMode == 2
+            }
+          ]"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         ></div>
         <!-- 暖场视频播放按钮 -->
@@ -289,7 +295,8 @@
   import { computeRecordTime, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
-  import { boxEventOpitons, isIE } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, isIE, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   import swfList from './js/swf-list.js';
   const ossimg = '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
   export default {
@@ -340,6 +347,7 @@
         marquee: {}, // 跑马灯
         water: {}, //水印
         agreement: false,
+        imageCropperMode: 1,
         playerOtherOptions: {
           barrage_button: 0,
           progress_bar: 0,
@@ -391,14 +399,28 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
+        let webinarUrl = cover;
+        if (webinar.img_url) {
+          if (cropperImage(webinar.img_url)) {
+            webinarUrl = webinar.img_url;
+            this.handlerImageInfo(webinar.img_url);
+          } else {
+            webinarUrl = webinar.img_url + ossimg;
+          }
+        }
         if (this.warmUpVideoList.length) {
-          return warmup.warmup_img_url
-            ? warmup.warmup_img_url + ossimg
-            : webinar.img_url
-            ? webinar.img_url + ossimg
-            : cover;
+          if (warmup.warmup_img_url) {
+            if (cropperImage(warmup.warmup_img_url)) {
+              this.handlerImageInfo(warmup.warmup_img_url);
+              return warmup.warmup_img_url;
+            } else {
+              return warmup.warmup_img_url + ossimg;
+            }
+          } else {
+            return webinarUrl;
+          }
         } else {
-          return webinar.img_url ? webinar.img_url + ossimg : cover;
+          return webinarUrl;
         }
       },
       isShowContainer() {
@@ -797,6 +819,12 @@
           window.location.reload();
         }
       },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
+      },
       // 判断是直播还是回放 活动状态
       getWebinerStatus(info) {
         if (info && info.autoPlay) {
@@ -1018,8 +1046,18 @@
         position: absolute;
         top: 0;
         left: 0;
+        background-position: center;
+        background-repeat: no-repeat;
         background-size: 100% 100%;
+        background-color: #1a1a1a;
         z-index: 8;
+        &.background_3 {
+          background-size: contain;
+        }
+        &.background_2 {
+          background-size: cover;
+          background-position: left top;
+        }
       }
       &-btn {
         position: absolute;
