@@ -62,9 +62,9 @@
         // 第三方登录后 回调地址 - 待确定如何书写
         // 前端回传地址
         let jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.roomId}`;
-        // if (this.$route.name == 'Subject') {
-        //   jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail${location.search}`;
-        // }
+        if (this.$route.name == 'Subject') {
+          jumpUrlPath = `https:${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail${location.search}`;
+        }
         // 第三方登录地址
         this.options.wxPath =
           `https:${process.env.VUE_APP_BIND_BASE_URL}/v3/commons/auth/weixin?source=pc&jump_url=` +

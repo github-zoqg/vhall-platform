@@ -7,6 +7,7 @@ import VueRouter from 'vue-router';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
 import Subject from '../views/Subject/index.vue';
+import initCheckAuth from '../mixins/chechAuth.js';
 import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
@@ -112,6 +113,9 @@ router.beforeEach(async (to, from, next) => {
     await ssoAutoLogin(); // sso自动登录置换token
   }
   console.log('---grayInit---', res);
+  if (to.name == 'Subject') {
+    initCheckAuth.methods.initCheckAuth.call({ $route: to });
+  }
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
