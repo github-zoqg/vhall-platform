@@ -568,7 +568,6 @@
           })
           .catch(error => {
             console.error('[screen] 桌面共享创建本地流失败', error);
-            window.vhallReportForProduct?.toReport(110252);
             if (error?.name == 'NotAllowed') {
               if (/macintosh|mac os x/i.test(navigator.userAgent)) {
                 this.isShowAccessDeniedAlert = true;
@@ -593,6 +592,7 @@
       },
       // 关闭弹窗
       closeConfirm() {
+        window.vhallReportForProduct?.toReport(110252);
         this.popAlert.visible = false;
       },
       //结束演示
