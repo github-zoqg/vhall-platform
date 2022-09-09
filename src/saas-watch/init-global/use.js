@@ -27,6 +27,7 @@ import VmpBasicCenterMain from '@/packages/basic-center-main';
 import VmpShare from '@/packages/share'; // 观看端分享
 import VmpOfficialPc from '@/packages/official-module/official-pc'; //公众号弹窗
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公权限验证
+import VmpPrivacyCompliance from '@/packages/privacy-compliance'; // 隐私合规
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
@@ -150,6 +151,7 @@ Vue.use(VmpInsertStream);
 Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
+Vue.use(VmpPrivacyCompliance);
 
 // ------------------------------【时尚风格】注册组件------start----------
 Vue.use(VmpFashionChat);

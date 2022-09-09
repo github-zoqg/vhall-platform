@@ -313,9 +313,10 @@
     },
     created() {
       this.childrenCom = this.$parent.cuid ? window.$serverConfig[this.$parent.cuid].children : [];
-      if (this.isSpeakOn && useChatServer().state.allBanned) {
+      /** 禁言，被邀请的用户，刷新页面不下麦
+       * if (this.isSpeakOn && useChatServer().state.allBanned) {
         useMicServer().speakOff();
-      }
+      }*/
       this.initViewData();
     },
     mounted() {

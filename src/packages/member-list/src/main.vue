@@ -557,6 +557,12 @@
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
+              if (this.roleName == 1) {
+                window.vhallReportForProduct?.toResultsReporting(110179, {
+                  event_type: 'message',
+                  ...rawMsg
+                });
+              }
               handleApplyConnect(temp);
               break;
             case 'vrtc_connect_apply_cancel':
@@ -1044,6 +1050,10 @@
           // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
           if (_this.LocalCatchTarget_id != msg.data.target_id) {
             _this.LocalCatchTarget_id = msg.data.target_id;
+            window.vhallReportForProduct?.toResultsReporting(110180, {
+              event_type: 'message',
+              ...msg
+            });
             if (msg.data.room_role != 2) {
               _this.$message.success({
                 message: _this.$t('interact.interact_1030', { n: msg.data.nick_name })
@@ -1432,13 +1442,20 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
+        //数据埋点--开启/关闭允许举手
+        window.vhallReportForProduct?.toStartReporting(
+          element.target.checked ? 110127 : 110128,
+          element.target.checked ? 110153 : 110154
+        );
         this.micServer
           .setHandsUp(params)
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(
+              element.target.checked ? 110153 : 110154,
+              { event_type: 'interface', res, request_id: res?.request_id }
+            );
             console.log('switch-mic-status', res);
             if (res.code == 200) {
-              //数据埋点--开启/关闭允许举手
-              window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
               this.$message.success({ message: '设置成功' });
             }
           })
@@ -1540,9 +1557,17 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
+        window.vhallReportForProduct?.toStartReporting(110194, 110195, {
+          params
+        });
         this.micServer
           .hostAgreeApply(params)
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res,
+              event_type: 'interface',
+              request_id: res?.request_id
+            });
             if (res.code !== 200) {
               this.$message.error(res.msg);
               return;
@@ -1550,6 +1575,9 @@
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res: err
+            });
             console.log('allow speak fail ::', err);
           });
       },
@@ -1567,18 +1595,38 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
+            window.vhallReportForProduct?.toStartReporting(110174, 110175);
             this.micServer.userSpeakOn().then(res => {
+              window.vhallReportForProduct?.toResultsReporting(110175, {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              });
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
             });
           } else {
+            //数据埋点--邀请上麦
+            const cUser = this.onlineUsers.filter(el => {
+              return el.account_id == accountId;
+            });
+            window.vhallReportForProduct?.toStartReporting(110130, 110155, {
+              invitee_role: cUser[0].role_name,
+              invitee_info: { ...cUser[0] }
+            });
             this.micServer
               .inviteMic({
                 room_id: this.roomId,
                 receive_account_id: accountId
               })
               .then(res => {
+                window.vhallReportForProduct?.toResultsReporting(110155, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  receive_account_id: accountId,
+                  res
+                });
                 if (res.code == 200) {
                   this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
@@ -1597,6 +1645,18 @@
           room_id: this.roomId,
           receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
+        const cUser = this.onlineUsers.filter(el => {
+          return el.account_id == accountId;
+        });
+        if (this.userId == accountId && this.roleName == 1) {
+          // 主持人下麦自己
+          window.vhallReportForProduct?.toStartReporting(110172, 110173);
+        } else {
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: cUser[0].role_name,
+            info_of_expelleds: { ...cUser[0] }
+          });
+        }
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1610,6 +1670,21 @@
               .speakOff(data)
               .then(res => {
                 //todo 埋点上报
+                if (this.userId == accountId && this.roleName == 1) {
+                  // 主持人下麦自己
+                  window.vhallReportForProduct?.toResultsReporting(110173, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    reasonTxt: '演示中下麦,演示自动结束',
+                    res
+                  });
+                } else {
+                  window.vhallReportForProduct?.toResultsReporting(110157, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    res
+                  });
+                }
                 return res;
               })
               .catch(error => {
@@ -1621,6 +1696,20 @@
             .speakOff(data)
             .then(res => {
               //todo 埋点上报
+              if (this.userId == accountId && this.roleName == 1) {
+                // 主持人下麦自己
+                window.vhallReportForProduct?.toResultsReporting(110173, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
+              } else {
+                window.vhallReportForProduct?.toResultsReporting(110157, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
+              }
               return res;
             })
             .catch(error => {
@@ -1679,11 +1768,33 @@
             });
         }
         //设置主讲人
+        if (this.userId == accountId) {
+          window.vhallReportForProduct?.toStartReporting(110176, 110177, {
+            rejection_method: encodeURIComponent('成员列表主持人将自己设置为主讲人')
+          }); // 主持人将自己设为主讲人
+        } else {
+          let cUser = this.onlineUsers.filter(el => {
+            return el.account_id == accountId;
+          });
+          window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
+            rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人'),
+            guest_info: cUser[0]
+          }); // 主持人将嘉宾设为主讲人
+        }
         return this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(
+              this.userId == accountId ? 110177 : 110170,
+              {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              }
+            );
+
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {
@@ -1709,9 +1820,6 @@
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')
               } else {
-                //数据埋点--邀请上麦
-                window.vhallReportForProduct?.report(110130);
-
                 this.$message.success(this.$t('message.message_1034'));
               }
             } else {

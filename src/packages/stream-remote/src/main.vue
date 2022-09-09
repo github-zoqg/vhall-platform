@@ -243,7 +243,7 @@
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
     <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
-      <img :src="coverImgUrl" alt />
+      <img :src="coverImgUrl" :class="`vmp-stream-remote__pause-${coverImageMode}`" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -259,6 +259,8 @@
     useMsgServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpStreamRemote',
     data() {
@@ -412,6 +414,7 @@
           this.isShowNetError = true;
         }
       }, 5000);
+      this.handlerImageInfo();
     },
     mounted() {},
     beforeDestroy() {
@@ -427,6 +430,15 @@
       useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      // 解析图片地址
+      handlerImageInfo() {
+        if (cropperImage(this.coverImgUrl)) {
+          let obj = parseImgOssQueryString(this.coverImgUrl);
+          this.coverImageMode = Number(obj.mode) || 3;
+        } else {
+          this.coverImageMode = 3;
+        }
+      },
       listenEvents() {
         this.micServer.$on('live_over', () => {
           clearInterval(this._audioLeveInterval);
@@ -524,10 +536,14 @@
         };
 
         console.log('订阅参数', opt, this.stream);
+        window.vhallReportForProduct?.toStartReporting(110198, 110166, {
+          opt
+        });
         this.interactiveServer
           .subscribe(opt)
           .then(e => {
             console.log('订阅成功--1--', e);
+            window.vhallReportForProduct?.toResultsReporting(110166, { res: e });
             if (this.joinInfo.role_name === 1) {
               this.interactiveServer.resetLayout();
             }
@@ -538,6 +554,7 @@
             this.getLevel();
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110166, { res: e });
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
@@ -557,13 +574,28 @@
           window.vhallReportForProduct?.report(status == 1 ? 110139 : 110138);
         }
       },
-      speakOff() {
-        this.micServer.speakOff({
+      async speakOff() {
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: this.stream.roleName,
+            info_of_expelleds: { ...this.stream }
+          });
+        }
+        const res = await this.micServer.speakOff({
           receive_account_id: this.stream.accountId
         });
-
-        if (this.joinInfo.role_name == 1 && this.stream.roleName == 4) {
-          window.vhallReportForProduct?.report(110133);
+        if (
+          this.joinInfo.role_name == 1 &&
+          (this.stream.roleName == 4 || this.stream.roleName == 2)
+        ) {
+          window.vhallReportForProduct?.toResultsReporting(110157, {
+            request_id: res?.request_id,
+            event_type: 'interface',
+            res
+          });
         }
       },
       fullScreen() {
@@ -653,6 +685,10 @@
         //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
         //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
         // }
+        window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
+          rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人'),
+          guest_info: this.stream
+        });
         if (setMainScreen) {
           this.setMainScreen();
         }
@@ -661,6 +697,11 @@
             receive_account_id: accountId || this.stream.accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110170, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
+            });
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {
@@ -964,6 +1005,17 @@
         width: 100%;
         height: 100%;
         z-index: -1;
+      }
+      &-1 {
+        object-fit: fill;
+      }
+      &-2 {
+        object-fit: cover;
+        object-position: left top;
+      }
+      &-3 {
+        object-fit: contain;
+        object-position: center;
       }
       p {
         width: 72px;

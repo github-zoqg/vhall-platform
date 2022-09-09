@@ -7,7 +7,7 @@
     ]"
   >
     <lottery-header :prizeInfo="prizeInfo" />
-    <el-form ref="forms" class="winner-info-form">
+    <el-form ref="forms" :class="['winner-info-form', isEmbed ? '' : ' privacy-css']">
       <el-form-item v-for="(item, index) in stepHtmlList" :key="index" :required="true">
         <span v-if="item.is_required == 1" class="required-flag">*</span>
         <el-input
@@ -30,10 +30,19 @@
         ></textarea>
       </el-form-item>
     </el-form>
-    <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p>
-    <div :class="['winner-info__submit-btn', verified ? '' : 'disabled']" @click="postWinnerInfo">
+    <!-- <p class="winner-info-tip">{{ $t('interact_tools.interact_tools_1018') }}</p> -->
+    <div
+      :class="[
+        'winner-info__submit-btn ',
+        isEmbed ? '' : 'privacy-css ',
+        verified ? '' : 'disabled'
+      ]"
+      @click="postWinnerInfo"
+    >
       {{ $t('interact_tools.interact_tools_1019') }}
     </div>
+    <!-- 隐私合规（嵌入不展示） -->
+    <vmp-privacy-compliance scene="lottery" clientType="pc" compType="2"></vmp-privacy-compliance>
     <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
   </div>
 </template>
@@ -222,6 +231,9 @@
     }
     .winner-info-form {
       max-height: 156px;
+      &.privacy-css {
+        max-height: 130px;
+      }
       overflow-y: auto;
       overflow-x: hidden;
       .el-form-item__content {
@@ -349,6 +361,9 @@
       left: 50%;
       transform: translateX(-80px);
       font-size: 14px;
+      &.privacy-css {
+        bottom: 80px;
+      }
       &.disabled {
         opacity: 0.7;
         pointer-events: none;

@@ -213,10 +213,18 @@
       // 显示插播列表 dialog
       openInsertFileDialog() {
         // 检查是否可以插播文件
+        window.vhallReportForProduct.toStartReporting(110189, [110190, 110191]);
         const isCanInsert = this.checkInsertFileProcess();
+        window.vhallReportForProduct.toResultsReporting(110190, {
+          event_type: 'static',
+          isCanInsert
+        });
         if (isCanInsert) {
           // 显示插播列表
           this.insertVideoVisible = true;
+          window.vhallReportForProduct.toResultsReporting(110191, {
+            event_type: 'static'
+          });
           this.getTableList({
             isNeedResetPage: true,
             isInvokeInCreated: true
@@ -293,6 +301,7 @@
       },
       // 选择本地文件插播
       selectLocalVideo() {
+        window.vhallReportForProduct?.toReport(110216);
         // 他人正在演示插播，当前不可操作；有人正在桌面共享，当前不可插播
         if (!this.checkInsertFileProcess() || this.isShareScreen) {
           if (this.isShareScreen && this.desktopShareInfo) {
@@ -351,7 +360,7 @@
           this.$message.warning('超过文件大小限制，请选择5G以下的音视频文件');
           return;
         }
-
+        window.vhallReportForProduct?.toReport(110217);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitInsertFileChange', [File, 'local'])
         );
@@ -427,6 +436,7 @@
       }, 300),
       // 云插播开始播放
       handlePlay(video) {
+        window.vhallReportForProduct?.toReport(110197, { report_extra: { file_info: video } });
         const insertFileServer = useInsertFileServer();
         const insertFileServerState = insertFileServer.state;
         const { watchInitData } = useRoomBaseServer().state;
@@ -464,6 +474,7 @@
         }
       },
       handleDelete(video) {
+        window.vhallReportForProduct.toStartReporting(110231, [110233, 110238, 110234]);
         this.$confirm('删除后将会影响视频的演示和观看，确定删除？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -471,11 +482,19 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         })
           .then(() => {
+            window.vhallReportForProduct?.toResultsReporting(110233, {
+              event_type: 'static'
+            });
             this.insertFileServer
               .deleteInsertFile({
                 ids: video.id
               })
               .then(res => {
+                window.vhallReportForProduct?.toResultsReporting(110238, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
                 if (res.code === 200) {
                   this.getTableList({
                     isNeedResetPage: true
@@ -489,6 +508,9 @@
                 }
               })
               .catch(res => {
+                window.vhallReportForProduct?.toResultsReporting(110234, {
+                  event_type: 'static'
+                });
                 this.$message({
                   message: res.msg || '删除失败',
                   showClose: true,
@@ -502,6 +524,7 @@
       // 预览页面
       handlePreview(video) {
         this.previewDialog = true;
+        window.vhallReportForProduct.toReport(110192, { report_extra: { file_info: video } });
         if (video.transcode_status == 1) {
           this.videoParam = {
             autoplay: true,

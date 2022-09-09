@@ -7,7 +7,8 @@
     <el-image
       class="vmp-screen-post-wap-img"
       :src="screenPosterInfo_m_img"
-      fit="cover"
+      :fit="imageShowMode"
+      :class="imageShowMode == 'cover' ? 'lt' : ''"
       lazy
     ></el-image>
     <div class="vmp-screen-post-wap-close-tip" @click.stop="screenPostClose">
@@ -19,6 +20,8 @@
 
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpScreenPostWap',
     data() {
@@ -26,6 +29,7 @@
         useRoomBaseServer: {},
         timer: null,
         time: 5,
+        imageShowMode: 'fill',
         screenShow: false,
         screenWidth: 375, //默认是iphonexr设计稿1/2
         screenHeight: 667
@@ -33,7 +37,13 @@
     },
     computed: {
       screenPosterInfo_m_img() {
-        return `${this.useRoomBaseServer.state.screenPosterInfo.m_img}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
+        let url = this.useRoomBaseServer.state.screenPosterInfo.m_img;
+        if (cropperImage(url)) {
+          this.handlerImageInfo(url);
+          return url;
+        } else {
+          return `${url}?x-oss-process=image/resize,m_lfit,h_${this.screenHeight},w_${this.screenWidth}`;
+        }
       }
     },
     created() {
@@ -57,7 +67,16 @@
         const url = this.useRoomBaseServer.state.screenPosterInfo.url;
         url && window.open(url);
       },
-
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageShowMode = 'fill';
+        if (Number(obj.mode) == 2) {
+          this.imageShowMode = 'cover';
+        } else if (Number(obj.mode) == 3) {
+          this.imageShowMode = 'contain';
+        }
+      },
       // 自动关闭
       handleAutoClose() {
         if (this.timer) clearInterval(this.timer);
@@ -99,6 +118,11 @@
     .vmp-screen-post-wap-img {
       width: 100%;
       height: 100%;
+      &.lt {
+        img {
+          object-position: left top;
+        }
+      }
     }
 
     .vmp-screen-post-wap-close-tip {

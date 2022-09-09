@@ -5,3 +5,12 @@ export function resizeImg(url, { type, width, height }) {
   }
   return url;
 }
+
+//图片经阿里云转换
+export function cropperImage(url) {
+  if (url && url.indexOf('?x-oss-process') != -1) {
+    return true;
+  } else {
+    return false;
+  }
+}

@@ -180,18 +180,17 @@
               ? 'production'
               : 'test'
           });
+
           window.vhallReport.report('ENTER_WATCH');
-          domain.initVhallReportForWatch({
+          // 产品侧数据埋点初始化
+          domain.initVhallReportForProduct({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
-            pf: 10
+            app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            pf: 3, // 客户端类型  web 网页端用 8
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id, // C端用户 id（如果是B端用当前用户id）
+            webinar_id: this.$route.params.id // 活动 id
           });
-          const commonReportForProductParams = generateWatchReportCommonParams(
-            roomBaseServer.state.watchInitData,
-            new useUserServer().state.userInfo,
-            this.$route.query.shareId || this.$route.query.share_id
-          );
-          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
-          window.vhallReportForWatch?.report(170017);
           this.state = 1;
           this.addEventListener();
         } catch (err) {

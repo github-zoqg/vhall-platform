@@ -12,7 +12,7 @@
       class="vmp-login__form__common"
     >
       <!-- 手机号 -->
-      <el-form-item prop="phone">
+      <el-form-item prop="phone" class="common_mg3">
         <el-input
           v-model.trim="ruleForm.phone"
           clearable
@@ -21,11 +21,11 @@
         ></el-input>
       </el-form-item>
       <!-- 图片验证码 -->
-      <el-form-item>
+      <el-form-item class="common_mg3">
         <div id="codeLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code common_mg3">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -58,7 +58,7 @@
       <el-form-item>
         <div
           :class="[
-            'vmp-reg-login-box__link vmp-reg-login-box__code__link',
+            'vmp-reg-login-box__link vmp-reg-login-box__code__link common_mg3',
             {
               'vmp-reg-login-box__height__max': isMaxHeight
             }
@@ -72,17 +72,25 @@
             {{ $t('login.login_1005') }}
           </span>
         </div>
-        <el-button
-          type="primary"
-          round
-          class="length-max vmp-reg-login__login__btn"
-          @click="handleCodeLogin"
-        >
-          {{ $t('nav.nav_1005') }}
-        </el-button>
+        <div class="common_mg3">
+          <el-button
+            type="primary"
+            round
+            class="length-max vmp-reg-login__login__btn"
+            @click="handleCodeLogin"
+          >
+            {{ $t('nav.nav_1005') }}
+          </el-button>
+        </div>
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="loginDynamic"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
         <a
           href="javascript:void(0)"
-          class="vmp-reg-login__reg__link"
+          class="vmp-reg-login__reg__link common_mg3"
           v-if="showToReg == 1"
           @click="handleToReg"
         >
@@ -136,7 +144,8 @@
         },
         autoLoginStatus: false, // 账户的自动登录
         isMaxHeight: false, // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
-        btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
+        btnDisabled: true, // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
+        loginDynamicChecked: false // 登录(快捷短信登录)——默认未选中
       };
     },
     watch: {
@@ -190,6 +199,15 @@
       },
       // 点击登录 - 验证码登录
       async handleCodeLogin() {
+        if (!this.loginDynamicChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
         const valid = await this.$refs.ruleForm.validate();
         if (!valid) return false;
         const params = {
@@ -215,6 +233,10 @@
             });
           }
         });
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     async mounted() {
@@ -225,6 +247,10 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-code-login {
-    padding: 0 32px 24px;
+    padding: 0 29px 24px;
+    .common_mg3 {
+      margin-right: 3px;
+      margin-left: 3px;
+    }
   }
 </style>
