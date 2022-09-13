@@ -131,6 +131,11 @@ const routes = [
     name: 'appQuestion',
     component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedQuestion'),
     meta: { grayType: '' }
+  },
+  {
+    path: '/test', // app-sdk内嵌问卷页
+    name: 'test',
+    component: () => import(/* webpackChunkName: "test" */ '../views/demos/index.vue'),
   }
 ];
 

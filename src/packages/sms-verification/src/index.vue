@@ -2,13 +2,13 @@
   <van-popup v-model="dialogVisible" class="sms-verification" round :close-on-click-overlay="false">
     <div class="container">
       <div class="title-wrap">
-        <p class="title">提交手机号接收消息提醒</p>
+        <p class="title">Submit and receive notifications</p>
         <i class="vh-iconfont vh-line-close" />
       </div>
       <ul class="form-wrap">
         <li class="form-item line">
           <van-field
-            v-model="input"
+            v-model="phone"
             :placeholder="$t('account.account_1025')"
             type="tel"
             class="input"
@@ -19,7 +19,7 @@
           <li class="smsVerificationCaptcha form-item"></li>
           <li class="verification-wrap form-item line">
             <van-field
-              v-model="input"
+              v-model="code"
               :placeholder="$t('form.form_1020')"
               type="tel"
               class="code-input"
@@ -35,7 +35,6 @@
           </li>
         </template>
       </ul>
-
       <van-button round type="danger" class="btn" size="normal" block :disabled="btnDisabled">
         提交
       </van-button>
@@ -51,7 +50,8 @@
       return {
         userServerState,
         dialogVisible: true,
-        input: '',
+        phone: '',
+        code: '',
         needVerification: false
       };
     },
@@ -64,7 +64,7 @@
           return true;
         } else {
           // 不需要验证只要数字为 11-11-15即可
-          return this.input.length < 11 || this.input.length > 15;
+          return this.phone.length < 11 || this.phone.length > 15;
         }
       },
       captchaReady() {
@@ -80,7 +80,7 @@
     methods: {
       open(needVerification = false) {
         this.needVerification = needVerification;
-        this.input = '';
+        this.phone = '';
         this.dialogVisible = true;
         if (this.needVerification) {
           this.$nextTick(() => {
@@ -96,7 +96,7 @@
 </script>
 <style lang="less">
   .sms-verification {
-    // overflow: visible;
+    overflow: visible; // 易盾在弹层中可能被遮挡
     .container {
       width: 670px;
       padding: 50px 60px;
