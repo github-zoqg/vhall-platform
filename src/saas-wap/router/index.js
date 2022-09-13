@@ -135,7 +135,7 @@ const routes = [
   {
     path: '/test', // app-sdk内嵌问卷页
     name: 'test',
-    component: () => import(/* webpackChunkName: "test" */ '../views/demos/index.vue'),
+    component: () => import(/* webpackChunkName: "test" */ '../views/demos/index.vue')
   }
 ];
 
