@@ -21,7 +21,6 @@
             class="picture-uploader-img"
             :src="canvasImgUrl"
             alt=""
-            lazy
           ></el-image>
           <p class="picture-uploader-controller-panel">
             <span class="icon-wrap-con icon-wrap-change" :class="{ 'icon-wrap-only': !showDelImg }">
