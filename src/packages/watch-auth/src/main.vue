@@ -7,7 +7,7 @@
       width="400px"
     >
       <div class="vmp-auth-wrap">
-        <div class="vmp-auth-wrap-text">
+        <div :class="['vmp-auth-wrap-text', isWhiteCheck ? 'auth__privacy' : '']">
           <el-input
             :type="isHideEye ? 'text' : 'password'"
             v-model="authTitle"
@@ -20,6 +20,13 @@
             ></i>
           </el-input>
         </div>
+        <!-- 隐私合规（嵌入不支持） -->
+        <vmp-privacy-compliance
+          scene="auth"
+          clientType="pc"
+          compType="2"
+          v-if="isWhiteCheck"
+        ></vmp-privacy-compliance>
         <div class="vmp-auth-wrap-btn">
           <el-button type="primary" round @click="authSubmit">
             {{ $t('account.account_1062') }}
@@ -30,7 +37,7 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
+  import { useRoomBaseServer, useSubscribeServer, useSubjectServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWatchAuth',
@@ -38,18 +45,26 @@
       return {
         authVisible: false,
         isHideEye: false,
+        isSubject: false,
+        webinarId: '',
         placeholder: '',
-        authTitle: ''
+        authTitle: '',
+        isWhiteCheck: false
       };
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
+      this.subjectServer = useSubjectServer();
     },
     methods: {
       openAuthDialog(info) {
+        console.log(info);
+        this.isSubject = info.isSubject;
+        this.webinarId = info.webinarId;
         this.authVisible = true;
-        this.placeholder = info;
+        this.placeholder = info.placeHolder;
+        this.isWhiteCheck = info.isWhiteCheck; // 是否开启了白名单验证
       },
       hideEye() {
         this.isHideEye = !this.isHideEye;
@@ -61,6 +76,14 @@
         this.authVisible = false;
       },
       authSubmit() {
+        if (this.isSubject) {
+          this.authSubjectCheck();
+        } else {
+          this.authWebinarCheck();
+        }
+      },
+      // 活动验证
+      authWebinarCheck() {
         const { webinar } = this.roomBaseServer.state.watchInitData;
         console.log(webinar, '???13214');
         let data = {
@@ -87,10 +110,40 @@
               }, 1000);
             }
           } else if (res.code === 512525) {
-            // 填写报名表单
+            // 关闭权限验证框，打开报名表单
+            this.closeVisibleDialog();
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitClickOpenSignUpForm')
             );
+          } else {
+            this.$message({
+              message: this.$tec(res.code) || res.msg,
+              showClose: true,
+              type: 'warning',
+              customClass: 'zdy-info-box'
+            });
+          }
+        });
+      },
+      // 专题验证
+      authSubjectCheck() {
+        const { subjectDetailInfo, subjectAuthInfo } = this.subjectServer.state;
+        let data = {
+          subject_id: subjectDetailInfo.id,
+          visitor_id: subjectAuthInfo.visitor_id,
+          type: subjectAuthInfo.verify,
+          verify_value: this.authTitle,
+          ...this.$route.query
+        };
+        this.subjectServer.getSubjectWatchAuth(data).then(res => {
+          if (res.code == 200) {
+            this.subjectServer.state.subjectAuthInfo.pass = 1;
+            this.authVisible = false;
+            let href =
+              window.location.origin +
+              process.env.VUE_APP_ROUTER_BASE_URL +
+              `/lives/watch/${this.webinarId}${window.location.search}`;
+            window.open(href, '_blank');
           } else {
             this.$message({
               message: this.$tec(res.code) || res.msg,
@@ -121,9 +174,16 @@
         .el-input__inner {
           padding-right: 40px;
         }
+        &.auth__privacy {
+          padding-bottom: 4px;
+        }
       }
       &-btn {
         text-align: right;
+        .el-button {
+          background-color: var(--theme-color) !important;
+          border: 1px solid var(--theme-color) !important;
+        }
       }
     }
   }

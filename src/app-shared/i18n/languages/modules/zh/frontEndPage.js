@@ -71,7 +71,8 @@ export default {
     player_1023: '调整播放时间失败',
     player_1024: '设置当前时间失败,请稍后重试',
     player_1025: '正常',
-    player_1026: '直播回放中'
+    player_1026: '直播回放中',
+    player_1027: '现在没有进行彩排，下次再来参与吧'
   },
   appointment: {
     appointment_1001: '白名单验证',
@@ -105,7 +106,8 @@ export default {
     appointment_1029: '秒',
     appointment_1030: '活动主办方设置了试看',
     appointment_1031: '请耐心等待',
-    appointment_1032: '白名单'
+    appointment_1032: '白名单',
+    appointment_1033: '彩排已开始，请观看直播吧'
   },
   nav: {
     nav_1001: '主办方',
@@ -159,7 +161,10 @@ export default {
     nav_1049: '地点',
     nav_1050: '主播还未开启邀请哦',
     nav_1051: '支付宝',
-    nav_1052: '复制失败'
+    nav_1052: '复制失败',
+    nav_1053: '主办方',
+    nav_1054: '分享彩排观看地址',
+    nav_1055: '彩排中'
   },
   login: {
     login_1001: '账号登录',
@@ -348,7 +353,8 @@ export default {
     chat_1094: '仅查看聊天内容',
     chat_1095: '聊天设置',
     chat_1096: '已开启仅查看聊天内容',
-    chat_1097: '已关闭仅查看聊天内容'
+    chat_1097: '已关闭仅查看聊天内容',
+    chat_1098: '点击查看'
   },
   form: {
     form_1001: '姓名',
@@ -438,7 +444,9 @@ export default {
     form_1085: '地址',
     form_1086: '输入关键词/用户昵称',
     form_1087: '提交成功，感谢您的参与',
-    form_1088: '提交成功'
+    form_1088: '提交成功',
+    form_1089: '填写',
+    form_1090: '已填'
   },
   menu: {
     menu_1001: '文档',
@@ -478,7 +486,7 @@ export default {
     interact_tools_1018: '请填写领奖信息，方便主办方与您联系',
     interact_tools_1019: '提交',
     interact_tools_1020: '中奖名单',
-    interact_tools_1021: '正在进行抽奖环节',
+    interact_tools_1021: '正在进行抽奖...',
     interact_tools_1022: '很遗憾，您没有中奖！',
     interact_tools_1023: '恭喜您中奖了！',
     interact_tools_1024: '签到',
@@ -518,9 +526,9 @@ export default {
     interact_tools_1057: '进行中...',
     interact_tools_1058: '免费',
     interact_tools_1059: '咖啡',
-    interact_tools_1060: '赞',
+    interact_tools_1060: '爱心',
     interact_tools_1061: '鼓掌',
-    interact_tools_1062: '鲜花',
+    interact_tools_1062: '玫瑰',
     interact_tools_1063: '礼物赠送成功',
     interact_tools_1064: '请选择礼物',
     interact_tools_1065: '发送口令{n}参与抽奖吧',
@@ -543,7 +551,11 @@ export default {
     interact_tools_1082: '一键复制口令',
     interact_tools_1083: '查看领取名单',
     interact_tools_1085: '领取Top10名单',
-    interact_tools_1086: '公告'
+    interact_tools_1086: '公告',
+    interact_tools_1087: '火箭',
+    interact_tools_1088: '飞机',
+    interact_tools_1089: '礼炮',
+    interact_tools_1090: '汽车'
   },
   setting: {
     setting_1002: '观看设置',
@@ -811,7 +823,8 @@ export default {
     doc_1025: '单向箭头',
     doc_1026: '双向箭头',
     doc_1027: '上传',
-    doc_1028: '取消移动'
+    doc_1028: '取消移动',
+    doc_1029: '直播准备中，敬请期待'
   },
   webinar: {
     webinar_1001: '关闭',
@@ -893,5 +906,12 @@ export default {
     other_1018: '拒绝',
     other_1019: '知道了',
     other_1020: '很遗憾无法继续为您提供服务，您可以手动关闭页面'
+  },
+  privacy: {
+    privacy_1001: '阅读并同意{n}及{n1}',
+    privacy_1002: '提交即同意{n}及{n1}',
+    privacy_1003: '《微吼用户保护协议》',
+    privacy_1004: '《微吼隐私政策》',
+    privacy_1005: '请先阅读并同意隐私政策及用户服务协议'
   }
 };

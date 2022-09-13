@@ -27,7 +27,6 @@ import VmpInsertStream from '@/packages/insert-video-stream';
 import VmpBasicCenterContainerLive from '@/packages/basic-center-container-live';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpGroupDiscussion from '@/packages/group-discussion';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpTabMenu from '@/packages/tab-menu';
 import VmpCustomMenu from '@/packages/custom-menu';
@@ -54,12 +53,13 @@ import VmpPollingSetting from '@/packages/video-polling-setting';
 // 视频轮询流订阅
 import VmpStreamPollingRemote from '@/packages/stream-polling-remote';
 // 客户端嵌入页
-import VmpEmbedClient from '@/packages/embed-client-live';
+// import VmpEmbedClient from '@/packages/embed-client-live';
 // 邀请上麦
 import VmpMicInvited from '@/packages/mic-invited/index';
 // 云导播播放器&本地流推送组件
 import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
-
+// 隐私合规文案
+import VmpPrivacyCompliance from '@/packages/privacy-compliance';
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -111,6 +111,7 @@ Vue.use(VmpStreamPollingRemote);
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpStreamDesktopScreen);
-Vue.use(VmpEmbedClient);
+// Vue.use(VmpEmbedClient);
 Vue.use(VmpMicInvited);
 Vue.use(VmpPcPlayerLiveYun);
+Vue.use(VmpPrivacyCompliance);

@@ -6,7 +6,7 @@
  * 2、地址链接中有debug=true
  * 3、非生产环境默认开启日志
  */
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.VUE_APP_SAAS_ENV === 'production';
 const cacheKey = '__openDebug__';
 let debugStatusCache = sessionStorage.getItem(cacheKey);
 const debugSwitch = window.location.search.indexOf('debug=true') > -1;
@@ -31,47 +31,50 @@ if (openLog) {
   }
 }
 
-// 重写console.log
-console.log = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.log);
+// 只有生产环境才重写console方法
+if (isProd) {
+  // 重写console.log
+  console.log = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.log);
 
-// 重写console.info
-console.info = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.info);
+  // 重写console.info
+  console.info = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.info);
 
-// 重写console.warn
-console.warn = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.warn);
+  // 重写console.warn
+  console.warn = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.warn);
 
-// 重写console.error
-console.error = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.error);
+  // 重写console.error
+  console.error = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.error);
 
-// 重写console.table
-console.table = (function (oriLogFunc) {
-  return function () {
-    if (openLog) {
-      oriLogFunc.call(console, ...arguments);
-    }
-  };
-})(console.table);
+  // 重写console.table
+  console.table = (function (oriLogFunc) {
+    return function () {
+      if (openLog) {
+        oriLogFunc.call(console, ...arguments);
+      }
+    };
+  })(console.table);
+}

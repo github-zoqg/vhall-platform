@@ -3,7 +3,7 @@
     <div class="vmp-footer-tools__left">
       <div
         class="vmp-footer-tools__left-setting"
-        v-if="isInteractLive || (isVideoLive && isVideoPolling)"
+        v-if="isInteractLive || (isVideoLive && isVideoPolling && isLiving)"
         @click="settingShow()"
       >
         <i class="vh-iconfont vh-line-setting"></i>
@@ -14,14 +14,14 @@
         v-if="roomBaseState.watchInitData.online.show && !isInGroup"
       >
         <i class="vh-iconfont vh-line-user"></i>
-        {{ onlineNum | formatHotNum }}
+        {{ onlineNumTxt | formatHotNum }}
       </div>
       <div
         class="vmp-footer-tools__left-hot"
         v-if="roomBaseState.watchInitData.pv.show && !isInGroup"
       >
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-        {{ hotNum | formatHotNum }}
+        {{ hotNumTxt | formatHotNum }}
       </div>
       <div
         class="vmp-footer-tools__left-language"
@@ -70,7 +70,7 @@
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
         <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
-      <li>
+      <li v-if="isLiving">
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
       </li>
@@ -79,7 +79,7 @@
         <lottery-icon @clickIcon="checkLotteryIcon" @takeAward="takeAward" />
         <vmp-air-container :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="!isEmbed">
+      <li v-if="!isEmbed && isLiving">
         <red-packet-icon @clickIcon="checkredPacketIcon" />
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
@@ -135,6 +135,7 @@
       :close-on-click-modal="true"
       :modal-append-to-body="true"
       custom-class="polling-dialog"
+      @closed="closePollingDialog"
       width="400px"
     >
       <div class="polling-dialog_warp">
@@ -160,10 +161,10 @@
     useMicServer,
     useChatServer,
     useGroupServer,
+    useMediaCheckServer,
     useVideoPollingServer
   } from 'middle-domain';
   import handup from './component/handup/index.vue';
-  // import reward from './component/reward/index.vue';
   import vhGifts from './component/gifts/index.vue';
   import notice from './component/notice/index.vue';
   import praise from './component/praise/index.vue';
@@ -172,6 +173,7 @@
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
   import { throttle } from 'lodash';
+  import alternateStylesheet from 'caniuse-lite/data/features/alternate-stylesheet';
   export default {
     name: 'VmpFooterTools',
     components: {
@@ -201,7 +203,9 @@
         zfQr: '',
         wxQr: '',
         lang: {},
-        languageList: []
+        languageList: [],
+        onlineNumTxt: 0,
+        hotNumTxt: 0
       };
     },
     watch: {
@@ -209,6 +213,12 @@
         if (val) {
           this.roomBaseServer.state.timerInfo = {};
         }
+      },
+      onlineNum(val) {
+        this.updateOnlineNum(val);
+      },
+      hotNum(val) {
+        this.updateHotNum(val);
       }
     },
     computed: {
@@ -231,6 +241,10 @@
       // 是否开启视频轮巡
       isVideoPolling() {
         return this.roomBaseServer.state.configList['video_polling'] == 1;
+      },
+      // 是否开启视频轮巡
+      hasVideoPollingStart() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus?.video_polling == 1;
       },
       // 是否正在直播
       isLiving() {
@@ -287,6 +301,8 @@
       this.videoPollingServer = useVideoPollingServer();
     },
     created() {
+      this.onlineNumTxt = this.onlineNum;
+      this.hotNumTxt = this.hotNum;
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.roomBaseState = this.roomBaseServer.state;
       if (this.isEmbed) {
@@ -310,11 +326,33 @@
       this.throttleHandleShowGift = throttle(this.handleShowGift, 500, { trailing: false });
     },
     mounted() {
+      const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
       this.videoPollingServer.$on('VIDEO_POLLING_START', () => {
         this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
       });
+      if (sessionStorage.getItem(`hasVideoPollingStart_${roomId}`) == 1) return;
+      if (this.hasVideoPollingStart) {
+        this.pollingVisible = true;
+        useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 1);
+      }
     },
     methods: {
+      updateOnlineNum: throttle(function (val) {
+        this.onlineNumTxt = val;
+      }, 500),
+      updateHotNum: throttle(function (val) {
+        this.hotNumTxt = val;
+      }, 500),
+      closePollingDialog() {
+        sessionStorage.setItem(
+          `pollingAgreeStatus_${this.roomBaseServer.state.watchInitData.webinar.id}`,
+          1
+        );
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClosePollingDialog'));
+      },
       settingShow() {
         if (this.isInteractLive) {
           // 互动直播
@@ -415,7 +453,7 @@
 <style lang="less">
   .vmp-footer-tools {
     height: 56px;
-    background: @bg-dark-section;
+    background: var(--chat-background-color-base);
     line-height: 56px;
     display: flex;
     justify-content: space-between;
@@ -427,7 +465,7 @@
     &__left {
       display: flex;
       align-items: center;
-      color: @font-dark-normal;
+      color: var(--chat-font-color-msg-nickname);
       font-size: 14px;
       > div {
         margin-right: 16px;

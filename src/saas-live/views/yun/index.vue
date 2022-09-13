@@ -25,12 +25,12 @@
           bu: 0,
           user_id: this.$domainStore.state.roomBaseServer.watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
-          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         },
         {
           namespace: 'saas', //业务线

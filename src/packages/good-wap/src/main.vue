@@ -55,7 +55,7 @@
                 <span class="price" v-html="good.priceText"></span>
               </div>
               <div>
-                <button class="buy" @click.stop="handleBuy(good.goods_url)">
+                <button class="buy" @click.stop="handleBuy(good)">
                   {{ $t('menu.menu_1007') }}
                 </button>
               </div>
@@ -229,11 +229,22 @@
         this.totalPages = Math.ceil(this.total / this.limit);
       },
       showDetailDialog(goodsItem) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170029, {
+          goods_id: goodsItem.goods_id,
+          goods_name: encodeURIComponent(goodsItem.name)
+        });
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowDetail', [goodsItem])
         );
       },
-      handleBuy(url) {
+      handleBuy(good) {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170030, {
+          goods_id: good.goods_id,
+          goods_name: encodeURIComponent(good.name)
+        });
+        const url = good.goods_url;
         const { system } = getBrowserType();
         if ('ios' === system) {
           console.log('当前是手机端打开-ios');
@@ -252,7 +263,7 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background: #fff;
+    // background: #fff;
     overflow: auto;
     .vh-goods_list {
       display: block;
@@ -316,10 +327,14 @@
         }
       } */
       /* 新商品样式 */
+      .van-cell::after {
+        border-color: var(--theme-tab-content-good-split-bg);
+      }
       .vh-goods_item {
         padding: 24px 32px 18px 32px;
         /* border-bottom: 1px solid #f0f0f0; */
         clear: both;
+        background-color: var(--theme-tab-content-good-bg);
         &-cover {
           width: 200px;
           height: 200px;
@@ -347,6 +362,11 @@
             -webkit-line-clamp: 2; /** 显示的行数 **/
             overflow: hidden; /** 隐藏超出的内容 **/
             text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            /* autoprefixer: ignore next */
+            -webkit-box-orient: vertical;
             text-align: left;
           }
           .describe {
@@ -356,7 +376,7 @@
             line-height: 30px;
           }
           .discount_price {
-            color: #8c8c8c;
+            color: var(--theme-tab-content-good-discountPrice-font);
             font-size: 16px;
             height: 40px;
             display: inline-block;
@@ -370,19 +390,19 @@
             .discount {
               .price-tip {
                 padding: 2px 5px;
-                background: #fff0f0;
+                background: var(--theme-tab-content-good-priceTag-bg);
                 border-radius: 2px;
-                color: #fb3a32;
+                color: #fb2626;
                 font-size: 14px;
               }
             }
             i {
-              color: #fb2626;
+              color: var(--theme-tab-content-good-price-font);
               font-size: 10px;
             }
             .price {
               font-size: 28px;
-              color: #fb2626;
+              color: var(--theme-tab-content-good-price-font);
             }
             .price ::v-deep > .remainder {
               font-size: 10px;
@@ -393,11 +413,11 @@
               height: 54px;
               line-height: 50px;
               border-radius: 32px;
-              border: 1px solid #8c8c8c;
-              color: #595959;
+              border: 1px solid var(--theme-color);
+              color: var(--theme-color);
               font-size: 24px;
               text-align: center;
-              background: #fff;
+              background: transparent;
               position: absolute;
               right: 0;
               bottom: 0;
@@ -406,6 +426,12 @@
         }
         &-info__top {
           min-height: 106px;
+          .name {
+            color: var(--theme-tab-content-good-name-font);
+          }
+          .describe {
+            color: var(--theme-tab-content-good-describe-font);
+          }
         }
       }
     }

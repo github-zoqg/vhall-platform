@@ -42,7 +42,7 @@
 </template>
 <script>
   import { useMsgServer, useNoticeServer, useRoomBaseServer } from 'middle-domain';
-  import { throttle } from '@/app-shared/utils/tool';
+  import { debounce } from 'lodash';
   export default {
     name: 'VmpNoticeList',
     data() {
@@ -140,7 +140,7 @@
       /**
        * 发送一条公告
        */
-      sendNotice: throttle(function () {
+      sendNotice: debounce(function () {
         if (this.inputVal === '' || this.inputVal === undefined) {
           return this.$message.warning('内容不能为空');
         }
@@ -156,7 +156,7 @@
         } catch (error) {
           console.warn('发送公告消息错误', error);
         }
-      })
+      }, 300)
     }
   };
 </script>

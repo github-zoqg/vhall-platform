@@ -19,12 +19,12 @@
           <span class="avatar">
             <img :src="item.img_url ? item.img_url : defaultAvatar" />
           </span>
-          <span>{{ item.nick_name }}</span>
+          <span class="name">{{ item.nick_name }}</span>
         </div>
         <!-- <div>
           邀请 &nbsp; <span>{{ item.invites }}</span>&nbsp; 人
         </div> -->
-        <div>{{ $t('nav.nav_1037', { n: item.invites }) }}</div>
+        <div class="invite-info">{{ $t('nav.nav_1037', { n: item.invites }) }}</div>
       </li>
     </ul>
   </section>
@@ -59,16 +59,19 @@
 <style lang="less" scoped>
   @import '../styles/list.less';
   .invite-wrap {
-    background: #fff;
+    background: var(--theme-tab-content-rank-bg-font);
     width: 94%;
     height: 90%;
     margin: 0px auto;
   }
   .invite-list {
-    background: #fff;
+    background: var(--theme-tab-content-rank-bg-font);
     .invite-item {
       display: flex;
       align-items: center;
+      .name {
+        color: var(--theme-tab-content-rank-title-font);
+      }
     }
     .rank-icon,
     .rank-num {
@@ -81,6 +84,9 @@
     }
     .avatar img {
       border: none !important;
+    }
+    .invite-info {
+      color: var(--theme-tab-content-rank-content-font);
     }
   }
 </style>

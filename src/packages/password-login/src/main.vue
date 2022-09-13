@@ -144,6 +144,7 @@
             :model="loginForm"
             :rules="loginRules"
             class="password-login-form"
+            :disabled="formDisable"
           >
             <el-form-item
               v-if="!isHost"
@@ -163,6 +164,7 @@
                 :maxlength="6"
               ></el-input>
             </el-form-item>
+            <div v-if="formDisable" class="password_err_tip">您已输入错误5次，请15分钟后重试</div>
             <el-form-item class="main-wrap__form__inner">
               <el-button class="main-wrap__form__red-button length-max" @click="handleEntryLive">
                 {{ $t('webinar.webinar_1023') }}
@@ -230,7 +232,10 @@
         //无延迟图标的地址(注意这是生产环境地址，测试环境地址是阿里的)
         noDelayIconUrl: `//cnstatic01.e.vhall.com/common-static/images/nodelay-icon/v1.0.0/pc/delay-icon_zh-CN.png`,
         //上传图片地址
-        actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`
+        actionUrl: `${process.env.VUE_APP_BASE_URL}/v3/commons/upload/index`,
+        err_num: 0,
+        errNumTimer: null,
+        formDisable: false
       };
     },
     computed: {
@@ -240,7 +245,7 @@
       },
       //图片保存的路径
       pathUrl() {
-        return `webinars/join-avatar/${moment().format('YYYYMM')}`;
+        return `webinars/join-avatar/${dayjs().format('YYYYMM')}`;
       }
     },
     beforeCreate() {
@@ -258,7 +263,23 @@
     beforeDestroy() {
       window.removeEventListener('resize', this.checkIsMobile, false);
     },
-    mounted() {},
+    mounted() {
+      // 初始化本地缓存
+      if (!sessionStorage.getItem('invite_password')) {
+        let arr = [];
+        arr.push({
+          webinar_id: this.$route.params.id,
+          err_num: 0
+        });
+        sessionStorage.setItem('invite_password', JSON.stringify(arr));
+      }
+      console.log(JSON.parse(sessionStorage.getItem('invite_password')), 'obj');
+      // 获取本活动错误次数
+      let obj = JSON.parse(sessionStorage.getItem('invite_password')).find(
+        item => item.webinar_id == this.$route.params.id
+      );
+      this.err_num = obj.err_num;
+    },
     methods: {
       //获取活动信息
       getWebinarInfo() {
@@ -328,10 +349,29 @@
             const { code = '', msg = '' } = res || {};
             if ([200, '200'].includes(code)) {
               sessionStorage.setItem('interact_token', res.data.live_token);
-              sessionStorage.setItem('visitorId', res.data.visitor_id);
+              localStorage.setItem('visitorId', res.data.visitor_id);
               this.handleJump(params.type, res.data.live_token, res.data.visitor_id);
             } else {
               this.$message.error(msg);
+              clearTimeout(this.errNumTimer);
+              // 获取本场活动数据
+              let errNumSession = JSON.parse(sessionStorage.getItem('invite_password'));
+              let obj = errNumSession.find(item => item.webinar_id == this.$route.params.id);
+              obj.err_num = ++this.err_num;
+              console.log(this.err_num, errNumSession, 'errNumSession');
+              sessionStorage.setItem('invite_password', JSON.stringify(errNumSession));
+              // 5秒后清除累计错误次数
+              this.errNumTimer = setTimeout(() => {
+                obj.err_num = this.err_num = 0;
+                sessionStorage.setItem('invite_password', JSON.stringify(errNumSession));
+              }, 1000 * 60 * 5);
+              // 如果错误5次 禁用表单15分钟
+              if (this.err_num == 5) {
+                this.formDisable = true;
+                setTimeout(() => {
+                  this.formDisable = false;
+                }, 1000 * 60 * 15);
+              }
             }
             return res;
           })
@@ -341,7 +381,7 @@
       },
       //处理口令登录参数
       handleRoleLoginParams() {
-        const visitorId = sessionStorage.getItem('visitorId');
+        const visitorId = localStorage.getItem('visitorId');
         let params = {
           webinar_id: this.$route.params.id,
           refer: '',
@@ -600,6 +640,11 @@
             &.main-wrap__form__item-error-msg {
               margin-bottom: 24px;
             }
+          }
+          .password_err_tip {
+            color: #f56c6c;
+            font-size: 12px;
+            position: absolute;
           }
         }
         .main-wrap__form__avatar {

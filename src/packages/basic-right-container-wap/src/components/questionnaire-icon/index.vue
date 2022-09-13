@@ -32,8 +32,10 @@
                 <p class="data-text_title" :class="item.is_answered ? 'write_over' : ''">
                   <span class="ellipsis_title">{{ item.title }}</span>
                 </p>
-                <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">填写</span>
-                <span v-else class="write write_over">已填</span>
+                <span class="write" v-if="item.is_answered == 0" @click="writeQ(item)">
+                  {{ $t('form.form_1089') }}
+                </span>
+                <span v-else class="write write_over">{{ $t('form.form_1090') }}</span>
               </div>
             </li>
           </ul>

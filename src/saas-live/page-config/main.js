@@ -72,6 +72,12 @@ export default {
         cuid: 'comThirdStream',
         method: 'validatePullUrl'
       }
+    ],
+    emitOpenShare: [
+      {
+        cuid: 'comShare',
+        method: 'openShareDialog'
+      }
     ]
   },
   // 中间主区域容器
@@ -233,11 +239,10 @@ export default {
         method: 'open'
       }
     ],
-    emitHandleQa: [
+    emitHandleQA: [
       {
-        cuid: ['comTabMenu'],
-        method: 'setVisible',
-        args: ['$0']
+        cuid: ['comQa'],
+        method: 'handleQAPopup'
       }
     ]
   },
@@ -520,7 +525,13 @@ export default {
         cuid: 'comLivePrivateChat',
         method: 'openModal'
       }
-    ]
+    ],
+    // 屏蔽特效
+    emitHideEffect: {
+      cuid: 'comPcRewardEffect',
+      method: 'setHideEffect',
+      args: ['$0']
+    }
   },
   // 通知组件
   comNotice: {

@@ -24,9 +24,11 @@
       </p>
 
       <virtual-list
+        v-if="virtual.showlist"
         ref="chatlist"
-        style="height: 100%; overflow: auto"
-        :keeps="20"
+        :key="virtual.key"
+        :style="{ height: chatlistHeight + 'px', overflow: 'auto' }"
+        :keeps="25"
         :estimate-size="100"
         :data-key="'count'"
         :data-sources="renderList"
@@ -78,6 +80,7 @@
         @openPrivateChatModal="openPrivateChatModal"
         @onSwitchShowSpecialEffects="onSwitchShowSpecialEffects"
         @onSwitchShowSponsor="onSwitchShowSponsor"
+        @onSwitchShowIsChat="onSwitchShowIsChat"
         @updateHeight="chatOperateBarHeightChange"
         @needLogin="handleLogin"
         @sendEnd="sendMsgEnd"
@@ -89,6 +92,7 @@
         @closeImgPreview="onClosePreviewImg"
       ></img-preview>
       <chat-user-control
+        ref="control"
         :roomId="roomId"
         :userId="accountId"
         :reply="reply"
@@ -101,15 +105,23 @@
 </template>
 
 <script>
-  import defaultAvatar from './img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';
   import ChatOperateBar from './components/chat-operate-bar';
-  import { useChatServer, useRoomBaseServer, useMsgServer, useGroupServer } from 'middle-domain';
+  import {
+    useChatServer,
+    useRoomBaseServer,
+    useMsgServer,
+    useGroupServer,
+    useMenuServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
+  import { cl_previewImg, cl_join, cl_left } from '@/app-shared/client/client-methods.js';
+  import { throttle } from 'lodash';
   //消息提示定时器
   let tipMsgTimer;
   export default {
@@ -154,7 +166,7 @@
         /** 消息提示结束 */
         //是否正在执行动画
         animationRunning: false,
-        //是否是助理
+        //是否是客户端嵌入
         assistantType: this.$route.query.assistantType,
         //@用户
         atList: [],
@@ -195,7 +207,7 @@
         //礼物特效数组
         specialEffectsList: [],
         //只看主办方
-        isOnlyShowSponsor: false,
+        isOnlyShowSponsor: sessionStorage.getItem('filterStatus_isOnlyShowSponsor') == 'true',
         //特效样式map
         effectsMap: {
           鲜花: 'bg-flower',
@@ -218,7 +230,13 @@
         //隐藏拉取历史聊天按钮
         hideChatHistory: false,
         //回复或@消息id
-        targetId: ''
+        targetId: '',
+        //虚拟列表配置
+        virtual: {
+          showlist: false,
+          contentHeight: 0,
+          key: 1
+        }
       };
     },
     computed: {
@@ -231,11 +249,29 @@
         return [1, '1'].includes(this.configList['ui.hide_chat_history']);
       },
 
-      //视图中渲染的消息,为了实现主看主办方效果
+      //视图中渲染的消息
       renderList() {
-        return this.isOnlyShowSponsor
-          ? this.chatList.filter(item => ![2, '2'].includes(item.roleName))
-          : this.chatList;
+        let list = this.chatList;
+        // 实现主看主办方效果
+        if (this.isOnlyShowSponsor) {
+          list = this.chatList.filter(
+            item =>
+              item.roleName != 2 && !['gift_send_success', 'free_gift_send'].includes(item.type)
+          );
+        }
+        // 仅查看聊天内容
+        if (this.$refs.chatOperator?.filterStatus.isChat) {
+          list = this.chatList.filter(item => ['text', 'image'].includes(item.type));
+        }
+        // 实现仅查看聊天消息
+        // if (this.$refs.chatOperator?.filterStatus.isShieldingEffects) {
+        //   // undefined为历史聊天消息
+        //   return this.chatList.filter(
+        //     item => !['gift_send_success', 'free_gift_send'].includes(item.type)
+        //   );
+        // }
+        // console.log(list);
+        return list;
       },
       // 是否观看端
       isWatch() {
@@ -287,6 +323,11 @@
       // 聊天免登录的配置项更改，重新计算是否需要登录聊天
       noLoginKey() {
         this.initChatLoginStatus();
+      },
+      ['roomBaseServer.state.miniElement'](oldval, newval) {
+        if (Boolean(oldval) != Boolean(newval)) {
+          this.updateHeight();
+        }
       }
     },
     beforeCreate() {
@@ -307,15 +348,35 @@
       }
       //监听domain层chatServer通知
       this.listenChatServer();
-
       // 展示欢迎语
       this.showWelcome();
+      if (this.$route.query.assistantType) {
+        this.updateHeight();
+      }
+      window.addEventListener('resize', this.updateHeight);
     },
-    destroyed() {},
+    destroyed() {
+      window.removeEventListener('resize', this.updateHeight);
+    },
     methods: {
+      updateHeight() {
+        this.$nextTick(() => {
+          this.virtual.contentHeight = this.$refs.chatContent?.offsetHeight;
+          this.virtual.showlist = true;
+          this.virtual.key++;
+          this.chatlistHeight = this.virtual.contentHeight;
+          this.scrollBottom();
+        });
+      },
+      updateUnread: throttle(function () {
+        this.tipMsg = this.$t('chat.chat_1035', {
+          n: this.unReadMessageCount < 100 ? this.unReadMessageCount : '99' + '+'
+        });
+      }, 500),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
+        console.log('widget', this.cuid, window.$serverConfig);
         if (widget && widget.options) {
           this.chatOptions = widget.options;
         }
@@ -339,6 +400,7 @@
       listenChatServer() {
         const chatServer = useChatServer();
         const msgServer = useMsgServer();
+        const menuServer = useMenuServer();
         //监听到新消息过来
         chatServer.$on('receiveMsg', msg => {
           if (!this.isBottom()) {
@@ -349,7 +411,7 @@
               this.isHasUnreadAtMeMsg = false;
               this.isHasUnreadReplyMsg = false;
               this.unReadMessageCount++;
-              this.tipMsg = this.$t('chat.chat_1035', { n: this.unReadMessageCount });
+              this.updateUnread();
             }
           }
           this.dispatch('VmpTabContainer', 'noticeHint', 3);
@@ -408,6 +470,214 @@
             chatServer.clearChatMsg();
             this.getHistoryMsg();
           }
+        });
+        //客户端嵌入处理互动消息
+        if (this.$route.query.assistantType) {
+          msgServer.$onMsg('JOIN', msg => {
+            cl_join(msg);
+          });
+
+          //离开房间
+          msgServer.$onMsg('LEFT', msg => {
+            cl_left(msg);
+          });
+          // msgServer.$onMsg('CHAT', rawMsg => {
+          //   let temp = Object.assign({}, rawMsg);
+
+          //   if (typeof temp.data !== 'object') {
+          //     temp.data = JSON.parse(temp.data);
+          //     temp.context = JSON.parse(temp.context);
+          //   }
+          //   const { event_type = '' } = temp.data || {};
+          //   switch (event_type) {
+          //     // 计时器暂停
+          //     case 'free_gift_send': {
+          //       const nickname = temp.data.gift_user_nickname || temp.data.nickname;
+          //       const data = {
+          //         nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+          //         avatar: temp.data.avatar,
+          //         content: {
+          //           gift_name: temp.data.gift_name,
+          //           gift_url: `${temp.data.gift_image_url || temp.data.gift_url}`,
+          //           source_status: temp.data.source_status
+          //         },
+          //         type: 'gift_send_success',
+          //         interactToolsStatus: true
+          //       };
+          //       chatServer.addChatToList(data);
+          //       break;
+          //     }
+          //     default:
+          //       break;
+          //   }
+          // });
+          //处理计时器消息
+          msgServer.$onMsg('ROOM_MSG', msg => {
+            let str = '';
+            switch (msg.data.type) {
+              case 'timer_start':
+                str = '发起了计时器';
+                break;
+              case 'timer_end':
+                str = '关闭了计时器';
+                break;
+              case 'timer_pause':
+                str = '暂停了计时器';
+                break;
+              case 'timer_reset':
+                str = '重置了计时器';
+                break;
+              case 'timer_resume':
+                str = '继续了计时器';
+                break;
+            }
+            if (str) {
+              const text = this.$getRoleName(msg.data.role_name);
+              const data = {
+                nickname: '计时器',
+                avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+                content: {
+                  text_content: `${text}${str}`
+                },
+                type: msg.data.type
+              };
+              chatServer.addChatToList(data);
+            }
+          });
+          msgServer.$onMsg('ROOM_MSG', msg => {
+            const { type = '' } = msg.data || {};
+            switch (type) {
+              // 开始签到
+              case 'sign_in_push': {
+                const data = {
+                  roleName: msg.data.role_name,
+                  nickname: msg.data.sign_creator_nickname,
+                  avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+                  content: {
+                    text_content: `${this.$t('chat.chat_1027')}`
+                  },
+                  type: msg.data.type,
+                  interactStatus: true
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              // 签到结束
+              case 'sign_end': {
+                const data = {
+                  roleName: msg.data.role_name,
+                  nickname: msg.data.sign_creator_nickname,
+                  avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+                  content: {
+                    text_content: `${this.$t('chat.chat_1028')}`
+                  },
+                  type: msg.data.type,
+                  interactStatus: true
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              // //送礼物
+              // case 'gift_send_success': {
+              //   const nickname = msg.data.gift_user_nickname || msg.data.nickname;
+              //   const data = {
+              //     nickname: nickname.length > 8 ? nickname.substr(0, 8) + '...' : nickname,
+              //     avatar: msg.data.avatar,
+              //     content: {
+              //       gift_name: msg.data.gift_name,
+              //       gift_url: `${msg.data.gift_image_url || msg.data.gift_url}`,
+              //       source_status: msg.data.source_status
+              //     },
+              //     type: 'gift_send_success',
+              //     interactToolsStatus: true
+              //   };
+              //   chatServer.addChatToList(data);
+              //   break;
+              // }
+              //打赏
+              case 'reward_pay_ok': {
+                const data = {
+                  avatar: msg.data.rewarder_avatar,
+                  nickName:
+                    msg.data.rewarder_nickname.length > 8
+                      ? msg.data.rewarder_nickname.substr(0, 8) + '...'
+                      : msg.data.rewarder_nickname,
+                  type: 'reward_pay_ok',
+                  content: {
+                    text_content: msg.data.reward_describe
+                      ? msg.data.reward_describe
+                      : this.$t('chat.chat_1037'),
+                    num: msg.data.reward_amount
+                  },
+                  sendId: this.webinarData.join_info.third_party_user_id,
+                  // roleName: this.roleName,
+                  interactToolsStatus: true
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              //问卷
+              case 'questionnaire_push': {
+                const join_info =
+                  this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
+                let text = this.$getRoleName(msg.data.room_role);
+                if (msg.room_role != 1) {
+                  text = `${text}${msg.data.nick_name}`;
+                }
+                const data = {
+                  nickname: '问卷',
+                  avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+                  content: {
+                    text_content: `${text}发起了问卷`,
+                    questionnaire_id: msg.questionnaire_id
+                  },
+                  roleName: join_info.role_name,
+                  type: msg.type
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              //开启问答
+              case 'question_answer_open': {
+                const data = {
+                  content: {
+                    //观看端显示编辑后的问答名称，发起端不变，消息体默认返回“问答”
+                    text_content: this.$t('chat.chat_1026', { n: this.$t('common.common_1004') })
+                  },
+                  roleName: msg.data.role_name,
+                  nickname: msg.data.nick_name,
+                  type: msg.data.type,
+                  interactStatus: true
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              //关闭问答
+              case 'question_answer_close': {
+                const data = {
+                  content: {
+                    text_content: this.$t('chat.chat_1081', { n: this.$t('common.common_1004') })
+                  },
+                  roleName: msg.data.role_name,
+                  nickname: msg.data.nick_name,
+                  type: msg.data.type,
+                  interactStatus: true
+                };
+                chatServer.addChatToList(data);
+                break;
+              }
+              default:
+                break;
+            }
+          });
+        }
+        //监听切换到当前tab
+        menuServer.$on('tab-switched', data => {
+          this.$nextTick(() => {
+            if (data.cuid == this.cuid) {
+              this.updateHeight();
+            }
+          });
         });
       },
       //初始化聊天输入框数据
@@ -504,6 +774,10 @@
       previewImg(index, images) {
         //处理掉图片携带的查询参数，只保留主要链接
         this.previewImgList = images.map(item => item.split('?')[0]);
+        if (this.$route.query.assistantType) {
+          cl_previewImg({ list: this.previewImgList, index });
+          return;
+        }
         this.imgPreviewVisible = true;
         this.$nextTick(() => {
           this.$refs.imgPreview.jumpToTargetImg(index);
@@ -602,8 +876,12 @@
         // useChatServer().clearChatMsg();
         // await this.getHistoryMsg();
         // this.$nextTick(() => {
-        //   this.scrollBottom();
+        this.scrollBottom();
         // });
+      },
+      // 仅查看聊天内容
+      onSwitchShowIsChat() {
+        this.scrollBottom();
       },
       //处理全体禁言切换
       handleChangeAllBanned(data) {
@@ -700,9 +978,35 @@
         }
         const offsetPos = this.pos;
         const { list } = await this.getHistoryMsg();
+        // const vsl = this.$refs.chatlist;
+        // this.$nextTick(() => {
+        //   this.$refs.chatlist.scrollToIndex(
+        //     this.isOnlyShowSponsor
+        //       ? list.filter(item => {
+        //           return item.roleName != 2;
+        //         }).length
+        //       : list.length
+        //   );
+        // });
+        const IdList = list.map(item => {
+          return item.count.toString();
+        });
         const vsl = this.$refs.chatlist;
+        if (IdList.length == 0) {
+          return;
+        }
         this.$nextTick(() => {
-          this.$refs.chatlist.scrollToIndex(list.length);
+          const offset = IdList.reduce((previousValue, currentSid) => {
+            const previousSize =
+              typeof previousValue === 'string'
+                ? vsl.getSize(Number(previousValue))
+                : previousValue;
+            console.log(previousValue);
+            console.log(currentSid);
+            console.log(vsl.getSize(Number(currentSid)));
+            return previousSize + (vsl.getSize(Number(currentSid)) || 0);
+          });
+          vsl.scrollToOffset(offset);
         });
       },
       checkOverflow() {
@@ -712,6 +1016,10 @@
             this.overflow = vsl.getScrollSize() > vsl.getClientSize();
           }
         });
+      },
+      //客户端操作踢出
+      assistantKickout(data) {
+        this.$refs['control'].assistantKickout(data);
       }
     }
   };
@@ -724,6 +1032,10 @@
     width: 100%;
     height: 100%;
     position: relative;
+
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
 
     .vmp-chat-welcome {
       width: 100%;
@@ -782,12 +1094,10 @@
     .chat-content {
       position: relative;
       .chat_loading {
-        color: #fff;
         text-align: center;
-        font-size: 12px;
-        line-height: 30px;
-      }
-      .vmp-chat-msg-item {
+        font-size: 14px;
+        line-height: 22px;
+        color: rgba(255, 255, 255, 0.65);
       }
       &__get-list-btn-container {
         display: block;
@@ -806,24 +1116,23 @@
       &__tip-box {
         position: absolute;
         z-index: 0;
-        bottom: 5px;
+        bottom: 4px;
         left: 50%;
         transform: translate(-50%, 0);
       }
       &__tip-box-content {
-        padding: 0 14px;
-        line-height: 28px;
-        border-radius: 14px;
-        background-color: #363636;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-        color: @font-error;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 30px;
+        padding: 4px 8px;
         font-size: 14px;
+        line-height: 22px;
+        color: #fb2626;
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
         .vh-line-arrow-down {
           font-size: 12px;
-          margin-left: 6px;
+          margin-left: 7px;
         }
       }
     }

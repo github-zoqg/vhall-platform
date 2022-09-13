@@ -10,7 +10,7 @@
             @click="goto(item.url)"
           >
             <div class="subscribe-wrap-item_cover">
-              <img :src="item.img_url ? item.img_url : defaultBanner" alt="" />
+              <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" alt="" />
             </div>
             <div class="subscribe-wrap-item_info">
               <p>{{ item.subject }}</p>
@@ -28,7 +28,7 @@
           >
             <div class="recommend-item">
               <div class="banner">
-                <img :src="item.img_url ? item.img_url : defaultBanner" />
+                <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" />
               </div>
               <div class="info">
                 <h4 class="title ellipsis">{{ item.subject }}</h4>
@@ -47,7 +47,8 @@
 </template>
 <script>
   import { useRoomBaseServer, useRecommendServer, useMenuServer } from 'middle-domain';
-
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpRecommend',
     data() {
@@ -135,6 +136,7 @@
       setDefaultAdvs() {
         this.advs = [...this.roomBaseServer.state.advDefault.adv_list];
         this.total = this.roomBaseServer.state.advDefault.total;
+        this.handlerAdvsInfo(this.advs);
       },
       onScrollStop() {
         if (!this.$refs.scroll) return;
@@ -157,6 +159,15 @@
 
         this.getAdsInfo();
       },
+      handlerAdvsInfo(list) {
+        list.map(item => {
+          if (cropperImage(item.img_url)) {
+            item.imageMode = this.handlerImageInfo(item.img_url);
+          } else {
+            item.imageMode = 3;
+          }
+        });
+      },
       async getAdsInfo() {
         this.loading = true;
 
@@ -166,7 +177,7 @@
             pos: this.pos + this.limit,
             limit: 10
           });
-
+          this.handlerAdvsInfo(res.data.adv_list);
           const data = this.advs;
           this.advs = data.concat(res.data.adv_list);
           this.total = res.data.total;
@@ -174,6 +185,12 @@
         } finally {
           this.loading = false;
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        console.log(url, '??!23guangao');
+        let obj = parseImgOssQueryString(url);
+        return Number(obj.mode) || 1;
       },
       goto(url) {
         window.open(url, '_blank');
@@ -216,11 +233,19 @@
           border-top-right-radius: 4px;
           overflow: hidden;
           cursor: pointer;
-          img {
+          .ad_img {
             width: 100%;
             height: 100%;
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
             transition: all 0.4s;
+            &.ad_bg_1 {
+              object-fit: fill;
+            }
+            &.ad_bg_2 {
+              object-fit: cover;
+              object-position: left top;
+            }
             &:hover {
               transform: scale(1.2);
             }
@@ -238,16 +263,16 @@
           cursor: pointer;
           &:hover {
             p {
-              color: #fb3a32;
+              color: var(--theme-color);
             }
             span {
-              background: #fb3a32;
+              background: var(--theme-color);
               color: #fff;
             }
           }
           p {
             width: 100%;
-            color: #1a1a1a;
+            color: var(--theme-subscribe-tab-content-recommend-buy-font);
             font-size: 16px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -258,8 +283,8 @@
             display: inline-block;
             width: 64px;
             height: 26px;
-            color: #fb3a32;
-            border: 1px solid #fb3a32;
+            color: var(--theme-color);
+            border: 1px solid var(--theme-color);
             text-align: center;
             line-height: 26px;
             position: absolute;
@@ -268,7 +293,7 @@
             border-radius: 15px;
             cursor: pointer;
             &:hover {
-              background: #fb3a32;
+              background: var(--theme-color);
               color: #fff;
             }
           }
@@ -287,9 +312,9 @@
         flex-direction: row;
         align-items: center;
         box-sizing: border-box;
-        border-bottom: 1px solid #444;
+        border-bottom: 1px solid var(--theme-tab-content-recommend-border);
         padding: 16px 5px;
-
+        background-color: transparent;
         a {
           display: inline-block;
           margin-bottom: 30px;
@@ -304,16 +329,24 @@
           flex: 0 0 auto;
           max-width: 180px;
 
-          img {
+          .ad_img {
             height: 100%;
             width: 100%;
-            object-fit: scale-down;
+            object-fit: contain;
+            object-position: center;
+            &.ad_bg_1 {
+              object-fit: fill;
+            }
+            &.ad_bg_2 {
+              object-fit: cover;
+              object-position: left top;
+            }
           }
         }
         .title {
           font-size: 14px;
           font-weight: bold;
-          color: @font-dark-normal;
+          color: var(--theme-tab-content-recommend-title-font);
           line-height: 22px;
           height: 34px;
         }
@@ -331,22 +364,23 @@
             width: 64px;
             height: 26px;
             border-radius: 15px;
-            border: 1px solid #ccc;
-            color: #fff;
+            border: 1px solid var(--theme-tab-content-recommend-buy-border);
+            color: var(--theme-tab-content-recommend-buy-font);
             text-align: center;
             line-height: 26px;
           }
         }
 
         &:hover {
-          background: #3c3c3c;
+          background: var(--theme-tab-content-recommend-hover-bg);
           border-radius: 4px;
           cursor: pointer;
           border-bottom-color: transparent;
 
           .check-btn {
-            background: #fb3a32;
-            border-color: #fb3a32;
+            background: var(--theme-color);
+            border-color: var(--theme-color);
+            color: var(--theme-tab-content-recommend-buy-font-hover);
           }
         }
       }
@@ -357,7 +391,7 @@
       width: 100%;
       text-align: center;
       padding: 10px 0px;
-      color: #999;
+      color: var(--theme-tab-content-recommend-noData-font);
     }
 
     @media screen and (max-width: 1366px) {

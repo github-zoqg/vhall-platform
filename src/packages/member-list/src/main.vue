@@ -133,7 +133,7 @@
           class="info-panel__online-num"
           v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
         >
-          {{ totalNum | formatHotNum }}人在线
+          {{ totalNumTxt | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -229,6 +229,7 @@
     useMsgServer,
     useGroupServer
   } from 'middle-domain';
+  import { toSJIS } from 'qrcode/lib/core/utils';
   export default {
     name: 'VmpMemberList',
     components: {
@@ -286,7 +287,8 @@
         //是否是pc观看端功能
         isWatch: false,
         //连麦断开的定时器
-        timer: null
+        timer: null,
+        totalNumTxt: 0
       };
     },
     beforeCreate() {
@@ -296,6 +298,9 @@
       this.memberServer = useMemberServer();
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
+    },
+    created() {
+      this.totalNumTxt = this.totalNum;
     },
     beforeDestroy() {},
     async mounted() {
@@ -316,6 +321,9 @@
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
+      },
+      totalNum(val) {
+        this.updateTotalNum(val);
       }
     },
     computed: {
@@ -406,6 +414,9 @@
       }
     },
     methods: {
+      updateTotalNum: throttle(function (val) {
+        this.totalNumTxt = val;
+      }, 500),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -546,6 +557,12 @@
           switch (type) {
             case 'vrtc_connect_apply':
               //用户申请上麦
+              if (this.roleName == 1) {
+                window.vhallReportForProduct?.toResultsReporting(110179, {
+                  event_type: 'message',
+                  ...rawMsg
+                });
+              }
               handleApplyConnect(temp);
               break;
             case 'vrtc_connect_apply_cancel':
@@ -1033,6 +1050,10 @@
           // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
           if (_this.LocalCatchTarget_id != msg.data.target_id) {
             _this.LocalCatchTarget_id = msg.data.target_id;
+            window.vhallReportForProduct?.toResultsReporting(110180, {
+              event_type: 'message',
+              ...msg
+            });
             if (msg.data.room_role != 2) {
               _this.$message.success({
                 message: _this.$t('interact.interact_1030', { n: msg.data.nick_name })
@@ -1421,13 +1442,20 @@
           status: this.allowRaiseHand ? 1 : 0
         };
 
+        //数据埋点--开启/关闭允许举手
+        window.vhallReportForProduct?.toStartReporting(
+          element.target.checked ? 110127 : 110128,
+          element.target.checked ? 110153 : 110154
+        );
         this.micServer
           .setHandsUp(params)
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(
+              element.target.checked ? 110153 : 110154,
+              { event_type: 'interface', res, request_id: res?.request_id }
+            );
             console.log('switch-mic-status', res);
             if (res.code == 200) {
-              //数据埋点--开启/关闭允许举手
-              window.vhallReportForProduct?.report(element.target.checked ? 110127 : 110128);
               this.$message.success({ message: '设置成功' });
             }
           })
@@ -1529,9 +1557,17 @@
           room_id: this.roomId,
           receive_account_id: accountId
         };
+        window.vhallReportForProduct?.toStartReporting(110194, 110195, {
+          params
+        });
         this.micServer
           .hostAgreeApply(params)
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res,
+              event_type: 'interface',
+              request_id: res?.request_id
+            });
             if (res.code !== 200) {
               this.$message.error(res.msg);
               return;
@@ -1539,6 +1575,9 @@
             this._deleteUser(accountId, this.applyUsers, 'applyUsers');
           })
           .catch(err => {
+            window.vhallReportForProduct?.toResultsReporting(110195, {
+              res: err
+            });
             console.log('allow speak fail ::', err);
           });
       },
@@ -1556,18 +1595,38 @@
         } else {
           if (this.userId === accountId) {
             // 主持人自己上麦
+            window.vhallReportForProduct?.toStartReporting(110174, 110175);
             this.micServer.userSpeakOn().then(res => {
+              window.vhallReportForProduct?.toResultsReporting(110175, {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              });
               if (res.code !== 200) {
                 this.$message.error(res.msg);
               }
             });
           } else {
+            //数据埋点--邀请上麦
+            const cUser = this.onlineUsers.filter(el => {
+              return el.account_id == accountId;
+            });
+            window.vhallReportForProduct?.toStartReporting(110130, 110155, {
+              invitee_role: cUser[0].role_name,
+              invitee_info: { ...cUser[0] }
+            });
             this.micServer
               .inviteMic({
                 room_id: this.roomId,
                 receive_account_id: accountId
               })
               .then(res => {
+                window.vhallReportForProduct?.toResultsReporting(110155, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  receive_account_id: accountId,
+                  res
+                });
                 if (res.code == 200) {
                   this.$message.success({ message: this.$t('message.message_1033') });
                 } else {
@@ -1586,6 +1645,18 @@
           room_id: this.roomId,
           receive_account_id: this.userId == accountId && this.guestHasInvitePer ? null : accountId // 当前嘉宾为主讲人且下麦的人是自己时，下麦自己不传此参数，即可归还主讲人权限
         };
+        const cUser = this.onlineUsers.filter(el => {
+          return el.account_id == accountId;
+        });
+        if (this.userId == accountId && this.roleName == 1) {
+          // 主持人下麦自己
+          window.vhallReportForProduct?.toStartReporting(110172, 110173);
+        } else {
+          window.vhallReportForProduct?.toStartReporting(110133, 110157, {
+            expelled_role: cUser[0].role_name,
+            info_of_expelleds: { ...cUser[0] }
+          });
+        }
         if (needConfirm && this.isInGroup && this.isLive) {
           this.$confirm('下麦后，演示将自动结束，是否下麦？', this.$t('account.account_1061'), {
             confirmButtonText: this.$t('account.account_1062'),
@@ -1599,6 +1670,21 @@
               .speakOff(data)
               .then(res => {
                 //todo 埋点上报
+                if (this.userId == accountId && this.roleName == 1) {
+                  // 主持人下麦自己
+                  window.vhallReportForProduct?.toResultsReporting(110173, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    reasonTxt: '演示中下麦,演示自动结束',
+                    res
+                  });
+                } else {
+                  window.vhallReportForProduct?.toResultsReporting(110157, {
+                    request_id: res?.request_id,
+                    event_type: 'interface',
+                    res
+                  });
+                }
                 return res;
               })
               .catch(error => {
@@ -1610,6 +1696,20 @@
             .speakOff(data)
             .then(res => {
               //todo 埋点上报
+              if (this.userId == accountId && this.roleName == 1) {
+                // 主持人下麦自己
+                window.vhallReportForProduct?.toResultsReporting(110173, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
+              } else {
+                window.vhallReportForProduct?.toResultsReporting(110157, {
+                  request_id: res?.request_id,
+                  event_type: 'interface',
+                  res
+                });
+              }
               return res;
             })
             .catch(error => {
@@ -1668,11 +1768,33 @@
             });
         }
         //设置主讲人
+        if (this.userId == accountId) {
+          window.vhallReportForProduct?.toStartReporting(110176, 110177, {
+            rejection_method: encodeURIComponent('成员列表主持人将自己设置为主讲人')
+          }); // 主持人将自己设为主讲人
+        } else {
+          let cUser = this.onlineUsers.filter(el => {
+            return el.account_id == accountId;
+          });
+          window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
+            rejection_method: encodeURIComponent('成员列表设置嘉宾为主讲人'),
+            guest_info: cUser[0]
+          }); // 主持人将嘉宾设为主讲人
+        }
         return this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId
           })
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(
+              this.userId == accountId ? 110177 : 110170,
+              {
+                request_id: res?.request_id,
+                event_type: 'interface',
+                res
+              }
+            );
+
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {
@@ -1698,9 +1820,6 @@
               if (!['', null, void 0].includes(accountId) && accountId === this.userId) {
                 // this.$message.success('邀请演示发送成功')
               } else {
-                //数据埋点--邀请上麦
-                window.vhallReportForProduct?.report(110130);
-
                 this.$message.success(this.$t('message.message_1034'));
               }
             } else {
@@ -1850,17 +1969,23 @@
 </script>
 
 <style lang="less">
+  .vmp-member-dropdown-menu.el-dropdown-menu {
+    background-color: var(--header-tab-item-dropdown-color) !important;
+    .el-dropdown-menu__item:hover {
+      color: var(--group-more-mute-font-color) !important;
+    }
+  }
   .vmp-member-list {
     height: 100%;
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #2a2a2a;
+    background-color: var(--theme-menu-bg);
     &__group-name {
       display: flex;
       align-items: center;
       padding: 18px 20px 5px;
-      color: #ccc;
+      color: var(--group-name-icon-font-color);
       .pr_top {
         margin-left: 10px;
         font-size: 14px;
@@ -1929,27 +2054,28 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #2a2a2a;
+      background-color: var(--theme-menu-bg);
       box-sizing: border-box;
       color: #e2e2e2;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid var(--theme-menu-bg);
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;
         margin-right: 4px;
+        color: var(--group-online-icon-color);
       }
       .info-panel__online-num {
         display: inline-block;
         margin-left: 6px;
-        color: #ababab;
+        color: var(--group-online-font-color);
       }
       .info-panel__refresh-btn {
         display: inline-block;
         margin-left: 6px;
-        color: #ababab;
+        color: var(--group-refresh-font-color);
         cursor: pointer;
         &:hover {
-          color: #4da1ff;
+          color: var(--theme-color);
         }
       }
       .info-panel__allow-raise-hand {
@@ -2011,23 +2137,23 @@
           width: 74px;
           height: 30px;
           text-align: center;
-          background-color: #434343;
-          color: #999;
+          background-color: var(--group-btn-bg-color);
+          color: var(--group-btn-font-color);
           float: left;
           cursor: pointer;
           position: relative;
           margin-right: 1px;
           &:hover {
-            background-color: #969696;
-            color: #fff;
+            background-color: var(--group-btn-hover-color);
+            color: var(--group-btn-hover-font-color);
           }
           &.active {
-            background-color: #595959;
-            color: #e6e6e6;
-            &:hover {
-              color: #e6e6e6;
-              background-color: #595959;
-            }
+            background-color: var(--group-btn-active-color);
+            color: var(--group-btn-active-font-color);
+            // &:hover {
+            //   color: #e6e6e6;
+            //   background-color: #595959;
+            // }
           }
           &.raise-hand {
             &::before {
@@ -2038,7 +2164,7 @@
               width: 7px;
               height: 7px;
               border-radius: 50%;
-              background-color: #fb3a32;
+              background-color: var(--theme-color);
             }
           }
         }
@@ -2049,8 +2175,8 @@
           line-height: 30px;
           border-radius: 4px;
           text-align: center;
-          color: #999;
-          background-color: #434343;
+          background-color: var(--group-btn-bg-color);
+          color: var(--group-btn-font-color);
         }
       }
       &__search-panel {
@@ -2060,7 +2186,7 @@
         position: absolute;
         top: 4px;
         left: 10px;
-        background-color: #34363a;
+        background-color: var(--group-search-input-bg2-color);
         border-radius: 4px;
         overflow: hidden;
 
@@ -2068,10 +2194,19 @@
           box-sizing: border-box;
           width: 100%;
           height: 100%;
-          background-color: hsla(0, 0%, 100%, 0.9);
+          background-color: var(--group-search-input-bg-color);
           padding: 0 75px 0 10px;
           border: none;
-          color: #666;
+          color: var(--group-search-input-font-color);
+          &::-webkit-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
+          &::-moz-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
+          &::-ms-input-placeholder {
+            color: var(--group-search-placeholder-color);
+          }
         }
         .search-panel__clear-btn {
           width: 15px;
@@ -2090,8 +2225,8 @@
           line-height: 30px;
           border-radius: 0 4px 4px 0;
           text-align: center;
-          background-color: #a6a6a8;
-          color: #fff;
+          background-color: var(--group-search-bg-color);
+          color: var(--group-search-font-color);
           position: absolute;
           top: 0;
           right: 0;

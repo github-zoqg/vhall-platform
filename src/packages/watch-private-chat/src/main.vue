@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/img/my-dark@2x.png';
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
@@ -267,6 +267,11 @@
     position: relative;
     width: 100%;
     height: 100%;
+
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--chat-scrollbar-thumb-bg) !important;
+    }
+
     .private-chat-content {
       position: relative;
       &:last-child {

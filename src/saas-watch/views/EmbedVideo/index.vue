@@ -63,12 +63,12 @@
           bu: 0,
           user_id: roomBaseServer.state.watchInitData.join_info.join_id,
           webinar_id: this.$route.params.id,
-          t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           os: 10,
           type: 4,
-          entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           pf: 7,
-          env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+          env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV) ? 'production' : 'test'
         });
         window.vhallReport.report('ENTER_WATCH');
         console.log('%c---初始化直播房间 完成', 'color:blue');
@@ -128,7 +128,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
@@ -181,6 +183,10 @@
       },
       handleErrorCode(err) {
         let currentQuery = location.search;
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -195,7 +201,7 @@
               currentQuery.indexOf('record_id=') > -1
                 ? currentQuery.replace('record_id=', 'rid=')
                 : currentQuery;
-            window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
+            window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${currentQuery}`; // 跳转到老 saas
             break;
           case 512002:
             this.errorData.errorPageTitle = 'active_lost'; // 此视频暂时下线了

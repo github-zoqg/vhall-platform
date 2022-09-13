@@ -131,7 +131,7 @@
           class="info-panel__online-num"
           v-if="isShowBtn(configList['ui.hide_host_userlist_nums'])"
         >
-          {{ totalNum | formatHotNum }}人在线
+          {{ totalNumTxt | formatHotNum }}人在线
         </span>
         <span class="info-panel__refresh-btn" @click="refreshList">
           {{ $t('webinar.webinar_1032') }}
@@ -269,7 +269,8 @@
         //是否是pc发起端功能
         isLive: false,
         //是否是pc观看端功能
-        isWatch: false
+        isWatch: false,
+        totalNumTxt: this.totalNum
       };
     },
     beforeCreate() {
@@ -301,6 +302,9 @@
     watch: {
       roleName(newVal) {
         this.roleName = newVal;
+      },
+      totalNum(val) {
+        this.updateTotalNum(val);
       }
     },
     computed: {
@@ -407,6 +411,9 @@
       }
     },
     methods: {
+      updateTotalNum: throttle(val => {
+        this.totalNumTxt = val;
+      }, 5000),
       // 初始化配置
       initConfig() {
         const widget = window.$serverConfig?.[this.cuid];
@@ -1128,7 +1135,7 @@
     display: flex;
     flex-direction: column;
     font-size: 12px;
-    background-color: #2a2a2a;
+    background-color: var(--theme-menu-bg);
     &__group-name {
       display: flex;
       align-items: center;
@@ -1203,10 +1210,10 @@
       width: 100%;
       height: 80px;
       padding: 10px;
-      background-color: #2a2a2a;
+      background-color: var(--theme-menu-bg);
       box-sizing: border-box;
       color: #e2e2e2;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid var(--theme-menu-bg);
       .vh-saas-a-line-Onlinelist {
         margin-top: -3px;
         vertical-align: middle;

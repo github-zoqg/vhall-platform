@@ -73,7 +73,8 @@ export default {
     player_1023: 'Ajustar el tiempo de reproducción falló',
     player_1024: 'El tiempo de configuración falló, inténtelo de nuevo más tarde',
     player_1025: '',
-    player_1026: 'replaying'
+    player_1026: 'replaying',
+    player_1027: 'There is no rehearsal now, please come again next time'
   },
   appointment: {
     appointment_1001: 'Verificación de lista blanca',
@@ -109,7 +110,8 @@ export default {
     appointment_1029: 'Segundo',
     appointment_1030: 'El patrocinador de la actividad configuró una prueba de video',
     appointment_1031: 'Por favor sea paciente',
-    appointment_1032: 'Lista blanca'
+    appointment_1032: 'Lista blanca',
+    appointment_1033: 'The rehearsal has started, please watch it live'
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -163,7 +165,10 @@ export default {
     nav_1049: 'Ubicación',
     nav_1050: 'Anchor aún no ha activado la invitación',
     nav_1051: '',
-    nav_1052: ''
+    nav_1052: '',
+    nav_1053: '',
+    nav_1054: 'Share the rehearsal viewing address',
+    nav_1055: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',
@@ -355,7 +360,8 @@ export default {
     chat_1094: '',
     chat_1095: '',
     chat_1096: '',
-    chat_1097: ''
+    chat_1097: '',
+    chat_1098: 'Hace clic para ver los detalles'
   },
   form: {
     form_1001: 'Nombre',
@@ -448,7 +454,9 @@ export default {
     form_1085: '',
     form_1086: '',
     form_1087: 'Enviar con éxito, gracias por su participación',
-    form_1088: 'Enviar con éxito'
+    form_1088: 'Enviar con éxito',
+    form_1089: '',
+    form_1090: ''
   },
   menu: {
     menu_1001: 'Documentación',
@@ -555,13 +563,17 @@ export default {
     interact_tools_1082: '',
     interact_tools_1083: '',
     interact_tools_1085: '',
-    interact_tools_1086: ''
+    interact_tools_1086: '',
+    interact_tools_1087: '',
+    interact_tools_1088: '',
+    interact_tools_1089: '',
+    interact_tools_1090: ''
   },
   setting: {
-    setting_1002: 'Configuración de la vista',
-    setting_1003: 'Cámara',
-    setting_1004: 'Micrófono',
-    setting_1005: 'Altavoz',
+    setting_1002: '',
+    setting_1003: '',
+    setting_1004: '',
+    setting_1005: '',
     setting_1006: 'Pantalla de flujo de empuje',
     setting_1007: 'Imagen',
     setting_1008: 'Cambiando el dispositivo, por favor, espere ...',
@@ -814,7 +826,8 @@ export default {
     interact_1037: '',
     interact_1038: '',
     interact_1039: '',
-    interact_1040: ''
+    interact_1040: '',
+    interact_1041: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',
@@ -844,7 +857,8 @@ export default {
     doc_1025: '',
     doc_1026: '',
     doc_1027: '',
-    doc_1028: ''
+    doc_1028: '',
+    doc_1029: ''
   },
   webinar: {
     webinar_1001: 'Apagar',
@@ -929,5 +943,12 @@ export default {
     other_1018: '',
     other_1019: '',
     other_1020: ''
+  },
+  privacy: {
+    privacy_1001: '',
+    privacy_1002: '',
+    privacy_1003: '',
+    privacy_1004: '',
+    privacy_1005: ''
   }
 };

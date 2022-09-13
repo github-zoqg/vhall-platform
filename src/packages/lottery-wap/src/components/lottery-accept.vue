@@ -26,6 +26,12 @@
       <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
       </button>
+      <!-- 隐私合规（嵌入不展示） -->
+      <vmp-privacy-compliance
+        scene="lottery"
+        clientType="mobile"
+        compType="2"
+      ></vmp-privacy-compliance>
     </div>
   </div>
 </template>
@@ -113,7 +119,6 @@
       },
       submit() {
         if (!this.verify()) return false;
-
         const failure = err => {
           this.$toast(this.$t(err.msg));
         };

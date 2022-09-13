@@ -63,7 +63,7 @@
           <span class="pay-dialog__header-title">
             {{ $t('interact_tools.interact_tools_1048') }}
           </span>
-          <span class="iconfont iconguanbi_icon" @click="closeDialog"></span>
+          <span class="vh-iconfont vh-line-close" @click="closeDialog"></span>
         </p>
         <div class="pay-dialog__body">
           <div class="pay-qr-box">

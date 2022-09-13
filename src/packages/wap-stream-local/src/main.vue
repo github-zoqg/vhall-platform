@@ -154,6 +154,18 @@
       // 退出全屏   原因同wap-stream-remote
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
+      },
+      // 权限list
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
@@ -180,7 +192,7 @@
       }
       if (this.micServer.getSpeakerStatus()) {
         await this.speakOff();
-        await this.stopPush();
+        await this.stopPush({ type: 'beforeDestroy' });
         this.interactiveServer.destroy();
       }
     },
@@ -199,7 +211,7 @@
             未检测时，则检测互动SDK的支持情况
               不支持上麦时，确认是否在麦上
           */
-          if (this.mediaCheckServer.state.isBrowserNotSupport) {
+          if (this.mediaCheckServer.state.isBrowserNotSupport && !this.hideItem) {
             this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {
               await this.speakOff();
@@ -207,7 +219,7 @@
             return;
           }
           if (isSpeakOn) {
-            this.startPush();
+            this.startPush({ source: 'checkStartPush' });
           }
         }
       },
@@ -252,14 +264,14 @@
           // live_over 结束直播  停止推流,
           if (msg.data.type == 'live_over' && this.micServer.getSpeakerStatus()) {
             await this.speakOff();
-            await this.stopPush();
+            await this.stopPush({ type: 'live_over' });
             this.interactiveServer.destroy();
           }
         });
         // 分组继续讨论，初始化互动实例完成后，开始推流
         this.interactiveServer.$on('PROCEED_DISCUSSION', msg => {
           console.log('分组继续讨论');
-          this.startPush();
+          this.startPush({ source: 'PROCEED_DISCUSSION' });
         });
 
         // 主持人同意上麦申请
@@ -271,23 +283,6 @@
         // 上麦成功
         this.micServer.$on('vrtc_connect_success', async () => {
           if (this.localSpeaker.streamId) return;
-          // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-          let device_status = this.mediaCheckServer.state.deviceInfo.device_status;
-          if (device_status == 2) {
-            this.speakOff();
-            return;
-          } else if (device_status == 0) {
-            let _flag = await this.mediaCheckServer.getMediaInputPermission({
-              isNeedBroadcast: false
-            });
-            if (!_flag) {
-              this.speakOff();
-              this.$toast(this.$t('interact.interact_1040'));
-              return;
-            }
-          }
-          console.log('[stream-local] vrtc_connect_success startPush');
-
           // 无延迟｜分组直播
           // 如果成功，销毁播放器
           if (useRoomBaseServer().state.watchInitData.webinar.no_delay_webinar == 0) {
@@ -301,12 +296,12 @@
 
           // 轮询判断是否有互动实例
           await this.checkVRTCInstance();
-          this.startPush();
+          this.startPush({ source: 'vrtc_connect_success_role_2' });
         });
 
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          await this.stopPush();
+          await this.stopPush({ type: 'vrtc_disconnect_success' });
 
           await this.interactiveServer.destroy();
 
@@ -319,6 +314,12 @@
           }
         });
 
+        // micServe异常处理
+        this.micServer.$on('vrtc_exception_msg', msg => {
+          if (msg.type === 1039) {
+            this.$toast(this.$t('interact.interact_1040'));
+          }
+        });
         // 开启摄像头
         this.interactiveServer.$on('vrtc_frames_display', () => {
           this.$toast(this.$t('interact.interact_1024'));
@@ -376,7 +377,7 @@
         } else if (err == 'noPermission') {
           await this.interactiveServer.destroy();
           await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
-          this.publishLocalStream();
+          this.publishLocalStream('noPermission');
         } else {
           console.error(err);
           throw new Error('代码错误');
@@ -403,13 +404,13 @@
         });
       },
       // 开始推流
-      async startPush() {
+      async startPush(opt) {
         try {
           this.interactiveServer.state.defaultStreamBg = true;
           // 创建本地流
-          await this.createLocalStream();
+          await this.createLocalStream(opt);
           // 推流
-          await this.publishLocalStream();
+          await this.publishLocalStream('startPush');
           // 分组活动 自动上麦默认禁音
           console.warn('自动上麦条件：', this.autoSpeak);
           if (this.autoSpeak) {
@@ -428,12 +429,19 @@
         }
       },
       // 创建本地流
-      async createLocalStream() {
+      async createLocalStream(opt) {
+        window.vhallReportForProduct?.toResultsReporting(110187, {
+          videoType: 'camera',
+          ...opt
+        });
         await this.interactiveServer
           .createWapLocalStream({
             videoNode: `stream-${this.joinInfo.third_party_user_id}`
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110188, {
+              failed_reason: e
+            });
             if (e && e?.name == 'NotAllowed') {
               return Promise.reject('NotAllowed');
             } else {
@@ -442,13 +450,19 @@
           });
       },
       // 推流
-      async publishLocalStream() {
+      async publishLocalStream(type) {
+        window.vhallReportForProduct?.toResultsReporting(110183, {
+          pubTyle: type
+        });
         await this.interactiveServer
           .publishStream()
           .then(() => {
             this.isStreamPublished = true;
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110184, {
+              failed_reason: e
+            });
             if (e.code === '611007') {
               this.handleSpeakOnError('noPermission');
             } else {
@@ -457,22 +471,31 @@
           });
       },
       // 结束推流
-      stopPush() {
+      stopPush(options) {
         return new Promise((resolve, reject) => {
           // 增加判断当前是否在推流中
           if (!this.localStreamId) {
             resolve();
             return;
           }
+          window.vhallReportForProduct?.toResultsReporting(110193, {
+            ev_type: { ...options }
+          });
           this.interactiveServer
             .unpublishStream()
-            .then(() => {
+            .then(data => {
+              window.vhallReportForProduct?.toResultsReporting(110185, {
+                res: data
+              });
               this.isStreamPublished = false;
               clearInterval(this._audioLeveInterval);
               clearInterval(this._netWorkStatusInterval);
               resolve();
             })
             .catch(e => {
+              window.vhallReportForProduct?.toResultsReporting(110186, {
+                res: e
+              });
               reject(e);
             });
         });

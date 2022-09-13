@@ -8,7 +8,10 @@
       <div id="videoWapBox" class="vmp-wap-player-video">
         <!-- 播放器背景图片 -->
         <div class="vmp-wap-player-prompt" v-if="isShowPoster && !isSmallPlayer">
-          <img class="vmp-wap-player-prompt-poster" :src="webinarsBgImg" />
+          <img
+            :class="`vmp-wap-player-prompt-poster player_bg_${imageCropperMode}`"
+            :src="webinarsBgImg"
+          />
         </div>
         <!-- 播放 按钮 -->
         <div v-show="!isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
@@ -34,7 +37,7 @@
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
           v-show="isVodEnd && !isPlayering"
-          class="vmp-wap-player-ending"
+          :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
           <!-- 试看播放结束 和线上保持一致 -->
@@ -71,11 +74,11 @@
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span @click="changePlayerSize(true)">
+            <span v-if="!isConcise" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span>
-              <span class="hot_num">
+              <span class="hot_num hot_num_display">
                 <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                 {{ hotNum | formatHotNum }}
               </span>
@@ -91,7 +94,7 @@
           </template>
           <template v-else>
             <span v-if="isWarnPreview"></span>
-            <span class="hot_num" v-else>
+            <span class="hot_num hot_num_display" v-else>
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
@@ -328,12 +331,13 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
   import playerMixins from './js/mixins';
-
+  import { cropperImage } from '@/app-shared/utils/common';
+  const ossimg = '?x-oss-process=image/resize,m_fill,w_828,h_466';
   export default {
     name: 'VmpWapPlayer',
     mixins: [playerMixins],
@@ -349,14 +353,28 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseState.watchInitData;
-        if (warmup && this.warmUpVideoList.length) {
-          return warmup.warmup_img_url
-            ? warmup.warmup_img_url
-            : webinar.img_url
-            ? webinar.img_url
-            : cover;
+        let webinarUrl = cover;
+        if (webinar.img_url) {
+          if (cropperImage(webinar.img_url)) {
+            webinarUrl = webinar.img_url;
+            this.handlerImageInfo(webinar.img_url);
+          } else {
+            webinarUrl = webinar.img_url + ossimg;
+          }
+        }
+        if (this.warmUpVideoList.length) {
+          if (warmup.warmup_img_url) {
+            if (cropperImage(warmup.warmup_img_url)) {
+              this.handlerImageInfo(warmup.warmup_img_url);
+              return warmup.warmup_img_url;
+            } else {
+              return warmup.warmup_img_url + ossimg;
+            }
+          } else {
+            return webinarUrl;
+          }
         } else {
-          return webinar.img_url || cover;
+          return webinarUrl;
         }
       },
       // 初始化了第几个
@@ -457,8 +475,10 @@
         lang: {},
         languageList: [],
         isSmallPlayer: false,
+        imageCropperMode: 1,
         circleSliderVal: 0,
-        initIndex
+        initIndex,
+        isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -560,6 +580,19 @@
         }
       });
       this.setSetingHeight();
+
+      let skin_json_wap = {
+        style: 1
+      };
+      const skinInfo = this.roomBaseState.skinInfo;
+      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      }
+      if (skin_json_wap?.style == 3) {
+        this.isConcise = true;
+      } else {
+        this.isConcise = false;
+      }
     },
     methods: {
       /**
@@ -582,6 +615,12 @@
             document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
           tabDom.style.height = popHeight;
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
       },
       startPlay() {
         this.isPlayering ? this.pause() : this.play();
@@ -923,6 +962,7 @@
   };
 </script>
 <style lang="less">
+  @import url(./skins/wap-player.concise.less);
   .vmp-wap-player {
     height: 100%;
     width: 100%;
@@ -1048,10 +1088,16 @@
       &-poster {
         width: 100%;
         height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
+        object-fit: fill;
         z-index: 3;
+        &.player_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.player_bg_3 {
+          object-fit: contain;
+          object-position: center;
+        }
       }
     }
     &-pause {
@@ -1080,12 +1126,20 @@
     &-ending {
       background-repeat: no-repeat;
       background-size: 100% 100%;
+      background-position: center;
       width: 100%;
       height: 100%;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 10;
+      &.ending_bg_3 {
+        background-size: contain;
+      }
+      &.ending_bg_2 {
+        background-size: cover;
+        background-position: left top;
+      }
       &-box {
         width: 100%;
         height: 100%;

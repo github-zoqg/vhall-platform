@@ -76,7 +76,12 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useSplitScreenServer, useUserServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useSplitScreenServer,
+    useUserServer,
+    useMediaSettingServer
+  } from 'middle-domain';
   export default {
     name: 'HeaderControl',
     computed: {
@@ -163,10 +168,11 @@
         if (this.isOpenSplitScreen) {
           this.splitScreenServer.closeSplit();
         } else {
+          const layout = useMediaSettingServer().state.layout || sessionStorage.getItem('layout');
           // queryString
           const search = location.search
-            ? `${location.search}&s=1&layout=${sessionStorage.getItem('layout')}`
-            : `?s=1&layout=${sessionStorage.getItem('layout')}`;
+            ? `${location.search}&s=1&layout=${layout}`
+            : `?s=1&layout=${layout}`;
           // location
           const url =
             process.env.NODE_ENV === 'development'

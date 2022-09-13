@@ -197,6 +197,9 @@
           type: msg.data.type,
           interactStatus: true
         });
+        window.vhallReportForWatch?.report(170022, {
+          lottery_id: msg.data.lottery_id
+        });
       },
       // 抽奖结果消息推送
       async callBackResultNotice(msg) {

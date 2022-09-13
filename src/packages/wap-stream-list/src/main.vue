@@ -77,7 +77,7 @@
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
-        <img src="./../img/load.gif" />
+        <van-loading color="#ffffff" />
       </div>
     </div>
     <!-- 小组协作中 -->
@@ -265,6 +265,18 @@
       // 开始推流到成功期间展示默认图
       defaultBg() {
         return this.interactiveServer.state.defaultStreamBg;
+      },
+      // 权限list
+      configList() {
+        return this.$domainStore.state.roomBaseServer.configList;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 隐藏部分文案及选项(安利定制)
+      hideItem() {
+        return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       }
     },
     beforeCreate() {
@@ -284,7 +296,8 @@
         useMediaCheckServer().state.isBrowserNotSupport &&
         (this.roomBaseServer.state.watchInitData.webinar.mode == 3 ||
           this.roomBaseServer.state.watchInitData.webinar.mode == 6) &&
-        this.webinarType == 1
+        this.webinarType == 1 &&
+        !this.hideItem
       ) {
         return this.$toast(this.$t('other.other_1010'));
       }
@@ -319,7 +332,9 @@
           }
         });
         const str =
-          msg.data.type == 'vrtc_speaker_switch' ? this.$t('interact.interact_1034') : '主画面';
+          msg.data.type == 'vrtc_speaker_switch'
+            ? this.$t('interact.interact_1034')
+            : this.$t('interact.interact_1033');
         this.$toast(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }));
       },
       // 事件监听
@@ -615,8 +630,8 @@
         z-index: 1;
         background: #000;
         img {
-          width: 88px;
-          height: 88px;
+          width: 66px;
+          height: 66px;
         }
       }
       .opcity-flase {

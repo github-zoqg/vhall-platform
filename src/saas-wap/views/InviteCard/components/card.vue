@@ -7,13 +7,19 @@
       <div class="vh-invitation__card-preview-content-download" ref="drawCanvasDom">
         <div class="vh-invitation__card-preview-content-warp">
           <div class="watch-img" v-if="webinarInfo.show_type == 1" id="shopInvent">
-            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
+            <div class="hsrc vh-invitation__show-img">
+              <img
+                :src="webinarInfo.showImg"
+                alt
+                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+              />
+            </div>
             <div class="watch-bg">
               <div class="watch-header">
                 <div class="watch-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="watch-middle-box">
@@ -23,10 +29,14 @@
                     <p v-if="webinarInfo.desciption">{{ webinarInfo.desciption }}</p>
                   </div>
                   <div class="watch-time">
-                    <p v-show="webinarInfo.date"><i class="iconfont icontime_icon"></i></p>
+                    <p v-show="webinarInfo.company"><i class="iconfont icontime_icon"></i></p>
+                    <p>{{ webinarInfo.company }}</p>
+                    <p class="location-icon" v-show="webinarInfo.date">
+                      <i class="vh-iconfont vh-line-time"></i>
+                    </p>
                     <p>{{ webinarInfo.date }}</p>
                     <p class="location-icon" v-show="webinarInfo.location">
-                      <i class="iconfont iconplace_icon"></i>
+                      <i class="vh-iconfont vh-line-location-outline"></i>
                     </p>
                     <p>{{ webinarInfo.location }}</p>
                   </div>
@@ -45,12 +55,18 @@
             </div>
           </div>
           <div class="look-img" v-else-if="webinarInfo.show_type == 2" id="shopInvent">
-            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
+            <div class="hsrc vh-invitation__show-img">
+              <img
+                :src="webinarInfo.showImg"
+                alt
+                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+              />
+            </div>
             <div class="look-header">
               <div class="look-avator">
                 <img class="hsrc" :src="webinarInfo.avatar" alt="" />
               </div>
-              <p>{{ webinarInfo.nick_name }}</p>
+              <p class="ellips">{{ webinarInfo.nick_name }}</p>
               <p>{{ $t('nav.nav_1044') }}</p>
             </div>
             <div class="bottom-content">
@@ -63,6 +79,7 @@
                   <img class="hsrc" :src="invite_qr_url" alt="" />
                 </div>
                 <div class="look-action">
+                  <p>{{ webinarInfo.company }}</p>
                   <p>{{ webinarInfo.date }}</p>
                   <p>{{ webinarInfo.location }}</p>
                 </div>
@@ -71,14 +88,20 @@
           </div>
 
           <div class="show-img" v-else id="shopInvent">
-            <img :src="webinarInfo.showImg" alt class="hsrc vh-invitation__show-img" />
+            <div class="hsrc vh-invitation__show-img">
+              <img
+                :src="webinarInfo.showImg"
+                alt
+                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+              />
+            </div>
             <div class="show-img-shadow"></div>
             <div class="show-container">
               <div class="show-header">
                 <div class="show-avator">
                   <img class="hsrc" :src="webinarInfo.avatar" alt="" />
                 </div>
-                <p>{{ webinarInfo.nick_name }}</p>
+                <p class="ellips">{{ webinarInfo.nick_name }}</p>
                 <p>{{ $t('nav.nav_1044') }}</p>
               </div>
               <div class="show-middle-box">
@@ -86,6 +109,11 @@
                   <div class="show-text" v-if="webinarInfo.title || webinarInfo.desciption">
                     <h1>{{ webinarInfo.title }}</h1>
                     <p>{{ webinarInfo.desciption }}</p>
+                  </div>
+                  <div v-if="webinarInfo.company" class="show-time">
+                    <p class="top-border"></p>
+                    <p class="show-time-item no-padding-bottom">{{ $t('nav.nav_1053') }}</p>
+                    <p class="show-time-item no-padding-top">{{ webinarInfo.company }}</p>
                   </div>
                   <div v-if="webinarInfo.date" class="show-time">
                     <p class="top-border"></p>
@@ -131,9 +159,10 @@
 
   import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
-  import { sleep } from '@/app-shared/utils/tool';
+  import { sleep, parseImgOssQueryString } from '@/app-shared/utils/tool';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useInviteServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
 
   export default {
     name: 'invitationCard',
@@ -141,6 +170,7 @@
       return {
         isInviteVisible: false, // 是否开启邀请卡
         inited: false,
+        imageCropperMode: 1,
         // 展示添加封面背景数据
         selectBgDataInit: Object.freeze(bgImgOptions),
         webinarInfo: {
@@ -177,6 +207,10 @@
           params.invite_id = this.$route.query.join_id || this.$route.query.invite_id;
         }
 
+        // 获取屏幕宽高
+        const screen_wid = Math.floor(window.screen.width);
+        const screen_height = Math.floor(window.screen.height);
+
         const res = await this.inviteServer.createInvite(params);
         const data = res.data;
 
@@ -196,10 +230,16 @@
 
         if (this.webinarInfo.img_type == 0) {
           // 默认
-          this.webinarInfo.showImg =
-            data.invite_card.img + '?x-oss-process=image/resize,m_fill,w_560,h_920,limit_0';
+          if (cropperImage(data.invite_card.img)) {
+            this.handlerImageInfo(data.invite_card.img);
+            this.webinarInfo.showImg = data.invite_card.img;
+          } else {
+            this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
+          }
         } else {
-          this.webinarInfo.showImg = this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl;
+          this.webinarInfo.showImg = `${
+            this.selectBgDataInit[this.webinarInfo.img_type - 1].imageUrl
+          }?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
         }
 
         this.nickname = padStringWhenTooLang(data.nick_name, '...', 5);
@@ -213,6 +253,11 @@
           });
         }
         this.wxShareInfo();
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
       },
       getWxShareUrl() {
         const protocol = window.location.protocol;
@@ -291,7 +336,7 @@
           imgList.forEach(img => {
             const imaObj = new Image();
             imaObj.setAttribute('crossorigin', 'anonymous');
-            imaObj.onload = () => {
+            const draw = () => {
               count++;
               img.src = getBase64Image(imaObj);
               if (imgList.length === count) {
@@ -313,6 +358,8 @@
                   });
               }
             };
+            imaObj.onload = draw;
+            imaObj.onerror = draw;
             imaObj.src = img.getAttribute('src');
           });
         });
@@ -352,6 +399,11 @@
       .vh-invitation__card-preview-content-warp {
         width: 100%;
         height: 100%;
+        .ellips {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .vh-invitation__show-img {
           position: absolute;
           left: 0;
@@ -359,6 +411,19 @@
           height: 100%;
           width: 100%;
           z-index: 1;
+          .invitation__img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            &.invitation_bg_2 {
+              object-fit: cover;
+              object-position: left top;
+            }
+            &.invitation_bg_3 {
+              object-fit: contain;
+              object-position: center;
+            }
+          }
         }
         .show-img {
           width: 100%;
@@ -710,6 +775,7 @@
             height: 600px;
             position: absolute;
             bottom: 0;
+            left: 0;
             background: #ffffff;
             z-index: 2;
           }

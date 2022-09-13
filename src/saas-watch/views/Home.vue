@@ -26,12 +26,15 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useMsgServer, useUserServer } from 'middle-domain';
   import roomState, { isMSECanUse } from '../headless/room-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
+  import skins from '@/app-shared/skins/watch';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+
   export default {
     name: 'Home',
     components: {
@@ -106,8 +109,12 @@
           }
           const domain = await this.initReceiveLive(this.clientType);
           await roomState();
+
+          this.setPageConfig();
+
           // 是否跳转预约页
           if (
+            roomBaseServer.state.watchInitData.live_type != 2 &&
             this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe' &&
             !this.$domainStore.state.roomBaseServer.watchInitData.record.preview_paas_record_id
           ) {
@@ -121,19 +128,44 @@
           // 如果往观看页跳转，需要清除暖场视频缓存
           window.sessionStorage.removeItem('warm_recordId');
           window.sessionStorage.removeItem('recordIds');
-
+          // 上报wiki: http://wiki.vhallops.com/pages/viewpage.action?pageId=290882260
           domain.initVhallReport({
             bu: 0,
             user_id: roomBaseServer.state.watchInitData.join_info.join_id,
             webinar_id: this.$route.params.id,
-            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
             type: 4,
-            entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test'
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test'
           });
+
+          // 产品侧数据埋点初始化
+          domain.initVhallReportForProduct({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            app_id: process.env.NODE_ENV === 'production' ? '15df4d3f' : 'fd8d3653', // 产品 app id
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            pf: 8, // 客户端类型  web 网页端用 8
+            user_id: roomBaseServer.state.watchInitData.join_info.join_id, // C端用户 id（如果是B端用当前用户id）
+            webinar_id: this.$route.params.id // 活动 id
+          });
+
           window.vhallReport.report('ENTER_WATCH');
+          // 产品侧上报需求
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 7
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId || this.$route.query.share_id
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
+          window.vhallReportForWatch?.report(170017);
           console.log('%c---初始化直播房间 完成', 'color:blue');
           // 如果加密状态为 1 或者 2
           // 并且是点播或者回放
@@ -168,6 +200,7 @@
       },
       initReceiveLive(clientType) {
         const { id } = this.$route.params;
+        const { rehearsal } = this.$route.query;
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
           requestHeaders: {
@@ -176,12 +209,15 @@
           initRoom: {
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
+            live_type: rehearsal == 1 ? 2 : 0, // 2 彩排   0 正式
             ...this.$route.query // 第三方地址栏传参
           },
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
@@ -233,6 +269,10 @@
         }
       },
       handleErrorCode(err) {
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -249,9 +289,10 @@
                 _embedQuery.indexOf('record_id=') > -1
                   ? _embedQuery.replace('record_id=', 'rid=')
                   : _embedQuery;
-              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+
+              window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
             } else {
-              window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+              window.location.href = `${origin}/${this.$route.params.id}`;
             }
             break;
           case 512002:
@@ -303,6 +344,85 @@
       },
       handleChangeNoticeState() {
         this.$emit('notice_panel_close', false);
+      },
+      setPageConfig() {
+        /*
+        {
+            "backGroundColor": "1", //主题色 按照数字逻辑 前端枚举
+            "pageStyle": "#FB3A32", // 页面风格
+            "popStyle": "",// 原有字段 预留
+            "background": "", //背景图
+            "backgroundSize": "", //背景图大小字符串
+            "blurryDegree": "0", // 模糊程度
+            "lightDegree": "10",// 光亮程度
+            "style": "1",// 风格 按照数字逻辑 前端枚举
+            "inavLayout": "CANVAS_ADAPTIVE_LAYOUT_TILED_MODE", //连麦布局
+            "inavDocumentLayout": "1", //连麦+演示布局 1 上下 2 左右
+            "videoColor": "#1A1A1A",  //视频底色
+            "videoBackGround": "", // 视频背景图
+            "videoBlurryDegree": "0",  //视频模糊程度
+            "videoLightDegree": "10",//视频亮度
+            "videoBackGroundSize": "", //视频图片裁剪大小对象
+            "chatLayout": "1" //聊天布局 1 上下 2 左右
+          }
+        */
+
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+
+        const styleMap = {
+          1: 'default', // 传统风格
+          2: 'simple', // 简洁风格
+          3: 'fashion' // 时尚风格
+        };
+        let skin_json_pc = {
+          style: 1,
+          backGroundColor: 1,
+          chatLayout: 1 // 聊天布局 1 上下 2 左右
+        };
+
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
+        }
+
+        if (skin_json_pc?.chatLayout == 2) {
+          // 设置聊天组件为左右风格
+          updatePageNode('comChat', 'component', 'VmpFashionChat');
+        }
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skin_json_pc?.style || 1];
+        const theme = themeMap[skin_json_pc?.backGroundColor || 1];
+
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(theme, skin_json_pc);
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(theme, skin) {
+        if (skin?.pcBackground) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
+          document.body.style.backgroundSize = 'cover';
+        } else {
+          if (theme == 'black') {
+            document.body.style.background = `rgb(26, 26, 26)`;
+          } else {
+            document.body.style.backgroundImage = `url(${
+              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-watch/theme/skins/' +
+              theme +
+              '.png'
+            })`;
+            document.body.style.backgroundSize = 'cover';
+          }
+        }
       }
     }
   };

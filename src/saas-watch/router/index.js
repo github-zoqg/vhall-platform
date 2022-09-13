@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
-import Subscribe from '../views/Subscribe/index.vue';
-import entryForm from '../views/Subscribe/entryForm.vue';
-import forgetPwd from '../views/forgetPwd/index.vue';
+// import Home from '../views/Home.vue';
+// import Subscribe from '../views/Subscribe/index.vue';
+// import entryForm from '../views/Subscribe/entryForm.vue';
+// import forgetPwd from '../views/forgetPwd/index.vue';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import Subject from '../views/Subject/index.vue';
+import initCheckAuth from '../mixins/chechAuth.js';
 import ssoAutoLogin from '@/app-shared/sso-auto-login';
 
 Vue.use(VueRouter);
@@ -13,14 +15,14 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/lives/watch/:id',
-    component: Home,
     name: 'LiveRoom',
+    component: () => import(/* webpackChunkName: "LiveRoom" */ '../views/Home.vue'),
     meta: { title: '直播间', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclient/watch/:id', //嵌入观看页
-    component: Home,
     name: 'LiveEmbedRoom',
+    component: () => import(/* webpackChunkName: "LiveEmbedRoom" */ '../views/Home.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' },
     redirect: to => {
       if (to.query.embed === 'video') {
@@ -34,45 +36,59 @@ const routes = [
   },
   {
     path: '/lives/embedclientfull/watch/:id', //完全嵌入观看页
-    component: Home,
     name: 'LiveEmbedFullRoom',
+    component: () => import(/* webpackChunkName: "LiveEmbedFullRoom" */ '../views/Home.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'main' }
   },
   {
     path: '/lives/embedclientvideo/watch/:id', //单视频嵌入观看页
-    component: () => import('../views/EmbedVideo/index.vue'),
     name: 'LiveEmbedVideoRoom',
+    component: () =>
+      import(/* webpackChunkName: "LiveEmbedVideoRoom" */ '../views/EmbedVideo/index.vue'),
     meta: { title: '直播间嵌入', grayType: 'webinar', page: 'embed-video' }
   },
   {
     path: '/lives/subscribe/:id',
-    component: Subscribe,
     name: 'Subscribe',
+    component: () => import(/* webpackChunkName: "Subscribe" */ '../views/Subscribe/index.vue'),
     meta: { title: '预约', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/embedclient/subscribe/:id', //嵌入预约页
-    component: Subscribe,
     name: 'SubscribeEmbed',
+    component: () =>
+      import(/* webpackChunkName: "SubscribeEmbed" */ '../views/Subscribe/index.vue'),
     meta: { title: '预约嵌入', grayType: 'webinar', page: 'subscribe' }
   },
   {
     path: '/lives/entryform/:id',
-    component: entryForm,
     name: 'entryForm',
+    component: () => import(/* webpackChunkName: "entryForm" */ '../views/Subscribe/entryForm.vue'),
     meta: { title: '独立报名表单', grayType: 'webinar' }
   },
   {
+    path: '/special/entryform/:id',
+    component: () => import(/* webpackChunkName: "entryForm" */ '../views/Subscribe/entryForm.vue'),
+    name: 'entryFormSubject',
+    meta: { title: '独立报名表单', grayType: 'subject' }
+  },
+  {
     path: '/forgetPwd',
-    component: forgetPwd,
     name: 'forgetPwd',
+    component: () => import(/* webpackChunkName: "forgetPwd" */ '../views/forgetPwd/index.vue'),
     meta: { title: '忘记密码' }
+  },
+  {
+    path: '/special/detail',
+    component: Subject,
+    name: 'Subject',
+    meta: { title: '专题详情', page: 'subject', grayType: 'subject' }
   },
   {
     path: '/lives/error/:id/:code', // 统一错误页
     name: 'PageError',
-    meta: { title: '系统异常' },
-    component: () => import('../views/ErrorPage/error.vue')
+    component: () => import(/* webpackChunkName: "PageError" */ '../views/ErrorPage/error.vue'),
+    meta: { title: '系统异常' }
   }
 ];
 
@@ -97,6 +113,10 @@ router.beforeEach(async (to, from, next) => {
     await ssoAutoLogin(); // sso自动登录置换token
   }
   console.log('---grayInit---', res);
+  // 专题页未登录进行三方登录时
+  if (to.name == 'Subject' && !localStorage.getItem('token')) {
+    initCheckAuth.methods.initCheckAuth.call({ $route: to });
+  }
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {

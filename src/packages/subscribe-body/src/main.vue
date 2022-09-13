@@ -4,7 +4,7 @@
       <div class="subscribe-img">
         <template v-if="!showVideo">
           <div class="subscribe-img-box">
-            <img class="subscribe-bg" :src="webinarsBgImg" />
+            <img :class="`subscribe-bg subscribe_bg_${imageCropperMode}`" :src="webinarsBgImg" />
           </div>
           <div v-if="isLivingEnd && !isEmbed" class="subscribe-img-box subscribe-img_end">
             <img src="./img/live_start.png" alt="" />
@@ -76,7 +76,8 @@
   import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSubscribeBody',
     data() {
@@ -90,6 +91,7 @@
         lang: {},
         isLoaderTwoPlayer: false,
         languageList: [],
+        imageCropperMode: 1,
         subOption: {
           startTime: '',
           type: 0,
@@ -100,7 +102,9 @@
           actual_start_time: '',
           show: 1,
           num: 0,
-          needAgreement: false
+          needAgreement: false,
+          open_reg_form: null,
+          save_reg_form: null
         }
       };
     },
@@ -113,7 +117,16 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
-        return webinar.img_url || cover;
+        let webinarUrl = cover;
+        if (webinar.img_url) {
+          if (cropperImage(webinar.img_url)) {
+            webinarUrl = webinar.img_url;
+            this.handlerImageInfo(webinar.img_url);
+          } else {
+            webinarUrl = webinar.img_url + '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
+          }
+        }
+        return webinarUrl;
       },
       isWarmVideo() {
         return this.roomBaseServer.state.watchInitData.warmup.warmup_paas_record_id;
@@ -196,6 +209,12 @@
         //   this.showBottom = true;
         // });
       },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
+      },
       handlerInitInfo() {
         const { webinar, subscribe, join_info, warmup, agreement } =
           this.roomBaseServer.state.watchInitData;
@@ -211,6 +230,10 @@
         // 自定义placeholder&&预约按钮是否展示
         this.subOption.verify_tip = webinar.verify_tip;
         this.subOption.hide_subscribe = webinar.hide_subscribe;
+        // 报名表单是否已填写
+        this.subOption.save_reg_form = join_info.reg_form;
+        // 报名表单是否已开启
+        this.subOption.open_reg_form = webinar.reg_form;
         if (webinar.type == 3) {
           this.showVideo = false;
           this.isLivingEnd = true;
@@ -294,7 +317,12 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: '',
+          isSubject: false,
+          isWhiteCheck: false // 是否开启了白名单验证
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -312,23 +340,27 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1024');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.subOption.verify_tip || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.subOption.verify_tip || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder =
+              this.subOption.verify_tip || this.$t('common.common_1006');
+            placeHolderInfo.isWhiteCheck = true;
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:
@@ -407,6 +439,14 @@
           height: 100%;
           object-fit: fill;
           border-radius: 4px 4px 0 0;
+          &.subscribe_bg_2 {
+            object-fit: cover;
+            object-position: left top;
+          }
+          &.subscribe_bg_3 {
+            object-fit: contain;
+            object-position: center;
+          }
         }
         .subscribe-img_end {
           display: flex;
@@ -485,7 +525,7 @@
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #333333;
+        color: #262626;
         line-height: 20px;
         text-align: center;
         padding-top: 54px;
@@ -511,12 +551,12 @@
         .subscribe-start {
           width: 160px;
           height: 40px;
-          background: #fb3a32;
+          background: var(--theme-color);
           border-radius: 20px;
           font-size: 14px;
           font-family: PingFangSC-Regular, PingFang SC;
           font-weight: 400;
-          color: #ffffff;
+          color: #fff;
           line-height: 40px;
           border: none;
           outline: none;
@@ -528,7 +568,6 @@
       position: relative;
     }
     &-tab {
-      background: #2a2a2a;
       margin: 0px auto;
     }
     .subscribe-img-box-embed {

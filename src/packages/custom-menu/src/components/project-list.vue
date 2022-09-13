@@ -9,11 +9,10 @@
         @click="linkSubject(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img class="cover_pic" :src="item.cover" alt="" />
+          <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.cover" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <div class="vh-chose-active-item__cover-hots__content">
-              <!-- <i class="saasicon_redu"></i> -->
-              <i class="saasicon_redu vh-saas-iconfont vh-saas-line-heat"></i>
+              <i class="vh-saas-iconfont vh-saas-line-heat icon_heart_css"></i>
               <i>{{ item.pv }}</i>
             </div>
           </div>
@@ -32,7 +31,8 @@
 </template>
 <script>
   import { useCustomMenuServer } from 'middle-domain';
-
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -86,9 +86,23 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list;
+            this.activeList = res.data.list.map(item => {
+              let mode = 1;
+              if (cropperImage(item.cover)) {
+                mode = this.handlerImageInfo(item.cover);
+              }
+              return {
+                ...item,
+                itemMode: mode
+              };
+            });
           }
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        return Number(obj.mode);
       }
     }
   };
@@ -117,9 +131,16 @@
     padding: 8px 10px 8px;
     font-family: PingFangSC-Regular, PingFang SC;
     border-radius: 4px;
+    background-color: var(--theme-tab-content-project-card-bg);
     &:hover {
-      background: #383838;
       cursor: pointer;
+      background-color: var(--theme-tab-content-project-card-hover-bg);
+      .vh-chose-active-item__title {
+        color: var(--theme-color);
+      }
+      .cover_pic {
+        transform: scale(1.2);
+      }
     }
     &__cover {
       position: relative;
@@ -127,11 +148,21 @@
       height: 80px;
       margin-right: 12px;
       border-radius: 4px;
-      img {
+      overflow: hidden;
+      .cover_pic {
         display: inline-block;
-        width: 142px;
-        height: 80px;
+        width: 100%;
+        height: 100%;
         border-radius: 4px;
+        object-fit: contain;
+        object-position: center;
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
       }
       &-status {
         position: absolute;
@@ -169,7 +200,7 @@
           line-height: 20px;
           z-index: 4;
         }
-        .saasicon_redu {
+        .icon_heart_css {
           &:before {
             display: inline-block;
             width: 14px !important;
@@ -201,12 +232,13 @@
     }
     &__titleInfo {
       height: 55px;
+      flex: 1;
     }
     &__title {
       margin: 10px 0px 4px 0px;
       font-size: 14px;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--theme-tab-content-project-title-font);
       line-height: 20px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -216,13 +248,14 @@
       text-align: left;
       /**autoprefixer: ignore next */
       -webkit-box-orient: vertical;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;
       word-break: keep-all;
       white-space: nowrap;
       font-size: 12px;
-      color: @font-dark-low;
+      color: var(--theme-tab-content-project-info-font);
       line-height: 16px;
       text-align: left;
     }
@@ -252,11 +285,11 @@
     &__cover {
       width: 100%;
       height: 160px;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background: #000;
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
       overflow: hidden;
-      img {
+      .cover_pic {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -266,6 +299,17 @@
         transition: all 0.3s;
         &:hover {
           transform: scale(1.2);
+        }
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.box_bg_3 {
+          object-fit: contain;
+          object-position: center;
         }
       }
       &-hots {
@@ -286,7 +330,7 @@
       background: #fff;
       &:hover {
         .vh-chose-active-item__title {
-          color: #fb3a32;
+          color: var(--theme-color);
         }
       }
     }
@@ -298,6 +342,10 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
     }
     &__info {

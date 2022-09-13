@@ -46,8 +46,6 @@
                 :class="statePaly ? 'vh-a-line-videopause' : 'vh-line-video-play'"
                 @click="videoPlayBtn"
               ></i>
-              <!-- <i v-if="!statePaly" class="iconfont iconbofang_icon" @click="videoPlayBtn"></i>
-              <i v-else class="iconfont iconzanting_icon" @click="videoPlayBtn"></i> -->
               <div class="vmp-center-box" :class="isVod ? '' : 'vmp-center-box__hidden'">
                 <span>
                   {{ currentTime | secondToDate }}
@@ -231,6 +229,16 @@
       },
       videoPlayBtn() {
         this.statePaly ? this.playerServer.pause() : this.playerServer.play();
+        if (this.isInsertVideoPreview) {
+          window.vhallReportForProduct.toReport(110212, {
+            report_extra: {
+              type: 'yunInsert',
+              file_info: '',
+              pre_status: this.statePaly ? 'playing' : 'pause',
+              after_atatus: this.statePaly ? 'pause' : 'playing'
+            }
+          });
+        }
       },
       setVideo() {
         const time = (this.sliderVal / 100) * this.totalTime; // 快进

@@ -12,7 +12,7 @@
       class="vmp-login__form__common"
     >
       <!-- 手机号 -->
-      <el-form-item prop="phone">
+      <el-form-item prop="phone" class="common_mg3">
         <el-input
           v-model.trim="ruleForm.phone"
           :placeholder="$t('account.account_1025')"
@@ -23,11 +23,11 @@
         ></el-input>
       </el-form-item>
       <!-- 验证码 -->
-      <el-form-item>
+      <el-form-item class="common_mg3">
         <div id="regCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 短信验证码 -->
-      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code">
+      <el-form-item prop="captchas" class="vmp-reg-login__wrap__code common_mg3">
         <el-input
           v-model.trim="ruleForm.captchas"
           clearable
@@ -60,7 +60,7 @@
           }}
         </span>
       </el-form-item>
-      <el-form-item prop="password" class="vmp-register__pwd__box">
+      <el-form-item prop="password" class="vmp-register__pwd__box common_mg3">
         <el-input
           :type="regPwdShow ? 'text' : 'password'"
           v-model.trim="ruleForm.password"
@@ -82,39 +82,23 @@
           {{ $t('nav.nav_1005') }}
         </a>
       </el-form-item>
-      <el-button
-        type="primary"
-        round
-        class="length-max vmp-reg-login__register__btn"
-        @click="handleRegister"
-      >
-        {{ $t('register.register_1013') }}
-      </el-button>
-      <div class="vmp-reg-login__register__checked" v-if="!isMobile">
-        <el-checkbox v-model="agreementChecked">
-          {{ $t('register.register_1008') }}
-          <a
-            href="https://t.e.vhall.com/home/vhallapi/serviceterms"
-            target="_blank"
-            class="vmp-register__to__link"
-            rel="noopener noreferrer"
-          >
-            {{ $t('register.register_1011') }}
-          </a>
-        </el-checkbox>
+      <div class="common_mg3">
+        <el-button
+          type="primary"
+          round
+          class="length-max vmp-reg-login__register__btn"
+          @click="handleRegister"
+        >
+          {{ $t('register.register_1013') }}
+        </el-button>
       </div>
-      <div class="vmp-reg-login__register__checked" v-else>
-        <el-checkbox v-model="agreementChecked">
-          {{ $t('login.login_1030') }}
-          <a
-            href="https://t.e.vhall.com/home/vhallapi/serviceterms"
-            target="_blank"
-            class="vmp-register__to__link"
-            rel="noopener noreferrer"
-          >
-            {{ $t('login.login_1031') }}
-          </a>
-        </el-checkbox>
+      <div class="vmp-reg-login__register__checked">
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="register"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
       </div>
     </el-form>
   </div>
@@ -181,7 +165,7 @@
           password: [{ required: false, validator: validRegPwd, trigger: 'blur' }]
         },
         regPwdShow: false, // 注册 - 密码框的显示
-        agreementChecked: false, // 是否勾选注册协议
+        registerChecked: false,
         loginKeyVo: null,
         btnDisabled: true // 手机号 & 图形验证码 校验，控制发送验证码是否可以点击。默认不可点击
       };
@@ -240,20 +224,20 @@
       },
       // 注册
       handleRegister() {
+        if (!this.registerChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return;
+        }
         this.$refs.ruleForm.validate(async valid => {
           if (valid) {
             if (!this.captchaReady) {
               this.$message({
                 message: this.$t('login.login_1023'),
-                showClose: true,
-                type: 'error',
-                customClass: 'zdy-info-box'
-              });
-              return;
-            }
-            if (!this.agreementChecked) {
-              this.$message({
-                message: this.$t('register.register_1003'),
                 showClose: true,
                 type: 'error',
                 customClass: 'zdy-info-box'
@@ -314,6 +298,10 @@
               });
           }
         });
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     async mounted() {
@@ -324,7 +312,11 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-register {
-    padding: 0 32px 24px 32px;
+    padding: 0 29px 24px 29px;
+    .common_mg3 {
+      margin-right: 3px;
+      margin-left: 3px;
+    }
   }
   .vmp-register__pwd__box {
     position: relative;

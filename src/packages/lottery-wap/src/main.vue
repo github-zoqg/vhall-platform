@@ -174,6 +174,9 @@
           interactStatus: true
         });
         await this.changeView('LotteryPending');
+        window.vhallReportForWatch?.report(170022, {
+          lottery_id: msg.data.lottery_id
+        });
       },
       // 抽奖结果消息推送
       async callBackResultNotice(msg) {

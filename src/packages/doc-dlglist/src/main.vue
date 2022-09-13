@@ -58,7 +58,12 @@
               </el-upload>
 
               <!-- 观看端不能操作资料库 -->
-              <el-button type="white-primary" v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button
+                type="white-primary"
+                v-if="!isWatch && showDatabase"
+                round
+                @click="handleGotoDoclib"
+              >
                 {{ $t('doc.doc_1015') }}
               </el-button>
             </div>
@@ -79,7 +84,7 @@
                 <el-button type="primary" round>{{ $t('doc.doc_1027') }}</el-button>
               </el-upload>
               <!-- 资料库按钮 -->
-              <el-button v-if="!isWatch" round @click="handleGotoDoclib">
+              <el-button v-if="!isWatch && showDatabase" round @click="handleGotoDoclib">
                 {{ $t('doc.doc_1015') }}
               </el-button>
 
@@ -300,7 +305,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import DocProgressStatus from './progress-status.vue';
   import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
-  import _ from 'lodash';
+  import { throttle } from 'lodash';
 
   export default {
     name: 'VmpDocDlglist',
@@ -345,6 +350,16 @@
       // 活动直播类型
       webinarMode() {
         return this.roomBaseServer.state.watchInitData.webinar.mode;
+      },
+      configList() {
+        return this.roomBaseServer.state.configList;
+      },
+      //是否显示资料库
+      showDatabase() {
+        return (
+          (this.$route?.query.assistantType && this.configList['ui.database'] == 1) ||
+          !this.$route?.query.assistantType
+        );
       }
     },
     watch: {
@@ -359,8 +374,8 @@
       }
     },
     mounted() {
-      this.handleThrottleDocSearch = _.throttle(this.handleDocSearch, 300, { trailing: false });
-      this.handleThrottleDoclibSearch = _.throttle(this.handleDoclibSearch, 300, {
+      this.handleThrottleDocSearch = throttle(this.handleDocSearch, 300, { trailing: false });
+      this.handleThrottleDoclibSearch = throttle(this.handleDoclibSearch, 300, {
         trailing: false
       });
 
@@ -627,7 +642,7 @@
         const fileObj = {
           file_name: file.name,
           ext: file.name.split('.')[1],
-          created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           page: 1,
           docStatus: 'uploading', // 文档状态:上传中
           uploadPropress: 0, // 上传进度

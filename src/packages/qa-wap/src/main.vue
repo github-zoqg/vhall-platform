@@ -365,7 +365,7 @@
           }
           .answer {
             padding: 20px;
-            background: rgba(249, 249, 249, 1);
+            background: var(--theme-tab-content-qa-replyText-bg);
             border-radius: 8px;
           }
           .user {
@@ -395,19 +395,20 @@
               border-radius: 50px;
               font-size: 20px;
               &.host {
-                background-color: rgba(252, 86, 89, 0.2);
-                color: #fb3a32;
+                color: rgba(251, 38, 38, 1);
+                background-color: rgba(251, 38, 38, 0.15);
               }
               &.assistant {
-                background-color: rgba(166, 166, 166, 0.2);
-                color: #a6a6a6;
+                color: rgba(10, 127, 245, 1);
+                background-color: rgba(10, 127, 245, 0.15);
               }
               &.guest {
-                background-color: rgba(77, 161, 255, 0.2);
-                color: #4da1ff;
+                color: rgba(10, 127, 245, 1);
+                background-color: rgba(10, 127, 245, 0.15);
               }
             }
             .nick-name {
+              color: var(--theme-tab-content-qa-text-font);
               flex: 1;
               line-height: 50px;
               font-size: 26px;
@@ -416,6 +417,9 @@
               font-weight: bolder;
               white-space: nowrap;
             }
+            .time {
+              color: var(--theme-tab-content-qa-text-font);
+            }
           }
           .content {
             line-height: 40px;
@@ -423,11 +427,12 @@
             // text-align: justify;
             word-break: break-word;
             .question-label {
-              color: #fb3a32;
+              color: var(--theme-tab-content-qa-qaLabel-font);
               float: left;
             }
             .question-reply {
               display: inline-block;
+              color: var(--theme-tab-content-qa-replyText-font);
             }
           }
         }

@@ -96,6 +96,7 @@
   import TiledReverseImg from '../../assets/img/tiled-reverse.png';
   import GridImg from '../../assets/img/grid.png';
   export default {
+    name: 'BasicSetting',
     data() {
       return {
         loading: false, // 读取中
@@ -211,8 +212,10 @@
         const saveScreenRate =
           sessionStorage.getItem('selectedScreenRate') || this.screenRatesConfig[1].value; // 默认PPT静态
         const videoHint = sessionStorage.getItem('videoHint') || this.videoContentHint[0].value; // 插播文件默认清晰度
-
-        const savedLayout = sessionStorage.getItem('layout') || 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'; // 默认主次平铺
+        const savedLayout =
+          this.mediaState.layout ||
+          sessionStorage.getItem('layout') ||
+          'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE'; // 默认主次平铺
 
         this.mediaState.rate = saveRate;
         this.mediaState.screenRate = saveScreenRate;

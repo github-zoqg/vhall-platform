@@ -29,6 +29,12 @@
         questionnaireId: '' // 问卷Id
       };
     },
+    computed: {
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
       this.zIndexServer = useZIndexServer();
@@ -50,7 +56,7 @@
           return;
         }
         // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-        this.questionnaireServer.init({ mode: 'watch' });
+        this.questionnaireServer.init({ mode: 'watch', showVhPrivacy: !this.isEmbed });
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$message({
@@ -78,7 +84,7 @@
           async msg => {
             if (window.VHall_Questionnaire_Service) {
               // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-              this.questionnaireServer.init({ mode: 'watch' });
+              this.questionnaireServer.init({ mode: 'watch', showVhPrivacy: !this.isEmbed });
             }
             useChatServer().addChatToList({
               nickname: msg.nick_name,
@@ -155,7 +161,7 @@
         width: 7px;
         height: 7px;
         border: 1px solid #2a2a2a;
-        background: #fb3a32;
+        background: var(--theme-color) !important;
         border-radius: 50%;
       }
       img {

@@ -257,6 +257,7 @@
     useGroupServer,
     useSplitScreenServer,
     useMediaCheckServer,
+    useMediaSettingServer,
     useChatServer,
     useDocServer,
     useMsgServer,
@@ -454,15 +455,37 @@
       isThirdStream() {
         return this.$domainStore.state.roomBaseServer.isThirdStream;
       },
-      // 是否开启视频轮巡
-      isVideoPolling() {
-        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
-      },
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
       }
+      /**
+       * pollingData() {
+        console.log('pollingData-a', this.agreeStatusData);
+        return {
+          agreeStatus: this.agreeStatusData,
+          isPolling: this.videoPollingServer.state.isPolling
+        };
+      }*/
     },
+    /** 需求反复，代码先做保留【视频轮巡的设备检测机制】
+     * watch: {
+      // 视频轮训观众收到轮训消息，点击“我知道了” => 获取设备权限 => 开始视频推流
+      pollingData: {
+        async handler(val, oldVal) {
+          console.log('pollingData-', val, oldVal);
+          if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
+            if (val.agreeStatus == 1) {
+              await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+            }
+            if (val.isPolling) {
+              this.videoStartPush({ type: 1, ...val });
+            }
+          }
+        },
+        deep: true
+      }
+    },*/
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.micServer = useMicServer();
@@ -480,12 +503,15 @@
       // 轮训列表更新消息
       this.videoPollingServer.$on('VIDEO_POLLING_UPDATE', msg => {
         console.log('轮训列表更新消息', msg);
-        this.videoStartPush();
+        this.videoStartPush({ type: 1 });
       });
       // 停止视频轮巡
       this.videoPollingServer.$on('VIDEO_POLLING_END', async msg => {
+        const roomId = this.roomBaseServer.state.watchInitData.webinar.id;
+        sessionStorage.setItem(`hasVideoPollingStart_${roomId}`, 0);
+        sessionStorage.setItem(`pollingAgreeStatus_${roomId}`, 0);
         if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
-          await this.stopPush();
+          await this.stopPush({ type: 'VIDEO_POLLING_END' });
           await this.interactiveServer.destroy();
           if (this.isNoDelay == 1) {
             await this.interactiveServer.init();
@@ -493,9 +519,13 @@
         }
       });
       if (!this.isSpeakOn) {
-        await this.videoStartPush();
+        await this.videoStartPush({ type: 2 });
       }
       this.checkStartPush();
+      let el = document
+        .getElementById(`vmp-stream-local__${this.joinInfo.third_party_user_id}`)
+        .querySelector('.vmp-alert-wrap');
+      document.body.appendChild(el);
     },
     beforeDestroy() {
       // 清空计时器
@@ -507,6 +537,7 @@
       }
     },
     methods: {
+      closePollingDialog() {},
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
@@ -531,14 +562,51 @@
        */
       startPushOnce() {
         this.startPushStreamOnce = true;
-        this.startPush();
+        this.startPush({ source: 'startPushOnce' });
+      },
+      // 取消订阅当前所有互动流
+      unSubscribeAll() {
+        const speakStreamId = this.micServer.state.speakerList.map(el => {
+          return el.streamId;
+        });
+        console.log('上麦列表-as', speakStreamId);
+        return new Promise((resolve, reject) => {
+          const promiseResults = [];
+          let iteratorIndex = 0;
+          // 已完成的数量，用于最终的返回，不能直接用完成数量作为iteratorIndex
+          // 输出顺序和完成顺序是两码事
+          let fullCount = 0;
+          // 用于迭代iterator数据
+          for (const item of speakStreamId) {
+            let resultIndex = iteratorIndex;
+            iteratorIndex += 1;
+            this.interactiveServer
+              .unSubscribeStream(item)
+              .then(res => {
+                console.log('resultIndex', resultIndex, res);
+                promiseResults[resultIndex] = res;
+                fullCount += 1;
+                if (fullCount === iteratorIndex) {
+                  resolve(promiseResults);
+                }
+              })
+              .catch(err => {
+                reject(err);
+              });
+          }
+          // 处理空 iterator 的情况
+          if (iteratorIndex === 0) {
+            resolve(promiseResults);
+          }
+        });
       },
       /**
        *
        * @description: 视频轮巡推流
        * @param arr {Array} 当前参与轮巡的观众流列表
        */
-      async videoStartPush() {
+      async videoStartPush(data) {
+        console.log('videoStartPush-params', data);
         if (this.videoPollingServer.state.isPolling) {
           if (this.joinInfo.role_name !== 2) return; //视频轮巡只有观众推流
           if (this.micServer.getSpeakerStatus()) return; // 上麦状态的观众不推流
@@ -546,6 +614,9 @@
           try {
             if (this.$domainStore.state.interactiveServer.isInstanceInit) {
               // 如果存在互动实例需要销毁，重新初始化
+              await sleep(1000);
+              const unsub = await this.unSubscribeAll();
+              console.log('unSubscribeAll', unsub);
               await this.interactiveServer.destroy();
             }
             await this.interactiveServer.init({ videoPolling: true });
@@ -557,7 +628,7 @@
           this.startPollingPush();
         } else {
           if (!this.isSpeakOn && this.joinInfo.role_name == 2) {
-            await this.stopPush();
+            await this.stopPush({ type: 'VIDEO_POLLING_NO_SPEAK' });
             const obj = this.$domainStore.state.interactiveServer;
             console.log('销毁1-1-1-1-1', obj);
             // 优化代码逻辑，如果是ROLE_HOST角色，需要销毁实例
@@ -603,15 +674,18 @@
           (!this.isOpenSplitScreen ||
             (this.isOpenSplitScreen && this.splitScreenServer.state.role == 'splitPage'))
         ) {
-          this.startPush();
+          this.startPush({ source: 'checkStartPush' });
         } else if (this.joinInfo.role_name == 1) {
           // 主持人不在麦上，但是刷新页面也需要设置一下旁路
           await this.setBroadCastAdaptiveLayoutMode(
-            VhallRTC[sessionStorage.getItem('layout')] || VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+            VhallRTC[useMediaSettingServer().state.layout] ||
+              VhallRTC[sessionStorage.getItem('layout')] ||
+              VhallRTC.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
           );
 
           await this.setBroadCastScreen();
         }
+        // console.log('VhallRTC', VhallRTC['CANVAS_ADAPTIVE_LAYOUT_TILED_MODE']);
       },
       // 自动上麦禁音条件更新
       updateAutoSpeak() {
@@ -641,35 +715,12 @@
               this.startPushStreamOnce = false;
               return;
             }
-            // 若上麦成功后发现设备不允许上麦，则进行下麦操作
-            let device_status = useMediaCheckServer().state.deviceInfo.device_status;
-            if (device_status == 2) {
-              this.speakOff();
-              return;
-            } else if (device_status == 0 && [2, 4].includes(this.joinInfo.role_name)) {
-              // 观众 嘉宾
-              let _flag = await this.mediaCheckServer.getMediaInputPermission({
-                isNeedBroadcast: this.isVideoPolling && this.mode != 6
-              });
-              if (!_flag) {
-                this.speakOff();
-                this.$message.warning(this.$t('interact.interact_1039'));
-                return;
-              }
-            }
-
-            console.log('[stream-local] vrtc_connect_success startPush');
-
-            // 上麦成功后，如果开启文档可见，把主画面置为小屏
-            if (useDocServer().state.switchStatus) {
-              useRoomBaseServer().setChangeElement('stream-list');
-            }
 
             if ([1, 4, '1', '4'].includes(this.joinInfo.role_name)) {
               // 轮询判断是否有互动实例
               await this.checkVRTCInstance();
               // 开始推流
-              this.startPush();
+              this.startPush({ source: 'vrtc_connect_success_role_1_4' });
             } else if (this.joinInfo.role_name == 2) {
               // 无延迟｜分组直播
               // 如果成功，销毁播放器
@@ -685,13 +736,19 @@
 
               // 轮询判断是否有互动实例
               await this.checkVRTCInstance();
-              this.startPush();
+              this.startPush({ source: 'vrtc_connect_success_role_2' });
             }
           }
         });
         // 下麦成功
-        this.micServer.$on('vrtc_disconnect_success', async () => {
-          await this.stopPush();
+        this.micServer.$on('vrtc_disconnect_success', async msg => {
+          if (this.joinInfo.role_name == 4) {
+            window.vhallReportForProduct?.toResultsReporting(110182, {
+              event_type: 'message',
+              ...msg
+            });
+          }
+          await this.stopPush({ type: 'vrtc_disconnect_success' });
 
           if (this.joinInfo.role_name == 2) {
             await this.interactiveServer.destroy();
@@ -725,6 +782,13 @@
             );
           }
         });
+
+        // micServe异常处理
+        this.micServer.$on('vrtc_exception_msg', msg => {
+          if (msg.type === 1039) {
+            this.$message.warning(this.$t('interact.interact_1039'));
+          }
+        });
         // 结束直播
         this.micServer.$on('live_over', async () => {
           // 如果开启分屏并且是主页面，不需要停止推流
@@ -747,7 +811,9 @@
           if (this.isWatch) {
             this.roomBaseServer.setChangeElement('');
           } else {
-            this.roomBaseServer.setChangeElement('stream-list');
+            if (!this.$route.query.assistantType) {
+              this.roomBaseServer.setChangeElement('stream-list');
+            }
           }
 
           if (![1, 3, 4].includes(parseInt(this.joinInfo.role_name))) {
@@ -758,7 +824,7 @@
         });
         // 分组继续讨论，初始化互动实例完成后，开始推流
         this.interactiveServer.$on('PROCEED_DISCUSSION', msg => {
-          this.startPush();
+          this.startPush({ source: 'PROCEED_DISCUSSION' });
         });
         useMsgServer().$onMsg('ROOM_MSG', async msg => {
           if (msg.data.type === 'vrtc_definition_set') {
@@ -781,10 +847,10 @@
             }
 
             // 由于结束直播导致的结束讨论
-            if (msg.data.over_live == 1) {
+            if (msg.data.over_type) {
               // 此处仅处理非主持人的角色
               if (this.joinInfo.role_name != 1) {
-                await this.stopPush();
+                await this.stopPush({ type: 'group_switch_end_stop' });
               }
               if (this.isWatch) {
                 this.roomBaseServer.setChangeElement('');
@@ -806,17 +872,27 @@
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
           this.$message.success(
-            this.$t('interact.interact_1012', { n: msg.data.nick_name, m: '主画面' })
+            this.$t('interact.interact_1012', {
+              n: msg.data.nick_name,
+              m: this.$t('interact.interact_1033')
+            })
           );
         });
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_speaker_switch', msg => {
+          if (this.joinInfo.role_name == 4) {
+            // 嘉宾被设为主讲人埋点
+            window.vhallReportForProduct?.toResultsReporting(110171, {
+              event_type: 'meassage',
+              ...msg
+            });
+          }
           // 开始直播的时候不监听这个  ----  进行服务端增加字段控制是否进行提示
           if (msg.data.is_start_live == 1) return;
           const m =
             this.roomBaseServer.state.watchInitData.webinar.mode == 6
-              ? '主画面'
+              ? this.$t('interact.interact_1033')
               : this.$t('interact.interact_1034');
           this.$message.success(
             this.$t('interact.interact_1012', {
@@ -883,17 +959,18 @@
             // 重新推流
             if (param.isRepublishMode) {
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 3 });
               } else {
-                this.isSpeakOn && (await this.startPush());
+                this.isSpeakOn &&
+                  (await this.startPush({ source: 'switchStreamType_isRepublishMode' }));
               }
             } else if (this.localSpeaker.streamId || this.isRecording) {
               await this.interactiveServer.unpublishStream(this.localSpeaker);
 
               if (isPolling) {
-                await this.videoStartPush();
+                await this.videoStartPush({ type: 4 });
               } else {
-                await this.startPush();
+                await this.startPush({ source: 'switchStreamType_2' });
               }
             }
           } else {
@@ -923,9 +1000,11 @@
               type: 'audio'
             })
             .catch(err => {
+              window.vhallReportForProduct?.toResultsReporting(110164, {
+                failed_reason: err
+              });
               console.error('切换失败', err);
             });
-          return;
         }
 
         // 无缝切换视频
@@ -936,9 +1015,11 @@
               type: 'video'
             })
             .catch(err => {
+              window.vhallReportForProduct?.toResultsReporting(110164, {
+                failed_reason: err
+              });
               console.error('切换失败', err);
             });
-          return;
         }
       },
       sleep(time = 1000) {
@@ -964,6 +1045,8 @@
       },
       // 用户下麦接口
       speakOff() {
+        // 用户下麦
+        window.vhallReportForProduct?.toStartReporting(170002, [170003, 170033, 110193, 110185]);
         return this.micServer.speakOff();
       },
       // 处理上麦失败
@@ -988,7 +1071,7 @@
           // 无推流权限
           await this.interactiveServer.destroy();
           await this.interactiveServer.init({ role: VhallRTC.ROLE_HOST });
-          await this.publishLocalStream();
+          await this.publishLocalStream('noPermission');
         } else if (err == 'startBroadCastError') {
           // 开启主屏失败
           console.log('开启主屏失败');
@@ -1009,7 +1092,7 @@
         }
       },
       // 开始推流
-      async startPush() {
+      async startPush(opt) {
         // 第三方推流直接开始直播
         if (useRoomBaseServer().state.isThirdStream && this.joinInfo.role_name == 1) {
           // 派发事件 此处会导致重复回调emitClickPublishComplate
@@ -1025,9 +1108,10 @@
         }
         try {
           // 创建本地流
-          await this.createLocalStream();
+          await this.createLocalStream(opt);
           // 推流
-          await this.publishLocalStream();
+          await this.publishLocalStream('startPush');
+
           // 实时获取网络状况
           this.getLevel();
 
@@ -1062,14 +1146,21 @@
         }
       },
       // 创建本地流
-      async createLocalStream() {
+      async createLocalStream(opt) {
         console.log('创建本地流', this.$domainStore.state.mediaSettingServer.videoType);
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
+          window.vhallReportForProduct?.toResultsReporting(110187, {
+            videoType: 'camera',
+            ...opt
+          });
           await this.interactiveServer
             .createLocalVideoStream({
               videoNode: `stream-${this.joinInfo.third_party_user_id}`
             })
             .catch(e => {
+              window.vhallReportForProduct?.toResultsReporting(110188, {
+                failed_reason: e
+              });
               if (e && e?.name == 'NotAllowed') {
                 return Promise.reject('NotAllowed');
               } else {
@@ -1083,20 +1174,33 @@
           if (!videoTracks) {
             throw 'getCanvasStreamError';
           }
+          window.vhallReportForProduct?.toResultsReporting(110187, {
+            videoType: 'img',
+            ...opt
+          });
           await this.interactiveServer
             .createLocalPhotoStream({
               videoNode: `stream-${this.joinInfo.third_party_user_id}`,
               videoTrack: videoTracks
             })
-            .catch(() => {
+            .catch(err => {
+              window.vhallReportForProduct?.toResultsReporting(110188, {
+                failed_reason: err
+              });
               return Promise.reject('createLocalPhotoStreamError');
             });
         }
       },
       // 推流
-      async publishLocalStream() {
+      async publishLocalStream(type) {
+        window.vhallReportForProduct?.toResultsReporting(110183, {
+          pubTyle: type
+        });
         await this.interactiveServer.publishStream().catch(e => {
           console.log('paltForm publishLocalStream failed....', e);
+          window.vhallReportForProduct?.toResultsReporting(110184, {
+            failed_reason: e
+          });
           if (e.code === '611007') {
             this.handleSpeakOnError('noPermission');
           } else {
@@ -1115,7 +1219,10 @@
       // 设置旁路布局
       async setBroadCastAdaptiveLayoutMode(layout) {
         const param = {
-          adaptiveLayoutMode: VhallRTC[sessionStorage.getItem('layout')] || layout
+          adaptiveLayoutMode:
+            VhallRTC[useMediaSettingServer().state.layout] ||
+            VhallRTC[sessionStorage.getItem('layout')] ||
+            layout
         };
         await this.interactiveServer.setBroadCastAdaptiveLayoutMode(param).catch(() => {
           return Promise.reject('setBroadCastAdaptiveLayoutModeError');
@@ -1158,10 +1265,16 @@
             // );
             resolve();
           }
+          window.vhallReportForProduct?.toResultsReporting(110193, {
+            ev_type: { ...options }
+          });
 
           this.interactiveServer
             .unpublishStream()
-            .then(() => {
+            .then(data => {
+              window.vhallReportForProduct?.toResultsReporting(110185, {
+                res: data
+              });
               clearInterval(this._audioLeveInterval);
               // 如果是主持人，并且是结束直播导致的停止推流，需要派发事件改变开始直播按钮状态
               if (this.joinInfo.role_name == 1 && options?.source === 'live_over') {
@@ -1172,6 +1285,9 @@
               resolve();
             })
             .catch(err => {
+              window.vhallReportForProduct?.toResultsReporting(110186, {
+                res: err
+              });
               reject(err);
             });
         });
@@ -1283,11 +1399,17 @@
         if (setMainScreen) {
           this.setMainScreen();
         }
+        window.vhallReportForProduct?.toStartReporting(110176, 110177);
         this.interactiveServer
           .setSpeaker({
             receive_account_id: accountId || this.joinInfo.third_party_user_id
           })
           .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110177, {
+              request_id: res?.request_id,
+              event_type: 'interface',
+              res
+            });
             console.log('setSpeaker success ::', res);
           })
           .catch(err => {

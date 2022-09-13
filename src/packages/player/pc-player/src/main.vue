@@ -24,7 +24,13 @@
         <!-- 背景图片 -->
         <div
           v-if="isShowPoster"
-          class="vmp-player-living-background"
+          :class="[
+            'vmp-player-living-background',
+            {
+              background_3: imageCropperMode == 3,
+              background_2: imageCropperMode == 2
+            }
+          ]"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         ></div>
         <!-- 暖场视频播放按钮 -->
@@ -286,10 +292,13 @@
 </template>
 <script>
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
-  import { computeRecordTime, isIE, windowVersion } from './js/utils';
+  import { computeRecordTime, windowVersion } from './js/utils';
   import playerMixins from './js/mixins';
   import controlEventPoint from '../src/components/control-event-point.vue';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, isIE, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import swfList from './js/swf-list.js';
+  const ossimg = '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
   export default {
     name: 'VmpPcPlayer',
     mixins: [playerMixins],
@@ -338,6 +347,7 @@
         marquee: {}, // 跑马灯
         water: {}, //水印
         agreement: false,
+        imageCropperMode: 1,
         playerOtherOptions: {
           barrage_button: 0,
           progress_bar: 0,
@@ -389,24 +399,43 @@
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
+        let webinarUrl = cover;
+        if (webinar.img_url) {
+          if (cropperImage(webinar.img_url)) {
+            webinarUrl = webinar.img_url;
+            this.handlerImageInfo(webinar.img_url);
+          } else {
+            webinarUrl = webinar.img_url + ossimg;
+          }
+        }
         if (this.warmUpVideoList.length) {
-          return warmup.warmup_img_url
-            ? warmup.warmup_img_url
-            : webinar.img_url
-            ? webinar.img_url
-            : cover;
+          if (warmup.warmup_img_url) {
+            if (cropperImage(warmup.warmup_img_url)) {
+              this.handlerImageInfo(warmup.warmup_img_url);
+              return warmup.warmup_img_url;
+            } else {
+              return warmup.warmup_img_url + ossimg;
+            }
+          } else {
+            return webinarUrl;
+          }
         } else {
-          return webinar.img_url || cover;
+          return webinarUrl;
         }
       },
       isShowContainer() {
-        return (
-          !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
-          (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
-            this.$domainStore.state.micServer.isSpeakOn ||
-            this.isLivingEnd) &&
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
-        );
+        if (this.isSubscribe && this.warmUpVideoList.length > 0) {
+          // 预约页，有暖场视频，一定初始化播放器； 解决无延迟直播开播之后，没有通过观看限制，暖场视频看不了的问题
+          return false;
+        } else {
+          return (
+            !this.$domainStore.state.interactiveServer.initInteractiveFailed &&
+            (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar == 1 ||
+              this.$domainStore.state.micServer.isSpeakOn ||
+              this.isLivingEnd) &&
+            this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1
+          );
+        }
       },
       isVisibleMiniElement() {
         // 添加插播桌面共享后，再添加插播桌面共享场景的处理
@@ -638,7 +667,12 @@
         });
       },
       handleAuthErrorCode(code, msg) {
-        let placeHolder = '';
+        let placeHolderInfo = {
+          placeHolder: '',
+          webinarId: '',
+          isSubject: false,
+          isWhiteCheck: false // 是否开启了白名单验证
+        };
         switch (code) {
           case 510008: // 未登录
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
@@ -656,25 +690,26 @@
             break;
           case 512531:
             // 邀请码
-            placeHolder =
+            placeHolderInfo.placeHolder =
               this.roomBaseServer.state.watchInitData.webinar.verify_tip ||
               this.$t('appointment.appointment_1024');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512528:
             // 密码
-            placeHolder = this.authText || this.$t('appointment.appointment_1022');
+            placeHolderInfo.placeHolder = this.authText || this.$t('appointment.appointment_1022');
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512532:
             //白名单
-            placeHolder = this.authText || this.$t('common.common_1006');
+            placeHolderInfo.placeHolder = this.authText || this.$t('common.common_1006');
+            placeHolderInfo.isWhiteCheck = true;
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolder)
+              boxEventOpitons(this.cuid, 'emitClickAuth', placeHolderInfo)
             );
             break;
           case 512523:
@@ -786,6 +821,12 @@
           window.location.reload();
         }
       },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        this.imageCropperMode = Number(obj.mode);
+        console.log(this.imageCropperMode, '???mode');
+      },
       // 判断是直播还是回放 活动状态
       getWebinerStatus(info) {
         if (info && info.autoPlay) {
@@ -841,6 +882,10 @@
       optionTypeInfo(type, id) {
         // 暖场视频或者试看
         const winVersion = windowVersion();
+        const ua = window.navigator.userAgent;
+        const swf = swfList.some(item => {
+          return ua.includes(item);
+        });
         // 直播
         this.playerServer.setType(type);
         if (type === 'live') {
@@ -855,16 +900,18 @@
           };
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         } else {
           this.vodOption.recordId = id;
           this.liveOption = {};
           if (isIE() && winVersion == 'win10') {
             this.liveOption.useSWF = false;
-          } else if (isIE() && winVersion == 'win7') {
+          } else if ((isIE() && winVersion == 'win7') || swf) {
             this.liveOption.useSWF = true;
+            this.vodOption.useSWF = true;
           }
         }
         if (this.isWarnPreview) {
@@ -1001,8 +1048,18 @@
         position: absolute;
         top: 0;
         left: 0;
+        background-position: center;
+        background-repeat: no-repeat;
         background-size: 100% 100%;
+        background-color: #1a1a1a;
         z-index: 8;
+        &.background_3 {
+          background-size: contain;
+        }
+        &.background_2 {
+          background-size: cover;
+          background-position: left top;
+        }
       }
       &-btn {
         position: absolute;

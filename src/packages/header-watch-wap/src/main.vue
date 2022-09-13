@@ -4,7 +4,11 @@
       <img class="img-box" :src="hostAvatar" @click="skipAction" srcset />
       {{ watchInitData.webinar.userinfo.nickname | overHidden(8) }}
     </span>
-    <span class="tool-box" :style="{ color: themeClass.pageStyle }">
+    <span class="tool-box">
+      <span class="rehearsalStatus" v-if="isRehearsal && isLiving">
+        <span class="dot"></span>
+        {{ $t('nav.nav_1055') }}
+      </span>
       <i class="vh-iconfont vh-line-house" @click="goUser"></i>
       <i
         class="vh-saas-iconfont vh-saas-line-public1"
@@ -51,9 +55,17 @@
       this.initUserLoginStatus();
 
       //设置品牌皮肤
-      this.setSkinInfo(this.skinInfo);
+      // this.setSkinInfo(this.skinInfo);
     },
     computed: {
+      // 直播中
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       /**
        * 是否显示头部
        */
@@ -151,7 +163,7 @@
           });
       },
       goUser() {
-        window.location.href = `//${process.env.VUE_APP_WEB_BASE}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
+        window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/user/home/${this.watchInitData.webinar.userinfo.user_id}`;
       },
       showPublic() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenOfficical'));
@@ -187,6 +199,7 @@
               console.log('attention-------->', res);
               this.$toast(this.$t('nav.nav_1030'));
               this.attentionStatus = 1;
+              window.vhallReportForWatch?.report(170019);
             });
         }
       }
@@ -197,12 +210,14 @@
 <style lang="less">
   .vh-header-box {
     height: 71px;
-    background: rgba(255, 255, 255, 1);
+    background: var(--theme-header-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
+
     .host-user-info {
+      color: var(--theme-header-font-color);
       .ellipsis();
       font-size: 28px;
       line-height: 71px;
@@ -223,9 +238,27 @@
     .tool-box {
       display: flex;
       justify-content: space-between;
+      color: var(--theme-header-icon-color);
       i {
         margin-left: 37px;
         font-size: 30px;
+      }
+      .rehearsalStatus {
+        color: var(--theme-header-icon-rehearsal-color);
+        font-weight: 400;
+        font-size: 24px;
+        line-height: 24px;
+        margin-right: -8px;
+        display: flex;
+        align-items: center;
+        .dot {
+          margin-right: 6px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background-color: var(--theme-header-icon-rehearsal-color);
+          content: '';
+        }
       }
     }
     .icon-default {

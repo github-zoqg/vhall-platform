@@ -260,6 +260,8 @@
                   : this.$t('webinar.webinar_1041', { n: `￥${this.fee}` });
             } else if (this.verify == 4) {
               ret = this.handleTypeText();
+            } else if (this.verify == 5) {
+              ret = this.handleTypeText();
             } else if (this.verify == 6) {
               ret = this.$t('appointment.appointment_1011');
               this.addText =
@@ -282,8 +284,13 @@
         }
       },
       authCheck() {
-        console.log(55555);
         this.$emit('authFetch');
+        if (this.type === 2) {
+          // 数据埋点
+          window.vhallReportForWatch?.report(170028, {
+            verify: this.verify
+          });
+        }
       },
       payMore() {
         this.$emit('payMore', { type: 3 });
@@ -299,7 +306,7 @@
     position: absolute;
     bottom: 0px;
     left: 0px;
-    background: rgba(26, 26, 26, 0.6);
+    background: var(--theme-subscribe-tab-bg);
     overflow: hidden;
     width: 100%;
     height: 70px;
@@ -313,7 +320,7 @@
       font-size: 16px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: #f7f7f7;
+      color: var(--theme-subscribe-tab-font);
       span {
         vertical-align: top;
         display: inline-block;
@@ -324,7 +331,6 @@
         font-size: 36px !important;
         font-family: DINAlternate-Bold, DINAlternate;
         font-weight: bold;
-        color: #f7f7f7;
         margin: 0px 4px 0px 12px;
         vertical-align: top;
       }
@@ -346,11 +352,11 @@
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #ffffff;
+        color: var(--theme-subscribe-tab-font);
         line-height: 70px;
       }
       .sub-detail .num {
-        color: #fb3a32;
+        color: var(--theme-color);
       }
       .sub-auth {
         vertical-align: top;
@@ -358,7 +364,7 @@
         line-height: 36px;
         min-width: 100px;
         height: 36px;
-        background: #fb3a32;
+        background: var(--theme-color);
         border-radius: 18px;
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
@@ -372,7 +378,9 @@
         padding: 0px 18px;
       }
       .disableClick {
-        background: rgba(251, 58, 50, 0.6);
+        background: var(--theme-color);
+        opacity: 0.6;
+        filter: alpha(opacity=60); //filter 过滤器   兼容IE678
         &:hover {
           cursor: auto;
         }
@@ -387,7 +395,7 @@
         font-size: 16px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #f7f7f7;
+        color: var(--theme-subscribe-tab-font);
       }
       .end-btn {
         width: 160px;

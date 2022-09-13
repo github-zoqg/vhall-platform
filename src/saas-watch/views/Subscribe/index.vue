@@ -14,12 +14,14 @@
   </div>
 </template>
 <script>
-  import { Domain, useRoomBaseServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
-  import { logRoomInitFailed } from '@/app-shared/utils/report';
+  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
+  import skins from '@/app-shared/skins/watch';
+  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   export default {
     name: 'vmpSubscribe',
     data() {
@@ -75,7 +77,7 @@
           } catch (e) {
             console.log('嵌入', e);
           }
-          await this.initReceiveLive(this.clientType);
+          const domain = await this.initReceiveLive(this.clientType);
           await subscribeState();
           if (this.clientType != 'embed') {
             await this.initCheckAuth('subscribe'); // 必须先setToken (绑定qq,wechat)
@@ -83,6 +85,9 @@
           document.title = roomBaseServer.state.languages.curLang.subject;
           let lang = roomBaseServer.state.languages.lang;
           this.$i18n.locale = lang.type;
+
+          this.setPageConfig();
+
           console.log('%c---初始化直播房间 完成', 'color:blue');
           this.state = 1;
           // 是否跳转观看页
@@ -96,6 +101,17 @@
             window.sessionStorage.removeItem('recordIds');
             this.goWatchPage(this.clientType);
           }
+          // 观看端上报
+          domain.initVhallReportForWatch({
+            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
+            pf: 7 // 7：PC 10: wap
+          });
+          const commonReportForProductParams = generateWatchReportCommonParams(
+            roomBaseServer.state.watchInitData,
+            new useUserServer().state.userInfo,
+            this.$route.query.shareId || this.$route.query.share_id
+          );
+          window.vhallReportForWatch?.injectCommonParams(commonReportForProductParams);
         } catch (err) {
           //上报日志
           logRoomInitFailed({ error: err });
@@ -121,7 +137,9 @@
           // 日志上报的参数
           devLogOptions: {
             namespace: 'saas', //业务线
-            env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
             method: 'post' // 上报方式
           }
         });
@@ -134,6 +152,10 @@
         window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${pageUrl}/watch/${this.$route.params.id}${window.location.search}`;
       },
       handleErrorCode(err) {
+        let origin =
+          process.env.NODE_ENV === 'production'
+            ? window.location.origin
+            : 'https://t-webinar.e.vhall.com';
         switch (err.code) {
           case 512534:
             window.location.href = err.data.url; // 第三方k值校验失败 跳转指定地址
@@ -150,9 +172,9 @@
                 _embedQuery.indexOf('record_id=') > -1
                   ? _embedQuery.replace('record_id=', 'rid=')
                   : _embedQuery;
-              window.location.href = `${window.location.origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
+              window.location.href = `${origin}/webinar/inituser/${this.$route.params.id}${_embedQuery}`;
             } else {
-              window.location.href = `${window.location.origin}/${this.$route.params.id}`;
+              window.location.href = `${origin}/${this.$route.params.id}`;
             }
             break;
           case 512002:
@@ -198,6 +220,65 @@
             this.errorData.errorPageTitle = 'embed_verify';
             this.errorData.errorPageText = this.$tec(err.code) || err.msg;
         }
+      },
+      setPageConfig() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+
+        const styleMap = {
+          1: 'default', // 传统风格
+          2: 'simple', // 简洁风格
+          3: 'fashion' // 时尚风格
+        };
+        let skin_json_pc = {
+          style: 1,
+          backGroundColor: 1,
+          chatLayout: 1 // 聊天布局 1 上下 2 左右
+        };
+
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
+        }
+
+        // if (skin_json_pc?.chatLayout == 2) {
+        //   // 设置聊天组件为左右风格
+        //   updatePageNode('comChat', 'component', 'VmpFashionChat');
+        // }
+
+        // 设置主题，如果没有就用传统风格白色
+        const style = styleMap[skin_json_pc?.style || 1];
+        const theme = themeMap[skin_json_pc?.backGroundColor || 1];
+
+        console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
+
+        skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        this.drawBody(theme, skin_json_pc);
+
+        // 挂载到window方便调试
+        window.skins = skins;
+      },
+      drawBody(theme, skin) {
+        if (skin?.pcBackground) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
+          document.body.style.backgroundSize = 'cover';
+        } else {
+          if (theme == 'black') {
+            document.body.style.background = `rgb(26, 26, 26)`;
+          } else {
+            document.body.style.backgroundImage = `url(${
+              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-watch/theme/skins/' +
+              theme +
+              '.png'
+            })`;
+            document.body.style.backgroundSize = 'cover';
+          }
+        }
       }
     }
   };
@@ -208,7 +289,7 @@
     .vmp-basic-container {
       width: 100%;
       height: 100%;
-      background: #1a1a1a;
+      // background: #1a1a1a;
       overflow-y: auto;
       font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
         '微软雅黑', Arial, sans-serif;

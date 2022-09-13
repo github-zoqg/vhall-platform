@@ -25,7 +25,11 @@ import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
+// 默认主题
+import skins from '@/app-shared/skins/wap';
+skins.setTheme(skins.themes.theme_main_white);
 
+dayjs.extend(window.dayjs_plugin_duration);
 Vue.config.productionTip = false;
 if (process.env.NODE_ENV !== 'production') {
   Vue.config.devtools = true;

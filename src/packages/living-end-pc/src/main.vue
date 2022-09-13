@@ -5,7 +5,8 @@
       {
         'vmp-living-end-embedFull': isEmbedVideo,
         'vmp-living-end-embed': isEmbed && !isEmbedVideo
-      }
+      },
+      `ending_bg_${imageCropperMode}`
     ]"
     v-if="isLivingEnd"
     :style="`backgroundImage: url('${webinarsBgImg}')`"
@@ -14,19 +15,34 @@
       <div class="end_img">
         <img src="../src/img/liveEnd.png" alt="" />
       </div>
-      <h1>{{ $t('player.player_1017') }}</h1>
+      <h1>{{ isRehearsal ? $t('player.player_1027') : $t('player.player_1017') }}</h1>
       <p v-if="isEmbedVideo">
         <i class="vh-saas-iconfont vh-saas-line-heat"></i>
         {{ hotNum | formatHotNum }}
       </p>
     </div>
+    <section class="vmp-living-end-to" v-if="isShowLiveStartNotice">
+      <section class="vmp-living-end-to-start">
+        <section class="vmp-living-end-cover"></section>
+        <span>{{ $t('appointment.appointment_1033') }}</span>
+        <button class="vmp-living-end__btn" @click="reloadPage">
+          {{ $t('player.player_1013') }}
+        </button>
+      </section>
+    </section>
   </div>
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpLivingEnd',
     computed: {
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      },
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/images/mobile/video_default_nologo.png';
         const { webinar } = this.roomBaseServer.state.watchInitData;
@@ -53,7 +69,9 @@
     },
     data() {
       return {
-        isLivingEnd: false
+        isShowLiveStartNotice: false,
+        isLivingEnd: false,
+        imageCropperMode: 1
       };
     },
     beforeCreate() {
@@ -64,19 +82,36 @@
       if (this.webinarsType == 3) {
         this.isLivingEnd = true;
       }
+      this.handlerImageInfo();
     },
     mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
+        // live_start 开始直播
+        if (msg.data.type == 'live_start' && this.isRehearsal) {
+          this.isShowLiveStartNotice = true;
+        }
         // live_over 结束直播
         if (msg.data.type == 'live_over') {
           this.isLivingEnd = true;
         }
         if (msg.data.type == 'group_switch_end') {
-          if (msg.data.over_live) {
+          if (msg.data.over_type) {
             this.isLivingEnd = true;
           }
         }
       });
+    },
+    methods: {
+      // 解析图片地址
+      handlerImageInfo() {
+        if (cropperImage(this.webinarsBgImg)) {
+          let obj = parseImgOssQueryString(this.webinarsBgImg);
+          this.imageCropperMode = Number(obj.mode);
+        }
+      },
+      reloadPage() {
+        location.reload();
+      }
     }
   };
 </script>
@@ -90,6 +125,13 @@
     z-index: 11;
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    &.ending_bg_2 {
+      background-size: cover;
+      background-position: left top;
+    }
+    &.ending_bg_3 {
+      background-size: contain;
+    }
     &-embed {
       width: calc(100% - 360px);
       height: calc(100% - 56px);
@@ -133,6 +175,60 @@
       color: #999;
       padding-left: 38px;
       font-weight: 400;
+    }
+    &-to {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 35;
+      &-start {
+        width: 400px;
+        height: 260px;
+        background: #ffffff;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        font-weight: 400;
+        color: #333333;
+        line-height: 20px;
+        text-align: center;
+        padding-top: 54px;
+        box-sizing: border-box;
+        margin: 20vh auto 0px auto;
+        .vmp-living-end-cover {
+          display: block;
+          width: 80px;
+          height: 80px;
+          margin: 0px auto;
+          margin-bottom: 10px;
+          background: url('./img/live_start.png') no-repeat;
+          background-size: 100%;
+          background-position: center;
+        }
+        span {
+          display: block;
+          text-align: center;
+          margin-bottom: 18px;
+          height: 20px;
+          line-height: 20px;
+        }
+        .vmp-living-end__btn {
+          width: 160px;
+          height: 40px;
+          background: #fb3a32;
+          border-radius: 20px;
+          font-size: 14px;
+          font-family: PingFangSC-Regular, PingFang SC;
+          font-weight: 400;
+          color: #ffffff;
+          line-height: 40px;
+          border: none;
+          outline: none;
+        }
+      }
     }
   }
 </style>

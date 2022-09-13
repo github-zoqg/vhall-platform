@@ -30,6 +30,12 @@
         questionnaireId: '' // 当前问卷Id
       };
     },
+    computed: {
+      isEmbed() {
+        // 是不是嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      }
+    },
     beforeCreate() {
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
       this.msgServer = useMsgServer();
@@ -58,7 +64,7 @@
           return;
         }
         // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-        this.questionnaireServer.init({ mode: 'watch' });
+        this.questionnaireServer.init({ mode: 'watch', showVhPrivacy: !this.isEmbed });
         this.questionnaireServer.checkAnswerStatus(questionnaireId).then(res => {
           if (res.data === false) {
             this.$toast(this.$t('form.form_1087'));
@@ -79,7 +85,7 @@
           async msg => {
             if (window.VHall_Questionnaire_Service) {
               // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
-              this.questionnaireServer.init({ mode: 'watch' });
+              this.questionnaireServer.init({ mode: 'watch', showVhPrivacy: !this.isEmbed });
             }
             useChatServer().addChatToList({
               nickname: msg.nick_name,
@@ -152,47 +158,47 @@
       }
       .el-checkbox__input.is-checked .el-checkbox__inner,
       .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__inner:hover {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__input.is-checked + .el-checkbox__label {
         color: #1a1a1a;
       }
       .el-checkbox__input.is-focus .el-checkbox__inner {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-checkbox__input.is-checked.is-focus .el-checkbox__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       /*单选选中效果重置*/
       .el-radio__input.is-checked .el-radio__inner {
-        background-color: #fb3a32;
-        border-color: #fb3a32;
+        background-color: var(--theme-component-qa);
+        border-color: var(--theme-component-qa);
       }
       .el-radio__inner:hover {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-radio__input.is-focus .el-radio__inner {
-        border-color: #fb3a32;
+        border-color: var(--theme-component-qa);
       }
       .el-radio__input.is-checked + .el-radio__label {
         color: #1a1a1a;
       }
       /* 日期选择效果重置*/
       .el-date-table td.today span {
-        color: #fb3a32;
+        color: var(--theme-component-qa);
         font-weight: normal;
       }
       .el-date-table td.available:hover {
-        color: #fb3a32;
+        color: var(--theme-component-qa);
       }
       .el-date-table td.current:not(.disabled) span {
         color: #fff;
-        background-color: #fb3a32;
+        background-color: var(--theme-component-qa);
       }
       .q-wrap {
         padding-bottom: 400px;
@@ -200,6 +206,11 @@
           height: 125px;
           overflow: hidden;
         }
+      }
+      .q-btns span {
+        border: 1px solid var(--theme-component-qa) !important;
+        background-color: var(--theme-component-qa) !important;
+        color: #fff !important;
       }
     }
   }
@@ -254,8 +265,8 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    box-shadow: 0px 0px 0px 9px #ff0005;
-    background: #ff0005;
+    box-shadow: 0px 0px 0px 9px var(--theme-component-qa) !important;
+    background: var(--theme-component-qa) !important;
   }
   .question-box {
     position: fixed;

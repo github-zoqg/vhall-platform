@@ -71,7 +71,8 @@ export default {
     player_1023: 'Failed to adjust the playback time',
     player_1024: 'Failed to set the time. Please try again later',
     player_1025: 'normal',
-    player_1026: 'replaying'
+    player_1026: 'replaying',
+    player_1027: 'There is no rehearsal now, please come again next time'
   },
   appointment: {
     appointment_1001: 'Whitelist verification',
@@ -106,7 +107,8 @@ export default {
     appointment_1029: 'S',
     appointment_1030: 'The event organizer set up a trial',
     appointment_1031: 'Please be patient',
-    appointment_1032: 'Whitelist'
+    appointment_1032: 'Whitelist',
+    appointment_1033: 'The rehearsal has started, please watch it live'
   },
   nav: {
     nav_1001: 'Sponsor',
@@ -129,7 +131,7 @@ export default {
     nav_1018: 'QQ',
     nav_1019: 'Scan on WeChat',
     nav_1020: 'Scan on WeChat to follow the official account',
-    nav_1021: 'Long press the QR Code',
+    nav_1021: 'Long press',
     nav_1022: 'You can share the activity to friends or WeChat Moments',
     nav_1023: 'Get and forward your own exclusive invitation card',
     nav_1024: 'Copy successfully',
@@ -139,7 +141,7 @@ export default {
     nav_1028: 'Withdrawal',
     nav_1029: 'Unsubscribe',
     nav_1030: 'Followed',
-    nav_1031: 'Long press and save',
+    nav_1031: 'Long press',
     nav_1032: 'Top Inviters',
     nav_1033: 'Top Spenders',
     nav_1034: 'Rules',
@@ -160,7 +162,10 @@ export default {
     nav_1049: 'Place',
     nav_1050: "The host hasn't opened the invitation yet",
     nav_1051: 'Alipay',
-    nav_1052: 'Copy failed'
+    nav_1052: 'Copy failed',
+    nav_1053: 'Sponsor',
+    nav_1054: 'Share the rehearsal viewing address',
+    nav_1055: 'in rehearsal'
   },
   login: {
     login_1001: 'Account login',
@@ -349,7 +354,8 @@ export default {
     chat_1094: 'Chat only',
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
-    chat_1097: 'Chat only off'
+    chat_1097: 'Chat only off',
+    chat_1098: 'Click for details'
   },
   form: {
     form_1001: 'Name',
@@ -442,7 +448,9 @@ export default {
     form_1085: 'address',
     form_1086: '',
     form_1087: 'Submitted successfully, thank you for your participation',
-    form_1088: 'Submitted successfully'
+    form_1088: 'Submitted successfully',
+    form_1089: 'Fill in',
+    form_1090: 'Filled'
   },
   menu: {
     menu_1001: 'Doc',
@@ -484,7 +492,7 @@ export default {
     interact_tools_1020: 'List of winners',
     interact_tools_1021: 'Lottery is in progress',
     interact_tools_1022: 'Unfortunately, you did not win a prize!',
-    interact_tools_1023: 'Congratulations on your winning!',
+    interact_tools_1023: 'Congratulations!',
     interact_tools_1024: 'Sign in',
     interact_tools_1025: 'Host initiates sign-in...',
     interact_tools_1026: 'Sign in now',
@@ -523,9 +531,9 @@ export default {
     interact_tools_1057: 'In progress',
     interact_tools_1058: 'Free',
     interact_tools_1059: 'Coffee',
-    interact_tools_1060: 'Like',
+    interact_tools_1060: 'Love',
     interact_tools_1061: 'Applaud',
-    interact_tools_1062: 'Flowers',
+    interact_tools_1062: 'Rose',
     interact_tools_1063: 'Successfully presented',
     interact_tools_1064: 'Please choose a gift',
     interact_tools_1065: 'Send in your password {n} and enter the lottery',
@@ -548,7 +556,11 @@ export default {
     interact_tools_1082: 'Copy password',
     interact_tools_1083: 'View the detail',
     interact_tools_1085: 'TOP 10 list',
-    interact_tools_1086: 'Notice'
+    interact_tools_1086: 'Notice',
+    interact_tools_1087: 'Rocket',
+    interact_tools_1088: 'Aircraft',
+    interact_tools_1089: 'Salute',
+    interact_tools_1090: 'Car'
   },
   setting: {
     setting_1002: 'View settings',
@@ -791,7 +803,7 @@ export default {
     interact_1030: '{n} microphone off',
     interact_1031: '{n} invites you to open the microphone',
     interact_1032: '',
-    interact_1033: '主画面',
+    interact_1033: 'home screen',
     interact_1034: 'presenter',
     interact_1035: 'Opposite party network exception',
     interact_1036:
@@ -804,7 +816,7 @@ export default {
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
-    interact_1041: 'Apply for video interaction'
+    interact_1041: 'Apply for video interaction'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -834,7 +846,8 @@ export default {
     doc_1025: '',
     doc_1026: '',
     doc_1027: '',
-    doc_1028: 'Cancel Move'
+    doc_1028: 'Cancel Move',
+    doc_1029: ''
   },
   webinar: {
     webinar_1001: 'Close',
@@ -919,5 +932,12 @@ export default {
     other_1018: 'Refuse',
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+  },
+  privacy: {
+    privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
+    privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
+    privacy_1003: 'VHALL User Protection Agreement',
+    privacy_1004: 'VHALL Privacy Policy',
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
   }
 };

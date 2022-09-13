@@ -275,6 +275,10 @@
         const inputValue = this.trimPlaceHolder('reply');
         //判断是否有输入内容，或者上传图片
         if ((!inputValue || (inputValue && !inputValue.trim())) && !this.imgUrls.length) {
+          if (this.$route.query.assistantType) {
+            //如果是客户端嵌入直接return
+            return;
+          }
           return this.$message.warning(this.$t('chat.chat_1009'));
         }
         const curmsg = useChatServer().createCurMsg();
@@ -316,6 +320,10 @@
       },
       /** 发送聊天消息节流 */
       sendMsgThrottle() {
+        // 数据埋点
+        window.vhallReportForWatch?.report(170026, {
+          is_empty: this.inputValue.trim() ? 0 : 1
+        });
         //如果没有登录，则不能发消息
         if (this.chatLoginStatus) {
           return;
@@ -448,7 +456,7 @@
   .vmp-chat-input {
     @bg-dark-normal: #1a1a1a;
     @font-dark-normal: #e6e6e6;
-    @font-dark-second: #666;
+    @font-dark-second: var(--chat-font-color-msg-nickname);
     // 错误提示字体颜色
     @font-error: #fb3a32;
     // 链接字体颜色
@@ -463,11 +471,11 @@
         width: 264px;
       }
       flex: 1;
-      background-color: @bg-dark-normal;
+      background-color: var(--chat-background-color-input);
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--chat-font-color-input);
       line-height: 20px;
       padding: 10px 12px;
       text-align: left;
@@ -483,6 +491,7 @@
         min-height: 20px;
       }
       .textarea-box__textarea {
+        color: var(--chat-font-color-input);
         &::-webkit-input-placeholder {
           color: @font-dark-second;
         }
@@ -502,7 +511,7 @@
         position: absolute;
         bottom: 9px;
         right: 14px;
-        background-color: @bg-dark-normal;
+
         .textarea-show-limit__current-count {
           color: @font-link;
           &.limited {
@@ -510,7 +519,7 @@
           }
         }
         .textarea-show-limit__total {
-          color: @font-dark-normal;
+          color: var(--header-font-color-regular);
         }
       }
     }
@@ -520,11 +529,11 @@
       &.is-watch {
         width: 264px;
       }
-      background-color: @bg-dark-normal;
+      background-color: var(--chat-background-color-input);
       font-size: 14px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
-      color: @font-dark-normal;
+      color: var(--chat-font-color-msg-nickname);
       line-height: 20px;
       padding: 10px 12px;
       text-align: left;
@@ -543,7 +552,7 @@
       width: 40px;
       height: 40px;
       border-radius: 20px;
-      background-color: #1a1a1a;
+      background-color: var(--chat-background-color-input);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -551,7 +560,7 @@
       margin-left: 8px;
       .vh-line-send {
         font-size: 18px;
-        color: #e6e6e6;
+        color: var(--chat-font-color-msg-nickname);
       }
       &.disable {
         cursor: default;

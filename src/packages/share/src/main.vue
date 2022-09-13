@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-share">
     <el-dialog
-      :title="$t('nav.nav_1013')"
+      :title="isRehearsal ? $t('nav.nav_1054') : $t('nav.nav_1013')"
       :visible.sync="shareVisible"
       :close-on-click-modal="true"
       :modal-append-to-body="true"
@@ -60,6 +60,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
+  import { getUrl } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpShare',
     data() {
@@ -70,6 +71,7 @@
         shareUrl: '',
         introduceText: this.$t('nav.nav_1022'),
         isInviteShare: false,
+        isSubjectShare: false,
         isWatchInvite: false
       };
     },
@@ -79,10 +81,23 @@
     created() {
       this.roomBaseState = this.roomBaseServer.state;
     },
+    computed: {
+      // 是否是彩排
+      isRehearsal() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.live_type == 2;
+      }
+    },
     methods: {
       // 事件驱动打开分享弹窗
-      openShareDialog() {
+      openShareDialog(id) {
+        this.watchWebUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.$route.params.id}`;
         this.shareVisible = true;
+        if (id && this.isSubjectShare) {
+          this.watchWebUrl = `${window.location.protocol}${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${id}`;
+        }
+        if (this.isRehearsal) {
+          this.watchWebUrl = getUrl(this.watchWebUrl, { rehearsal: 1 });
+        }
         if (!this.isInviteShare) return; //发起端不用判断是否开启邀请卡
         if (this.roomBaseState.inviteCard.status == '1') {
           this.isWatchInvite = true;
@@ -105,56 +120,75 @@
           this.openInviteDialog();
           this.introduceText = this.$t('nav.nav_1023');
         }
+        // 上报分享
+        const shareChannelArr = [0, 3, 2, 1, 4]; // 0:复制链接、1:微博、2:QQ、3:微信、4:邀请卡
+        window.vhallReportForWatch?.report(170020, {
+          share_channel: shareChannelArr[index]
+        });
       },
       // 打开微信弹窗 - 3
       openWeixinDialog() {
         this.shareOtherVisible = true;
         const shareId = `${this.roomBaseState.watchInitData.share_id}-3`;
-        const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
+        let url = this.isSubjectShare
+          ? this.watchWebUrl
+          : getUrl(this.watchWebUrl, { shareId: shareId });
         this.shareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
       },
       // 打开qq分享 - 2
       openQqDialog() {
-        const p = {
-          /* 获取URL，可加上来自分享到QQ标识，方便统计 */
-          url: `${this.watchWebUrl}?shareId=${encodeURIComponent(
-            this.roomBaseState.watchInitData.share_id + '-2'
-          )}`,
-          desc: '',
-          /* 分享标题(可选) */
-          title: this.$t('nav.nav_1026'),
-          /* 分享摘要(可选) */
-          summary: this.$t('nav.nav_1025'),
-          /* 分享图片(可选) */
-          pics: '',
-          /* 分享来源(可选) 如：QQ分享 */
-          site: '',
-          style: '201',
-          width: 32,
-          height: 32
-        };
-        const s = [];
-        for (const i in p) {
-          s.push(i + '=' + encodeURIComponent(p[i] || ''));
+        if (this.isSubjectShare) {
+          let url = `//connect.qq.com/widget/shareqq/index.html?url=${this.watchWebUrl}`;
+          window.open(url, '_blank');
+        } else {
+          let urlStr = getUrl(this.watchWebUrl, {
+            shareId: this.roomBaseState.watchInitData.share_id + '-2'
+          });
+
+          const p = {
+            /* 获取URL，可加上来自分享到QQ标识，方便统计 */
+            url: urlStr,
+            desc: '',
+            /* 分享标题(可选) */
+            title: this.$t('nav.nav_1026'),
+            /* 分享摘要(可选) */
+            summary: this.$t('nav.nav_1025'),
+            /* 分享图片(可选) */
+            pics: '',
+            /* 分享来源(可选) 如：QQ分享 */
+            site: '',
+            style: '201',
+            width: 32,
+            height: 32
+          };
+          const s = [];
+          for (const i in p) {
+            s.push(i + '=' + encodeURIComponent(p[i] || ''));
+          }
+          const url = 'http://connect.qq.com/widget/shareqq/index.html?' + s.join('&');
+          window.open(url);
         }
-        const url = 'http://connect.qq.com/widget/shareqq/index.html?' + s.join('&');
-        window.open(url);
       },
       // 打开微博 - 1
       openWeiboDialog() {
-        const shareId = `${this.roomBaseState.watchInitData.share_id}-1`;
-        const url = `${this.watchWebUrl}?shareId=${encodeURIComponent(shareId)}`;
-        const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
-        const p = {
-          url: weiboShareUrl,
-          title: this.$t('nav.nav_1027')
-        };
-        const s = [];
-        for (const i in p) {
-          s.push(i + '=' + encodeURIComponent(p[i] || ''));
+        if (this.isSubjectShare) {
+          let url = `http://service.weibo.com/share/share.php?url=${this.watchWebUrl}`;
+          window.open(url, '_blank');
+        } else {
+          const shareId = `${this.roomBaseState.watchInitData.share_id}-1`;
+          let url = getUrl(this.watchWebUrl, { shareId: shareId });
+          const weiboShareUrl = `https://aliqr.e.vhall.com/qr.png?s=7&t=${url}`;
+          const p = {
+            url: weiboShareUrl,
+            title: this.$t('nav.nav_1027')
+          };
+          const s = [];
+          for (const i in p) {
+            s.push(i + '=' + encodeURIComponent(p[i] || ''));
+          }
+          const weiBourl = 'http://service.weibo.com/share/share.php?' + s.join('&');
+          window.open(weiBourl);
         }
-        const weiBourl = 'http://service.weibo.com/share/share.php?' + s.join('&');
-        window.open(weiBourl);
       },
       // 打开邀请卡
       openInviteDialog() {
@@ -180,6 +214,10 @@
           showClose: true,
           type: 'success',
           customClass: 'zdy-info-box'
+        });
+        // 上报分享
+        window.vhallReportForWatch?.report(170020, {
+          share_channel: 0
         });
       }
     }

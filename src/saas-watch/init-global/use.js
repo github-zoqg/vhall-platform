@@ -1,8 +1,7 @@
 import Vue from 'vue';
-// element-ui
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-import '../assets/icon-font/iconfont.css';
+
+//字体图标样式
+// import '../assets/icon-font/iconfont.css';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -28,6 +27,7 @@ import VmpBasicCenterMain from '@/packages/basic-center-main';
 import VmpShare from '@/packages/share'; // 观看端分享
 import VmpOfficialPc from '@/packages/official-module/official-pc'; //公众号弹窗
 import VmpWatchAuth from '@/packages/watch-auth'; // 观看端公权限验证
+import VmpPrivacyCompliance from '@/packages/privacy-compliance'; // 隐私合规
 //观看端成员列表
 import VmpMemberList from '@/packages/member-list';
 //观看端私聊
@@ -48,7 +48,6 @@ import VmpCustomMenu from '@/packages/custom-menu';
 import VmpRecommend from '@/packages/recommend';
 import VmpPcMediaSetting from '@/packages/media-setting';
 import VmpLivingEnd from '@/packages/living-end-pc';
-import 'overlayscrollbars/css/OverlayScrollbars.css';
 import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';
@@ -78,8 +77,16 @@ import VmpCameraCheck from '@/packages/camera-check/index';
 
 import VmpViewRestriction from '@/packages/view-restriction/index';
 
+// 专题预览页
+import VmpSubjectBody from '@/packages/subject-body/index';
+import VmpSubjectHeader from '@/packages/subject-header/index';
+
+// ------------------------------【时尚风格】引入组件------start----------
+import VmpFashionChat from '@/packages/fashion-style/chat-fashion';
+// ------------------------------【时尚风格】引入组件------end----------
+
 // 全局注册组件
-Vue.use(ElementUI);
+// Vue.use(ElementUI);
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
 Vue.use(VmpWatchAsideMenu);
@@ -133,6 +140,10 @@ Vue.use(VmpSubscribeBody);
 Vue.use(VmpQa);
 Vue.use(VmpQuestionnaireWatch);
 
+// 专题
+Vue.use(VmpSubjectBody);
+Vue.use(VmpSubjectHeader);
+
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpStreamDesktopScreen);
@@ -140,3 +151,8 @@ Vue.use(VmpInsertStream);
 Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
+Vue.use(VmpPrivacyCompliance);
+
+// ------------------------------【时尚风格】注册组件------start----------
+Vue.use(VmpFashionChat);
+// ------------------------------【时尚风格】注册组件------end----------

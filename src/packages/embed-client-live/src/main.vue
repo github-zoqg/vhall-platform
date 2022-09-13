@@ -2,8 +2,12 @@
   <div class="publish-wrap">
     <div v-if="roomStatus.show" class="vh-embed-live">
       <!-- 聊天 -->
-      <vmp-chat v-if="componentName == 'Chat'"></vmp-chat>
-      <div v-if="componentName == 'Doc'" class="embed-doc-box">
+      <vmp-air-container
+        v-if="componentName == 'Chat'"
+        :cuid="childrenCom[2]"
+        :oneself="true"
+      ></vmp-air-container>
+      <div v-if="componentName == 'Doc'" class="embed-doc-box" style="height: 100%">
         <!-- 文档 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
         <!-- 文档列表 -->
@@ -11,18 +15,36 @@
       </div>
       <div v-if="componentName == 'Tools'" class="h100">
         <!-- 问卷 -->
-        <vmp-questionnaire
-          ref="questionnaire"
-          v-show="tool_component_name == 'questionnaire'"
-        ></vmp-questionnaire>
+        <div v-show="tool_component_name == 'questionnaire'">
+          <vmp-questionnaire ref="questionnaire"></vmp-questionnaire>
+        </div>
+
         <!-- 抽奖 -->
-        <VmpLotteryLive ref="lottery" v-show="tool_component_name == 'lottery'" />
+        <div v-show="tool_component_name == 'lottery'">
+          <vmp-air-container cref="lottery" :cuid="childrenCom[4]" :oneself="true" />
+        </div>
+
         <!-- 问答 -->
-        <vmp-qa ref="qa" v-show="tool_component_name == 'qa'"></vmp-qa>
+        <div v-show="tool_component_name == 'qa'">
+          <vmp-air-container cref="qa" :cuid="childrenCom[3]" :oneself="true"></vmp-air-container>
+        </div>
         <!-- 签到 -->
-        <vmp-sign-live ref="signLive" v-show="tool_component_name == 'signLive'"></vmp-sign-live>
+        <div v-show="tool_component_name == 'signLive'">
+          <vmp-air-container cref="signLive" :cuid="childrenCom[5]" :oneself="true" />
+        </div>
+
         <!-- 红包 -->
-        <VmpRedPacketLive ref="redPacket" v-show="tool_component_name == 'redPacket'" />
+        <div v-show="tool_component_name == 'redPacketLive'">
+          <vmp-air-container cref="redPacketLive" :cuid="childrenCom[6]" :oneself="true" />
+        </div>
+
+        <!-- 计时器 -->
+        <div v-show="tool_component_name == 'timerSetLive'">
+          <vmp-air-container cref="timerSetLive" :cuid="childrenCom[7]" :oneself="true" />
+        </div>
+        <div v-show="tool_component_name == 'timerSetLive'">
+          <vmp-air-container cref="timerLive" :cuid="childrenCom[8]" :oneself="true" />
+        </div>
       </div>
     </div>
   </div>
@@ -35,13 +57,15 @@
     useMsgServer,
     useDocServer
   } from 'middle-domain';
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
   import { QWebChannel } from '@/app-shared/utils/qwebchannel';
   import { getQueryString } from '@/app-shared/utils/tool';
   import { sessionOrLocal } from '@/packages/chat/src/js/utils';
+  import { clientMixin } from '../mixins/clientMixin';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpEmbedClient',
+    mixins: [clientMixin],
     data() {
       return {
         rootActive: {}, // 活动信息
@@ -52,7 +76,8 @@
         componentName: '',
         domain: null,
         tool_component_name: '',
-        childrenCom: []
+        childrenCom: [],
+        disTimer: false
       };
     },
     beforeCreate() {
@@ -61,6 +86,7 @@
     },
     async created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
+      console.log('当前客户端嵌入进入', this.childrenCom);
       if (!browserSupport()) return;
       await this.getGrayConfig();
       if (location.search.includes('assistant_token=')) {
@@ -68,31 +94,24 @@
       }
       this.assistantToken = getQueryString('assistant_token');
       this.assistantType = getQueryString('assistantType');
+      //初始化房间信息
+      await this.initRoomInfo();
+      // 客户端中嵌入的一个第三方采用的是cef框架，用view_type=cef地址栏传递
       this.webviewType = getQueryString('view_type');
       if (this.assistantType == 'doc') {
         this.componentName = 'Doc';
-        // TODO: 待优化 dom按时无法获取
-        let dom = document.getElementsByClassName('embed-doc-box')[0];
-        if (!dom) {
-          let timer = setInterval(() => {
-            this.$nextTick(() => {
-              console.log(document.getElementsByClassName('embed-doc-box')[0], 'embed-doc-box');
-            });
-            document.getElementsByClassName('embed-doc-box')[0].style.height =
-              window.innerHeight + 'px';
-            clearInterval(timer);
-          }, 500);
-        }
       } else if (this.assistantType == 'chat') {
         this.componentName = 'Chat';
       } else if (this.assistantType == 'tools') {
         this.componentName = 'Tools';
       }
-      await this.getUserinfo();
-      setTimeout(() => {
-        // 给一些时间去初始化  要不不存在dom对象
+      // setTimeout(() => {
+      //   // 给一些时间去初始化  要不不存在dom对象
+
+      // }, 500);
+      this.$nextTick(() => {
         this.initAssistantMsg();
-      }, 500);
+      });
     },
 
     mounted() {
@@ -133,21 +152,78 @@
             console.log(`房间-灰度ID-获取活动by用户信息失败~${e}`);
           });
       },
-      // 给予 客户端嵌入使用方法
-      assistantMsg(type, msg) {
-        console.log('接受上下线消息', { type, msg });
-        if (this.webviewType != 'cef') {
-          if (window.bridge) {
-            window.bridge.JsCallQtMsg(JSON.stringify({ type, msg }));
-          } else {
-            console.error('此方法不存在');
-          }
-        } else {
-          window.JsCallQtMsg(JSON.stringify({ type, msg })); // Join,Leave
+      handleAssitant(type) {
+        // 获取文档dom
+        let container = '';
+        try {
+          container = document.querySelector('.vhall-document-container');
+        } catch (error) {
+          console.log(error);
+        }
+        switch (type) {
+          case 1: // 文档
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emiSwitchTo', ['document'])
+            );
+            break;
+          case 2: // 白板
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emiSwitchTo', ['board'])
+            );
+            break;
+          case 3: // 问卷
+            this.showAssistantTools('questionnaire');
+            this.$refs.questionnaire.open();
+            break;
+          case 4: // 抽奖
+            this.showAssistantTools('lottery');
+            this.$refs.lottery.open();
+            break;
+          case 5: // 签到
+            this.showAssistantTools('signLive');
+            this.$refs.signLive.openSign();
+            break;
+          case 6: // 答题
+            this.showAssistantTools('qa');
+            this.$refs.qa.handleQAPopup();
+            break;
+          case 7: // 隐藏文档
+            container && (container.style.opacity = 0);
+            break;
+          case 8: // 显示文档
+            container && (container.style.opacity = 1);
+            break;
+          case 9: // 文档最小化
+            this.exitFullscreen('#vhall-document-container');
+            break;
+          case 11: // 打开红包
+            this.showAssistantTools('redPacketLive');
+            this.$refs.redPacketLive.open();
+            break;
+          case 12: // 通知文档调用doc.sdk.start
+            // EventBus.$emit('live_start');
+            break;
+          // case 13: // 退出全屏
+          //   break;
+          // case 14: // 全屏
+          //   break;
+          case 15: // 计时器
+            this.showAssistantTools('timerSetLive');
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenTimerSet'));
+            break;
         }
       },
+      // 展示当前互动工具
+      showAssistantTools(name) {
+        this.$refs.questionnaire.close();
+        this.$refs.lottery.close();
+        this.$refs.signLive.closeSign();
+        this.$refs.qa.close();
+        // this.$refs.redPacketLive.close();
+        this.tool_component_name = name;
+      },
       initAssistantMsg() {
-        window.vhallClientEmbed = this.$refs.vhallClient;
+        // window.vhallClientEmbed = this.$refs.vhallClient;
         console.warn('this.$refs.vhallClient', this.$refs.vhallClient, this.$refs);
         if (this.webviewType != 'cef') {
           /* eslint-disable no-new */
@@ -158,62 +234,10 @@
           });
         }
         window.QtCallFunctionPage = _msg => {
-          const msg = Number(_msg);
+          let msg = Number(_msg);
           console.error('展示当前点击的消息转换-------', _msg);
-          // 获取文档dom
-          let container = '';
-          try {
-            container = document.querySelector('.vhall-document-container');
-          } catch (error) {
-            console.log(error);
-          }
           // 判断执行对应方法
-          switch (msg) {
-            case 1: // 文档
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emiSwitchTo', ['document'])
-              );
-              break;
-            case 2: // 白板
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emiSwitchTo', ['board'])
-              );
-              break;
-            case 3: // 问卷
-              this.closeAssistantTools('questionnaire');
-              this.$refs.questionnaire.open();
-              break;
-            case 4: // 抽奖
-              this.closeAssistantTools('lottery');
-              this.$refs.lottery.open();
-              break;
-            case 5: // 签到
-              this.closeAssistantTools('signLive');
-              this.$refs.signLive.openSign();
-              break;
-            case 6: // 答题
-              this.closeAssistantTools('qa');
-              // this.$refs.qa.open();
-              break;
-            case 7: // 隐藏文档
-              container && (container.style.opacity = 0);
-              break;
-            case 8: // 显示文档
-              container && (container.style.opacity = 1);
-              break;
-            case 9: // 文档最小化
-              this.exitFullscreen('#vhall-document-container');
-              break;
-            case 11: // 打开红包
-              this.closeAssistantTools('redPacket');
-              this.$refs.redPacket.openSign();
-              break;
-            case 12: // 打开红包
-              // this.closeAssistantTools()
-              // this.openRedPacketPopup()
-              // EventBus.$emit('live_start');
-              break;
-          }
+          this.handleAssitant(msg);
         };
         // 显示/隐藏文档工具栏
         window.QtCallJsChangeDocTool = _msg => {
@@ -229,14 +253,9 @@
           this.$refs.vhallClient.handleAssitantDocFocus(msg);
         };
       },
-      // 关闭其他互动工具
-      closeAssistantTools(name) {
-        this.tool_component_name = name;
-        // 关闭签到弹框
-        this.$refs.signLive.signVisible = false;
-      },
+
       // 初始化房间
-      async getUserinfo() {
+      async initRoomInfo() {
         const _data = {
           webinar_id: this.il_id,
           check_online: 0,
@@ -276,23 +295,33 @@
         }
 
         this.domain = await this.initSendLive(_data);
-        await useMsgServer().init();
-        console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
-
-        await useDocServer().init();
-        console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
-
-        // this.roomBaseServer
-        //   .initLive({
-        //     ..._data
-        //   })
-        //   .then(async res => {
         const { watchInitData } = this.roomBaseServer.state;
 
         // 使用活动的标题作为浏览器title显示, 由于发起端不用翻译所以直接用活动下的, 如果后期要翻译需要, 通过翻译里取
         document.title = watchInitData.webinar.subject;
 
         const mockResult = (this.rootActive = watchInitData);
+        const promiseList = [
+          // 获取房间互动工具状态
+          this.getTools(mockResult.interact.room_id),
+          this.roomBaseServer.getCustomRoleName()
+        ];
+        await Promise.all(promiseList);
+        console.log('%c------获取互动工具状态完成', 'color:blue');
+        await useMsgServer().initMaintMsg({ hide: 1 });
+        console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
+        if (this.assistantType == 'doc') {
+          await useDocServer().init();
+        }
+        console.log('%c------服务初始化 docServer 初始化完成', 'color:blue');
+        //初始化嵌入监听
+        this.initListener();
+        // this.roomBaseServer
+        //   .initLive({
+        //     ..._data
+        //   })
+        //   .then(async res => {
+
         console.warn(
           '*************this.rootActive*************',
           this.roomBaseServer.state.watchInitData,
@@ -312,7 +341,7 @@
         sessionStorage.setItem('defaultMainscreenDefinition', mockResult.push_definition || '');
         sessionStorage.setItem('defaultSmallscreenDefinition', mockResult.hd_definition || '');
         sessionStorage.setItem('interact_token', mockResult.interact.interact_token);
-        this.getTools(mockResult.interact.room_id);
+
         // // 初始化数据上报
         this.initVHallReport();
 
@@ -340,14 +369,20 @@
             });
         });
       },
-      // 初始化直播房间
+      // 初始化直domain
       initSendLive(params) {
-        const { token } = this.$route.query;
-        if (token) {
-          localStorage.setItem('token', token);
+        const { assistant_token } = this.$route.query;
+        if (assistant_token) {
+          localStorage.setItem('token', assistant_token);
+        }
+        const plugins = ['chat'];
+        if (this.assistantType == 'doc') {
+          plugins.push('doc');
+        } else if (this.assistantType == 'tools') {
+          plugins.push('interaction', 'questionnaire');
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction'],
+          plugins,
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
@@ -360,10 +395,10 @@
           {
             user_id: this.rootActive.join_info.join_id,
             webinar_id: this.rootActive.webinar.id,
-            t_start: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            t_start: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             os: 10,
             type: 4,
-            entry_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            entry_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             pf: 7,
             env: ['production', 'pre'].includes(process.env.VUE_APP_NODE_ENV)
               ? 'production'
@@ -376,6 +411,12 @@
           }
         );
         window.vhallReport && window.vhallReport.report('ENTER_WATCH');
+      },
+      // 更改禁用状态
+      changeStatus(data, status) {
+        console.log(data, status, 'data, status');
+        // 举例： disTimer
+        this[data] = status;
       }
     }
   };

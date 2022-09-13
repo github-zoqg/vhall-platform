@@ -312,12 +312,12 @@
     @font-error: #fb3a32;
     // 链接字体颜色
     @font-link: #3562fa;
-    @active-color: #fb3a32;
+    @active-color: var(--theme-color);
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
-    background: #2a2a2a;
-    border-top: 1px solid #1a1a1a;
+    border-top: 1px solid var(--tab-menu-bg-border);
+    background-color: var(--chat-background-color-base);
     position: absolute;
     bottom: 0;
     .private-chat-operate-container__tool-bar {
@@ -357,10 +357,6 @@
         &.pic-disabled {
           pointer-events: none;
         }
-        &.icontupianliaotian {
-          font-size: 18px;
-        }
-
         margin-left: 10px;
       }
       .vh-line-expression {
@@ -379,11 +375,11 @@
       align-items: flex-end;
       .input-bar__textarea-box {
         width: 264px;
-        background-color: #1a1a1a;
+        background-color: var(--chat-background-color-input);
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
         font-weight: 400;
-        color: #e6e6e6;
+        color: var(--chat-font-color-input);
         line-height: 20px;
         padding: 10px 12px;
         text-align: left;
@@ -432,7 +428,7 @@
       }
       .input-bar__textarea-box__textarea-placeholder {
         width: 264px;
-        background-color: @bg-dark-normal;
+        background-color: var(--chat-background-color-input);
         font-size: 14px;
         color: @font-dark-normal;
         line-height: 20px;
@@ -453,14 +449,14 @@
         width: 40px;
         height: 40px;
         border-radius: 20px;
-        background-color: #1a1a1a;
+        background-color: var(--chat-background-color-input);
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         .vh-line-send {
           font-size: 18px;
-          color: #e6e6e6;
+          color: var(--chat-font-color-msg-nickname);
         }
         &.disable {
           cursor: default;

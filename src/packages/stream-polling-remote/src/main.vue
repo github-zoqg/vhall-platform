@@ -13,7 +13,7 @@
       class="vmp-polling-stream-remote__container__net-error"
     >
       <div class="net-error-img"></div>
-      <p>{{ $t('interact.interact_1035') }}</p>
+      <p>当前用户暂无轮巡画面</p>
     </section>
 
     <!-- 底部流信息 -->
@@ -182,15 +182,20 @@
           videoNode // 远端流显示容器， 必填
         };
 
+        window.vhallReportForProduct?.toStartReporting(110196, 110165, {
+          opt
+        });
         this.interactiveServer
           .subscribe(opt)
-          .then(() => {
+          .then(res => {
+            window.vhallReportForProduct?.toResultsReporting(110165, { res });
             setTimeout(() => {
               this.replayPlay();
             }, 2000);
             this.getLevel();
           })
           .catch(e => {
+            window.vhallReportForProduct?.toResultsReporting(110165, { res: e });
             console.log('订阅失败----', e); // object 类型， { code:错误码, message:"", data:{} }
           });
       },
@@ -290,16 +295,18 @@
       align-items: center;
       flex-direction: column;
       .net-error-img {
-        width: 25px;
-        height: 19px;
-        margin-bottom: 1px;
-        background-image: url('./img/net-error.png');
-        background-size: contain;
+        width: 169px;
+        height: 119px;
+        margin-bottom: 20px;
+        background-image: url('./img/no-video.png');
+        background-size: 100% 100%;
         background-repeat: no-repeat;
+        transform: translateX(20px);
       }
       & > p {
-        font-size: 12px;
-        color: #ccc;
+        font-size: 16px;
+        line-height: 22px;
+        color: #999;
       }
     }
 

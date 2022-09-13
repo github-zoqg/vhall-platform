@@ -112,11 +112,25 @@
         };
         useChatServer().addChatToList(data);
       });
+      // 收到结束签到的消息
+      this.signServer.$on('live_over', e => {
+        this.signVisible = false;
+        this.signinDown = false;
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+      });
     },
     methods: {
+      handleSign(flag) {
+        flag ? this.openSign() : this.closeSign();
+      },
       openSign() {
         // 是否发起了签到
         this.getSignInfo();
+      },
+      closeSign() {
+        this.signVisible = false;
       },
       getSignInfo() {
         this.signServer

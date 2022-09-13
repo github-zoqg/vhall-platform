@@ -2,11 +2,6 @@
   <div class="vmp-chat-auth">
     <!--聊天审核头部栏-->
     <div class="vmp-chat-auth__header-bar">
-      <!--活动标题-->
-      <!--      <div class="header-bar__title">-->
-      <!--        <i class="iconfont iconzhibo"></i>-->
-      <!--        {{ activityTitle }}-->
-      <!--      </div>-->
       <div class="header-bar__operate-bar">
         <div class="switch-box">
           <span class="switch-title">聊天审核</span>
@@ -441,12 +436,19 @@
         return this.chatAuthServer
           .getChatAuthEnableStatus(params)
           .then(res => {
-            this.enableChatAuth = res && res.data ? Number(res.data.switch) : 1;
-            this.enableAutoHandle = res.data.switch_options + '';
+            if (res.code == 200) {
+              this.enableChatAuth = res?.data?.switch ? Number(res.data.switch) : 1;
+              this.enableAutoHandle = res.data.switch_options + '';
+            } else {
+              this.$message({
+                message: res.msg,
+                type: 'error'
+              });
+            }
           })
-          .catch(res => {
+          .catch(error => {
             this.$message({
-              message: res.msg,
+              message: error,
               type: 'error'
             });
           });
