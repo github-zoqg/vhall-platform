@@ -487,15 +487,18 @@
             layout: this.mediaState.layout || 0,
             screen_definition: this.mediaState.screenRate, // 桌面共享清晰度
             extend: JSON.stringify({
-              audioInput: devices?.audioInputDevices?.filter(item => {
-                return item.deviceId == audioInput;
-              })[0].label,
-              audioOutput: devices?.audioOutputDevices?.filter(item => {
-                return item.deviceId == audioOutput;
-              })[0].label,
-              video: devices?.videoInputDevices?.filter(item => {
-                return item.deviceId == video;
-              })[0].label
+              audioInput:
+                devices?.audioInputDevices?.filter(item => {
+                  return item.deviceId == audioInput;
+                })[0]?.label || '',
+              audioOutput:
+                devices?.audioOutputDevices?.filter(item => {
+                  return item.deviceId == audioOutput;
+                })[0]?.label || '',
+              video:
+                devices?.videoInputDevices?.filter(item => {
+                  return item.deviceId == video;
+                })[0]?.label || ''
             })
           });
         }
