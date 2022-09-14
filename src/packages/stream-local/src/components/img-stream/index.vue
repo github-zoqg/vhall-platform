@@ -7,7 +7,7 @@
       crossorigin="anonymous"
       style="margin-right: 20px; vertical-align: top"
     />
-    <canvas id="capCanvas" ref="capCanvas" :width="canvasData.width" :height="canvasData.height">
+    <canvas id="capCanvas" ref="capCanvas">
       Your browser does not support the HTML5 canvas tag.
     </canvas>
   </div>
@@ -31,12 +31,11 @@
         canvasDom: this.$refs.capCanvas,
         canvasImgDom: this.$refs.capImage
       });
-      try {
-        // 检测是否为图片推流，若为真，则进行绘制canvas的captureStream
-        await canvasStreamServer.checkImgStream();
-      } catch (error) {
-        this.$message.error('非默认图片推流设置失败');
-      }
+      // try {
+      //   // 检测是否为图片推流，若为真，则进行绘制canvas的captureStream
+      // } catch (error) {
+      //   this.$message.error('非默认图片推流设置失败');
+      // }
     },
     methods: {
       // 获取图片流
@@ -52,6 +51,9 @@
 </script>
 <style lang="less">
   .vmp-img-stream {
-    display: none;
+    // display: none;
+    position: fixed;
+    top: 0;
+    left: -99999px;
   }
 </style>
