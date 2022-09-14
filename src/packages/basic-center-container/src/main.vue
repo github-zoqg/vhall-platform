@@ -6,6 +6,7 @@
         'vmp-basic-center-embed': isEmbed
       }
     ]"
+    :style="{ background: mainBackground }"
   >
     <!-- 流列表 -->
     <vmp-air-container :cuid="cuid"></vmp-air-container>
@@ -53,6 +54,12 @@
       // },
       coverImgUrl() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      mainBackground() {
+        return (
+          JSON.parse(this.$domainStore.state.roomBaseServer.skinInfo.skin_json_pc)
+            .videoBackGroundColor || '#000'
+        );
       }
     },
     created() {

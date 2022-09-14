@@ -1,5 +1,10 @@
 <template>
-  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop.prevent="videoShowIcon">
+  <div
+    class="vmp-wap-stream-wrap"
+    ref="vmp-wap-stream-wrap"
+    :style="{ background: mainBackground }"
+    @click.stop.prevent="videoShowIcon"
+  >
     <div
       class="vmp-stream-list"
       :class="{
@@ -277,6 +282,12 @@
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
         return this.configList['watch_embed_close_entrance'] && this.isEmbed;
+      },
+      mainBackground() {
+        return (
+          JSON.parse(this.$domainStore.state.roomBaseServer.skinInfo.skin_json_wap)
+            .videoBackGroundColor || '#000'
+        );
       }
     },
     beforeCreate() {
@@ -504,7 +515,6 @@
     height: 422px;
     width: 100%;
     position: relative;
-    background: #000;
     // 小组协作中
     &-group {
       position: absolute;
