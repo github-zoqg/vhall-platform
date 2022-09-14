@@ -87,7 +87,7 @@
       //       console.log(`灰度ID-获取活动by用户信息失败~${e}`);
       //     });
       // },
-      // 报名表单独立链接是否有效
+      // 报名表单独立链接是否有效（活动下）
       getFormOpenLinkStatus() {
         this.entryformServer
           .verifyOpenLink({
@@ -116,28 +116,37 @@
       },
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus() {
-        this.entryformServer
-          .watchInit({
-            webinar_id: this.webinarOrSubjectId
+        // 当前是正常活动点开
+        this.roomBaseServer
+          .getWebinarInfo({
+            webinar_id: this.webinarOrSubjectId,
+            is_no_check: 1
           })
           .then(res => {
-            if (res.data.status == 'live') {
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarOrSubjectId}`;
-            } else if (res.data.status == 'subscribe') {
-              // 如果预约或结束，跳转到预约页
-              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinarOrSubjectId}`;
-            }
-          })
-          .catch(e => {
-            //512502 不支持的活动类型(flash)、512503	不支持的活动类型(旧h5)
-            if (e.code == 512503 || e.code == 512502) {
+            // /v3/webinars/webinar/info 接口判断 res.data.webinar_state:  2 预告 1 直播 3 结束 5 回放 4 点播
+            // webinar_type: 1.音频 2 视频 3 互动  5 定时直播
+            if (res.code == 512503 || res.code == 512502) {
+              // 跳转老活动
               let origin =
                 process.env.NODE_ENV === 'production'
                   ? window.location.origin
                   : 'https://t-webinar.e.vhall.com';
               window.location.href = `${origin}/${this.webinarOrSubjectId}`;
+              return false;
             }
+            // 如果是独立链接，判断状态进行跳转
+            this.gotoWebinarPage(res);
           });
+      },
+      // 跳转活动页
+      gotoWebinarPage(res) {
+        const queryString = this.$route.query.refer ? `?refer=${this.$route.query.refer}` : '';
+        if (res.data.status == 'live') {
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+        } else {
+          // 如果预约或结束，跳转到预约页
+          window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+        }
       }
     }
   };
