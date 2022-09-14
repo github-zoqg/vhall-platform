@@ -643,6 +643,10 @@
           case 512523:
             this.webinarPayAuth();
             break;
+          case 513422:
+            // 短信预约填写手机号
+            console.log(513422);
+            break;
           default:
             this.$toast(this.$tec(code) || msg);
             break;
