@@ -43,6 +43,12 @@
       <van-button round type="danger" class="btn" size="normal" block @click="handleSumbit">
         提交
       </van-button>
+      <!-- 隐私合规（嵌入不展示） -->
+      <vmp-privacy-compliance
+        scene="smsVerification"
+        clientType="mobile"
+        compType="2"
+      ></vmp-privacy-compliance>
     </div>
   </van-popup>
 </template>
