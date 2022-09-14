@@ -54,6 +54,7 @@
 </template>
 <script>
   import { useUserServer, useSubscribeServer, useRoomBaseServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpSmsVerification',
     data() {
@@ -122,15 +123,10 @@
           params.code = this.code;
         }
         useSubscribeServer()
-          .noticeWechatSubmit({
-            visitor_id: watchInitData?.visitor_id,
-            webinar_id: watchInitData?.webinar?.id,
-            phone: this.phone,
-            code: this.code
-          })
+          .noticeWechatSubmit(params)
           .then(res => {
             if (res.code === 200) {
-              alert();
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSubmitSuccess'));
             } else {
               failure(res);
             }

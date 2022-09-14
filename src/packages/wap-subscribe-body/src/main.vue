@@ -893,6 +893,11 @@
         this.subOption.needAgreement = false;
         const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         this.authCheck(type);
+      },
+      // 已提交了短信通知手机号
+      handleNoticeWechatSubmitSuccess() {
+        const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        this.authCheck(type);
       }
     }
   };

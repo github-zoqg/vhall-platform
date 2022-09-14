@@ -208,6 +208,10 @@ export default {
     component: 'VmpGoodsDetail'
   },
   comSmsVerification: {
-    component: 'VmpSmsVerification'
+    component: 'VmpSmsVerification',
+    emitSubmitSuccess: {
+      cuid: 'comSubcribeWapBody',
+      method: 'handleNoticeWechatSubmitSuccess'
+    }
   }
 };
