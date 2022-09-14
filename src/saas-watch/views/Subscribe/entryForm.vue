@@ -31,16 +31,61 @@
     },
     async created() {
       this.interfaceType === 'webinar' ? this.initWebinarInfo() : this.initSubjectInfo();
-      this.setPageConfig();
     },
     methods: {
       setPageConfig() {
-        window.skins = skins;
-        skins.setTheme(skins.themes.theme_default_black);
+        if (this.interfaceType === 'webinar') {
+          const themeMap = {
+            1: 'black',
+            2: 'white',
+            3: 'red',
+            4: 'golden',
+            5: 'blue'
+          };
+
+          const styleMap = {
+            1: 'default', // 传统风格
+            2: 'simple', // 简洁风格
+            3: 'fashion' // 时尚风格
+          };
+          let skin_json_pc = {
+            style: 1,
+            backGroundColor: 1,
+            chatLayout: 1 // 聊天布局 1 上下 2 左右
+          };
+
+          if (this.skinInfo?.skin_json_pc && this.skinInfo.skin_json_pc != 'null') {
+            skin_json_pc = JSON.parse(this.skinInfo.skin_json_pc);
+          }
+
+          // 设置主题，如果没有就用传统风格白色
+          const style = styleMap[skin_json_pc?.style || 1];
+          const theme = themeMap[skin_json_pc?.backGroundColor || 1];
+
+          console.log('------设置主题------', `theme_【${style}】_【${theme}】`, skin_json_pc);
+
+          skins.setTheme(skins.themes[`theme_${style}_${theme}`]);
+        } else {
+          window.skins = skins;
+          skins.setTheme(skins.themes.theme_default_black);
+        }
+      },
+      getWebinarSkinInfo() {
+        this.roomBaseServer
+          .getSkinsInfo({
+            webinar_id: this.webinarOrSubjectId
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.skinInfo = res.data;
+              this.setPageConfig();
+            }
+          });
       },
       async initWebinarInfo() {
         // await this.getGrayConfig();
         this.getFormOpenLinkStatus();
+        this.getWebinarSkinInfo();
         //多语言接口
         await this.roomBaseServer.getLangList(this.webinarOrSubjectId);
         const roomBaseState = this.roomBaseServer.state;
@@ -54,6 +99,7 @@
         // }
       },
       initSubjectInfo() {
+        this.setPageConfig();
         this.entryformServer
           .verifyOpenLink({
             subject_id: this.webinarOrSubjectId,

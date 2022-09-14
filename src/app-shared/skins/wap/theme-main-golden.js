@@ -28,7 +28,7 @@ export default {
   '--theme-chat-sendBox-bg': '#fff',
   //主题色
   '--theme-color': '#c99f67',
-  '--theme-color-sub': '#ffd1c9',
+  '--theme-color-sub': '#fcf8ed',
   //分组
   '--theme-group-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-group-name-color': 'rgba(0, 0, 0, 0.45)',

@@ -28,7 +28,7 @@ export default {
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
   //主题色
   '--theme-color': '#3552ea',
-  '--theme-color-sub': '#ffd1c9',
+  '--theme-color-sub': '#dee8ff',
   //分组
   '--theme-group-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-group-name-color': 'rgba(0, 0, 0, 0.45)',

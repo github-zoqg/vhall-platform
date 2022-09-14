@@ -725,9 +725,20 @@
         this.roomBaseServer = useRoomBaseServer();
       }
       this.interfaceType === 'subject' ? this.initSubjectInfo() : this.initWebinarInfo();
-      this.setPageConfig();
     },
     methods: {
+      getWebinarSkinInfo() {
+        this.roomBaseServer
+          .getSkinsInfo({
+            webinar_id: this.webinarOrSubjectId
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.skinInfo = res.data;
+              this.setPageConfig();
+            }
+          });
+      },
       // 设置接口入参，是活动维度 还是 专题维度
       setParamsIdByRoute(params) {
         if (this.interfaceType === 'webinar') {
@@ -738,6 +749,7 @@
         return params;
       },
       async initWebinarInfo() {
+        this.getWebinarSkinInfo();
         await this.getFormLinkStatus();
         await this.roomBaseServer.getLangList(this.$route.params.id);
         const roomBaseState = this.roomBaseServer.state;
@@ -760,6 +772,7 @@
         this.getQuestionList();
       },
       async initSubjectInfo() {
+        this.setPageConfig();
         if (this.subjectServer) {
           // 初始化专题
           await this.initSubjectAuth();
@@ -1882,8 +1895,41 @@
         }
       },
       setPageConfig() {
-        window.skins = skins;
-        skins.setTheme(skins.themes.theme_main_white);
+        if (this.interfaceType === 'subject') {
+          window.skins = skins;
+          skins.setTheme(skins.themes.theme_main_white);
+        } else {
+          const styleMap = {
+            1: 'main', // 传统风格
+            2: 'fashion', // 时尚风格
+            3: 'fashion' // 极简风格预约页使用时尚风格背景
+          };
+
+          const themeMap = {
+            1: 'black',
+            2: 'white',
+            3: 'red',
+            4: 'golden',
+            5: 'blue'
+          };
+
+          let skin_json_wap = {
+            style: 1,
+            backGroundColor: 2
+          };
+
+          if (this.skinInfo?.skin_json_wap && this.skinInfo.skin_json_wap != 'null') {
+            skin_json_wap = JSON.parse(this.skinInfo.skin_json_wap);
+          }
+
+          // 设置主题，如果没有就用传统风格白色
+          const style = styleMap[skin_json_wap?.style || 1];
+          const theme = themeMap[skin_json_wap?.backGroundColor || 2];
+
+          console.log('----设置主题为----', `theme_${style}_${theme}`);
+
+          skins.setTheme(skins.themes[`theme_main_${theme}`]);
+        }
       }
     }
   };
