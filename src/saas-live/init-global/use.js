@@ -58,7 +58,8 @@ import VmpStreamPollingRemote from '@/packages/stream-polling-remote';
 import VmpMicInvited from '@/packages/mic-invited/index';
 // 云导播播放器&本地流推送组件
 import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
-
+// 隐私合规文案
+import VmpPrivacyCompliance from '@/packages/privacy-compliance';
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -113,3 +114,4 @@ Vue.use(VmpStreamDesktopScreen);
 // Vue.use(VmpEmbedClient);
 Vue.use(VmpMicInvited);
 Vue.use(VmpPcPlayerLiveYun);
+Vue.use(VmpPrivacyCompliance);

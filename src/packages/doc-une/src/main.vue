@@ -55,7 +55,7 @@
               (!isInGroup && roleName == 1 && doc_permission != userId)
             "
           >
-            {{ $t('doc.doc_1011') }}
+            {{ webinarType == 1 ? $t('doc.doc_1011') : $t('doc.doc_1029') }}
           </span>
           <span v-else>{{ $t('doc.doc_1003') }}</span>
         </div>

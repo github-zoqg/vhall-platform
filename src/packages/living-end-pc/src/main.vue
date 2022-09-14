@@ -5,7 +5,8 @@
       {
         'vmp-living-end-embedFull': isEmbedVideo,
         'vmp-living-end-embed': isEmbed && !isEmbedVideo
-      }
+      },
+      `ending_bg_${imageCropperMode}`
     ]"
     v-if="isLivingEnd"
     :style="`backgroundImage: url('${webinarsBgImg}')`"
@@ -33,6 +34,8 @@
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
+  import { cropperImage } from '@/app-shared/utils/common';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpLivingEnd',
     computed: {
@@ -67,7 +70,8 @@
     data() {
       return {
         isShowLiveStartNotice: false,
-        isLivingEnd: false
+        isLivingEnd: false,
+        imageCropperMode: 1
       };
     },
     beforeCreate() {
@@ -78,6 +82,7 @@
       if (this.webinarsType == 3) {
         this.isLivingEnd = true;
       }
+      this.handlerImageInfo();
     },
     mounted() {
       this.msgServer.$onMsg('ROOM_MSG', msg => {
@@ -97,6 +102,13 @@
       });
     },
     methods: {
+      // 解析图片地址
+      handlerImageInfo() {
+        if (cropperImage(this.webinarsBgImg)) {
+          let obj = parseImgOssQueryString(this.webinarsBgImg);
+          this.imageCropperMode = Number(obj.mode);
+        }
+      },
       reloadPage() {
         location.reload();
       }
@@ -113,6 +125,13 @@
     z-index: 11;
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    &.ending_bg_2 {
+      background-size: cover;
+      background-position: left top;
+    }
+    &.ending_bg_3 {
+      background-size: contain;
+    }
     &-embed {
       width: calc(100% - 360px);
       height: calc(100% - 56px);

@@ -12,7 +12,7 @@
       class="vmp-login__form__common"
     >
       <!-- 账户相关 -->
-      <el-form-item prop="account">
+      <el-form-item prop="account" class="common_mg3">
         <el-input
           v-model.trim="ruleForm.account"
           clearable
@@ -20,11 +20,11 @@
         ></el-input>
       </el-form-item>
       <!-- 图片验证码 -->
-      <el-form-item v-show="captchaIsShow">
+      <el-form-item v-show="captchaIsShow" class="common_mg3">
         <div id="pwdLoginCaptcha" class="vhsaas-yundun-captcha"></div>
       </el-form-item>
       <!-- 请输入登录密码 -->
-      <el-form-item prop="password">
+      <el-form-item prop="password" class="common_mg3">
         <PwdInput
           v-model.trim="ruleForm.password"
           clearable
@@ -38,7 +38,7 @@
       <el-form-item>
         <div
           :class="[
-            'vmp-reg-login-box__link vmp-reg-login-box__pwd__link',
+            'vmp-reg-login-box__link vmp-reg-login-box__pwd__link common_mg3',
             {
               'vmp-reg-login-box__height__max': isMaxHeight
             }
@@ -55,14 +55,22 @@
             <a :href="forgetUrl" target="_blank">{{ $t('login.login_1012') }}</a>
           </span>
         </div>
-        <el-button
-          type="primary"
-          round
-          class="length-max vmp-reg-login__login__btn"
-          @click="handlePwdLogin"
-        >
-          {{ $t('nav.nav_1005') }}
-        </el-button>
+        <div class="common_mg3">
+          <el-button
+            type="primary"
+            round
+            class="length-max vmp-reg-login__login__btn"
+            @click="handlePwdLogin"
+          >
+            {{ $t('nav.nav_1005') }}
+          </el-button>
+        </div>
+        <!-- 隐私合规 -->
+        <vmp-privacy-compliance
+          scene="login"
+          clientType="pc"
+          @check="checkResult"
+        ></vmp-privacy-compliance>
         <a
           href="javascript:void(0)"
           class="vmp-reg-login__reg__link"
@@ -122,7 +130,8 @@
         isLoginPwdFocus: false, // handleFocus / handleBlur 会更改此参
         autoLoginStatus: false, // 账户的自动登录
         forgetUrl: 'javascript:void(0);', // 忘记密码链接入口
-        isMaxHeight: false // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
+        isMaxHeight: false, // 样式控制 - 若验证码通过，或者未输入情况下，自动登录跟其间距只需要8px;
+        loginChecked: false // 登录(账号密码登录)——默认未选中
       };
     },
     watch: {
@@ -153,6 +162,15 @@
       },
       // 密码登录
       async handlePwdLogin() {
+        if (!this.loginChecked) {
+          this.$message({
+            message: this.$t('privacy.privacy_1005'),
+            showClose: true,
+            type: 'warning',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        }
         if (this.captchaIsShow && !this.captchaReady) {
           // 开启了图片验证码展示，但是当前未选择图形码
           this.$message({
@@ -254,6 +272,10 @@
             customClass: 'zdy-info-box'
           });
         }
+      },
+      /* 隐私合规选择结果标记 */
+      checkResult(obj) {
+        this[`${obj.scene}Checked`] = obj.checked;
       }
     },
     created() {
@@ -265,6 +287,10 @@
 <style lang="less">
   @import url('../styles/reset.less');
   .vmp-pwd-login {
-    padding: 0 32px 24px;
+    padding: 0 29px 24px;
+    .common_mg3 {
+      margin-right: 3px;
+      margin-left: 3px;
+    }
   }
 </style>

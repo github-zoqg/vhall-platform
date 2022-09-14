@@ -9,7 +9,12 @@
         @click="gotoRoom(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img class="cover_pic" :src="item.img_url" alt="" />
+          <img
+            class="cover_pic"
+            :class="`img_box_bg box_bg_${item.itemMode}`"
+            :src="item.img_url"
+            alt=""
+          />
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
@@ -46,7 +51,8 @@
 </template>
 <script>
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
-
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -136,9 +142,23 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list;
+            this.activeList = res.data.list.map(item => {
+              let mode = 1;
+              if (cropperImage(item.img_url)) {
+                mode = this.handlerImageInfo(item.img_url);
+              }
+              return {
+                ...item,
+                itemMode: mode
+              };
+            });
           }
         }
+      },
+      // 解析图片地址
+      handlerImageInfo(url) {
+        let obj = parseImgOssQueryString(url);
+        return Number(obj.mode);
       }
     }
   };
@@ -185,11 +205,20 @@
       background: #383838;
       border-radius: 4px;
       overflow: hidden;
-      img {
+      .img_box_bg {
         display: inline-block;
-        width: 142px;
-        height: 80px;
+        width: 100%;
+        height: 100%;
         border-radius: 4px;
+        object-fit: contain;
+        object-position: center;
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
       }
       &-status {
         position: absolute;
@@ -256,6 +285,9 @@
         margin: 4px 10px 0px 0px;
       }
     }
+    &__titleInfo {
+      flex: 1;
+    }
     &__title {
       margin: 10px 0 4px 0;
       font-size: 14px;
@@ -271,6 +303,7 @@
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
       max-height: 200px;
+      word-break: break-word;
     }
     &__info {
       font-weight: 400;
@@ -320,11 +353,11 @@
     &__cover {
       width: 100%;
       height: 160px;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background: #000;
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
       overflow: hidden;
-      img {
+      .img_box_bg {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -334,6 +367,17 @@
         transition: all 0.3s;
         &:hover {
           transform: scale(1.2);
+        }
+        &.box_bg_1 {
+          object-fit: fill;
+        }
+        &.box_bg_2 {
+          object-fit: cover;
+          object-position: left top;
+        }
+        &.box_bg_3 {
+          object-fit: contain;
+          object-position: center;
         }
       }
       &-status {

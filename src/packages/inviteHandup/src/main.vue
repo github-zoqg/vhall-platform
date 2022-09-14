@@ -95,6 +95,13 @@
               clearInterval(this.inviteFun);
               this.refusedText = `${this.$t('interact.interact_1010')}`;
               this.showInviteConnectMic = false;
+              this.toResultsReporting(
+                170010,
+                encodeURIComponent(this.$t('interact.interact_1025')),
+                {
+                  event_type: 'message'
+                }
+              );
             }
           }, 1000);
         }
@@ -144,6 +151,9 @@
       // 同意邀请上麦
       customAgreeConnect() {
         this.btnDisabled = true;
+        window?.vhallReportForProduct.toStartReporting(170009, [170010, 170032, 110187, 110183], {
+          waiting_time: this.inviteTime
+        });
         useMicServer()
           .userAgreeInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -162,6 +172,10 @@
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitAgreeInvite'));
               useMicServer().userSpeakOn();
             }
+            this.toResultsReporting(170010, res, {
+              event_type: 'interface',
+              waiting_time: `wait-for ${30 - this.inviteTime}s`
+            });
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
             this.refusedText = this.$t('interact.interact_1010');
@@ -169,11 +183,18 @@
           })
           .catch(err => {
             this.btnDisabled = false;
+            this.toResultsReporting(170010, err, {
+              event_type: 'interface'
+            });
           });
       },
       // 拒绝上麦
       refuseInviteConnect() {
         this.btnDisabled = true;
+        window?.vhallReportForProduct.toStartReporting(170011, 170012, {
+          waiting_time: this.inviteTime,
+          rejection_method: '点击了按钮或关闭弹窗'
+        });
         useMicServer()
           .userRejectInvite({
             room_id: this.roomBaseState.watchInitData.interact.room_id,
@@ -181,6 +202,12 @@
             extra_params: this.senderId
           })
           .then(res => {
+            this.toResultsReporting(170012, {
+              event_type: 'interface',
+              waiting_time: this.inviteTime,
+              rejection_method: res,
+              request_id: res?.request_id
+            });
             this.btnDisabled = false;
             clearInterval(this.inviteFun);
             this.inviteTime = 30;
@@ -191,8 +218,25 @@
           .catch(err => {
             // 拒绝失败
             console.log(err);
+            this.toResultsReporting(170012, {
+              event_type: 'interface',
+              waiting_time: this.inviteTime,
+              rejection_method: err
+            });
             this.btnDisabled = false;
           });
+      },
+      // 上报_结果
+      toResultsReporting(eventId, res, options = {}) {
+        window.vhallReportForProduct.toResultsReporting(
+          eventId,
+          {
+            ...{ event_type: 'interface', failed_reason: res },
+            ...options
+          }
+          // 返回的key值
+          // todo keyCode
+        );
       }
     }
   };
