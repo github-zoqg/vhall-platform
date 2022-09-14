@@ -107,7 +107,8 @@ export default {
     appointment_1030: '活动主办方设置了试看',
     appointment_1031: '请耐心等待',
     appointment_1032: '白名单',
-    appointment_1033: '彩排已开始，请观看直播吧'
+    appointment_1033: '彩排已开始，请观看直播吧',
+    appointment_1034: '提交手机号接收消息提醒'
   },
   nav: {
     nav_1001: '主办方',

@@ -108,7 +108,8 @@ export default {
     appointment_1030: 'The event organizer set up a trial',
     appointment_1031: 'Please be patient',
     appointment_1032: 'Whitelist',
-    appointment_1033: 'The rehearsal has started, please watch it live'
+    appointment_1033: 'The rehearsal has started, please watch it live',
+    appointment_1034: 'Submit and receive notifications'
   },
   nav: {
     nav_1001: 'Sponsor',

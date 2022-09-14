@@ -643,9 +643,15 @@
           case 512523:
             this.webinarPayAuth();
             break;
+          case 513421:
+            // 短信预约填写手机号(无需验证)
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSmsVerify'));
+            break;
           case 513422:
-            // 短信预约填写手机号
-            console.log(513422);
+            // 短信预约填写手机号(需要手机验证)
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitSmsVerify', [true])
+            );
             break;
           default:
             this.$toast(this.$tec(code) || msg);

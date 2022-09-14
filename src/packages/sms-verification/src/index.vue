@@ -2,11 +2,11 @@
   <van-popup v-model="dialogVisible" class="sms-verification" round :close-on-click-overlay="false">
     <div class="container">
       <div class="title-wrap">
-        <p class="title">Submit and receive notifications</p>
+        <p class="title">{{ $t('appointment.appointment_1034') }}</p>
         <i class="vh-iconfont vh-line-close" />
       </div>
       <ul class="form-wrap">
-        <li class="form-item line">
+        <li :class="['form-item line', phoneError ? 'error' : '']">
           <van-field
             v-model="phone"
             :placeholder="$t('account.account_1025')"
@@ -23,9 +23,14 @@
               :placeholder="$t('form.form_1020')"
               type="tel"
               class="code-input"
-              maxlength="15"
+              maxlength="6"
             />
-            <van-button class="code-btn" type="danger" :disabled="isDownTime" @click="sendCode">
+            <van-button
+              class="code-btn"
+              type="danger"
+              :disabled="!captchaReady || isDownTime"
+              @click="sendCode"
+            >
               {{
                 isDownTime
                   ? $t('account.account_1031', { n: userServerState.second })
@@ -35,14 +40,14 @@
           </li>
         </template>
       </ul>
-      <van-button round type="danger" class="btn" size="normal" block :disabled="btnDisabled">
+      <van-button round type="danger" class="btn" size="normal" block @click="handleSumbit">
         提交
       </van-button>
     </div>
   </van-popup>
 </template>
 <script>
-  import { useUserServer } from 'middle-domain';
+  import { useUserServer, useSubscribeServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpSmsVerification',
     data() {
@@ -52,20 +57,23 @@
         dialogVisible: true,
         phone: '',
         code: '',
-        needVerification: false
+        needVerification: false,
+        phoneError: '',
+        captchaError: '',
+        codeError: ''
       };
     },
     beforeCreate() {
       this.userServer = useUserServer();
     },
     computed: {
-      btnDisabled() {
-        if (this.needVerification) {
-          return true;
-        } else {
-          // 不需要验证只要数字为 11-11-15即可
-          return this.phone.length < 11 || this.phone.length > 15;
-        }
+      codeBtnDisabled() {
+        return this.phone.length < 11 || this.phone.length > 15;
+        // if (this.needVerification) {
+        // }
+        //   return false;
+        // } else {
+        //   // 不需要验证只要数字为 11-11-15即可
       },
       captchaReady() {
         return !!this.userServerState.captchaVal;
@@ -75,7 +83,7 @@
       }
     },
     mounted() {
-      this.open(true);
+      this.open(false);
     },
     methods: {
       open(needVerification = false) {
@@ -89,7 +97,61 @@
         }
       },
       sendCode() {
-        this.userServer.sendCode(18510781799);
+        this.userServer.sendCode(this.phone, 17);
+      },
+      // 提交
+      handleSumbit() {
+        const validate = this.checkMobile();
+        if (!validate) return false;
+        const watchInitData = useRoomBaseServer().state?.watchInitData;
+        const failure = res => {
+          this.$toast(res.msg);
+        };
+        const params = {
+          visitor_id: watchInitData?.visitor_id,
+          webinar_id: watchInitData?.webinar?.id,
+          phone: this.phone
+        };
+        if (this.needVerification) {
+          params.code = this.code;
+        }
+        useSubscribeServer()
+          .noticeWechatSubmit({
+            visitor_id: watchInitData?.visitor_id,
+            webinar_id: watchInitData?.webinar?.id,
+            phone: this.phone,
+            code: this.code
+          })
+          .then(res => {
+            if (res.code === 200) {
+              alert();
+            } else {
+              failure(res);
+            }
+          })
+          .catch(res => failure(res));
+      },
+      checkMobile() {
+        let relt;
+        if (this.needVerification) {
+          const reg = /^1[0-9]{10}$/; // 手机号
+          relt = reg.test(this.phone);
+        } else {
+          // 没有开启手机号验证  只有手机号长度
+          relt = this.phone.length >= 11 && this.phone.length <= 15;
+        }
+        if (relt) {
+          this.clearVerify();
+        } else {
+          this.phoneError = '请输入正确的手机号';
+        }
+        console.log(relt);
+        return relt;
+      },
+      // 清除错误提示
+      clearVerify() {
+        this.phoneError = null;
+        // this.userServerState();
       }
     }
   };
