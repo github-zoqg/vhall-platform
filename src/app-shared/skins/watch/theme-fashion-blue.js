@@ -71,6 +71,8 @@ export default {
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(0, 0, 0, 0.45)',
+  // 互动工具icon
+  '--footer-icon-tip-border-color': '#f0f5ff',
   //footer
   '--footer-color-font': 'rgba(0, 0, 0, 0.45)',
   //主题色

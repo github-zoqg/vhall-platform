@@ -64,7 +64,7 @@
       width: 8px;
       height: 8px;
       background: #fb2626;
-      border: 1px solid #fb2626;
+      border: 1px solid var(--footer-icon-tip-border-color);
       border-radius: 50%;
       right: -3px;
       position: absolute;
