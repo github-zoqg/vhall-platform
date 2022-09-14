@@ -103,7 +103,7 @@
         }
       },
       sendCode() {
-        this.userServer.sendCode(this.phone, 17);
+        this.userServer.sendCode(this.phone, 12);
       },
       // 提交
       handleSumbit() {
