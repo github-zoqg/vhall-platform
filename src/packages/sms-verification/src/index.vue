@@ -127,6 +127,7 @@
           .then(res => {
             if (res.code === 200) {
               window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSubmitSuccess'));
+              this.dialogVisible = false;
             } else {
               failure(res);
             }
