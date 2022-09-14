@@ -377,10 +377,9 @@
   .vmp-stream-list {
     height: 80px;
     width: 100%;
-    background-color: #242424;
     display: flex;
     justify-content: center;
-    background: #000;
+    // background: #000;
     border-bottom: 1px solid #1f1f1f;
 
     // 流列表高度为0
