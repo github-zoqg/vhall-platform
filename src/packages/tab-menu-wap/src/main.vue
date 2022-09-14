@@ -760,8 +760,10 @@
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: var(--theme-tab-menu-tip);
-          border: 9px solid var(--theme-tab-menu-tip);
+          // background: var(--theme-tab-menu-tip);
+          // border: 9px solid var(--theme-tab-menu-tip);
+          background: #fb2626;
+          border: 9px solid #fb2626;
           right: 18px;
           top: 10px;
         }
