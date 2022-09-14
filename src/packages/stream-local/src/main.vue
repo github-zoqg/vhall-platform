@@ -261,7 +261,8 @@
     useChatServer,
     useDocServer,
     useMsgServer,
-    useVideoPollingServer
+    useVideoPollingServer,
+    useCanvasStreamServer
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
   import { boxEventOpitons, sleep } from '@/app-shared/utils/tool';
@@ -1169,8 +1170,9 @@
             });
         } else {
           // 若是图片推流，刷新则需等待canvas进行绘制
-          await this.sleep();
-          const videoTracks = await this.$refs.imgPushStream.getCanvasStream();
+          // await this.sleep();
+          await this.$refs.imgPushStream.updateCanvasImg();
+          const videoTracks = await useCanvasStreamServer().getCanvasStream();
           if (!videoTracks) {
             throw 'getCanvasStreamError';
           }
