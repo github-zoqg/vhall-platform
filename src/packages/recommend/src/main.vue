@@ -20,12 +20,7 @@
         </div>
 
         <ul class="a-wrap" v-else>
-          <li
-            class="recommend-item"
-            v-for="item in advs"
-            :key="item.adv_id"
-            @click="goto(item.url)"
-          >
+          <li v-for="item in advs" :key="item.adv_id" @click="goto(item.url)">
             <div class="recommend-item">
               <div class="banner">
                 <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" />
