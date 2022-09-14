@@ -99,7 +99,9 @@
           .then(res => {
             if (res.code == 200) {
               // 如果当前 visitor_id 已经报名，跳转到直播间
-              if (res.data.has_registed) return this.getWebinarStatus();
+              if (res.data.has_registed) {
+                return this.getWebinarStatus();
+              }
               // 如果独立链接无效，显示无效页
               if (res.data.available == 0) return (this.formOpenLinkStatus = 2);
               // 显示报名表单
