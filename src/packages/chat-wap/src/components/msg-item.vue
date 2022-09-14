@@ -689,7 +689,7 @@
           // line-height: 40px;
           font-size: 28px;
           background-color: var(--theme-chat-msg-bg);
-          border-radius: 0 8px 8px 8px;
+          border-radius: 0px 16px 16px 16px;
           span {
             word-break: break-word;
           }
