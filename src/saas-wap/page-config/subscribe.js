@@ -44,11 +44,18 @@ export default {
         method: 'open'
       }
     ],
-    emitSmsVerify: [
+    emitSmsPhone: [
       {
         cuid: 'comSmsVerification',
         method: 'open',
-        args: ['$0']
+        args: false
+      }
+    ],
+    emitSmsPhoneWithVerify: [
+      {
+        cuid: 'comSmsVerification',
+        method: 'open',
+        args: true
       }
     ]
   },

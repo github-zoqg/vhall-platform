@@ -645,12 +645,12 @@
             break;
           case 513421:
             // 短信预约填写手机号(无需验证)
-            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSmsVerify'));
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSmsPhone'));
             break;
           case 513422:
             // 短信预约填写手机号(需要手机验证)
             window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitSmsVerify', [true])
+              boxEventOpitons(this.cuid, 'emitSmsPhoneWithVerify')
             );
             break;
           default:

@@ -1,9 +1,9 @@
 <template>
-  <van-popup v-model="dialogVisible" class="sms-verification" round :close-on-click-overlay="false">
+  <van-popup v-model="dialogVisible" class="sms-verification" round>
     <div class="container">
       <div class="title-wrap">
         <p class="title">{{ $t('appointment.appointment_1034') }}</p>
-        <i class="vh-iconfont vh-line-close" />
+        <i class="vh-iconfont vh-line-close" @click="dialogVisible = false" />
       </div>
       <ul class="form-wrap">
         <li :class="['form-item line', phoneError ? 'error' : '']">
@@ -60,7 +60,7 @@
       const userServerState = this.userServer.state; // 响应式注入
       return {
         userServerState,
-        dialogVisible: true,
+        dialogVisible: false,
         phone: '',
         code: '',
         needVerification: false,
@@ -89,7 +89,7 @@
       }
     },
     mounted() {
-      this.open(false);
+      // this.open(false);
     },
     methods: {
       open(needVerification = false) {
