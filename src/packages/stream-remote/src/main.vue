@@ -242,12 +242,12 @@
     </section>
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
-    <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
+    <!-- <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
       <img :src="coverImgUrl" :class="`vmp-stream-remote__pause-${coverImageMode}`" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
   </div>
 </template>
 
