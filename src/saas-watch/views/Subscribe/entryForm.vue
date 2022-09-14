@@ -64,7 +64,7 @@
           .then(res => {
             // 如果当前 visitor_id 已经报名，跳转到专题页
             if (res.data.has_registed)
-              return (window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${this.webinarOrSubjectId}`);
+              return (window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${this.webinarOrSubjectId}`);
             // 如果独立链接无效，显示无效页
             if (res.data.available == 0) return (this.formOpenLinkStatus = 2);
             // 显示报名表单
@@ -122,10 +122,10 @@
           })
           .then(res => {
             if (res.data.status == 'live') {
-              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarOrSubjectId}`;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/watch/${this.webinarOrSubjectId}`;
             } else if (res.data.status == 'subscribe') {
               // 如果预约或结束，跳转到预约页
-              window.location.href = `//${process.env.VUE_APP_WAP_WATCH}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinarOrSubjectId}`;
+              window.location.href = `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives/subscribe/${this.webinarOrSubjectId}`;
             }
           })
           .catch(e => {
