@@ -6,7 +6,7 @@
         <i class="vh-iconfont vh-line-close" @click="dialogVisible = false" />
       </div>
       <ul class="form-wrap">
-        <li :class="['form-item line', phoneError ? 'error' : '']">
+        <li class="form-item line input-item">
           <van-field
             v-model="phone"
             :placeholder="$t('account.account_1025')"
@@ -14,10 +14,11 @@
             class="input"
             maxlength="15"
           />
+          <p v-if="showPhoneErrorShow" class="error-message">{{ $t('account.account_1069') }}</p>
         </li>
         <template v-if="needVerification">
           <li class="smsVerificationCaptcha form-item"></li>
-          <li class="verification-wrap form-item line">
+          <li class="verification-wrap form-item line input-item">
             <van-field
               v-model="code"
               :placeholder="$t('form.form_1020')"
@@ -37,6 +38,7 @@
                   : $t('account.account_1030')
               }}
             </van-button>
+            <p v-if="showCodeError" class="error-message">{{ $t('form.form_1020') }}</p>
           </li>
         </template>
       </ul>
@@ -65,9 +67,8 @@
         phone: '',
         code: '',
         needVerification: false,
-        phoneError: '',
-        captchaError: '',
-        codeError: ''
+        showPhoneErrorShow: false,
+        showCodeError: false
       };
     },
     beforeCreate() {
@@ -76,11 +77,6 @@
     computed: {
       codeBtnDisabled() {
         return this.phone.length < 11 || this.phone.length > 15;
-        // if (this.needVerification) {
-        // }
-        //   return false;
-        // } else {
-        //   // 不需要验证只要数字为 11-11-15即可
       },
       captchaReady() {
         return !!this.userServerState.captchaVal;
@@ -90,7 +86,7 @@
       }
     },
     mounted() {
-      // this.open(false);
+      // this.open(true);
     },
     methods: {
       open(needVerification = false) {
@@ -104,14 +100,20 @@
         }
       },
       sendCode() {
-        this.userServer.sendCode(this.phone, 12);
+        if (this.checkMobile()) {
+          this.userServer.sendCode(this.phone, 12);
+        }
       },
       // 提交
       handleSumbit() {
-        const validate = this.checkMobile();
-        if (!validate) return false;
+        if (!this.checkMobile()) return false;
+        if (this.needVerification && !this.code) {
+          this.showCodeError = true;
+          return false;
+        }
         const watchInitData = useRoomBaseServer().state?.watchInitData;
         const failure = res => {
+          this.userServer.refreshNECaptha();
           this.$toast(res.msg);
         };
         const params = {
@@ -135,6 +137,7 @@
           .catch(res => failure(res));
       },
       checkMobile() {
+        this.clearVerify();
         let relt;
         if (this.needVerification) {
           const reg = /^1[0-9]{10}$/; // 手机号
@@ -143,18 +146,15 @@
           // 没有开启手机号验证  只有手机号长度
           relt = this.phone.length >= 11 && this.phone.length <= 15;
         }
-        if (relt) {
-          this.clearVerify();
-        } else {
-          this.phoneError = '请输入正确的手机号';
+        if (!relt) {
+          this.showPhoneErrorShow = true;
         }
-        console.log(relt);
         return relt;
       },
       // 清除错误提示
       clearVerify() {
-        this.phoneError = null;
-        // this.userServerState();
+        this.showPhoneErrorShow = false;
+        this.showCodeError = false;
       }
     }
   };
@@ -164,7 +164,7 @@
     overflow: visible; // 易盾在弹层中可能被遮挡
     .container {
       width: 670px;
-      padding: 50px 60px;
+      padding: 50px 60px 64px;
     }
     .title-wrap {
       height: 44px;
@@ -185,9 +185,19 @@
       width: 100%;
     }
     .form-item {
+      position: relative;
       margin-bottom: 30px;
       &.line {
         border-bottom: 1px solid #e6e6e6;
+      }
+      &.input-item {
+        margin-bottom: 48px;
+      }
+      .error-message {
+        position: absolute;
+        bottom: -36px;
+        font-size: 24px;
+        color: #fb2626;
       }
     }
     .smsVerificationCaptcha {
@@ -214,6 +224,10 @@
       display: inline-block;
       width: 60%;
       // border: 1px solid #ccc;
+    }
+    // 覆盖vant-ui
+    .van-cell {
+      padding: 15px 0;
     }
   }
 </style>
