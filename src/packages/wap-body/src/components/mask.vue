@@ -61,7 +61,8 @@
       padding: 0 22px;
       white-space: nowrap;
       z-index: 2000;
-      opacity: 1;
+      background: #000000;
+      opacity: 0.7;
     }
     .center-text {
       height: 144px;
