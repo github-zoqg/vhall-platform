@@ -48,8 +48,9 @@
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
             此处不能用v-if
        -->
+      <!-- h5连麦，大窗情况下，在麦上 + 未展示过滑动提示，展示遮罩层-->
+      <masksliding v-if="!mini"></masksliding>
     </div>
-    <masksliding></masksliding>
     <!-- 弹出直播提醒 -->
     <alertBox
       v-if="isShowLiveStartNotice"
