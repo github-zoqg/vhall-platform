@@ -39,6 +39,7 @@
           ></el-input>
           <span @click="copy">{{ $t('nav.nav_1014') }}</span>
         </div>
+        <div v-if="!isWatchInvite" class="share_tip">注：嘉宾、助理通过正式直播地址参与彩排</div>
       </div>
     </el-dialog>
     <el-dialog
@@ -318,6 +319,11 @@
           vertical-align: top;
           cursor: pointer;
         }
+      }
+      .share_tip {
+        color: #666;
+        font-size: 12px;
+        margin-top: 8px;
       }
     }
     &_other {
