@@ -606,6 +606,7 @@
         });
       },
       handleAuthErrorCode(code, msg) {
+        this.isSubscribeShow = false; // 先关闭弹窗
         this.isWhiteCheck = false; // 是否白名单验证
         switch (code) {
           case 510008: // 未登录
@@ -819,13 +820,13 @@
                 window.location.reload();
               }, 1000);
             }
-          // } else if (res.code === 512525) {
-          //   this.toSignupPage();
-          // } else {
-          //   this.$toast(this.$tec(res.code) || res.msg);
-          // }
+            // } else if (res.code === 512525) {
+            //   this.toSignupPage();
+            // } else {
+            //   this.$toast(this.$tec(res.code) || res.msg);
+            // }
           } else {
-             this.handleAuthErrorCode(res.code, res.msg);
+            this.handleAuthErrorCode(res.code, res.msg);
           }
         });
       },
