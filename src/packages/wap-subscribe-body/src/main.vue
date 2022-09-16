@@ -580,6 +580,7 @@
           ...this.$route.query
         };
         this.subscribeServer.watchAuth(params).then(res => {
+          this.isSubscribeShow = false; // 先关闭弹窗
           if (res.code == 200) {
             if (res.data.status == 'live') {
               let pageUrl = '';
@@ -818,10 +819,13 @@
                 window.location.reload();
               }, 1000);
             }
-          } else if (res.code === 512525) {
-            this.toSignupPage();
+          // } else if (res.code === 512525) {
+          //   this.toSignupPage();
+          // } else {
+          //   this.$toast(this.$tec(res.code) || res.msg);
+          // }
           } else {
-            this.$toast(this.$tec(res.code) || res.msg);
+             this.handleAuthErrorCode(res.code, res.msg);
           }
         });
       },
