@@ -305,8 +305,8 @@
         new Date(
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
         ).getTime() - new Date().getTime();
-      // 倒计时大于0
-      if (this.countDownTime > 0) {
+      // 倒计时大于0小于24小时
+      if (this.countDownTime > 0 && this.countDownTime < 24 * 60 * 60 * 1000) {
         let timer = setInterval(() => {
           this.countDownTime =
             new Date(
