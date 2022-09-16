@@ -56,10 +56,12 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
       },
       mainBackground() {
-        return (
-          JSON.parse(this.$domainStore.state.roomBaseServer.skinInfo.skin_json_pc)
-            .videoBackGroundColor || '#000'
-        );
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonPc = {};
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+        }
+        return skinJsonPc?.videoBackGroundColor || '#000';
       }
     },
     created() {

@@ -284,10 +284,12 @@
         return this.configList['watch_embed_close_entrance'] && this.isEmbed;
       },
       mainBackground() {
-        return (
-          JSON.parse(this.$domainStore.state.roomBaseServer.skinInfo.skin_json_wap)
-            .videoBackGroundColor || '#000'
-        );
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonWap = {};
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skinJsonWap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return skinJsonWap?.videoBackGroundColor || '#000';
       }
     },
     beforeCreate() {
