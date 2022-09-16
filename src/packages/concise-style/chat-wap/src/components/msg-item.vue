@@ -118,7 +118,11 @@
                   "
                 >
                   <span class="nickname">
-                    <span>{{ source.replyMsg.nick_name || source.replyMsg.nickname }}&nbsp;</span>
+                    <span>
+                      {{
+                        source.replyMsg.nick_name || source.replyMsg.nickname | overHidden(8)
+                      }}&nbsp;
+                    </span>
                   </span>
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
                   <template v-if="!!!source.replyMsg.content.text_content">
@@ -381,7 +385,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#FB2626'>${userName}</span>`
+                  `<span style='color:#FB2626'>${this.overHidden(userName, 8)}</span>`
                 )
               );
             }

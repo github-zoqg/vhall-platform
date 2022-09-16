@@ -132,7 +132,7 @@
                   <img class="chat-avatar" :src="source.replyMsg.avatar || defaultAvatar" alt />
                   <span
                     class="nickname"
-                    v-html="source.replyMsg.nick_name || source.replyMsg.nickname"
+                    v-html="overHidden(source.replyMsg.nick_name || source.replyMsg.nickname, 8)"
                   />
                   <span>&nbsp;</span>
                   <span class="chat-text" v-html="source.replyMsg.content.text_content" />
@@ -421,7 +421,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                  `<span style='color:#3562fa'>${this.overHidden(userName, 8)}</span>`
                 )
               );
             }
