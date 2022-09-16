@@ -50,7 +50,7 @@
       <handup class=""></handup>
     </div>
     <!-- 互动工具 -->
-    <ul v-if="!isTrySee && !isInGroup" class="vmp-footer-tools__right">
+    <ul v-if="!isTrySee && !isInGroup && vodType != 'shikan'" class="vmp-footer-tools__right">
       <li v-if="isLiving">
         <!-- 公告 直播显示公告 -->
         <notice ref="notice"></notice>
@@ -292,6 +292,15 @@
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
         return this.roomBaseServer.state.configList['watch_embed_close_entrance'] && this.isEmbed;
+      },
+      // 是否是试看
+      vodType() {
+        const { webinar, status } = this.roomBaseServer.state.watchInitData;
+        if (status !== 'live' && (webinar.type === 5 || webinar.type === 4)) {
+          return 'shikan';
+        } else {
+          return '';
+        }
       }
     },
     beforeCreate() {
