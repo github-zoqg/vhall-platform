@@ -6,6 +6,18 @@
 缓存类型：js|css 
 缓存时间：604800（7天）
 
+
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ cd /Users/shaoyongkai/
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ll
+-bash: ll: command not found
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ ls
+Applications		Downloads		Pictures		go			sensors
+Aurora			Library			Public			ossutil_output		vhall
+Desktop			Movies			example.com+4-key.pem	ossutilmac64
+Documents		Music			example.com+4.pem	pnpm
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ vim .ossutilconfig
+shaoyongkaideMacBook-Pro:~ shaoyongkai$ 
+
 Error: accessKeyID and ecsUrl are both empty
 shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/images/base-right.png Cache-Control:max-age=2592000
 
@@ -41,6 +53,10 @@ shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstati
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-wap Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-watch Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-live Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
+
+
+
+./ossutilmac64 set-meta oss://t-vhallsaas-static/common-static/saas-live Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 
 #上传目录
 ./ossutilmac64 set-meta oss://vhallstatic/upload/ Cache-Control:max-age=31536000 --include "*.jpg" --include "*.png" --include "*.gif" -r -u
