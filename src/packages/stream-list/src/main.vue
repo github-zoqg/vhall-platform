@@ -102,6 +102,7 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
+        timmer: null,
         streamInfo
       };
     },
@@ -243,6 +244,14 @@
         return this.isPolling
           ? !!this.isNoDelay
           : this.remoteSpeakers.length && this.liveStatus == 1;
+      },
+      mainBackground() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonPc = {};
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+        }
+        return skinJsonPc?.videoBackGroundColor || '#000';
       }
     },
     watch: {
@@ -309,9 +318,35 @@
 
     mounted() {
       this.computTop();
+      this.setMainScreenBg();
+      this.micServer.$on('vrtc_big_screen_set', msg => {
+        this.setMainScreenBg();
+      });
     },
 
     methods: {
+      // 设置主画面背景色
+      setMainScreenBg() {
+        if (this.joinInfo.role_name != 2) return;
+        let num = 10;
+        this.$nextTick(() => {
+          this.timmer = setInterval(() => {
+            num--;
+            let allStream = document.querySelectorAll('#vmp-stream-list .licode_player');
+
+            let mainDom = document.querySelector('.vmp-stream-list__main-screen .licode_player');
+            if (mainDom) {
+              clearInterval(this.timmer);
+              allStream.forEach(el => {
+                el.style.backgroundColor = 'black';
+              });
+              console.log('主画面dom', allStream.length, num);
+              mainDom.style.backgroundColor = this.mainBackground;
+            }
+            if (num <= 0) clearInterval(this.timmer);
+          }, 200);
+        });
+      },
       /**
        * 左右翻页更改streamWrapper的scrollLeft值实现滚动
        */

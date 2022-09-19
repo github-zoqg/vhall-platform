@@ -304,7 +304,6 @@
           // 非无延迟互动，下麦退出全屏
           if (
             this.interactiveServer.state.fullScreenType &&
-            this.micServer.state.speakerList.length <= 1 &&
             this.isNoDelay != 1 &&
             this.mode == 3
           ) {
