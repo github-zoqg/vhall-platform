@@ -1,3 +1,11 @@
+图片字体动画音视频资源
+缓存类型：jpg|jpeg|png|gif|svg|webp|bmp|ico|woff|woff2|ttf|svga|mp3|mp4
+缓存时间：31536000（一年）
+
+脚本样式资源
+缓存类型：js|css 
+缓存时间：604800（7天）
+
 Error: accessKeyID and ecsUrl are both empty
 shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstatic/common-static/images/base-right.png Cache-Control:max-age=2592000
 
