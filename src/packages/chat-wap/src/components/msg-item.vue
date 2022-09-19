@@ -181,7 +181,9 @@
                     "
                   >
                     <span
-                      v-html="overHidden(source.replyMsg.nick_name || source.replyMsg.nickname, 8)"
+                      v-html="
+                        overHidden(source.replyMsg.nick_name || source.replyMsg.nickname, 8) + ' '
+                      "
                     />
                     ：
                     <span v-html="source.replyMsg.content.text_content" />
@@ -455,7 +457,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#3562fa'>${this.overHidden(userName, 8)}</span>`
+                  `<span style='color:#3562fa'>${this.overHidden(userName, 8)} </span>`
                 )
               );
             }

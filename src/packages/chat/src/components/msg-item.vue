@@ -114,7 +114,7 @@
                     `<span class='reply-wrapper__content__nick-name'>${overHiddenFunc(
                       source.replyMsg.nickname || source.replyMsg.nick_name,
                       8
-                    )}</span>${source.replyMsg.content.text_content}`
+                    )} </span>${source.replyMsg.content.text_content}`
                   "
                 ></p>
                 <!-- 图片 -->
@@ -140,7 +140,9 @@
                     v-if="!source.replyMsg.content.text_content"
                     class="reply-wrapper__img-wrapper__nick-name"
                   >
-                    {{ overHiddenFunc(source.replyMsg.nickname || source.replyMsg.nick_name, 8) }}
+                    {{
+                      overHiddenFunc(source.replyMsg.nickname || source.replyMsg.nick_name, 8) + ' '
+                    }}
                   </span>
                   <p
                     v-if="!source.replyMsg.content.text_content"
@@ -486,7 +488,7 @@
                   userName,
                   `<span class='normal-msg__content-wrapper__at ${
                     !isStart ? 'normal-msg__content-wrapper__at-ml__4' : ''
-                  }'>${this.overHiddenFunc(userName, 8)}</span>`
+                  }'>${this.overHiddenFunc(userName, 8)} </span>`
                 )
               );
             }

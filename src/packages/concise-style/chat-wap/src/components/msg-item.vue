@@ -385,7 +385,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#FB2626'>${this.overHidden(userName, 8)}</span>`
+                  `<span style='color:#FB2626'>${this.overHidden(userName, 8)} </span>`
                 )
               );
             }
