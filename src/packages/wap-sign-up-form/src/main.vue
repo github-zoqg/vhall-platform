@@ -2117,9 +2117,10 @@
         font-size: 0.37rem;
         color: #1a1a1a;
         word-break: break-all;
+        position: relative;
         .vh-line-check {
           position: absolute;
-          left: 0.267rem;
+          left: 0;
           top: 50%;
           transform: translateY(-50%);
           /* prettier-ignore */
