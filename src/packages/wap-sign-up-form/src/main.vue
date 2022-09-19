@@ -2100,8 +2100,8 @@
           background: #dedede !important;
           border: 0.02rem solid #dedede !important;
           &.enable {
-            border: 0.02rem solid #fb3a32 !important;
-            background-color: #fb3a32 !important;
+            border: 0.02rem solid var(--theme-color) !important;
+            background-color: var(--theme-color) !important;
           }
         }
       }

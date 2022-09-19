@@ -2484,11 +2484,11 @@
         }
       }
       .isLoginActive {
-        background: #fb3a32;
+        background-color: var(--theme-color);
         color: #fff;
         cursor: pointer;
         &.is-disabled:hover {
-          background: #fb3a32;
+          background-color: var(--theme-color);
           color: #fff;
           cursor: not-allowed;
         }
