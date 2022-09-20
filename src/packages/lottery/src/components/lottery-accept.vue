@@ -109,6 +109,7 @@
     },
     async created() {
       await this.initStepHtmlList();
+      this.fillUserInfo();
       const retReciveInfo = {};
       this.stepHtmlList.forEach(element => {
         retReciveInfo[element.field_key] = '';
@@ -205,6 +206,15 @@
           .catch(err => {
             failure(err);
           });
+      },
+      // 用户信息预填
+      fillUserInfo() {
+        this.lotteryServer.getLotteryUserInfo().then(res => {
+          const data = res.data;
+          this.reciveInfo['name'] = data.lottery_user_name;
+          this.reciveInfo['phone'] = data.lottery_user_phone;
+          this.reciveInfo['address'] = data.lottery_user_address;
+        });
       }
     }
   };
