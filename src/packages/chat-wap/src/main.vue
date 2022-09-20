@@ -178,6 +178,9 @@
       },
       isWapBodyDocSwitch() {
         this.changeChatHeight();
+      },
+      chatlistHeight(val, oldVal) {
+        console.log('chatlistHeight----', val, oldVal);
       }
     },
     computed: {
