@@ -7,7 +7,7 @@
         <span>时</span>
         <span>{{ countDown.time_m }}</span>
         <span>分</span>
-        <span>{{ countDown.time_h }}</span>
+        <span>{{ countDown.time_s }}</span>
         <span>秒</span>
       </div>
       <record-control
