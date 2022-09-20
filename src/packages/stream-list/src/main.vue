@@ -322,6 +322,15 @@
       this.micServer.$on('vrtc_big_screen_set', msg => {
         this.setMainScreenBg();
       });
+      this.interactiveServer.$on('EVENT_REMOTESTREAM_ADD', msg => {
+        this.setMainScreenBg();
+      });
+      this.interactiveServer.$on('EVENT_REMOTESTREAM_REMOVED', msg => {
+        this.setMainScreenBg();
+      });
+      this.micServer.$on('vrtc_connect_success', msg => {
+        this.setMainScreenBg();
+      });
     },
 
     methods: {
