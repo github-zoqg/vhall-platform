@@ -292,6 +292,17 @@
           }
         },
         immediate: true
+      },
+      // 设置主画面背景色
+      mainBackground: {
+        handler(val) {
+          console.log('mainBackground---', val);
+          this.$nextTick(() => {
+            const dom = document.getElementById('vmp-stream-list');
+            dom.setAttribute('style', `--main-bg-color:${val}`);
+          });
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -318,44 +329,9 @@
 
     mounted() {
       this.computTop();
-      this.setMainScreenBg();
-      this.micServer.$on('vrtc_big_screen_set', msg => {
-        this.setMainScreenBg();
-      });
-      this.interactiveServer.$on('EVENT_REMOTESTREAM_ADD', msg => {
-        this.setMainScreenBg();
-      });
-      this.interactiveServer.$on('EVENT_REMOTESTREAM_REMOVED', msg => {
-        this.setMainScreenBg();
-      });
-      this.micServer.$on('vrtc_connect_success', msg => {
-        this.setMainScreenBg();
-      });
     },
 
     methods: {
-      // 设置主画面背景色
-      setMainScreenBg() {
-        if (this.joinInfo.role_name != 2) return;
-        let num = 10;
-        this.$nextTick(() => {
-          this.timmer = setInterval(() => {
-            num--;
-            let allStream = document.querySelectorAll('#vmp-stream-list .licode_player');
-
-            let mainDom = document.querySelector('.vmp-stream-list__main-screen .licode_player');
-            if (mainDom) {
-              clearInterval(this.timmer);
-              allStream.forEach(el => {
-                el.style.backgroundColor = 'black';
-              });
-              console.log('主画面dom', allStream.length, num);
-              mainDom.style.backgroundColor = this.mainBackground;
-            }
-            if (num <= 0) clearInterval(this.timmer);
-          }, 200);
-        });
-      },
       /**
        * 左右翻页更改streamWrapper的scrollLeft值实现滚动
        */
@@ -425,13 +401,16 @@
     justify-content: center;
     // background: #000;
     border-bottom: 1px solid #1f1f1f;
-
+    --main-bg-color: #000;
     // 流列表高度为0
     &-h0 {
       height: 0 !important;
       .vmp-stream-list__main-screen {
         top: 0 !important;
       }
+    }
+    .vmp-stream-list__main-screen div.licode_player {
+      background-color: var(--main-bg-color) !important;
     }
 
     &__stream-wrapper {

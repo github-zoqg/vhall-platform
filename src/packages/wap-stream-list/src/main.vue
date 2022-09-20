@@ -294,6 +294,19 @@
         return skinJsonWap?.videoBackGroundColor || '#000';
       }
     },
+    watch: {
+      // 设置主画面背景色
+      mainBackground: {
+        handler(val) {
+          console.log('mainBackground---', val);
+          this.$nextTick(() => {
+            const dom = document.getElementById('vmp-stream-list');
+            dom.setAttribute('style', `--main-bg-color:${val}`);
+          });
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.interactiveServer = useInteractiveServer();
       this.roomBaseServer = useRoomBaseServer();
@@ -329,20 +342,6 @@
 
       this.addSDKEvents();
       this.fiveDown();
-
-      this.setMainScreenBg();
-      this.micServer.$on('vrtc_big_screen_set', msg => {
-        this.setMainScreenBg();
-      });
-      this.interactiveServer.$on('EVENT_REMOTESTREAM_ADD', msg => {
-        this.setMainScreenBg();
-      });
-      this.interactiveServer.$on('EVENT_REMOTESTREAM_REMOVED', msg => {
-        this.setMainScreenBg();
-      });
-      this.micServer.$on('vrtc_connect_success', msg => {
-        this.setMainScreenBg();
-      });
     },
     beforeDestroy() {
       if (this.scroll) {
@@ -351,29 +350,6 @@
     },
 
     methods: {
-      // 设置主画面背景色
-      setMainScreenBg() {
-        if (this.joinInfo.role_name != 2) return;
-        let num = 10;
-        this.$nextTick(() => {
-          this.timmer = setInterval(() => {
-            num--;
-            let allStream = document.querySelectorAll('#vmp-stream-list .licode_player');
-
-            let mainDom = document.querySelector('.vmp-stream-list__main-screen .licode_player');
-            if (mainDom) {
-              clearInterval(this.timmer);
-              allStream.forEach(el => {
-                el.style.backgroundColor = 'black';
-              });
-              console.log('主画面dom', allStream.length, num);
-              // mainDom.style.borderColor = `1px solid ${this.mainBackground}`;
-              mainDom.style.backgroundColor = this.mainBackground;
-            }
-            if (num <= 0) clearInterval(this.timmer);
-          }, 200);
-        });
-      },
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
         this.$nextTick(() => {
@@ -732,6 +708,10 @@
   .vmp-stream-list {
     height: 83px;
     display: inline-block;
+    --main-bg-color: #000;
+    .vmp-stream-list__main-screen div.licode_player {
+      background-color: var(--main-bg-color) !important;
+    }
     &__local-container {
       width: 148px;
       height: 100%;
