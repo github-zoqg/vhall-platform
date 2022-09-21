@@ -323,6 +323,18 @@
           }
         });
 
+        // 下麦成功
+        this.micServer.$on('before_vrtc_disconnect_success', async () => {
+          // 非无延迟互动，下麦退出全屏
+          if (
+            this.interactiveServer.state.fullScreenType &&
+            this.isNoDelay != 1 &&
+            this.mode == 3
+          ) {
+            this.exitFullscreen();
+          }
+        });
+
         // micServe异常处理
         this.micServer.$on('vrtc_exception_msg', msg => {
           if (msg.type === 1039) {
