@@ -92,7 +92,7 @@
       white-space: nowrap;
     }
     .role_doc {
-      width: 500px;
+      max-width: 500px;
     }
     .vhall-room-id-container {
       height: 20px;
