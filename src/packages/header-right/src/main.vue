@@ -229,7 +229,7 @@
       // 开播倒计时
       countDown() {
         let countDown = this.countDownTime;
-        if (countDown <= 0) return;
+        if (countDown <= 0 || countDown > 24 * 60 * 60 * 1000) return;
         let h, m, s, _h, _m, time_str, timeObj;
         h = parseInt(countDown / (60 * 60 * 1000));
         _h = parseInt(countDown % (60 * 60 * 1000));
@@ -306,7 +306,7 @@
           this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
         ).getTime() - new Date().getTime();
       // 倒计时大于0小于24小时
-      if (this.countDownTime > 0 && this.countDownTime < 24 * 60 * 60 * 1000) {
+      if (this.countDownTime > 0) {
         let timer = setInterval(() => {
           this.countDownTime =
             new Date(

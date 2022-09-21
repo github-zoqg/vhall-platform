@@ -39,7 +39,9 @@
           ></el-input>
           <span @click="copy">{{ $t('nav.nav_1014') }}</span>
         </div>
-        <div v-if="!isWatchInvite" class="share_tip">注：嘉宾、助理通过正式直播地址参与彩排</div>
+        <div v-if="!isWatchInvite && isRehearsal" class="share_tip">
+          注：嘉宾、助理通过正式直播地址参与彩排
+        </div>
       </div>
     </el-dialog>
     <el-dialog
