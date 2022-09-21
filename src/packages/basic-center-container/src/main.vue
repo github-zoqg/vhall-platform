@@ -6,6 +6,7 @@
         'vmp-basic-center-embed': isEmbed
       }
     ]"
+    :style="{ background: mainBackground }"
   >
     <!-- 流列表 -->
     <vmp-air-container :cuid="cuid"></vmp-air-container>
@@ -53,6 +54,14 @@
       // },
       coverImgUrl() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
+      },
+      mainBackground() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonPc = {};
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+        }
+        return skinJsonPc?.videoBackGroundColor || '#000';
       }
     },
     created() {
@@ -118,6 +127,7 @@
       justify-content: center;
       align-items: center;
       z-index: 11;
+      background-color: #000;
       &.cover_embed {
         width: calc(100% - 360px) !important;
       }

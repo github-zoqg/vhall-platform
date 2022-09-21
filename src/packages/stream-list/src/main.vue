@@ -102,6 +102,7 @@
         childrenCom: [],
         isShowInteract: true, // 是否展示互动区
         isShowControlArrow: false, // 是否展示左右按钮
+        timmer: null,
         streamInfo
       };
     },
@@ -243,6 +244,14 @@
         return this.isPolling
           ? !!this.isNoDelay
           : this.remoteSpeakers.length && this.liveStatus == 1;
+      },
+      mainBackground() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonPc = {};
+        if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
+          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+        }
+        return skinJsonPc?.videoBackGroundColor || '#000';
       }
     },
     watch: {
@@ -281,6 +290,17 @@
               useRoomBaseServer().setChangeElement('stream-list');
             }
           }
+        },
+        immediate: true
+      },
+      // 设置主画面背景色
+      mainBackground: {
+        handler(val) {
+          console.log('mainBackground---', val);
+          this.$nextTick(() => {
+            const dom = document.getElementById('vmp-stream-list');
+            dom.setAttribute('style', `--main-bg-color:${val}`);
+          });
         },
         immediate: true
       }
@@ -377,18 +397,21 @@
   .vmp-stream-list {
     height: 80px;
     width: 100%;
-    background-color: #242424;
     display: flex;
     justify-content: center;
-    background: #000;
+    // background: #000;
     border-bottom: 1px solid #1f1f1f;
-
+    --main-bg-color: #000;
     // 流列表高度为0
     &-h0 {
       height: 0 !important;
       .vmp-stream-list__main-screen {
         top: 0 !important;
       }
+    }
+    .vmp-stream-list__main-screen div.licode_player,
+    .vmp-stream-list__stream-wrapper {
+      background-color: var(--main-bg-color) !important;
     }
 
     &__stream-wrapper {

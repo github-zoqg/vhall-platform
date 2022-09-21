@@ -242,12 +242,12 @@
     </section>
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
-    <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
+    <!-- <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
       <img :src="coverImgUrl" :class="`vmp-stream-remote__pause-${coverImageMode}`" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
   </div>
 </template>
 
@@ -505,23 +505,32 @@
       // 恢复播放
       replayPlay() {
         clearTimeout(this.timmer);
+        const _this = this;
+        function videoPlay(video) {
+          video
+            .play()
+            .then(res => {
+              console.log('play-res-', res, _this.interactiveServer.state.showPlayIcon);
+              if (_this.interactiveServer.state.showPlayIcon) {
+                _this.interactiveServer.state.showPlayIcon = false;
+              }
+            })
+            .catch(err => {
+              console.log('play-err-', err);
+              if (err.name == 'NotAllowedError' || err.name == 'NotSupportedError') {
+                _this.interactiveServer.state.showPlayIcon = true;
+              }
+            });
+        }
         let videos = document.querySelectorAll('.vmp-stream-remote video');
+        let localVideo = document.querySelectorAll('.vmp-stream-local video')[0];
+        console.log('本地流video', localVideo);
+        if (localVideo && this.joinInfo.role_name == 2) {
+          videoPlay(localVideo);
+        }
         videos.length > 0 &&
           videos.forEach(video => {
-            video
-              .play()
-              .then(res => {
-                console.log('play-res-', res, this.interactiveServer.state.showPlayIcon);
-                if (this.interactiveServer.state.showPlayIcon) {
-                  this.interactiveServer.state.showPlayIcon = false;
-                }
-              })
-              .catch(err => {
-                console.log('play-err-', err);
-                if (err.name == 'NotAllowedError' || err.name == 'NotSupportedError') {
-                  this.interactiveServer.state.showPlayIcon = true;
-                }
-              });
+            videoPlay(video);
           });
       },
       async subscribeRemoteStream() {

@@ -296,8 +296,8 @@
     min-height: 94px;
     margin-top: -94px;
     font-size: 28px;
-    background-color: #fff;
-    box-shadow: 0px -1px 1px #f1f1f1;
+    background-color: var(--theme-chat-sendBox-model-bg-color);
+    box-shadow: 0px -1px 1px var(--theme-chat-sendBox-box-shadow-color);
     .noMsg {
       opacity: 0.4 !important;
     }
@@ -321,7 +321,8 @@
         width: 64px;
         height: 64px;
         min-height: 64px;
-        color: #262626;
+        // 表情按钮icon字体色
+        color: var(--theme-chat-sendBox-emoji-font-color);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -338,10 +339,14 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #f0f0f0;
+          // 发送消息按钮icon字体色
+          color: var(--theme-chat-sendBox-send-active-font-color);
+          background-color: var(--theme-chat-sendBox-send-bg-color);
 
           &.noMsg {
-            opacity: 0.4;
+            // 发送消息按钮icon禁用字体色
+            color: var(--theme-chat-sendBox-send-font-color);
+            // opacity: 0.4;
           }
           .vh-iconfont {
             font-size: 34px;
@@ -351,7 +356,8 @@
 
       .textarea {
         textarea {
-          background-color: #f0f0f0;
+          background-color: var(--theme-chat-sendBox-input-bg-color);
+          color: var(--theme-chat-sendBox-input-font-color);
           min-height: 64px !important;
           padding: 10px 24px !important;
           max-height: 144px !important;
@@ -364,6 +370,7 @@
         }
         .el-textarea__inner::-webkit-input-placeholder {
           font-size: 28px !important;
+          color: var(--theme-chat-sendBox-input-placeholder-color);
         }
         .el-textarea__inner {
           line-height: 50px;
@@ -377,12 +384,12 @@
       margin: 0 24px;
       position: relative;
       .text-limit {
-        background-color: #f0f0f0;
+        background-color: var(--theme-chat-sendBox-input-bg-color);
         position: absolute;
         bottom: 16px;
         right: 12px;
         font-size: 24px;
-        color: #bfbfbf;
+        color: var(--theme-chat-sendBox-input-max-font-color);
         padding-left: 4px;
         line-height: 32px;
         > span {
