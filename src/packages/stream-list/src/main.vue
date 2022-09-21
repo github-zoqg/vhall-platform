@@ -409,7 +409,8 @@
         top: 0 !important;
       }
     }
-    .vmp-stream-list__main-screen div.licode_player {
+    .vmp-stream-list__main-screen div.licode_player,
+    .vmp-stream-list__stream-wrapper {
       background-color: var(--main-bg-color) !important;
     }
 
