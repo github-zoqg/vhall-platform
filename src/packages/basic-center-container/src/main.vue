@@ -127,6 +127,7 @@
       justify-content: center;
       align-items: center;
       z-index: 11;
+      background-color: #000;
       &.cover_embed {
         width: calc(100% - 360px) !important;
       }
@@ -141,11 +142,11 @@
         object-fit: fill;
       }
       &-2 {
-        object-fit: fill;
+        object-fit: cover;
         object-position: left top;
       }
       &-3 {
-        object-fit: fill;
+        object-fit: contain;
         object-position: center;
       }
       &-icon {
