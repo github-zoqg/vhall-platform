@@ -141,11 +141,11 @@
         object-fit: fill;
       }
       &-2 {
-        object-fit: cover;
+        object-fit: fill;
         object-position: left top;
       }
       &-3 {
-        object-fit: contain;
+        object-fit: fill;
         object-position: center;
       }
       &-icon {

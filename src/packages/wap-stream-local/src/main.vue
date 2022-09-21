@@ -301,15 +301,6 @@
 
         // 下麦成功
         this.micServer.$on('vrtc_disconnect_success', async () => {
-          // 非无延迟互动，下麦退出全屏
-          if (
-            this.interactiveServer.state.fullScreenType &&
-            this.isNoDelay != 1 &&
-            this.mode == 3
-          ) {
-            console.log('wap-exitFullscreen-----1');
-            this.exitFullscreen();
-          }
           await this.stopPush({ type: 'vrtc_disconnect_success' });
 
           await this.interactiveServer.destroy();
@@ -562,26 +553,6 @@
           .then(() => {
             this.interactiveServer.state.fullScreenType = false;
           });
-      },
-      getFullscreenElement() {
-        return (
-          document.fullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullScreenElement ||
-          document.webkitFullscreenElement ||
-          null
-        );
-      },
-      exitFullscreen() {
-        if (document.exitFullScreen) {
-          document.exitFullScreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
       }
     }
   };

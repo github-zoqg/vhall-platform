@@ -317,15 +317,14 @@
       this.childrenCom = window.$serverConfig[this.cuid].children;
 
       // 订阅流播放失败
-      /**
-       * this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
+      this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', () => {
         let videos = document.querySelectorAll('video');
         videos.length > 0 &&
           videos.forEach(video => {
             video.pause();
           });
         this.interactiveServer.state.showPlayIcon = true;
-      });*/
+      });
     },
 
     mounted() {

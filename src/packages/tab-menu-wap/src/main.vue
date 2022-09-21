@@ -68,7 +68,9 @@
     useDocServer,
     useMsgServer,
     useGroupServer,
-    useRoomBaseServer
+    useRoomBaseServer,
+    useInteractiveServer,
+    useMicServer
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
@@ -198,6 +200,8 @@
       this.menuServer = useMenuServer();
       this.docServer = useDocServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.micServer = useMicServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       // if (this.isTryVideo && this.isSubscribe) return;
@@ -212,6 +216,16 @@
       this.selectDefault();
       this.setSetingHeight();
       this.computedWidth();
+      this.micServer.$on('vrtc_disconnect_success', async () => {
+        // 非无延迟互动，下麦退出全屏
+        if (this.interactiveServer.state.fullScreenType && this.isNoDelay != 1 && this.mode == 3) {
+          console.log('wap-exitFullscreen-----1');
+          this.exitFullscreen();
+          setTimeout(() => {
+            this.setSetingHeight();
+          }, 500);
+        }
+      });
     },
 
     methods: {
@@ -627,6 +641,26 @@
 
         await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
+      },
+      getFullscreenElement() {
+        return (
+          document.fullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullScreenElement ||
+          document.webkitFullscreenElement ||
+          null
+        );
+      },
+      exitFullscreen() {
+        if (document.exitFullScreen) {
+          document.exitFullScreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
       }
     }
   };

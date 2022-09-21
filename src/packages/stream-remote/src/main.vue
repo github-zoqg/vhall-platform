@@ -506,6 +506,11 @@
       replayPlay() {
         clearTimeout(this.timmer);
         let videos = document.querySelectorAll('.vmp-stream-remote video');
+        let localVideo = document.querySelectorAll('.vmp-stream-local video')[0];
+        console.log('本地流video', localVideo);
+        if (localVideo) {
+          videos.push(localVideo);
+        }
         videos.length > 0 &&
           videos.forEach(video => {
             video
