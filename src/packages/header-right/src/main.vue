@@ -39,7 +39,7 @@
         </template>
         <template v-else>
           <div
-            v-if="liveStep == 1"
+            v-if="liveStep == 1 && configList['live_rehearsal']"
             class="vmp-header-right_btn rehearsal"
             :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
             @click="doStartClick($event, true)"
