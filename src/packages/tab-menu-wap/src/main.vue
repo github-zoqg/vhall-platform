@@ -164,6 +164,9 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      isNoDelay() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     watch: {
@@ -218,7 +221,11 @@
       this.computedWidth();
       this.micServer.$on('vrtc_disconnect_success', async () => {
         // 非无延迟互动，下麦退出全屏
-        if (this.interactiveServer.state.fullScreenType && this.isNoDelay != 1 && this.mode == 3) {
+        if (
+          this.interactiveServer.state.fullScreenType &&
+          this.isNoDelay != 1 &&
+          this.webinarInfo.mode == 3
+        ) {
           console.log('wap-exitFullscreen-----1');
           this.exitFullscreen();
           setTimeout(() => {
