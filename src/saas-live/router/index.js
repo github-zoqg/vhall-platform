@@ -6,6 +6,7 @@ import VueRouter from 'vue-router';
 // import PasswordLogin from '@/packages/password-login/index';
 import grayInit from '@/app-shared/gray-init';
 import pageConfig from '../page-config/index';
+import { useUserServer } from 'middle-domain';
 
 Vue.use(VueRouter);
 
@@ -106,6 +107,36 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  const linkToken = to.query?.token || to.query?.liveT || to.query?.live_token || '';
+  //非地址栏 token信息加入 token刷新校验
+  if (!linkToken) {
+    const token = localStorage.getItem('token') || '';
+    if (token) {
+      //发起端、控制台进入页面添加刷新token机制,每七天刷新一次。  7*24*3600*1000 mm
+      let tokenRefresh = localStorage.getItem('tokenRefresh') || new Date().getTime();
+      tokenRefresh = parseFloat(tokenRefresh);
+      const curTime = new Date().getTime();
+      const dur = 7 * 24 * 3600 * 1000;
+      console.log('Token-Refresh:', new Date(tokenRefresh).toLocaleString(), tokenRefresh);
+      if (curTime - tokenRefresh > dur) {
+        useUserServer()
+          .refreshToken()
+          .then(res => {
+            console.log(res);
+            localStorage.setItem('token', res.data.token || '');
+            localStorage.setItem('tokenRefresh', new Date().getTime());
+            localStorage.setItem('tokenExpiredTime', res.data.exp_time || '');
+          })
+          .catch(error => {
+            // token 失效
+            if (error.code == 511006 || error.code == 511007 || error.code == 511004) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('tokenExpiredTime');
+            }
+          });
+      }
+    }
+  }
   if (to.meta.page && (!window.$serverConfig || window.$serverConfig._page !== to.meta.page)) {
     // 根据不同的页面，动态加载不同的配置
     window.$serverConfig = pageConfig[to.meta.page];

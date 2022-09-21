@@ -910,8 +910,8 @@ export default {
   privacy: {
     privacy_1001: '阅读并同意{n}及{n1}',
     privacy_1002: '提交即同意{n}及{n1}',
-    privacy_1003: '《微吼用户保护协议》',
-    privacy_1004: '《微吼隐私政策》',
+    privacy_1003: '《用户保护协议》',
+    privacy_1004: '《隐私政策》',
     privacy_1005: '请先阅读并同意隐私政策及用户服务协议'
   }
 };
