@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
-      <div v-if="countDown" class="rehearsal_countDown">
+      <div v-if="countDown && (!isLiving || (isRehearsal && isLiving))" class="rehearsal_countDown">
         <span v-show="roleName != 1">距离开播：</span>
         <span>{{ countDown.time_h }}</span>
         <span>时</span>
@@ -978,6 +978,7 @@
         margin-right: 12px;
         box-sizing: border-box;
         width: 100px;
+        position: relative;
         &:hover {
           border: 1px solid #fb3a32;
           background-color: #fb3a32;
