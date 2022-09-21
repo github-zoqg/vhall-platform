@@ -649,15 +649,6 @@
         await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
       },
-      getFullscreenElement() {
-        return (
-          document.fullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullScreenElement ||
-          document.webkitFullscreenElement ||
-          null
-        );
-      },
       exitFullscreen() {
         if (document.exitFullScreen) {
           document.exitFullScreen();
