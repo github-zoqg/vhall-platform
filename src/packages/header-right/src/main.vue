@@ -32,7 +32,7 @@
           <div
             v-if="liveStep == 1"
             class="vmp-header-right_btn rehearsal"
-            :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+            :class="isStreamYun && !director_stream ? 'right_btn_dis rehearsal_yun' : ''"
             @click="doStartClick($event, true)"
           >
             开始彩排
@@ -948,9 +948,14 @@
         }
       }
     }
+    .rehearsal_yun:hover {
+      border: 1px solid rgba(252, 86, 89, 0.5) !important;
+      background-color: rgba(252, 86, 89, 0.5) !important;
+    }
     .right_btn_dis {
-      background: #fc5659;
-      opacity: 0.5;
+      background: rgba(252, 86, 89, 0.5);
+      // background: #fc5659;
+      // opacity: 0.5;
     }
     .vmp-header-right_duration {
       &-end {
