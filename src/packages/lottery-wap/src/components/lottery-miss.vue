@@ -4,7 +4,9 @@
     <p class="lottery-result">{{ $t('interact_tools.interact_tools_1022') }}</p>
     <p class="no-win-tip">
       {{
-        `${$t('interact_tools.interact_tools_1010')}，${$t('interact_tools.interact_tools_1011')}`
+        `${$t('interact_tools.interact_tools_1010')},${$t(
+          'interact_tools.interact_tools_1011'
+        ).toLocaleLowerCase()}`
       }}!
     </p>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">

@@ -182,7 +182,7 @@
     width: 94%;
     margin: 0px auto 40px auto;
     word-break: break-all;
-    padding: 0 30px;
+    padding: 8px 30px 12px;
     line-height: 1.4;
     color: var(--theme-tab-content-rank-rule-content-font);
     background: var(--theme-tab-content-rank-rule-content-bg);

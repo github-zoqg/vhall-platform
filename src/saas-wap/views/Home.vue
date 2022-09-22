@@ -33,6 +33,7 @@
   import bindWeiXin from '../headless/bindWeixin.js';
   import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
+  import { imgPositionSizeMap } from '@/app-shared/utils/imgModeMap.js';
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
@@ -387,7 +388,10 @@
         }
         if (skin?.wapBackground) {
           app.style.backgroundImage = `url(${skin?.wapBackground})`;
-          app.style.backgroundSize = 'cover';
+          const styleMap = imgPositionSizeMap[skin?.backgroundSize?.imageCropMode || 2];
+          for (let key in styleMap) {
+            app.style[key] = styleMap[key];
+          }
         } else {
           if (style == 'main' && (theme == 'black' || theme == 'white')) {
             if (theme == 'black') {

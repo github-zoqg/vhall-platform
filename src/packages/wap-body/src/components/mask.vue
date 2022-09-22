@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-mask-top" v-show="showMask">
-    <div :class="[activeClass]" id="mask-center">
+    <div class="vmp-mask-top__center" id="mask-center">
       <div class="top-area"><i class="vh-saas-iconfont vh-saas-a-icon_zuoyouhuadong2x"></i></div>
       <div class="center-text">{{ $t('other.other_1007') }}</div>
       <div class="bottom-btn" @click="clickSure">{{ $t('other.other_1015') }}</div>
@@ -14,8 +14,7 @@
     name: 'MaskTop',
     data() {
       return {
-        maskStatus: true,
-        activeClass: 'center'
+        maskStatus: true
       };
     },
     computed: {
@@ -27,9 +26,7 @@
         return this.maskStatus && useMicServer().state.isSpeakOn;
       }
     },
-    created() {
-      this.setfirstModelStatus();
-    },
+    created() {},
     mounted() {
       if (sessionStorage.getItem(`${this.webinarId}_mask`)) {
         this.maskStatus = false;
@@ -39,15 +36,6 @@
       clickSure() {
         this.maskStatus = false;
         sessionStorage.setItem(`${this.webinarId}_mask`, true);
-      },
-      setfirstModelStatus() {
-        if (this.$domainStore.state.roomBaseServer.webinarTag?.organizers_status == 1) {
-          // 顶部有距离
-          this.activeClass = 'center';
-        } else {
-          // 贴顶展示
-          this.activeClass = 'centerNoTopPadding';
-        }
       }
     }
   };
@@ -64,19 +52,17 @@
       border-radius: 10px;
       font-size: 26px;
     }
-    .center {
-      padding: 0.9rem 0.293333rem 0;
-      position: relative;
-      margin: 0.42rem;
+    &__center {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 422px;
+      padding: 0 22px;
+      white-space: nowrap;
       z-index: 2000;
-      opacity: 1;
-    }
-    .centerNoTopPadding {
-      padding: 0 0.293333rem 0;
-      position: relative;
-      margin: 0 0.42rem 0.42rem;
-      z-index: 2000;
-      opacity: 1;
+      background: #000000;
+      opacity: 0.7;
     }
     .center-text {
       height: 144px;
