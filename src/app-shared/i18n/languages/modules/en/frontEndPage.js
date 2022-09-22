@@ -355,7 +355,8 @@ export default {
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
     chat_1097: 'Chat only off',
-    chat_1098: 'Click for details'
+    chat_1098: 'Click for details',
+    chat_1099: 'Sent a'
   },
   form: {
     form_1001: 'Name',
