@@ -1,6 +1,6 @@
 <template>
   <div class="no-win-lottery">
-    <img class="no-win-lottery-img" :src="noLotteryImg" alt srcset />
+    <div class="no-win-lottery-img" />
     <p class="lottery-result">{{ $t('interact_tools.interact_tools_1022') }}</p>
     <p class="no-win-tip">
       {{
@@ -30,11 +30,14 @@
     text-align: center;
     background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px 20px 0 0;
     .no-win-lottery-img {
-      display: inline-block;
-      width: 256.83px;
-      height: 158px;
-      margin: 46px auto 15px;
+      width: 220px;
+      height: 220px;
+      margin: 20px auto 0;
+      background-image: url('../img/lottery-miss.png');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
     .lottery-result {
       font-weight: 500;

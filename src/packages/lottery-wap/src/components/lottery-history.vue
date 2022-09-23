@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-lottery-history">
-    <header class="vmp-title-container">
+    <!-- <header class="vmp-title-container">
       <div class="vmp-title-warp">
         <span class="star star-1"></span>
         <span class="star star-2"></span>
@@ -8,7 +8,7 @@
         <h1 class="vmp-lottery-title">{{ $t('interact_tools.interact_tools_1076') }}</h1>
         <div class="line"></div>
       </div>
-    </header>
+    </header> -->
     <div class="vmp-lottery-wrap-container">
       <ul class="vmp-lottery-wrap">
         <li v-for="(lottery, index) in winLotteryHistory" :key="index" class="vmp-win-lottery">

@@ -1,20 +1,19 @@
 <template>
   <div class="lottery-accept">
-    <header class="title">{{ title }}</header>
+    <!-- <header class="title">{{ title }}</header> -->
+    <lotteryTitle title="提交信息" />
     <div class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
           <div :class="[item.is_required === 1 ? 'required' : '', 'form-item__input']">
-            <div class="input-warp">
-              <input
-                class="form-inpput"
-                v-model="item.field_value"
-                type="text"
-                :maxlength="item.maxLength"
-                :placeholder="$tdefault(item.placeholder)"
-                autocomplete="off"
-              />
-            </div>
+            <input
+              class="form-inpput"
+              v-model="item.field_value"
+              type="text"
+              :maxlength="item.maxLength"
+              :placeholder="$tdefault(item.placeholder)"
+              autocomplete="off"
+            />
           </div>
           <div class="form-item__error">
             <span v-if="item.error">
@@ -38,8 +37,12 @@
 
 <script>
   import props from './props';
+  import lotteryTitle from './lottery-title.vue';
   export default {
     name: 'LotteryAccept',
+    components: {
+      lotteryTitle
+    },
     mixins: [props],
     inject: ['lotteryServer'],
     data() {
@@ -169,6 +172,10 @@
 </script>
 <style lang="less">
   .lottery-accept {
+    position: relative;
+    // background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+    background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+    border-radius: 20px 20px 0px 0px;
     .title {
       height: 100px;
       font-weight: 500;
@@ -178,26 +185,35 @@
       line-height: 100px;
     }
     .form-wrap {
-      padding: 0 8px; // 给滚动条样式留空间
-      margin: 50px 0 60px;
+      padding: 0 8px 48px; // 给滚动条样式留空间
+      margin: 32px 0 0;
     }
     .form {
       padding: 0 24px;
-      max-height: 498px;
+      max-height: 640px;
       overflow: auto;
     }
     .form-item {
+      // padding: 24px 32px;
+      height: 88px;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      &:not(:last-child) {
+        margin-bottom: 16px;
+      }
       &__input {
+        line-height: 88px;
         position: relative;
-        padding-left: 37px;
-        border-bottom: 1px solid rgba(#f0f0f0);
+        padding-left: 55px;
+        // border-bottom: 1px solid rgba(#f0f0f0);
         &.required:before {
           display: inline-block;
           width: 12px;
           height: 12px;
           position: absolute;
-          top: 10px;
-          left: 12px;
+          top: 3px;
+          left: 32px;
           content: '*';
           font-size: 24px;
           color: #fb2626;
@@ -213,8 +229,8 @@
       }
     }
     .input-warp {
-      height: 32px;
-      margin: 12px 0 25px;
+      // height: 32px;
+      // margin: 12px 0 25px;
     }
     .form-inpput {
       width: 100%;
@@ -229,7 +245,7 @@
       display: block;
       width: 686px;
       height: 90px;
-      margin: 0 auto;
+      margin: 56px auto 0;
       background: #fb2626;
       border-radius: 45px;
       line-height: 90px;

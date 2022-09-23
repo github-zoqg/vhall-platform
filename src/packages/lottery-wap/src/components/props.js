@@ -43,7 +43,6 @@ export default {
   },
   data() {
     return {
-      noLotteryImg: require('../img/noWin.png'),
       defaultLotteryImg: require('../img/win.png')
     };
   }

@@ -1,6 +1,6 @@
 <template>
   <van-popup
-    v-model="popupVisible"
+    v-model="visible"
     :position="pending ? 'center' : 'bottom'"
     :class="[pending ? 'pending' : '', 'vmp-lottery']"
     get-container="body"
@@ -50,9 +50,10 @@
     },
     data() {
       return {
+        visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: '', // 抽奖组件视图名称
+        lotteryView: 'LotteryMiss', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -324,6 +325,7 @@
 
 <style lang="less">
   .vmp-lottery {
+    overflow: visible;
     &.pending {
       background: transparent;
     }
@@ -332,11 +334,10 @@
       position: absolute;
       top: 37px;
       right: 36px;
-      color: #8c8c8c;
+      color: #f6c667;
       z-index: 10;
     }
     .content-wrapper {
-      // position: relative;
       box-sizing: border-box;
     }
     // 组件内所有的按钮样式

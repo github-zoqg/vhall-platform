@@ -1,10 +1,12 @@
 <template>
   <div class="submit-lottery">
-    <i class="vh-iconfont vh-line-circle-check submit-success-icon"></i>
+    <div class="submit-success-icon"></div>
+
     <p class="submit-lottery-text">
       {{ $t('interact_tools.interact_tools_1013') }}
     </p>
-    <button v-if="showWinnerList" class="vmp-lottery-btn" @click="navToWinnerList">
+    <button class="vmp-lottery-btn" @click="navToWinnerList">
+      <!-- <button v-if="showWinnerList" class="vmp-lottery-btn" @click="navToWinnerList"> -->
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
   </div>
@@ -24,19 +26,24 @@
 </script>
 <style lang="less">
   .submit-lottery {
+    // background: linear-gradient(180deg, #ffebd9 0%, #fcf1e7 100%);
+    background: linear-gradient(45deg, #fbf0e6 0%, #fff 50%);
+    border-radius: 20px 20px 0px 0px;
     text-align: center;
     padding: 60px;
     .submit-success-icon {
-      margin-top: 79px;
-      font-size: 120px;
-      color: #0fba5a;
+      margin: 20px auto 0;
+      width: 185px;
+      height: 195px;
+      background-image: url('../img/submit-success.png');
+      background-size: contain;
     }
     .submit-lottery-text {
-      color: #000;
-      font-size: 28px;
-      line-height: 39px;
       text-align: center;
-      margin: 20px auto 62px;
+      margin: 0 auto 64px;
+      font-weight: 500;
+      font-size: 36px;
+      color: #262626;
     }
   }
 </style>

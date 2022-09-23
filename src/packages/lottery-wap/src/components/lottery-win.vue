@@ -37,8 +37,10 @@
   .win-lottery {
     text-align: center;
     padding: 60px;
-    background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
+    // TODO: 跟UI具体调参数
+    background: linear-gradient(45deg, #fbf0e6 0%, #fff 50%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px 20px 0px 0px;
     .award-wrap {
       width: 180px;
       height: 180px;
