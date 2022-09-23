@@ -208,9 +208,9 @@
         if (this.mediaCheckServer.state.deviceInfo.device_status != 2) {
           const isSpeakOn = this.micServer.getSpeakerStatus();
           /*
-            未检测时，则检测互动SDK的支持情况
-              不支持上麦时，确认是否在麦上
-          */
+              未检测时，则检测互动SDK的支持情况
+                不支持上麦时，确认是否在麦上
+            */
           if (this.mediaCheckServer.state.isBrowserNotSupport && !this.hideItem) {
             this.$toast(this.$t('other.other_1010'));
             if (isSpeakOn) {

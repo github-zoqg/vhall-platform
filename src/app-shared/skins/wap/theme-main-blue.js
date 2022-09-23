@@ -26,9 +26,21 @@ export default {
   '--theme-chat-msg-interact-bg': 'rgba(255, 209, 201, 0.2)',
   '--theme-chat-sendBox-bg': '#fff',
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
+  // 聊天输入框输入状态
+  '--theme-chat-sendBox-model-bg-color': '#ffffff',
+  '--theme-chat-sendBox-box-shadow-color': '#d9d9d9',
+  '--theme-chat-sendBox-emoji-font-color': 'rgba(0, 0, 0, 0.65)',
+  '--theme-chat-sendBox-send-font-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-chat-sendBox-send-bg-color': 'rgba(0, 0, 0, 0.06)',
+  '--theme-chat-sendBox-send-active-font-color': 'rgba(0, 0, 0, 0.85)',
+  '--theme-chat-sendBox-input-bg-color': 'rgba(0, 0, 0, 0.06)',
+  '--theme-chat-sendBox-input-placeholder-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-chat-sendBox-input-font-color': '#262626',
+  '--theme-chat-sendBox-input-scroll-bg-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-chat-sendBox-input-max-font-color': 'rgba(0, 0, 0, 0.45)',
   //主题色
   '--theme-color': '#3552ea',
-  '--theme-color-sub': '#ffd1c9',
+  '--theme-color-sub': '#dee8ff',
   //分组
   '--theme-group-color': 'rgba(0, 0, 0, 0.65)',
   '--theme-group-name-color': 'rgba(0, 0, 0, 0.45)',

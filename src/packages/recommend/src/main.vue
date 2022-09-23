@@ -20,12 +20,7 @@
         </div>
 
         <ul class="a-wrap" v-else>
-          <li
-            class="recommend-item"
-            v-for="item in advs"
-            :key="item.adv_id"
-            @click="goto(item.url)"
-          >
+          <li v-for="item in advs" :key="item.adv_id" @click="goto(item.url)">
             <div class="recommend-item">
               <div class="banner">
                 <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" />
@@ -206,7 +201,7 @@
     box-sizing: border-box;
 
     &-wrapper {
-      padding: 16px 16px 0 0;
+      padding: 16px 8px 0;
     }
     .subscribe-wrap {
       display: flex;

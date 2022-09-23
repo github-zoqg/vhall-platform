@@ -1,6 +1,12 @@
 <template>
-  <div class="vmp-wap-stream-wrap" ref="vmp-wap-stream-wrap" @click.stop.prevent="videoShowIcon">
+  <div
+    class="vmp-wap-stream-wrap"
+    ref="vmp-wap-stream-wrap"
+    :style="{ background: mainBackground }"
+    @click.stop.prevent="videoShowIcon"
+  >
     <div
+      id="vmp-stream-list"
       class="vmp-stream-list"
       :class="{
         'vmp-stream-list-h0': isStreamListH0,
@@ -131,7 +137,8 @@
         isOpenlang: false,
         lang: {},
         languageList: [],
-        streamInfo
+        streamInfo,
+        timmer: null
       };
     },
     computed: {
@@ -277,6 +284,27 @@
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
         return this.configList['watch_embed_close_entrance'] && this.isEmbed;
+      },
+      mainBackground() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skinJsonWap = {};
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skinJsonWap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return skinJsonWap?.videoBackGroundColor || '#000';
+      }
+    },
+    watch: {
+      // 设置主画面背景色
+      mainBackground: {
+        handler(val) {
+          console.log('mainBackground---', val);
+          this.$nextTick(() => {
+            const dom = document.getElementById('vmp-stream-list');
+            dom.setAttribute('style', `--main-bg-color:${val}`);
+          });
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -504,7 +532,6 @@
     height: 422px;
     width: 100%;
     position: relative;
-    background: #000;
     // 小组协作中
     &-group {
       position: absolute;
@@ -681,6 +708,10 @@
   .vmp-stream-list {
     height: 83px;
     display: inline-block;
+    --main-bg-color: #000;
+    .vmp-stream-list__main-screen div.licode_player {
+      background-color: var(--main-bg-color) !important;
+    }
     &__local-container {
       width: 148px;
       height: 100%;
