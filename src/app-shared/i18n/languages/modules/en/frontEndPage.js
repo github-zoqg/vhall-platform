@@ -164,7 +164,7 @@ export default {
     nav_1051: 'Alipay',
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
-    nav_1054: 'Share the rehearsal viewing address',
+    nav_1054: 'Audience simulated viewing address during rehearsal',
     nav_1055: 'in rehearsal'
   },
   login: {
@@ -355,7 +355,8 @@ export default {
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
     chat_1097: 'Chat only off',
-    chat_1098: 'Click for details'
+    chat_1098: 'Click for details',
+    chat_1099: 'Sent a'
   },
   form: {
     form_1001: 'Name',

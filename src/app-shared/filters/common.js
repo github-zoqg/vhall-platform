@@ -130,7 +130,6 @@ Vue.filter('secondToDate', (val, type) => {
   } else {
     totalTime = time.format('mm:ss');
   }
-  console.log(totalTime);
   return totalTime;
 });
 

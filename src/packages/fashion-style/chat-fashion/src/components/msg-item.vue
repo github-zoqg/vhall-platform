@@ -108,9 +108,10 @@
                   "
                   class="reply-wrapper__content reply-msg"
                   v-html="
-                    `<span class='reply-wrapper__content__nick-name'>${
-                      source.replyMsg.nickname || source.replyMsg.nick_name
-                    }</span>${source.replyMsg.content.text_content}`
+                    `<span class='reply-wrapper__content__nick-name'>${overHiddenFunc(
+                      source.replyMsg.nickname || source.replyMsg.nick_name,
+                      8
+                    )} </span>${source.replyMsg.content.text_content}`
                   "
                 ></p>
                 <!-- 图片 -->
@@ -136,7 +137,8 @@
                     v-if="!source.replyMsg.content.text_content"
                     class="reply-wrapper__img-wrapper__nick-name"
                   >
-                    {{ source.replyMsg.nickname || source.replyMsg.nick_name }}
+                    {{ source.replyMsg.nickname || source.replyMsg.nick_name | overHidden(8)
+                    }}{{ ' ' }}
                   </span>
                   <p
                     v-if="!source.replyMsg.content.text_content"
@@ -426,6 +428,13 @@
       this.handleAt();
     },
     methods: {
+      overHiddenFunc(value = '', len = 0) {
+        if (value === null || value === undefined) return '';
+        if (value.length > len) {
+          return value.substring(0, len) + '...';
+        }
+        return value;
+      },
       setPersonStatus(event, msg) {
         if (!msg.sendId) {
           return;
@@ -482,7 +491,7 @@
                   userName,
                   `<span class='normal-msg__content-wrapper__at ${
                     !isStart ? 'normal-msg__content-wrapper__at-ml__4' : ''
-                  }'>${userName}</span>`
+                  }'>${this.overHiddenFunc(userName, 8)} </span>`
                 )
               );
             }
@@ -610,7 +619,7 @@
           height: 24px;
           border-radius: 14px;
           position: absolute;
-          top: 4px;
+          top: 3px;
           .normal-msg__avatar-img {
             width: 100%;
             height: 100%;

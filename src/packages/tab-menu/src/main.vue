@@ -625,7 +625,8 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background-color: var(--theme-color);
+            // background-color: var(--theme-color);
+            background-color: #fb2626;
           }
           .bottom-line {
             display: none;

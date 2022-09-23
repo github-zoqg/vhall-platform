@@ -17,6 +17,7 @@
   import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
   import subscribeState from '../../headless/subscribe-state.js';
   import { getQueryString } from '@/app-shared/utils/tool';
+  import { imgPositionSizeMap } from '@/app-shared/utils/imgModeMap.js';
   import authCheck from '../../mixins/chechAuth';
   import ErrorPage from '../ErrorPage';
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
@@ -266,7 +267,10 @@
       drawBody(theme, skin) {
         if (skin?.pcBackground) {
           document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
-          document.body.style.backgroundSize = 'cover';
+          const styleMap = imgPositionSizeMap[skin?.backgroundSize?.imageCropMode || 2];
+          for (let key in styleMap) {
+            document.body.style[key] = styleMap[key];
+          }
         } else {
           if (theme == 'black') {
             document.body.style.background = `rgb(26, 26, 26)`;

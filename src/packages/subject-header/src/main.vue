@@ -2,8 +2,8 @@
   <div class="vmp-subject-header">
     <div class="vmp-subject-header_container">
       <div class="subject_logo">
-        <a href="" target="_blank">
-          <img src="../images/logo-red@2x.png" alt="" />
+        <a :href="logoInfo.logo_jump_url || ''" target="_blank">
+          <img :src="logoInfo.logo || defaultLogo" alt="" />
         </a>
       </div>
       <div class="subject_title">
@@ -55,11 +55,14 @@
 <script>
   import { useSubjectServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import defaultLogo from '../images/logo-red@2x.png';
   export default {
     name: 'VmpSubjectHeader',
     data() {
       return {
-        isLogin: Boolean(window.localStorage.getItem('token'))
+        defaultLogo,
+        isLogin: Boolean(window.localStorage.getItem('token')),
+        logoInfo: {}
       };
     },
     beforeCreate() {
@@ -75,7 +78,19 @@
         return this.userServer.state.userInfo;
       }
     },
+    mounted() {
+      this.extendsLoginInfo();
+    },
     methods: {
+      extendsLoginInfo() {
+        this.userServer
+          .extendsLoginInfo({ webinar_user_id: this.subjectInfo.user_id })
+          .then(res => {
+            if (res.code == 200) {
+              this.logoInfo = res.data;
+            }
+          });
+      },
       goLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickLogin'));
       },

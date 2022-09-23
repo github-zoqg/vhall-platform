@@ -2251,6 +2251,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      overflow: hidden;
     }
     .el-dialog__header {
       padding: 0;
@@ -2484,11 +2485,11 @@
         }
       }
       .isLoginActive {
-        background: #fb3a32;
+        background-color: var(--theme-color);
         color: #fff;
         cursor: pointer;
         &.is-disabled:hover {
-          background: #fb3a32;
+          background-color: var(--theme-color);
           color: #fff;
           cursor: not-allowed;
         }
