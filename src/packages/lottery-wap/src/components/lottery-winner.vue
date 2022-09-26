@@ -1,9 +1,18 @@
 <template>
   <div class="lottery-winner-list">
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
+    <div class="award-detail">
+      <img class="award-img" :src="fitment.url || defaultLotteryImg" alt />
+      <p class="award-name">
+        参与观众获得“
+        {{ fitment.name || '奖品' }}
+        ”
+      </p>
+    </div>
     <div class="winner-content">
       <ul class="lottery-winner-wrap">
         <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
+          <span class="serial">{{ index | fmtSerial }}</span>
           <img class="avatar" :src="item.lottery_user_avatar || defaultAvatar" alt />
           <p class="nickname">{{ item.lottery_user_nickname }}</p>
         </li>
@@ -14,12 +23,18 @@
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import props from './props';
-  import LotteryTitle from './lottery-title-old-backups.vue';
+  import LotteryTitle from './lottery-title.vue';
   export default {
     name: 'LotteryWinner',
     mixins: [props],
     components: {
       LotteryTitle
+    },
+    filters: {
+      fmtSerial(val) {
+        const serial = `${val + 1}`;
+        return serial.padStart(2, '0');
+      }
     },
     data() {
       return {
@@ -30,38 +45,70 @@
 </script>
 <style lang="less">
   .lottery-winner-list {
-    padding: 40px 0 32px;
+    position: relative;
+    padding: 0 0 32px;
     text-align: center;
-    // background: linear-gradient(53.35deg, #fdf1ed 14.39%, #f3f2ff 104%);
-    background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+    background: linear-gradient(180deg, #ffebd9 0%, #fcf1e7 100%);
+    border-radius: 20px 20px 0px 0px;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    .award-detail {
+      height: 144px;
+      margin: 0 24px;
+      padding: 0 32px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 28px 32px;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .award-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 5px;
+    }
+    .award-name {
+      margin-left: 12px;
+      font-weight: 500;
+      font-size: 30px;
+      color: #fb2626;
+    }
     .winner-content {
+      margin-top: 12px;
+      padding: 0 24px;
       overflow-y: auto;
       touch-action: pan-y;
-      margin-top: 37px;
-      padding: 0 24px;
     }
     .lottery-winner-wrap {
-      height: 440px;
-      background: rgba(#fff, 0.8);
+      min-height: 300px;
+      max-height: 352px;
+      background: #fff;
       border-radius: 16px;
       overflow: auto;
     }
+    .serial {
+      display: inline-block;
+      width: 56px;
+      font-weight: 700;
+      font-size: 26px;
+    }
     .lottery-user {
-      height: 87px;
+      height: 100px;
       margin: 0 32px;
       padding: 16px 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       &:not(:last-child) {
-        border-bottom: 1px solid rgba(#fcc7c7, 0.6);
-      }
-      &:after {
-        clear: left;
+        // TODO: border的颜色
+        border-bottom: 1px solid rgba(#c8c8c8, 0.4);
       }
       .avatar {
-        float: left;
         display: block;
         width: 56px;
         height: 56px;
+        margin-left: 32px;
         border-radius: 50%;
       }
       .nickname {

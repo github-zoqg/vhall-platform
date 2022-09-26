@@ -28,7 +28,7 @@
     position: relative;
     background: transparent;
     width: 100%;
-    height: 100px;
+    height: 96px;
 
     .title-panel {
       display: flex;

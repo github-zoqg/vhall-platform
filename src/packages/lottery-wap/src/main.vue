@@ -41,7 +41,8 @@
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
       LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
-      LotteryHistory: () => import('./components/lottery-history.vue') // 领取结果页面
+      LotteryHistory: () => import('./components/lottery-history.vue'), // 领取结果页面
+      LotterySubmitDetail: () => import('./components/lottery-submit-detail.vue') // 中奖详情页
     },
     provide() {
       return {
@@ -53,7 +54,7 @@
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryMiss', // 抽奖组件视图名称
+        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -249,7 +250,7 @@
             this.winLotteryUserList = res.data?.list || [];
           });
         }
-        const opneView = view => {
+        const openView = view => {
           this.popupVisible = true;
           this.lotteryView = view;
         };
@@ -258,10 +259,10 @@
           await this.$nextTick();
           const st = setTimeout(() => {
             clearTimeout(st);
-            opneView(view);
+            openView(view);
           }, 600);
         } else {
-          opneView(view);
+          openView(view);
         }
       },
       /**
@@ -285,7 +286,6 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log(join_info);
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
           console.log(userId, id);
