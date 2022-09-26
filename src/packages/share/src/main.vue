@@ -39,7 +39,7 @@
           ></el-input>
           <span @click="copy">{{ $t('nav.nav_1014') }}</span>
         </div>
-        <div v-if="!isWatchInvite && isRehearsal" class="share_tip">
+        <div v-if="isRehearsal" class="share_tip">
           {{ $t('other.other_1021') }}
         </div>
       </div>
