@@ -166,7 +166,8 @@
           visible: false
         },
         deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status,
-        countDownTime: Number
+        countDownTime: Number,
+        countDownTimer: null // 开播倒计时计时器
       };
     },
     computed: {
@@ -307,14 +308,14 @@
         ).getTime() - new Date().getTime();
       // 倒计时大于0小于24小时
       if (this.countDownTime > 0) {
-        let timer = setInterval(() => {
+        this.countDownTimer = setInterval(() => {
           this.countDownTime =
             new Date(
               this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
             ).getTime() - new Date().getTime();
 
           if (this.countDownTime <= 0) {
-            clearInterval(timer);
+            clearInterval(this.countDownTimer);
           }
         }, 1000);
       }
@@ -711,6 +712,16 @@
             }
           } else {
             this.handleEndClickInLive();
+            console.log(
+              '彩排倒计时清除',
+              this.countDownTimer,
+              this.countDown && (!this.isLiving || (this.isRehearsal && this.isLiving))
+            );
+            // 彩排倒计时清除
+            if (this.countDownTimer) {
+              this.countDownTime = -1;
+              clearInterval(this.countDownTimer);
+            }
           }
         }
       },

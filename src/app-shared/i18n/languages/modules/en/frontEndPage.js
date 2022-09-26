@@ -932,7 +932,9 @@ export default {
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
     other_1019: 'got it',
-    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
+    other_1021:
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
