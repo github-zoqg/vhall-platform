@@ -20,7 +20,7 @@
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { getBrowserType, browserSupport } from '@/app-shared/utils/getBrowserType.js';
   import { logRoomInitFailed } from '@/app-shared/utils/report';
-  import { bu_appId } from '../init-global/businessData';
+  import { bu_appId } from '@/app-shared/global-data/businessData';
 
   import {
     Domain,

@@ -17,7 +17,7 @@
   import MsgTip from '../MsgTip';
   import Chrome from '../Chrome';
   import { Domain, useRoomBaseServer } from 'middle-domain';
-  import { bu_appId } from '@/saas-live/init-global/businessData';
+  import { bu_appId } from '@/app-shared/global-data/businessData';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     data() {

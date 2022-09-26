@@ -27,6 +27,11 @@ setBaseUrl({
   middleUrl: process.env.VUE_APP_MIDDLE_BASE_URL,
   wxBindBaseUrl: process.env.VUE_APP_BIND_BASE_URL
 });
+
+/**
+ * 平台标识
+ * wiki:
+ */
 setRequestHeaders({
   platform: 7
 });
