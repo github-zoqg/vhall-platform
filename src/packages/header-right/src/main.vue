@@ -712,11 +712,6 @@
             }
           } else {
             this.handleEndClickInLive();
-            console.log(
-              '彩排倒计时清除',
-              this.countDownTimer,
-              this.countDown && (!this.isLiving || (this.isRehearsal && this.isLiving))
-            );
             // 彩排倒计时清除
             if (this.countDownTimer) {
               this.countDownTime = -1;
