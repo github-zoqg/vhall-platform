@@ -1,13 +1,20 @@
 <template>
   <div class="win-lottery">
-    <div class="award-wrap">
-      <img class="award-img" :src="prizeInfo.image_url || defaultLotteryImg" alt srcset />
-    </div>
-    <div class="win-tip">{{ $t('interact_tools.interact_tools_1015') }}</div>
-    <div class="win-award-tip">
-      {{ $t('interact_tools.interact_tools_1016') }}"{{
-        prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
-      }}"
+    <div class="award-container">
+      <!-- <div class="win-tip">{{ $t('interact_tools.interact_tools_1015') }}</div> -->
+      <div class="wordart-wrap">
+        <wordart class="wordart" :text="$t('interact_tools.interact_tools_1015')" />
+      </div>
+      <div class="award-annulus"></div>
+      <div class="gold-cion-bg"></div>
+      <div class="award-img-outer-annular"></div>
+      <div class="award-img-inner-annular"></div>
+      <img class="award-img" :src="fitment.url || defaultLotteryImg" alt />
+      <p class="win-award-tip">
+        {{ $t('interact_tools.interact_tools_1016') }}"{{
+          prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
+        }}"
+      </p>
     </div>
     <!-- 领奖 -->
     <button class="vmp-lottery-btn" v-if="needTakeAward" @click="acceptLottery">
@@ -20,9 +27,13 @@
 </template>
 <script>
   import props from './props';
+  import wordart from './wordart';
   export default {
     name: 'LotteryWin',
     mixins: [props],
+    components: {
+      wordart
+    },
     methods: {
       acceptLottery() {
         this.$emit('navTo', 'LotteryAccept');
@@ -34,39 +45,112 @@
   };
 </script>
 <style lang="less">
+  // 完全局职工
+  .center-mixin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .annular {
+    display: inline-block;
+    border-radius: 50%;
+  }
   .win-lottery {
     text-align: center;
-    padding: 60px;
-    // TODO: 跟UI具体调参数
-    background: linear-gradient(45deg, #fbf0e6 0%, #fff 50%);
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 20px 20px 0px 0px;
+    .award-container {
+      width: 600px;
+      height: 600px;
+      position: relative;
+    }
+    .wordart-wrap {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .wordart {
+      letter-spacing: 10px;
+    }
+    // 环状外观
+    .award-annulus {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background-image: url('../img/lottery-win-annulus.png');
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    // 金币背景图
+    .gold-cion-bg {
+      position: absolute;
+      background-image: url('../img/lottery-win-gold-coin.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 100%;
+      height: 100%;
+      background-position: center 80%;
+    }
+    .win-award-tip {
+      display: inline-block;
+      width: 450px;
+      height: 52px;
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      line-height: 52px;
+      font-size: 28px;
+      color: #fce09e;
+      background: linear-gradient(
+        270deg,
+        rgba(255, 119, 73, 0) 2.54%,
+        #d00011 32.61%,
+        #d50013 59.83%,
+        rgba(255, 119, 73, 0) 94.2%
+      );
+    }
+    .award-img-outer-annular {
+      .center-mixin;
+      .annular;
+      width: 284px;
+      height: 284px;
+      border: 12px solid rgba(255, 255, 255, 0.1);
+    }
+    .award-img-inner-annular {
+      .center-mixin;
+      .annular;
+      width: 260px;
+      height: 260px;
+      border: 10px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .award-img {
+      .center-mixin;
+      .annular;
+      border-radius: 50%;
+      display: inline-block;
+      width: 240px;
+      height: 240px;
+      object-fit: contain;
+    }
     .award-wrap {
       width: 180px;
       height: 180px;
       margin: 0px auto;
       margin-top: 58px;
       margin-bottom: 12px;
+
       .award-img {
         display: block;
         width: 100%;
         height: 100%;
       }
     }
-    .win-tip {
-      font-weight: 500;
-      font-size: 32px;
-      line-height: 45px;
-      text-align: center;
-      color: #5b3521;
-    }
-    .win-award-tip {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 28px;
-      line-height: 39px;
-      color: #e75427;
-      margin-bottom: 48px;
+
+    .vmp-lottery-btn {
+      margin-top: -30px;
     }
   }
 </style>

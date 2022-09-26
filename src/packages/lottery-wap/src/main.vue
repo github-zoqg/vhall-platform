@@ -1,13 +1,16 @@
 <template>
   <van-popup
-    v-model="visible"
+    v-model="popupVisible"
     :position="pending ? 'center' : 'bottom'"
     :class="[pending ? 'pending' : '', 'vmp-lottery']"
     get-container="body"
     overlay-class="vmp-lottery-popup-overlay"
     round
   >
-    <i v-if="!pending" class="vh-iconfont vh-line-close close" @click="close" />
+    <i
+      :class="['vh-iconfont', pending ? 'vh-line-circle-close' : 'vh-line-close close']"
+      @click="close"
+    />
     <section class="content-wrapper">
       <component
         :is="lotteryView"
@@ -54,7 +57,7 @@
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -67,7 +70,7 @@
     },
     computed: {
       pending() {
-        return this.lotteryView === 'LotteryPending';
+        return ['LotteryPending', 'LotteryMiss', 'LotteryWin'].includes(this.lotteryView);
       }
     },
     beforeCreate() {
@@ -329,14 +332,6 @@
     &.pending {
       background: transparent;
     }
-    .close {
-      font-size: 32px;
-      position: absolute;
-      top: 37px;
-      right: 36px;
-      color: #f6c667;
-      z-index: 10;
-    }
     .content-wrapper {
       box-sizing: border-box;
     }
@@ -351,6 +346,25 @@
       text-align: center;
       font-size: 32px;
       color: #fff;
+    }
+    // 带弹窗的关闭按钮
+    .vh-line-close {
+      font-size: 32px;
+      position: absolute;
+      top: 37px;
+      right: 36px;
+      color: #f6c667;
+      z-index: 10;
+    }
+    // 底部白色的关闭按钮
+    .vh-line-circle-close {
+      position: absolute;
+      bottom: -120px;
+      color: #fff;
+      font-size: 54px;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
   .vmp-lottery-popup-overlay {
