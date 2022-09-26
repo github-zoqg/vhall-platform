@@ -97,6 +97,8 @@ import VmpConciseBodyBlockWap from '@/packages/concise-style/wap-block';
 import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap';
 // 送礼物飘屏动画
 import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
+// 弹出自定义菜单框
+import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // ------------------------------【极简风格】引入组件------end----------
 
 // ------------------------------【时尚风格】引入组件------start----------
@@ -157,6 +159,7 @@ Vue.use(VmpConciseChatWap);
 Vue.use(VmpConciseBodyBlockWap);
 Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
+Vue.use(VmpWapMenuDialog);
 // ------------------------------【极简风格】注册组件------end----------
 
 // ------------------------------【时尚风格】注册组件------start----------
