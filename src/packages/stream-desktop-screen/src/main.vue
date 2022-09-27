@@ -386,6 +386,17 @@
               this.stopShare('vrtc_speaker_switch');
             }
           }
+          // 主画面变更
+          if (msg.data.type == 'vrtc_big_screen_set') {
+            // 自己正在发起桌面共享
+            if (
+              this.isShareScreen &&
+              this.accountId == this.desktopShareInfo.accountId &&
+              msg.data.target_id != this.accountId
+            ) {
+              this.stopShare('vrtc_big_screen_set');
+            }
+          }
           // 演示着变更
           if (msg.data.type === 'vrtc_presentation_screen_set') {
             // 自己正在发起桌面共享
