@@ -135,13 +135,13 @@
         });
         let conciseVisibleMenu = [];
         console.log('当前是否是简洁模式', otherVisibleMenu);
-        // if (this.isConcise) {
-        //   conciseVisibleMenu = otherVisibleMenu.filter(item => {
-        //     // 如果是简洁模式，菜单抛开 - 聊天tab
-        //     if (item.type == 3) return false;
-        //     return item.visible === true;
-        //   });
-        // }
+        if (this.isConcise) {
+          conciseVisibleMenu = otherVisibleMenu.filter(item => {
+            // 如果是简洁模式，菜单抛开 - 聊天tab
+            if (item.type == 3) return false;
+            return item.visible === true;
+          });
+        }
         console.log('当前是否是简洁模式conciseVisibleMenu', conciseVisibleMenu);
         return this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
       },
