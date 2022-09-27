@@ -373,21 +373,10 @@
           }
         });
         useMsgServer().$onMsg('ROOM_MSG', msg => {
-          // 主讲人变更
-          if (msg.data.type === 'vrtc_speaker_switch') {
+          // 主讲人变更 | 主画面变更
+          if (msg.data.type == 'vrtc_big_screen_set') {
             // 小组中，组长变更不会停止桌面共享
             if (this.isInGroup) return;
-            // 自己正在发起桌面共享
-            if (
-              this.isShareScreen &&
-              this.accountId == this.desktopShareInfo.accountId &&
-              msg.data.target_id != this.accountId
-            ) {
-              this.stopShare('vrtc_speaker_switch');
-            }
-          }
-          // 主画面变更
-          if (msg.data.type == 'vrtc_big_screen_set') {
             // 自己正在发起桌面共享
             if (
               this.isShareScreen &&
@@ -595,6 +584,9 @@
         this.setDesktop('0');
         this.interactiveServer.resetLayout();
         this.docServer.resetLayoutByMiniElement();
+        if (source == 'vrtc_big_screen_set') {
+          this.roomBaseServer.setChangeElement('stream-list');
+        }
       },
       // 桌面共享开启并且白板或者文档观众可见状态时观看端视频最大化
       setDesktop(status) {
