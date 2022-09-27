@@ -1,41 +1,36 @@
 <template>
   <div class="vmp-lottery-pending">
-    <!-- 标题 -->
-    <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
-    <!-- 发送参与 -->
-    <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
-      <span class="lottery-remark" place="n">{{ lotteryInfo.command }}</span>
-    </i18n>
-    <p v-else class="lottery-remark">
-      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-    </p>
-    <div class="lottery-pending-wrap">
-      <img
-        :class="[`machine-${fitment.img_order}`, 'lottery-pending-animation']"
-        :src="fitment.url"
-        alt
-      />
-    </div>
-    <button
-      v-if="needJoin"
-      :class="['vmp-lottery-btn', `order-${fitment.img_order}`]"
-      @click="joinLottery"
-    >
-      {{ $t('interact_tools.interact_tools_1008') }}
-    </button>
-    <div class="close-btn-wrap">
-      <i class="vh-iconfont vh-line-circle-close vmp-close-btn" @click="close"></i>
+    <!-- 自定义图片的抽奖样式 -->
+    <LotteryPendingCustom
+      v-if="isCustom"
+      :needJoin="needJoin"
+      :fitment="fitment"
+      @joinLottery="joinLottery"
+    />
+    <!-- 自定义图片的抽奖样式 -->
+    <div v-else>
+      <div id="lottery-svga"></div>
     </div>
   </div>
 </template>
 <script>
+  import LotteryPendingCustom from './lottery-pending-custom.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
+  import SVGA from 'svgaplayerweb';
+  let player, parser;
+
   export default {
     name: 'LotteryPending',
     inject: ['lotteryServer'],
     mixins: [props],
+    components: {
+      LotteryPendingCustom
+    },
     computed: {
+      isCustom() {
+        return this.fitment.img_order === 0;
+      },
       // 显示
       needJoin() {
         return (
@@ -78,8 +73,13 @@
         joined: false
       };
     },
+    mounted() {
+      if (this.fitment.img_order !== 0) {
+        this.initSvgaResource();
+      }
+    },
     methods: {
-      //
+      // 发送口令
       joinLottery() {
         if (this.needLoginStatus) {
           return this.$emit('needLogin');
@@ -101,74 +101,36 @@
             this.loading = false;
           });
       },
-      close() {
-        this.$emit('close');
+      initSvgaResource() {
+        player = new SVGA.Player('#lottery-svga');
+        parser = new SVGA.Parser('#lottery-svga');
+        const url =
+          'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-capsule.svga';
+        // const url =
+        //   'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-turnplate.svga';
+        // const url =
+        //   'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-slotmachine.svga';
+        const imgUrl =
+          'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/test/send.png';
+        parser.load(url, function (videoItem) {
+          player.setVideoItem(videoItem);
+          player.setImage(imgUrl, 'img_21117');
+          player.startAnimationWithRange({
+            location: 30,
+            length: 60
+          });
+        });
       }
     }
   };
 </script>
 <style lang="less">
   .vmp-lottery-pending {
-    text-align: center;
-    color: #ffebc9;
-    text-shadow: 0px 3px 6px rgba(218, 111, 17, 0.6);
-    .lottery-title {
-      font-weight: 500;
-      font-size: 32px;
-      margin-bottom: 6px;
-      line-height: 44px;
-    }
-    .lottery-remark {
-      font-size: 24px;
-      line-height: 32px;
-    }
-    .lottery-pending-wrap {
-      width: 700px;
-      height: 550px;
-      background-image: url('../img/lottery-pendding-bg.png');
-      background-size: 100%;
-      background-repeat: no-repeat;
-      background-position: center;
-      position: relative;
-    }
-    .lottery-pending-animation {
-      position: absolute;
-      width: 475px; // 默认的转轮
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      &.machine-2 {
-        // 老虎机
-        width: 520px;
-        // 老虎机的设计图问题,需要css手动偏移
-        transform: translate(-48%, -50%);
-      }
-      &.machine-3 {
-        // 扭蛋
-        width: 500px;
-      }
-    }
-    .vmp-lottery-btn {
-      // 默认为转盘
-      background: linear-gradient(273.71deg, #ff2313 0%, #fd620c 96.61%);
-      &.order-2 {
-        // 老虎机
-        background: linear-gradient(273.71deg, #fb721d 0%, #f9a61d 96.61%);
-      }
-      &.order-3 {
-        // 扭蛋
-        background: linear-gradient(273.19deg, #046ffd 7.83%, #00b9f5 97.59%);
-      }
-    }
-    .close-btn-wrap {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .vmp-close-btn {
-      color: #fff;
-      font-size: 54px;
-      display: inline-block;
-      height: 58px;
+    #lottery-svga {
+      overflow: hidden;
+      width: 750px;
+      height: 750px;
+      background: red;
     }
   }
 </style>
