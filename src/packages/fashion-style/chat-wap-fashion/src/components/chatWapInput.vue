@@ -64,7 +64,7 @@
 </template>
 
 <script>
-  import { getEmojiList } from '@/packages/chat/src/js/emoji';
+  import { getEmojiList } from '@/packages/chat/src/common/js/emoji';
   import EventBus from '../js/Events.js';
   import { isMse } from '../js/utils.js';
   export default {

@@ -104,7 +104,7 @@
   import chatWapInput from './chatWapInput';
   import chatSeting from './chatSeting';
   import EventBus from '../js/Events';
-  import { emojiToPath } from '@/packages/chat/src/js/emoji';
+  import { emojiToPath } from '@/packages/chat/src/common/js/emoji';
   import {
     useGroupServer,
     useRoomBaseServer,
