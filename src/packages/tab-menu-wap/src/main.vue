@@ -753,7 +753,12 @@
         color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
-
+        &.prev-btn {
+          padding-right: 44px;
+        }
+        &.next-btn {
+          padding-left: 10px;
+        }
         &.disabledClick {
           i {
             color: rgba(140, 140, 140, 0.4);
@@ -798,6 +803,12 @@
         color: var(--theme-tab-menu-font);
         cursor: pointer;
         user-select: none;
+        &:first-child {
+          padding: 0 32px 0 42px;
+        }
+        &:last-child {
+          padding: 0 42px 0 32px;
+        }
         &_subscrbe {
           &:first-child {
             padding-left: 0;
