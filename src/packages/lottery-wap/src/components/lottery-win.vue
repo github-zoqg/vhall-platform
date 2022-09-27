@@ -1,7 +1,6 @@
 <template>
   <div class="win-lottery">
     <div class="award-container">
-      <!-- <div class="win-tip">{{ $t('interact_tools.interact_tools_1015') }}</div> -->
       <div class="wordart-wrap">
         <wordart class="wordart" :text="$t('interact_tools.interact_tools_1015')" />
       </div>
@@ -9,7 +8,7 @@
       <div class="gold-cion-bg"></div>
       <div class="award-img-outer-annular"></div>
       <div class="award-img-inner-annular"></div>
-      <img class="award-img" :src="fitment.url || defaultLotteryImg" alt />
+      <img class="award-img" :src="(prizeInfo && prizeInfo.icon) || defaultLotteryImg" alt />
       <p class="win-award-tip">
         {{ $t('interact_tools.interact_tools_1016') }}"{{
           prizeInfo.award_name || $t('interact_tools.interact_tools_1009')

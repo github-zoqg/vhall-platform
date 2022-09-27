@@ -4,7 +4,7 @@
     <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
     <!-- 发送参与 -->
     <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
-      <span class="lottery-remark" place="n">{{ lotteryInfo.command }}</span>
+      <span class="lottery-remark" place="n">{{ command }}</span>
     </i18n>
     <p v-else class="lottery-remark">
       {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
@@ -21,6 +21,12 @@
   export default {
     name: 'LotteryPendingCustom',
     props: {
+      command: {
+        type: String,
+        default() {
+          return '';
+        }
+      },
       needJoin: {
         required: true,
         type: Boolean

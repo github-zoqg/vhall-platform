@@ -1,6 +1,6 @@
 <template>
   <van-popup
-    v-model="visible"
+    v-model="popupVisible"
     :position="pending ? 'center' : 'bottom'"
     :class="[pending ? 'pending' : '', 'vmp-lottery']"
     get-container="body"
@@ -57,7 +57,7 @@
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryPending', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -95,7 +95,7 @@
         try {
           const res = await this.lotteryServer.checkLotteryResult(msg.lottery_id);
           const take_award = res?.data?.take_award;
-          const lotteryView = take_award === 0 ? 'LotteryWin' : 'LotterySuccess';
+          const lotteryView = take_award === 0 ? 'LotteryWin' : 'LotterySubmitDetail';
           await this.changeView(lotteryView);
         } catch (err) {
           console.warn('获取中奖信息接口: ', err);
@@ -127,7 +127,7 @@
               const winLottery = winLotteryHistory[0];
               this.lotteryId = winLottery.id;
               if (winLottery.take_award === 1) {
-                lotteryView = 'LotterySuccess'; // 已领取提示已提交
+                lotteryView = 'LotterySubmitDetail'; // 显示提交历史
               } else {
                 lotteryView = 'LotteryWin'; // 为领取显示中奖结果
               }
