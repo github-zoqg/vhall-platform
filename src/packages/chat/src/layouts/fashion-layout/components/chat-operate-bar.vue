@@ -69,82 +69,68 @@
         <div class="operate-container__tool-bar__emoji-wrap">
           <emoji ref="emoji" @emojiInput="emojiInput"></emoji>
         </div>
-        <div class="operate-container__tool-bar__right">
-          <template v-if="chatOptions && chatOptions.enableChatSetting">
-            <!--聊天设置-->
-            <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
-            <!--            {{ $t('common.common_1008') }}-->
-            <!--          </i>-->
-            <!-- 主持人不在小组或组长在小组显示聊天设置 -->
-            <div
-              class="chat-setting-btn--chat-auth"
-              v-if="
-                (roleName == 1 || roleName == 3 || roleName == 4) &&
-                !isInGroup &&
-                (configList['comment_check'] || configList['disable_msg'])
-              "
-            >
-              <i
-                class="chat-setting-btn vh-iconfont vh-line-audit"
-                @click.stop="toggleChatSetingBoxIsShow"
-              ></i>
-              <div class="chat-setting-box" v-show="chatSetingBoxIsShow" @click.stop="">
-                <div class="chat-setting-box__item_switch switch-box">
-                  <span class="switch-title">屏蔽礼物特效</span>
-                  <el-switch
-                    class="switch"
-                    v-model="filterStatus.isShieldingEffects"
-                    inactive-color="#CECECE"
-                    active-color="#fb3a32"
-                    @change="onClickShieldingEffects"
-                  />
-                </div>
-                <div class="chat-setting-box__item_switch switch-box switch-box_bottom">
-                  <span class="switch-title">仅看聊天信息</span>
-                  <el-switch
-                    class="switch"
-                    v-model="filterStatus.isChat"
-                    inactive-color="#CECECE"
-                    active-color="#fb3a32"
-                    @change="onClickChat"
-                  />
-                  <span class="tip_only">仅对个人生效</span>
-                </div>
-                <div
-                  class="chat-setting-box__item switch-box join-chat-btn"
-                  v-if="configList['disable_msg']"
-                >
-                  <span class="switch-title">全体禁言</span>
+      </div>
 
-                  <el-switch
-                    class="switch"
-                    :value="allBanned"
-                    inactive-color="#CECECE"
-                    active-color="#fb3a32"
-                    @change="toggleMutedAllStatus"
-                  />
-                </div>
-                <div class="chat-setting-box__item" v-if="showBannedCheckbox">
-                  <el-checkbox
-                    v-for="(item, index) in bannedMoudleList"
-                    :key="index"
-                    :label="item.name"
-                    v-model="item.status"
-                    :disabled="item.isDisable || !allBanned"
-                    @change="setAllBanned(allBanned)"
-                  ></el-checkbox>
-                </div>
-                <div
-                  class="chat-setting-box__item join-chat-btn join-chat-but-col"
-                  @click="joinChatAuth"
-                  v-if="configList['comment_check']"
-                >
-                  进入聊天审核
-                </div>
+      <div class="operate-container__tool-bar__right">
+        <template v-if="chatOptions && chatOptions.enableChatSetting">
+          <!--聊天设置-->
+          <!--          <i class="chat-setting-btn" @click.stop="openPrivateChatModal">-->
+          <!--            {{ $t('common.common_1008') }}-->
+          <!--          </i>-->
+          <!-- 主持人不在小组或组长在小组显示聊天设置 -->
+          <div
+            class="chat-setting-btn--chat-auth"
+            v-if="
+              (roleName == 1 || roleName == 3 || roleName == 4) &&
+              !isInGroup &&
+              (configList['comment_check'] || configList['disable_msg'])
+            "
+          >
+            <i class="chat-setting-btn">聊天设置</i>
+            <div class="chat-setting-box">
+              <!--              <div class="chat-setting-box__item switch-box">-->
+              <!--                <span class="switch-title">屏蔽礼物/打赏消息</span>-->
+              <!--                <el-switch-->
+              <!--                  class="switch"-->
+              <!--                  v-model="filterStatus.isShieldingEffects"-->
+              <!--                  inactive-color="#E2E2E2"-->
+              <!--                  :width="32"-->
+              <!--                  active-color="#fc5659"-->
+              <!--                  @change="onClickShieldingEffects"-->
+              <!--                />-->
+              <!--              </div>-->
+              <div class="chat-setting-box__item switch-box" v-if="configList['disable_msg']">
+                <span class="switch-title">全体禁言</span>
+
+                <el-switch
+                  class="switch"
+                  :value="allBanned"
+                  inactive-color="#E2E2E2"
+                  :width="32"
+                  active-color="#fb3a32"
+                  @change="toggleMutedAllStatus"
+                />
+              </div>
+              <div class="chat-setting-box__item" v-if="showBannedCheckbox">
+                <el-checkbox
+                  v-for="(item, index) in bannedMoudleList"
+                  :key="index"
+                  :label="item.name"
+                  v-model="item.status"
+                  :disabled="item.isDisable || !allBanned"
+                  @change="setAllBanned(allBanned)"
+                ></el-checkbox>
+              </div>
+              <div
+                class="chat-setting-box__item join-chat-btn"
+                @click="joinChatAuth"
+                v-if="configList['comment_check']"
+              >
+                进入聊天审核
               </div>
             </div>
-          </template>
-        </div>
+          </div>
+        </template>
       </div>
     </div>
     <div class="operate-container__input-bar">
@@ -165,12 +151,11 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useGroupServer, useChatServer } from 'middle-domain';
-  import Emoji from './emoji.vue';
-  import ChatImgUpload from './chat-img-upload';
+  import Emoji from '../../../common/components/emoji.vue';
+  import ChatImgUpload from '../../../common/components/chat-img-upload';
   import ChatInput from './chat-input';
-  import { cl_openChatFilterUrl, cl_toast } from '@/app-shared/client/client-methods.js';
+  import { cl_toast } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpChatOperateBar',
     components: {
@@ -302,8 +287,7 @@
             name: '私聊',
             isDisable: false
           }
-        },
-        chatSetingBoxIsShow: false
+        }
       };
     },
     beforeCreate() {
@@ -311,11 +295,6 @@
     },
     mounted() {
       this.listenEvents();
-      document.addEventListener('click', () => {
-        if (this.chatSetingBoxIsShow) {
-          this.chatSetingBoxIsShow = false;
-        }
-      });
     },
     methods: {
       listenEvents() {
@@ -329,11 +308,7 @@
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
         if (this.liveStatus !== 1) {
-          if (this.$route.query.assistantType) {
-            cl_toast('error', '直播未开始禁止调用');
-          } else {
-            this.$message.error('直播未开始禁止调用');
-          }
+          this.$message.error('直播未开始禁止调用');
           return;
         }
         this.setAllBanned(val);
@@ -358,12 +333,7 @@
             ''
           );
         }
-        if (this.$route.query.assistantType) {
-          //客户端嵌入通知客户端打开聊天审核页面
-          cl_openChatFilterUrl(url);
-        } else {
-          window.open(url, '_blank');
-        }
+        window.open(url, '_blank');
       },
       //唤起登录
       handleLogin() {
@@ -377,21 +347,10 @@
         }
 
         if (this.inputStatus.disable) {
-          if (this.$route.query.assistantType) {
-            cl_toast('warning', this.$t('chat.chat_1006'));
-          } else {
-            this.$message.warning(this.$t('chat.chat_1006'));
-          }
+          this.$message.warning(this.$t('chat.chat_1006'));
           return;
         }
         this.$refs.emoji.toggleShow();
-        // 关闭聊天设置弹框
-        this.chatSetingBoxIsShow = false;
-      },
-      // 打开聊天设置box
-      toggleChatSetingBoxIsShow() {
-        this.chatSetingBoxIsShow = !this.chatSetingBoxIsShow;
-        this.$refs.emoji.closeModal();
       },
       //将表情发送给input
       emojiInput(value) {
@@ -409,28 +368,16 @@
       //只看主办方
       onClickOnlyShowSponsor(status) {
         let message = status ? this.$t('chat.chat_1014') : this.$t('chat.chat_1015');
-        if (this.$route.query.assistantType) {
-          cl_toast('success', message);
-        } else {
-          this.$message.success(message);
-        }
-        sessionStorage.setItem('filterStatus_isOnlyShowSponsor', status);
-        this.filterStatus.onlyShowSponsor = status;
-
+        this.$message.success(message);
         this.$emit('onSwitchShowSponsor', status);
       },
       //屏蔽特效
       onClickShieldingEffects(status) {
         let message = status ? this.$t('chat.chat_1016') : this.$t('chat.chat_1017');
-        if (this.$route.query.assistantType) {
-          cl_toast('success', message);
-        } else {
-          this.$message.success(message);
-        }
-        sessionStorage.setItem('filterStatus_isShieldingEffects', status);
-        this.filterStatus.isShieldingEffects = status;
+        this.$message.success(message);
         this.$emit('onSwitchShowSpecialEffects', status);
       },
+
       // 仅查看聊天内容
       onClickChat(status) {
         let message = status ? this.$t('chat.chat_1096') : this.$t('chat.chat_1097');
@@ -526,13 +473,23 @@
         flex: 1;
       }
       &__right {
+        display: flex;
+        justify-content: flex-end;
+        flex: 1;
         .chat-setting-btn {
+          margin-right: 10px;
           font-size: 14px;
           color: #999;
           cursor: pointer;
+          &:hover {
+            color: @font-error;
+            cursor: pointer;
+          }
         }
         .chat-setting-btn--chat-auth {
           position: relative;
+          display: inline-flex;
+          margin-right: 10px;
           font-size: 14px;
           color: #999;
           cursor: pointer;
@@ -552,58 +509,31 @@
             &:after {
               display: block;
             }
+            .chat-setting-box {
+              display: block;
+            }
           }
         }
         .chat-setting-box {
-          display: block;
+          display: none;
           position: absolute;
-          bottom: 26px;
-          left: -14px;
-          width: 212px;
-          padding: 20px 24px 10px;
+          bottom: 30px;
+          right: -15px;
+          width: 236px;
+          padding: 4px 20px;
           border-radius: 4px;
           background-color: #fff;
           text-align: left;
-          font-size: 12px;
+          font-size: 14px;
           color: #555;
-          .tip_only {
-            line-height: 29px;
-            color: #666;
-            font-size: 12px;
-            margin-left: 8px;
-          }
-          .el-switch__core {
-            width: 28px !important;
-            height: 16px;
-          }
-          .el-switch__core:after {
-            width: 12px;
-            height: 12px;
-          }
-          .el-switch.is-checked .el-switch__core::after {
-            margin-left: -13px;
-          }
-          .el-checkbox__input.is-disabled .el-checkbox__inner {
-            background-color: #e6e6e6;
-          }
           &__item {
-            height: 29px;
-            line-height: 29px;
+            height: 40px;
+            line-height: 40px;
             padding-bottom: 4px;
             color: #1a1a1a;
           }
-          &__item_switch {
-            color: #1a1a1a;
-            line-height: 29px;
-          }
-          .switch-box_bottom {
-            padding-bottom: 6px;
-          }
           .el-checkbox {
             color: #1a1a1a;
-            font-size: 12px;
-            margin-right: 22px;
-            font-weight: 400;
             &.is-disabled {
               .el-checkbox__label {
                 color: #b3b3b3 !important;
@@ -618,9 +548,6 @@
               border-color: #fff;
             }
           }
-          .el-checkbox__label {
-            font-size: 12px;
-          }
           .el-checkbox__input.is-checked + .el-checkbox__label {
             color: #1a1a1a;
           }
@@ -628,15 +555,11 @@
             .switch-title {
               display: inline-block;
               vertical-align: middle;
-              margin-right: 8px;
+              margin-right: 4px;
             }
           }
           .join-chat-btn {
             border-top: 1px solid #e2e2e2;
-            padding-top: 6px;
-          }
-          .join-chat-but-col {
-            color: #3562fa;
           }
         }
       }
@@ -665,6 +588,9 @@
           display: flex;
           align-items: center;
           cursor: pointer;
+          &.is-checkbox {
+            background-color: var(--chat-bg-color-filter-checked);
+          }
           &:hover {
             .filter-item__label {
               color: #e6e6e6;
@@ -707,7 +633,7 @@
           color: @active-color;
         }
         &:hover {
-          color: @font-error;
+          color: @active-color;
           cursor: pointer;
         }
         &.pic-disabled {
@@ -732,6 +658,10 @@
         font-size: 18px;
         color: #999;
         margin-left: 0;
+        &:hover {
+          color: @active-color;
+          cursor: pointer;
+        }
       }
     }
     .operate-container__input-bar {

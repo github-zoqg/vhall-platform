@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-  import EventBus from '../js/Events.js';
+  import EventBus from '../../../common/js/Events.js';
   import { useChatServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   import { cl_kickout, cl_banned, cl_permit } from '@/app-shared/client/client-methods.js';
   export default {

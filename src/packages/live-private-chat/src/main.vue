@@ -140,8 +140,8 @@
 </template>
 
 <script>
-  import imgPreview from '@/packages/chat/src/components/img-preview';
-  import emoji from '@/packages/chat/src/components/emoji';
+  import imgPreview from '@/packages/chat/src/common/components/img-preview';
+  import emoji from '@/packages/chat/src/common/components/emoji';
   import chatList from './components/chat-list';
   import comUpload from '@/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';

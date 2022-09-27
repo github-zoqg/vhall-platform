@@ -305,7 +305,7 @@
 
         // 自定义皮肤
         await this.$nextTick();
-        const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
+        const { pageStyle } = skinInfo.skin_json_pc || {};
         this.themeClass.pageBg = pageStyle;
       },
       updateAuth() {

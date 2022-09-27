@@ -1,13 +1,5 @@
 <template>
-  <div
-    class="vmp-chat-msg-item"
-    v-if="
-      !(
-        isOnlyShowSponsor &&
-        (source.roleName == 2 || ['gift_send_success', 'free_gift_send'].includes(source.type))
-      )
-    "
-  >
+  <div class="vmp-fashion-chat-msg-item" v-if="!(isOnlyShowSponsor && source.roleName == 2)">
     <!--消息发送时间-->
     <div v-if="showTime" class="vmp-chat-msg-item__showtime">{{ showTime }}</div>
     <!--常规消息-->
@@ -30,76 +22,81 @@
           v-if="!source.interactStatus && !source.interactToolsStatus"
           class="msg-item-template__normal-msg clearfix"
         >
-          <template
-            v-if="
-              chatOptions &&
-              chatOptions.userControlOptions &&
-              chatOptions.userControlOptions.enable &&
-              !isSelfMsg(source.sendId)
-            "
-          >
-            <div
-              :class="['normal-msg__avatar', 'cur-pointer']"
-              @click="setPersonStatus($event, source)"
-            >
-              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
-              <img
-                v-if="source.client === 'h5_browser'"
-                class="chat-phone"
-                width="9"
-                height="12"
-                :src="phoneImg"
-                alt
-              />
-            </div>
-          </template>
-          <template v-else>
-            <div class="normal-msg__avatar">
-              <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
-              <img
-                v-if="source.client === 'h5_browser'"
-                class="chat-phone"
-                width="9"
-                height="12"
-                :src="phoneImg"
-                alt
-              />
-            </div>
-          </template>
-
           <div class="normal-msg__content">
-            <p class="normal-msg__content__info-wrap clearfix">
-              <span
-                v-if="
-                  (['text', 'image'].includes(source.type) || source.isHistoryMsg) &&
-                  source.roleName &&
-                  source.roleName != '2'
-                "
-                class="info-wrap__role-name"
-                :class="source.roleName | roleClassFilter"
-              >
-                {{ source.roleName | roleFilter }}
-              </span>
-
-              <template>
-                <span
-                  class="info-wrap__nick-name cur-pointer"
-                  @click="setPersonStatus($event, source)"
-                  v-if="
-                    chatOptions &&
-                    chatOptions.userControlOptions &&
-                    chatOptions.userControlOptions.enable &&
-                    !isSelfMsg(source.sendId)
-                  "
-                >
-                  {{ source.nickname }}
-                </span>
-                <span class="info-wrap__nick-name" v-else>
-                  {{ source.nickname }}
-                </span>
-              </template>
-            </p>
             <div class="normal-msg__content__msg-wrap">
+              <template
+                v-if="
+                  chatOptions &&
+                  chatOptions.userControlOptions &&
+                  chatOptions.userControlOptions.enable &&
+                  !isSelfMsg(source.sendId)
+                "
+              >
+                <div
+                  :class="['normal-msg__avatar', 'cur-pointer']"
+                  @click="setPersonStatus($event, source)"
+                >
+                  <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
+                  <img
+                    v-if="source.client === 'h5_browser'"
+                    class="chat-phone"
+                    width="9"
+                    height="12"
+                    :src="phoneImg"
+                    alt
+                  />
+                </div>
+              </template>
+              <template v-else>
+                <div class="normal-msg__avatar">
+                  <img class="normal-msg__avatar-img" :src="source.avatar || defaultAvatar" alt />
+                  <img
+                    v-if="source.client === 'h5_browser'"
+                    class="chat-phone"
+                    width="9"
+                    height="12"
+                    :src="phoneImg"
+                    alt
+                  />
+                </div>
+              </template>
+              <p class="normal-msg__content__info-wrap clearfix">
+                <span
+                  v-if="isShowRoleTag"
+                  class="info-wrap__role-name"
+                  :class="source.roleName | roleClassFilter"
+                >
+                  {{ source.roleName | roleFilter }}
+                </span>
+
+                <template>
+                  <span
+                    class="info-wrap__nick-name cur-pointer"
+                    :class="isShowRoleTag ? '' : 'info-wrap__nick-name__ml32'"
+                    @click="setPersonStatus($event, source)"
+                    v-if="
+                      chatOptions &&
+                      chatOptions.userControlOptions &&
+                      chatOptions.userControlOptions.enable &&
+                      !isSelfMsg(source.sendId)
+                    "
+                  >
+                    {{ source.nickname | overHidden(8) }}
+                  </span>
+                  <span
+                    class="info-wrap__nick-name"
+                    :class="isShowRoleTag ? '' : 'info-wrap__nick-name__ml32'"
+                    v-else
+                  >
+                    {{ source.nickname | overHidden(8) }}
+                  </span>
+                  <span
+                    class="normal-msg__content-wrapper"
+                    v-if="!hasReplyMsg && source.content.text_content"
+                    v-html="msgContent"
+                  ></span>
+                </template>
+              </p>
               <!-- 被回复的消息 -->
               <div v-if="hasReplyMsg" class="normal-msg__content__reply-wrapper">
                 <!-- 文本 -->
@@ -140,9 +137,8 @@
                     v-if="!source.replyMsg.content.text_content"
                     class="reply-wrapper__img-wrapper__nick-name"
                   >
-                    {{
-                      overHiddenFunc(source.replyMsg.nickname || source.replyMsg.nick_name, 8) + ' '
-                    }}
+                    {{ source.replyMsg.nickname || source.replyMsg.nick_name | overHidden(8)
+                    }}{{ ' ' }}
                   </span>
                   <p
                     v-if="!source.replyMsg.content.text_content"
@@ -170,7 +166,7 @@
               </div>
               <!-- 文本 -->
               <p
-                v-if="source.content.text_content"
+                v-if="hasReplyMsg && source.content.text_content"
                 class="normal-msg__content-wrapper"
                 :class="hasReplyMsg ? 'normal-msg__content-wrapper__mt4' : ''"
                 v-html="msgContent"
@@ -235,7 +231,7 @@
             <img
               v-if="source.type == 'pwd_red_envelope_ok'"
               class="interact-content__redpackage-img"
-              src="../img/red-package-1.png"
+              src="../../../common/img/red-package-1.png"
               alt=""
             />
             <span
@@ -264,7 +260,7 @@
               {{
                 source.type === 'reward_pay_ok'
                   ? $t('chat.chat_1029')
-                  : `${$t('chat.chat_1032')} ${$tdefault(source.content.gift_name)}`
+                  : `${$t('chat.chat_1032')}${source.content.gift_name}`
               }}
             </span>
             <div
@@ -298,8 +294,8 @@
   </div>
 </template>
 <script>
-  import EventBus from '../js/Events.js';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import EventBus from '../../../common/js/Events.js';
+  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
   import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
   export default {
@@ -370,6 +366,13 @@
       };
     },
     computed: {
+      isShowRoleTag() {
+        return (
+          (['text', 'image'].includes(this.source.type) || this.source.isHistoryMsg) &&
+          this.source.roleName &&
+          this.source.roleName != '2'
+        );
+      },
       hasReplyMsg() {
         return (
           this.source.replyMsg &&
@@ -553,7 +556,7 @@
   };
 </script>
 <style lang="less">
-  .vmp-chat-msg-item {
+  .vmp-fashion-chat-msg-item {
     @font-dark-low: #999;
     @font-dark-normal: #e6e6e6;
     @bg-dark-normal: #1a1a1a;
@@ -612,10 +615,11 @@
         display: flex;
         /*普通消息*/
         .normal-msg__avatar {
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           border-radius: 14px;
-          position: relative;
+          position: absolute;
+          top: 3px;
           .normal-msg__avatar-img {
             width: 100%;
             height: 100%;
@@ -633,13 +637,14 @@
           padding-left: 8px;
           word-break: break-all;
           .normal-msg__content__info-wrap {
-            display: flex;
-            align-items: center;
+            display: inline;
+            // align-items: center;
           }
           .normal-msg__content__msg-wrap {
+            position: relative;
             display: inline-block;
             margin-top: 4px;
-            padding: 4px 8px;
+            padding: 4px 6px;
             background: var(--chat-background-color-secondary);
             border-radius: 15px;
           }
@@ -650,10 +655,14 @@
             line-height: 22px;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            // white-space: nowrap;
             margin-left: 4px;
+            &__ml32 {
+              margin-left: 32px;
+            }
           }
           .info-wrap__role-name {
+            margin-left: 32px;
             padding: 2px 4px;
             font-size: 12px;
             line-height: 12px;
@@ -784,8 +793,8 @@
             width: 40px;
             height: 40px;
             &.is-watch {
-              width: 64px;
-              height: 64px;
+              width: 56px;
+              height: 56px;
             }
             border-radius: 4px;
             overflow: hidden;
@@ -856,9 +865,9 @@
           }
         }
         .interact-content__redpackage-img {
-          width: 16px;
-          margin-left: 4px;
-          margin-top: 1px;
+          width: 19px;
+          margin-left: 5px;
+          margin-top: 2px;
           float: left;
         }
         .interact-content__click-detail {
