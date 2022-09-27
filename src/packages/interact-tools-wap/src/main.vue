@@ -33,7 +33,14 @@
           <img class="tool share-img" src="./img/icon_share.png" />
         </a>
       </div>
-
+      <!-- 极简模式下, 菜单入口 -->
+      <div>
+        <vmp-air-container
+          cuid="comWapMenuDialog"
+          :oneself="true"
+          v-if="isConcise"
+        ></vmp-air-container>
+      </div>
       <!-- 点赞 -->
       <div v-if="localRoomInfo.showLike">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
@@ -77,6 +84,14 @@
         webinarId: roomBaseState.watchInitData.webinar.id
       };
       let webinarData = roomBaseState.watchInitData;
+
+      let skin_json_wap = {
+        style: 1
+      };
+      const skinInfo = roomBaseState.skinInfo;
+      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      }
       return {
         roomBaseState,
         localRoomInfo,
@@ -87,7 +102,8 @@
         showInviteCard: roomBaseState.inviteCard.status == '1',
         location:
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
-        qwe: 1
+        qwe: 1,
+        isConcise: skin_json_wap?.style == 3 // 是否极简模式
       };
     },
     created() {
