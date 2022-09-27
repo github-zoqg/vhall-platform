@@ -1,5 +1,8 @@
 <template>
-  <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
+  <section
+    :class="['vmp-tab-menu', isConcise ? ' tab-menu__concise' : '']"
+    v-if="!embedObj.embedVideo"
+  >
     <!-- <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
         <div class="try-img">
@@ -112,7 +115,7 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        return this.menu.filter(item => {
+        let otherVisibleMenu = this.menu.filter(item => {
           if (!this.isWatch) {
             // 此处逻辑较复杂，请参考tab-menu/readme.md
             if (item.type == 8 && !this.auth.member) return false; // 成员
@@ -128,9 +131,19 @@
           if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
             return (item.status == 1 || item.status == 4) && item.visible;
           }
-
           return item.visible === true;
         });
+        let conciseVisibleMenu = [];
+        console.log('当前是否是简洁模式', otherVisibleMenu);
+        if (this.isConcise) {
+          conciseVisibleMenu = otherVisibleMenu.filter(item => {
+            // 如果是简洁模式，菜单抛开 - 聊天tab
+            if (item.type == 3) return false;
+            return item.visible === true;
+          });
+        }
+        console.log('当前是否是简洁模式conciseVisibleMenu', conciseVisibleMenu);
+        return this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
       },
       // 是否为嵌入页
       embedObj() {
@@ -167,6 +180,17 @@
       },
       isNoDelay() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return !!(skin_json_wap?.style == 3);
       }
     },
     watch: {
