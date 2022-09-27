@@ -249,7 +249,7 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skinJsonPc = {};
         if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
-          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+          skinJsonPc = skinInfo.skin_json_pc;
         }
         return skinJsonPc?.videoBackGroundColor || '#000';
       }

@@ -77,7 +77,7 @@
 
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
-  import Emoji from '@/packages/chat/src/components/emoji';
+  import Emoji from '@/packages/chat/src/common/components/emoji';
   import { useQaServer, useRoomBaseServer } from 'middle-domain';
   export default {
     components: {

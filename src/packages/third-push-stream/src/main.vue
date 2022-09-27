@@ -106,7 +106,7 @@
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
-  import { copy } from '@/packages/chat/src/js/utils';
+  import { copy } from '@/packages/chat/src/common/js/utils';
   export default {
     name: 'VmpThirdStream',
     data() {
