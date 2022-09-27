@@ -1,23 +1,26 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="dialogVisible"
+    v-if="visible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
-    <component
-      :is="lotteryView"
-      :winner-list="winLotteryUserList"
-      :fitment="fitment"
-      mode="watch"
-      :show-winner-list="showWinnerList"
-      :prizeInfo="prizeInfo"
-      :lottery-id="lotteryId"
-      :lottery-info="lotteryInfo"
-      :need-take-award="needTakeAward"
-      @needLogin="handleGoLogin"
-      @close="close"
-      @navTo="changeView"
-    />
+    <div class="lottery-content-container">
+      <component
+        class="lottery-content"
+        :is="lotteryView"
+        :winner-list="winLotteryUserList"
+        :fitment="fitment"
+        mode="watch"
+        :show-winner-list="showWinnerList"
+        :prizeInfo="prizeInfo"
+        :lottery-id="lotteryId"
+        :lottery-info="lotteryInfo"
+        :need-take-award="needTakeAward"
+        @needLogin="handleGoLogin"
+        @close="close"
+        @navTo="changeView"
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -37,7 +40,8 @@
       LotteryWin: () => import('./components/lottery-win.vue'), // 中奖界面
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
-      LotterySuccess: () => import('./components/lottery-success.vue') // 领取结果页面
+      LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
+      LotterySubmitDetail: () => import('./components/lottery-submit-detail.vue') // 中奖详情页
     },
     provide() {
       return {
@@ -48,9 +52,10 @@
       const zIndexServerState = this.zIndexServer.state;
       return {
         zIndexServerState,
+        visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: '', // 抽奖组件视图名称
+        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -321,6 +326,23 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
     line-height: initial; // 清除父容器的css影响
+    .lottery-content-container {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .vmp-lottery-btn {
+      width: 160px;
+      height: 40px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 20px;
+      background: #fb2626;
+      border: 0;
+    }
     .lottery__close-btn {
       position: absolute;
       bottom: -36px;
@@ -329,6 +351,15 @@
       font-size: 30px;
       color: #ffffff;
       cursor: pointer;
+    }
+    .lottery-box {
+      position: relative;
+      box-sizing: border-box;
+      width: 424px;
+      background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+      border-radius: 12px;
+      text-align: center;
+      padding: 24px 32px;
     }
   }
 </style>

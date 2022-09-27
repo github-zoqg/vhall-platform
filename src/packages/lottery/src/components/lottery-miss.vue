@@ -1,84 +1,63 @@
 <template>
-  <div class="lottery-losing-dialog" :class="{ 'lottery-losing-dialog__no-list': !showWinnerList }">
-    <span class="lottery-res">{{ $t('interact_tools.interact_tools_1074') }}</span>
-    <p class="lottery-title">{{ $t('interact_tools.interact_tools_1010') }}</p>
-    <p class="lottery-title">{{ $t('interact_tools.interact_tools_1011') }}</p>
-    <div v-if="showWinnerList" class="lottery-check-ret-btn" @click="navToWinnerList">
+  <div class="no-win-lottery">
+    <div class="no-win-lottery-img" />
+    <p class="lottery-result" :data-text="`很遗憾, ${$t('interact_tools.interact_tools_1010')}`">
+      {{ `很遗憾, ${$t('interact_tools.interact_tools_1010')}` }}
+    </p>
+    <p class="no-win-tip">{{ $t('interact_tools.interact_tools_1011') }}!</p>
+    <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
-    </div>
-    <i class="lottery__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
+    </button>
+    <button class="vmp-lottery-btn" @click="navToWinnerList">
+      {{ $t('interact_tools.interact_tools_1012') }}
+    </button>
   </div>
 </template>
 <script>
-  /**
-   * 没有中奖
-   */
   export default {
     name: 'LotteryMiss',
-    props: {
-      showWinnerList: {
-        type: Boolean,
-        default() {
-          return false;
-        }
-      }
-    },
     methods: {
-      close() {
-        this.$emit('close');
-      },
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');
       }
     }
   };
 </script>
-
-<style lang="less" scoped>
-  .lottery-losing-dialog {
-    width: 424px;
-    height: 334px;
-    background: url(../img/lose-lottery.png);
-    background-size: 100% auto;
-    margin-top: 15vh;
-    margin-left: 50%;
-    transform: translate(-50%, 0);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 66px;
-    position: relative;
-    .lottery-res {
-      position: absolute;
-      line-height: 46px;
-      top: 2px;
-      color: #fff;
+<style lang="less">
+  .no-win-lottery {
+    text-align: center;
+    .no-win-lottery-img {
+      width: 110px;
+      height: 110px;
+      margin: 10px auto 0;
+      background-image: url('../img/lottery-miss.png');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
-    .lottery-title {
-      line-height: 22px;
-      font-size: 16px;
-      color: #ffffff;
-    }
-    .lottery-check-ret-btn {
-      margin-top: 183px;
-      width: 160px;
-      height: 40px;
-      text-align: center;
-      line-height: 40px;
-      color: #fb3a32;
-      font-size: 14px;
-      user-select: none;
-      cursor: pointer;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.9);
-    }
-    &.lottery-losing-dialog__no-list {
-      background: url(../img/lose-lottery-no-list.png);
-      height: 314px;
-      padding-top: 86px;
-      .lottery-check-ret-btn {
-        display: none;
+    .lottery-result {
+      position: relative;
+      font-weight: 600;
+      font-size: 27px;
+      line-height: 32px;
+      color: #fef8f4;
+      -webkit-text-stroke: 6px #eb6a37;
+      text-shadow: 0px 1px 1px rgba(197, 21, 14, 0.56);
+      transform: matrix(0.99, 0, -0.15, 1, 0, 0);
+      &::before {
+        content: attr(data-text);
+        position: absolute;
+        -webkit-text-stroke: 0;
+        color: #fef8f4;
       }
+    }
+    .no-win-tip {
+      margin-top: 12px;
+      font-size: 16px;
+      line-height: 22px;
+      color: #fce09e;
+    }
+    .vmp-lottery-btn {
+      margin-top: 25px;
     }
   }
 </style>
