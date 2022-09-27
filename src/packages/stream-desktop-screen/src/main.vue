@@ -584,7 +584,7 @@
         this.setDesktop('0');
         this.interactiveServer.resetLayout();
         this.docServer.resetLayoutByMiniElement();
-        if (source == 'vrtc_big_screen_set') {
+        if ((this.roleName == 1 || this.roleName == 4) && source == 'vrtc_big_screen_set') {
           this.roomBaseServer.setChangeElement('stream-list');
         }
       },
