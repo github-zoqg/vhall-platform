@@ -1,6 +1,7 @@
 <template>
   <div class="vmp-wap-menu-dialog">
-    <img class="menu_icon-concise" src="./images/icon_gift.png" @click="openMenusPanel" />
+    <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
+    <span class="menu_icon-pointer"></span>
     <van-popup
       class="wap-menu-van-popup"
       v-model="menuDialogVisible"
@@ -49,9 +50,24 @@
 
 <style lang="less">
   .vmp-wap-menu-dialog {
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    position: relative;
     .menu_icon-concise {
       width: 50px;
       height: 50px;
+    }
+    .menu_icon-pointer {
+      width: 14px;
+      height: 14px;
+      right: -7px;
+      top: -4px;
+      position: absolute;
+      border-radius: 100%;
+      display: block;
+      background: #fb3a32;
     }
   }
   .wap-menu-van-popup {

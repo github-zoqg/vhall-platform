@@ -1,5 +1,5 @@
 <template>
-  <section class="vmp-intro">
+  <section :class="['vmp-intro', isConcise ? ' vmp-intro__concise' : '']">
     <section class="vmp-intro-main">
       <section class="vmp-intro-block">
         <header class="vmp-intro-block__headtitle">
@@ -141,6 +141,17 @@
       // 简介富文本正文 Type:String
       content() {
         return this.languagesInfo.introduction || '<p></p>';
+      },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return !!(skin_json_wap?.style == 3);
       }
     },
     created() {
@@ -169,7 +180,7 @@
     flex-direction: column;
 
     .vmp-intro-block {
-      padding: 32px 24px 0 24px;
+      padding: 24px 24px 0 24px;
       background-color: var(--theme-tab-content-intro-introLink-bg);
       position: relative;
 
@@ -183,7 +194,7 @@
       }
 
       &__headtitle {
-        font-size: 36px;
+        font-size: 32px;
         text-overflow: -o-ellipsis-lastline;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -194,7 +205,7 @@
         -webkit-box-orient: vertical;
         word-break: break-all;
         font-weight: 500;
-        line-height: 48px;
+        line-height: 50px;
         color: var(--theme-tab-content-intro-title-font);
         .delay-icon {
           display: inline-block;
@@ -236,7 +247,7 @@
         justify-content: space-between;
         align-items: center;
         color: var(--theme-tab-content-intro-subTitle-font);
-        margin-top: 2px;
+        margin-top: 7px;
         p {
           // i {
           //   margin-right: 8px;
@@ -310,6 +321,10 @@
         text-align: center;
         display: block;
       }
+    }
+
+    &__concise {
+      /* 简洁模式 */
     }
   }
 </style>
