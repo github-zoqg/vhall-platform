@@ -524,7 +524,7 @@
         }
         let videos = document.querySelectorAll('.vmp-stream-remote video');
         let localVideo = document.querySelectorAll('.vmp-stream-local video')[0];
-        console.log('本地流video', localVideo);
+
         if (localVideo && this.joinInfo.role_name == 2) {
           videoPlay(localVideo);
         }

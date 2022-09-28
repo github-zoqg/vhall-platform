@@ -33,8 +33,11 @@
       },
       isVisibleMiniElement() {
         // TODO:后续添加插播桌面共享后，再添加插播桌面共享场景的处理
+        // 开启文档 + 非合并模式 显示
         return (
-          (this.$domainStore.state.docServer.switchStatus || this.miniElement) &&
+          ((this.$domainStore.state.docServer.switchStatus &&
+            this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1) ||
+            this.miniElement) &&
           [1, 4, 5].includes(this.webinarType)
         );
       },

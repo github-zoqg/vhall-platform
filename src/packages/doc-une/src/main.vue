@@ -155,7 +155,6 @@
   import {
     useRoomBaseServer,
     useDocServer,
-    useMsgServer,
     useGroupServer,
     useInteractiveServer,
     useMemberServer,
@@ -283,6 +282,7 @@
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
         // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限,不能是单视频嵌入页
+        // 4. 未上麦的观众 | 未出实话互动 | 合并模式不显示文档
         if (this.isWatch) {
           if (!this.isEmbedVideo) {
             if (this.hasDocPermission) {
@@ -291,7 +291,14 @@
               if (this.micServer.state.isSpeakOn && this.isShareScreen) {
                 return false;
               } else {
-                return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+                if (
+                  !this.$domainStore.state.interactiveServer.isInstanceInit &&
+                  this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1
+                ) {
+                  return false;
+                } else {
+                  return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+                }
               }
             }
           } else {
@@ -406,6 +413,57 @@
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
         return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
+      },
+      isHostPermission() {
+        const { watchInitData, interactToolStatus } = this.$domainStore.state.roomBaseServer;
+        return (
+          watchInitData.join_info.role_name == 1 ||
+          interactToolStatus.doc_permission == watchInitData.join_info.third_party_user_id
+        );
+      },
+      isGroupLeader() {
+        const { groupInitData } = this.$domainStore.state.groupServer;
+        return (
+          groupInitData.isInGroup &&
+          this.watchInitData.join_info.third_party_user_id == groupInitData.doc_permission
+        );
+      },
+      // 是否开启文档云融屏功能
+      isOpenDocStream() {
+        /**
+         * 开启文档融屏需同时满足一下条件
+         * 1.主持人/嘉宾，分组中的组长
+         * 2.开启观众可见
+         * 3.互动实例初始化成功
+         * 4.直播中
+         * 5.演示文档/白板加载完成（主讲人自己/演示者演示文档）
+         * 6.存在文档id
+         * 7.开启文档融屏功能
+         */
+        const status =
+          (this.isHostPermission || this.isGroupLeader) &&
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          this.docLoadComplete &&
+          !!this.watchInitData.interact.channel_id &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1;
+
+        console.table({
+          status,
+          isHostPermission: this.isHostPermission,
+          isGroupLeader: this.isGroupLeader,
+          switchStatus: this.$domainStore.state.docServer.switchStatus,
+          isInstanceInit: this.$domainStore.state.interactiveServer.isInstanceInit,
+          liveStatus: this.webinarType,
+          docLoadComplete: this.docLoadComplete,
+          channelId: this.watchInitData.interact.channel_id,
+          currentCid: this.$domainStore.state.docServer.currentCid,
+          speakerAndShowLayout: this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout
+        });
+
+        return status;
       }
     },
     watch: {
@@ -451,6 +509,17 @@
       // 演示者变更时,隐藏缩列图列表
       presenterId() {
         this.thumbnailShow = false;
+      },
+      // 开启文档云融屏
+      isOpenDocStream: {
+        handler(newval) {
+          if (newval) {
+            this.openDocYunStream();
+          } else if (this.isHostPermission || this.isGroupLeader) {
+            this.closeDocYunStream();
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -466,6 +535,13 @@
       window.addEventListener('keydown', this.listenKeydown);
     },
     methods: {
+      // 开启文档云融屏
+      openDocYunStream() {
+        this.interactiveServer.openDocCloudStream();
+      },
+      closeDocYunStream() {
+        this.interactiveServer.closeDocCloudStream();
+      },
       /**
        * 全屏切换
        */
