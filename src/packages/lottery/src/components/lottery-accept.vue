@@ -14,10 +14,8 @@
               autocomplete="off"
             />
           </div>
-          <div class="form-item__error">
-            <span v-if="item.error">
-              {{ item.field_key | errorMsg }}
-            </span>
+          <div v-if="item.error" class="form-item__error">
+            {{ item.field_key | errorMsg }}
           </div>
         </li>
       </ul>
@@ -51,11 +49,6 @@
         verified: false
       };
     },
-    computed: {
-      title() {
-        return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
-      }
-    },
     filters: {
       errorMsg(fieldKey = '') {
         const map = {
@@ -81,6 +74,20 @@
       this.initFromInfo();
     },
     methods: {
+      fmtRemark() {
+        const remark = [];
+        this.winForm.map(item => {
+          remark.push({
+            field_value: item.field_value, // 前端的新增值,其余的
+            field: item.field,
+            field_key: item.field_key,
+            is_required: item.is_required,
+            is_system: item.is_system,
+            placeholder: item.placeholder,
+            rank: item.rank
+          });
+        });
+      },
       initFromInfo() {
         this.lotteryServer.getDrawPrizeInfo().then(res => {
           if (res.data && res.data.length > 0) {
@@ -102,7 +109,7 @@
        * @description 验证数据
        */
       verify() {
-        let relt = true;
+        let result = true;
         this.winForm.map(item => {
           if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
             // 当手机号为必填,或者有输入手机号才正则校验
@@ -110,16 +117,16 @@
             const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
             if (!regs.test(phone)) {
               item.error = true;
-              relt = false;
+              result = false;
             }
           } else if (item.is_required === 1 && item.field_value == '') {
             item.error = true;
-            relt = false;
+            result = false;
           } else {
             item.error = false;
           }
         });
-        return relt;
+        return result;
       },
       submit() {
         if (!this.verify()) return false;
@@ -183,22 +190,18 @@
       text-align: center;
       line-height: 50px;
     }
-    .form-wrap {
-      // padding: 0 4px; // 给滚动条样式留空间
-      // margin: 16px 0 0;
-    }
     .form {
-      // padding: 0 12px;
-      max-height: 640px;
+      max-height: 180px;
       overflow: auto;
     }
     .form-item {
+      position: relative;
       height: 44px;
       background: #ffffff;
       border-radius: 4px;
-      overflow: hidden;
+      // overflow: hidden;
       &:not(:last-child) {
-        margin-bottom: 8px;
+        margin-bottom: 24px;
       }
       &__input {
         line-height: 44px;
@@ -220,16 +223,16 @@
         }
       }
       &__error {
+        position: absolute;
+        top: 45px;
         height: 20px;
-        padding-top: 3px;
-        padding-left: 18px;
-        font-size: 14px;
+        font-size: 12px;
+        line-height: 20px;
         color: #fb2626;
       }
     }
     .form-inpput {
       width: 100%;
-      outline: 0;
       font-size: 14px;
       color: #262626;
       outline: none;

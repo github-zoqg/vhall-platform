@@ -1,6 +1,5 @@
 <template>
   <div class="lottery-accept">
-    <!-- <header class="title">{{ title }}</header> -->
     <lotteryTitle title="提交信息" />
     <div class="form-wrap">
       <ul class="form">
@@ -14,11 +13,6 @@
               :placeholder="$tdefault(item.placeholder)"
               autocomplete="off"
             />
-          </div>
-          <div class="form-item__error">
-            <span v-if="item.error">
-              {{ item.field_key | errorMsg }}
-            </span>
           </div>
         </li>
       </ul>
@@ -48,24 +42,8 @@
     data() {
       return {
         winForm: [], // 中奖信息表单
-        verified: false
+        verified: false // 是否可提交
       };
-    },
-    computed: {
-      title() {
-        return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
-      }
-    },
-    filters: {
-      errorMsg(fieldKey = '') {
-        const map = {
-          name: '姓名',
-          address: '地址',
-          phone: '手机号'
-        };
-        const field = map[fieldKey] || '';
-        return `请输入正确的信息${field}`;
-      }
     },
     watch: {
       winForm: {
@@ -102,24 +80,25 @@
        * @description 验证数据
        */
       verify() {
-        let relt = true;
-        this.winForm.map(item => {
+        const errorItem = this.winForm.find(item => {
           if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
             // 当手机号为必填,或者有输入手机号才正则校验
             const phone = item.field_value.replace(/\s/g, '');
             const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
             if (!regs.test(phone)) {
-              item.error = true;
-              relt = false;
+              return true;
             }
           } else if (item.is_required === 1 && item.field_value == '') {
-            item.error = true;
-            relt = false;
-          } else {
-            item.error = false;
+            return true;
           }
+          return false;
         });
-        return relt;
+        if (errorItem) {
+          this.$toast(`请输入正确的信息${errorItem.field}`);
+          return false;
+        } else {
+          return true;
+        }
       },
       submit() {
         if (!this.verify()) return false;
