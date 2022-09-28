@@ -5,6 +5,10 @@
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">
+      <i
+        :class="['vh-iconfont', boxLayout ? 'vh-line-close' : 'vh-line-circle-close']"
+        @click="close"
+      />
       <component
         class="lottery-content"
         :is="lotteryView"
@@ -55,7 +59,7 @@
         visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
+        lotteryView: 'LotteryAccept', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -65,6 +69,17 @@
         winLotteryHistory: [], // 中奖历史
         winnerListData: {}
       };
+    },
+    computed: {
+      boxLayout() {
+        return [
+          'LotteryWin',
+          'LotterySubmitDetail',
+          'LotterySuccess',
+          'LotteryAccept',
+          'LotteryWinner'
+        ].indexOf(this.lotteryView);
+      }
     },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
@@ -360,6 +375,24 @@
       border-radius: 12px;
       text-align: center;
       padding: 24px 32px;
+    }
+    .vh-line-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      cursor: pointer;
+      color: #f6c667;
+      z-index: 10;
+    }
+    .vh-line-circle-close {
+      position: absolute;
+      bottom: -60px;
+      color: #fff;
+      font-size: 27px;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
     }
   }
 </style>

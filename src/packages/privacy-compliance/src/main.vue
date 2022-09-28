@@ -191,17 +191,11 @@
         padding: 0 0;
       }
       &.scene_lottery {
-        position: absolute;
-        padding: 0 0;
-        margin: 0 0;
-        width: 300px;
-        bottom: 53px;
+        width: 100%;
         text-align: center;
-        padding-left: 6px;
         span {
           font-size: 12px;
           line-height: 17px;
-          color: #ffffff;
         }
         a {
           font-size: 12px;

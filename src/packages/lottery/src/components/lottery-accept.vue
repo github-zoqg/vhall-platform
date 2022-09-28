@@ -25,7 +25,12 @@
         {{ $t('interact_tools.interact_tools_1019') }}
       </button>
       <!-- 隐私合规（嵌入不展示） -->
-      <vmp-privacy-compliance scene="lottery" clientType="pc" compType="2"></vmp-privacy-compliance>
+      <vmp-privacy-compliance
+        class="privacy"
+        scene="lottery"
+        clientType="pc"
+        compType="2"
+      ></vmp-privacy-compliance>
     </div>
   </div>
 </template>
@@ -238,8 +243,8 @@
         opacity: 0.4;
       }
     }
-    .vmp-privacy-compliance {
-      position: static !important;
+    .privacy {
+      margin-top: 12px;
     }
     ::-webkit-scrollbar {
       width: 4px;

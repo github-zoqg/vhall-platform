@@ -13,6 +13,9 @@
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
+    <button class="vmp-lottery-btn" @click="navToWinnerList">
+      {{ $t('interact_tools.interact_tools_1012') }}
+    </button>
   </div>
 </template>
 <script>
@@ -40,8 +43,8 @@
 <style lang="less">
   .lottery-submit-detail {
     .award-detail {
+      box-sizing: border-box;
       height: 72px;
-      margin: 0 12px;
       padding: 0 16px;
       display: flex;
       flex-direction: row;
@@ -64,19 +67,22 @@
     }
     .submit-content {
       background: #fff;
-      border-radius: 24px;
-      padding: 16px;
-      margin: 6px 12px 18px;
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 4px;
       min-height: 50px;
     }
     .submit-content-item {
       font-size: 14px;
-      line-height: 20px;
+      line-height: 22px;
       color: #262626;
       text-align: left;
       &:not(:last-child) {
         margin-bottom: 8px;
       }
+    }
+    .vmp-lottery-btn {
+      margin-top: 42px;
     }
   }
 </style>
