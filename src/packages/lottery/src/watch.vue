@@ -1,7 +1,7 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="visible"
+    v-if="dialogVisible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">
@@ -20,6 +20,8 @@
         :lottery-id="lotteryId"
         :lottery-info="lotteryInfo"
         :need-take-award="needTakeAward"
+        :win-lottery-history="winLotteryHistory"
+        @takeAward="handleTakeAward"
         @needLogin="handleGoLogin"
         @close="close"
         @navTo="changeView"
@@ -45,6 +47,7 @@
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
       LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
+      LotteryHistory: () => import('./components/lottery-history.vue'), // 领取结果页面
       LotterySubmitDetail: () => import('./components/lottery-submit-detail.vue') // 中奖详情页
     },
     provide() {
@@ -59,7 +62,7 @@
         visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryPending', // 抽奖组件视图名称
+        lotteryView: 'LotteryHistory', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -76,7 +79,8 @@
           'LotterySubmitDetail',
           'LotterySuccess',
           'LotteryAccept',
-          'LotteryWinner'
+          'LotteryWinner',
+          'LotteryHistory'
         ];
         return boxLayoutModules.includes(this.lotteryView);
       }
@@ -148,8 +152,9 @@
               this.setFitment(winLottery);
             } else if (winLotteryHistory.length > 1) {
               // 中奖记录2条以上显示中奖历史
-              this.lotteryServer.$emit('ShowHistory', winLotteryHistory); // 弹起中奖历史
-              return false;
+              // this.lotteryServer.$emit('ShowHistory', winLotteryHistory); // 弹起中奖历史
+              this.winLotteryHistory = winLotteryHistory;
+              this.lotteryView = 'LotteryHistory';
             } else {
               lotteryMiss();
             }
@@ -357,15 +362,6 @@
       border-radius: 20px;
       background: #fb2626;
       border: 0;
-    }
-    .lottery__close-btn {
-      position: absolute;
-      bottom: -36px;
-      left: 50%;
-      transform: translateX(-15px);
-      font-size: 30px;
-      color: #ffffff;
-      cursor: pointer;
     }
     .lottery-box {
       position: relative;
