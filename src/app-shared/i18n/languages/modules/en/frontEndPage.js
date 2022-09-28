@@ -109,7 +109,7 @@ export default {
     appointment_1031: 'Please be patient',
     appointment_1032: 'Whitelist',
     appointment_1033: 'The rehearsal has started, please watch it live',
-    appointment_1034: 'Submit and receive notifications'
+    appointment_1034: 'Submit and receive SMS'
   },
   nav: {
     nav_1001: 'Sponsor',
