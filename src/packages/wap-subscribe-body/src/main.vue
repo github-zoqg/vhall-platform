@@ -579,6 +579,11 @@
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           ...this.$route.query
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          params.clientType = 'embed';
+          params.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(params).then(res => {
           this.isSubscribeShow = false; // 先关闭弹窗
           if (res.code == 200) {
@@ -800,6 +805,11 @@
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           ...this.$route.query
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          params.clientType = 'embed';
+          params.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
