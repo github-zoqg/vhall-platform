@@ -30,7 +30,7 @@ setRequestHeaders({
 });
 setResponseInterceptors(e => {
   //如果是本地token（非地址栏中的token或live_token）失效，清空token
-  if ([511006, 511007].includes(e.data.code)) {
+  if ([511006, 511007].includes(e?.data?.code)) {
     localStorage.removeItem('token');
   }
 });
