@@ -94,6 +94,7 @@
               item.error = false;
             });
             this.winForm = res.data;
+            this.fillUserInfo();
           }
         });
       },
@@ -154,17 +155,18 @@
       fillUserInfo() {
         this.lotteryServer.getLotteryUserInfo().then(res => {
           const data = res.data;
-          this.winForm.map(item => {
-            if (item.field_key == 'name') {
-              // 当手机号为必填,或者有输入手机号才正则校验
-              item.field_value = data.lottery_user_name;
-              item.error = false;
-            } else if (item.field_key == 'phone') {
-              item.field_value = data.lottery_user_phone;
-            } else if (item.field_key == 'address') {
-              item.field_value = data.lottery_user_address;
-            }
-          });
+          data &&
+            this.winForm.map(item => {
+              if (item.field_key == 'name') {
+                // 当手机号为必填,或者有输入手机号才正则校验
+                item.field_value = data.lottery_user_name;
+                item.error = false;
+              } else if (item.field_key == 'phone') {
+                item.field_value = data.lottery_user_phone;
+              } else if (item.field_key == 'address') {
+                item.field_value = data.lottery_user_address;
+              }
+            });
         });
       }
     }

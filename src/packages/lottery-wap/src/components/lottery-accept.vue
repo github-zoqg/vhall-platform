@@ -94,6 +94,7 @@
               item.error = false;
             });
             this.winForm = res.data;
+            this.fillUserInfo();
           }
         });
       },

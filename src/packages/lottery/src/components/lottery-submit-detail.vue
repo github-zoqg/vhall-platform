@@ -13,9 +13,6 @@
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
-    <button class="vmp-lottery-btn" @click="navToWinnerList">
-      {{ $t('interact_tools.interact_tools_1012') }}
-    </button>
   </div>
 </template>
 <script>
@@ -24,6 +21,7 @@
   export default {
     name: 'LotteryWinner',
     mixins: [props],
+    inject: ['lotteryServer'],
     components: {
       LotteryTitle
     },
@@ -33,9 +31,17 @@
         return serial.padStart(2, '0');
       }
     },
+    created() {
+      this.getLotteryUserDetail();
+    },
     methods: {
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');
+      },
+      getLotteryUserDetail() {
+        this.lotteryServer.getLotteryUserDetail(this.lotteryId).then(res => {
+          console.log(res);
+        });
       }
     }
   };

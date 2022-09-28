@@ -1,7 +1,7 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="visible"
+    v-if="dialogVisible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">
@@ -72,13 +72,13 @@
     },
     computed: {
       boxLayout() {
-        return [
-          'LotteryWin',
+        const boxLayoutModules = [
           'LotterySubmitDetail',
           'LotterySuccess',
           'LotteryAccept',
           'LotteryWinner'
-        ].indexOf(this.lotteryView);
+        ];
+        return boxLayoutModules.includes(this.lotteryView);
       }
     },
     beforeCreate() {
@@ -109,7 +109,7 @@
             if (res.data.take_award === 0) {
               this.lotteryView = 'LotteryWin';
             } else {
-              this.lotteryView = 'LotterySuccess';
+              this.lotteryView = 'LotterySubmitDetail';
             }
             this.dialogVisible = true;
             this.zIndexServer.setDialogZIndex('lottery');

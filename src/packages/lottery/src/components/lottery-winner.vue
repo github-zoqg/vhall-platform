@@ -26,8 +26,10 @@
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import LotteryTitle from './lottery-title.vue';
+  import props from './props';
   export default {
     name: 'LotteryWinner',
+    mixins: [props],
     props: {
       winnerList: {
         required: true,
