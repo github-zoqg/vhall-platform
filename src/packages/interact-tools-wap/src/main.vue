@@ -34,12 +34,8 @@
         </a>
       </div>
       <!-- 极简模式下, 菜单入口 -->
-      <div>
-        <vmp-air-container
-          cuid="comWapMenuDialog"
-          :oneself="true"
-          v-if="isConcise"
-        ></vmp-air-container>
+      <div v-if="isConcise">
+        <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
       </div>
       <!-- 点赞 -->
       <div v-if="localRoomInfo.showLike">
@@ -103,11 +99,13 @@
         location:
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
-        isConcise: skin_json_wap?.style == 3 // 是否极简模式
+        isConcise: skin_json_wap?.style == 3, // 是否极简模式
+        childrenComp: []
       };
     },
     created() {
       window.interactTools = this;
+      this.childrenComp = window.$serverConfig[this.cuid].children;
     },
     mounted() {
       this.joinInfoInGift = {

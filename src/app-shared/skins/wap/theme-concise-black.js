@@ -92,5 +92,5 @@ export default {
   '--theme-chapter-list-bg': ' ',
   '--theme-chapter-font-color-title': ' ',
   '--theme-chapter-font-color-time': ' ',
-  '--theme-chapter-font-color-active': ' '
+  '--theme-chapter-font-color-active': '#FB2626'
 };

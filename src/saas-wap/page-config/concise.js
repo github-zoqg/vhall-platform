@@ -105,7 +105,7 @@ export default {
       menuConfig: [
         { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
         { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, //文档
-        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
+        // { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
         { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
         { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
         { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品

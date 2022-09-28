@@ -117,8 +117,8 @@ export default {
   '--theme-chat-msg-reply-content': ' ',
   '--theme-header-attention-color': ' ',
   // 章节
-  '--theme-chapter-list-bg': '#ffffff',
-  '--theme-chapter-font-color-title': 'rgba(0,0,0,0.85)',
-  '--theme-chapter-font-color-time': 'rgba(0,0,0,0.45)',
+  '--theme-chapter-list-bg': '',
+  '--theme-chapter-font-color-title': '#262626',
+  '--theme-chapter-font-color-time': 'rgba(0, 0, 0, 0.65)',
   '--theme-chapter-font-color-active': '#3552EA'
 };
