@@ -62,7 +62,13 @@
           await this.initSubjectAuth();
           this.state = 1;
         } catch (err) {
-          this.state = 2;
+          if ([511006, 511007].includes(err.code)) {
+            localStorage.removeItem('token');
+            window.location.reload();
+            return;
+          } else {
+            this.state = 2;
+          }
         }
       },
       async getWebinarList() {

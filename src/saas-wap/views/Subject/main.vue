@@ -273,7 +273,13 @@
           this.initSubjectAuth();
           this.wxShareInfo(this.detailInfo);
         } catch (err) {
-          this.$toast(err.msg);
+          if ([511006, 511007].includes(err.code)) {
+            localStorage.removeItem('token');
+            window.location.reload();
+            return;
+          } else {
+            this.$toast(err.msg);
+          }
         }
       },
       getWebinarList() {
