@@ -59,6 +59,21 @@
       this.initFromInfo();
     },
     methods: {
+      fmtRemark() {
+        const remark = [];
+        this.winForm.map(item => {
+          remark.push({
+            field_value: item.field_value, // 前端的新增值,其余的
+            field: item.field,
+            field_key: item.field_key,
+            is_required: item.is_required,
+            is_system: item.is_system,
+            placeholder: item.placeholder,
+            rank: item.rank
+          });
+        });
+        return JSON.stringify(remark);
+      },
       initFromInfo() {
         this.lotteryServer.getDrawPrizeInfo().then(res => {
           if (res.data && res.data.length > 0) {
@@ -109,7 +124,7 @@
           .acceptPrize({
             lottery_user_name: this.winForm[0].field_value,
             lottery_user_phone: this.winForm[1].field_value,
-            lottery_user_remark: JSON.stringify(this.winForm),
+            lottery_user_remark: this.fmtRemark(this.winForm),
             lottery_id: this.lotteryId
           })
           .then(res => {

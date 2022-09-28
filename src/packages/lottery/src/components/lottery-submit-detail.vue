@@ -2,13 +2,13 @@
   <div class="lottery-box lottery-submit-detail">
     <lottery-title title="中奖详情" />
     <div class="award-detail">
-      <img class="award-img" :src="fitment.url || defaultLotteryImg" alt />
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
       <p class="award-name">参与观众获得“{{ fitment.name || '奖品' }}”</p>
     </div>
     <div class="submit-content">
-      <div class="submit-content-item">蔡星</div>
-      <div class="submit-content-item">13435464012</div>
-      <div class="submit-content-item">北京市朝阳区紫檀大厦</div>
+      <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
+        {{ submitItem }}
+      </div>
     </div>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
@@ -25,6 +25,11 @@
     components: {
       LotteryTitle
     },
+    data() {
+      return {
+        submitInfo: []
+      };
+    },
     filters: {
       fmtSerial(val) {
         const serial = `${val + 1}`;
@@ -40,7 +45,25 @@
       },
       getLotteryUserDetail() {
         this.lotteryServer.getLotteryUserDetail(this.lotteryId).then(res => {
-          console.log(res);
+          console.log('getLotteryUserDetail', res);
+          const data = res.data;
+          this.submitInfo = [];
+          if (!data) return;
+          this.submitInfo.push(data.lottery_user_name);
+          this.submitInfo.push(data.lottery_user_phone);
+          let remark = null;
+          try {
+            remark = JSON.parse(data.lottery_user_remark);
+          } catch (e) {
+            console.warn('转换remark', e);
+          }
+          if (Array.isArray(remark)) {
+            remark.forEach(item => {
+              if (item.field_key !== 'phone' && item.field_key !== 'name' && item.field_value) {
+                this.submitInfo.push(item.field_value);
+              }
+            });
+          }
         });
       }
     }
