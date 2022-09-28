@@ -262,6 +262,11 @@
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
+            if ([511006, 511007].includes(res.code)) {
+              localStorage.removeItem('token');
+              window.location.reload();
+              return;
+            }
             this.state = 2;
             this.$toast(res.msg);
             return;
@@ -273,13 +278,7 @@
           this.initSubjectAuth();
           this.wxShareInfo(this.detailInfo);
         } catch (err) {
-          if ([511006, 511007].includes(err.code)) {
-            localStorage.removeItem('token');
-            window.location.reload();
-            return;
-          } else {
-            this.$toast(err.msg);
-          }
+          this.$toast(err.msg);
         }
       },
       getWebinarList() {
