@@ -157,9 +157,11 @@
         console.log('this.fitment', this.fitment);
         const itemIdx = this.fitment.img_order || 3;
         const resourceItem = animationEffectArr[itemIdx];
-        parser.load(resourceItem.svgaUrl, function (videoItem) {
+        parser.load(resourceItem.svgaUrl, videoItem => {
           player.setVideoItem(videoItem);
-          player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+          if (this.needJoin) {
+            player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+          }
           player.startAnimationWithRange({
             location: 1,
             length: 15
@@ -181,7 +183,6 @@
       width: 750px;
       height: 850px;
       position: relative;
-      // background: red;
     }
     .lottery-send-command-container {
       width: 100%;

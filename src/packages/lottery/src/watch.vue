@@ -1,7 +1,7 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="dialogVisible"
+    v-if="visible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">
@@ -59,7 +59,7 @@
         visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryAccept', // 抽奖组件视图名称
+        lotteryView: 'LotteryPending', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)

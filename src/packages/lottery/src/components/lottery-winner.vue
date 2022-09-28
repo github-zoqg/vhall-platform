@@ -2,10 +2,7 @@
   <div class="lottery-box lottery-winner-list">
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
-      <img
-        class="award-img"
-        :src="(fitment.award_snapshoot && fitment.prizeInfo.icon) || defaultLotteryImg"
-      />
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
       <p class="award-name">
         参与观众获得“
         {{ (fitment && fitment.name) || '奖品' }}

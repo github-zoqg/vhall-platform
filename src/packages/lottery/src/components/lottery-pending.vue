@@ -1,85 +1,80 @@
 <template>
-  <div class="prize-pending" :class="fitment.img_order === 3 ? 'blue' : ''">
-    <h4 class="prize-pending__title">
-      {{ fitment.title || $t('interact_tools.interact_tools_1003') }}
-    </h4>
-    <div class="prize-pending-imgWrap">
-      <img v-if="fitment.url" :src="fitment.url" />
-    </div>
-    <p class="prize-pending__desc" v-if="!needJoin">
-      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-    </p>
-    <p
-      v-if="mode === 'live'"
-      class="prize-pending__end-button"
-      @click="endLottery"
-      :class="[
-        'common-but',
-        'lottery-end',
-        { 'lottery-start': !(disabledTime > 0 && disabledTime <= 5) },
-        { 'lottery-downTime': disabledTime > 0 && disabledTime <= 5 },
-        { disabled: (disabledTime > 0 && disabledTime <= 5) || endLotteryDisable }
-      ]"
-    >
-      结束抽奖
-      <!-- {{ $t('interact_tools.interact_tools_1008') }} -->
-      <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
-    </p>
-    <template v-if="needJoin">
-      <p class="lottery-desc">
-        <i18n path="interact_tools.interact_tools_1007">
-          <span place="n" class="lottery-desc__commond">{{ lotteryInfo.command }}</span>
-        </i18n>
-      </p>
-      <div class="lottery-code-participate-btn" @click="joinLottery">
-        {{ $t('interact_tools.interact_tools_1008') }}
+  <div class="vmp-lottery-pending">
+    <!-- 自定义图片的抽奖样式 -->
+    <!-- <LotteryPendingCustom
+      v-if="isCustom"
+      :needJoin="needJoin"
+      :fitment="fitment"
+      :command="lotteryInfo.command"
+      @joinLottery="joinLottery"
+    /> -->
+    <!-- 自定义图片的抽奖样式 -->
+    <div class="vmp-lottery-pending-container">
+      <div v-if="needJoin" class="lottery-send-command-container">
+        <span class="lottery-send-command">
+          <i18n path="interact_tools.interact_tools_1065" tag="p">
+            <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
+          </i18n>
+        </span>
       </div>
-    </template>
-    <i class="prize-pending__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
+      <div id="lottery-svga"></div>
+      <p :class="['lottery-remark', 'order-1', `order-${fitment.img_order}`]">
+        <span class="remark-text">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
+      </p>
+      <div
+        :class="['start-lottery-btn', 'order-1', `order-${fitment.img_order}`]"
+        @click="handleClickStartLottery"
+      ></div>
+    </div>
   </div>
 </template>
-
 <script>
+  // import LotteryPendingCustom from './lottery-pending-custom.vue';
+  import props from './props';
   import { useChatServer } from 'middle-domain';
-  // 抽奖中的展示样式(发起与观看,必须有多语言)
+  import SVGA from 'svgaplayerweb';
+  let player, parser;
+
+  const slotmachineResource = {
+    svgaUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-slotmachine.svga',
+    imageKey: 'img_21117',
+    sendBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-slotmachine.png'
+  };
+  const turnplateResource = {
+    svgaUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-turnplate.svga',
+    imageKey: 'img_39023',
+    sendBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-turnplate.png'
+  };
+  const capsuleResource = {
+    svgaUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-capsule.svga',
+    imageKey: 'img_39218',
+    sendBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-capsule.png'
+  };
+
+  const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
+
   export default {
     name: 'LotteryPending',
     inject: ['lotteryServer'],
-    props: {
-      lotteryInfo: {
-        type: Object,
-        default() {
-          return {};
-        }
-      },
-      lotteryId: {
-        type: [String, Object, Number],
-        required: true
-      },
-      fitment: {
-        // 皮肤门厅
-        type: Object,
-        required: true
-      },
-      mode: {
-        // 是否显示结束抽奖(发起端)
-        type: String,
-        default() {
-          return 'watch';
-        }
-      },
-      disabledTime: {
-        type: Number,
-        default() {
-          return 0;
-        }
-      }
-    },
+    mixins: [props],
+    // components: {
+    //   LotteryPendingCustom
+    // },
     computed: {
+      isCustom() {
+        return this.fitment.img_order === 0;
+      },
       // 显示
       needJoin() {
         return (
-          this.mode === 'watch' &&
           this.lotteryInfo.lottery_type == 8 &&
           this.lotteryInfo.submit_command !== 1 &&
           !this.joined
@@ -115,25 +110,25 @@
     },
     data() {
       return {
-        timer: null,
         loading: false,
-        joined: false,
-        endLotteryDisable: false // 结束抽奖防抖3秒
+        joined: false
       };
     },
-
+    mounted() {
+      if (this.fitment.img_order !== 0) {
+        this.initSvgaResource();
+      }
+    },
     methods: {
-      close() {
-        this.$emit('close');
+      // 点击参与抽奖
+      handleClickStartLottery() {
+        if (this.needJoin && !this.joined) {
+          this.joinLottery();
+        } else {
+          this.startAnimation();
+        }
       },
-      endLottery() {
-        this.$emit('end');
-        this.endLotteryDisable = true;
-        const st = setTimeout(() => {
-          clearTimeout(st);
-          this.endLotteryDisable = true;
-        }, 3000);
-      },
+      // 发送口令
       joinLottery() {
         if (this.needLoginStatus) {
           return this.$emit('needLogin');
@@ -148,126 +143,142 @@
               msg.setText(this.lotteryInfo.command);
               useChatServer().sendMsg(msg);
               this.joined = true;
-              this.$message({
-                message: this.$t('chat.chat_1010'),
-                showClose: true,
-                type: 'success',
-                customClass: 'zdy-info-box'
-              });
+              this.$toast(this.$t('chat.chat_1010'));
+              if (!this.isCustom) {
+                this.startAnimation();
+              }
             }
           })
           .finally(() => {
             this.loading = false;
           });
+      },
+      initSvgaResource() {
+        player = new SVGA.Player('#lottery-svga');
+        parser = new SVGA.Parser('#lottery-svga');
+        const itemIdx = this.fitment.img_order || 1;
+        const resourceItem = animationEffectArr[itemIdx];
+        parser.load(resourceItem.svgaUrl, videoItem => {
+          player.setVideoItem(videoItem);
+          if (this.needJoin) {
+            player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+          }
+          player.startAnimationWithRange({
+            location: 1,
+            length: 15
+          });
+        });
+      },
+      startAnimation() {
+        player.startAnimationWithRange({
+          location: 30,
+          length: 60
+        });
       }
     }
   };
 </script>
 <style lang="less">
-  .prize-pending {
-    width: 400px;
-    height: 456px;
-    text-align: center;
-    background-image: url(../img/bg-normal.png);
-    position: fixed;
-    background-size: 100% 100%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 6px;
-    z-index: 777;
-    &.blue {
-      background-image: url(../img/bg-blue.png);
+  .vmp-lottery-pending {
+    .vmp-lottery-pending-container {
+      width: 400px;
+      height: 380px;
+      position: relative;
     }
-    &__title {
-      font-size: 26px;
-      font-weight: 500;
-      color: #ffffff;
-      line-height: 37px;
-      margin-top: 60px;
-    }
-    &-imgWrap {
-      margin: 22px auto 0;
-      width: 170px;
-      height: 170px;
-      img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        margin: 0 auto;
-        object-fit: scale-down;
-      }
-    }
-    &__desc {
+    .lottery-send-command-container {
       width: 100%;
-      text-align: center;
-      font-size: 14px;
-      font-family: @fontRegular;
-      font-weight: 400;
-      color: #ffffff;
-      margin-top: 24px;
-      line-height: 20px;
-    }
-    &__end-button {
-      width: 160px;
-      height: 40px;
-      border-radius: 20px;
-      background-color: #ffffff;
-      color: #fb3a32;
-      text-align: center;
-      line-height: 40px;
-      font-size: 14px;
       position: absolute;
-      bottom: 62px;
+      top: -26px;
+      text-align: center;
+    }
+    .lottery-send-command {
+      display: inline-block;
+      height: 26px;
+      line-height: 26px;
+      padding: 0 12px;
+      background: linear-gradient(89.99deg, #ff1d00 -5.26%, rgba(255, 79, 57, 0.2) 83.45%);
+      opacity: 0.65;
+      box-shadow: inset 0px 2px 4px rgba(255, 255, 255, 0.25);
+      border-radius: 13px;
+      color: #fce09e;
+    }
+    .lottery-command {
+      color: #fff;
+    }
+    #lottery-svga {
+      width: 100%;
+      height: 100%;
+    }
+    .lottery-remark {
+      display: inline-block;
+      position: absolute;
+      color: #fff;
+      font-size: 12px;
+      top: 275px;
       left: 50%;
-      transform: translateX(-80px);
-      user-select: none;
-      cursor: default;
-      &.lottery-start {
-        cursor: pointer;
+      height: 20px;
+      transform: translate(-50%);
+      text-align: center;
+      overflow: hidden;
+      // background: yellow;
+      &.order-1 {
+        width: 118px;
+        top: 323px;
+        color: #fff1ce;
       }
-      &.lottery-downTime {
-        cursor: not-allowed;
+      &.order-2 {
+        width: 165px;
+        top: 33px;
+        color: #fff;
       }
-      &.disabled {
-        cursor: default;
-        pointer-events: none;
+      &.order-3 {
+        width: 100px;
+        top: 243px;
+        color: #fff;
+      }
+      .remark-text {
+        white-space: nowrap;
+        position: absolute;
+        animation: move2left 5s linear infinite;
+      }
+      // 文字往左移
+      @keyframes move2left {
+        from {
+          right: -100%;
+        }
+        to {
+          right: 100%;
+        }
       }
     }
-    &__close-btn {
+
+    .start-lottery-btn {
+      display: inline-block;
+      height: 150px;
+      width: 150px;
       position: absolute;
-      bottom: -18px;
-      left: 50%;
-      transform: translateX(-15px);
-      font-size: 30px;
-      color: #ffffff;
+      top: 250px;
+      left: 300px;
+      // background: red;
       cursor: pointer;
+      &.order-1 {
+        top: 112px;
+        left: 160px;
+        height: 75px;
+        width: 75px;
+      }
+      &.order-2 {
+        top: 272px;
+        left: 128px;
+        height: 55px;
+        width: 145px;
+      }
+      &.order-3 {
+        top: 300px;
+        left: 220px;
+        height: 60px;
+        width: 100px;
+      }
     }
-  }
-  .lottery-desc {
-    line-height: 20px;
-    color: #ffffff;
-    font-size: 14px;
-    text-align: center;
-    margin-top: 22px;
-    &__commond {
-      color: #ffdf46;
-    }
-  }
-  .lottery-code-participate-btn {
-    width: 160px;
-    height: 40px;
-    border-radius: 20px;
-    background-color: #ffffff;
-    color: #fb3a32;
-    text-align: center;
-    line-height: 40px;
-    font-size: 14px;
-    position: absolute;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-80px);
-    user-select: none;
-    cursor: pointer;
   }
 </style>
