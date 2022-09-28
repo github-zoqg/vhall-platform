@@ -85,9 +85,6 @@
         return this.userServerState.second >= 0;
       }
     },
-    mounted() {
-      // this.open(true);
-    },
     methods: {
       open(needVerification = false) {
         this.needVerification = needVerification;
@@ -228,6 +225,9 @@
     // 覆盖vant-ui
     .van-cell {
       padding: 15px 0;
+    }
+    .van-button__text {
+      white-space: nowrap; //为了避免部分机型折行
     }
   }
 </style>
