@@ -5,7 +5,7 @@
     <van-popup
       class="wap-menu-van-popup"
       v-model="menuDialogVisible"
-      get-container="#app"
+      :lazy-render="false"
       round
       position="bottom"
     >
@@ -13,11 +13,7 @@
       <span class="filter_two"></span>
       <span class="filter_three"></span>
       <!-- 菜单 -->
-      <vmp-air-container
-        :cuid="childrenComp[0]"
-        :oneself="true"
-        v-if="menuDialogVisible"
-      ></vmp-air-container>
+      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
     </van-popup>
   </div>
 </template>
@@ -34,9 +30,9 @@
     },
     watch: {},
     computed: {},
-    beforeCreate() {},
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
+      this.menuDialogVisible = true;
     },
     mounted() {},
     beforeDestroy() {},

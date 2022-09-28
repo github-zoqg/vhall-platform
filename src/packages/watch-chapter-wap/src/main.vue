@@ -8,6 +8,10 @@
           @click.stop="changeTime(item.createTime)"
           :class="{ active: select == item.createTime }"
         >
+          <i
+            class="vh-saas-iconfont vh-saas-line-Live vmp-chapter-icon"
+            v-show="select == item.createTime"
+          ></i>
           <span class="title">{{ index + 1 }}.{{ $t(item.title) }}</span>
           <span class="time">{{ item.createTime | secondToDate(1) }}</span>
         </div>
@@ -19,6 +23,10 @@
             @click.stop="changeTime(sub.createTime)"
             :class="{ active: select == sub.createTime }"
           >
+            <i
+              class="vh-saas-iconfont vh-saas-line-Live vmp-chapter-icon"
+              v-show="select == sub.createTime"
+            ></i>
             <span class="title">{{ index + 1 }}-{{ i + 1 }}.{{ $t(sub.title) }}</span>
             <span class="time">{{ sub.createTime | secondToDate(1) }}</span>
           </div>
@@ -147,7 +155,7 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    padding: 20px;
+    padding: 0 0;
     background: var(--theme-chapter-list-bg);
     ul {
       display: block;
@@ -156,16 +164,15 @@
       overflow-y: scroll;
       touch-action: pan-y;
       box-sizing: border-box;
-      padding: 0px 30px 30px;
-      font-size: 30px;
-      font-family: PingFangSC-Regular, PingFang SC;
+      padding: 0 0;
+      font-size: 28px;
+      font-style: normal;
       font-weight: 400;
     }
     li {
       display: block;
       width: 100%;
-      min-height: 80px;
-
+      min-height: 94px;
       .active {
         .title {
           color: var(--theme-chapter-font-color-active);
@@ -173,11 +180,17 @@
         .time {
           color: var(--theme-chapter-font-color-active);
         }
+        .vmp-chapter-icon {
+          font-size: 16px;
+          margin-right: 8px;
+          color: var(--theme-chapter-font-color-active);
+        }
       }
       div {
         height: 100%;
         width: 100%;
-        line-height: 80px;
+        padding: 27px 24px;
+        line-height: 40px;
       }
     }
     .chapter-info {
@@ -193,15 +206,19 @@
       overflow: hidden;
       word-break: break-all;
       vertical-align: middle;
+      text-align: left;
       color: var(--theme-chapter-font-color-title);
     }
     .time {
       display: inline-block;
-      width: 20%;
+      width: 25%;
+      text-align: right;
       color: var(--theme-chapter-font-color-time);
     }
     .step-info {
-      margin-left: 25px;
+      width: calc(100% - 48px);
+      padding: 27px 0 27px 24px;
+      margin-left: 24px;
     }
     .posit {
       position: absolute;

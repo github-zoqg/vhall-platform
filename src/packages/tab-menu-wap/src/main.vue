@@ -648,7 +648,7 @@
         const positionItem = rectArr.find(item => item.id === id);
 
         this.$refs['menu'].scrollTo({
-          left: positionItem.left,
+          left: positionItem.left - 12, // 左右切换多留出来间距了
           behavior: 'smooth'
         });
       },
@@ -754,10 +754,10 @@
         height: 100%;
         cursor: pointer;
         &.prev-btn {
-          padding-right: 44px;
+          padding-right: 32px;
         }
         &.next-btn {
-          padding-left: 10px;
+          padding-left: 30px;
         }
         &.disabledClick {
           i {
@@ -803,12 +803,6 @@
         color: var(--theme-tab-menu-font);
         cursor: pointer;
         user-select: none;
-        &:first-child {
-          padding: 0 32px 0 42px;
-        }
-        &:last-child {
-          padding: 0 42px 0 32px;
-        }
         &_subscrbe {
           &:first-child {
             padding-left: 0;

@@ -119,6 +119,6 @@ export default {
   // 章节
   '--theme-chapter-list-bg': '#262626',
   '--theme-chapter-font-color-title': '#ffffff',
-  '--theme-chapter-font-color-time': 'rgba(255,255,255,0.45)',
-  '--theme-chapter-font-color-active': '#fb2626'
+  '--theme-chapter-font-color-time': 'rgba(255, 255, 255, 0.65)',
+  '--theme-chapter-font-color-active': '#FB2626'
 };
