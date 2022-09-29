@@ -187,7 +187,7 @@
        */
       setSkinInfo(skin) {
         if (skin && skin.skin_json_wap && skin.status == 1) {
-          const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_wap) || '';
+          const { bgColor, pageStyle, background } = skin.skin_json_wap || '';
           this.themeClass.pageStyle = pageStyle;
           this.themeClass.background = background;
           this.themeClass.bgColor = bgColor;

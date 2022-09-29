@@ -586,7 +586,7 @@
       };
       const skinInfo = this.roomBaseState.skinInfo;
       if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        skin_json_wap = skinInfo.skin_json_wap;
       }
       if (skin_json_wap?.style == 3) {
         this.isConcise = true;

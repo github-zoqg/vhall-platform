@@ -1885,7 +1885,7 @@
           };
 
           if (this.skinInfo?.skin_json_wap && this.skinInfo.skin_json_wap != 'null') {
-            skin_json_wap = JSON.parse(this.skinInfo.skin_json_wap);
+            skin_json_wap = this.skinInfo.skin_json_wap;
           }
 
           // 设置主题，如果没有就用传统风格白色
