@@ -160,7 +160,7 @@ export default {
   },
   // 聊天
   comChatWap: {
-    component: 'VmpConciseChatWap',
+    component: 'VmpChatWap',
     addTab: [
       {
         cuid: ['comTabMenuWap'],

@@ -384,7 +384,7 @@
           color: var(--theme-chat-sendBox-input-placeholder-color);
         }
         .el-textarea__inner {
-          line-height: 40px;
+          line-height: 50px;
         }
       }
     }

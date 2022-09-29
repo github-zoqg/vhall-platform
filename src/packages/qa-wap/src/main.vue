@@ -46,7 +46,7 @@
 <script>
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
-  import SendBox from '@/packages/chat-wap/src/components/send-box';
+  import SendBox from '@/packages/chat-wap/src/common/components/send-box';
   import {
     useRoomBaseServer,
     useQaServer,
@@ -56,7 +56,7 @@
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
-  import EventBus from '@/packages/chat-wap/src/js/Events.js';
+  import EventBus from '@/packages/chat-wap/src/common/js/Events.js';
   import { isMse } from '@/app-shared/utils/isMse';
   export default {
     name: 'VmpQaWap',
