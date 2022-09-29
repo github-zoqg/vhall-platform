@@ -57,7 +57,11 @@
             v-if="isStreamYun && joinInfo.role_name == 3"
           ></vmp-air-container>
           <!-- 非云导播活动 -->
-          <vmp-stream-remote :stream="streamInfo(speaker)" v-if="!isStreamYun"></vmp-stream-remote>
+          <vmp-stream-remote
+            :cuid="childrenCom[2]"
+            :stream="streamInfo(speaker)"
+            v-if="!isStreamYun"
+          ></vmp-stream-remote>
         </div>
       </template>
 
