@@ -8,7 +8,7 @@
       <div class="gold-cion-bg"></div>
       <div class="award-img-outer-annular"></div>
       <div class="award-img-inner-annular"></div>
-      <img class="award-img" :src="(prizeInfo && prizeInfo.icon) || defaultLotteryImg" alt />
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
       <p class="win-award-tip">
         {{ $t('interact_tools.interact_tools_1016') }}"{{
           prizeInfo.award_name || $t('interact_tools.interact_tools_1009')

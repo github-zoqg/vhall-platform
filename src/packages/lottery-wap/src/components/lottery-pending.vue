@@ -19,7 +19,9 @@
       </div>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
-        {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}...` }}
+        <span class="remark-text">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
       </p>
       <div
         :class="['start-lottery-btn', `order-${fitment.img_order}`]"
@@ -221,9 +223,10 @@
       font-size: 24px;
       top: 550px;
       left: 50%;
+      height: 40px;
       transform: translate(-50%);
       text-align: center;
-      // background: yellow;
+      overflow: hidden;
       &.order-1 {
         width: 260px;
         top: 730px;
@@ -238,6 +241,22 @@
         width: 220px;
         top: 550px;
         color: #fff;
+      }
+      .remark-text {
+        white-space: nowrap;
+        position: absolute;
+        transform: translateX(100%);
+        left: 0;
+        animation: move2left 5s linear infinite;
+      }
+      // 文字往左移
+      @keyframes move2left {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
       }
     }
     .start-lottery-btn {

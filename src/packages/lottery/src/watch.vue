@@ -213,6 +213,7 @@
       callBackLotteryPush(msg) {
         this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
+        this.lotteryId = msg.data.lottery_id;
         this.dialogVisible = true;
         this.zIndexServer.setDialogZIndex('lottery');
         useChatServer().addChatToList({

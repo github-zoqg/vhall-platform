@@ -171,6 +171,7 @@
       async callBackLotteryPush(msg) {
         const msgData = msg.data;
         this.setFitment(msgData);
+        this.lotteryId = msgData.lottery_id;
         useChatServer().addChatToList({
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')

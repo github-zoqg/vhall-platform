@@ -176,7 +176,12 @@
               msg.setText(this.lotteryInfo.command);
               useChatServer().sendMsg(msg);
               this.joined = true;
-              this.$toast(this.$t('chat.chat_1010'));
+              this.$message({
+                message: this.$t('chat.chat_1010'),
+                showClose: true,
+                type: 'success',
+                customClass: 'zdy-info-box'
+              });
               if (!this.isCustom) {
                 this.startAnimation();
               }

@@ -7,7 +7,9 @@
           <div class="vmp-lottery-item">
             <img
               class="vmp-lottery-item__img"
-              :src="(lottery.award_snapshoot && lottery.award_snapshoot.icon) || defaultLotteryImg"
+              :src="
+                (lottery.award_snapshoot && lottery.award_snapshoot.image_url) || defaultLotteryImg
+              "
             />
             <div class="vmp-lottery-item__content">
               <p class="vmp-award-name">
