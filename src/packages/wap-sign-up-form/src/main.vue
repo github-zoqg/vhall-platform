@@ -1196,7 +1196,11 @@
                   `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${this.webinarOrSubjectId}${queryString}`
                 );
               } else {
-                const queryString = this.returnQueryString();
+                let queryString = this.returnQueryString();
+                if (this.isEmbed) {
+                  // 如果是嵌入页表单
+                  queryString = delUrlParams(window.location.search, ['isIndependent']);
+                }
                 location.replace(
                   `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${
                     this.isEmbed ? '/embedclient' : ''
@@ -1852,7 +1856,12 @@
             `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/special/detail?id=${this.webinarOrSubjectId}${queryString}`
           );
         } else {
-          const queryString = this.returnQueryString();
+          let queryString = this.returnQueryString();
+          // 如果是嵌入页表单
+          if (this.isEmbed) {
+            // 如果是嵌入页表单
+            queryString = delUrlParams(window.location.search, ['isIndependent']);
+          }
           location.replace(
             `${window.location.origin}${process.env.VUE_APP_ROUTER_BASE_URL}/lives${
               this.isEmbed ? '/embedclient' : ''

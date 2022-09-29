@@ -262,6 +262,11 @@
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
+            if ([511006, 511007].includes(res.code)) {
+              localStorage.removeItem('token');
+              window.location.reload();
+              return;
+            }
             this.state = 2;
             this.$toast(res.msg);
             return;
