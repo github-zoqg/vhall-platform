@@ -1,15 +1,16 @@
 <template>
   <div class="vmp-lottery-pending">
     <!-- 自定义图片的抽奖样式 -->
-    <!-- <LotteryPendingCustom
+    <LotteryPendingCustom
       v-if="isCustom"
       :needJoin="needJoin"
       :fitment="fitment"
+      :mode="mode"
       :command="lotteryInfo.command"
       @joinLottery="joinLottery"
-    /> -->
+    />
     <!-- 自定义图片的抽奖样式 -->
-    <div class="vmp-lottery-pending-container">
+    <div v-else class="vmp-lottery-pending-container">
       <div v-if="needJoin" class="lottery-send-command-container">
         <span class="lottery-send-command">
           <i18n path="interact_tools.interact_tools_1065" tag="p">
@@ -18,20 +19,31 @@
         </span>
       </div>
       <div id="lottery-svga"></div>
-      <p :class="['lottery-remark', 'order-1', `order-${fitment.img_order}`]">
+      <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
           {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
         </span>
       </p>
       <div
-        :class="['start-lottery-btn', 'order-1', `order-${fitment.img_order}`]"
+        :class="['start-lottery-btn', `order-${fitment.img_order}`]"
         @click="handleClickStartLottery"
       ></div>
     </div>
+    <el-button
+      v-if="mode === 'live'"
+      class="vmp-lottery-btn"
+      @click="endLottery"
+      :disabled="(disabledTime > 0 && disabledTime <= 5) || endLotteryDisable"
+    >
+      <span>
+        结束抽奖
+        <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
+      </span>
+    </el-button>
   </div>
 </template>
 <script>
-  // import LotteryPendingCustom from './lottery-pending-custom.vue';
+  import LotteryPendingCustom from './lottery-pending-custom.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
   import SVGA from 'svgaplayerweb';
@@ -65,9 +77,28 @@
     name: 'LotteryPending',
     inject: ['lotteryServer'],
     mixins: [props],
-    // components: {
-    //   LotteryPendingCustom
-    // },
+    components: {
+      LotteryPendingCustom
+    },
+    props: {
+      lotteryId: {
+        type: [String, Object, Number],
+        required: true
+      },
+      mode: {
+        // 是否显示结束抽奖(发起端)
+        type: String,
+        default() {
+          return 'watch';
+        }
+      },
+      disabledTime: {
+        type: Number,
+        default() {
+          return 0;
+        }
+      }
+    },
     computed: {
       isCustom() {
         return this.fitment.img_order === 0;
@@ -111,7 +142,9 @@
     data() {
       return {
         loading: false,
-        joined: false
+        joined: false,
+        endLotteryDisable: false, // 结束抽奖防抖3秒
+        inProgress: false // 动画演示中(已点击,立刻抽奖)
       };
     },
     mounted() {
@@ -160,20 +193,45 @@
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
           player.setVideoItem(videoItem);
-          if (this.needJoin) {
-            player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+          if (this.mode === 'live') {
+            this.startAnimation();
+          } else {
+            const cacheKey = `lottery_${this.lotteryId}_cache`;
+            const cache = sessionStorage.getItem(cacheKey);
+            if (cache) {
+              this.startAnimation();
+            } else {
+              if (this.needJoin) {
+                player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+              }
+              player.startAnimationWithRange({
+                location: 1,
+                length: 15
+              });
+            }
           }
-          player.startAnimationWithRange({
-            location: 1,
-            length: 15
-          });
         });
       },
       startAnimation() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        sessionStorage.setItem(cacheKey, 1);
         player.startAnimationWithRange({
           location: 30,
           length: 60
         });
+      },
+      endLottery() {
+        this.$emit('end');
+        this.endLotteryDisable = true;
+        const st = setTimeout(() => {
+          clearTimeout(st);
+          this.endLotteryDisable = true;
+        }, 3000);
+      },
+      judgeInProgress() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        const cache = sessionStorage.getItem(cacheKey);
+        return;
       }
     }
   };
@@ -220,7 +278,6 @@
       transform: translate(-50%);
       text-align: center;
       overflow: hidden;
-      // background: yellow;
       &.order-1 {
         width: 118px;
         top: 323px;
@@ -239,19 +296,20 @@
       .remark-text {
         white-space: nowrap;
         position: absolute;
+        transform: translateX(100%);
+        left: 0;
         animation: move2left 5s linear infinite;
       }
       // 文字往左移
       @keyframes move2left {
         from {
-          right: -100%;
+          transform: translateX(100%);
         }
         to {
-          right: 100%;
+          transform: translateX(-100%);
         }
       }
     }
-
     .start-lottery-btn {
       display: inline-block;
       height: 150px;
@@ -259,7 +317,6 @@
       position: absolute;
       top: 250px;
       left: 300px;
-      // background: red;
       cursor: pointer;
       &.order-1 {
         top: 112px;
@@ -278,6 +335,16 @@
         left: 220px;
         height: 60px;
         width: 100px;
+      }
+    }
+    .vmp-lottery-btn {
+      margin-top: 10px;
+      &.is-disabled {
+        border: 0;
+        background: #fb2626;
+        color: #fff;
+        opacity: 0.6;
+        pointer-events: none;
       }
     }
   }

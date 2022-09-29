@@ -18,6 +18,7 @@
         </li>
       </ul>
     </div>
+    <el-button v-if="mode === 'live'" @click="reStart" class="vmp-lottery-btn">继续抽奖</el-button>
   </div>
 </template>
 <script>
@@ -28,6 +29,13 @@
     name: 'LotteryWinner',
     mixins: [props],
     props: {
+      mode: {
+        // 是否显示结束抽奖(发起端)
+        type: String,
+        default() {
+          return 'watch';
+        }
+      },
       winnerList: {
         required: true,
         type: Array,
@@ -56,6 +64,11 @@
       return {
         defaultAvatar
       };
+    },
+    methods: {
+      reStart() {
+        this.$emit('reStart');
+      }
     }
   };
 </script>
@@ -132,6 +145,9 @@
         text-overflow: ellipsis;
         overflow: hidden;
       }
+    }
+    .vmp-lottery-btn {
+      margin-top: 15px;
     }
   }
 </style>

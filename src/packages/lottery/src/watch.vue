@@ -242,7 +242,6 @@
 
         this.winnerListData[this.lotteryId].list =
           this.winnerListData[this.lotteryId].list.concat(winnerList);
-        console.log(this.winnerListData, 'this.winnerListData', msg.data);
 
         clearTimeout(this.winnerListData[this.lotteryId].timer);
         // 判断id数量是否等于中奖人数 不等于需要接收后续消息数据

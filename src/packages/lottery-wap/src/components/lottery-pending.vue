@@ -159,13 +159,19 @@
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
           player.setVideoItem(videoItem);
-          if (this.needJoin) {
-            player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+          const cacheKey = `lottery_${this.lotteryId}_cache`;
+          const cache = sessionStorage.getItem(cacheKey);
+          if (cache) {
+            this.startAnimation();
+          } else {
+            if (this.needJoin) {
+              player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+            }
+            player.startAnimationWithRange({
+              location: 1,
+              length: 15
+            });
           }
-          player.startAnimationWithRange({
-            location: 1,
-            length: 15
-          });
         });
       },
       startAnimation() {

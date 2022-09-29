@@ -132,7 +132,12 @@
       submit() {
         if (!this.verify()) return false;
         const failure = err => {
-          this.$toast(this.$t(err.msg));
+          this.$message({
+            message: err.msg,
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
         };
         this.lotteryServer
           .acceptPrize({
@@ -145,12 +150,12 @@
             if (res.code === 200) {
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
               this.lotteryServer.initIconStatus();
-              if (this.showWinnerList) {
-                this.$emit('navTo', 'LotterySuccess');
-              } else {
-                this.$toast(this.$t('interact_tools.interact_tools_1013'));
-                this.$emit('close');
-              }
+              this.$emit('navTo', 'LotterySuccess');
+              // if (this.showWinnerList) {
+              // } else {
+              // this.$toast(this.$t('interact_tools.interact_tools_1013'));
+              //   this.$emit('close');
+              // }
             } else {
               failure(res);
             }

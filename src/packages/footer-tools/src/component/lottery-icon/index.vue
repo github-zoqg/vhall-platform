@@ -35,12 +35,12 @@
     },
     methods: {
       initEvent() {
-        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
-        this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
+        // this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
+        // this.lotteryServer.$on(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
       },
       removeEvent() {
-        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
-        this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
+        // this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_PUSH, this.closeHistory);
+        // this.lotteryServer.$off(this.lotteryServer.Events.LOTTERY_RESULT_NOTICE, this.closeHistory);
       },
       checkLotteryIcon() {
         this.$emit('clickIcon');
