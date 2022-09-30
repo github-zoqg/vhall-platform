@@ -22,7 +22,7 @@
               {{ source.answer ? source.answer.nick_name : questionNickname | overHidden(8) }}
             </span>
             <!-- 只有回复问题的人才会显示role -->
-            <span v-if="source.answer" class="role" :class="source.roleName | roleClassFilter">
+            <span v-if="source.answer" class="role" :class="source.answer.role_name">
               {{ source.answer.role_name | roleFilter }}
             </span>
           </p>
