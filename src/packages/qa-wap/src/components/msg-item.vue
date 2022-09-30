@@ -176,7 +176,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
-            color: var(--theme-tab-content-private-name-font);
+            color: var(--theme-tab-content-qa-name-font);
             max-width: 300px;
             height: 28px;
             font-size: 28px;
@@ -205,14 +205,14 @@
           .send_time {
             font-size: 24px;
             font-weight: 400;
-            color: var(--theme-tab-content-private-time-font);
+            color: var(--theme-tab-content-qa-time-font);
             line-height: 34px;
           }
         }
         .msg-content_body {
           display: inline-block;
           padding: 10px 12px;
-          background: var(--theme-tab-content-private-content-bg);
+          background: var(--theme-tab-content-qa-content-bg);
           border-radius: 0px 32px 32px 32px;
           width: fit-content;
           max-width: 100%;
@@ -220,18 +220,18 @@
           line-height: 39px;
           word-break: break-word;
           &-top {
-            color: var(--theme-tab-content-private-content-font);
+            color: var(--theme-tab-content-qa-content-font);
             &_msg {
               display: inline;
             }
           }
           &-bottom {
-            color: var(--theme-tab-content-private-content-font);
+            color: var(--theme-tab-content-qa-content-font);
             margin-top: 8px;
             position: relative;
             &-box {
               padding-left: 14px;
-              color: rgba(0, 0, 0, 0.45);
+              color: var(--theme-tab-content-qa-question-font);
             }
             &_msg {
               display: inline;
@@ -242,7 +242,7 @@
               top: 0;
               bottom: 0;
               width: 6px;
-              background: rgba(0, 0, 0, 0.25);
+              background: var(--theme-tab-content-qa-question-font);
               border-radius: 3px;
             }
           }
