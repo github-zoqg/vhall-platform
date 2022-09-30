@@ -126,8 +126,9 @@
               // 只有一个中奖,显示中奖结果
               const winLottery = winLotteryHistory[0];
               this.lotteryId = winLottery.id;
+              this.showWinnerList = !!winLottery.publish_winner;
               if (winLottery.take_award === 1) {
-                lotteryView = 'LotterySubmitDetail'; // 显示提交历史
+                lotteryView = 'LotterySuccess'; // 显示提交历史
               } else {
                 lotteryView = 'LotteryWin'; // 为领取显示中奖结果
               }

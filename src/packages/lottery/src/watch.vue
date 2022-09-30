@@ -144,8 +144,9 @@
               const winLottery = winLotteryHistory[0];
               // 只中奖一次,显示该次中奖结果
               this.lotteryId = winLottery.id;
+              this.showWinnerList = !!winLottery.publish_winner;
               if (winLottery.take_award === 1) {
-                this.lotteryView = 'LotterySuccess'; // 已领取提示已提交
+                this.lotteryView = 'LotterySubmitDetail'; // 已领取提示已提交
               } else {
                 this.lotteryView = 'LotteryWin'; // 为领取显示中奖结果
               }
@@ -211,6 +212,7 @@
       },
       // 抽奖开始消息推送
       callBackLotteryPush(msg) {
+        console.log('🚀 ~ file: watch.vue ~ line 215 ~ callBackLotteryPush ~ msg', msg);
         this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
         this.lotteryId = msg.data.lottery_id;
@@ -229,6 +231,7 @@
       },
       // 抽奖结果消息推送
       async callBackResultNotice(msg) {
+        console.log('🚀 ~ file: watch.vue ~ line 232 ~ callBackResultNotice ~ msg', msg);
         this.lotteryId = msg.data.lottery_id;
         this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);

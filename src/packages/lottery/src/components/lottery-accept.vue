@@ -153,7 +153,12 @@
               this.$emit('navTo', 'LotterySuccess');
               // if (this.showWinnerList) {
               // } else {
-              // this.$toast(this.$t('interact_tools.interact_tools_1013'));
+              //   this.$message({
+              //     message: this.$t('interact_tools.interact_tools_1013'),
+              //     showClose: true,
+              //     type: 'success',
+              //     customClass: 'zdy-info-box'
+              //   });
               //   this.$emit('close');
               // }
             } else {

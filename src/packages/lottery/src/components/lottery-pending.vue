@@ -194,7 +194,10 @@
       initSvgaResource() {
         player = new SVGA.Player('#lottery-svga');
         parser = new SVGA.Parser('#lottery-svga');
-        const itemIdx = this.fitment.img_order || 1;
+        let itemIdx = this.fitment.img_order;
+        if (![1, 2, 3].includes(this.fitment.img_order)) {
+          itemIdx = 1;
+        }
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
           player.setVideoItem(videoItem);

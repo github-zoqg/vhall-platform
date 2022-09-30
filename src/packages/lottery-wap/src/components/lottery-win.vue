@@ -9,10 +9,12 @@
       <div class="award-img-outer-annular"></div>
       <div class="award-img-inner-annular"></div>
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
-      <p class="win-award-tip">
-        {{ $t('interact_tools.interact_tools_1016') }}"{{
-          prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
-        }}"
+      <p class="win-award-tip-container">
+        <span class="win-award-tip">
+          {{ $t('interact_tools.interact_tools_1016') }}"{{
+            prizeInfo.award_name || $t('interact_tools.interact_tools_1009')
+          }}"
+        </span>
       </p>
     </div>
     <!-- 领奖 -->
@@ -91,17 +93,19 @@
       height: 100%;
       background-position: center 80%;
     }
-    .win-award-tip {
-      display: inline-block;
-      width: 450px;
+    .win-award-tip-container {
+      width: 100%;
       height: 52px;
       position: absolute;
       bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
+    }
+    .win-award-tip {
       line-height: 52px;
       font-size: 28px;
       color: #fce09e;
+      white-space: nowrap;
       background: linear-gradient(
         270deg,
         rgba(255, 119, 73, 0) 2.54%,
@@ -110,6 +114,7 @@
         rgba(255, 119, 73, 0) 94.2%
       );
     }
+
     .award-img-outer-annular {
       .center-mixin;
       .annular;

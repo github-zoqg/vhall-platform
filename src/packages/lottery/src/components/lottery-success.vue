@@ -4,7 +4,7 @@
     <p class="submit-lottery-text">
       {{ $t('interact_tools.interact_tools_1013') }}
     </p>
-    <button class="vmp-lottery-btn" @click="navToWinnerList">
+    <button v-if="showWinnerList" class="vmp-lottery-btn" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
   </div>
@@ -12,6 +12,14 @@
 <script>
   export default {
     name: 'LotterySuccess',
+    props: {
+      showWinnerList: {
+        type: Boolean,
+        default() {
+          return false;
+        }
+      }
+    },
     methods: {
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');
