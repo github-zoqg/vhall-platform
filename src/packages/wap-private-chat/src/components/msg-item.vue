@@ -9,8 +9,6 @@
       <div class="private-chat-msg__item-main__avatar-wrap">
         <img
           class="private-chat-msg__item-main__chat-avatar"
-          width="35"
-          height="35"
           :src="source.avatar || defaultAvatar"
           alt
         />
@@ -18,6 +16,7 @@
       <div class="private-chat-msg__item-main__msg-content">
         <div class="msg-content_name">
           <p>
+            <span class="nickname">{{ source.nickname | overHidden(8) }}</span>
             <span
               v-if="source.roleName && source.roleName != '2'"
               class="role"
@@ -25,7 +24,6 @@
             >
               {{ source.roleName | roleFilter }}
             </span>
-            <span class="nickname">{{ source.nickname | overHidden(8) }}</span>
           </p>
           <span class="send_time">{{ source.sendTime.slice(-8) }}</span>
         </div>
@@ -139,47 +137,53 @@
       text-align: center;
     }
     .private-chat-msg__item-main {
-      margin: 0 30px;
-      padding: 10px 0;
+      margin: 0 24px;
+      padding: 24px 0 8px;
       display: flex;
       align-items: flex-start;
       &__avatar-wrap {
         position: relative;
-        margin-right: 10px;
+        margin-right: 9px;
+        width: 56px;
+        height: 56px;
       }
       &__chat-avatar {
         border-radius: 50%;
         display: block;
-        border: 2px solid #e3e3e3;
+        width: 100%;
+        height: 100%;
+        object-fit: scale-down;
       }
 
       &__msg-content {
         flex: 1;
         .msg-content_name {
           display: flex;
-          padding-left: 10px;
-          align-items: center;
+          padding-left: 3px;
+          // align-items: center;
           justify-content: space-between;
-          margin-bottom: 5px;
+          margin-bottom: 3px;
           .nickname {
-            font-size: 22px;
+            float: left;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             word-break: break-all;
             color: var(--theme-tab-content-private-name-font);
             max-width: 300px;
-            height: 26px;
-            line-height: 26px;
+            height: 28px;
+            font-size: 28px;
+            line-height: 28px;
           }
           .role {
-            margin-right: 10px;
-            padding: 3px 10px;
-            line-height: 28px;
-            border-radius: 50px;
+            float: left;
+            margin-left: 12px;
+            padding: 4px 8px;
             font-size: 20px;
+            line-height: 22px;
+            border-radius: 50px;
             &.host {
-              color: rgba(251, 38, 38, 1);
+              color: #fb2626;
               background-color: rgba(251, 38, 38, 0.15);
             }
             &.assistant {
@@ -195,22 +199,28 @@
             font-size: 24px;
             font-weight: 400;
             color: var(--theme-tab-content-private-time-font);
+            line-height: 34px;
           }
         }
         .msg-content_body {
           display: inline-block;
-          margin-top: 5px;
-          padding: 18px 20px;
+          padding: 10px 12px;
           color: var(--theme-tab-content-private-content-font);
-          line-height: 36px;
-          background-color: #f7f7f7;
+          background: var(--theme-tab-content-private-content-bg);
+          border-radius: 0px 32px 32px 32px;
           width: fit-content;
           max-width: 100%;
           text-align: justify;
           word-break: break-word;
-          border-radius: 8px;
+          font-size: 28px;
+          line-height: 39px;
           span {
             word-break: break-word;
+          }
+          img {
+            width: 34px;
+            height: 34px;
+            vertical-align: middle !important;
           }
         }
         .msg-content_chat-img-wrapper {
@@ -242,6 +252,7 @@
           }
           .msg-content_body {
             float: right;
+            border-radius: 32px 0px 32px 32px;
           }
         }
       }

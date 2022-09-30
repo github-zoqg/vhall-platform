@@ -128,8 +128,8 @@
     position: relative;
     font-size: 28px;
     .vh-line-audit {
-      padding-right: 10px;
-      border-right: 3px solid #d9d9d9;
+      padding-right: 8px;
+      border-right: 3px solid var(--theme-chat-input-placeholder-font);
     }
   }
   .van-overlay_chat_set {

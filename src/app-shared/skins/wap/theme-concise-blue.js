@@ -4,6 +4,7 @@
 
 export default {
   '--theme-chat-input-bg': 'rgba(255, 255, 255, 0.1)',
+  '--theme-chat-input-placeholder-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-header-attention-bg': 'linear-gradient(280.56deg, #4042FF 9.45%, #336DFF 90.39%)',
   '--theme-header-attention-color': '#fff',
   '--theme-component-qa': '#3552ea',
@@ -79,9 +80,11 @@ export default {
   '--theme-tab-content-qa-replyText-bg': ' ',
   '--theme-tab-content-qa-qaLabel-font': ' ',
   '--theme-tab-content-qa-onlyMe-font': ' ',
-  '--theme-tab-content-private-name-font': ' ',
-  '--theme-tab-content-private-content-font': ' ',
-  '--theme-tab-content-private-time-font': ' ',
+  // 私聊
+  '--theme-tab-content-private-name-font': 'rgba(0, 0, 0, 0.65)',
+  '--theme-tab-content-private-content-font': '#262626',
+  '--theme-tab-content-private-time-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-private-content-bg': 'rgba(255, 255, 255, 0.85)',
   '--theme-component-subscribe': '#3552ea',
   '--theme-component-subscribe-success-bg': '#fff',
   '--theme-component-subscribe-text': 'rgba(89, 89, 89, 1)',

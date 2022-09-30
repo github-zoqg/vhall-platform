@@ -501,7 +501,7 @@
 
         .content-input__placeholder {
           background-color: var(--theme-chat-input-bg);
-          color: #bfbfbf;
+          color: var(--theme-chat-input-placeholder-font);
           border-radius: 40px;
           width: 100%;
           height: 60px;
@@ -524,7 +524,7 @@
             float: left;
             height: 60px;
             line-height: 60px;
-            padding-left: 12px;
+            padding-left: 16px;
           }
         }
       }

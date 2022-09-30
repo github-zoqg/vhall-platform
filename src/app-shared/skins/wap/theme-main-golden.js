@@ -17,6 +17,7 @@ export default {
   '--theme-header-icon-rehearsal-color': '#fb2626',
   // 聊天区域
   '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
+  '--theme-chat-input-placeholder-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-chat-msg-name-font': '#8c8c8c',
   '--theme-chat-msg-timeline': '#595959',
   '--theme-chat-msg-gift-font': '#595959',
@@ -101,7 +102,8 @@ export default {
   //私聊
   '--theme-tab-content-private-name-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-private-content-font': '#262626',
-  '--theme-tab-content-private-time-font': 'rgba(0, 0, 0, 0.65)',
+  '--theme-tab-content-private-time-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-private-content-bg': 'rgba(255, 255, 255, 0.85)',
   //组件
   '--theme-component-qa': '#c99f67',
   '--theme-component-subscribe': '#c99f67',
