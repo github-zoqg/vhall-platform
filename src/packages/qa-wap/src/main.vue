@@ -238,8 +238,7 @@
         this.menuServer.$on('tab-switched', async data => {
           if (this.cuid === data.cuid) {
             if (!qaServer.state.active) {
-              // TODO:调试，暂时注释
-              // await this.getQAHistroy();
+              await this.getQAHistroy();
               qaServer.setState('active', true);
             }
             this.$nextTick(() => {
