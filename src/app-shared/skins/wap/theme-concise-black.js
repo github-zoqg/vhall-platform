@@ -75,11 +75,13 @@ export default {
   '--theme-tab-content-recommend-bg': ' ',
   '--theme-tab-content-recommend-border': ' ',
   '--theme-tab-content-doc-font': ' ',
-  '--theme-tab-content-qa-text-font': ' ',
-  '--theme-tab-content-qa-replyText-font': ' ',
-  '--theme-tab-content-qa-replyText-bg': ' ',
-  '--theme-tab-content-qa-qaLabel-font': ' ',
-  '--theme-tab-content-qa-onlyMe-font': ' ',
+  //问答
+  '--theme-tab-content-qa-onlyMe-check': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-text-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-replyText-font': '#fff',
+  '--theme-tab-content-qa-replyText-bg': 'rgba(255, 255, 255, 0.08)',
+  '--theme-tab-content-qa-qaLabel-font': '#fc9600',
+  '--theme-tab-content-qa-onlyMe-font': 'rgba(255, 255, 255, 0.45)',
   // 私聊
   '--theme-tab-content-private-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-tab-content-private-content-font': '#fff',

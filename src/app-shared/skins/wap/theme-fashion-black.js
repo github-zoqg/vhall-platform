@@ -95,6 +95,7 @@ export default {
   //文档
   '--theme-tab-content-doc-font': 'rgba(255, 255, 255, 0.45)',
   //问答
+  '--theme-tab-content-qa-onlyMe-check': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-qa-text-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-qa-replyText-font': '#fff',
   '--theme-tab-content-qa-replyText-bg': 'rgba(255, 255, 255, 0.08)',

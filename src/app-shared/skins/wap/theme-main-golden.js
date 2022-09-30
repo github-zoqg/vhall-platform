@@ -94,11 +94,12 @@ export default {
   //文档
   '--theme-tab-content-doc-font': 'rgba(0, 0, 0, 0.45)',
   //问答
+  '--theme-tab-content-qa-onlyMe-check': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-qa-text-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-qa-replyText-font': '#262626',
   '--theme-tab-content-qa-replyText-bg': '#fff',
   '--theme-tab-content-qa-qaLabel-font': '#fc9600',
-  '--theme-tab-content-qa-onlyMe-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-qa-onlyMe-font': 'rgba(0, 0, 0, 0.65)',
   //私聊
   '--theme-tab-content-private-name-font': 'rgba(0, 0, 0, 0.65)',
   '--theme-tab-content-private-content-font': '#262626',
