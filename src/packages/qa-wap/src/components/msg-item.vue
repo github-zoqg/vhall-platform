@@ -119,6 +119,87 @@
 </script>
 <style lang="less">
   .qa-item-wrapper {
+    padding: 0 30px;
+    &.qa-last-ios-progress {
+      padding-bottom: 34px;
+    }
+    .question {
+      padding: 20px 0;
+    }
+    .answer {
+      padding: 20px;
+      background: var(--theme-tab-content-qa-replyText-bg);
+      border-radius: 8px;
+    }
+    .user {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      color: #666666;
+      padding: 1px;
+      .avatar-box {
+        width: 70px;
+        height: 70px;
+        border: 2px solid #e3e3e3;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 20px;
+        display: inline-block;
+      }
+      .avatar {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .role {
+        margin-right: 10px;
+        padding: 3px 10px;
+        line-height: 28px;
+        border-radius: 50px;
+        font-size: 20px;
+        &.host {
+          color: rgba(251, 38, 38, 1);
+          background-color: rgba(251, 38, 38, 0.15);
+        }
+        &.assistant {
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
+        }
+        &.guest {
+          color: rgba(10, 127, 245, 1);
+          background-color: rgba(10, 127, 245, 0.15);
+        }
+      }
+      .nick-name {
+        color: var(--theme-tab-content-qa-text-font);
+        flex: 1;
+        line-height: 50px;
+        font-size: 26px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: bolder;
+        white-space: nowrap;
+      }
+      .time {
+        color: var(--theme-tab-content-qa-text-font);
+      }
+    }
+    .content {
+      line-height: 40px;
+      color: #444444;
+      // text-align: justify;
+      word-break: break-word;
+      .question-label {
+        color: var(--theme-tab-content-qa-qaLabel-font);
+        float: left;
+      }
+      .question-reply {
+        display: inline-block;
+        color: var(--theme-tab-content-qa-replyText-font);
+      }
+    }
+  }
+  .qa-item-wrapper {
     .msg-item__content-body__content-link {
       color: #3562fa;
       text-decoration: underline #3562fa !important;
