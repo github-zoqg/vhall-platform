@@ -1,5 +1,6 @@
 <template>
   <div class="lottery-box lottery-winner-list">
+    <ribbon v-if="winnerList.length" class="ribbon-panel" />
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
@@ -24,6 +25,7 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import Ribbon from '../art/ribbon/index.vue';
   import LotteryTitle from './lottery-title.vue';
   import props from './props';
   export default {
@@ -53,7 +55,8 @@
       }
     },
     components: {
-      LotteryTitle
+      LotteryTitle,
+      Ribbon
     },
     filters: {
       fmtSerial(val) {
@@ -76,6 +79,15 @@
 <style lang="less">
   .lottery-winner-list {
     box-sizing: border-box;
+    .ribbon-panel {
+      width: 100%;
+      height: 200px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
     .award-detail {
       box-sizing: border-box;
       height: 72px;
