@@ -150,7 +150,7 @@ export default {
       cuid: ['compRegLoginWap'],
       method: 'open'
     },
-    children: ['comWapMenuDialog']
+    children: [] // 暂时不配置 'comWapMenuDialog'
   },
   // 自定义菜单-简洁mosh
   comWapMenuDialog: {
@@ -203,7 +203,12 @@ export default {
         args: ['$0']
       }
     ],
-    children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
+    children: [
+      'comInteractToolsWap',
+      'comWapRewardEffect',
+      'comWapRewardEffectSVGA',
+      'comWapMenuDialog'
+    ],
     options: {}
   },
   // 礼物动画组件

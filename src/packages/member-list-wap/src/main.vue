@@ -2,7 +2,7 @@
   <div class="vmp-member-list-wap">
     <div v-if="groupInitData.isInGroup" class="vmp-member-list-wap__group-title">
       <i class="vh-iconfont vh-line-group"></i>
-      {{ groupInitData.name }}
+      <span v-text="groupInitData.name"></span>
     </div>
     <van-pull-refresh v-model="refreshing" @refresh="handleRefresh" class="member-list-wrap">
       <van-list v-model="loading" :finished="finished" finished-text="" @load="loadMore">
@@ -377,29 +377,25 @@
       padding-bottom: 20px;
     }
     .member-list-item {
-      margin: 0 32px 38px 32px;
+      margin: 0 0;
+      padding: 23px 30px 23px 24px;
       display: flex;
       align-items: center;
-      &:first-child {
-        margin-top: 19px;
-      }
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
     .avatar-box {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: rgba(173, 225, 255, 1);
+      border-radius: 100%;
       img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 50%;
         display: block;
-        border: 2px solid #e3e3e3;
       }
     }
     .info-name {
@@ -410,10 +406,11 @@
       overflow: hidden;
       word-break: break-all;
       vertical-align: middle;
-      font-size: 30px;
-      font-weight: 400;
       color: var(--theme-group-name-color);
-      line-height: 30px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 28px;
     }
     .info-role {
       text-align: center;
@@ -427,16 +424,16 @@
       line-height: 22px;
     }
     .info-role--host {
-      background: rgba(255, 209, 201, 0.7);
+      background: rgba(255, 209, 201, 1);
       color: #fb2626;
     }
     .info-role--assistant {
-      background: rgba(173, 225, 255, 0.5);
-      color: #0a7ff5;
+      background: rgba(10, 127, 245, 0.15);
+      color: rgba(10, 127, 245, 1);
     }
     .info-role--guest {
-      background: rgba(173, 225, 255, 0.5);
-      color: #0a7ff5;
+      background: rgba(10, 127, 245, 0.15);
+      color: rgba(10, 127, 245, 1);
     }
     .info-role--demonstrate {
       background: rgba(0, 0, 0, 0.4);
@@ -444,18 +441,30 @@
     }
     .vmp-member-list-wap__group-title {
       color: var(--theme-group-color);
-      padding: 30px 45px 10px;
-      .vh-iconfont {
-        font-size: 40px;
-        vertical-align: text-bottom;
+      text-align: left;
+      padding: 23px 24px;
+      i {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 44px;
+        margin-right: 8px;
+      }
+      span {
+        display: inline-block;
+        vertical-align: middle;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 32px;
+        line-height: 45px;
+        color: var(--theme-group-color);
       }
     }
     .self {
       position: absolute;
-      right: 32px;
+      right: 30px;
       .vh-saas-iconfont {
-        color: #ff9446;
-        font-size: 30px;
+        color: rgba(217, 131, 3, 1);
+        font-size: 28px;
       }
     }
   }

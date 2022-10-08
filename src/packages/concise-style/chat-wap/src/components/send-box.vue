@@ -89,6 +89,10 @@
           <!-- 底部互动工具组件 comChatWap-->
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
+        <div class="icon-wrapper" v-if="isConcise">
+          <!-- 底部区域 自定义菜单入口-->
+          <vmp-air-container :oneself="true" :cuid="childrenCom[3]"></vmp-air-container>
+        </div>
       </div>
     </div>
     <chat-wap-input
@@ -185,6 +189,13 @@
     },
     data() {
       const { state: roomBaseState } = this.roomBaseServer;
+      let skin_json_wap = {
+        style: 1
+      };
+      const skinInfo = roomBaseState.skinInfo;
+      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      }
       return {
         roomBaseState,
         //定时器
@@ -204,7 +215,8 @@
         handUpStatus: false,
         //只看我的问答
         isShowMyQA: false,
-        childrenCom: []
+        childrenCom: [],
+        isConcise: skin_json_wap?.style == 3 // 是否极简模式
       };
     },
     computed: {
