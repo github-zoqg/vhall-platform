@@ -120,47 +120,47 @@
   .vh-goods-wrapper-detail {
     // 淘口令
     .tao-wrap {
-      width: 630px;
-      min-height: 414px;
-      border-radius: 14px;
+      width: 670px;
+      min-height: 477px;
+      border-radius: 32px;
       background: rgba(255, 255, 255, 1);
       overflow: hidden;
-      padding: 30px 40px 40px 40px;
+      padding: 40px 44px 42px 44px;
       .vh-line-close {
         position: absolute;
         right: 36px;
         top: 33px;
-        color: #8c8c8c;
-        font-size: 21px;
-        width: 21px;
-        height: 21px;
+        color: rgba(140, 140, 140, 1);
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
       }
       .tao-password {
         display: flex;
         flex-direction: column;
         span {
-          line-height: 50px;
-
+          line-height: 40px;
           &:nth-child(1) {
             width: 100%;
-            height: 45px;
-            font-size: 32px;
             font-weight: 400;
+            font-size: 32px;
+            line-height: 45px;
             color: #262626;
             line-height: 45px;
-            margin: 7px 0 40px 0;
+            margin: 0 0 40px 0;
             text-align: center;
           }
           &:nth-child(2) {
-            border: 2px solid #dddddd;
+            border: 2px solid rgba(0, 0, 0, 0.45);
             padding: 20px;
-            width: 542px;
-            min-height: 174px;
+            width: 582px;
+            min-height: 212px;
             margin: 0 auto 20px;
-            font-size: 28px;
             border-radius: 8px;
-            font-weight: 400;
             color: #262626;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 28px;
             word-break: break-all;
             line-height: 40px;
           }
@@ -187,7 +187,7 @@
     width: 100%;
     height: 100%;
     z-index: 1000;
-    background: #000000;
+    background: var(--theme-tab-content-good-detail-mask-bg);
     mix-blend-mode: normal;
     opacity: 0.7;
   }
@@ -222,7 +222,7 @@
       .has-img {
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: scale-down;
         transform: translate3d(0, 0, 0);
         border-radius: 32px 32px 0 0;
       }
@@ -230,35 +230,40 @@
         width: 100%;
         height: 720px;
         display: flex;
+        background: rgba(0, 0, 0, 1);
       }
       .custom-indicator {
         position: absolute;
-        bottom: 22px;
+        bottom: 24px;
         right: 24px;
         width: 91px;
         height: 44px;
         line-height: 44px;
-        text-align: center;
-        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
         border-radius: 22px;
+        font-style: normal;
+        font-weight: 400;
         font-size: 28px;
-        background: rgba(0, 0, 0, 0.4);
+        text-align: center;
+        color: #ffffff;
       }
     }
     .vh-goods-wrapper-detail-info {
       padding: 24px 32px;
       overflow-y: auto;
       height: 254px;
-      background: #ffffff;
+      background: var(--theme-tab-content-good-detail-content-bg);
       &-price {
         height: 40px;
+        line-height: 40px;
         .price-tip {
-          padding: 2px 5px;
-          background: #fff0f0;
+          padding: 3px 4px;
+          background: var(--theme-tab-content-good-priceTag-bg);
           border-radius: 2px;
-          color: #fb3a32;
-          font-size: 14px;
-          margin-right: 5px;
+          color: var(--theme-tab-content-good-priceTag-font);
+          font-size: 20px;
+          line-height: 20px;
+          margin-right: 8px;
         }
         i {
           color: #fb2626;
@@ -273,11 +278,11 @@
         }
         .price-through {
           font-size: 20px;
-          color: #8c8c8c;
-          padding-left: 10px;
+          color: var(--theme-tab-content-good-discountPrice-font);
+          padding-left: 8px;
           text-decoration: line-through;
           i {
-            color: #8c8c8c;
+            color: var(--theme-tab-content-good-discountPrice-font);
           }
         }
         .price-through ::v-deep > .remainder {
@@ -285,42 +290,48 @@
         }
       }
       .price-title {
-        padding-top: 19px;
-        font-size: 32px;
+        padding-top: 24px;
         font-weight: 500;
-        color: #262626;
-        line-height: 45px;
+        font-size: 28px;
+        line-height: 39px;
+        color: var(--theme-tab-content-good-name-font);
+        line-height: 39px;
       }
       .price-des {
-        padding-top: 8px;
-        font-size: 24px;
+        padding-top: 2px;
+        font-style: normal;
         font-weight: 400;
-        color: #595959;
-        line-height: 33px;
+        font-size: 24px;
+        line-height: 34px;
+        color: var(--theme-tab-content-good-describe-font);
       }
     }
     .vh-goods-wrapper-detail-btn {
       text-align: right;
       width: 100%;
       height: 140px;
-      background: #fff;
-      padding-top: 27px;
-      padding-bottom: 33px;
-      box-shadow: 0px -1px 0px 0px #f0f0f0;
+      background: var(--theme-tab-content-good-detail-content-bg);
+      padding-top: 24px;
+      padding-bottom: 38px;
+      box-shadow: 0px -1px 0px var(--theme-tab-content-good-detail-btn-shadow-color);
       span {
         display: inline-block;
         width: 200px;
         height: 80px;
         line-height: 82px;
         text-align: center;
-        color: #fff;
         border-radius: 40px;
         &:first-child {
-          background: #fc9600;
+          background: var(--theme-tab-content-good-detail-btn-store-bg);
+          color: var(--theme-tab-content-good-detail-btn-store-font);
+          border: 1px solid var(--theme-tab-content-good-detail-btn-store-border);
           margin-right: 16px;
         }
         &:last-child {
-          background: #fb2626;
+          background: var(--theme-tab-content-good-detail-btn-buy-bg);
+          color: var(--theme-tab-content-good-detail-btn-buy-font);
+          border: 1px solid var(--theme-tab-content-good-detail-btn-buy-border);
+          margin-right: 24px;
         }
       }
     }
