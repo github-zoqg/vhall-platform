@@ -239,14 +239,14 @@
       }
       .sign-circle {
         position: absolute;
-        top: -2px;
-        right: -2px;
+        top: 0;
+        right: -3px;
         display: inline-block;
         width: 7px;
         height: 7px;
         background: #fb3a32;
         border-radius: 50%;
-        border: 1px solid #2a2a2a;
+        border: 1px solid var(--footer-icon-tip-border-color);
       }
       img {
         width: 100%;

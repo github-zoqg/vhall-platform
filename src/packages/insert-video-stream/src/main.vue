@@ -884,6 +884,17 @@
           this.reSetBroadcast();
           this.subscribeInsert();
         });
+
+        useMsgServer().$onMsg('ROOM_MSG', msg => {
+          const accountId = useRoomBaseServer().state.watchInitData.join_info.third_party_user_id;
+          // 主画面变更
+          if (msg.data.type == 'vrtc_big_screen_set') {
+            // 自己正在发起桌面共享
+            if (this.isCurrentRoleInsert && msg.data.target_id != accountId) {
+              this.closeInsertvideoHandler();
+            }
+          }
+        });
       },
       // 设置旁路
       reSetBroadcast() {

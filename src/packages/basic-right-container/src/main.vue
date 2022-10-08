@@ -67,6 +67,8 @@
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
+    border-radius: 4px;
+    overflow: hidden;
     // z-index: 1;
 
     .vmp-basic-right-hd {

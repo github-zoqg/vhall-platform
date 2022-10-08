@@ -1,6 +1,15 @@
 <template>
   <div class="vmp-header-right">
     <section class="vmp-header-right_btn-box">
+      <div v-if="countDown && (!isLiving || (isRehearsal && isLiving))" class="rehearsal_countDown">
+        <span v-show="roleName != 1">距离开播：</span>
+        <span>{{ countDown.time_h }}</span>
+        <span>时</span>
+        <span>{{ countDown.time_m }}</span>
+        <span>分</span>
+        <span>{{ countDown.time_s }}</span>
+        <span>秒</span>
+      </div>
       <record-control
         v-if="configList['cut_record'] && !isInGroup && !isRehearsal"
       ></record-control>
@@ -30,16 +39,18 @@
         </template>
         <template v-else>
           <div
-            v-if="liveStep == 1"
+            v-if="liveStep == 1 && configList['live_rehearsal']"
             class="vmp-header-right_btn rehearsal"
-            :class="isStreamYun && !director_stream ? 'right_btn_dis' : ''"
+            :class="isStreamYun && !director_stream ? 'right_btn_dis rehearsal_yun' : ''"
             @click="doStartClick($event, true)"
           >
             开始彩排
             <!-- 提示 -->
             <div class="audience-tip">
               <div class="audience-tip__arrow"></div>
-              开启彩排后，生成测试观众地址。正式观众地址依然有效，但看不到彩排内容。
+              1.彩排下，主持人/嘉宾/助理依然使用正式直播地址参与，观众正式地址看不到彩排内容。
+              <br />
+              2.彩排会消耗流量/时长等，计费模式与正式直播一致。
             </div>
           </div>
           <div
@@ -154,7 +165,9 @@
           text: '',
           visible: false
         },
-        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status
+        deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status,
+        countDownTime: Number,
+        countDownTimer: null // 开播倒计时计时器
       };
     },
     computed: {
@@ -213,6 +226,31 @@
       // 云导播台是否有流
       director_stream() {
         return this.$domainStore.state.roomBaseServer.director_stream == 1;
+      },
+      // 开播倒计时
+      countDown() {
+        let countDown = this.countDownTime;
+        if (countDown <= 0 || countDown > 24 * 60 * 60 * 1000) return;
+        let h, m, s, _h, _m, time_str, timeObj;
+        h = parseInt(countDown / (60 * 60 * 1000));
+        _h = parseInt(countDown % (60 * 60 * 1000));
+        m = parseInt(_h / (1000 * 60));
+        _m = parseInt(_h % (1000 * 60));
+        s = parseInt(_m / 1000);
+        time_str =
+          (h > 9 ? h : '0' + h) +
+          '时' +
+          (m > 9 ? m : '0' + m) +
+          '分' +
+          (s > 9 ? s : '0' + s) +
+          '秒';
+        timeObj = {
+          time_str,
+          time_h: h > 9 ? h : '0' + h,
+          time_m: m > 9 ? m : '0' + m,
+          time_s: s > 9 ? s : '0' + s
+        };
+        return timeObj;
       }
     },
     components: {
@@ -263,6 +301,23 @@
       }
       if (this.isStreamYun) {
         this.roomBaseServer.getStreamStatus();
+      }
+      this.countDownTime =
+        new Date(
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
+        ).getTime() - new Date().getTime();
+      // 倒计时大于0小于24小时
+      if (this.countDownTime > 0) {
+        this.countDownTimer = setInterval(() => {
+          this.countDownTime =
+            new Date(
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
+            ).getTime() - new Date().getTime();
+
+          if (this.countDownTime <= 0) {
+            clearInterval(this.countDownTimer);
+          }
+        }, 1000);
       }
     },
     methods: {
@@ -657,6 +712,11 @@
             }
           } else {
             this.handleEndClickInLive();
+            // 彩排倒计时清除
+            if (this.countDownTimer) {
+              this.countDownTime = -1;
+              clearInterval(this.countDownTimer);
+            }
           }
         }
       },
@@ -871,6 +931,20 @@
       height: 100%;
       align-items: center;
       position: relative;
+      .rehearsal_countDown {
+        color: #fff;
+        font-size: 18px;
+        margin-right: 16px;
+        span:nth-child(2n) {
+          padding-left: 7px;
+        }
+        span:nth-child(2) {
+          padding-left: 0;
+        }
+        span:nth-child(2n + 1) {
+          font-size: 10px;
+        }
+      }
       .rehearsalStatus {
         color: #fb3a32;
         font-weight: 400;
@@ -910,6 +984,7 @@
         margin-right: 12px;
         box-sizing: border-box;
         width: 100px;
+        position: relative;
         &:hover {
           border: 1px solid #fb3a32;
           background-color: #fb3a32;
@@ -948,9 +1023,14 @@
         }
       }
     }
+    .rehearsal_yun:hover {
+      border: 1px solid rgba(252, 86, 89, 0.5) !important;
+      background-color: rgba(252, 86, 89, 0.5) !important;
+    }
     .right_btn_dis {
-      background: #fc5659;
-      opacity: 0.5;
+      background: rgba(252, 86, 89, 0.5);
+      // background: #fc5659;
+      // opacity: 0.5;
     }
     .vmp-header-right_duration {
       &-end {

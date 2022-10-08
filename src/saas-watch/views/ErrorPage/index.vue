@@ -104,7 +104,7 @@
           stop_serve: `${this.$t('message.message_1006')}=_=${this.$t('message.message_1025')}`,
           un_auth: this.$t('message.message_1007'),
           surpass_limit: this.$t('message.message_1008'),
-          clear_cookie: `${this.$t('message.message_1009')}'`,
+          clear_cookie: `${this.$t('message.message_1009')}`,
           network: `${this.$t('message.message_1010')}`,
           browser_version: this.$t('message.message_1011'),
           embed_verify: this.$t('message.message_1012'),

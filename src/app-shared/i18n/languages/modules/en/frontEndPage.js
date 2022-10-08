@@ -165,7 +165,7 @@ export default {
     nav_1051: 'Alipay',
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
-    nav_1054: 'Share the rehearsal viewing address',
+    nav_1054: 'Audience simulated viewing address during rehearsal',
     nav_1055: 'in rehearsal'
   },
   login: {
@@ -356,7 +356,8 @@ export default {
     chat_1095: 'Setting',
     chat_1096: 'Chat only on',
     chat_1097: 'Chat only off',
-    chat_1098: 'Click for details'
+    chat_1098: 'Click for details',
+    chat_1099: 'Sent a'
   },
   form: {
     form_1001: 'Name',
@@ -932,7 +933,9 @@ export default {
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
     other_1019: 'got it',
-    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
+    other_1021:
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',

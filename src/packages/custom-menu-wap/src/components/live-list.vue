@@ -181,7 +181,7 @@
     flex-direction: column;
     overflow: hidden;
     box-sizing: border-box;
-    width: 300px;
+    width: calc(50% - 28px);
     height: 306px;
     margin: 20px 14px;
     border-radius: 6px;

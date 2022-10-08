@@ -226,7 +226,7 @@
         <el-tooltip content="设为主画面" placement="bottom">
           <span
             v-show="isShowSetMainScreenBtn"
-            @click="setMainScreen"
+            @click="setMainScreen(true)"
             class="vmp-stream-remote__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
           ></span>
         </el-tooltip>
@@ -240,14 +240,27 @@
         </el-tooltip>
       </p>
     </section>
+    <!-- 设置主画面弹窗 -->
+    <saas-alert
+      :visible="popAlert.visible"
+      :confirm="popAlert.confirm"
+      :knowText="'知道了'"
+      :confirmText="'继续'"
+      :cancelText="'取消'"
+      @onSubmit="stopShareOrInsert"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+    >
+      <main slot="content">{{ popAlert.text }}</main>
+    </saas-alert>
 
     <!-- VmpBasicCenterContainer 组件内还有一个占位图 -->
-    <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
+    <!-- <section class="vmp-stream-remote__pause" v-show="isSafari && showInterIsPlay">
       <img :src="coverImgUrl" :class="`vmp-stream-remote__pause-${coverImageMode}`" alt />
       <p @click.stop="replayPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
-    </section>
+    </section> -->
   </div>
 </template>
 
@@ -260,7 +273,8 @@
   } from 'middle-domain';
   import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
   import { cropperImage } from '@/app-shared/utils/common';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import SaasAlert from '@/packages/pc-alert/src/alert.vue';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpStreamRemote',
     data() {
@@ -270,7 +284,12 @@
         isFullScreen: false,
         isShowNetError: false,
         timmer: null,
-        isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/)
+        isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
+        popAlert: {
+          text: '切换主画面将中断插播视频或桌面共享操作，是否继续？',
+          visible: false,
+          confirm: true
+        }
       };
     },
     props: {
@@ -278,6 +297,9 @@
         require: true,
         default: () => {}
       }
+    },
+    components: {
+      SaasAlert
     },
     watch: {
       'stream.streamId': {
@@ -401,6 +423,21 @@
           room.interactToolStatus.doc_permission == this.joinInfo.third_party_user_id &&
           this.joinInfo.role_name == 4
         );
+      },
+      accountId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id;
+      },
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
+      },
+      // 是否是当前用户插播
+      isCurrentRoleInsert() {
+        return (
+          // 当前正在插播，插播人id等于当前用户id
+          this.$domainStore.state.insertFileServer.isInsertFilePushing &&
+          this.$domainStore.state.insertFileServer.insertStreamInfo.userInfo.accountId ==
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
       }
     },
     beforeCreate() {
@@ -430,6 +467,24 @@
       useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
     methods: {
+      // 停止桌面共享或插播
+      stopShareOrInsert() {
+        if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
+          // 自己正在发起桌面共享
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickStopShare', 'setMainScreen')
+          );
+        } else if (this.isCurrentRoleInsert) {
+          // 正在插播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStopInsert'));
+        }
+        this.setMainScreen();
+        this.popAlert.visible = false;
+      },
+      // 关闭弹窗
+      closeConfirm() {
+        this.popAlert.visible = false;
+      },
       // 解析图片地址
       handlerImageInfo() {
         if (cropperImage(this.coverImgUrl)) {
@@ -505,23 +560,32 @@
       // 恢复播放
       replayPlay() {
         clearTimeout(this.timmer);
+        const _this = this;
+        function videoPlay(video) {
+          video
+            .play()
+            .then(res => {
+              console.log('play-res-', res, _this.interactiveServer.state.showPlayIcon);
+              if (_this.interactiveServer.state.showPlayIcon) {
+                _this.interactiveServer.state.showPlayIcon = false;
+              }
+            })
+            .catch(err => {
+              console.log('play-err-', err);
+              if (err.name == 'NotAllowedError' || err.name == 'NotSupportedError') {
+                _this.interactiveServer.state.showPlayIcon = true;
+              }
+            });
+        }
         let videos = document.querySelectorAll('.vmp-stream-remote video');
+        let localVideo = document.querySelectorAll('.vmp-stream-local video')[0];
+        console.log('本地流video', localVideo);
+        if (localVideo && this.joinInfo.role_name == 2) {
+          videoPlay(localVideo);
+        }
         videos.length > 0 &&
           videos.forEach(video => {
-            video
-              .play()
-              .then(res => {
-                console.log('play-res-', res, this.interactiveServer.state.showPlayIcon);
-                if (this.interactiveServer.state.showPlayIcon) {
-                  this.interactiveServer.state.showPlayIcon = false;
-                }
-              })
-              .catch(err => {
-                console.log('play-err-', err);
-                if (err.name == 'NotAllowedError' || err.name == 'NotSupportedError') {
-                  this.interactiveServer.state.showPlayIcon = true;
-                }
-              });
+            videoPlay(video);
           });
       },
       async subscribeRemoteStream() {
@@ -710,7 +774,15 @@
       },
 
       //  设为主画面
-      setMainScreen() {
+      setMainScreen(opt) {
+        if (opt) {
+          // 若当前在桌面共享或插播，不允许设置主画面
+          const stream = this.interactiveServer.getDesktopAndIntercutInfo();
+          if (stream) {
+            this.popAlert.visible = true;
+            return;
+          }
+        }
         this.interactiveServer
           .setMainScreen({
             receive_account_id: this.stream.accountId
