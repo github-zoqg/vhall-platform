@@ -32,7 +32,6 @@
     computed: {},
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
-      this.menuDialogVisible = true;
     },
     mounted() {},
     beforeDestroy() {},

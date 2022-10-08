@@ -222,7 +222,7 @@
       .has-img {
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: scale-down;
         transform: translate3d(0, 0, 0);
         border-radius: 32px 32px 0 0;
       }
