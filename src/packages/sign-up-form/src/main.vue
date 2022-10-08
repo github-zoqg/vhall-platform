@@ -2110,7 +2110,7 @@
           window.location.href =
             window.location.origin +
             process.env.VUE_APP_WEB_KEY +
-            `/lives/watch/${this.webinarOrSubjectId}${queryString}`;
+            `/lives/watch/${this.webinarOrSubjectId}${window.location.search}`;
         } else {
           // 如果预约或结束，跳转到预约页
           if (res.data.webinar_state == 2 && isSubmitForm) {
@@ -2127,7 +2127,7 @@
                   window.location.href =
                     window.location.origin +
                     process.env.VUE_APP_WEB_KEY +
-                    `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+                    `/lives/subscribe/${this.webinarOrSubjectId}${window.location.search}`;
                 }
               }
             );
@@ -2135,7 +2135,7 @@
             window.location.href =
               window.location.origin +
               process.env.VUE_APP_WEB_KEY +
-              `/lives/subscribe/${this.webinarOrSubjectId}${queryString}`;
+              `/lives/subscribe/${this.webinarOrSubjectId}${window.location.search}`;
           }
         }
       },
