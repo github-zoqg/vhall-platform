@@ -15,7 +15,8 @@ export default {
   '--theme-header-icon-color': 'rgba(255, 255, 255, 0.45)',
   '--theme-header-icon-rehearsal-color': '#fb2626',
   // 聊天区域
-  '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
+  '--theme-chat-input-bg': 'rgba(255, 255, 255, 0.1)',
+  '--theme-chat-input-placeholder-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-chat-msg-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-chat-msg-timeline': 'rgba(255, 255, 255, 0.65)',
   '--theme-chat-msg-gift-font': 'rgba(255, 255, 255, 0.65)',
@@ -109,15 +110,18 @@ export default {
   //文档
   '--theme-tab-content-doc-font': 'rgba(255, 255, 255, 0.45)',
   //问答
-  '--theme-tab-content-qa-text-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-qa-replyText-font': '#fff',
-  '--theme-tab-content-qa-replyText-bg': 'rgba(255, 255, 255, 0.08)',
-  '--theme-tab-content-qa-qaLabel-font': '#fc9600',
-  '--theme-tab-content-qa-onlyMe-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-onlyMe-check': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-name-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-qa-content-font': '#ffffff',
+  '--theme-tab-content-qa-question-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-time-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-content-bg': 'rgba(0, 0, 0, 0.85)',
+  '--theme-tab-content-qa-onlyMe-font': ' rgba(255, 255, 255, 0.65)',
   //私聊
   '--theme-tab-content-private-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-tab-content-private-content-font': '#fff',
-  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-private-content-bg': 'rgba(0, 0, 0, 0.85)',
   //组件
   '--theme-component-qa': '#fb2626',
   '--theme-component-subscribe': '#fb2626',

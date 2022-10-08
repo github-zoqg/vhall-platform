@@ -267,7 +267,7 @@
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+          skin_json_wap = skinInfo.skin_json_wap;
         }
 
         // 设置主题，如果没有就用传统风格白色

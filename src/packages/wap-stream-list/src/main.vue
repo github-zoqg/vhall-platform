@@ -289,7 +289,7 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skinJsonWap = {};
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skinJsonWap = JSON.parse(skinInfo.skin_json_wap);
+          skinJsonWap = skinInfo.skin_json_wap;
         }
         return skinJsonWap?.videoBackGroundColor || '#000';
       }

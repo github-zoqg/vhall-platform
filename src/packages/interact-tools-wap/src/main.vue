@@ -86,7 +86,7 @@
       };
       const skinInfo = roomBaseState.skinInfo;
       if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        skin_json_wap = skinInfo.skin_json_wap;
       }
       return {
         roomBaseState,
