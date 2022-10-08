@@ -3,21 +3,22 @@
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
-      <p class="award-name">
-        参与观众获得“
-        {{ (fitment && fitment.name) || '奖品' }}
-        ”
-      </p>
+      <p class="award-name">参与观众获得“{{ (fitment && fitment.name) || '奖品' }}”</p>
     </div>
     <div class="winner-content">
-      <ul class="lottery-winner-wrap">
+      <ul v-if="winnerList.length" class="lottery-winner-wrap">
         <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
           <span class="serial">{{ index | fmtSerial }}</span>
           <img class="avatar" :src="item.lottery_user_avatar || defaultAvatar" alt />
           <p class="nickname">{{ item.lottery_user_nickname }}</p>
         </li>
       </ul>
+      <div v-else class="no-winner">
+        <div class="no-win-lottery-img"></div>
+        <p class="tip">当前无中奖用户</p>
+      </div>
     </div>
+    <!-- 发起端的继续抽奖 -->
     <el-button v-if="mode === 'live'" @click="reStart" class="vmp-lottery-btn">继续抽奖</el-button>
   </div>
 </template>
@@ -100,16 +101,35 @@
     .winner-content {
       margin-top: 6px;
       overflow-y: auto;
-      touch-action: pan-y;
-    }
-    .lottery-winner-wrap {
-      box-sizing: border-box;
-      min-height: 150px;
-      max-height: 177px;
-      background: #fff;
-      border-radius: 4px;
+      height: 184px;
       overflow: auto;
+      > div {
+        min-height: 100%;
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: 4px;
+      }
     }
+    .no-winner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .no-win-lottery-img {
+        width: 80px;
+        height: 80px;
+        background-image: url('../img/lottery-miss.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+      .tip {
+        height: 26px;
+        font-weight: 500;
+        font-size: 16px;
+        color: #262626;
+      }
+    }
+
     .serial {
       display: inline-block;
       width: 28px;

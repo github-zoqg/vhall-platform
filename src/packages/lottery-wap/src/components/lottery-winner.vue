@@ -13,13 +13,17 @@
       </p>
     </div>
     <div class="winner-content">
-      <ul class="lottery-winner-wrap">
+      <ul v-if="winnerList.length" class="lottery-winner-wrap">
         <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
           <span class="serial">{{ index | fmtSerial }}</span>
           <img class="avatar" :src="item.lottery_user_avatar || defaultAvatar" alt />
           <p class="nickname">{{ item.lottery_user_nickname }}</p>
         </li>
       </ul>
+      <div v-else class="no-winner">
+        <div class="no-win-lottery-img"></div>
+        <p class="tip">当前无中奖用户</p>
+      </div>
     </div>
   </div>
 </template>
@@ -79,16 +83,34 @@
     }
     .winner-content {
       margin-top: 12px;
+      height: 352px;
       padding: 0 24px;
       overflow-y: auto;
       touch-action: pan-y;
+      > div {
+        min-height: 100%;
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: 16px;
+      }
     }
-    .lottery-winner-wrap {
-      min-height: 300px;
-      max-height: 352px;
-      background: #fff;
-      border-radius: 16px;
-      overflow: auto;
+    .no-winner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .no-win-lottery-img {
+        width: 160px;
+        height: 160px;
+        background-image: url('../img/lottery-miss.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+      .tip {
+        height: 48px;
+        font-weight: 500;
+        font-size: 36px;
+      }
     }
     .serial {
       display: inline-block;
