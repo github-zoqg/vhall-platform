@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-header-left">
-    <div :title="webinarInfo.subject" class="vhall-room-name">
+    <div :title="webinarInfo.subject" class="vhall-room-name" :class="{ role_doc: roleName == 1 }">
       {{ webinarInfo.subject || '房间名称' }}
     </div>
     <div class="vhall-room-id-container">
@@ -36,6 +36,11 @@
         text: '',
         webinarInfo: {}
       };
+    },
+    computed: {
+      roleName() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.role_name;
+      }
     },
     created() {
       const { watchInitData } = useRoomBaseServer().state;
@@ -85,6 +90,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .role_doc {
+      max-width: 500px;
     }
     .vhall-room-id-container {
       height: 20px;

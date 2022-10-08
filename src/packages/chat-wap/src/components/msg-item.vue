@@ -180,7 +180,11 @@
                         : ''
                     "
                   >
-                    <span v-html="source.replyMsg.nick_name || source.replyMsg.nickname" />
+                    <span
+                      v-html="
+                        overHidden(source.replyMsg.nick_name || source.replyMsg.nickname, 8) + ' '
+                      "
+                    />
                     ：
                     <span v-html="source.replyMsg.content.text_content" />
                     <template v-if="!!!source.replyMsg.content.text_content">
@@ -456,7 +460,7 @@
               this.msgContent = this.urlToLink(
                 this.source.content.text_content.replace(
                   userName,
-                  `<span style='color:#3562fa'>${userName}</span>`
+                  `<span style='color:#3562fa'>${this.overHidden(userName, 8)} </span>`
                 )
               );
             }
@@ -692,7 +696,7 @@
           // line-height: 40px;
           font-size: 28px;
           background-color: var(--theme-chat-msg-bg);
-          border-radius: 0 8px 8px 8px;
+          border-radius: 0px 16px 16px 16px;
           span {
             word-break: break-word;
           }

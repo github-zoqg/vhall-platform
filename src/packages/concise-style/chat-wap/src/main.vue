@@ -709,6 +709,25 @@
       position: relative;
       // background-color: #f7f7f7;
 
+      // TODO: 极简风格，聊天渐变色遮罩调研
+      // &:after {
+      //   display: block;
+      //   height: 40px;
+      //   width: 100%;
+      //   content: '';
+      //   box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.2);
+      //   position: absolute;
+      //   top: -40px;
+      // }
+      // &:after {
+      //   top: 0;
+      //   display: block;
+      //   height: 60px;
+      //   width: 100%;
+      //   content: '';
+      //   position: absolute;
+      //   background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.1));
+      // }
       // TODO: 首条置底
       /*     .virtual-list {
         height: 100%;
