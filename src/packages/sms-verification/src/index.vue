@@ -43,7 +43,7 @@
         </template>
       </ul>
       <van-button round type="danger" class="btn" size="normal" block @click="handleSumbit">
-        {{ $t('login.login_1054') }}
+        {{ $t('form.form_1045') }}
       </van-button>
       <!-- 隐私合规（嵌入不展示） -->
       <vmp-privacy-compliance
