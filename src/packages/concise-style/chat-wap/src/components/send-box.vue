@@ -1,6 +1,6 @@
 <template>
-  <div class="vmp-send-box" :class="[className]">
-    <div class="vmp-send-box__content">
+  <div class="vmp-send-box-concise" :class="[className]">
+    <div class="vmp-send-box-concise__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
@@ -46,16 +46,13 @@
           </div>
         </template>
       </div>
-      <p
+      <span
         @click="showMyQA"
         :class="[{ 'only-my': isShowMyQA }, 'only-my-default']"
         v-if="currentTab == 'qa'"
       >
-        <!-- <span class="only-my-default__check"></span> -->
-        <van-checkbox v-model="isShowMyQA" shape="square">
-          {{ $t('chat.chat_1018') }}
-        </van-checkbox>
-      </p>
+        {{ $t('chat.chat_1018') }}
+      </span>
       <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
         <!-- 上麦入口 -->
         <div class="icon-wrapper" v-show="isShowMicBtn && !hideItem">
@@ -109,8 +106,8 @@
 
 <script>
   import chatWapInput from './chatWapInput';
-  import chatSeting from './chatSeting';
   import EventBus from '../js/Events';
+  import chatSeting from './chatSeting';
   import { emojiToPath } from '@/packages/chat/src/common/js/emoji';
   import {
     useGroupServer,
@@ -478,8 +475,8 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-send-box {
-    background-color: var(--theme-chat-sendBox-bg);
+  .vmp-send-box-concise {
+    // background-color: #fff;
     // box-shadow: 0px -1px 1px #f1f1f1;
     // &::after {
     //   content: '';
@@ -516,7 +513,7 @@
 
         .content-input__placeholder {
           background-color: var(--theme-chat-input-bg);
-          color: var(--theme-chat-input-placeholder-font);
+          color: #bfbfbf;
           border-radius: 40px;
           width: 100%;
           height: 60px;
@@ -539,7 +536,7 @@
             float: left;
             height: 60px;
             line-height: 60px;
-            padding-left: 16px;
+            padding-left: 12px;
           }
         }
       }
@@ -615,34 +612,7 @@
         color: #fb3a32;
       }
       .only-my-default {
-        margin-left: 24px;
-        color: var(--theme-tab-content-qa-onlyMe-font);
-        display: flex;
-        .van-checkbox {
-          ::v-deep .van-checkbox__icon {
-            height: auto;
-          }
-          ::v-deep .van-icon {
-            width: 28px;
-            height: 28px;
-            font-size: 28px;
-            line-height: 28px;
-            border: 1px solid var(--theme-tab-content-qa-onlyMe-check);
-            border-radius: 4px;
-          }
-          ::v-deep .van-checkbox__icon--checked {
-            .van-icon {
-              border: 1px solid #fb3a32;
-              background: #fb3a32;
-            }
-          }
-          ::v-deep .van-checkbox__label {
-            font-size: 28px;
-            line-height: 28px;
-            margin-left: 8px;
-            color: var(--theme-tab-content-qa-onlyMe-font);
-          }
-        }
+        margin-left: 16px;
       }
     }
   }

@@ -46,7 +46,7 @@ export default {
   '--theme-color-sub': '#ffd1c9',
   //分组
   '--theme-group-color': 'rgba(255, 255, 255, 0.65)',
-  '--theme-group-name-color': 'rgba(255, 255, 255, 0.45)',
+  '--theme-group-name-color': '#FFFFFF',
   //菜单-内容
   '--tab-menu-btn-color': 'rgba(255, 255, 255, 0.45)',
   //简介
