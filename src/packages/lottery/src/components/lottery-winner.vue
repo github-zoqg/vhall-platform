@@ -171,6 +171,7 @@
         border-radius: 50%;
       }
       .nickname {
+        width: 248px;
         height: 28px;
         margin-left: 8px;
         font-size: 14px;

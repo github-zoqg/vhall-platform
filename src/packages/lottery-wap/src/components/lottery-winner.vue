@@ -76,7 +76,7 @@
       border-radius: 5px;
     }
     .award-name {
-      margin-left: 12px;
+      margin-left: 30px;
       font-weight: 500;
       font-size: 30px;
       color: #fb2626;
@@ -87,7 +87,8 @@
       padding: 0 24px;
       overflow-y: auto;
       touch-action: pan-y;
-      > div {
+      > div,
+      > ul {
         min-height: 100%;
         box-sizing: border-box;
         background: #fff;
@@ -126,7 +127,6 @@
       flex-direction: row;
       align-items: center;
       &:not(:last-child) {
-        // TODO: border的颜色
         border-bottom: 1px solid rgba(#c8c8c8, 0.4);
       }
       .avatar {
@@ -137,7 +137,6 @@
         border-radius: 50%;
       }
       .nickname {
-        float: left;
         width: 550px;
         height: 56px;
         margin-left: 16px;
