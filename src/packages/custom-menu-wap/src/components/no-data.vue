@@ -1,7 +1,24 @@
 <template>
   <section>
     <div>
-      <img src="../assets/imgs/noData.png" alt="" srcset="" />
+      <img
+        src="../assets/imgs/noData_red.png"
+        alt=""
+        srcset=""
+        v-show="isConcise && ![4, 5].includes(backGroundColor)"
+      />
+      <img
+        src="../assets/imgs/noData_golden.png"
+        alt=""
+        srcset=""
+        v-show="isConcise && backGroundColor == 4"
+      />
+      <img
+        src="../assets/imgs/noData_blue.png"
+        alt=""
+        srcset=""
+        v-show="isConcise && backGroundColor == 5"
+      />
     </div>
     <p>
       {{ showType ? $t('nav.nav_1038') : $t('nav.nav_1039') }}
@@ -18,6 +35,29 @@
         type: Number,
         default: 1
       }
+    },
+    computed: {
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
+      },
+      backGroundColor() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return skin_json_wap.backGroundColor;
+      }
     }
   };
 </script>
@@ -28,10 +68,12 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin-top: 82px;
     div {
-      width: 266px;
+      width: 200px;
       img {
         width: 100%;
+        margin-left: 54px;
       }
     }
     p {
