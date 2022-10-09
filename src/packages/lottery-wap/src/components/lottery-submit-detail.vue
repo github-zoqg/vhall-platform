@@ -106,6 +106,8 @@
       padding: 32px;
       margin: 12px 24px 36px;
       min-height: 100px;
+      max-height: 360px;
+      overflow-y: auto;
     }
     .submit-content-item {
       font-size: 28px;
@@ -115,6 +117,14 @@
       &:not(:last-child) {
         margin-bottom: 16px;
       }
+      //多行溢出
+      -webkit-line-clamp: 2;
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
   }
 </style>

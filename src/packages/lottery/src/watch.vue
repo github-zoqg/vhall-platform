@@ -1,7 +1,7 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="visible"
+    v-if="dialogVisible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">
@@ -62,7 +62,7 @@
         visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryWinner', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -121,7 +121,7 @@
         });
       },
       /**
-       * @description 点击聊天按钮
+       * @description 点击视频下方的抽奖icon
        */
       async handleClickIcon() {
         const list = await this.lotteryServer.initIconStatus();
@@ -212,7 +212,6 @@
       },
       // 抽奖开始消息推送
       callBackLotteryPush(msg) {
-        console.log('🚀 ~ file: watch.vue ~ line 215 ~ callBackLotteryPush ~ msg', msg);
         this.setFitment(msg.data);
         this.lotteryView = 'LotteryPending';
         this.lotteryId = msg.data.lottery_id;
@@ -231,7 +230,6 @@
       },
       // 抽奖结果消息推送
       async callBackResultNotice(msg) {
-        console.log('🚀 ~ file: watch.vue ~ line 232 ~ callBackResultNotice ~ msg', msg);
         this.lotteryId = msg.data.lottery_id;
         this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);
@@ -295,6 +293,7 @@
         delete this.winnerListData[this.lotteryId];
       },
       close() {
+        this.lotteryView = '';
         this.dialogVisible = false;
       },
       /**
@@ -382,10 +381,13 @@
       cursor: pointer;
       color: #f6c667;
       z-index: 10;
+      &:hover {
+        color: #fc9600;
+      }
     }
     .vh-line-circle-close {
       position: absolute;
-      bottom: -60px;
+      bottom: -45px;
       color: #fff;
       font-size: 27px;
       display: inline-block;

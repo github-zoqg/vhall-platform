@@ -389,6 +389,13 @@
           margin: 0 auto;
         }
       }
+
+      .vh-line-close {
+        color: #000;
+        &:hover {
+          color: #000;
+        }
+      }
     }
     .vmp-lottery-btn {
       width: 160px;
@@ -408,10 +415,13 @@
       cursor: pointer;
       color: #f6c667;
       z-index: 10;
+      &:hover {
+        color: #fc9600;
+      }
     }
     .vh-line-circle-close {
       position: absolute;
-      bottom: -60px;
+      bottom: -45px;
       color: #fff;
       font-size: 27px;
       display: inline-block;

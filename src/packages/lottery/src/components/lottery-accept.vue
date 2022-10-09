@@ -1,6 +1,6 @@
 <template>
   <div class="lottery-box lottery-accept">
-    <lotteryTitle title="提交信息" />
+    <lotteryTitle :title="$t('interact_tools.interact_tools_1091')" />
     <div class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">

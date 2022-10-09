@@ -100,12 +100,12 @@
     }
 
     .award-img {
-      width: 45px;
-      height: 45px;
+      width: 48px;
+      height: 48px;
       border-radius: 4px;
     }
     .award-name {
-      margin-left: 6px;
+      margin-left: 15px;
       font-weight: 500;
       font-size: 15px;
       color: #fb2626;
@@ -115,12 +115,16 @@
       overflow-y: auto;
       height: 184px;
       overflow: auto;
-      > div {
+      > div,
+      > ul {
         min-height: 100%;
         box-sizing: border-box;
         background: #fff;
         border-radius: 4px;
       }
+    }
+    .lottery-winner-wrap {
+      max-height: 360px;
     }
     .no-winner {
       display: flex;
@@ -144,7 +148,7 @@
 
     .serial {
       display: inline-block;
-      width: 28px;
+      width: 35px;
       font-weight: 700;
       font-size: 13px;
     }

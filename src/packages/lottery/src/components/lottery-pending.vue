@@ -29,17 +29,17 @@
         @click="handleClickStartLottery"
       ></div>
     </div>
-    <el-button
+    <button
       v-if="mode === 'live'"
       class="vmp-lottery-btn"
       @click="endLottery"
-      :disabled="(disabledTime > 0 && disabledTime <= 5) || endLotteryDisable"
+      :disabled="disabledTime > 0 && disabledTime <= 5"
     >
       <span>
         结束抽奖
         <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
       </span>
-    </el-button>
+    </button>
   </div>
 </template>
 <script>
@@ -95,7 +95,8 @@
       disabledTime: {
         type: Number,
         default() {
-          return 0;
+          // return 0;
+          return 5;
         }
       }
     },
@@ -229,11 +230,12 @@
         });
       },
       endLottery() {
+        if (this.endLotteryDisable) return false; // 逻辑防抖, 不影响样式
         this.$emit('end');
         this.endLotteryDisable = true;
         const st = setTimeout(() => {
           clearTimeout(st);
-          this.endLotteryDisable = true;
+          this.endLotteryDisable = false;
         }, 3000);
       },
       judgeInProgress() {
@@ -294,12 +296,12 @@
       &.order-2 {
         width: 165px;
         top: 33px;
-        color: #fff;
+        color: #fff1ce;
       }
       &.order-3 {
         width: 100px;
         top: 243px;
-        color: #fff;
+        color: #fff1ce;
       }
       .remark-text {
         white-space: nowrap;
@@ -347,11 +349,10 @@
     }
     .vmp-lottery-btn {
       margin-top: 10px;
-      &.is-disabled {
+      &[disabled] {
         border: 0;
-        background: #fb2626;
+        background: #ffd1c9;
         color: #fff;
-        opacity: 0.6;
         pointer-events: none;
       }
     }

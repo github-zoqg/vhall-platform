@@ -65,7 +65,7 @@
         lotteryId: '', // 抽奖的信息id(接口返回)
         lotteryInfo: {}, // 抽奖信息
         winLotteryHistory: [], // 中奖历史
-        winnerListData: Object
+        winnerListData: {}
       };
     },
     computed: {
@@ -244,6 +244,7 @@
         delete this.winnerListData[this.lotteryId];
       },
       close() {
+        this.lotteryView = '';
         this.popupVisible = false;
       },
       /**

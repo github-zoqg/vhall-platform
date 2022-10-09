@@ -100,6 +100,8 @@
       padding: 12px;
       margin-top: 4px;
       min-height: 50px;
+      max-height: 200px;
+      overflow-y: auto;
     }
     .submit-content-item {
       font-size: 14px;
@@ -109,6 +111,14 @@
       &:not(:last-child) {
         margin-bottom: 8px;
       }
+      //多行溢出
+      -webkit-line-clamp: 2;
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
     .vmp-lottery-btn {
       margin-top: 42px;

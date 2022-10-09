@@ -561,7 +561,8 @@ export default {
     interact_tools_1087: 'Rocket',
     interact_tools_1088: 'Aircraft',
     interact_tools_1089: 'Salute',
-    interact_tools_1090: 'Car'
+    interact_tools_1090: 'Car',
+    interact_tools_1091: 'Receive prizes'
   },
   setting: {
     setting_1002: 'View settings',
