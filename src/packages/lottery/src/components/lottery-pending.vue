@@ -18,6 +18,7 @@
           </i18n>
         </span>
       </div>
+      <acclaim v-else-if="inProgress" class="acclaim-panel"></acclaim>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
@@ -44,6 +45,7 @@
 </template>
 <script>
   import LotteryPendingCustom from './lottery-pending-custom.vue';
+  import acclaim from '../art/acclaim/index.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
   import SVGA from 'svgaplayerweb';
@@ -78,7 +80,8 @@
     inject: ['lotteryServer'],
     mixins: [props],
     components: {
-      LotteryPendingCustom
+      LotteryPendingCustom,
+      acclaim
     },
     props: {
       lotteryId: {
@@ -224,6 +227,7 @@
       startAnimation() {
         const cacheKey = `lottery_${this.lotteryId}_cache`;
         sessionStorage.setItem(cacheKey, 1);
+        this.inProgress = true;
         player.startAnimationWithRange({
           location: 30,
           length: 60
@@ -248,8 +252,16 @@
 </script>
 <style lang="less">
   .vmp-lottery-pending {
+    .acclaim-panel {
+      width: 380px;
+      height: 120px;
+      position: absolute;
+      top: -80px;
+      left: 0;
+      // background: red;
+    }
     .vmp-lottery-pending-container {
-      width: 400px;
+      width: 380px;
       height: 380px;
       position: relative;
     }

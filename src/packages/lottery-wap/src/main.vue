@@ -57,7 +57,7 @@
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: '', // 抽奖组件视图名称
+        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -313,7 +313,7 @@
         let LotteryView = 'LotteryAccept';
         if (lottery.take_award === 1) {
           // 已领奖
-          LotteryView = 'LotterySuccess';
+          LotteryView = 'LotterySubmitDetail';
         } else if (lottery.need_take_award === 1) {
           // 尚未领取
           LotteryView = 'LotteryAccept';
@@ -322,6 +322,7 @@
           LotteryView = 'LotteryWin';
         }
         this.lotteryId = lottery.id;
+        this.showWinnerList = !!lottery.publish_winner;
         this.setFitment(lottery);
         await this.changeView(LotteryView);
       }

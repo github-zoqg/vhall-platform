@@ -557,7 +557,9 @@ export default {
     interact_tools_1088: '飞机',
     interact_tools_1089: '礼炮',
     interact_tools_1090: '汽车',
-    interact_tools_1091: '领奖信息'
+    interact_tools_1091: '领奖信息',
+    interact_tools_1092: '中奖详情',
+    interact_tools_1093: '参与观众获得“{n}”'
   },
   setting: {
     setting_1002: '观看设置',

@@ -568,7 +568,9 @@ export default {
     interact_tools_1088: '',
     interact_tools_1089: '',
     interact_tools_1090: '',
-    interact_tools_1091: ''
+    interact_tools_1091: '',
+    interact_tools_1092: '',
+    interact_tools_1093: ''
   },
   setting: {
     setting_1002: '',

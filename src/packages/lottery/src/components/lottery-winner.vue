@@ -21,11 +21,16 @@
     </div>
     <!-- 发起端的继续抽奖 -->
     <el-button v-if="mode === 'live'" @click="reStart" class="vmp-lottery-btn">继续抽奖</el-button>
+    <template v-if="mode !== 'live'">
+      <transition name="gift-animation">
+        <div class="gift-animation animation"></div>
+      </transition>
+    </template>
   </div>
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
-  import Ribbon from '../art/ribbon/index.vue';
+  import Ribbon from '../art/ribbon/winner.vue';
   import LotteryTitle from './lottery-title.vue';
   import props from './props';
   export default {
@@ -185,6 +190,22 @@
     }
     .vmp-lottery-btn {
       margin-top: 15px;
+    }
+    .gift-animation {
+      position: absolute;
+      right: -30px;
+      bottom: -30px;
+      width: 60px;
+      height: 60px;
+      transform: rotate(-30deg);
+      background-image: url('../img/win.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      &.animation {
+        right: -10px;
+        bottom: -10px;
+        transition: all 0.5s linear;
+      }
     }
   }
 </style>

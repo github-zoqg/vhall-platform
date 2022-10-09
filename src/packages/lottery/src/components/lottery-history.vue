@@ -4,7 +4,7 @@
     <div class="vmp-lottery-wrap-container">
       <ul class="vmp-lottery-wrap">
         <li v-for="(lottery, index) in winLotteryHistory" :key="index" class="vmp-win-lottery">
-          <div class="vmp-lottery-item">
+          <div class="vmp-lottery-item" @click.stop="takeAward(lottery)">
             <img
               class="vmp-lottery-item__img"
               :src="
@@ -26,7 +26,7 @@
                 type="danger"
                 size="mini"
                 round
-                @click="takeAward(lottery)"
+                @click.stop="takeAward(lottery)"
               >
                 {{ filterAwardStatus(lottery) }}
               </el-button>
@@ -115,7 +115,7 @@
       background: #fff;
       border-radius: 4px;
       margin-bottom: 4px;
-
+      cursor: pointer;
       &__img {
         width: 50px;
         height: 50px;

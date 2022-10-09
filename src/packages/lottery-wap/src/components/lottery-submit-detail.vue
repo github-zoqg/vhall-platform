@@ -1,9 +1,13 @@
 <template>
   <div class="lottery-submit-detail">
-    <lottery-title title="中奖详情" />
+    <lottery-title :title="$t('interact_tools.interact_tools_1092')" />
     <div class="award-detail">
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
-      <p class="award-name">参与观众获得“{{ fitment.name || '奖品' }}”</p>
+      <p class="award-name">
+        <i18n path="interact_tools.interact_tools_1093">
+          <span class="n" place="n">{{ fitment.name || '奖品' }}</span>
+        </i18n>
+      </p>
     </div>
     <div class="submit-content">
       <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
@@ -117,14 +121,7 @@
       &:not(:last-child) {
         margin-bottom: 16px;
       }
-      //多行溢出
-      -webkit-line-clamp: 2;
-      text-overflow: -o-ellipsis-lastline;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      overflow-x: hidden;
     }
   }
 </style>

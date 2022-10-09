@@ -1,6 +1,5 @@
 <template>
   <div class="wrap">
-    12312312
     <span class="ribbon ribbon-1 flutter-1"></span>
     <span class="ribbon ribbon-2 flutter-2"></span>
     <span class="ribbon ribbon-3 flutter-3"></span>
