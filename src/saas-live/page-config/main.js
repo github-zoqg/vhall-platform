@@ -170,7 +170,7 @@ export default {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
       kind: 'desktopShare',
-      auth: true
+      auth: 'desktop_share'
     },
     handleClick: [
       {
