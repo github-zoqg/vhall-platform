@@ -18,7 +18,7 @@
           </i18n>
         </span>
       </div>
-      <acclaim v-else-if="inProgress" class="acclaim-panel"></acclaim>
+      <acclaim v-else-if="inProgress && mode !== 'live'" class="acclaim-panel"></acclaim>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
