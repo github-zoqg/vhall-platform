@@ -64,6 +64,10 @@ const cl_banned = function (id) {
 const cl_permit = function (id) {
   assistantMsg('permit', id);
 };
+// 文档云渲染相关参数通知客户端
+const cl_docComplete = function (msg) {
+  assistantMsg('cloud_doc', msg);
+};
 export {
   cl_left,
   cl_join,
@@ -78,5 +82,6 @@ export {
   cl_openUrl,
   cl_setDocMenu,
   cl_moveToDoc,
-  cl_toast
+  cl_toast,
+  cl_docComplete
 };
