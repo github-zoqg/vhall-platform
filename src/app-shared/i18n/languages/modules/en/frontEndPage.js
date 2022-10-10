@@ -211,8 +211,8 @@ export default {
     login_1041: '',
     login_1042: '',
     login_1043: '',
-    login_1044: '',
-    login_1045: '',
+    login_1044: 'Please enter phone number',
+    login_1045: 'verification code',
     login_1046: '',
     login_1047: '',
     login_1048: '',
@@ -941,6 +941,8 @@ export default {
     privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
-    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
+    privacy_1007: 'Please check the agreement first'
   }
 };

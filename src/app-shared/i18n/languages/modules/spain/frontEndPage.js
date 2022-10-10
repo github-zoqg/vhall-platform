@@ -949,6 +949,7 @@ export default {
     privacy_1002: '',
     privacy_1003: '',
     privacy_1004: '',
-    privacy_1005: ''
+    privacy_1005: '',
+    privacy_1006: ''
   }
 };
