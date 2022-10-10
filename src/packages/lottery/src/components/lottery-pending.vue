@@ -1,14 +1,24 @@
 <template>
   <div class="vmp-lottery-pending">
     <!-- 自定义图片的抽奖样式 -->
-    <LotteryPendingCustom
-      v-if="isCustom"
-      :needJoin="needJoin"
-      :fitment="fitment"
-      :mode="mode"
-      :command="lotteryInfo.command"
-      @joinLottery="joinLottery"
-    />
+    <template v-if="isCustom">
+      <div class="vmp-lottery-pending-custom">
+        <!-- 标题 -->
+        <!-- 发送参与 -->
+        <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-remark-custom" place="n">{{ command }}</span>
+        </i18n>
+        <p v-else class="lottery-remark-custom">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
+        </p>
+        <div class="lottery-pending-animation">
+          <img class="lottery-pending-animation-img" :src="fitment.url" alt />
+        </div>
+        <button v-if="needJoin && mode === 'watch'" class="vmp-lottery-btn" @click="joinLottery">
+          {{ $t('interact_tools.interact_tools_1008') }}
+        </button>
+      </div>
+    </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
       <div v-if="needJoin" class="lottery-send-command-container">
@@ -44,7 +54,6 @@
   </div>
 </template>
 <script>
-  import LotteryPendingCustom from './lottery-pending-custom.vue';
   import acclaim from '../art/acclaim/index.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
@@ -80,7 +89,6 @@
     inject: ['lotteryServer'],
     mixins: [props],
     components: {
-      LotteryPendingCustom,
       acclaim
     },
     props: {
@@ -262,7 +270,7 @@
     }
     .vmp-lottery-pending-container {
       width: 380px;
-      height: 380px;
+      height: 400px;
       position: relative;
     }
     .lottery-send-command-container {
@@ -285,6 +293,24 @@
     .lottery-command {
       color: #fff;
     }
+    .lottery-pending-animation {
+      display: inline-block;
+      width: 380px;
+      height: 400px;
+      .lottery-pending-animation-img {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+    .lottery-remark-custom {
+      margin-bottom: 32px;
+    }
+    .vmp-lottery-pending-custom {
+      text-align: center;
+    }
+
     #lottery-svga {
       width: 100%;
       height: 100%;

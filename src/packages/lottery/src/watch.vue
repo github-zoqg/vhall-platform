@@ -62,7 +62,7 @@
         visible: true,
         dialogVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotteryWinner', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -370,7 +370,8 @@
       position: relative;
       box-sizing: border-box;
       width: 424px;
-      background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+      background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
+      border-radius: 20px 20px 0px 0px;
       border-radius: 12px;
       text-align: center;
       padding: 24px 32px;

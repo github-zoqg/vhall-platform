@@ -6,6 +6,7 @@
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
           <div :class="[item.is_required === 1 ? 'required' : '', 'form-item__input']">
             <input
+              v-if="['phone', 'name'].includes(item.field_key)"
               class="form-inpput"
               v-model="item.field_value"
               type="text"
@@ -13,9 +14,15 @@
               :placeholder="$tdefault(item.placeholder)"
               autocomplete="off"
             />
-          </div>
-          <div v-if="item.error" class="form-item__error">
-            {{ item.field_key | errorMsg }}
+            <textarea
+              v-else
+              class="form-inpput-textarea"
+              v-model="item.field_value"
+              rows="2"
+              :maxlength="item.maxLength"
+              :placeholder="$tdefault(item.placeholder)"
+              autocomplete="off"
+            />
           </div>
         </li>
       </ul>
@@ -48,17 +55,6 @@
         winForm: [], // 中奖信息表单
         verified: false
       };
-    },
-    filters: {
-      errorMsg(fieldKey = '') {
-        const map = {
-          name: '姓名',
-          address: '地址',
-          phone: '手机号'
-        };
-        const field = map[fieldKey] || '';
-        return `请输入正确的信息${field}`;
-      }
     },
     watch: {
       winForm: {
@@ -110,24 +106,30 @@
        * @description 验证数据
        */
       verify() {
-        let result = true;
-        this.winForm.map(item => {
+        const errorItem = this.winForm.find(item => {
           if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
             // 当手机号为必填,或者有输入手机号才正则校验
             const phone = item.field_value.replace(/\s/g, '');
             const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
             if (!regs.test(phone)) {
-              item.error = true;
-              result = false;
+              return true;
             }
           } else if (item.is_required === 1 && item.field_value == '') {
-            item.error = true;
-            result = false;
-          } else {
-            item.error = false;
+            return true;
           }
+          return false;
         });
-        return result;
+        if (errorItem) {
+          this.$message({
+            message: `请输入正确的信息${errorItem.field}`, // 只会校验手机号
+            showClose: true,
+            type: 'error',
+            customClass: 'zdy-info-box'
+          });
+          return false;
+        } else {
+          return true;
+        }
       },
       submit() {
         if (!this.verify()) return false;
@@ -151,16 +153,6 @@
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
               this.lotteryServer.initIconStatus();
               this.$emit('navTo', 'LotterySuccess');
-              // if (this.showWinnerList) {
-              // } else {
-              //   this.$message({
-              //     message: this.$t('interact_tools.interact_tools_1013'),
-              //     showClose: true,
-              //     type: 'success',
-              //     customClass: 'zdy-info-box'
-              //   });
-              //   this.$emit('close');
-              // }
             } else {
               failure(res);
             }
@@ -202,22 +194,19 @@
       line-height: 50px;
     }
     .form {
-      max-height: 180px;
+      max-height: 275px;
       overflow: auto;
     }
     .form-item {
       position: relative;
-      height: 44px;
       background: #ffffff;
       border-radius: 4px;
-      // overflow: hidden;
       &:not(:last-child) {
-        margin-bottom: 24px;
+        margin-bottom: 16px;
       }
       &__input {
-        line-height: 44px;
         position: relative;
-        padding-left: 28px;
+        padding: 10px 0 10px 28px;
         outline: none;
         border: none;
         &.required:before {
@@ -225,7 +214,7 @@
           width: 6px;
           height: 6px;
           position: absolute;
-          top: 2px;
+          top: 18px;
           left: 16px;
           content: '*';
           font-size: 12px;
@@ -242,8 +231,11 @@
         color: #fb2626;
       }
     }
-    .form-inpput {
+    .form-inpput,
+    .form-inpput-textarea {
       width: 100%;
+      line-height: 24px;
+      height: 24px;
       font-size: 14px;
       color: #262626;
       outline: none;
@@ -251,6 +243,11 @@
       &::-webkit-input-placeholder {
         color: #bfbfbf;
       }
+    }
+    // 2行文本域
+    .form-inpput-textarea {
+      height: 42px;
+      line-height: 1.5;
     }
     .vmp-lottery-btn {
       margin-top: 10px;

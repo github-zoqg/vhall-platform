@@ -90,10 +90,11 @@
     .award-img {
       width: 45px;
       height: 45px;
-      border-radius: 5px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
     }
     .award-name {
-      margin-left: 6px;
+      margin-left: 15px;
       font-weight: 500;
       font-size: 15px;
       color: #fb2626;

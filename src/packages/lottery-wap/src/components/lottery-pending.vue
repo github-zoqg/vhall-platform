@@ -1,13 +1,25 @@
 <template>
   <div class="vmp-lottery-pending">
     <!-- 自定义图片的抽奖样式 -->
-    <LotteryPendingCustom
-      v-if="isCustom"
-      :needJoin="needJoin"
-      :fitment="fitment"
-      :command="lotteryInfo.command"
-      @joinLottery="joinLottery"
-    />
+    <template v-if="isCustom">
+      <div class="vmp-lottery-pending-custom">
+        <!-- 标题 -->
+        <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
+        <!-- 发送参与 -->
+        <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-remark" place="n">{{ command }}</span>
+        </i18n>
+        <p v-else class="lottery-remark">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
+        </p>
+        <div class="lottery-pending-animation">
+          <img class="lottery-pending-animation-img" :src="fitment.url" alt />
+        </div>
+        <button v-if="needJoin" class="vmp-lottery-btn" @click="joinLottery">
+          {{ $t('interact_tools.interact_tools_1008') }}
+        </button>
+      </div>
+    </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
       <div v-if="needJoin" class="lottery-send-command-container">
@@ -31,7 +43,6 @@
   </div>
 </template>
 <script>
-  import LotteryPendingCustom from './lottery-pending-custom.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
   import SVGA from 'svgaplayerweb';
@@ -65,9 +76,6 @@
     name: 'LotteryPending',
     inject: ['lotteryServer'],
     mixins: [props],
-    components: {
-      LotteryPendingCustom
-    },
     computed: {
       isCustom() {
         return this.fitment.img_order === 0;
@@ -218,6 +226,16 @@
     #lottery-svga {
       width: 100%;
       height: 100%;
+    }
+    .lottery-pending-animation {
+      width: 380px;
+      height: 400px;
+      .lottery-pending-animation-img {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     }
     .lottery-remark {
       display: inline-block;

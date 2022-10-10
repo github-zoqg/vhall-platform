@@ -169,8 +169,7 @@
 <style lang="less">
   .lottery-accept {
     position: relative;
-    // background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
-    background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+    background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
     border-radius: 20px 20px 0px 0px;
     .title {
       height: 100px;

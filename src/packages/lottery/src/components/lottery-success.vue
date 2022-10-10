@@ -32,6 +32,8 @@
     max-width: 380px;
     min-height: 224px;
     .submit-success-icon {
+      position: relative;
+      left: 3px; // 图片问题,手动偏移
       margin: 10px auto 0;
       width: 95px;
       height: 98px;

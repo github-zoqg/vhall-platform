@@ -98,7 +98,7 @@
     }
     .vmp-lottery-wrap {
       min-height: 128px;
-      max-height: 228px;
+      max-height: 300px;
       overflow: auto;
     }
     .vmp-win-lottery {
@@ -117,6 +117,7 @@
       margin-bottom: 4px;
       cursor: pointer;
       &__img {
+        margin-left: 0;
         width: 50px;
         height: 50px;
         border-radius: 4px;
@@ -149,6 +150,10 @@
       .tak-award-btn {
         border: 0;
         color: #fff;
+        width: 66px;
+        height: 28px;
+        background: #fb2626;
+        border-radius: 20px;
       }
     }
 

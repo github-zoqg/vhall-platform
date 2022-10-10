@@ -25,11 +25,6 @@
     </div>
     <!-- 发起端的继续抽奖 -->
     <el-button v-if="mode === 'live'" @click="reStart" class="vmp-lottery-btn">继续抽奖</el-button>
-    <template v-if="mode !== 'live'">
-      <transition name="gift-animation">
-        <div class="gift-animation animation"></div>
-      </transition>
-    </template>
   </div>
 </template>
 <script>
@@ -112,6 +107,7 @@
       width: 48px;
       height: 48px;
       border-radius: 4px;
+      border: 1px solid #d9d9d9;
     }
     .award-name {
       margin-left: 15px;
@@ -122,8 +118,8 @@
     .winner-content {
       margin-top: 6px;
       overflow-y: auto;
-      height: 184px;
-      overflow: auto;
+      height: 228px;
+      overflow-x: hidden;
       > div,
       > ul {
         min-height: 100%;
@@ -133,7 +129,7 @@
       }
     }
     .lottery-winner-wrap {
-      max-height: 360px;
+      padding: 4px;
     }
     .no-winner {
       display: flex;
@@ -157,9 +153,9 @@
 
     .serial {
       display: inline-block;
-      width: 35px;
+      width: 38px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 14px;
     }
     .lottery-user {
       height: 44px;
@@ -194,22 +190,6 @@
     }
     .vmp-lottery-btn {
       margin-top: 15px;
-    }
-    .gift-animation {
-      position: absolute;
-      right: -30px;
-      bottom: -30px;
-      width: 60px;
-      height: 60px;
-      transform: rotate(-30deg);
-      background-image: url('../img/win.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      &.animation {
-        right: -10px;
-        bottom: -10px;
-        transition: all 0.5s linear;
-      }
     }
   }
 </style>

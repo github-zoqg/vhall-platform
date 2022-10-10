@@ -433,7 +433,7 @@
       position: relative;
       box-sizing: border-box;
       width: 424px;
-      background: linear-gradient(180deg, #fbf0e6 0%, #fcf1e7 100%);
+      background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
       border-radius: 12px;
       text-align: center;
       padding: 24px 32px;

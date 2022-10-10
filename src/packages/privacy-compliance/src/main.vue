@@ -213,7 +213,7 @@
       }
       &.client_pc {
         &.scene_lottery {
-          width: 278px;
+          // width: 278px;
           bottom: 34px;
           padding-left: 0;
         }

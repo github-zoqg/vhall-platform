@@ -55,7 +55,7 @@
     position: relative;
     padding: 0 0 32px;
     text-align: center;
-    background: linear-gradient(180deg, #ffebd9 0%, #fcf1e7 100%);
+    background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
     border-radius: 20px 20px 0px 0px;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     .award-detail {

@@ -28,17 +28,18 @@
     position: relative;
     background: transparent;
     width: 100%;
-    height: 48px;
+    height: 36px; // 占位.实际大小48
+    overflow: visible;
 
     .title-panel {
       display: flex;
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      width: 265px;
-      height: 60px;
+      width: 198px;
+      height: 36px;
       position: absolute;
-      top: -38px;
+      top: -30px;
       left: 50%;
       transform: translate(-50%);
       background-image: url('../img/title-panel.png');
