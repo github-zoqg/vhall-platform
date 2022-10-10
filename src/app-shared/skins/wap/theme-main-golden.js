@@ -102,13 +102,17 @@ export default {
   '--theme-tab-content-project-card-bg': 'transparent',
   //自定义菜单
   '--theme-tab-content-title-font': '#262626',
-  //推荐
-  '--theme-tab-content-recommend-title-font': '#262626',
-  '--theme-tab-content-recommend-buy-font': 'rgba(0, 0, 0, 0.65)',
-  '--theme-tab-content-recommend-buy-border': '#c99f67',
-  '--theme-tab-content-recommend-bg': '#fff',
+  // 广告推荐
+  '--theme-tab-content-recommend-bg': '',
+  '--theme-tab-content-recommend-active-bg': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-recommend-border': 'rgba(0, 0, 0, 0.06)',
-  '--theme-tab-content-recommend-bg-font': '#c99f67',
+  '--theme-tab-content-recommend-title-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-recommend-buy-bg': '',
+  '--theme-tab-content-recommend-buy-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-recommend-buy-border': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-recommend-buy-active-bg': 'rgba(201, 159, 103, 1)',
+  '--theme-tab-content-recommend-buy-active-font': '#FFFFFF',
+  '--theme-tab-content-recommend-buy-active-border': 'rgba(201, 159, 103, 1)',
   //文档
   '--theme-tab-content-doc-font': 'rgba(0, 0, 0, 0.45)',
   //问答

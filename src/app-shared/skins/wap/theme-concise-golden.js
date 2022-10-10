@@ -89,11 +89,18 @@ export default {
   '--theme-tab-content-project-info-font': ' ',
   '--theme-tab-content-project-card-bg': ' ',
   '--theme-tab-content-title-font': ' ',
-  '--theme-tab-content-recommend-title-font': ' ',
-  '--theme-tab-content-recommend-buy-font': ' ',
-  '--theme-tab-content-recommend-buy-border': ' ',
-  '--theme-tab-content-recommend-bg': ' ',
-  '--theme-tab-content-recommend-border': ' ',
+  // 广告推荐
+  '--theme-tab-content-recommend-bg': '',
+  '--theme-tab-content-recommend-active-bg': 'rgba(0, 0, 0, 0.06)',
+  '--theme-tab-content-recommend-border': 'rgba(0, 0, 0, 0.06)',
+  '--theme-tab-content-recommend-title-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-recommend-buy-bg': '',
+  '--theme-tab-content-recommend-buy-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-recommend-buy-border': 'rgba(0, 0, 0, 0.45)',
+  '--theme-tab-content-recommend-buy-active-bg': 'rgba(201, 159, 103, 1)',
+  '--theme-tab-content-recommend-buy-active-font': '#FFFFFF',
+  '--theme-tab-content-recommend-buy-active-border': 'rgba(201, 159, 103, 1)',
+  // 文档
   '--theme-tab-content-doc-font': ' ',
   //问答
   '--theme-tab-content-qa-onlyMe-check': 'rgba(0, 0, 0, 0.45)',
