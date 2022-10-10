@@ -56,7 +56,7 @@
           {{ $t('chat.chat_1018') }}
         </van-checkbox>
       </p>
-      <div class="interact-wrapper" v-if="[3, '3'].includes(currentTab)">
+      <div class="interact-wrapper" v-if="currentTab == 3">
         <!-- 上麦入口 -->
         <div class="icon-wrapper" v-show="isShowMicBtn && !hideItem">
           <!-- 上麦 -->
@@ -92,10 +92,10 @@
           <!-- 底部互动工具组件 comChatWap-->
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
-        <div class="icon-wrapper" v-if="isConcise">
-          <!-- 底部区域 自定义菜单入口-->
-          <vmp-air-container :oneself="true" :cuid="childrenCom[3]"></vmp-air-container>
-        </div>
+      </div>
+      <!-- 底部区域 自定义菜单入口 【进入了小组】 -->
+      <div class="icon-menu-concise" v-if="groupInitData.isInGroup && currentTab == 3 && isConcise">
+        <vmp-air-container :oneself="true" :cuid="childrenCom[3]"></vmp-air-container>
       </div>
     </div>
     <chat-wap-input
@@ -578,7 +578,6 @@
           display: inline-block;
           margin-right: 24px;
           text-align: center;
-
           &:last-child {
             margin-right: 0;
             font-size: 43px;
@@ -646,7 +645,6 @@
       }
     }
   }
-
   .user-avatar-wrap {
     vertical-align: middle;
     display: inline-flex;

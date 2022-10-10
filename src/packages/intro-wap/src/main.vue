@@ -178,7 +178,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-
     .vmp-intro-block {
       padding: 24px 24px 0 24px;
       background-color: var(--theme-tab-content-intro-introLink-bg);
