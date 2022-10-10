@@ -24,6 +24,8 @@ const htmlConfig = {
     dayjs: '//s2.e.vhall.com/common-static/middle/dayjs/1.10.8/dayjs.min.js',
     duration: '//s2.e.vhall.com/common-static/middle/dayjs/1.10.8/plugins/duration.js',
 
+    imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
+
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
     MiddleDomain: '' //空值，用于占位,具体环境中需配置覆盖此项
