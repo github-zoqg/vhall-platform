@@ -1,8 +1,15 @@
 <template>
   <div class="no-win-lottery">
     <div class="no-win-lottery-img" />
-    <p class="lottery-result" :data-text="`很遗憾, ${$t('interact_tools.interact_tools_1010')}`">
-      {{ `很遗憾, ${$t('interact_tools.interact_tools_1010')}` }}
+    <p
+      class="lottery-result"
+      :data-text="`${$t('interact_tools.interact_tools_1074')}, ${$t(
+        'interact_tools.interact_tools_1010'
+      )}`"
+    >
+      {{
+        `${$t('interact_tools.interact_tools_1074')}, ${$t('interact_tools.interact_tools_1010')}`
+      }}
     </p>
     <p class="no-win-tip">{{ $t('interact_tools.interact_tools_1011') }}!</p>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">

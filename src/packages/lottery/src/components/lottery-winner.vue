@@ -20,7 +20,7 @@
       </ul>
       <div v-else class="no-winner">
         <div class="no-win-lottery-img"></div>
-        <p class="tip">当前无中奖用户</p>
+        <p class="tip">{{ $t('interact_tools.interact_tools_1094') }}</p>
       </div>
     </div>
     <!-- 发起端的继续抽奖 -->

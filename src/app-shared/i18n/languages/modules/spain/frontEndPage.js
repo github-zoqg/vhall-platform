@@ -570,7 +570,8 @@ export default {
     interact_tools_1090: '',
     interact_tools_1091: '',
     interact_tools_1092: '',
-    interact_tools_1093: ''
+    interact_tools_1093: '',
+    interact_tools_1094: ''
   },
   setting: {
     setting_1002: '',
