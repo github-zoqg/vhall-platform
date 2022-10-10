@@ -36,10 +36,10 @@
 </script>
 <style lang="less">
   .vmp-custom-menu-textlink {
-    margin-bottom: 30px;
     width: 100%;
     box-sizing: border-box;
-    padding: 0px 24px;
+    padding: 0 0;
+    margin-top: 24px;
     .textlink {
       width: 100%;
       // height: 24px;

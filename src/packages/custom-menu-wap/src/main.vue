@@ -99,10 +99,9 @@
       height: 100%;
       width: 100%;
       overflow: auto;
-      padding: 16px 30px 100px 30px;
+      padding: 0 30px 100px 30px;
       section:first-child {
         &.rank-list {
-          margin-top: -16px;
           margin-left: -30px;
           margin-right: -30px;
         }
