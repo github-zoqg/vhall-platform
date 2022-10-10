@@ -19,6 +19,7 @@
 </template>
 
 <script>
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpWapMenuDialog',
     components: {},
@@ -42,6 +43,7 @@
     methods: {
       openMenusPanel() {
         this.menuDialogVisible = true;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitComputedMenuWidth'));
       }
     }
   };
@@ -58,6 +60,7 @@
     &.last-position {
       margin-left: 24px;
     }
+    /* 极简模式下弹出来的样式，很多都需要重置 */
     .menu_icon-concise {
       width: 50px;
       height: 50px;
@@ -71,6 +74,10 @@
       border-radius: 100%;
       display: block;
       background: #fb3a32;
+    }
+    .vmp-interact-tools-wap .vh-saas-iconfont,
+    .vmp-interact-tools-wap .vh-iconfont {
+      font-size: 12px;
     }
   }
   .wap-menu-van-popup {

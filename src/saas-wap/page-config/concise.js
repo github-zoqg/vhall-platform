@@ -155,6 +155,10 @@ export default {
   // 自定义菜单-简洁mosh
   comWapMenuDialog: {
     component: 'VmpWapMenuDialog',
+    emitComputedMenuWidth: {
+      cuid: ['comTabMenuWap'],
+      method: 'menuDialogComputed'
+    },
     children: ['comTabMenuWap'],
     options: {}
   },

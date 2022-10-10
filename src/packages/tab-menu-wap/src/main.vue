@@ -683,6 +683,13 @@
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
         }
+      },
+      // 极简模式下，弹出框点开后初始化宽度计算效果。
+      async menuDialogComputed() {
+        if (this.isEmbedVideo) return;
+        await this.$nextTick();
+        this.scrollToItem({ id: this.selectedId });
+        this.computedWidth();
       }
     }
   };
@@ -770,6 +777,8 @@
         // }
         .vh-iconfont {
           font-weight: 600;
+          font-size: 14px;
+          color: var(--tab-menu-btn-color);
         }
       }
     }
