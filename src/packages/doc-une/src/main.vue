@@ -167,8 +167,10 @@
   import {
     cl_handleScreen,
     cl_setDocMenu,
-    cl_moveToDoc
+    cl_moveToDoc,
+    cl_docComplete
   } from '@/app-shared/client/client-methods.js';
+  import clientMsgApi from '@/app-shared/utils/clientMsgApi';
   export default {
     name: 'VmpDocUne',
     components: { VmpDocToolbar },
@@ -478,6 +480,12 @@
             useRoomBaseServer().setChangeElement('');
           }
         }
+        if (this.$route?.query.assistantType) {
+          cl_docComplete({
+            doc_loaded: this.docLoadComplete,
+            switch: this.docServer.state.switchStatus
+          });
+        }
       },
       // 通道变更
       ['docServer.state.isChannelChanged'](newval) {
@@ -768,6 +776,26 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        if (this.$route?.query.assistantType) {
+          // 当前文档加载完成
+          this.docServer.$on('dispatch_doc_load_complete', () => {
+            cl_docComplete({
+              doc_loaded: this.docLoadComplete,
+              switch: this.docServer.state.switchStatus
+            });
+          });
+
+          clientMsgApi.onQtCallFunctionPage(msg => {
+            // 客户端请求获取文档云渲染相关参数事件
+            if (msg === 1 || msg === 2 || msg === 15) {
+              cl_docComplete({
+                doc_loaded: this.docLoadComplete,
+                switch: this.docServer.state.switchStatus
+              });
+            }
+          });
+        }
       },
 
       listenKeydown(e) {
