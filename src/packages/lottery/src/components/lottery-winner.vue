@@ -4,7 +4,11 @@
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
-      <p class="award-name">参与观众获得“{{ (fitment && fitment.name) || '奖品' }}”</p>
+      <p class="award-name">
+        <i18n path="interact_tools.interact_tools_1093">
+          <span class="n" place="n">{{ fitment.name || '奖品' }}</span>
+        </i18n>
+      </p>
     </div>
     <div class="winner-content">
       <ul v-if="winnerList.length" class="lottery-winner-wrap">

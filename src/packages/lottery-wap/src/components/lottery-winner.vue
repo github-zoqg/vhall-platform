@@ -7,9 +7,9 @@
         :src="(fitment.award_snapshoot && fitment.award_snapshoot.icon) || defaultLotteryImg"
       />
       <p class="award-name">
-        参与观众获得“
-        {{ fitment.name || '奖品' }}
-        ”
+        <i18n path="interact_tools.interact_tools_1093">
+          <span class="n" place="n">{{ fitment.name || '奖品' }}</span>
+        </i18n>
       </p>
     </div>
     <div class="winner-content">
