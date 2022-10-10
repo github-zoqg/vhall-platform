@@ -1953,7 +1953,6 @@
                   window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitChangePass'));
                 }
                 // 报名成功的操作，跳转到直播间
-                debugger;
                 if (this.interfaceType === 'subject') {
                   // 情况一：独立报名表单
                   this.goToSubjectDetailOrReload('submit');
