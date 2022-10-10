@@ -224,7 +224,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: '',
+    login_1056: 'Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
