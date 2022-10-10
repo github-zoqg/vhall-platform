@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-menu-dialog">
+  <div :class="['vmp-wap-menu-dialog', isInGroup ? 'last-position' : '']">
     <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
     <span class="menu_icon-pointer"></span>
     <van-popup
@@ -29,7 +29,11 @@
       };
     },
     watch: {},
-    computed: {},
+    computed: {
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      }
+    },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
@@ -50,6 +54,10 @@
     -webkit-align-items: center;
     align-items: center;
     position: relative;
+    text-align: left;
+    &.last-position {
+      margin-left: 24px;
+    }
     .menu_icon-concise {
       width: 50px;
       height: 50px;

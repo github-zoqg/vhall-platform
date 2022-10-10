@@ -668,7 +668,7 @@
         this.scrollToItem({ id: item.id });
         item.tipsVisible = false;
 
-        this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+        this.$refs['tabContent'] && this.$refs['tabContent'].switchTo(item); // tab-content视图切换
 
         await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
