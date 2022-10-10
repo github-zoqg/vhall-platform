@@ -11,7 +11,8 @@
     </div>
     <div class="submit-content">
       <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
-        {{ submitItem }}
+        <span class="submit-content-label">{{ submitItem.label }}</span>
+        <span class="submit-content-value">{{ submitItem.value }}</span>
       </div>
     </div>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
@@ -53,8 +54,14 @@
           const data = res.data;
           this.submitInfo = [];
           if (!data) return;
-          this.submitInfo.push(data.lottery_user_name);
-          this.submitInfo.push(data.lottery_user_phone);
+          this.submitInfo.push({
+            label: '姓名:',
+            value: data.lottery_user_name
+          });
+          this.submitInfo.push({
+            label: '手机:',
+            value: data.lottery_user_phone
+          });
           let remark = null;
           try {
             remark = JSON.parse(data.lottery_user_remark);
@@ -64,7 +71,10 @@
           if (Array.isArray(remark)) {
             remark.forEach(item => {
               if (item.field_key !== 'phone' && item.field_key !== 'name' && item.field_value) {
-                this.submitInfo.push(item.field_value);
+                this.submitInfo.push({
+                  label: item.field_key === 'address' ? '地址:' : '',
+                  value: item.field_value
+                });
               }
             });
           }
@@ -109,6 +119,9 @@
       overflow-y: auto;
     }
     .submit-content-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
       font-size: 14px;
       line-height: 22px;
       color: #262626;
@@ -117,8 +130,21 @@
         margin-bottom: 8px;
       }
     }
+    .submit-content-label {
+      box-sizing: border-box;
+      display: inline-block;
+      width: 84px;
+      height: 22px;
+      padding-right: 15px;
+      text-align: right;
+      color: #8c8c8c;
+    }
+    .submit-content-value {
+      flex: 1;
+    }
     .vmp-lottery-btn {
       margin-top: 42px;
+      width: 250px;
     }
   }
 </style>
