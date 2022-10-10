@@ -81,14 +81,20 @@ export default {
   '--theme-tab-content-rank-li-border-color': 'rgba(0, 0, 0, 0.06)',
   '--theme-tab-content-rank-li-label-color': '#000000',
   '--theme-tab-content-rank-li-num-color': 'rgba(251, 38, 38, 1)',
-  '--theme-tab-content-word-font': ' ',
-  '--theme-tab-content-live-title-font': ' ',
-  '--theme-tab-content-live-info-font': ' ',
+  // 自定义菜单-图文组件
+  '--theme-tab-content-word-font': 'rgba(38, 38, 38, 1)',
+  // 自定义菜单-直播组件
+  '--theme-tab-content-live-title-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-live-info-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-live-card-bg': ' ',
-  '--theme-tab-content-project-title-font': ' ',
-  '--theme-tab-content-project-info-font': ' ',
+  // 自定义菜单-专题组件
+  '--theme-tab-content-project-title-font': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-project-info-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-project-card-bg': ' ',
-  '--theme-tab-content-title-font': ' ',
+  // 自定义菜单-标题组件
+  '--theme-tab-content-title-font': 'rgba(38, 38, 38, 1)',
+  // 自定义菜单-分割线组件
+  '--theme-tab-content-link-border': 'rgba(0, 0, 0, 0.25)',
   // 广告推荐
   '--theme-tab-content-recommend-bg': '',
   '--theme-tab-content-recommend-active-bg': 'rgba(0, 0, 0, 0.06)',

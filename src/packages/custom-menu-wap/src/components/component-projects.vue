@@ -43,6 +43,5 @@
 <style lang="less">
   .lives-wrapbox {
     width: 100%;
-    margin-bottom: 80px;
   }
 </style>

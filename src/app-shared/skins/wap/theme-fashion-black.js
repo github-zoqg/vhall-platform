@@ -91,18 +91,20 @@ export default {
   '--theme-tab-content-rank-li-label-color': '#FFFFFF',
   '--theme-tab-content-rank-li-num-color': 'rgba(251, 38, 38, 1)',
   '--theme-tab-content-rank-bg-font': 'transparent',
-  //图文组件
-  '--theme-tab-content-word-font': 'rgba(255, 255, 255, 0.65)',
-  //直播
-  '--theme-tab-content-live-title-font': '#fff',
+  // 自定义菜单-图文组件
+  '--theme-tab-content-word-font': 'rgba(255, 255, 255, 1)',
+  // 自定义菜单-直播组件
+  '--theme-tab-content-live-title-font': 'rgba(255, 255, 255, 1)',
   '--theme-tab-content-live-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-live-card-bg': '#383838',
-  //专题
-  '--theme-tab-content-project-title-font': '#fff',
+  '--theme-tab-content-live-card-bg': ' ',
+  // 自定义菜单-专题组件
+  '--theme-tab-content-project-title-font': 'rgba(255, 255, 255, 1)',
   '--theme-tab-content-project-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-project-card-bg': '#383838',
-  //自定义菜单
-  '--theme-tab-content-title-font': '#fff',
+  '--theme-tab-content-project-card-bg': ' ',
+  // 自定义菜单-标题组件
+  '--theme-tab-content-title-font': 'rgba(255, 255, 255, 1)',
+  // 自定义菜单-分割线组件
+  '--theme-tab-content-link-border': 'rgba(255, 255, 255, 0.1)',
   // 广告推荐
   '--theme-tab-content-recommend-bg': '',
   '--theme-tab-content-recommend-active-bg': 'rgba(255, 255, 255, 0.06)',

@@ -36,8 +36,8 @@
   .vmp-custom-menu-qrcode {
     max-width: 100%;
     height: auto;
-    margin: 0px 24px 20px 24px;
-
+    padding: 0 0;
+    margin-top: 24px;
     .comqrcode-previewbox {
       width: 100%;
       height: 100%;
