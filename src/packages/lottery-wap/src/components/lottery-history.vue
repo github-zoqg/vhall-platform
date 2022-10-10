@@ -3,7 +3,12 @@
     <lottery-title :title="$t('interact_tools.interact_tools_1076')" />
     <div class="vmp-lottery-wrap-container">
       <ul class="vmp-lottery-wrap">
-        <li v-for="(lottery, index) in winLotteryHistory" :key="index" class="vmp-win-lottery">
+        <li
+          v-for="(lottery, index) in winLotteryHistory"
+          :key="index"
+          class="vmp-win-lottery"
+          @click.stop="takeAward(lottery)"
+        >
           <div class="vmp-lottery-item">
             <img
               class="vmp-lottery-item__img"
@@ -25,7 +30,7 @@
                 type="danger"
                 size="mini"
                 round
-                @click="takeAward(lottery)"
+                @click.stop="takeAward(lottery)"
               >
                 {{ filterAwardStatus(lottery) }}
               </van-button>

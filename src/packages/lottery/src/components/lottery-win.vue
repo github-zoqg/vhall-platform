@@ -143,9 +143,7 @@
     .award-wrap {
       width: 90px;
       height: 90px;
-      margin: 0px auto;
-      margin-top: 29px;
-      margin-bottom: 6px;
+      margin: 29px auto 6px;
 
       .award-img {
         display: block;
