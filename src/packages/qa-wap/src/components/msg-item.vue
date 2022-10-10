@@ -248,7 +248,6 @@
           }
           &-tip {
             color: #fc9600;
-            margin-right: 8px;
           }
           img {
             width: 34px;
