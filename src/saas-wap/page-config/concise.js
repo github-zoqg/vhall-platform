@@ -150,11 +150,15 @@ export default {
       cuid: ['compRegLoginWap'],
       method: 'open'
     },
-    children: [] // 暂时不配置 'comWapMenuDialog'
+    children: ['comWapMenuDialog']
   },
   // 自定义菜单-简洁mosh
   comWapMenuDialog: {
     component: 'VmpWapMenuDialog',
+    emitComputedMenuWidth: {
+      cuid: ['comTabMenuWap'],
+      method: 'menuDialogComputed'
+    },
     children: ['comTabMenuWap'],
     options: {}
   },
