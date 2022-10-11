@@ -353,7 +353,7 @@
     .lottery-remark {
       display: inline-block;
       position: absolute;
-      font-size: 12px;
+      font-size: 14px;
       top: 275px;
       left: 50%;
       height: 20px;
@@ -362,11 +362,12 @@
       color: #fff1ce;
       overflow: hidden;
       &.order-1 {
+        font-size: 12px;
         width: 116px;
-        top: 336px;
+        top: 335px;
       }
       &.order-2 {
-        width: 165px;
+        width: 162px;
         top: 36px;
       }
       &.order-3 {
@@ -419,6 +420,7 @@
     }
     .vmp-lottery-btn {
       margin-top: 10px;
+      margin-bottom: 8px;
       &[disabled] {
         border: 0;
         background: #ffd1c9;

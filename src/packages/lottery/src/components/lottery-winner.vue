@@ -116,15 +116,17 @@
       color: #fb2626;
     }
     .winner-content {
-      margin-top: 6px;
+      margin-top: 4px;
       overflow-y: auto;
       height: 228px;
       overflow-x: hidden;
+      border-radius: 4px;
       > div,
       > ul {
         min-height: 100%;
         box-sizing: border-box;
         background: #fff;
+        padding: 4px 0;
         border-radius: 4px;
       }
     }
@@ -153,14 +155,13 @@
 
     .serial {
       display: inline-block;
-      width: 38px;
+      width: 24px;
       font-weight: 700;
       font-size: 14px;
     }
     .lottery-user {
       height: 44px;
-      margin: 0 16px;
-      padding: 8px 0;
+      margin: 0 12px;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -174,11 +175,11 @@
         height: 24px;
         margin-left: 12px;
         border-radius: 50%;
+        margin: 0 12px;
       }
       .nickname {
         width: 248px;
         height: 28px;
-        margin-left: 8px;
         font-size: 14px;
         line-height: 28px;
         color: #1a1a1a;
