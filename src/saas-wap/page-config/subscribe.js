@@ -43,6 +43,20 @@ export default {
         cuid: 'compRegLoginWap',
         method: 'open'
       }
+    ],
+    emitSmsPhone: [
+      {
+        cuid: 'comSmsVerification',
+        method: 'open',
+        args: false
+      }
+    ],
+    emitSmsPhoneWithVerify: [
+      {
+        cuid: 'comSmsVerification',
+        method: 'open',
+        args: true
+      }
     ]
   },
   // 播放器
@@ -131,7 +145,8 @@ export default {
       'comUserCenterWap',
       'comCashWap',
       'comInviteHandup',
-      'comViewRestrictionWap'
+      'comViewRestrictionWap',
+      'comSmsVerification'
     ]
   },
   // 登录弹窗
@@ -191,5 +206,12 @@ export default {
   },
   comGoodsDetail: {
     component: 'VmpGoodsDetail'
+  },
+  comSmsVerification: {
+    component: 'VmpSmsVerification',
+    emitSubmitSuccess: {
+      cuid: 'comSubcribeWapBody',
+      method: 'handleNoticeWechatSubmitSuccess'
+    }
   }
 };

@@ -108,7 +108,8 @@ export default {
     appointment_1030: 'The event organizer set up a trial',
     appointment_1031: 'Please be patient',
     appointment_1032: 'Whitelist',
-    appointment_1033: 'The rehearsal has started, please watch it live'
+    appointment_1033: 'The rehearsal has started, please watch it live',
+    appointment_1034: 'Submit and receive SMS'
   },
   nav: {
     nav_1001: 'Sponsor',
@@ -211,8 +212,8 @@ export default {
     login_1041: '',
     login_1042: '',
     login_1043: '',
-    login_1044: '',
-    login_1045: '',
+    login_1044: 'Please enter phone number',
+    login_1045: 'verification code',
     login_1046: '',
     login_1047: '',
     login_1048: '',
@@ -223,7 +224,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: '',
+    login_1056: 'Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -941,6 +942,8 @@ export default {
     privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
-    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
+    privacy_1007: 'Please check the agreement first'
   }
 };
