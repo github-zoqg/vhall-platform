@@ -94,7 +94,7 @@
         </div>
       </div>
       <!-- 底部区域 自定义菜单入口 【进入了小组】 -->
-      <div class="icon-menu-concise" v-if="groupInitData.isInGroup && currentTab == 3 && isConcise">
+      <div class="icon-menu-concise" v-if="isShowMenuByConcise">
         <vmp-air-container :oneself="true" :cuid="childrenCom[3]"></vmp-air-container>
       </div>
     </div>
@@ -219,7 +219,8 @@
         //只看我的问答
         isShowMyQA: false,
         childrenCom: [],
-        isConcise: skin_json_wap?.style == 3 // 是否极简模式
+        isConcise: skin_json_wap?.style == 3, // 是否极简模式
+        visibleMenuLength: 0
       };
     },
     computed: {
@@ -310,6 +311,11 @@
       // 隐藏部分文案及选项(安利定制)
       hideItem() {
         return this.configList['watch_embed_close_entrance'] && this.isEmbed;
+      },
+      // 是否展示自定义菜单组件
+      isShowMenuByConcise() {
+        // 进入了小组 & 当前展示成员列表 & 极简模式
+        return this.groupInitData.isInGroup && this.currentTab == 3 && this.isConcise;
       }
     },
     watch: {
@@ -473,6 +479,9 @@
             clearInterval(timer);
           }
         }, 1000);
+      },
+      setVisibleMenuLength(len) {
+        this.visibleMenuLength = len;
       }
     }
   };

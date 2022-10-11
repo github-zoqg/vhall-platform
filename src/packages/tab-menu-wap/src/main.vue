@@ -82,7 +82,7 @@
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
-
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpTabMenuWap',
     components: { tabContent },
@@ -146,7 +146,12 @@
             return item.visible === true;
           });
         }
-        return this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        // // 告知外部当前可展示的自定义菜单个数
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
+        );
+        return visibleMenu;
       },
       // 简洁模式菜单，因外部已有私聊内容，当前正文区域的渲染，需要绕开私聊部分。
       conciseMenu() {

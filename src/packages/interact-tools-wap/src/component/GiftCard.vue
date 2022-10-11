@@ -58,7 +58,6 @@
 </template>
 
 <script>
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useGiftsServer, useMsgServer, useChatServer } from 'middle-domain';
   export default {
     name: 'gift',
@@ -84,9 +83,6 @@
       },
       localRoomInfo: {
         required: false
-      },
-      cuid: {
-        required: true
       }
     },
     computed: {
@@ -235,7 +231,7 @@
         this.close();
         // 免费礼物不需要登录，付费礼物需要
         if (!this.localRoomInfo.isLogin && Number(this.currentGift.price) > 0) {
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+          this.$emit('showLogin');
           // EventBus.$emit('showChatLogin');
           return;
         }
