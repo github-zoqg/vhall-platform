@@ -57,7 +57,12 @@
 
     <!-- 正文区域 -->
     <section class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
+      <tab-content
+        ref="tabContent"
+        :menu="isConcise ? conciseMenu : menu"
+        :auth="auth"
+        @noticeHint="handleHint"
+      />
     </section>
     <!-- </template> -->
   </section>
@@ -134,7 +139,6 @@
           return item.visible === true;
         });
         let conciseVisibleMenu = [];
-        console.log('当前是否是简洁模式', otherVisibleMenu);
         if (this.isConcise) {
           conciseVisibleMenu = otherVisibleMenu.filter(item => {
             // 如果是简洁模式，菜单抛开 - 聊天tab
@@ -142,8 +146,11 @@
             return item.visible === true;
           });
         }
-        console.log('当前是否是简洁模式conciseVisibleMenu', conciseVisibleMenu);
         return this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+      },
+      // 简洁模式菜单，因外部已有私聊内容，当前正文区域的渲染，需要绕开私聊部分。
+      conciseMenu() {
+        return this.menu.filter(item => item.type != 3);
       },
       // 是否为嵌入页
       embedObj() {
