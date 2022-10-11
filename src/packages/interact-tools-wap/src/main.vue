@@ -188,7 +188,8 @@
         font-size: unset;
         color: unset;
       }
-      .vmp-send-box__qa {
+      .vmp-send-box__qa,
+      .vmp-send-box__private {
         .icon-wrap-chat_set {
           color: var(--theme-qa-chat-input-placeholder-font) !important;
           .vh-line-audit {

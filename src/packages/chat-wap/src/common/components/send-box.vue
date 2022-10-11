@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-send-box" :class="[className, currentTab == 'qa' ? 'vmp-send-box__qa' : '']">
+  <div class="vmp-send-box" :class="[className, `vmp-send-box__${currentTab}`]">
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
@@ -653,8 +653,9 @@
         }
       }
     }
-    /* 问答 */
-    &.vmp-send-box__qa {
+    /* 问答 & 私聊 */
+    &.vmp-send-box__qa,
+    &.vmp-send-box__private {
       background-color: var(--theme-qa-chat-sendBox-bg);
       box-shadow: var(--theme-qa-chat-sendBox-shadow);
       .content-input__placeholder {
