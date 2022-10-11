@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-interact-tools-wap">
+  <div :class="['vmp-interact-tools-wap', isConcise ? 'vmp-interact-tools-wap__concise' : '']">
     <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
       <!-- TODO:支付牌照问题 -->
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
@@ -165,6 +165,22 @@
     .redpacket-box {
       position: relative;
       top: -2px;
+    }
+    &.vmp-interact-tools-wap__concise {
+      .vh-saas-iconfont,
+      .vh-iconfont {
+        font-size: unset;
+        color: unset;
+      }
+      .vmp-send-box__qa {
+        .icon-wrap-chat_set {
+          color: var(--theme-qa-chat-input-placeholder-font) !important;
+          .vh-line-audit {
+            font-size: 32px;
+            border-right: 1px solid var(--theme-qa-chat-input-space-color) !important;
+          }
+        }
+      }
     }
   }
 </style>

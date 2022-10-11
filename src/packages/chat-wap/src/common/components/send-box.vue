@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-send-box" :class="[className]">
+  <div class="vmp-send-box" :class="[className, currentTab == 'qa' ? 'vmp-send-box__qa' : '']">
     <div class="vmp-send-box__content">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
@@ -631,8 +631,8 @@
           }
           ::v-deep .van-checkbox__icon--checked {
             .van-icon {
-              border: 1px solid #fb3a32;
-              background: #fb3a32;
+              border: 1px solid var(--theme-tab-content-qa-onlyMe-checkbox-active-border);
+              background: var(--theme-tab-content-qa-onlyMe-checkbox-active-bg);
             }
           }
           ::v-deep .van-checkbox__label {
@@ -642,6 +642,15 @@
             color: var(--theme-tab-content-qa-onlyMe-font);
           }
         }
+      }
+    }
+    /* 问答 */
+    &.vmp-send-box__qa {
+      background-color: var(--theme-qa-chat-sendBox-bg);
+      box-shadow: var(--theme-qa-chat-sendBox-shadow);
+      .content-input__placeholder {
+        background-color: var(--theme-qa-chat-input-bg);
+        color: var(--theme-qa-chat-input-placeholder-font);
       }
     }
   }
