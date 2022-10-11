@@ -114,7 +114,14 @@ export default {
         { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员列表
         { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } // 问答
       ]
-    }
+    },
+    emitVisibleMenuLength: [
+      {
+        cuid: ['comInteractToolsWap'],
+        method: 'setVisibleMenuLength',
+        args: ['$0']
+      }
+    ]
   },
   // 自定义菜单组件
   comCustomMenuWap: {

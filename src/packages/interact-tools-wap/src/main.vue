@@ -5,12 +5,12 @@
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
         <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
+          @showLogin="showLogin"
           ref="gifts"
           :isEmbed="localRoomInfo.isEmbed"
           :joinInfoInGift="joinInfoInGift"
           :roomId="localRoomInfo.room_id"
           :localRoomInfo="localRoomInfo"
-          :cuid="cuid"
         />
       </div>
       <!-- 打赏 -->
@@ -34,7 +34,7 @@
         </a>
       </div>
       <!-- 极简模式下, 菜单入口 -->
-      <div v-if="isConcise">
+      <div v-show="isShowMenuByConcise">
         <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
       </div>
       <!-- 点赞 -->
@@ -51,6 +51,7 @@
   import GiftCard from './component/GiftCard.vue';
   // import RewardCard from './component/reward.vue';
   import Parise from './component/parise.vue';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpInteractToolsWap',
@@ -100,8 +101,16 @@
           window.location.protocol + process.env.VUE_APP_WAP_WATCH + process.env.VUE_APP_WEB_KEY,
         qwe: 1,
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
-        childrenComp: []
+        childrenComp: [],
+        visibleMenuLength: 0
       };
+    },
+    computed: {
+      // 是否展示自定义菜单组件
+      isShowMenuByConcise() {
+        // 进入了小组 & 当前展示成员列表 & 极简模式
+        return this.isConcise && this.visibleMenuLength > 0;
+      }
     },
     created() {
       window.interactTools = this;
@@ -115,6 +124,9 @@
       };
     },
     methods: {
+      showLogin() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
+      },
       opneGifts() {
         this.$refs.gifts.showgift();
       },
@@ -126,6 +138,10 @@
         window.vhallReportForWatch?.report(170020, {
           share_channel: 4
         });
+      },
+      setVisibleMenuLength(len = 0) {
+        console.log('当前菜单是否进入', len);
+        this.visibleMenuLength = len;
       }
     }
   };

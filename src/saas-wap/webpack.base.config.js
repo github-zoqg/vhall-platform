@@ -32,7 +32,8 @@ const htmlConfig = {
     imageYunDun: '//cstaticdun.126.net/load.min.js?t=201903281201',
 
     // 自开发依赖
-    MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.1/index.js',
+    MiddleEventSdk:
+      'https://t-alistatic01.e.vhall.com/common-static/middle/middle-event-sdk/0.3.2-test/middle-event-sdk.js',
     MiddleDomain: ''
   },
   // cdn css
