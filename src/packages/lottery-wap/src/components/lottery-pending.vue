@@ -241,7 +241,7 @@
       display: inline-block;
       position: absolute;
       color: #fff;
-      font-size: 24px;
+      font-size: 28px;
       top: 550px;
       left: 50%;
       height: 40px;
@@ -249,8 +249,9 @@
       text-align: center;
       overflow: hidden;
       &.order-1 {
-        width: 260px;
-        top: 730px;
+        font-size: 24px;
+        width: 240px;
+        top: 700px;
         color: #fff1ce;
       }
       &.order-2 {
