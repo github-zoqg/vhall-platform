@@ -147,10 +147,12 @@
           });
         }
         let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
-        // // 告知外部当前可展示的自定义菜单个数
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
-        );
+        if (this.isConcise) {
+          // // 告知外部当前可展示的自定义菜单个数
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
+          );
+        }
         return visibleMenu;
       },
       // 简洁模式菜单，因外部已有私聊内容，当前正文区域的渲染，需要绕开私聊部分。
@@ -644,6 +646,9 @@
        */
       async scrollToItem({ id }) {
         await this.$nextTick();
+        if (this.visibleMenu.length <= 0) {
+          return;
+        }
         const rectArr = this.visibleMenu.map(item => {
           try {
             const id = item.id;
@@ -659,10 +664,11 @@
 
         const positionItem = rectArr.find(item => item.id === id);
 
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left - 12, // 左右切换多留出来间距了
-          behavior: 'smooth'
-        });
+        positionItem &&
+          this.$refs['menu'].scrollTo({
+            left: positionItem.left - 12, // 左右切换多留出来间距了
+            behavior: 'smooth'
+          });
       },
 
       /**
