@@ -353,28 +353,25 @@
     .lottery-remark {
       display: inline-block;
       position: absolute;
-      color: #fff;
       font-size: 12px;
       top: 275px;
       left: 50%;
       height: 20px;
       transform: translate(-50%);
       text-align: center;
+      color: #fff1ce;
       overflow: hidden;
       &.order-1 {
-        width: 118px;
-        top: 323px;
-        color: #fff1ce;
+        width: 116px;
+        top: 336px;
       }
       &.order-2 {
         width: 165px;
-        top: 33px;
-        color: #fff1ce;
+        top: 36px;
       }
       &.order-3 {
         width: 100px;
-        top: 243px;
-        color: #fff1ce;
+        top: 256px;
       }
       .remark-text {
         white-space: nowrap;
@@ -402,20 +399,20 @@
       left: 300px;
       cursor: pointer;
       &.order-1 {
-        top: 112px;
-        left: 160px;
+        top: 120px;
+        left: 154px;
         height: 75px;
         width: 75px;
       }
       &.order-2 {
-        top: 272px;
-        left: 128px;
+        top: 286px;
+        left: 120px;
         height: 55px;
         width: 145px;
       }
       &.order-3 {
-        top: 300px;
-        left: 220px;
+        top: 320px;
+        left: 210px;
         height: 60px;
         width: 100px;
       }

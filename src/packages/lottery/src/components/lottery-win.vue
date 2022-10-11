@@ -2,13 +2,17 @@
   <div class="win-lottery">
     <div class="award-container">
       <div class="wordart-wrap">
+        <span class="star star-1"></span>
+        <span class="star star-2"></span>
+        <span class="star star-3"></span>
         <wordart class="wordart nowarp" :text="$t('interact_tools.interact_tools_1015')" />
       </div>
       <div class="award-annulus"></div>
       <div class="gold-cion-bg"></div>
       <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
-      <div class="award-img-inner-annular"></div>
       <div class="award-img-outer-annular"></div>
+      <div class="award-img-inner-annular"></div>
+      <ribbon class="ribbon-container" />
       <p class="win-award-tip-container">
         <span class="win-award-tip">
           {{ $t('interact_tools.interact_tools_1016') }}"{{
@@ -29,11 +33,13 @@
 <script>
   import props from './props';
   import wordart from '../art/wordart/index.vue';
+  import ribbon from '../art/ribbon/win.vue';
   export default {
     name: 'LotteryWin',
     mixins: [props],
     components: {
-      wordart
+      wordart,
+      ribbon
     },
     methods: {
       acceptLottery() {
@@ -68,6 +74,35 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      .star {
+        display: inline-block;
+        position: absolute;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        z-index: 2;
+      }
+      .star-1 {
+        top: 6px;
+        left: -20px;
+        width: 14px;
+        height: 18px;
+        background-image: url('../img/star-1.png');
+      }
+      .star-2 {
+        top: 12px;
+        right: -20px;
+        width: 16px;
+        height: 22px;
+        background-image: url('../img/star-1.png');
+      }
+      .star-3 {
+        top: -2px;
+        right: -30px;
+        width: 10px;
+        height: 15px;
+        background-image: url('../img/star-2.png');
+      }
     }
     // 环状外观
     .award-annulus {
