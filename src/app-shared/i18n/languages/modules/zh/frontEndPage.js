@@ -561,7 +561,10 @@ export default {
     interact_tools_1091: '领奖信息',
     interact_tools_1092: '中奖详情',
     interact_tools_1093: '参与观众获得“{n}”',
-    interact_tools_1094: '当前无中奖用户'
+    interact_tools_1094: '当前无中奖用户',
+    interact_tools_1095: '您的姓名',
+    interact_tools_1096: '手机号码',
+    interact_tools_1097: '收货地址'
   },
   setting: {
     setting_1002: '观看设置',
