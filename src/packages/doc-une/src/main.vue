@@ -161,7 +161,8 @@
     useRebroadcastServer,
     useDesktopShareServer,
     usePlayerServer,
-    useMicServer
+    useMicServer,
+    useSplitScreenServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import {
@@ -430,13 +431,16 @@
           this.watchInitData.join_info.third_party_user_id == groupInitData.doc_permission
         );
       },
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
+      },
       // 是否开启文档云融屏功能
       isOpenDocStream() {
         /**
          * 开启文档融屏需同时满足一下条件
          * 1.主持人/嘉宾，分组中的组长
          * 2.开启观众可见
-         * 3.互动实例初始化成功
+         * 3.互动实例初始化成功 || 开启分屏
          * 4.直播中
          * 5.演示文档/白板加载完成（主讲人自己/演示者演示文档）
          * 6.存在文档id
@@ -445,7 +449,7 @@
         const status =
           (this.isHostPermission || this.isGroupLeader) &&
           this.$domainStore.state.docServer.switchStatus &&
-          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          (this.$domainStore.state.interactiveServer.isInstanceInit || this.isOpenSplitScreen) &&
           this.webinarType == 1 &&
           this.docLoadComplete &&
           !!this.watchInitData.interact.channel_id &&
@@ -458,6 +462,7 @@
           isGroupLeader: this.isGroupLeader,
           switchStatus: this.$domainStore.state.docServer.switchStatus,
           isInstanceInit: this.$domainStore.state.interactiveServer.isInstanceInit,
+          isOpenSplitScreen: this.isOpenSplitScreen,
           liveStatus: this.webinarType,
           docLoadComplete: this.docLoadComplete,
           channelId: this.watchInitData.interact.channel_id,
@@ -538,6 +543,7 @@
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
       this.micServer = useMicServer();
+      this.splitScreenServer = useSplitScreenServer();
     },
     created() {
       window.addEventListener('keydown', this.listenKeydown);
@@ -545,10 +551,18 @@
     methods: {
       // 开启文档云融屏
       openDocYunStream() {
-        this.interactiveServer.openDocCloudStream();
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.openDocCloudStreamEvent();
+        } else {
+          this.interactiveServer.openDocCloudStream();
+        }
       },
       closeDocYunStream() {
-        this.interactiveServer.closeDocCloudStream();
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.closeDocCloudStreamEvent();
+        } else {
+          this.interactiveServer.closeDocCloudStream();
+        }
       },
       /**
        * 全屏切换
