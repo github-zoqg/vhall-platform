@@ -55,11 +55,12 @@
           this.submitInfo = [];
           if (!data) return;
           this.submitInfo.push({
-            label: '姓名:',
+            label: '您的姓名:',
             value: data.lottery_user_name
           });
           this.submitInfo.push({
-            label: '手机:',
+            // label: 'Phone Number:',
+            label: '手机号码:',
             value: data.lottery_user_phone
           });
           let remark = null;
@@ -72,7 +73,7 @@
             remark.forEach(item => {
               if (item.field_key !== 'phone' && item.field_key !== 'name' && item.field_value) {
                 this.submitInfo.push({
-                  label: item.field_key === 'address' ? '地址:' : '',
+                  label: item.field_key === 'address' ? '收获地址:' : '',
                   value: item.field_value
                 });
               }
@@ -133,10 +134,8 @@
     .submit-content-label {
       box-sizing: border-box;
       display: inline-block;
-      width: 84px;
+      width: 112px;
       height: 22px;
-      padding-right: 15px;
-      text-align: right;
       color: #8c8c8c;
     }
     .submit-content-value {
