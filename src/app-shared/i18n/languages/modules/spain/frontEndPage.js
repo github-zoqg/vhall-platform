@@ -111,7 +111,8 @@ export default {
     appointment_1030: 'El patrocinador de la actividad configuró una prueba de video',
     appointment_1031: 'Por favor sea paciente',
     appointment_1032: 'Lista blanca',
-    appointment_1033: 'The rehearsal has started, please watch it live'
+    appointment_1033: 'The rehearsal has started, please watch it live',
+    appointment_1034: 'Submit and receive SMS'
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -953,6 +954,7 @@ export default {
     privacy_1002: '',
     privacy_1003: '',
     privacy_1004: '',
-    privacy_1005: ''
+    privacy_1005: '',
+    privacy_1006: ''
   }
 };

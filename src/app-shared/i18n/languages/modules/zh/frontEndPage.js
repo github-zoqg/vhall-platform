@@ -107,7 +107,8 @@ export default {
     appointment_1030: '活动主办方设置了试看',
     appointment_1031: '请耐心等待',
     appointment_1032: '白名单',
-    appointment_1033: '彩排已开始，请观看直播吧'
+    appointment_1033: '彩排已开始，请观看直播吧',
+    appointment_1034: '提交手机号接收消息提醒'
   },
   nav: {
     nav_1001: '主办方',
@@ -918,6 +919,8 @@ export default {
     privacy_1002: '提交即同意{n}及{n1}',
     privacy_1003: '《用户保护协议》',
     privacy_1004: '《隐私政策》',
-    privacy_1005: '请先阅读并同意隐私政策及用户服务协议'
+    privacy_1005: '请先阅读并同意隐私政策及用户服务协议',
+    privacy_1006: '提交并同意《隐私政策》及《用户保护协议》',
+    privacy_1007: '请先勾选协议'
   }
 };

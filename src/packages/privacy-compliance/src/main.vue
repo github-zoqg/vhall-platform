@@ -177,6 +177,19 @@
         margin-bottom: 0;
         text-align: left;
       }
+      /* wap端 - 短信鉴权 */
+      &.scene_smsVerification {
+        margin-top: 32px;
+        margin-bottom: 10px;
+        padding: 0 0;
+        span {
+          font-size: 24px;
+        }
+        a {
+          font-size: 24px;
+          line-height: 44px;
+        }
+      }
     }
     /* PC端样式设置 */
     &.client_pc {
