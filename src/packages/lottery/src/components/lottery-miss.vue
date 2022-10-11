@@ -1,16 +1,7 @@
 <template>
   <div class="no-win-lottery">
     <div class="no-win-lottery-img" />
-    <p
-      class="lottery-result"
-      :data-text="`${$t('interact_tools.interact_tools_1074')}, ${$t(
-        'interact_tools.interact_tools_1010'
-      )}`"
-    >
-      {{
-        `${$t('interact_tools.interact_tools_1074')}, ${$t('interact_tools.interact_tools_1010')}`
-      }}
-    </p>
+    <wordart :text="text" />
     <p class="no-win-tip">{{ $t('interact_tools.interact_tools_1011') }}!</p>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
@@ -18,10 +9,21 @@
   </div>
 </template>
 <script>
+  import wordart from '../art/wordart/index.vue';
   import props from './props';
   export default {
     name: 'LotteryMiss',
     mixins: [props],
+    components: {
+      wordart
+    },
+    computed: {
+      text() {
+        return `${this.$t('interact_tools.interact_tools_1074')},${this.$t(
+          'interact_tools.interact_tools_1010'
+        )}`;
+      }
+    },
     methods: {
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');
@@ -39,22 +41,6 @@
       background-image: url('../img/lottery-miss.png');
       background-size: contain;
       background-repeat: no-repeat;
-    }
-    .lottery-result {
-      position: relative;
-      font-weight: 600;
-      font-size: 27px;
-      line-height: 32px;
-      color: #fef8f4;
-      -webkit-text-stroke: 6px #eb6a37;
-      text-shadow: 0px 1px 1px rgba(197, 21, 14, 0.56);
-      transform: matrix(0.99, 0, -0.15, 1, 0, 0);
-      &::before {
-        content: attr(data-text);
-        position: absolute;
-        -webkit-text-stroke: 0;
-        color: #fef8f4;
-      }
     }
     .no-win-tip {
       margin-top: 12px;

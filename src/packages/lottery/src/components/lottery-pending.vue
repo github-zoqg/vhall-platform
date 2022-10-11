@@ -3,9 +3,8 @@
     <!-- 自定义图片的抽奖样式 -->
     <template v-if="isCustom">
       <div class="vmp-lottery-pending-custom">
-        <!-- 标题 -->
         <!-- 发送参与 -->
-        <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
+        <i18n v-if="needJoin && mode === 'watch'" path="interact_tools.interact_tools_1065" tag="p">
           <span class="lottery-remark-custom" place="n">{{ command }}</span>
         </i18n>
         <p v-else class="lottery-remark-custom">
@@ -21,7 +20,7 @@
     </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
-      <div v-if="needJoin" class="lottery-send-command-container">
+      <div v-if="needJoin && mode === 'watch'" class="lottery-send-command-container">
         <span class="lottery-send-command">
           <i18n path="interact_tools.interact_tools_1065" tag="p">
             <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
@@ -36,6 +35,7 @@
         </span>
       </p>
       <div
+        v-if="mode !== 'live'"
         :class="['start-lottery-btn', `order-${fitment.img_order}`]"
         @click="handleClickStartLottery"
       ></div>
@@ -54,7 +54,7 @@
   </div>
 </template>
 <script>
-  import acclaim from '../art/acclaim/index.vue';
+  import acclaim, { acclaimAE } from '../art/acclaim/index.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
   import SVGA from 'svgaplayerweb';
@@ -65,21 +65,27 @@
       'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-slotmachine.svga',
     imageKey: 'img_21117',
     sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-slotmachine.png'
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-slotmachine.png',
+    coverBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-slotmachine.png'
   };
   const turnplateResource = {
     svgaUrl:
       'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-turnplate.svga',
     imageKey: 'img_39023',
     sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-turnplate.png'
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-turnplate.png',
+    coverBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-turnplate.png'
   };
   const capsuleResource = {
     svgaUrl:
       'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-capsule.svga',
     imageKey: 'img_39218',
     sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-capsule.png'
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-capsule.png',
+    coverBtnImgUrl:
+      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-capsule.png'
   };
 
   const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
@@ -212,6 +218,9 @@
         }
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
+          if (this.mode === 'live') {
+            player.setImage(resourceItem.coverBtnImgUrl, resourceItem.imageKey);
+          }
           player.setVideoItem(videoItem);
           if (this.mode === 'live') {
             this.startAnimation();
@@ -235,6 +244,8 @@
       startAnimation() {
         const cacheKey = `lottery_${this.lotteryId}_cache`;
         sessionStorage.setItem(cacheKey, 1);
+        if (this.mode !== 'live') acclaimAE();
+        if (this.inProgress) return false;
         this.inProgress = true;
         player.startAnimationWithRange({
           location: 30,
@@ -262,11 +273,10 @@
   .vmp-lottery-pending {
     .acclaim-panel {
       width: 380px;
-      height: 120px;
+      height: 200px;
       position: absolute;
-      top: -80px;
+      top: -60px;
       left: 0;
-      // background: red;
     }
     .vmp-lottery-pending-container {
       width: 380px;
@@ -278,6 +288,31 @@
       position: absolute;
       top: -26px;
       text-align: center;
+      &::before {
+        // 大的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: 5px;
+        bottom: -10px;
+        width: 20px;
+        height: 25px;
+        background-image: url('../img/star-1.png');
+        background-size: contain;
+      }
+      &::after {
+        // 小的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: 0;
+        top: 40%;
+        width: 8px;
+        height: 15px;
+        background-image: url('../img/star-2.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
     }
     .lottery-send-command {
       display: inline-block;

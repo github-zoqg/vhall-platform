@@ -1,27 +1,107 @@
 <template>
   <div class="wrap">
-    <!-- 左666 -->
-    <div class="acclaim acclaim-1"></div>
+    <!-- 1:左666 -->
+    <div
+      v-for="(ele, idx) of eleList"
+      :key="ele.uuid"
+      :class="['acclaim', ele.position, ele.toTopAnimation, ele.icon]"
+      @webkitAnimationEnd="handleAnimationEnd(idx)"
+    ></div>
     <!-- 右666 -->
-    <div class="acclaim acclaim-2"></div>
+    <!-- <div class="acclaim acclaim-2"></div> -->
     <!-- gogogo -->
-    <div class="acclaim acclaim-3"></div>
+    <!-- <div class="acclaim acclaim-3"></div> -->
     <!-- 加油鸭 -->
-    <div class="acclaim acclaim-4"></div>
+    <!-- <div class="acclaim acclaim-4"></div> -->
     <!-- 哇哦 -->
-    <div class="acclaim acclaim-5"></div>
+    <!-- <div class="acclaim acclaim-5"></div> -->
     <!-- 有点意思 -->
-    <div class="acclaim acclaim-6"></div>
+    <!-- <div class="acclaim acclaim-6"></div> -->
     <!-- 太炫了 -->
-    <div class="acclaim acclaim-7"></div>
+    <!-- <div class="acclaim acclaim-7"></div> -->
   </div>
 </template>
+<script>
+  /**
+   * @description 随机算法闭包生成封装
+   * @param array Array随机的总数据池
+   * @returns Function 随机算法闭包
+   */
+  function randomAlgorithmFactory(array) {
+    const randomBase = Math.ceil(array.length / 2); // 随机选择前半边的元素
+    return function () {
+      const idx = Math.floor(randomBase * Math.random());
+      const eleArr = array.splice(idx, 1); // 选中的元素摘除
+      const ele = eleArr[0];
+      array.push(ele); // 塞到队尾
+      return ele;
+    };
+  }
+  const iconList = [
+    'acclaim-1',
+    'acclaim-2',
+    'acclaim-3',
+    'acclaim-4',
+    'acclaim-5',
+    'acclaim-6',
+    'acclaim-7'
+  ]; //图标列表
+  const toTopAnimations = [
+    'zan-animation-01',
+    'zan-animation-02',
+    'zan-animation-03',
+    'zan-animation-04'
+  ];
+  const position = ['position-1', 'position-2', 'position-3', 'position-4', 'position-5'];
+  const pickIcon = randomAlgorithmFactory(iconList); // 挑选向上动画
+  const pick2TopAnimations = randomAlgorithmFactory(toTopAnimations); // 挑选向上动画
+  const pickPosition = randomAlgorithmFactory(position); // 挑选左右摇摆动画
+  const eleList = []; // 元素列表
+  let uuid = 0;
+  /**
+   * @description 单次渲染一个元素的动画
+   */
+  function appendEl() {
+    uuid++;
+    eleList.push({
+      uuid,
+      icon: pickIcon(),
+      toTopAnimation: pick2TopAnimations(),
+      position: pickPosition()
+    });
+  }
+  /**
+   * @description 对外暴露的点赞函数
+   */
+  export function acclaimAE() {
+    const maxCount = 2; //一次点赞最大渲染元素次数
+    const count = Math.ceil(Math.random() * maxCount);
+    for (let i = 0; i < count; i++) {
+      appendEl();
+    }
+  }
+  window.aaa = acclaimAE;
 
+  export default {
+    name: 'acclaim',
+    data() {
+      return {
+        eleList
+      };
+    },
+    methods: {
+      handleAnimationEnd(idx) {
+        this.eleList.splice(idx, 1);
+      }
+    }
+  };
+</script>
 <style lang="css" scoped>
   .wrap {
     position: relative;
-    height: 120px;
+    height: 200px;
     pointer-events: none;
+    /* background: red; */
   }
 
   .acclaim {
@@ -29,16 +109,15 @@
     position: absolute;
     background-repeat: no-repeat;
     background-size: contain;
-    animation: cheer 1s infinite;
   }
 
   .acclaim-1 {
-    top: 80px;
+    /* top: 80px; */
     left: 5px;
     width: 45px;
     height: 49px;
     background-image: url('./img/acclaim-1.png');
-    animation: cheer-1 1000ms infinite;
+    animation: toTop 1000ms 1;
   }
 
   @keyframes cheer-1 {
@@ -51,12 +130,12 @@
   }
 
   .acclaim-2 {
-    top: 55px;
+    /* top: 55px; */
     right: 75px;
     width: 36px;
     height: 35px;
     background-image: url('./img/acclaim-2.png');
-    animation: cheer-2 800ms infinite;
+    animation: toTop 800ms 1;
   }
 
   @keyframes cheer-2 {
@@ -73,7 +152,7 @@
     width: 86px;
     height: 34px;
     background-image: url('./img/acclaim-3.png');
-    animation: cheer-3 900ms infinite alternate-reverse;
+    animation: toTop 900ms 1;
   }
 
   @keyframes cheer-3 {
@@ -90,7 +169,7 @@
     width: 86px;
     height: 34px;
     background-image: url('./img/acclaim-4.png');
-    animation: cheer-4 2000ms infinite alternate-reverse linear;
+    animation: toTop 2000ms 1 alternate-reverse linear;
   }
 
   @keyframes cheer-4 {
@@ -108,12 +187,12 @@
   }
 
   .acclaim-5 {
-    top: 45px;
+    /* top: 45px; */
     left: 30px;
     width: 151px;
     height: 24px;
     background-image: url('./img/acclaim-5.png');
-    animation: cheer-5 1000ms infinite;
+    animation: toTop 1000ms 1;
   }
 
   @keyframes cheer-5 {
@@ -129,7 +208,7 @@
     width: 67px;
     height: 38px;
     background-image: url('./img/acclaim-6.png');
-    animation: cheer-6 950ms infinite alternate-reverse;
+    animation: toTop 950ms 1 alternate-reverse;
   }
   @keyframes cheer-6 {
     from {
@@ -145,7 +224,7 @@
     width: 79px;
     height: 41px;
     background-image: url('./img/acclaim-7.png');
-    animation: cheer-7 750ms infinite alternate-reverse;
+    animation: toTop 750ms 1 alternate-reverse;
   }
 
   @keyframes cheer-7 {
@@ -156,6 +235,14 @@
     }
     to {
       top: 55px;
+    }
+  }
+  @keyframes toTop {
+    from {
+      top: 200px;
+    }
+    to {
+      top: -20px;
     }
   }
 </style>
