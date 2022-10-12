@@ -59,7 +59,6 @@
             value: data.lottery_user_name
           });
           this.submitInfo.push({
-            // label: 'Phone Number:',
             label: this.$t('interact_tools.interact_tools_1096') + ':',
             value: data.lottery_user_phone
           });
@@ -137,7 +136,7 @@
     .submit-content-label {
       box-sizing: border-box;
       display: inline-block;
-      width: 112px;
+      width: 84px;
       height: 22px;
       color: #8c8c8c;
     }

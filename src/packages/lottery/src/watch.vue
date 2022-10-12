@@ -1,7 +1,7 @@
 <template>
   <div
     class="vhall-lottery-wap"
-    v-if="visible"
+    v-if="dialogVisible"
     :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
   >
     <div class="lottery-content-container">

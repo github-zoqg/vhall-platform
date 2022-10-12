@@ -4,7 +4,7 @@
     <span class="ribbon ribbon-2 flutter-2"></span>
     <span class="ribbon ribbon-3 flutter-3"></span>
     <span class="ribbon ribbon-4 flutter-4"></span>
-    <span class="ribbon ribbon-5 flutter-1"></span>
+    <span class="ribbon ribbon-5 flutter-5"></span>
   </div>
 </template>
 
@@ -13,22 +13,21 @@
     position: relative;
     width: 160px;
     height: 90px;
-    /* pointer-events: none; */
-    background: red;
+    pointer-events: none;
+    /* background: black; */
   }
 
   .ribbon {
     position: absolute;
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     background-repeat: no-repeat;
     background-size: contain;
     opacity: 0;
   }
 
   .ribbon-1 {
-    transform: rotate(270deg);
     background-image: url('./img/ribbon-2.png');
   }
 
@@ -40,23 +39,21 @@
   @keyframes flutter-1 {
     0% {
       opacity: 1;
-      top: 190px;
-      left: 60px;
+      top: 35px;
+      left: 35px;
     }
     75% {
       opacity: 1;
     }
     100% {
-      top: 240px;
-      left: 10px;
+      top: 30px;
+      left: 20px;
       opacity: 0;
     }
   }
 
   .ribbon-2 {
-    width: 10px;
-    height: 10px;
-    background-image: url('./img/ribbon-2.png');
+    background-image: url('./img/ribbon-4.png');
   }
 
   .flutter-2 {
@@ -66,95 +63,92 @@
   @keyframes flutter-2 {
     0% {
       opacity: 1;
-      top: 80px;
-      left: 80px;
+      top: 65px;
+      left: 30px;
     }
     75% {
       opacity: 1;
     }
     100% {
-      top: 50px;
-      left: 0;
+      top: 70px;
+      left: 15px;
       opacity: 0;
     }
   }
 
   .ribbon-3 {
-    width: 12px;
-    height: 12px;
-    background-image: url('./img/ribbon-1.png');
+    background-image: url('./img/ribbon-5.png');
   }
 
   .flutter-3 {
-    animation: flutter-3 1s linear infinite;
-    /* animation: flutter-3 1s linear 1; */
+    /* animation: flutter-3 1s linear infinite; */
+    animation: flutter-3 1s linear 1;
   }
 
   @keyframes flutter-3 {
     0% {
       opacity: 1;
-      top: 100px;
-      left: 120px;
+      top: 20px;
+      left: 30px;
     }
     75% {
       opacity: 1;
     }
     100% {
-      top: 60px;
-      left: 80px;
+      top: 10px;
+      left: 10px;
       opacity: 0;
     }
   }
 
   .ribbon-4 {
-    width: 12px;
-    height: 12px;
-    transform: rotate(135deg);
-    background-image: url('./img/ribbon-3.png');
+    transform: rotate(45deg) scale(0.8);
+    background-image: url('./img/ribbon-5.png');
   }
 
   .flutter-4 {
-    animation: flutter-4 1s linear infinite;
-    /* animation: flutter-4 1s linear 1; */
+    /* animation: flutter-4 1s linear infinite; */
+    animation: flutter-4 1s linear 1;
   }
 
   @keyframes flutter-4 {
     0% {
       opacity: 1;
-      top: 160px;
+      top: 60px;
       left: 110px;
     }
     75% {
       opacity: 1;
     }
     100% {
-      top: 210px;
-      left: 70px;
+      top: 70px;
+      left: 130px;
       opacity: 0;
     }
   }
 
   .ribbon-5 {
-    background-image: url('./img/ribbon-4.png');
+    transform: rotate(135deg) scale(0.8);
+    background-image: url('./img/ribbon-3.png');
   }
 
   .flutter-5 {
-    animation: flutter-5 1s linear infinite;
-    /* animation: flutter-5 1s linear 1; */
+    /* animation: flutter-5 1s linear infinite; */
+    animation: flutter-5 1s linear 1;
   }
 
   @keyframes flutter-5 {
     0% {
       opacity: 1;
-      top: 150px;
+      top: 25px;
       left: 120px;
     }
     75% {
       opacity: 1;
     }
     100% {
-      top: 130px;
-      left: 20px;
+      top: 20px;
+      left: 140px;
       opacity: 0;
     }
   }

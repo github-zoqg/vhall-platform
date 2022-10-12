@@ -39,7 +39,6 @@
 
     .ribbon-panel {
       position: absolute;
-      background: red;
       top: 30px;
       left: 50%;
       transform: translate(-50%);

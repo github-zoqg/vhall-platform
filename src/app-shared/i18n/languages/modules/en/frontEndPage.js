@@ -568,8 +568,8 @@ export default {
     interact_tools_1093: 'won the prize "{n}"',
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
-    interact_tools_1096: 'Phone Number',
-    interact_tools_1097: 'Adress'
+    interact_tools_1096: 'Phone',
+    interact_tools_1097: 'Address'
   },
   setting: {
     setting_1002: 'View settings',
