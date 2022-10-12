@@ -34,7 +34,7 @@
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   import skins from '@/app-shared/skins/watch';
-  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+  // import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
 
   export default {
     name: 'Home',
