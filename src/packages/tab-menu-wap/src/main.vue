@@ -143,10 +143,13 @@
           conciseVisibleMenu = otherVisibleMenu.filter(item => {
             // 如果是简洁模式，菜单抛开 - 聊天tab
             if (item.type == 3) return false;
+            // 如果是简洁模式，并且 连麦+演示是 合并模式 - 不展示文档tab
+            if (this.speakerAndShowLayout == 1 && item.type == 2) return false;
             return item.visible === true;
           });
         }
         let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        console.log('当前菜单个数', visibleMenu.length, this.menu);
         if (this.isConcise) {
           // // 告知外部当前可展示的自定义菜单个数
           window.$middleEventSdk?.event?.send(
@@ -205,6 +208,17 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return !!(skin_json_wap?.style == 3);
+      },
+      // 当前连麦+演示模式：0分离模式；1合并模式
+      speakerAndShowLayout() {
+        let skin_json_wap = {
+          speakerAndShowLayout: 0
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return skin_json_wap?.speakerAndShowLayout;
       }
     },
     watch: {
@@ -388,8 +402,13 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
+          console.log('当前私聊消息');
           if (this.webinarInfo.type == 1) {
+            // 如果是直播中，才展示。1-直播中，2-预约，3-结束，4-点播，5-回放
             this.setVisible({ visible: true, type: 'private' });
+            if (this.visibleMenu.length == 1) {
+              this.selectDefault();
+            }
           }
         });
 
@@ -716,6 +735,10 @@
       async menuDialogComputed() {
         if (this.isEmbedVideo) return;
         await this.$nextTick();
+        if (this.visibleMenu.length == 1) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+        }
         this.scrollToItem({ id: this.selectedId });
         this.computedWidth();
       }
