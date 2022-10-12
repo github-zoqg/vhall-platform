@@ -478,7 +478,8 @@
       ['docServer.state.switchStatus'](newval) {
         if (this.isWatch && [4, 5].includes(this.webinarType)) {
           // 如果是回放会点播,文档显示与不显示是切换处理
-          if (newval) {
+          // 如果当前场次开启云渲染，不能把播放器设为小屏
+          if (newval && this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout != 1) {
             useRoomBaseServer().setChangeElement('player');
           } else {
             // 文档不可见设置小屏''

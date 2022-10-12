@@ -114,7 +114,9 @@
     },
     created() {
       window.interactTools = this;
-      this.childrenComp = window.$serverConfig[this.cuid].children;
+      if (this.isConcise) {
+        this.childrenComp = window.$serverConfig[this.cuid].children;
+      }
     },
     mounted() {
       this.joinInfoInGift = {

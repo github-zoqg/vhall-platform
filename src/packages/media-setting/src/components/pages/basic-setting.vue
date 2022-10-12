@@ -271,6 +271,7 @@
     .vmp-media-setting-item__content {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
 
       .vmp-media-setting-item-layout__item {
         background-size: 100%;

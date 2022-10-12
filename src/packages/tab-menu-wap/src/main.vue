@@ -447,12 +447,15 @@
         });
       },
       changeDocStatus(val) {
-        this.setVisible({ visible: val, type: 2 });
-        if (val) {
-          const obj = this.getItem({ type: 2 });
-          this.select({ type: obj.type, id: obj.id });
-        } else {
-          this.roomBaseServer.state.isWapBodyDocSwitch = false;
+        // 如果开启了合并模式，自定义菜单不显示文档
+        if (this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout != 1) {
+          this.setVisible({ visible: val, type: 2 });
+          if (val) {
+            const obj = this.getItem({ type: 2 });
+            this.select({ type: obj.type, id: obj.id });
+          } else {
+            this.roomBaseServer.state.isWapBodyDocSwitch = false;
+          }
         }
       },
       /**
@@ -471,6 +474,13 @@
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         for (const item of list) {
+          // 如果是合并模式，需要把文档从自定义菜单中刨除去
+          if (
+            this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1 &&
+            item.type == 2
+          ) {
+            continue;
+          }
           this.addItem(item);
         }
 
