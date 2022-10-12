@@ -271,8 +271,8 @@
       overflow: hidden;
       &.order-1 {
         font-size: 24px;
-        width: 190px;
-        top: 610px;
+        width: 220px;
+        top: 640px;
         color: #fff1ce;
       }
       &.order-2 {
@@ -311,7 +311,7 @@
       top: 250px;
       left: 300px;
       &.order-1 {
-        top: 246px;
+        top: 236px;
         left: 260px;
         height: 120px;
         width: 120px;

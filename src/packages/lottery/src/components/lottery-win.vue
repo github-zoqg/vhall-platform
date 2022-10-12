@@ -188,7 +188,7 @@
     }
 
     .vmp-lottery-btn {
-      margin-top: -15px;
+      margin-top: -20px;
     }
     @keyframes magnify {
       from {

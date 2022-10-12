@@ -132,11 +132,6 @@
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
               this.lotteryServer.initIconStatus();
               this.$emit('navTo', 'LotterySuccess');
-              //   if (this.showWinnerList) {
-              //   } else {
-              //     this.$toast(this.$t('interact_tools.interact_tools_1013'));
-              //     this.$emit('close');
-              //   }
             } else {
               failure(res);
             }
@@ -181,11 +176,10 @@
     }
     .form-wrap {
       padding: 0 8px 48px; // 给滚动条样式留空间
-      margin: 32px 0 0;
     }
     .form {
       padding: 0 24px;
-      max-height: 640px;
+      max-height: 300px;
       overflow: auto;
     }
     .form-item {

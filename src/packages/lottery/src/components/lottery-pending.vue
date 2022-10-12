@@ -273,7 +273,6 @@
 </script>
 <style lang="less">
   .vmp-lottery-pending {
-    width: 440px;
     text-align: center;
     .acclaim-panel {
       width: 380px;
@@ -286,6 +285,7 @@
       width: 380px;
       height: 400px;
       position: relative;
+      margin: 0 auto;
     }
     .lottery-send-command-container {
       display: inline-block;
@@ -349,6 +349,7 @@
     }
     .vmp-lottery-pending-custom {
       text-align: center;
+      margin: 0 auto;
     }
 
     #lottery-svga {
@@ -368,8 +369,8 @@
       overflow: hidden;
       &.order-1 {
         font-size: 12px;
-        width: 116px;
-        top: 335px;
+        width: 120px;
+        top: 341px;
       }
       &.order-2 {
         width: 162px;
@@ -404,6 +405,7 @@
       top: 250px;
       left: 300px;
       cursor: pointer;
+      // background: yellow;
       &.order-1 {
         top: 120px;
         left: 154px;

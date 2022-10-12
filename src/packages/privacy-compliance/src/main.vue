@@ -205,7 +205,7 @@
       }
       &.scene_lottery {
         width: 100%;
-        text-align: center;
+        // text-align: center;
         span {
           font-size: 12px;
           line-height: 17px;
@@ -233,9 +233,9 @@
       }
       &.client_mobile {
         &.scene_lottery {
-          &.language__en {
-            text-align: center;
-          }
+          // &.language__en {
+          // text-align: center;
+          // }
         }
         &.scene_signForm {
           &.language__en {
@@ -248,9 +248,9 @@
   @media (min-width: 375px) {
     .vmp-privacy-compliance {
       &.client_mobile {
-        &.scene_lottery {
-          text-align: center;
-        }
+        // &.scene_lottery {
+        // text-align: center;
+        // }
         &.scene_signForm {
           text-align: center;
         }

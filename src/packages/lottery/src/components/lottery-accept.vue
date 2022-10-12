@@ -250,7 +250,7 @@
       line-height: 1.5;
     }
     .vmp-lottery-btn {
-      margin-top: 10px;
+      margin-top: 16px;
       &.disabled {
         pointer-events: none;
         opacity: 0.4;

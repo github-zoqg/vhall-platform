@@ -145,7 +145,6 @@
     }
     .vmp-lottery-btn {
       margin-top: 42px;
-      width: 250px;
     }
   }
 </style>

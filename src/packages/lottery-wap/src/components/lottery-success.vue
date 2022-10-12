@@ -38,10 +38,11 @@
       transform: translate(-50%);
     }
     .submit-success-icon {
-      margin: 20px auto 0;
+      margin: 16px auto 0;
       width: 185px;
-      height: 195px;
-      left: 10px; // 图片问题,手动偏移
+      height: 400px;
+      width: 248px;
+      height: 176px;
       background-image: url('../img/submit-success.png');
       background-size: contain;
     }

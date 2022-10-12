@@ -22,7 +22,7 @@
     line-height: 32px;
     color: #fef8f4;
     letter-spacing: 0;
-    -webkit-text-stroke: 6px #eb6a37;
+    -webkit-text-stroke: 6px #f52900;
     text-shadow: 0px 1px 1px rgba(197, 21, 14, 0.56);
     transform: matrix(0.99, 0, -0.15, 1, 0, 0);
     &::before {

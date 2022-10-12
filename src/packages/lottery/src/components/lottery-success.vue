@@ -46,10 +46,9 @@
 
     .submit-success-icon {
       position: relative;
-      left: 5px; // 图片问题,手动偏移
-      margin: 10px auto 0;
-      width: 95px;
-      height: 98px;
+      margin: 6px auto 0;
+      width: 124px;
+      height: 88px;
       background-image: url('../img/submit-success.png');
       background-size: contain;
     }

@@ -35,10 +35,10 @@
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      width: 456px;
-      height: 90px;
+      width: 480px;
+      height: 80px;
       position: absolute;
-      top: -21px;
+      top: -14px;
       left: 50%;
       transform: translate(-50%);
       background-image: url('../img/title-panel.png');
@@ -47,12 +47,12 @@
       background-size: contain;
       text-align: center;
       line-height: 90px;
-      font-weight: 500;
       font-size: 32px;
       color: #ad2000;
     }
     .content {
       margin: 0 15px;
+      font-weight: 500;
     }
     .intersperse {
       display: inline-block;

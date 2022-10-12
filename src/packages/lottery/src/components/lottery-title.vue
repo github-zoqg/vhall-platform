@@ -28,7 +28,7 @@
     position: relative;
     background: transparent;
     width: 100%;
-    height: 36px; // 占位.实际大小48
+    height: 30px; // 占位.实际大小36
     overflow: visible;
 
     .title-panel {
@@ -36,7 +36,7 @@
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      width: 198px;
+      width: 216px;
       height: 36px;
       position: absolute;
       top: -30px;

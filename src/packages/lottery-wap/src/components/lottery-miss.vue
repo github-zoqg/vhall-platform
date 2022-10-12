@@ -36,8 +36,8 @@
     width: 640px;
     // height: 524px;
     .no-win-lottery-img {
-      width: 220px;
-      height: 220px;
+      width: 180px;
+      height: 180px;
       margin: 0 auto;
       background-image: url('../img/lottery-miss.png');
       background-size: contain;
@@ -52,13 +52,13 @@
       color: #262626;
     }
     .no-win-tip {
-      margin-top: 23px;
+      margin-top: 16px;
       font-size: 28px;
       line-height: 40px;
       color: #262626;
     }
     .vmp-lottery-btn {
-      margin-top: 50px;
+      margin-top: 64px;
     }
   }
 </style>
