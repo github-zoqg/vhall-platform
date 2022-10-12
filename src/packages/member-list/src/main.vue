@@ -1306,7 +1306,7 @@
             if (data.type === 8) {
               // 如果是成员列表
               _this.$nextTick(function () {
-                _this.refresh()
+                _this.refresh();
               });
             }
           });
