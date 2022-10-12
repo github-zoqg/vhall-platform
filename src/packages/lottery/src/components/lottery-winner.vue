@@ -32,6 +32,7 @@
   import Ribbon from '../art/ribbon/winner.vue';
   import LotteryTitle from './lottery-title.vue';
   import props from './props';
+  import '@/app-shared/assets/css/D-DIN-Bold/stylesheet.css';
   export default {
     name: 'LotteryWinner',
     mixins: [props],
@@ -158,6 +159,7 @@
       width: 24px;
       font-weight: 700;
       font-size: 14px;
+      font-family: 'D-DIN';
     }
     .lottery-user {
       height: 44px;
