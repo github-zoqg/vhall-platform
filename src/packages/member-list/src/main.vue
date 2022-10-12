@@ -303,8 +303,11 @@
     },
     created() {
       this.totalNumTxt = this.totalNum;
+      this.initMenuServerEvent();
     },
-    beforeDestroy() {},
+    beforeDestroy() {
+      this.removeMenuServerEvent();
+    },
     async mounted() {
       //初始化配置
       this.initConfig();
@@ -1301,15 +1304,6 @@
               this._deleteUser(msg.data.target_id, this.onlineUsers, 'onlineUsers');
             }
           }
-          // 选中当前面板,需要更新bs的高度计算
-          _this.menuServer.$on('tab-switched', data => {
-            if (data.type === 8) {
-              // 如果是成员列表
-              _this.$nextTick(function () {
-                _this.refresh();
-              });
-            }
-          });
         }
 
         //演示权限变更
@@ -1974,6 +1968,20 @@
           (preVal, curVal) => preVal + curVal.group_joins.length,
           0
         );
+      },
+      handleTabSwitched(data) {
+        if (data.type === 8) {
+          // 如果是成员列表
+          this.$nextTick(() => {
+            this.refresh();
+          });
+        }
+      },
+      initMenuServerEvent() {
+        this.menuServer.$on('tab-switched', this.handleTabSwitched);
+      },
+      removeMenuServerEvent() {
+        this.menuServer.$ff('tab-switched', this.handleTabSwitched);
       }
     }
   };
