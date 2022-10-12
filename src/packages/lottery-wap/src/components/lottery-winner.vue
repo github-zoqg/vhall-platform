@@ -8,7 +8,7 @@
       />
       <p class="award-name">
         <i18n path="interact_tools.interact_tools_1093">
-          <span class="n" place="n">{{ fitment.name || '奖品' }}</span>
+          <span class="n" place="n">{{ (prizeInfo && prizeInfo.award_name) || '奖品' }}</span>
         </i18n>
       </p>
     </div>
