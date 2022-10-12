@@ -155,7 +155,7 @@
 
 <style lang="less" scoped>
   .icon-wrap {
-    margin-bottom: 10px;
+    // margin-bottom: 10px;
     width: 84px;
     height: 84px;
     position: relative;
