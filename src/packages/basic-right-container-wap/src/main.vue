@@ -128,7 +128,7 @@
       flex-direction: column;
       position: absolute;
       display: inline-block;
-      right: 28px;
+      right: 24px;
       bottom: 108px;
       // width: 20px;
       .icon-wrap {

@@ -1,36 +1,37 @@
 <template>
   <section class="vmp-intro">
-    <section class="vmp-intro-main" :class="{ 'vmp-intor-haveIcon': showIconNum }">
-      <section class="vmp-intro-block">
-        <header class="vmp-intro-block__headtitle">
-          <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
-            <img :src="noDelayIconUrl" />
-          </i>
-          {{ languagesInfo.subject }}
-        </header>
-        <main class="vmp-intro-block__detail">
-          <p>
-            <!-- <i class="vh-iconfont vh-line-time" /> -->
-            {{ startTime }}
-          </p>
-          <!-- 预约人数 -->
-          <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p class="num" v-if="watchInitData.subscribe.show">
-              <i18n path="appointment.appointment_1018">
-                <span place="n">{{ watchInitData.subscribe.num }}</span>
-              </i18n>
+    <section class="vmp-intro-main">
+      <div :class="{ 'vmp-intor-haveIcon': showIconNum }">
+        <section class="vmp-intro-block">
+          <header class="vmp-intro-block__headtitle">
+            <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
+              <img :src="noDelayIconUrl" />
+            </i>
+            {{ languagesInfo.subject }}
+          </header>
+          <main class="vmp-intro-block__detail">
+            <p>
+              <!-- <i class="vh-iconfont vh-line-time" /> -->
+              {{ startTime }}
             </p>
-          </template>
-          <!-- 在线人数 -->
-          <template v-if="watchInitData.status != 'subscribe'">
-            <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-            <p v-if="watchInitData.online.show">
-              <i class="vh-iconfont vh-line-group"></i>
-              {{ personCountTxt | formatHotNum }}
-            </p>
-          </template>
-        </main>
-        <!-- <div
+            <!-- 预约人数 -->
+            <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
+              <p class="num" v-if="watchInitData.subscribe.show">
+                <i18n path="appointment.appointment_1018">
+                  <span place="n">{{ watchInitData.subscribe.num }}</span>
+                </i18n>
+              </p>
+            </template>
+            <!-- 在线人数 -->
+            <template v-if="watchInitData.status != 'subscribe'">
+              <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+              <p v-if="watchInitData.online.show">
+                <i class="vh-iconfont vh-line-group"></i>
+                {{ personCountTxt | formatHotNum }}
+              </p>
+            </template>
+          </main>
+          <!-- <div
           class="vmp-intro-block__auth"
           v-if="
             !isEmbed &&
@@ -61,11 +62,12 @@
             }}
           </span>
         </div> -->
-      </section>
-      <section class="vmp-intro-block vmp-intro-block-content">
-        <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
-        <main class="vmp-intro-block__content-main" v-html="content"></main>
-      </section>
+        </section>
+        <section class="vmp-intro-block vmp-intro-block-content">
+          <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
+          <main class="vmp-intro-block__content-main" v-html="content"></main>
+        </section>
+      </div>
       <aside>
         <a
           class="vmp-intro-link"
@@ -173,7 +175,7 @@
     flex-direction: column;
 
     .vmp-intor-haveIcon {
-      width: calc(100% - 96px);
+      width: calc(100% - 82px);
       .vmp-intro-block-content,
       .vmp-intro-block {
         padding-right: 0;
