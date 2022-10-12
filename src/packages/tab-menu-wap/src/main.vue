@@ -56,7 +56,7 @@
     </div>
 
     <!-- 正文区域 -->
-    <section class="vmp-tab-menu__main">
+    <section class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content
         ref="tabContent"
         :menu="isConcise ? conciseMenu : menu"
@@ -369,6 +369,10 @@
             type: msg.data.type,
             interactStatus: true
           });
+          if (this.visibleMenu.length == 1) {
+            // 默认显示菜单中的第一个
+            this.selectDefault();
+          }
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
