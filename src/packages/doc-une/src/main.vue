@@ -446,18 +446,18 @@
          * 6.存在文档id
          * 7.开启文档融屏功能
          */
-        const status =
+        const docStatus = this.$domainStore.state.docServer.switchStatus && this.docLoadComplete;
+        const precondition =
           (this.isHostPermission || this.isGroupLeader) &&
-          this.$domainStore.state.docServer.switchStatus &&
           (this.$domainStore.state.interactiveServer.isInstanceInit || this.isOpenSplitScreen) &&
           this.webinarType == 1 &&
-          this.docLoadComplete &&
           !!this.watchInitData.interact.channel_id &&
           !!this.$domainStore.state.docServer.currentCid &&
           this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1;
 
         console.table({
-          status,
+          docStatus,
+          precondition,
           isHostPermission: this.isHostPermission,
           isGroupLeader: this.isGroupLeader,
           switchStatus: this.$domainStore.state.docServer.switchStatus,
@@ -470,7 +470,10 @@
           speakerAndShowLayout: this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout
         });
 
-        return status;
+        return {
+          docStatus,
+          precondition
+        };
       }
     },
     watch: {
@@ -478,7 +481,8 @@
       ['docServer.state.switchStatus'](newval) {
         if (this.isWatch && [4, 5].includes(this.webinarType)) {
           // 如果是回放会点播,文档显示与不显示是切换处理
-          if (newval) {
+          // 如果当前场次开启云渲染，不能把播放器设为小屏
+          if (newval && this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout != 1) {
             useRoomBaseServer().setChangeElement('player');
           } else {
             // 文档不可见设置小屏''
@@ -526,9 +530,13 @@
       // 开启文档云融屏
       isOpenDocStream: {
         handler(newval) {
-          if (newval) {
+          // 开启融屏的前置条件是否满足
+          if (!newval.precondition) return;
+          if (newval.docStatus) {
+            console.log('open-doc-yun-stream');
             this.openDocYunStream();
-          } else if (this.isHostPermission || this.isGroupLeader) {
+          } else {
+            console.log('close-doc-yun-stream');
             this.closeDocYunStream();
           }
         },
