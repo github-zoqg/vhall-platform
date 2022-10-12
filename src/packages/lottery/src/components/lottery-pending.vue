@@ -23,7 +23,7 @@
       <div v-if="needJoin && mode === 'watch'" class="lottery-send-command-container">
         <span class="lottery-send-command">
           <i18n path="interact_tools.interact_tools_1065" tag="p">
-            <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
+            <span class="lottery-command" place="n">{{ `"${lotteryInfo.command}"` }}</span>
           </i18n>
         </span>
       </div>
@@ -112,7 +112,6 @@
       disabledTime: {
         type: Number,
         default() {
-          // return 0;
           return 5;
         }
       }
@@ -284,16 +283,22 @@
       position: relative;
     }
     .lottery-send-command-container {
+      box-sizing: border-box;
       width: 100%;
       position: absolute;
-      top: -26px;
+      top: -50px;
       text-align: center;
+      padding: 4px 0;
+      background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
+      background-color: rgba(initial, 0.65;);
+      box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
+      border-radius: 13px;
       &::before {
         // 大的⭐️
         content: '';
         display: inline-block;
         position: absolute;
-        right: 5px;
+        right: -12px;
         bottom: -10px;
         width: 20px;
         height: 25px;
@@ -305,8 +310,8 @@
         content: '';
         display: inline-block;
         position: absolute;
-        right: 0;
-        top: 40%;
+        right: -16px;
+        bottom: 0;
         width: 8px;
         height: 15px;
         background-image: url('../img/star-2.png');
@@ -316,14 +321,9 @@
     }
     .lottery-send-command {
       display: inline-block;
-      height: 26px;
-      line-height: 26px;
       padding: 0 12px;
-      background: linear-gradient(89.99deg, #ff1d00 -5.26%, rgba(255, 79, 57, 0.2) 83.45%);
-      opacity: 0.65;
-      box-shadow: inset 0px 2px 4px rgba(255, 255, 255, 0.25);
-      border-radius: 13px;
       color: #fce09e;
+      font-size: 14px;
     }
     .lottery-command {
       color: #fff;

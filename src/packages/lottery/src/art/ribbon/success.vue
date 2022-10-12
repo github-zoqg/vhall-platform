@@ -5,16 +5,16 @@
     <span class="ribbon ribbon-3 flutter-3"></span>
     <span class="ribbon ribbon-4 flutter-4"></span>
     <span class="ribbon ribbon-5 flutter-1"></span>
-    <span class="ribbon ribbon-6 flutter-2"></span>
   </div>
 </template>
 
 <style lang="css" scoped>
   .wrap {
     position: relative;
-    height: 200px;
-    width: 100%;
-    pointer-events: none;
+    width: 160px;
+    height: 90px;
+    /* pointer-events: none; */
+    background: red;
   }
 
   .ribbon {
@@ -25,83 +25,137 @@
     background-repeat: no-repeat;
     background-size: contain;
     opacity: 0;
-    /* animation: flutter 2400ms linear infinite; */
-  }
-
-  .flutter-1 {
-    animation: flutter 2400ms linear infinite;
-    /* animation: flutter 2400ms linear; */
-  }
-  .flutter-2 {
-    animation: flutter 1800ms linear infinite;
-    /* animation: flutter 1800ms linear; */
-  }
-  .flutter-3 {
-    animation: flutter 1500ms linear infinite;
-    /* animation: flutter 1500ms linear; */
-  }
-  .flutter-4 {
-    /* animation: flutter 2000ms linear; */
-    animation: flutter 2000ms linear infinite;
   }
 
   .ribbon-1 {
-    left: 10px;
-    background-image: url('./img/ribbon-1.png');
-  }
-
-  .ribbon-2 {
-    left: 130px;
+    transform: rotate(270deg);
     background-image: url('./img/ribbon-2.png');
   }
 
+  .flutter-1 {
+    /* animation: flutter-1 1s linear infinite; */
+    animation: flutter-1 1s linear 1;
+  }
+
+  @keyframes flutter-1 {
+    0% {
+      opacity: 1;
+      top: 190px;
+      left: 60px;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      top: 240px;
+      left: 10px;
+      opacity: 0;
+    }
+  }
+
+  .ribbon-2 {
+    width: 10px;
+    height: 10px;
+    background-image: url('./img/ribbon-2.png');
+  }
+
+  .flutter-2 {
+    /* animation: flutter-2 1s linear infinite; */
+    animation: flutter-2 1s linear 1;
+  }
+  @keyframes flutter-2 {
+    0% {
+      opacity: 1;
+      top: 80px;
+      left: 80px;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      top: 50px;
+      left: 0;
+      opacity: 0;
+    }
+  }
+
   .ribbon-3 {
-    left: 70px;
-    background-image: url('./img/ribbon-3.png');
+    width: 12px;
+    height: 12px;
+    background-image: url('./img/ribbon-1.png');
+  }
+
+  .flutter-3 {
+    animation: flutter-3 1s linear infinite;
+    /* animation: flutter-3 1s linear 1; */
+  }
+
+  @keyframes flutter-3 {
+    0% {
+      opacity: 1;
+      top: 100px;
+      left: 120px;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      top: 60px;
+      left: 80px;
+      opacity: 0;
+    }
   }
 
   .ribbon-4 {
-    left: 210px;
-    background-image: url('./img/ribbon-4.png');
+    width: 12px;
+    height: 12px;
+    transform: rotate(135deg);
+    background-image: url('./img/ribbon-3.png');
+  }
+
+  .flutter-4 {
+    animation: flutter-4 1s linear infinite;
+    /* animation: flutter-4 1s linear 1; */
+  }
+
+  @keyframes flutter-4 {
+    0% {
+      opacity: 1;
+      top: 160px;
+      left: 110px;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      top: 210px;
+      left: 70px;
+      opacity: 0;
+    }
   }
 
   .ribbon-5 {
-    left: 300px;
-    background-image: url('./img/ribbon-5.png');
+    background-image: url('./img/ribbon-4.png');
   }
 
-  .ribbon-6 {
-    left: 410px;
-    background-image: url('./img/ribbon-6.png');
+  .flutter-5 {
+    animation: flutter-5 1s linear infinite;
+    /* animation: flutter-5 1s linear 1; */
   }
 
-  @keyframes flutter {
+  @keyframes flutter-5 {
     0% {
       opacity: 1;
-      top: 0;
-      /*opacity: 0;*/
-      /*transform: skew(20deg);*/
-    }
-    25% {
-      /*top: 0;*/
-      /*opacity: 0;*/
-      transform: rotateX(90deg) rotateY(20deg);
-      /*transform: rotateX(90deg) rotateY(20deg) skew(-20deg);*/
-    }
-    50% {
-      top: 100px;
-      /*transform: translate3d(100% 100% 1);*/
-      transform: rotateX(180deg) rotateY(110deg);
+      top: 150px;
+      left: 120px;
     }
     75% {
-      transform: rotateX(240deg) rotateY(200deg);
-      /*transform: rotateX(240deg) rotateY(200deg) skew(-20deg);*/
-      /*opacity: 0;*/
+      opacity: 1;
     }
     100% {
-      top: 200px;
-      transform: rotateX(360deg) rotateY(290deg);
-      opacity: 1;
+      top: 130px;
+      left: 20px;
+      opacity: 0;
     }
   }
 </style>
