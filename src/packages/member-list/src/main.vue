@@ -1981,7 +1981,7 @@
         this.menuServer.$on('tab-switched', this.handleTabSwitched);
       },
       removeMenuServerEvent() {
-        this.menuServer.$ff('tab-switched', this.handleTabSwitched);
+        this.menuServer.$off('tab-switched', this.handleTabSwitched);
       }
     }
   };
