@@ -129,6 +129,7 @@
         width: 80px;
         height: 80px;
         border-radius: 12px;
+        border: 1px solid #d9d9d9;
       }
       &__content {
         flex: 1;

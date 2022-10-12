@@ -1,17 +1,15 @@
 <template>
   <div class="vmp-lottery-pending">
+    <div v-if="needJoin" class="lottery-send-command-container">
+      <span class="lottery-send-command">
+        <i18n path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
+        </i18n>
+      </span>
+    </div>
     <!-- 自定义图片的抽奖样式 -->
     <template v-if="isCustom">
       <div class="vmp-lottery-pending-custom">
-        <!-- 标题 -->
-        <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
-        <!-- 发送参与 -->
-        <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
-          <span class="lottery-remark" place="n">{{ command }}</span>
-        </i18n>
-        <p v-else class="lottery-remark">
-          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-        </p>
         <div class="lottery-pending-animation">
           <img class="lottery-pending-animation-img" :src="fitment.url" alt />
         </div>
@@ -22,13 +20,6 @@
     </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
-      <div v-if="needJoin" class="lottery-send-command-container">
-        <span class="lottery-send-command">
-          <i18n path="interact_tools.interact_tools_1065" tag="p">
-            <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
-          </i18n>
-        </span>
-      </div>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
@@ -202,17 +193,18 @@
 </script>
 <style lang="less">
   .vmp-lottery-pending {
+    text-align: center;
     .vmp-lottery-pending-container {
       width: 640px;
       height: 760px;
       position: relative;
     }
     .lottery-send-command-container {
-      width: 100%;
-      position: absolute;
-      top: -92px;
+      display: inline-block;
+      position: relative;
       text-align: center;
       padding: 8px 0;
+      margin-bottom: 44px;
       background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
       background-color: rgba(initial, 0.65;);
       box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
@@ -257,8 +249,8 @@
       height: 100%;
     }
     .lottery-pending-animation {
-      width: 380px;
-      height: 400px;
+      width: 640px;
+      height: 640px;
       .lottery-pending-animation-img {
         display: inline-block;
         width: 100%;
@@ -336,6 +328,10 @@
         height: 100px;
         width: 180px;
       }
+    }
+    .vmp-lottery-btn {
+      display: block;
+      margin: 32px auto 0;
     }
   }
 </style>

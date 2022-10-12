@@ -1,15 +1,22 @@
 <template>
   <div class="vmp-lottery-pending">
     <!-- 自定义图片的抽奖样式 -->
+    <div v-if="needJoin && mode === 'watch'" class="lottery-send-command-container">
+      <span class="lottery-send-command">
+        <i18n path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-command" place="n">{{ `"${lotteryInfo.command}"` }}</span>
+        </i18n>
+      </span>
+    </div>
     <template v-if="isCustom">
       <div class="vmp-lottery-pending-custom">
         <!-- 发送参与 -->
-        <i18n v-if="needJoin && mode === 'watch'" path="interact_tools.interact_tools_1065" tag="p">
+        <!-- <i18n v-if="needJoin && mode === 'watch'" path="interact_tools.interact_tools_1065" tag="p">
           <span class="lottery-remark-custom" place="n">{{ command }}</span>
         </i18n>
         <p v-else class="lottery-remark-custom">
           {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-        </p>
+        </p> -->
         <div class="lottery-pending-animation">
           <img class="lottery-pending-animation-img" :src="fitment.url" alt />
         </div>
@@ -20,14 +27,10 @@
     </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
-      <div v-if="needJoin && mode === 'watch'" class="lottery-send-command-container">
-        <span class="lottery-send-command">
-          <i18n path="interact_tools.interact_tools_1065" tag="p">
-            <span class="lottery-command" place="n">{{ `"${lotteryInfo.command}"` }}</span>
-          </i18n>
-        </span>
-      </div>
-      <acclaim v-else-if="inProgress && mode !== 'live'" class="acclaim-panel"></acclaim>
+      <acclaim
+        v-if="!needJoin && mode !== 'watch' && inProgress && mode !== 'live'"
+        class="acclaim-panel"
+      ></acclaim>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
@@ -270,6 +273,8 @@
 </script>
 <style lang="less">
   .vmp-lottery-pending {
+    width: 440px;
+    text-align: center;
     .acclaim-panel {
       width: 380px;
       height: 200px;
@@ -283,16 +288,16 @@
       position: relative;
     }
     .lottery-send-command-container {
+      display: inline-block;
+      position: relative;
       box-sizing: border-box;
-      width: 100%;
-      position: absolute;
-      top: -50px;
       text-align: center;
       padding: 4px 0;
       background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
       background-color: rgba(initial, 0.65;);
       box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
       border-radius: 13px;
+      margin-bottom: 24px;
       &::before {
         // 大的⭐️
         content: '';
@@ -330,8 +335,8 @@
     }
     .lottery-pending-animation {
       display: inline-block;
-      width: 380px;
-      height: 400px;
+      width: 328px;
+      height: 328px;
       .lottery-pending-animation-img {
         display: inline-block;
         width: 100%;
