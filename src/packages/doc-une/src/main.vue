@@ -539,8 +539,7 @@
             console.log('close-doc-yun-stream');
             this.closeDocYunStream();
           }
-        },
-        immediate: true
+        }
       }
     },
     beforeCreate() {

@@ -25,13 +25,19 @@
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
+      <div
+        v-show="isDocMainScreen"
+        class="vmp-stream-list__remote-container vmp-stream-list__main-screen doc-main-screen"
+      >
+        <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+      </div>
       <template v-if="remoteSpeakers.length">
         <div
           v-for="speaker in remoteSpeakers"
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen && !isDocMainScreen,
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
@@ -76,6 +82,7 @@
       </div>
       <!-- 进入全屏 -->
       <div
+        v-if="!isDocMainScreen"
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
@@ -292,6 +299,18 @@
           skinJsonWap = skinInfo.skin_json_wap;
         }
         return skinJsonWap?.videoBackGroundColor || '#000';
+      },
+      // 是否开启文档主画面
+      isDocMainScreen() {
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.docServer.docLoadComplete &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.roomBaseServer.watchInitData.interact.channel_id &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+        );
       }
     },
     watch: {
@@ -770,7 +789,10 @@
         top: 0;
       }
     }
-
+    .doc-main-screen {
+      display: flex;
+      justify-content: center;
+    }
     // 未上麦样式进行覆盖
     &-no-speack {
       display: flex;
