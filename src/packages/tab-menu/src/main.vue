@@ -40,7 +40,7 @@
       </span>
     </header>
 
-    <main class="vmp-tab-menu__main">
+    <main class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
     </main>
   </section>
@@ -211,6 +211,10 @@
             type: msg.data.type,
             interactStatus: true
           });
+          if (this.visibleMenu.length == 1) {
+            // 默认显示菜单中的第一个
+            this.selectDefault();
+          }
         });
         //收到问答关闭消息
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
@@ -228,6 +232,8 @@
             type: msg.data.type,
             interactStatus: true
           });
+          // 默认显示菜单中的第一个
+          this.selectDefault();
         });
         //收到问答修改消息
         qaServer.$on(qaServer.Events.QA_SET, msg => {
@@ -245,6 +251,9 @@
         chatServer.$on('receivePrivateMsg', () => {
           if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
+          }
+          if (this.visibleMenu.length == 1) {
+            this.selectDefault();
           }
         });
 
