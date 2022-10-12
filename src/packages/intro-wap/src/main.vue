@@ -173,7 +173,11 @@
     flex-direction: column;
 
     .vmp-intor-haveIcon {
-      width: calc(100% - 72px);
+      width: calc(100% - 96px);
+      .vmp-intro-block-content,
+      .vmp-intro-block {
+        padding-right: 0;
+      }
     }
 
     .vmp-intro-block {

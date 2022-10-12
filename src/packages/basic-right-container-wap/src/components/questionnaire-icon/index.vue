@@ -3,8 +3,14 @@
     class="icon-wrap"
     v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
   >
-    <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" />
-    <i class="dot" v-if="questionnaireServerState.dotVisible" />
+    <img
+      src="./images/questionnaire_no.png"
+      alt=""
+      @click="clickQuestionnaireIcon"
+      v-if="questionnaireServerState.dotVisible"
+    />
+    <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" v-else />
+    <!-- <i class="dot" v-if="questionnaireServerState.dotVisible" /> -->
     <!-- 问卷列表弹框 -->
     <div class="popup_base" v-if="showQuestionList"></div>
     <van-popup
@@ -46,7 +52,7 @@
   </div>
 </template>
 <script>
-  import { useQuestionnaireServer, useRoomBaseServer } from 'middle-domain';
+  import { useQuestionnaireServer } from 'middle-domain';
   export default {
     name: 'QuestionnaireIcon',
     data() {
@@ -75,8 +81,6 @@
             let arr = val.filter(item => item.is_answered == 0);
             if (arr.length > 0) {
               this.questionnaireServer.setDotVisible(true);
-              // 展示icon数量+1
-              this.roomBaseServer.setShowIconNum(true);
             } else {
               this.questionnaireServer.setDotVisible(false);
             }
@@ -91,7 +95,6 @@
       this.questionnaireServer = useQuestionnaireServer({
         mode: 'watch'
       });
-      this.roomBaseServer = useRoomBaseServer();
     },
     created() {
       this.questionnaireServer.checkIconStatus();

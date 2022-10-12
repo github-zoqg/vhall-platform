@@ -181,7 +181,7 @@
     height: 60px;
     position: relative;
     font-size: 28px;
-    background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+    // background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
     border-radius: 50%;
     img {
       width: 60px;

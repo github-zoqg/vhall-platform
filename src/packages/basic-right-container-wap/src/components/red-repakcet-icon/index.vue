@@ -1,7 +1,8 @@
 <template>
   <div class="icon-wrap" v-if="redPacketServerState.iconVisible" @click="checkRedPacketIcon">
-    <img src="./images/redPacket.png" alt="" />
-    <i class="dot" v-if="redPacketServerState.dotVisible" />
+    <img src="./images/redPacket_no.png" alt="" v-if="redPacketServerState.dotVisible" />
+    <img src="./images/redPacket.png" alt="" v-else />
+    <!-- <i class="dot" v-if="redPacketServerState.dotVisible" /> -->
   </div>
 </template>
 <script>

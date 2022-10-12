@@ -1,7 +1,14 @@
 <template>
   <div class="icon-wrap" v-if="lotteryServerState.iconVisible">
-    <img class="icon" src="./images/icon.png" alt="" @click="checkLotteryIcon" />
-    <i class="dot" v-if="lotteryServerState.docVisible" />
+    <img
+      class="icon"
+      src="./images/icon_no.png"
+      alt=""
+      @click="checkLotteryIcon"
+      v-if="lotteryServerState.docVisible"
+    />
+    <img class="icon" src="./images/icon.png" alt="" @click="checkLotteryIcon" v-else />
+    <!-- <i class="dot" v-if="lotteryServerState.docVisible" /> -->
   </div>
 </template>
 <script>

@@ -5,7 +5,7 @@
       <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <!-- 签到 -->
       <div class="icon-wrap" @click="handleSign" v-show="showSign && webinarType == 1">
-        <div class="have"></div>
+        <!-- <div class="have"></div> -->
         <img src="./image/icon.png" />
       </div>
       <!-- 抽奖 -->
@@ -22,8 +22,9 @@
       />
       <!-- 计时器 -->
       <div class="icon-wrap" @click="handleTimer" v-show="showTimer && webinarType == 1">
-        <div :class="!timerVisible ? 'have' : ''"></div>
-        <img src="./image/timer.png" />
+        <!-- <div :class="!timerVisible ? 'have' : ''"></div> -->
+        <img src="./image/timer.png" v-if="timerVisible" />
+        <img src="./image/timer_no.png" v-else />
       </div>
       <!-- 公告列表 -->
       <noticeList></noticeList>
@@ -127,7 +128,7 @@
       flex-direction: column;
       position: absolute;
       display: inline-block;
-      right: 24px;
+      right: 28px;
       bottom: 108px;
       // width: 20px;
       .icon-wrap {
