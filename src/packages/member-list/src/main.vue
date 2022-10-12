@@ -227,7 +227,8 @@
     useMemberServer,
     useInteractiveServer,
     useMsgServer,
-    useGroupServer
+    useGroupServer,
+    useMenuServer
   } from 'middle-domain';
   import { toSJIS } from 'qrcode/lib/core/utils';
   export default {
@@ -298,6 +299,7 @@
       this.memberServer = useMemberServer();
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
+      this.menuServer = useMenuServer();
     },
     created() {
       this.totalNumTxt = this.totalNum;
@@ -1299,6 +1301,15 @@
               this._deleteUser(msg.data.target_id, this.onlineUsers, 'onlineUsers');
             }
           }
+          // 选中当前面板,需要更新bs的高度计算
+          _this.menuServer.$on('tab-switched', data => {
+            if (data.type === 8) {
+              // 如果是成员列表
+              _this.$nextTick(function () {
+                _this.refresh()
+              });
+            }
+          });
         }
 
         //演示权限变更
