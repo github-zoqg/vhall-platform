@@ -2,13 +2,17 @@
   <div class="win-lottery">
     <div class="award-container">
       <div class="wordart-wrap">
-        <wordart class="wordart" :text="$t('interact_tools.interact_tools_1015')" />
+        <span class="star star-1"></span>
+        <span class="star star-2"></span>
+        <span class="star star-3"></span>
+        <wordart class="wordart nowarp" :text="$t('interact_tools.interact_tools_1015')" />
       </div>
       <div class="award-annulus"></div>
       <div class="gold-cion-bg"></div>
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
       <div class="award-img-outer-annular"></div>
       <div class="award-img-inner-annular"></div>
-      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt />
+      <ribbon class="ribbon-container" />
       <p class="win-award-tip-container">
         <span class="win-award-tip">
           {{ $t('interact_tools.interact_tools_1016') }}"{{
@@ -28,12 +32,14 @@
 </template>
 <script>
   import props from './props';
-  import wordart from './wordart';
+  import wordart from '../art/wordart/index.vue';
+  import ribbon from '../art/ribbon/win.vue';
   export default {
     name: 'LotteryWin',
     mixins: [props],
     components: {
-      wordart
+      wordart,
+      ribbon
     },
     methods: {
       acceptLottery() {
@@ -69,9 +75,36 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-    }
-    .wordart {
-      letter-spacing: 10px;
+
+      .star {
+        display: inline-block;
+        position: absolute;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        z-index: 2;
+      }
+      .star-1 {
+        top: 12px;
+        left: -40px;
+        width: 28px;
+        height: 36px;
+        background-image: url('../img/star-1.png');
+      }
+      .star-2 {
+        top: 24px;
+        right: -40px;
+        width: 32px;
+        height: 44px;
+        background-image: url('../img/star-1.png');
+      }
+      .star-3 {
+        top: -4px;
+        right: -60px;
+        width: 20px;
+        height: 30px;
+        background-image: url('../img/star-2.png');
+      }
     }
     // 环状外观
     .award-annulus {
@@ -82,6 +115,7 @@
       background-position: center;
       background-size: contain;
       background-repeat: no-repeat;
+      animation: rotation 0.8s 1;
     }
     // 金币背景图
     .gold-cion-bg {
@@ -92,6 +126,7 @@
       width: 100%;
       height: 100%;
       background-position: center 80%;
+      animation: magnify 0.4s linear 1;
     }
     .win-award-tip-container {
       width: 100%;
@@ -106,6 +141,7 @@
       font-size: 28px;
       color: #fce09e;
       white-space: nowrap;
+      padding: 0 40px;
       background: linear-gradient(
         270deg,
         rgba(255, 119, 73, 0) 2.54%,
@@ -128,6 +164,7 @@
       width: 260px;
       height: 260px;
       border: 10px solid rgba(255, 255, 255, 0.15);
+      overflow: hidden;
     }
 
     .award-img {
@@ -155,6 +192,41 @@
 
     .vmp-lottery-btn {
       margin-top: -30px;
+    }
+    @keyframes magnify {
+      from {
+        transform: scale(0.8);
+      }
+      to {
+      }
+    }
+    @keyframes rotation {
+      from {
+        transform: rotate(90deg);
+      }
+      to {
+      }
+    }
+    // 擦亮动画
+    .award-img-inner-annular::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      width: 240px;
+      height: 30px; /**光标的宽度，可根据实际调整**/
+      background-color: #fff;
+      transform: rotate(45deg);
+      animation: searchLights 0.8s ease-in 1s 1;
+    }
+    @keyframes searchLights {
+      from {
+        left: -100px;
+        top: 160px;
+      }
+      to {
+        left: 100px;
+        top: 20px;
+      }
     }
   }
 </style>

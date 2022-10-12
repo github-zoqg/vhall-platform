@@ -1,7 +1,7 @@
 <template>
   <div class="submit-lottery">
+    <ribbon class="ribbon-panel" />
     <div class="submit-success-icon"></div>
-
     <p class="submit-lottery-text">
       {{ $t('interact_tools.interact_tools_1013') }}
     </p>
@@ -12,9 +12,12 @@
 </template>
 <script>
   import props from './props';
-
+  import ribbon from '../art/ribbon/success.vue';
   export default {
     name: 'LotterySuccess',
+    components: {
+      ribbon
+    },
     mixins: [props],
     methods: {
       navToWinnerList() {
@@ -29,10 +32,16 @@
     border-radius: 20px 20px 0px 0px;
     text-align: center;
     padding: 60px;
+    .ribbon-panel {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
+    }
     .submit-success-icon {
       margin: 20px auto 0;
       width: 185px;
       height: 195px;
+      left: 10px; // 图片问题,手动偏移
       background-image: url('../img/submit-success.png');
       background-size: contain;
     }

@@ -32,5 +32,8 @@
       -webkit-text-stroke: 0;
       color: #fef8f4;
     }
+    &.nowarp {
+      white-space: nowrap;
+    }
   }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="lottery-winner-list">
+    <ribbon v-if="winnerList.length" class="ribbon-panel" />
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
       <img
@@ -31,11 +32,14 @@
   import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import props from './props';
   import LotteryTitle from './lottery-title.vue';
+  import Ribbon from '../art/ribbon/winner.vue';
+  import '@/app-shared/assets/css/D-DIN-Bold/stylesheet.css';
   export default {
     name: 'LotteryWinner',
     mixins: [props],
     components: {
-      LotteryTitle
+      LotteryTitle,
+      Ribbon
     },
     filters: {
       fmtSerial(val) {
@@ -58,6 +62,15 @@
     background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
     border-radius: 20px 20px 0px 0px;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    .ribbon-panel {
+      width: 100%;
+      height: 400px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
     .award-detail {
       height: 144px;
       margin: 0 24px;
@@ -73,7 +86,8 @@
     .award-img {
       width: 80px;
       height: 80px;
-      border-radius: 5px;
+      border-radius: 8px;
+      border: 1px solid #d9d9d9;
     }
     .award-name {
       margin-left: 30px;
@@ -118,6 +132,7 @@
       width: 56px;
       font-weight: 700;
       font-size: 26px;
+      font-family: 'D-DIN';
     }
     .lottery-user {
       height: 100px;
@@ -133,13 +148,12 @@
         display: block;
         width: 56px;
         height: 56px;
-        margin-left: 32px;
+        margin: 0 32px;
         border-radius: 50%;
       }
       .nickname {
         width: 550px;
         height: 56px;
-        margin-left: 16px;
         font-size: 28px;
         line-height: 56px;
         color: #1a1a1a;

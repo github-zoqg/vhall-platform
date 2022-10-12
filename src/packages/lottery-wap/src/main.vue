@@ -57,7 +57,7 @@
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
-        lotteryView: 'LotterySubmitDetail', // 抽奖组件视图名称
+        lotteryView: '', // 抽奖组件视图名称
         winLotteryUserList: [], // 中奖用户列表
         prizeInfo: {}, // 奖品信息
         showWinnerList: false, // 是否显示中奖列表(的按钮)
@@ -363,7 +363,7 @@
     // 底部白色的关闭按钮
     .vh-line-circle-close {
       position: absolute;
-      bottom: -120px;
+      bottom: -94px;
       color: #fff;
       font-size: 54px;
       display: inline-block;

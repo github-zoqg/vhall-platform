@@ -11,7 +11,8 @@
     </div>
     <div class="submit-content">
       <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
-        {{ submitItem }}
+        <span class="submit-content-label">{{ submitItem.label }}</span>
+        <span class="submit-content-value">{{ submitItem.value }}</span>
       </div>
     </div>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
@@ -53,8 +54,14 @@
           const data = res.data;
           this.submitInfo = [];
           if (!data) return;
-          this.submitInfo.push(data.lottery_user_name);
-          this.submitInfo.push(data.lottery_user_phone);
+          this.submitInfo.push({
+            label: this.$t('interact_tools.interact_tools_1095') + ':',
+            value: data.lottery_user_name
+          });
+          this.submitInfo.push({
+            label: this.$t('interact_tools.interact_tools_1096') + ':',
+            value: data.lottery_user_phone
+          });
           let remark = null;
           try {
             remark = JSON.parse(data.lottery_user_remark);
@@ -64,7 +71,13 @@
           if (Array.isArray(remark)) {
             remark.forEach(item => {
               if (item.field_key !== 'phone' && item.field_key !== 'name' && item.field_value) {
-                this.submitInfo.push(item.field_value);
+                this.submitInfo.push({
+                  label:
+                    item.field_key === 'address'
+                      ? this.$t('interact_tools.interact_tools_1097') + ':'
+                      : '',
+                  value: item.field_value
+                });
               }
             });
           }
@@ -96,7 +109,8 @@
     .award-img {
       width: 80px;
       height: 80px;
-      border-radius: 5px;
+      border-radius: 8px;
+      border: 1px solid #d9d9d9;
     }
     .award-name {
       margin-left: 12px;
@@ -114,14 +128,27 @@
       overflow-y: auto;
     }
     .submit-content-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
       font-size: 28px;
       line-height: 40px;
       color: #262626;
       text-align: left;
       &:not(:last-child) {
-        margin-bottom: 16px;
+        margin-bottom: 8px;
       }
       overflow-x: hidden;
+    }
+    .submit-content-label {
+      box-sizing: border-box;
+      display: inline-block;
+      width: 168px;
+      height: 40px;
+      color: #8c8c8c;
+    }
+    .submit-content-value {
+      flex: 1;
     }
   }
 </style>

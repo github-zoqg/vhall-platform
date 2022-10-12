@@ -188,6 +188,10 @@
         });
       },
       startAnimation() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        sessionStorage.setItem(cacheKey, 1);
+        if (this.inProgress) return false;
+        this.inProgress = true;
         player.startAnimationWithRange({
           location: 30,
           length: 60
@@ -199,25 +203,50 @@
 <style lang="less">
   .vmp-lottery-pending {
     .vmp-lottery-pending-container {
-      width: 750px;
-      height: 850px;
+      width: 640px;
+      height: 760px;
       position: relative;
     }
     .lottery-send-command-container {
       width: 100%;
       position: absolute;
-      top: -52px;
+      top: -92px;
       text-align: center;
+      padding: 8px 0;
+      background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
+      background-color: rgba(initial, 0.65;);
+      box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
+      border-radius: 26px;
+      &::before {
+        // 大的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -24px;
+        bottom: -20px;
+        width: 40px;
+        height: 50px;
+        background-image: url('../img/star-1.png');
+        background-size: contain;
+      }
+      &::after {
+        // 小的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -32px;
+        bottom: 0;
+        width: 16px;
+        height: 30px;
+        background-image: url('../img/star-2.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
     }
     .lottery-send-command {
       display: inline-block;
-      height: 52px;
-      line-height: 52px;
-      padding: 0 24px;
-      background: linear-gradient(89.99deg, #ff1d00 -5.26%, rgba(255, 79, 57, 0.2) 83.45%);
+      padding: 0 12px;
       opacity: 0.65;
-      box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
-      border-radius: 26px;
       color: #fce09e;
     }
     .lottery-command {
@@ -250,18 +279,18 @@
       overflow: hidden;
       &.order-1 {
         font-size: 24px;
-        width: 240px;
-        top: 700px;
+        width: 190px;
+        top: 610px;
         color: #fff1ce;
       }
       &.order-2 {
-        width: 380px;
-        top: 80px;
+        width: 300px;
+        top: 84px;
         color: #fff;
       }
       &.order-3 {
-        width: 220px;
-        top: 550px;
+        width: 180px;
+        top: 486px;
         color: #fff;
       }
       .remark-text {
@@ -290,22 +319,22 @@
       top: 250px;
       left: 300px;
       &.order-1 {
-        top: 250px;
-        left: 300px;
-        height: 150px;
-        width: 150px;
+        top: 246px;
+        left: 260px;
+        height: 120px;
+        width: 120px;
       }
       &.order-2 {
-        top: 600px;
-        left: 200px;
-        height: 150px;
-        width: 350px;
+        top: 530px;
+        left: 160px;
+        height: 140px;
+        width: 330px;
       }
       &.order-3 {
-        top: 660px;
-        left: 400px;
-        height: 150px;
-        width: 250px;
+        top: 600px;
+        left: 360px;
+        height: 100px;
+        width: 180px;
       }
     }
   }

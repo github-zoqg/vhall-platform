@@ -204,7 +204,7 @@
       to {
       }
     }
-    // 扫光动画
+    // 擦亮动画
     .award-img-inner-annular::before {
       content: '';
       display: inline-block;
