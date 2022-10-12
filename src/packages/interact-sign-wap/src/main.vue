@@ -95,6 +95,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', true])
         );
+        this.changeIconShowNum(true);
         console.log('sign_in_push', e);
         this.signInVisible = true;
         this.duration = Number(e.data.sign_show_time);
@@ -118,6 +119,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
         );
+        this.changeIconShowNum(false);
         // this.iconShow = false;
 
         const data = {
@@ -143,6 +145,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
         );
+        this.changeIconShowNum(false);
         // this.iconShow = false;
         this.duration = 30;
         this.signInVisible = false;
@@ -188,6 +191,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
               );
+              this.changeIconShowNum(false);
             }
             this.seconds--;
           }, 1000);
@@ -217,6 +221,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
               );
+              this.changeIconShowNum(false);
               // this.iconShow = false;
               this.seconds = 0;
               // this.$toast.sucess('签到成功！');
@@ -225,6 +230,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', false])
               );
+              this.changeIconShowNum(false);
               // this.iconShow = false;
               // this.$toast.fail(res.code == 505 ? '重复签到' : '签到失败');
               this.$toast.fail(
@@ -247,9 +253,14 @@
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitOpenSignIcon', ['showSign', true])
           );
+          this.changeIconShowNum(true);
         }
         console.log(this.signinInfo, 'this.signinInfo');
         this.openSignIn(this.signinInfo.id, Number(sign_time));
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
     }
   };

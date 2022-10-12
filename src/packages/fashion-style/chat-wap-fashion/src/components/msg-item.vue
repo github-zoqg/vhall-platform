@@ -543,6 +543,7 @@
           word-break: break-all;
           color: var(--theme-chat-msg-font);
           font-size: 26px;
+          max-width: 634px;
           .chat-text {
             img {
               width: 34px;

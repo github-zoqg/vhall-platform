@@ -188,6 +188,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
         );
+        this.changeIconShowNum(false);
         this.timerVisible = false;
         this.status = 'end';
         clearInterval(this.timer);
@@ -204,6 +205,7 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
         );
+        this.changeIconShowNum(false);
         this.timerVisible = false;
         clearInterval(this.timer);
       },
@@ -234,6 +236,7 @@
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
           );
+          // this.changeIconShowNum(false);
           this.timerVisible = false;
           this.status = 'end';
           clearInterval(this.timer);
@@ -245,6 +248,8 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', true])
         );
+        // 展示icon数量+1
+        this.changeIconShowNum(true);
       },
       // 关闭计时器及icon红点
       onClose() {
@@ -273,6 +278,7 @@
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitChangeTimer', ['showTimer', false])
               );
+              this.changeIconShowNum(false);
               this.timerVisible = false;
               return false;
             }
@@ -288,6 +294,10 @@
           this.timeFormat(Math.abs(--data));
           this.time = data;
         }, 1000);
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
       // TODO: 不应在此处调getCommonConfig用接口 须退出小组相关逻辑调用
       // 初始化房间互动工具

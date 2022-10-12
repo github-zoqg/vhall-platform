@@ -105,6 +105,8 @@
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
+          // 展示icon数量+1
+          !this.isShowIcon && this.roomBaseServer.setShowIconNum(true);
           this.isShowIcon = true;
           this.noticeNum = this.noticeNum + 1;
           this.noticeList.unshift({
@@ -119,6 +121,8 @@
       getNoticeInfo() {
         this.noticeNum = this.noticeLatestInfo.total || 0;
         if (this.noticeNum && this.noticeLatestInfo.list[0].created_at) {
+          // 展示icon数量+1
+          !this.isShowIcon && this.roomBaseServer.setShowIconNum(true);
           this.isShowIcon = true;
           this.pageInfo = {
             pos: 0,
@@ -172,16 +176,16 @@
 
 <style lang="less">
   .icon-wrap-notice {
-    margin-bottom: 10px;
-    width: 84px;
-    height: 84px;
+    margin-top: 24px;
+    width: 60px;
+    height: 60px;
     position: relative;
     font-size: 28px;
     background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
     border-radius: 50%;
     img {
-      width: 84px;
-      height: 84px;
+      width: 60px;
+      height: 60px;
     }
     .van-overlay {
       background-color: rgba(0, 0, 0, 0.7) !important;

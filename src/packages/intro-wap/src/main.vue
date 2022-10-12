@@ -1,6 +1,6 @@
 <template>
   <section class="vmp-intro">
-    <section class="vmp-intro-main">
+    <section class="vmp-intro-main" :class="{ 'vmp-intor-haveIcon': showIconNum }">
       <section class="vmp-intro-block">
         <header class="vmp-intro-block__headtitle">
           <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
@@ -25,8 +25,8 @@
           <template v-if="watchInitData.status != 'subscribe'">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
-              <!-- <i class="vh-iconfont vh-line-user"></i> -->
-              {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
+              <i class="vh-iconfont vh-line-group"></i>
+              {{ personCountTxt | formatHotNum }}
             </p>
           </template>
         </main>
@@ -141,6 +141,10 @@
       // 简介富文本正文 Type:String
       content() {
         return this.languagesInfo.introduction || '<p></p>';
+      },
+      // 展示icon数量
+      showIconNum() {
+        return this.$domainStore.state.roomBaseServer.showIconNum;
       }
     },
     created() {
@@ -167,6 +171,10 @@
     position: relative;
     display: flex;
     flex-direction: column;
+
+    .vmp-intor-haveIcon {
+      width: calc(100% - 72px);
+    }
 
     .vmp-intro-block {
       padding: 32px 24px 0 24px;
@@ -257,6 +265,9 @@
         }
         .num {
           color: var(--theme-component-subscribe);
+        }
+        .vh-line-group {
+          margin-right: 10px;
         }
       }
 

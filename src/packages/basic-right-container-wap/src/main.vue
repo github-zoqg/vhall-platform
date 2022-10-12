@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-container-right-wap" v-if="!isInGroup">
-    <div class="base-box" v-show="!showDoc">
+    <div class="base-box" v-show="showIcon">
       <!-- 问卷 -->
       <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <!-- 签到 -->
@@ -52,7 +52,7 @@
         showTimer: false,
         timerVisible: true,
         showSign: false,
-        showDoc: false
+        showIcon: true
       };
     },
     computed: {
@@ -81,10 +81,12 @@
     },
     mounted() {
       useMenuServer().$on('tab-switched', async data => {
-        if ('comDocWap' === data.cuid) {
-          this.showDoc = true;
+        // 需要展示icon tab
+        // console.log(data.cuid, 'data.cuid');
+        if (['comChatWap', 'comIntroWap'].includes(data.cuid)) {
+          this.showIcon = true;
         } else {
-          this.showDoc = false;
+          this.showIcon = false;
         }
       });
     },
@@ -125,18 +127,18 @@
       flex-direction: column;
       position: absolute;
       display: inline-block;
-      right: 26px;
-      top: 100px;
+      right: 24px;
+      bottom: 108px;
       // width: 20px;
       .icon-wrap {
-        margin-bottom: 10px;
-        max-width: 84px;
-        max-height: 84px;
+        margin-top: 24px;
+        max-width: 60px;
+        max-height: 60px;
         position: relative;
         background-color: transparent;
         img {
-          width: 84px;
-          height: 84px;
+          width: 60px;
+          height: 60px;
         }
       }
       .have {
