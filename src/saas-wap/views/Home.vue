@@ -37,7 +37,6 @@
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
-  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   import skins from '@/app-shared/skins/wap';
 
   export default {
