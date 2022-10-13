@@ -41,7 +41,8 @@
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
-              speaker.accountId == mainScreen && remoteSpeakers.length > 11
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11,
+            'vmp-stream-list__mini-dom': speaker.accountId != mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -324,6 +325,11 @@
           });
         },
         immediate: true
+      },
+      isDocMainScreen: {
+        handler(val) {
+          this.streamCenter();
+        }
       }
     },
     beforeCreate() {
@@ -432,10 +438,46 @@
           true
         );
       },
-
+      // 合并模式下，上麦流居中
+      streamCenter() {
+        if (this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1) {
+          return;
+        }
+        const domList = document.getElementById('vmp-stream-list');
+        const minW = document.getElementsByClassName('vmp-stream-list__mini-dom')[0]?.offsetWidth;
+        const defDom = document.getElementsByClassName('vmp-stream-list__remote-container');
+        let remoteNum = this.remoteSpeakers.length;
+        remoteNum = remoteNum + (this.isDocMainScreen ? 1 : 0);
+        const setStreamDomPos = () => {
+          for (const element of defDom) {
+            element.style.transform = `translateX(0px)`;
+          }
+          for (const element of defDom) {
+            // 文档主画面、互动流主画面 位置处理
+            if (
+              element.className.indexOf('doc-main-screen') != -1 ||
+              ((element.className.indexOf('vmp-stream-list__main-screen') != -1 ||
+                element.className.indexOf('vmp-stream-list__mini-dom') == -1) &&
+                !this.isDocMainScreen)
+            ) {
+              element.style.transform = `translateX(${
+                -(window.innerWidth - minW * remoteNum) / 2
+              }px)`;
+            }
+          }
+        };
+        if (remoteNum > 1 && remoteNum < 6) {
+          domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
+          setStreamDomPos();
+        } else {
+          domList.style.transform = `translateX(0px)`;
+          setStreamDomPos();
+        }
+      },
       // 创建betterScroll
       createBScroll() {
         this.$nextTick(() => {
+          this.streamCenter();
           if (this.scroll) {
             this.scroll.refresh();
           } else {

@@ -761,7 +761,14 @@
             useDocServer().state.switchStatus &&
             this.isNoDelay === 0
           ) {
-            useRoomBaseServer().setChangeElement('player');
+            // 开启合并模式
+            if (
+              this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+            ) {
+              useRoomBaseServer().setChangeElement('');
+            } else {
+              useRoomBaseServer().setChangeElement('player');
+            }
           }
 
           // 如果是嘉宾开启了分屏，不需要初始化互动实例

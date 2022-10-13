@@ -131,7 +131,6 @@
           temp.data = JSON.parse(temp.data);
         }
         const { type = '' } = temp.data || {};
-        console.log('11110-0-0-0-0-0-2222', temp, this.joinInfo.third_party_user_id);
         if (type === 'vrtc_connect_refused') {
           if (this.joinInfo.third_party_user_id != temp.data.room_join_id) return;
           this.lowerWheatFun && clearInterval(this.lowerWheatFun);

@@ -62,7 +62,7 @@
     <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
       {{ pageNum }}/{{ pageTotal }}
     </div>
-    <div class="tools" v-show="this.displayMode == 'normal' ? showTools : true">
+    <div class="tools" v-show="this.displayMode == 'normal' && isDocMainScreen ? showTools : true">
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"
@@ -287,6 +287,7 @@
           document
             .getElementsByClassName('vmp-wap-stream-wrap-mask')[0]
             .addEventListener('click', e => {
+              if (!this.clickDocShowTool) return;
               this.timmer && clearTimeout(this.timmer);
               if (this.$parent.showPlayIcon) return; //播放中
               this.showTools = true;
