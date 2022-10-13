@@ -3,10 +3,7 @@
     <ribbon v-if="winnerList.length" class="ribbon-panel" />
     <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
     <div class="award-detail">
-      <img
-        class="award-img"
-        :src="(fitment.award_snapshoot && fitment.award_snapshoot.icon) || defaultLotteryImg"
-      />
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
       <p class="award-name">
         <i18n path="interact_tools.interact_tools_1093">
           <span class="n" place="n">{{ (prizeInfo && prizeInfo.award_name) || '奖品' }}</span>
