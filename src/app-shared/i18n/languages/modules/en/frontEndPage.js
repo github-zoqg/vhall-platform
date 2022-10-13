@@ -562,7 +562,14 @@ export default {
     interact_tools_1087: 'Rocket',
     interact_tools_1088: 'Aircraft',
     interact_tools_1089: 'Salute',
-    interact_tools_1090: 'Car'
+    interact_tools_1090: 'Car',
+    interact_tools_1091: 'Receive prizes',
+    interact_tools_1092: 'Winning result',
+    interact_tools_1093: 'This round of prize "{n}"',
+    interact_tools_1094: 'No winner',
+    interact_tools_1095: 'Name',
+    interact_tools_1096: 'Phone',
+    interact_tools_1097: 'Address'
   },
   setting: {
     setting_1002: 'View settings',

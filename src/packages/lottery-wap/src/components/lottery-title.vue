@@ -1,78 +1,78 @@
 <template>
-  <header class="vmp-title-container">
-    <div class="vmp-title-warp">
-      <span class="star star-1"></span>
-      <span class="star star-2"></span>
-      <span class="star star-3"></span>
-      <h1 class="vmp-lottery-title">{{ title }}</h1>
-      <div class="line"></div>
+  <div class="title-container">
+    <div class="title-panel">
+      <span class="intersperse intersperse-left intersperse-yellow"></span>
+      <span class="intersperse intersperse-left intersperse-red"></span>
+      <p class="content">{{ title }}</p>
+      <span class="intersperse intersperse-right intersperse-yellow"></span>
+      <span class="intersperse intersperse-right intersperse-red"></span>
     </div>
-  </header>
+  </div>
 </template>
 <script>
+  /**
+   * @description 标题面板
+   */
   export default {
     name: 'LotteryTitle',
     props: {
       title: {
-        type: String,
         required: true,
-        default() {
-          return '';
-        }
+        type: String
       }
     }
   };
 </script>
 <style lang="less">
-  .vmp-title-warp {
-    display: inline-block;
+  .title-container {
     position: relative;
-    .line {
-      width: calc(100% + 16px);
-      height: 20px;
-      border-radius: 10px;
-      background: #f3c9c8;
+    background: transparent;
+    width: 100%;
+    height: 96px;
+
+    .title-panel {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 480px;
+      height: 80px;
       position: absolute;
+      top: -14px;
       left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      z-index: 1;
-    }
-    .star {
-      position: absolute;
-      display: inline-block;
-      background-size: 100%;
+      transform: translate(-50%);
+      background-image: url('../img/title-panel.png');
       background-repeat: no-repeat;
-      &-1 {
-        width: 25.6px;
-        height: 27.1px;
-        top: 26px;
-        left: -42px;
-        background-image: url('../img/star-1.png');
-      }
-      &-2 {
-        width: 26px;
-        height: 32px;
-        top: -4px;
-        right: -32px;
-        background-image: url('../img/star-2.png');
-      }
-      &-3 {
-        width: 16px;
-        height: 20px;
-        top: 20px;
-        right: -42px;
-        background-image: url('../img/star-3.png');
-      }
+      background-position: center;
+      background-size: contain;
+      text-align: center;
+      line-height: 90px;
+      font-size: 32px;
+      color: #ad2000;
     }
-    .vmp-lottery-title {
-      position: relative;
-      min-width: 160px;
-      color: #000;
-      font-size: 40px;
+    .content {
+      margin: 0 15px;
       font-weight: 500;
-      text-shadow: 0 4px 0 #fff;
-      z-index: 2;
+    }
+    .intersperse {
+      display: inline-block;
+      margin: 0 5px;
+    }
+    .intersperse-left {
+      transform: rotate(-30deg);
+    }
+    .intersperse-right {
+      transform: rotate(30deg);
+    }
+    .intersperse-yellow {
+      width: 8px;
+      height: 12px;
+      background: #ffb029;
+    }
+    .intersperse-red {
+      width: 8px;
+      height: 15px;
+      background: #fa490c;
     }
   }
 </style>
