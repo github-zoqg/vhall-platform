@@ -309,7 +309,6 @@
       isDocMainScreen() {
         return (
           this.$domainStore.state.docServer.switchStatus &&
-          this.$domainStore.state.docServer.docLoadComplete &&
           this.$domainStore.state.interactiveServer.isInstanceInit &&
           this.webinarType == 1 &&
           !!this.$domainStore.state.roomBaseServer.watchInitData.interact.channel_id &&

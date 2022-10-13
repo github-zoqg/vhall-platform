@@ -446,13 +446,14 @@
          * 6.存在文档id
          * 7.开启文档融屏功能
          */
-        const docStatus = this.$domainStore.state.docServer.switchStatus && this.docLoadComplete;
+        const docStatus =
+          this.$domainStore.state.docServer.switchStatus &&
+          !!this.$domainStore.state.docServer.currentCid;
         const precondition =
           (this.isHostPermission || this.isGroupLeader) &&
           (this.$domainStore.state.interactiveServer.isInstanceInit || this.isOpenSplitScreen) &&
           this.webinarType == 1 &&
           !!this.watchInitData.interact.channel_id &&
-          !!this.$domainStore.state.docServer.currentCid &&
           this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1;
 
         console.table({
@@ -464,7 +465,6 @@
           isInstanceInit: this.$domainStore.state.interactiveServer.isInstanceInit,
           isOpenSplitScreen: this.isOpenSplitScreen,
           liveStatus: this.webinarType,
-          docLoadComplete: this.docLoadComplete,
           channelId: this.watchInitData.interact.channel_id,
           currentCid: this.$domainStore.state.docServer.currentCid,
           speakerAndShowLayout: this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout
@@ -491,7 +491,7 @@
         }
         if (this.$route?.query.assistantType) {
           cl_docComplete({
-            doc_loaded: this.docLoadComplete,
+            doc_loaded: !!this.currentCid,
             switch: this.docServer.state.switchStatus
           });
         }
@@ -802,7 +802,7 @@
           // 当前文档加载完成
           this.docServer.$on('dispatch_doc_load_complete', () => {
             cl_docComplete({
-              doc_loaded: this.docLoadComplete,
+              doc_loaded: !!this.currentCid,
               switch: this.docServer.state.switchStatus
             });
           });
@@ -811,7 +811,7 @@
             // 客户端请求获取文档云渲染相关参数事件
             if (msg === 1 || msg === 2 || msg === 15) {
               cl_docComplete({
-                doc_loaded: this.docLoadComplete,
+                doc_loaded: !!this.currentCid,
                 switch: this.docServer.state.switchStatus
               });
             }
