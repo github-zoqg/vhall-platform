@@ -235,7 +235,6 @@
     .lottery-send-command {
       display: inline-block;
       padding: 0 12px;
-      opacity: 0.65;
       color: #fce09e;
     }
     .lottery-command {
