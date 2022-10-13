@@ -301,7 +301,9 @@
       color: #fff;
     }
     .lottery-pending-animation {
-      display: inline-block;
+      // display: inline-block;
+      display: block;
+      margin: 0 auto;
       width: 328px;
       height: 328px;
       .lottery-pending-animation-img {

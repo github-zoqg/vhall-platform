@@ -235,8 +235,8 @@
         this.lotteryId = msg.data.lottery_id;
         this.showWinnerList = !!msg.data.publish_winner;
         this.setFitment(msg.data);
+        this.close(); // 先关闭,防止异步
         const winnerList = msg.data.lottery_winners.split(',');
-
         // 遍历是否存在key
         console.log(!Object.prototype.hasOwnProperty.call(this.winnerListData, this.lotteryId));
         if (!Object.prototype.hasOwnProperty.call(this.winnerListData, this.lotteryId)) {
