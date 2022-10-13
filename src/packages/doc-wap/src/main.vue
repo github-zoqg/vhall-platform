@@ -260,9 +260,7 @@
           this.recoverLastDocs();
         });
       }
-      if (this.isDocMainScreen) {
-        this.clickDocShowTool();
-      }
+      this.clickDocShowTool();
       //this.resizeDoc();
       window.addEventListener('resize', this.resizeDoc);
     },
@@ -289,6 +287,7 @@
           document
             .getElementsByClassName('vmp-wap-stream-wrap-mask')[0]
             .addEventListener('click', e => {
+              if (!this.clickDocShowTool) return;
               this.timmer && clearTimeout(this.timmer);
               if (this.$parent.showPlayIcon) return; //播放中
               this.showTools = true;
