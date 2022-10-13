@@ -18,6 +18,7 @@
           <span v-else class="rank-num">{{ index + 1 }}</span>
           <span class="avatar">
             <img :src="item.img_url ? item.img_url : defaultAvatar" />
+            <span class="jop_img" v-if="index <= 2"></span>
           </span>
           <span class="name">{{ item.nick_name }}</span>
         </div>
