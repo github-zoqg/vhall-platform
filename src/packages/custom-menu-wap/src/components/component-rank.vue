@@ -128,6 +128,7 @@
     .title {
       color: var(--theme-tab-content-rank-title-font);
     }
+    position: relative;
   }
   header {
     position: relative;
@@ -196,9 +197,21 @@
     background-color: var(--theme-tab-content-rank-rule-content-bg);
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05), 0px 6px 10px rgba(0, 0, 0, 0.05);
     border-radius: 4px;
-    min-height: 30px;
+    // min-height: 30px;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 24px 24px;
     text-align: left; /* 外部有个样式影响到所有文字对齐方式了 */
+    position: absolute;
+    top: 75px;
+    left: 0;
+    z-index: 3;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+    &::-webkit-scrollbar {
+      width: 0;
+    }
     &__concise {
       background-image: url(../assets/imgs/rank-content-bg.png);
       background-repeat: no-repeat;
