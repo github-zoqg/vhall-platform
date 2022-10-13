@@ -341,7 +341,7 @@
       }
       &.order-2 {
         width: 162px;
-        top: 36px;
+        top: 52px;
       }
       &.order-3 {
         width: 100px;
@@ -380,10 +380,10 @@
         width: 75px;
       }
       &.order-2 {
-        top: 286px;
-        left: 120px;
-        height: 55px;
-        width: 145px;
+        top: 300px;
+        left: 110px;
+        height: 60px;
+        width: 160px;
       }
       &.order-3 {
         top: 320px;

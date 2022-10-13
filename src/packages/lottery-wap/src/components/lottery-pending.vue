@@ -274,7 +274,7 @@
       }
       &.order-2 {
         width: 300px;
-        top: 84px;
+        top: 118px;
         color: #fff;
       }
       &.order-3 {
@@ -314,7 +314,7 @@
         width: 120px;
       }
       &.order-2 {
-        top: 530px;
+        top: 560px;
         left: 160px;
         height: 140px;
         width: 330px;

@@ -565,7 +565,7 @@ export default {
     interact_tools_1090: 'Car',
     interact_tools_1091: 'Receive prizes',
     interact_tools_1092: 'Winning result',
-    interact_tools_1093: 'won the prize "{n}"',
+    interact_tools_1093: 'This round of prize "{n}"',
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
     interact_tools_1096: 'Phone',

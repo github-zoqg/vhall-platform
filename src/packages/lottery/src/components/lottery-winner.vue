@@ -109,6 +109,7 @@
       height: 48px;
       border-radius: 4px;
       border: 1px solid #d9d9d9;
+      object-fit: contain;
     }
     .award-name {
       margin-left: 15px;
