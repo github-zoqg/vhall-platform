@@ -227,7 +227,8 @@
     useMemberServer,
     useInteractiveServer,
     useMsgServer,
-    useGroupServer
+    useGroupServer,
+    useMenuServer
   } from 'middle-domain';
   import { toSJIS } from 'qrcode/lib/core/utils';
   export default {
@@ -298,11 +299,15 @@
       this.memberServer = useMemberServer();
       this.interactiveServer = useInteractiveServer();
       this.groupServer = useGroupServer();
+      this.menuServer = useMenuServer();
     },
     created() {
       this.totalNumTxt = this.totalNum;
+      this.initMenuServerEvent();
     },
-    beforeDestroy() {},
+    beforeDestroy() {
+      this.removeMenuServerEvent();
+    },
     async mounted() {
       //初始化配置
       this.initConfig();
@@ -1963,6 +1968,20 @@
           (preVal, curVal) => preVal + curVal.group_joins.length,
           0
         );
+      },
+      handleTabSwitched(data) {
+        if (data.type === 8) {
+          // 如果是成员列表
+          this.$nextTick(() => {
+            this.refresh();
+          });
+        }
+      },
+      initMenuServerEvent() {
+        this.menuServer.$on('tab-switched', this.handleTabSwitched);
+      },
+      removeMenuServerEvent() {
+        this.menuServer.$off('tab-switched', this.handleTabSwitched);
       }
     }
   };
