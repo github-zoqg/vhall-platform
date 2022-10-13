@@ -41,7 +41,8 @@
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
-              speaker.accountId == mainScreen && remoteSpeakers.length > 11
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11,
+            'vmp-stream-list__mini-dom': speaker.accountId != mainScreen
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -432,10 +433,35 @@
           true
         );
       },
-
+      // 合并模式下，上麦流居中
+      streamCenter() {
+        if (this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1) {
+          return;
+        }
+        const setMainDomPos = (n, l) => {
+          n &&
+            (n.style.transform = `translateX(${
+              l ? 0 : -(window.innerWidth - minW * remoteNum) / 2
+            }px)`);
+        };
+        const domList = document.getElementById('vmp-stream-list');
+        const remoteNum = this.remoteSpeakers.length;
+        const minW = document.getElementsByClassName('vmp-stream-list__mini-dom')[0]?.offsetWidth;
+        const mainDom = document.getElementsByClassName('vmp-stream-list__main-screen');
+        if (remoteNum > 1 && remoteNum < 6) {
+          domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
+          setMainDomPos(mainDom[0]);
+          setMainDomPos(mainDom[1]);
+        } else {
+          domList.style.transform = `translateX(0px)`;
+          setMainDomPos(mainDom[0], true);
+          setMainDomPos(mainDom[1], true);
+        }
+      },
       // 创建betterScroll
       createBScroll() {
         this.$nextTick(() => {
+          this.streamCenter();
           if (this.scroll) {
             this.scroll.refresh();
           } else {
