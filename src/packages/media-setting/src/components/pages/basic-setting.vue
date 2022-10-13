@@ -45,10 +45,7 @@
         </el-select>
       </section>
 
-      <section
-        class="vmp-media-setting-item"
-        v-if="liveMode != LIVE_MODE_MAP['VIDEO'] && roleName == 1"
-      >
+      <section class="vmp-media-setting-item" v-if="roleName == 1">
         <label class="vmp-media-setting-item__label vmp-media-setting-item__label-layout">
           观看端布局(视频)
         </label>
