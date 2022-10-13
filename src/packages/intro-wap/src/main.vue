@@ -22,7 +22,7 @@
             </p>
           </template>
           <!-- 在线人数 -->
-          <template v-if="watchInitData.status != 'subscribe'">
+          <template v-if="watchInitData.status != 'subscribe' && !isConcise">
             <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
             <p v-if="watchInitData.online.show">
               <!-- <i class="vh-iconfont vh-line-user"></i> -->
