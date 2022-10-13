@@ -649,6 +649,11 @@
           ...this.$route.query,
           ...params
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          data.clientType = 'embed';
+          data.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
