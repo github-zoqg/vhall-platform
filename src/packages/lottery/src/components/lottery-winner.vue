@@ -193,7 +193,7 @@
       }
     }
     .vmp-lottery-btn {
-      margin-top: 15px;
+      margin-top: 24px;
     }
   }
 </style>
