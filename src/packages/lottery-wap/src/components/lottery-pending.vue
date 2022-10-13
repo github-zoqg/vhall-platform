@@ -29,7 +29,7 @@
       </p>
       <div
         :class="['start-lottery-btn', `order-${fitment.img_order}`]"
-        @click="handleClickStartLottery"
+        @touchstart="handleClickStartLottery"
       ></div>
     </div>
   </div>
