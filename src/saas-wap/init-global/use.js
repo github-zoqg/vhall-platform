@@ -90,7 +90,8 @@ import VmpWapInsertFIle from '@/packages/stream-insert-file-wap';
 import VmpInviteHandup from '@/packages/inviteHandup';
 // 观看协议
 import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
-
+// 短信通知提交手机号
+import VmpSmsVerification from '@/packages/sms-verification';
 // ------------------------------【极简风格】引入组件------start----------
 import VmpConciseChatWap from '@/packages/concise-style/chat-wap';
 import VmpConciseBodyBlockWap from '@/packages/concise-style/wap-block';
@@ -152,6 +153,7 @@ Vue.use(VmpWapInsertFIle);
 Vue.use(VmpInviteHandup);
 Vue.use(VmpViewRestrictionWap);
 Vue.use(VmpPrivacyCompliance);
+Vue.use(VmpSmsVerification);
 // ------------------------------【极简风格】注册组件------start----------
 Vue.use(VmpConciseChatWap);
 Vue.use(VmpConciseBodyBlockWap);
@@ -161,4 +163,5 @@ Vue.use(VmpConciseWapRewardEffect);
 
 // ------------------------------【时尚风格】注册组件------start----------
 Vue.use(VmpChatWapFashion);
+
 // ------------------------------【时尚风格】注册组件------end----------

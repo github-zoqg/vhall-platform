@@ -52,6 +52,15 @@
         isWhiteCheck: false
       };
     },
+    computed: {
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      isEmbedVideo() {
+        // 是不是单视频嵌入
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      }
+    },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.subscribeServer = useSubscribeServer();
@@ -93,6 +102,11 @@
           verify_value: this.authTitle,
           ...this.$route.query
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          data.clientType = 'embed';
+          data.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(data).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
