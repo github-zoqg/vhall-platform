@@ -321,7 +321,12 @@
             const mainScreenSpeaker = this.speakerList.find(
               speaker => speaker.accountId == msg.data.room_join_id
             );
-            if (mainScreenSpeaker.streamId) {
+            // 开启文档融屏时，不设置旁路主画面
+            if (
+              mainScreenSpeaker.streamId &&
+              !this.$domainStore.state.docServer.switchStatus &&
+              this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1
+            ) {
               this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
             }
           }
