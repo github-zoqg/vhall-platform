@@ -1,25 +1,32 @@
 <template>
   <div class="vhall-lottery" v-if="dialogVisible">
     <!-- 抽奖中 -->
-    <lottery-pending
-      v-if="prizeShow"
-      mode="live"
-      :fitment="fitment"
-      :prize-info="prizeInfo"
-      :lottery-id="lotteryInfoId"
-      :lottery-info="lotteryInfo"
-      :disabled-time="disabledTime"
-      @close="close"
-      @end="endLottery"
-    />
-    <lottery-winner
-      mode="live"
-      v-else-if="lotteryResultShow"
-      :prize-info="prizeInfo"
-      :winner-list="winLotteryUserList"
-      @reStart="reStart"
-      @close="close"
-    />
+    <div class="postion-container" v-if="prizeShow || lotteryResultShow">
+      <i
+        :class="['vh-iconfont', lotteryResultShow ? 'vh-line-close' : 'vh-line-circle-close']"
+        @click="close"
+      />
+      <lottery-pending
+        v-if="prizeShow"
+        mode="live"
+        :fitment="fitment"
+        :prize-info="prizeInfo"
+        :lottery-id="lotteryInfoId"
+        :lottery-info="lotteryInfo"
+        :disabled-time="disabledTime"
+        :winnerList="[]"
+        @end="endLottery"
+      />
+      <lottery-winner
+        v-else-if="lotteryResultShow"
+        mode="live"
+        :fitment="fitment"
+        :lottery-id="lotteryInfoId"
+        :prize-info="prizeInfo"
+        :winner-list="winLotteryUserList"
+        @reStart="reStart"
+      />
+    </div>
     <!-- 发起抽奖 -->
     <div v-else-if="lotteryContentShow" class="payment-dialog">
       <div class="payment-title lottery-headleft">
@@ -45,12 +52,13 @@
     },
     data() {
       return {
+        visible: true,
         dialogVisible: false, // 整个组件的显隐(包括背景遮罩)
         fitment: {}, // 正在进行中的抽奖信息
         prizeShow: false, // 趣味抽奖
         lotteryContentShow: false, // 发起抽奖
         lotteryResultShow: false, // 抽奖结果
-        lotteryInfoId: null, // 抽奖的信息(接口返回)
+        lotteryInfoId: '', // 抽奖的信息(接口返回)
         winLotteryUserList: [], // 抽奖的结果
         prizeInfo: {}, // 奖品信息
         lotteryInfo: {},
@@ -142,7 +150,7 @@
             } else {
               // 上一轮抽奖已结束
               this.lotteryContentShow = true;
-              this.lotteryInfoId = null;
+              this.lotteryInfoId = '';
             }
           })
           .catch(err => {
@@ -181,7 +189,7 @@
       reStart() {
         this.lotteryContentShow = true;
         this.lotteryResultShow = false;
-        this.lotteryInfoId = null;
+        this.lotteryInfoId = '';
       },
       /**
        * @description 主动发起抽奖(倒计时)
@@ -218,6 +226,13 @@
     right: 0;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 102;
+    .postion-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
     .el-form-item__label {
       color: #1a1a1a;
     }
@@ -374,6 +389,54 @@
           margin: 0 auto;
         }
       }
+
+      .vh-line-close {
+        color: #000;
+        &:hover {
+          color: #000;
+        }
+      }
+    }
+    .vmp-lottery-btn {
+      width: 160px;
+      height: 40px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 20px;
+      background: #fb2626;
+      border: 0;
+    }
+    .vh-line-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      cursor: pointer;
+      color: #f6c667;
+      z-index: 10;
+      &:hover {
+        color: #fc9600;
+      }
+    }
+    .vh-line-circle-close {
+      position: absolute;
+      bottom: -45px;
+      color: #fff;
+      font-size: 27px;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+    }
+    .lottery-box {
+      position: relative;
+      box-sizing: border-box;
+      width: 424px;
+      background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
+      border-radius: 12px;
+      text-align: center;
+      padding: 24px 32px;
     }
   }
   .el-select-dropdown__list .el-select-dropdown__item {

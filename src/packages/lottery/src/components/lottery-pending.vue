@@ -1,64 +1,75 @@
 <template>
-  <div class="prize-pending" :class="fitment.img_order === 3 ? 'blue' : ''">
-    <h4 class="prize-pending__title">
-      {{ fitment.title || $t('interact_tools.interact_tools_1003') }}
-    </h4>
-    <div class="prize-pending-imgWrap">
-      <img v-if="fitment.url" :src="fitment.url" />
-    </div>
-    <p class="prize-pending__desc" v-if="!needJoin">
-      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-    </p>
-    <p
-      v-if="mode === 'live'"
-      class="prize-pending__end-button"
-      @click="endLottery"
-      :class="[
-        'common-but',
-        'lottery-end',
-        { 'lottery-start': !(disabledTime > 0 && disabledTime <= 5) },
-        { 'lottery-downTime': disabledTime > 0 && disabledTime <= 5 },
-        { disabled: (disabledTime > 0 && disabledTime <= 5) || endLotteryDisable }
-      ]"
-    >
-      结束抽奖
-      <!-- {{ $t('interact_tools.interact_tools_1008') }} -->
-      <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
-    </p>
-    <template v-if="needJoin">
-      <p class="lottery-desc">
-        <i18n path="interact_tools.interact_tools_1007">
-          <span place="n" class="lottery-desc__commond">{{ lotteryInfo.command }}</span>
+  <div class="vmp-lottery-pending">
+    <!-- 自定义图片的抽奖样式 -->
+    <div v-if="needJoin && mode === 'watch'" class="lottery-send-command-container">
+      <span class="lottery-send-command">
+        <i18n path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-command" place="n">{{ `"${lotteryInfo.command}"` }}</span>
         </i18n>
-      </p>
-      <div class="lottery-code-participate-btn" @click="joinLottery">
-        {{ $t('interact_tools.interact_tools_1008') }}
+      </span>
+    </div>
+    <template v-if="isCustom">
+      <div class="vmp-lottery-pending-custom">
+        <div class="lottery-pending-animation">
+          <img class="lottery-pending-animation-img" :src="fitment.url" alt />
+        </div>
+        <button v-if="needJoin && mode === 'watch'" class="vmp-lottery-btn" @click="joinLottery">
+          {{ $t('interact_tools.interact_tools_1008') }}
+        </button>
       </div>
     </template>
-    <i class="prize-pending__close-btn vh-iconfont vh-line-circle-close" @click="close"></i>
+    <!-- 自定义图片的抽奖样式 -->
+    <div v-else class="vmp-lottery-pending-container">
+      <acclaim v-if="!needJoin && inProgress && mode !== 'live'" class="acclaim-panel"></acclaim>
+      <div id="lottery-svga"></div>
+      <p :class="['lottery-remark', `order-${fitment.img_order}`]">
+        <span class="remark-text">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
+      </p>
+      <div
+        v-if="mode !== 'live'"
+        :class="['start-lottery-btn', `order-${fitment.img_order}`]"
+        @click="handleClickStartLottery"
+      ></div>
+    </div>
+    <button
+      v-if="mode === 'live'"
+      class="vmp-lottery-btn"
+      @click="endLottery"
+      :disabled="disabledTime > 0 && disabledTime <= 5"
+    >
+      <span>
+        结束抽奖
+        <span v-if="disabledTime > 0 && disabledTime <= 5">({{ disabledTime }}s)</span>
+      </span>
+    </button>
   </div>
 </template>
-
 <script>
+  import acclaim, { acclaimAE } from '../art/acclaim/index.vue';
+  import props from './props';
   import { useChatServer } from 'middle-domain';
-  // 抽奖中的展示样式(发起与观看,必须有多语言)
+  import {
+    slotmachineResource,
+    turnplateResource,
+    capsuleResource
+  } from '@/app-shared/utils/lotterySvga';
+  import SVGA from 'svgaplayerweb';
+  let player, parser;
+
+  const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
+
   export default {
     name: 'LotteryPending',
     inject: ['lotteryServer'],
+    mixins: [props],
+    components: {
+      acclaim
+    },
     props: {
-      lotteryInfo: {
-        type: Object,
-        default() {
-          return {};
-        }
-      },
       lotteryId: {
         type: [String, Object, Number],
-        required: true
-      },
-      fitment: {
-        // 皮肤门厅
-        type: Object,
         required: true
       },
       mode: {
@@ -71,15 +82,17 @@
       disabledTime: {
         type: Number,
         default() {
-          return 0;
+          return 5;
         }
       }
     },
     computed: {
+      isCustom() {
+        return this.fitment.img_order === 0;
+      },
       // 显示
       needJoin() {
         return (
-          this.mode === 'watch' &&
           this.lotteryInfo.lottery_type == 8 &&
           this.lotteryInfo.submit_command !== 1 &&
           !this.joined
@@ -115,25 +128,27 @@
     },
     data() {
       return {
-        timer: null,
         loading: false,
         joined: false,
-        endLotteryDisable: false // 结束抽奖防抖3秒
+        endLotteryDisable: false, // 结束抽奖防抖3秒
+        inProgress: false // 动画演示中(已点击,立刻抽奖)
       };
     },
-
+    mounted() {
+      if (this.fitment.img_order !== 0) {
+        this.initSvgaResource();
+      }
+    },
     methods: {
-      close() {
-        this.$emit('close');
+      // 点击参与抽奖
+      handleClickStartLottery() {
+        if (this.needJoin && !this.joined) {
+          this.joinLottery();
+        } else {
+          this.startAnimation();
+        }
       },
-      endLottery() {
-        this.$emit('end');
-        this.endLotteryDisable = true;
-        const st = setTimeout(() => {
-          clearTimeout(st);
-          this.endLotteryDisable = true;
-        }, 3000);
-      },
+      // 发送口令
       joinLottery() {
         if (this.needLoginStatus) {
           return this.$emit('needLogin');
@@ -154,120 +169,238 @@
                 type: 'success',
                 customClass: 'zdy-info-box'
               });
+              if (!this.isCustom) {
+                this.startAnimation();
+              }
             }
           })
           .finally(() => {
             this.loading = false;
           });
+      },
+      initSvgaResource() {
+        player = new SVGA.Player('#lottery-svga');
+        parser = new SVGA.Parser('#lottery-svga');
+        let itemIdx = this.fitment.img_order;
+        if (![1, 2, 3].includes(this.fitment.img_order)) {
+          itemIdx = 1;
+        }
+        const resourceItem = animationEffectArr[itemIdx];
+        parser.load(resourceItem.svgaUrl, videoItem => {
+          if (this.mode === 'live') {
+            player.setImage(resourceItem.coverBtnImgUrl, resourceItem.imageKey);
+          }
+          player.setVideoItem(videoItem);
+          if (this.mode === 'live') {
+            this.startAnimation();
+          } else {
+            const cacheKey = `lottery_${this.lotteryId}_cache`;
+            const cache = sessionStorage.getItem(cacheKey);
+            if (cache) {
+              this.startAnimation();
+            } else {
+              if (this.needJoin) {
+                player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+              }
+              player.startAnimationWithRange({
+                location: 1,
+                length: 15
+              });
+            }
+          }
+        });
+      },
+      startAnimation() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        sessionStorage.setItem(cacheKey, 1);
+        if (this.mode !== 'live') acclaimAE();
+        if (this.inProgress) return false;
+        this.inProgress = true;
+        player.startAnimationWithRange({
+          location: 30,
+          length: 60
+        });
+      },
+      endLottery() {
+        if (this.endLotteryDisable) return false; // 逻辑防抖, 不影响样式
+        this.$emit('end');
+        this.endLotteryDisable = true;
+        const st = setTimeout(() => {
+          clearTimeout(st);
+          this.endLotteryDisable = false;
+        }, 3000);
+      },
+      judgeInProgress() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        const cache = sessionStorage.getItem(cacheKey);
+        return;
       }
     }
   };
 </script>
 <style lang="less">
-  .prize-pending {
-    width: 400px;
-    height: 456px;
+  .vmp-lottery-pending {
     text-align: center;
-    background-image: url(../img/bg-normal.png);
-    position: fixed;
-    background-size: 100% 100%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 6px;
-    z-index: 777;
-    &.blue {
-      background-image: url(../img/bg-blue.png);
+    .acclaim-panel {
+      width: 380px;
+      height: 200px;
+      position: absolute;
+      top: -60px;
+      left: 0;
     }
-    &__title {
-      font-size: 26px;
-      font-weight: 500;
-      color: #ffffff;
-      line-height: 37px;
-      margin-top: 60px;
+    .vmp-lottery-pending-container {
+      width: 380px;
+      height: 400px;
+      position: relative;
+      margin: 0 auto;
     }
-    &-imgWrap {
-      margin: 22px auto 0;
-      width: 170px;
-      height: 170px;
-      img {
-        display: block;
+    .lottery-send-command-container {
+      display: inline-block;
+      position: relative;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 4px 0;
+      background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
+      background-color: rgba(initial, 0.65;);
+      box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
+      border-radius: 13px;
+      margin-bottom: 24px;
+      &::before {
+        // 大的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -12px;
+        bottom: -10px;
+        width: 20px;
+        height: 25px;
+        background-image: url('../img/star-1.png');
+        background-size: contain;
+      }
+      &::after {
+        // 小的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -16px;
+        bottom: 0;
+        width: 8px;
+        height: 15px;
+        background-image: url('../img/star-2.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+    }
+    .lottery-send-command {
+      display: inline-block;
+      padding: 0 12px;
+      color: #fce09e;
+      font-size: 14px;
+    }
+    .lottery-command {
+      color: #fff;
+    }
+    .lottery-pending-animation {
+      display: inline-block;
+      width: 328px;
+      height: 328px;
+      .lottery-pending-animation-img {
+        display: inline-block;
         width: 100%;
         height: 100%;
-        margin: 0 auto;
-        object-fit: scale-down;
+        object-fit: contain;
       }
     }
-    &__desc {
+    .lottery-remark-custom {
+      margin-bottom: 32px;
+    }
+    .vmp-lottery-pending-custom {
+      text-align: center;
+      margin: 0 auto;
+    }
+
+    #lottery-svga {
       width: 100%;
-      text-align: center;
-      font-size: 14px;
-      font-family: @fontRegular;
-      font-weight: 400;
-      color: #ffffff;
-      margin-top: 24px;
-      line-height: 20px;
+      height: 100%;
     }
-    &__end-button {
-      width: 160px;
-      height: 40px;
-      border-radius: 20px;
-      background-color: #ffffff;
-      color: #fb3a32;
-      text-align: center;
-      line-height: 40px;
-      font-size: 14px;
+    .lottery-remark {
+      display: inline-block;
       position: absolute;
-      bottom: 62px;
+      font-size: 14px;
+      top: 275px;
       left: 50%;
-      transform: translateX(-80px);
-      user-select: none;
-      cursor: default;
-      &.lottery-start {
-        cursor: pointer;
+      height: 20px;
+      transform: translate(-50%);
+      text-align: center;
+      color: #fff1ce;
+      overflow: hidden;
+      &.order-1 {
+        font-size: 12px;
+        width: 120px;
+        top: 341px;
       }
-      &.lottery-downTime {
-        cursor: not-allowed;
+      &.order-2 {
+        width: 162px;
+        top: 52px;
       }
-      &.disabled {
-        cursor: default;
+      &.order-3 {
+        width: 100px;
+        top: 256px;
+      }
+      .remark-text {
+        white-space: nowrap;
+        position: absolute;
+        transform: translateX(100%);
+        left: 0;
+        animation: move2left 5s linear infinite;
+      }
+      // 文字往左移
+      @keyframes move2left {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+    }
+    .start-lottery-btn {
+      display: inline-block;
+      height: 150px;
+      width: 150px;
+      position: absolute;
+      top: 250px;
+      left: 300px;
+      cursor: pointer;
+      // background: yellow;
+      &.order-1 {
+        top: 120px;
+        left: 154px;
+        height: 75px;
+        width: 75px;
+      }
+      &.order-2 {
+        top: 300px;
+        left: 110px;
+        height: 60px;
+        width: 160px;
+      }
+      &.order-3 {
+        top: 320px;
+        left: 210px;
+        height: 60px;
+        width: 100px;
+      }
+    }
+    .vmp-lottery-btn {
+      margin-top: 10px;
+      margin-bottom: 8px;
+      &[disabled] {
+        border: 0;
+        background: #ffd1c9;
+        color: #fff;
         pointer-events: none;
       }
     }
-    &__close-btn {
-      position: absolute;
-      bottom: -18px;
-      left: 50%;
-      transform: translateX(-15px);
-      font-size: 30px;
-      color: #ffffff;
-      cursor: pointer;
-    }
-  }
-  .lottery-desc {
-    line-height: 20px;
-    color: #ffffff;
-    font-size: 14px;
-    text-align: center;
-    margin-top: 22px;
-    &__commond {
-      color: #ffdf46;
-    }
-  }
-  .lottery-code-participate-btn {
-    width: 160px;
-    height: 40px;
-    border-radius: 20px;
-    background-color: #ffffff;
-    color: #fb3a32;
-    text-align: center;
-    line-height: 40px;
-    font-size: 14px;
-    position: absolute;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-80px);
-    user-select: none;
-    cursor: pointer;
   }
 </style>

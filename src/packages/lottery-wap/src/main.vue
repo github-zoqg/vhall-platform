@@ -7,7 +7,10 @@
     overlay-class="vmp-lottery-popup-overlay"
     round
   >
-    <i v-if="!pending" class="vh-iconfont vh-line-close close" @click="close" />
+    <i
+      :class="['vh-iconfont', pending ? 'vh-line-circle-close' : 'vh-line-close close']"
+      @click="close"
+    />
     <section class="content-wrapper">
       <component
         :is="lotteryView"
@@ -41,7 +44,8 @@
       LotteryWinner: () => import('./components/lottery-winner.vue'), // 中奖列表界面
       LotteryAccept: () => import('./components/lottery-accept.vue'), // 领奖界面
       LotterySuccess: () => import('./components/lottery-success.vue'), // 领取结果页面
-      LotteryHistory: () => import('./components/lottery-history.vue') // 领取结果页面
+      LotteryHistory: () => import('./components/lottery-history.vue'), // 领取结果页面
+      LotterySubmitDetail: () => import('./components/lottery-submit-detail.vue') // 中奖详情页
     },
     provide() {
       return {
@@ -50,6 +54,7 @@
     },
     data() {
       return {
+        visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
         lotteryView: '', // 抽奖组件视图名称
@@ -60,12 +65,12 @@
         lotteryId: '', // 抽奖的信息id(接口返回)
         lotteryInfo: {}, // 抽奖信息
         winLotteryHistory: [], // 中奖历史
-        winnerListData: Object
+        winnerListData: {}
       };
     },
     computed: {
       pending() {
-        return this.lotteryView === 'LotteryPending';
+        return ['LotteryPending', 'LotteryMiss', 'LotteryWin'].includes(this.lotteryView);
       }
     },
     beforeCreate() {
@@ -90,7 +95,7 @@
         try {
           const res = await this.lotteryServer.checkLotteryResult(msg.lottery_id);
           const take_award = res?.data?.take_award;
-          const lotteryView = take_award === 0 ? 'LotteryWin' : 'LotterySuccess';
+          const lotteryView = take_award === 0 ? 'LotteryWin' : 'LotterySubmitDetail';
           await this.changeView(lotteryView);
         } catch (err) {
           console.warn('获取中奖信息接口: ', err);
@@ -121,8 +126,9 @@
               // 只有一个中奖,显示中奖结果
               const winLottery = winLotteryHistory[0];
               this.lotteryId = winLottery.id;
+              this.showWinnerList = !!winLottery.publish_winner;
               if (winLottery.take_award === 1) {
-                lotteryView = 'LotterySuccess'; // 已领取提示已提交
+                lotteryView = 'LotterySuccess'; // 显示提交历史
               } else {
                 lotteryView = 'LotteryWin'; // 为领取显示中奖结果
               }
@@ -166,6 +172,7 @@
       async callBackLotteryPush(msg) {
         const msgData = msg.data;
         this.setFitment(msgData);
+        this.lotteryId = msgData.lottery_id;
         useChatServer().addChatToList({
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')
@@ -237,6 +244,7 @@
         delete this.winnerListData[this.lotteryId];
       },
       close() {
+        this.lotteryView = '';
         this.popupVisible = false;
       },
       /**
@@ -248,7 +256,7 @@
             this.winLotteryUserList = res.data?.list || [];
           });
         }
-        const opneView = view => {
+        const openView = view => {
           this.popupVisible = true;
           this.lotteryView = view;
         };
@@ -257,10 +265,10 @@
           await this.$nextTick();
           const st = setTimeout(() => {
             clearTimeout(st);
-            opneView(view);
+            openView(view);
           }, 600);
         } else {
-          opneView(view);
+          openView(view);
         }
       },
       /**
@@ -284,7 +292,6 @@
        */
       isSelf(id) {
         const join_info = useRoomBaseServer().state?.watchInitData?.join_info;
-        console.log(join_info);
         if (join_info && typeof join_info === 'object') {
           const userId = join_info.user_id || join_info.third_party_user_id;
           console.log(userId, id);
@@ -306,7 +313,7 @@
         let LotteryView = 'LotteryAccept';
         if (lottery.take_award === 1) {
           // 已领奖
-          LotteryView = 'LotterySuccess';
+          LotteryView = 'LotterySubmitDetail';
         } else if (lottery.need_take_award === 1) {
           // 尚未领取
           LotteryView = 'LotteryAccept';
@@ -315,6 +322,7 @@
           LotteryView = 'LotteryWin';
         }
         this.lotteryId = lottery.id;
+        this.showWinnerList = !!lottery.publish_winner;
         this.setFitment(lottery);
         await this.changeView(LotteryView);
       }
@@ -324,19 +332,11 @@
 
 <style lang="less">
   .vmp-lottery {
+    overflow: visible;
     &.pending {
       background: transparent;
     }
-    .close {
-      font-size: 32px;
-      position: absolute;
-      top: 37px;
-      right: 36px;
-      color: #8c8c8c;
-      z-index: 10;
-    }
     .content-wrapper {
-      // position: relative;
       box-sizing: border-box;
     }
     // 组件内所有的按钮样式
@@ -350,6 +350,25 @@
       text-align: center;
       font-size: 32px;
       color: #fff;
+    }
+    // 带弹窗的关闭按钮
+    .vh-line-close {
+      font-size: 32px;
+      position: absolute;
+      top: 37px;
+      right: 36px;
+      color: #f6c667;
+      z-index: 10;
+    }
+    // 底部白色的关闭按钮
+    .vh-line-circle-close {
+      position: absolute;
+      bottom: -94px;
+      color: #fff;
+      font-size: 54px;
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
   .vmp-lottery-popup-overlay {

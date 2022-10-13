@@ -434,7 +434,10 @@
       },
       // 点击查看抽奖信息
       checkLotteryDetail(e, msgData) {
-        this.emitLotteryEvent(msgData?.content?.msg?.data);
+        if (msgData.isCheck) {
+          // 防止未中奖也弹窗
+          this.emitLotteryEvent(msgData?.content?.msg?.data);
+        }
       },
       // 点击查看问卷
       checkQuestionDetail(questionnaire_id) {

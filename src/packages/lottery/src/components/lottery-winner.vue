@@ -1,296 +1,199 @@
 <template>
-  <div class="winner-list">
-    <div
-      class="custom-lottery-box"
-      :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery-box-default' : ''"
-    >
-      <div class="custom-lottery">
-        <img :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" alt="" />
-      </div>
-      <p
-        class="custom-lottery__name"
-        :class="prizeInfo && !prizeInfo.award_name ? 'custom-lottery__name-default' : ''"
-      >
-        {{ (prizeInfo && prizeInfo.award_name) || $t('interact_tools.interact_tools_1009') }}
+  <div class="lottery-box lottery-winner-list">
+    <ribbon v-if="winnerList.length" class="ribbon-panel" />
+    <lottery-title :title="$t('interact_tools.interact_tools_1020')" />
+    <div class="award-detail">
+      <img class="award-img" :src="(prizeInfo && prizeInfo.image_url) || defaultLotteryImg" />
+      <p class="award-name">
+        <i18n path="interact_tools.interact_tools_1093">
+          <span class="n" place="n">{{ (prizeInfo && prizeInfo.award_name) || '奖品' }}</span>
+        </i18n>
       </p>
     </div>
-    <!-- 列表 -->
-    <div class="lottery-winner-list">
-      <div class="lottery-winner-list__header" :class="{ 'is-scroll': isScroll }">
-        {{ $t('interact_tools.interact_tools_1020') }}
-      </div>
-      <ul class="lottery-winner-list__body" @scroll="handleScroll">
-        <li
-          v-for="item in winnerList"
-          :key="item.lottery_user_id"
-          class="lottery-winner-list__item"
-        >
-          <p class="winner-avatar">
-            <img
-              class="winner-avatar-img"
-              :src="item.lottery_user_avatar || defaultAvatarImg"
-              alt=""
-            />
-          </p>
-          <p class="winner-name">{{ item.lottery_user_nickname }}</p>
+    <div class="winner-content">
+      <ul v-if="winnerList.length" class="lottery-winner-wrap">
+        <li class="lottery-user" v-for="(item, index) in winnerList" :key="index">
+          <span class="serial">{{ index | fmtSerial }}</span>
+          <img class="avatar" :src="item.lottery_user_avatar || defaultAvatar" alt />
+          <p class="nickname">{{ item.lottery_user_nickname }}</p>
         </li>
       </ul>
+      <div v-else class="no-winner">
+        <div class="no-win-lottery-img"></div>
+        <p class="tip">{{ $t('interact_tools.interact_tools_1094') }}</p>
+      </div>
     </div>
-    <span v-if="mode === 'live'" @click="reStart" class="continue-btn-box">
-      <i class="continue-btn">继续抽奖</i>
-    </span>
-    <!-- 关闭按钮 -->
-    <i
-      class="winner-list__close-btn vh-iconfont vh-line-circle-close"
-      :class="{ 'winner-list-embed-close': isEmbed }"
-      @click="close"
-    ></i>
+    <!-- 发起端的继续抽奖 -->
+    <el-button v-if="mode === 'live'" @click="reStart" class="vmp-lottery-btn">继续抽奖</el-button>
   </div>
 </template>
 <script>
-  import { useRoomBaseServer } from 'middle-domain';
-  /**
-   * @description 中奖列表(发起端)
-   */
+  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import Ribbon from '../art/ribbon/winner.vue';
+  import LotteryTitle from './lottery-title.vue';
+  import props from './props';
+  import '@/app-shared/assets/css/D-DIN-Bold/stylesheet.css';
   export default {
     name: 'LotteryWinner',
-    inject: ['lotteryServer'],
+    mixins: [props],
     props: {
       mode: {
-        type: String
+        // 是否显示结束抽奖(发起端)
+        type: String,
+        default() {
+          return 'watch';
+        }
       },
       winnerList: {
-        type: Array,
         required: true,
+        type: Array,
         default() {
           return [];
         }
       },
-      // 奖品信息
-      prizeInfo: {
+      fitment: {
+        required: true,
         type: Object,
         default() {
           return {};
         }
       }
     },
-    beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
+    components: {
+      LotteryTitle,
+      Ribbon
     },
-    computed: {
-      isEmbed() {
-        // 判断完全嵌入，解决签到在特殊高度下 无法完全展示签到弹窗问题
-        const { embedObj } = this.roomBaseServer.state;
-        return embedObj.embed && !embedObj.embedVideo;
+    filters: {
+      fmtSerial(val) {
+        const serial = `${val + 1}`;
+        return serial.padStart(2, '0');
       }
     },
     data() {
       return {
-        // prizeInfo: {}, // 奖品信息
-        isScroll: false,
-        defaultAvatarImg: require('../img/avatar.png'),
-        defaultLotteryImg: require('../img/default-lottery.png')
+        defaultAvatar
       };
     },
-    mounted() {},
-    created() {
-      console.log(this.winnerList, 'winnerList');
-    },
     methods: {
-      handleScroll(e) {
-        // 滚动的像素+容器的高度>可滚动的总高度-100像素
-        if (e.srcElement.scrollTop > 0) {
-          this.isScroll = true;
-        } else {
-          this.isScroll = false;
-        }
-      },
-      close() {
-        this.$emit('close');
-      },
       reStart() {
         this.$emit('reStart');
       }
     }
   };
 </script>
-<style lang="less" scoped>
-  .winner-list {
-    width: 424px;
-    height: 469px;
-    background: url(../img/bg-winner-list.png);
-    position: fixed;
-    left: 50%;
-    margin-left: -212px;
-    top: 50%;
-    margin-top: -238px;
-    border-radius: 6px;
-    z-index: 777;
-    .continue-btn-box {
-      width: 142px;
-      height: 42px;
-      line-height: 40px;
-      text-align: center;
-      border-radius: 20px;
+<style lang="less">
+  .lottery-winner-list {
+    box-sizing: border-box;
+    .ribbon-panel {
+      width: 100%;
+      height: 200px;
       position: absolute;
-      left: 50%;
-      top: 422px;
-      margin-left: -71px;
-      background-color: #ff6e07;
-      background: linear-gradient(180deg, #ffe4cd 0%, #f3760d 100%);
-      .continue-btn {
-        position: absolute;
-        left: 2px;
-        top: 2px;
-        width: 138px;
-        height: 36px;
-        line-height: 36px;
-        border-radius: 18px;
-        background: linear-gradient(180deg, #fdfbf7 0%, #fed092 100%);
-        color: #e50000;
-        font-weight: 500;
-        font-size: 14px;
-        font-style: normal;
-        cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    .award-detail {
+      box-sizing: border-box;
+      height: 72px;
+      padding: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background: #fff;
+      border-radius: 4px;
+    }
+
+    .award-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      object-fit: contain;
+    }
+    .award-name {
+      margin-left: 15px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #fb2626;
+    }
+    .winner-content {
+      margin-top: 4px;
+      overflow-y: auto;
+      height: 228px;
+      overflow-x: hidden;
+      border-radius: 4px;
+      > div,
+      > ul {
+        min-height: 100%;
+        box-sizing: border-box;
+        background: #fff;
+        padding: 4px 0;
+        border-radius: 4px;
       }
     }
-    .custom-lottery-box {
-      width: 106px;
-      height: 106px;
-      position: relative;
-      margin-top: 30px;
-      margin-left: 50%;
-      transform: translate(-50%, 0);
-      &-default {
-        width: 120px;
-      }
-      .custom-lottery {
-        width: 100px;
-        height: 100px;
-        border-radius: 60px;
-        overflow: hidden;
-        background-color: #ffc95e;
-        border: 3px solid #ffc95e;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-      .custom-lottery__name {
-        position: absolute;
-        top: 79px;
-        background-color: #ff962e;
-        border-radius: 16px;
-        line-height: 30px;
-        padding: 0 13px;
-        white-space: nowrap;
-        margin-left: 50%;
-        transform: translate(-50%, 0);
-        color: #ffffff;
-        font-size: 16px;
-        &-default {
-          top: 88px;
-        }
-      }
+    .lottery-winner-wrap {
+      padding: 4px;
     }
-    .custom-lottery__default-name {
-      position: absolute;
-      top: 79px;
-      background-color: #ff962e;
-      border-radius: 16px;
-      line-height: 30px;
-      padding: 0 13px;
-      white-space: nowrap;
-      margin-left: 50%;
-      transform: translate(-50%, 0);
-      color: #ffffff;
-      font-size: 16px;
-    }
-    .lottery-winner-list {
-      height: 250px;
-      width: 268px;
-      background-color: rgba(255, 255, 255, 0.8);
-      border-radius: 8px;
-      position: absolute;
-      bottom: 54px;
-      left: 50%;
-      transform: translateX(-134px);
-      padding-right: 1px;
-      ::-webkit-scrollbar {
-        width: 6px; // 横向滚动条
-        height: 6px; // 纵向滚动条 必写
+    .no-winner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .no-win-lottery-img {
+        width: 80px;
+        height: 80px;
+        background-image: url('../img/lottery-miss.png');
+        background-size: contain;
+        background-repeat: no-repeat;
       }
-      // 滚动条的滑块
-      ::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        transition: all 0.3s;
-        cursor: pointer;
-        display: none;
-        background-color: #e0e0e0;
-      }
-      ::-webkit-scrollbar-track {
-        background-color: transparent;
-      }
-      &:hover {
-        ::-webkit-scrollbar-thumb {
-          display: block;
-        }
-      }
-      .lottery-winner-list__header {
+      .tip {
         height: 26px;
+        font-weight: 500;
+        font-size: 16px;
+        color: #262626;
+      }
+    }
+
+    .serial {
+      display: inline-block;
+      width: 24px;
+      font-weight: 700;
+      font-size: 14px;
+      font-family: 'D-DIN';
+    }
+    .lottery-user {
+      height: 44px;
+      margin: 0 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(#c8c8c8, 0.4);
+      }
+      color: #595959;
+      .avatar {
+        display: block;
+        width: 24px;
+        height: 24px;
+        margin-left: 12px;
+        border-radius: 50%;
+        margin: 0 12px;
+      }
+      .nickname {
+        width: 248px;
+        height: 28px;
+        font-size: 14px;
         line-height: 28px;
-        color: #666666;
-        font-size: 12px;
-        padding-left: 12px;
-        &.is-scroll {
-          box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-        }
-      }
-      .lottery-winner-list__body {
-        height: 215px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        .lottery-winner-list__item {
-          height: 40px;
-          padding-left: 17px;
-          display: flex;
-          align-items: center;
-          .winner-avatar {
-            &-img {
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              overflow: hidden;
-              object-fit: cover;
-            }
-          }
-          .winner-name {
-            font-size: 14px;
-            color: #1a1a1a;
-            padding-left: 7px;
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex: 1;
-          }
-        }
+        color: #1a1a1a;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
-    &__close-btn {
-      position: absolute;
-      bottom: -36px;
-      left: 50%;
-      transform: translateX(-15px);
-      font-size: 30px;
-      color: #ffffff;
-      cursor: pointer;
-    }
-  }
-  @media screen and (max-height: 580px) {
-    .winner-list-embed-close {
-      bottom: -20px;
+    .vmp-lottery-btn {
+      margin-top: 24px;
     }
   }
 </style>
