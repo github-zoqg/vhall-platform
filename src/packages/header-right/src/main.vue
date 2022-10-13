@@ -640,6 +640,13 @@
       async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
+        if (this.isThirdStream) {
+          await this.roomBaseServer.getInavToolStatus();
+          if (this.roomBaseServer.state.speakerAndShowLayout == 1) {
+            this.$message.warning('合并模式不支持三方推流');
+            return;
+          }
+        }
         //mode2  需要校验url，调用单独接口
         if (this.isThirdStream && this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
           this.checkValidatePullUrl();
