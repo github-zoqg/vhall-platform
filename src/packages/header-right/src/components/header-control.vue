@@ -122,7 +122,11 @@
       //是否显示第三方推流组件
       isShowThirdPushStream() {
         // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
-        return this.configList['btn_thirdway'] && this.webinarInfo.no_delay_webinar == 0;
+        return (
+          this.configList['btn_thirdway'] &&
+          this.webinarInfo.no_delay_webinar == 0 &&
+          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1
+        );
       },
       // 媒体设置icon展示
       showSetting() {
