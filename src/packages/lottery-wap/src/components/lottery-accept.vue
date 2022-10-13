@@ -16,7 +16,7 @@
           </div>
         </li>
       </ul>
-      <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
+      <button @click="submit" :class="['vmp-lottery-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
       </button>
       <!-- 隐私合规（嵌入不展示） -->
@@ -230,17 +230,9 @@
         color: #bfbfbf;
       }
     }
-    .submit-btn {
+    .vmp-lottery-btn {
       display: block;
-      width: 686px;
-      height: 90px;
-      margin: 56px auto 0;
-      background: #fb2626;
-      border-radius: 45px;
-      line-height: 90px;
-      text-align: center;
-      font-size: 32px;
-      color: #fff;
+      margin: 48px auto 0;
       &.disabled {
         pointer-events: none;
         opacity: 0.4;

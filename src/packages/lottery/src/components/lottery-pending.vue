@@ -10,13 +10,6 @@
     </div>
     <template v-if="isCustom">
       <div class="vmp-lottery-pending-custom">
-        <!-- 发送参与 -->
-        <!-- <i18n v-if="needJoin && mode === 'watch'" path="interact_tools.interact_tools_1065" tag="p">
-          <span class="lottery-remark-custom" place="n">{{ command }}</span>
-        </i18n>
-        <p v-else class="lottery-remark-custom">
-          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-        </p> -->
         <div class="lottery-pending-animation">
           <img class="lottery-pending-animation-img" :src="fitment.url" alt />
         </div>
@@ -27,10 +20,7 @@
     </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
-      <acclaim
-        v-if="!needJoin && mode !== 'watch' && inProgress && mode !== 'live'"
-        class="acclaim-panel"
-      ></acclaim>
+      <acclaim v-if="!needJoin && inProgress && mode !== 'live'" class="acclaim-panel"></acclaim>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
@@ -60,36 +50,13 @@
   import acclaim, { acclaimAE } from '../art/acclaim/index.vue';
   import props from './props';
   import { useChatServer } from 'middle-domain';
+  import {
+    slotmachineResource,
+    turnplateResource,
+    capsuleResource
+  } from '@/app-shared/utils/lotterySvga';
   import SVGA from 'svgaplayerweb';
   let player, parser;
-
-  const slotmachineResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-slotmachine.svga',
-    imageKey: 'img_21117',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-slotmachine.png',
-    coverBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-slotmachine.png'
-  };
-  const turnplateResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-turnplate.svga',
-    imageKey: 'img_39023',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-turnplate.png',
-    coverBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-turnplate.png'
-  };
-  const capsuleResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-capsule.svga',
-    imageKey: 'img_39218',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-capsule.png',
-    coverBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/cover-capsule.png'
-  };
 
   const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
 

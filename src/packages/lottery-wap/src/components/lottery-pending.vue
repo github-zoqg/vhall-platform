@@ -20,6 +20,7 @@
     </template>
     <!-- 自定义图片的抽奖样式 -->
     <div v-else class="vmp-lottery-pending-container">
+      <acclaim v-if="!needJoin && inProgress" class="acclaim-panel"></acclaim>
       <div id="lottery-svga"></div>
       <p :class="['lottery-remark', `order-${fitment.img_order}`]">
         <span class="remark-text">
@@ -35,31 +36,15 @@
 </template>
 <script>
   import props from './props';
+  import acclaim, { acclaimAE } from '../art/acclaim/index.vue';
+  import {
+    slotmachineResource,
+    turnplateResource,
+    capsuleResource
+  } from '@/app-shared/utils/lotterySvga';
   import { useChatServer } from 'middle-domain';
   import SVGA from 'svgaplayerweb';
   let player, parser;
-
-  const slotmachineResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-slotmachine.svga',
-    imageKey: 'img_21117',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-slotmachine.png'
-  };
-  const turnplateResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-turnplate.svga',
-    imageKey: 'img_39023',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-turnplate.png'
-  };
-  const capsuleResource = {
-    svgaUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/lottery-capsule.svga',
-    imageKey: 'img_39218',
-    sendBtnImgUrl:
-      'https://t-vhallsaas-static.oss-cn-beijing.aliyuncs.com/common-static/svga/lottery/send-capsule.png'
-  };
 
   const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
 
@@ -67,6 +52,9 @@
     name: 'LotteryPending',
     inject: ['lotteryServer'],
     mixins: [props],
+    components: {
+      acclaim
+    },
     computed: {
       isCustom() {
         return this.fitment.img_order === 0;
@@ -110,7 +98,8 @@
     data() {
       return {
         loading: false,
-        joined: false
+        joined: false,
+        inProgress: false
       };
     },
     mounted() {
@@ -181,6 +170,7 @@
       startAnimation() {
         const cacheKey = `lottery_${this.lotteryId}_cache`;
         sessionStorage.setItem(cacheKey, 1);
+        acclaimAE();
         if (this.inProgress) return false;
         this.inProgress = true;
         player.startAnimationWithRange({
@@ -194,6 +184,13 @@
 <style lang="less">
   .vmp-lottery-pending {
     text-align: center;
+    .acclaim-panel {
+      width: 680px;
+      height: 400px;
+      position: absolute;
+      top: -120px;
+      left: 0;
+    }
     .vmp-lottery-pending-container {
       width: 640px;
       height: 760px;

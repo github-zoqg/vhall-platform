@@ -7,18 +7,6 @@
       :class="['acclaim', ele.position, ele.toTopAnimation, ele.icon]"
       @webkitAnimationEnd="handleAnimationEnd(idx)"
     ></div>
-    <!-- 右666 -->
-    <!-- <div class="acclaim acclaim-2"></div> -->
-    <!-- gogogo -->
-    <!-- <div class="acclaim acclaim-3"></div> -->
-    <!-- 加油鸭 -->
-    <!-- <div class="acclaim acclaim-4"></div> -->
-    <!-- 哇哦 -->
-    <!-- <div class="acclaim acclaim-5"></div> -->
-    <!-- 有点意思 -->
-    <!-- <div class="acclaim acclaim-6"></div> -->
-    <!-- 太炫了 -->
-    <!-- <div class="acclaim acclaim-7"></div> -->
   </div>
 </template>
 <script>
@@ -99,9 +87,8 @@
 <style lang="css" scoped>
   .wrap {
     position: relative;
-    height: 200px;
+    height: 400px;
     pointer-events: none;
-    /* background: red; */
   }
 
   .acclaim {
@@ -113,9 +100,9 @@
 
   .acclaim-1 {
     /* top: 80px; */
-    left: 5px;
-    width: 45px;
-    height: 49px;
+    left: 10px;
+    width: 90px;
+    height: 98px;
     background-image: url('./img/acclaim-1.png');
     animation: toTop 1000ms 1;
   }
@@ -131,9 +118,9 @@
 
   .acclaim-2 {
     /* top: 55px; */
-    right: 75px;
-    width: 36px;
-    height: 35px;
+    right: 150px;
+    width: 72px;
+    height: 70px;
     background-image: url('./img/acclaim-2.png');
     animation: toTop 800ms 1;
   }
@@ -148,49 +135,49 @@
   }
 
   .acclaim-3 {
-    left: 80px;
-    width: 86px;
-    height: 34px;
+    left: 160px;
+    width: 172px;
+    height: 68px;
     background-image: url('./img/acclaim-3.png');
     animation: toTop 900ms 1;
   }
 
   @keyframes cheer-3 {
     from {
-      top: 60px;
+      top: 120px;
       transform: scale(0.85);
     }
     to {
-      top: 50px;
+      top: 100px;
     }
   }
 
   .acclaim-4 {
-    width: 86px;
-    height: 34px;
+    width: 172px;
+    height: 68px;
     background-image: url('./img/acclaim-4.png');
     animation: toTop 2000ms 1 alternate-reverse linear;
   }
 
   @keyframes cheer-4 {
     from {
-      left: 80px;
-      top: 20px;
+      left: 160px;
+      top: 40px;
       /* transition: ; */
       transform: scale(0.85) rotate(-30deg);
     }
     to {
-      top: 10px;
-      left: 230px;
+      top: 20px;
+      left: 460px;
       transform: rotate(10deg);
     }
   }
 
   .acclaim-5 {
     /* top: 45px; */
-    left: 30px;
-    width: 151px;
-    height: 24px;
+    left: 60px;
+    width: 302px;
+    height: 48px;
     background-image: url('./img/acclaim-5.png');
     animation: toTop 1000ms 1;
   }
@@ -204,9 +191,9 @@
   }
 
   .acclaim-6 {
-    right: 10px;
-    width: 67px;
-    height: 38px;
+    right: 20px;
+    width: 134px;
+    height: 76px;
     background-image: url('./img/acclaim-6.png');
     animation: toTop 950ms 1 alternate-reverse;
   }
@@ -220,29 +207,29 @@
   }
 
   .acclaim-7 {
-    left: 180px;
-    width: 79px;
-    height: 41px;
+    left: 360px;
+    width: 158px;
+    height: 82px;
     background-image: url('./img/acclaim-7.png');
     animation: toTop 750ms 1 alternate-reverse;
   }
 
   @keyframes cheer-7 {
     from {
-      top: 65px;
+      top: 130px;
       opacity: 0.8;
       transform: scale(0.85);
     }
     to {
-      top: 55px;
+      top: 110px;
     }
   }
   @keyframes toTop {
     from {
-      top: 200px;
+      top: 400px;
     }
     to {
-      top: -20px;
+      top: -40px;
     }
   }
 </style>

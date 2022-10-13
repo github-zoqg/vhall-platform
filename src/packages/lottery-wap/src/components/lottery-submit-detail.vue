@@ -9,10 +9,12 @@
         </i18n>
       </p>
     </div>
-    <div class="submit-content">
-      <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
-        <span class="submit-content-label">{{ submitItem.label }}</span>
-        <span class="submit-content-value">{{ submitItem.value }}</span>
+    <div class="submit-content-container">
+      <div class="submit-content">
+        <div v-for="(submitItem, idx) of submitInfo" :key="idx" class="submit-content-item">
+          <span class="submit-content-label">{{ submitItem.label }}</span>
+          <span class="submit-content-value">{{ submitItem.value }}</span>
+        </div>
       </div>
     </div>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
@@ -117,6 +119,9 @@
       font-weight: 500;
       font-size: 30px;
       color: #fb2626;
+    }
+    .submit-content-container {
+      min-height: 310px;
     }
     .submit-content {
       background: #fff;
