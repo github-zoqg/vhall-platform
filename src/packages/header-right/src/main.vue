@@ -642,7 +642,7 @@
         if (this.isStreamYun && !this.director_stream) return false;
         if (this.isThirdStream) {
           await this.roomBaseServer.getInavToolStatus();
-          if (this.roomBaseServer.state.speakerAndShowLayout == 1) {
+          if (this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1) {
             this.$message.warning('合并模式不支持三方推流');
             return;
           }
