@@ -26,6 +26,7 @@
         </div>
       </div>
       <div
+        v-if="speakerAndShowLayout == 1"
         v-show="isDocMainScreen"
         class="vmp-stream-list__remote-container vmp-stream-list__main-screen doc-main-screen"
       >
@@ -301,6 +302,9 @@
         }
         return skinJsonWap?.videoBackGroundColor || '#000';
       },
+      speakerAndShowLayout() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout;
+      },
       // 是否开启文档主画面
       isDocMainScreen() {
         return (
@@ -310,7 +314,7 @@
           this.webinarType == 1 &&
           !!this.$domainStore.state.roomBaseServer.watchInitData.interact.channel_id &&
           !!this.$domainStore.state.docServer.currentCid &&
-          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+          this.speakerAndShowLayout == 1
         );
       }
     },
@@ -440,7 +444,7 @@
       },
       // 合并模式下，上麦流居中
       streamCenter() {
-        if (this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1) {
+        if (this.speakerAndShowLayout != 1) {
           return;
         }
         const domList = document.getElementById('vmp-stream-list');
