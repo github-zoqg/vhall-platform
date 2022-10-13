@@ -62,7 +62,7 @@
     <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
       {{ pageNum }}/{{ pageTotal }}
     </div>
-    <div class="tools" v-show="this.displayMode == 'normal' ? showTools : true">
+    <div class="tools" v-show="this.displayMode == 'normal' && isDocMainScreen ? showTools : true">
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"
@@ -260,7 +260,9 @@
           this.recoverLastDocs();
         });
       }
-      this.clickDocShowTool();
+      if (this.isDocMainScreen) {
+        this.clickDocShowTool();
+      }
       //this.resizeDoc();
       window.addEventListener('resize', this.resizeDoc);
     },
