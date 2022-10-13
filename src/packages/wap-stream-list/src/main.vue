@@ -325,6 +325,11 @@
           });
         },
         immediate: true
+      },
+      isDocMainScreen: {
+        handler(val) {
+          this.streamCenter();
+        }
       }
     },
     beforeCreate() {
@@ -438,24 +443,35 @@
         if (this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1) {
           return;
         }
-        const setMainDomPos = (n, l) => {
-          n &&
-            (n.style.transform = `translateX(${
-              l ? 0 : -(window.innerWidth - minW * remoteNum) / 2
-            }px)`);
-        };
         const domList = document.getElementById('vmp-stream-list');
-        const remoteNum = this.remoteSpeakers.length;
         const minW = document.getElementsByClassName('vmp-stream-list__mini-dom')[0]?.offsetWidth;
-        const mainDom = document.getElementsByClassName('vmp-stream-list__main-screen');
+        const defDom = document.getElementsByClassName('vmp-stream-list__remote-container');
+        let remoteNum = this.remoteSpeakers.length;
+        remoteNum = remoteNum + (this.isDocMainScreen ? 1 : 0);
+        const setStreamDomPos = () => {
+          for (const element of defDom) {
+            element.style.transform = `translateX(0px)`;
+          }
+          for (const element of defDom) {
+            // 文档主画面、互动流主画面 位置处理
+            if (
+              element.className.indexOf('doc-main-screen') != -1 ||
+              ((element.className.indexOf('vmp-stream-list__main-screen') != -1 ||
+                element.className.indexOf('vmp-stream-list__mini-dom') == -1) &&
+                !this.isDocMainScreen)
+            ) {
+              element.style.transform = `translateX(${
+                -(window.innerWidth - minW * remoteNum) / 2
+              }px)`;
+            }
+          }
+        };
         if (remoteNum > 1 && remoteNum < 6) {
           domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
-          setMainDomPos(mainDom[0]);
-          setMainDomPos(mainDom[1]);
+          setStreamDomPos();
         } else {
           domList.style.transform = `translateX(0px)`;
-          setMainDomPos(mainDom[0], true);
-          setMainDomPos(mainDom[1], true);
+          setStreamDomPos();
         }
       },
       // 创建betterScroll
