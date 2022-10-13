@@ -453,7 +453,6 @@
           (this.isHostPermission || this.isGroupLeader) &&
           (this.$domainStore.state.interactiveServer.isInstanceInit || this.isOpenSplitScreen) &&
           this.webinarType == 1 &&
-          !!this.watchInitData.interact.channel_id &&
           this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1;
 
         console.table({
@@ -465,7 +464,6 @@
           isInstanceInit: this.$domainStore.state.interactiveServer.isInstanceInit,
           isOpenSplitScreen: this.isOpenSplitScreen,
           liveStatus: this.webinarType,
-          channelId: this.watchInitData.interact.channel_id,
           currentCid: this.$domainStore.state.docServer.currentCid,
           speakerAndShowLayout: this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout
         });

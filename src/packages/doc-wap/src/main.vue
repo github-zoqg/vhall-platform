@@ -203,7 +203,6 @@
           this.$domainStore.state.docServer.switchStatus &&
           this.$domainStore.state.interactiveServer.isInstanceInit &&
           this.webinarType == 1 &&
-          !!this.$domainStore.state.roomBaseServer.watchInitData.interact.channel_id &&
           !!this.$domainStore.state.docServer.currentCid &&
           this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
         );
