@@ -192,6 +192,7 @@
         this.lotteryId = msgData.lottery_id;
         this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
+        this.close(); // 先关闭,防止异步
         const winnerList = msgData.lottery_winners.split(',');
 
         // 遍历是否存在key

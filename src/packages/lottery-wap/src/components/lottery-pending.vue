@@ -245,6 +245,8 @@
       height: 100%;
     }
     .lottery-pending-animation {
+      display: block;
+      margin: 0 auto;
       width: 640px;
       height: 640px;
       .lottery-pending-animation-img {
