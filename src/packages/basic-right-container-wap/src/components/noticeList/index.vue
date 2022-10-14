@@ -200,14 +200,14 @@
     }
     .dot {
       position: absolute;
-      top: -12px;
+      top: -10px;
       right: -12px;
       width: 30px;
       height: 30px;
-      line-height: 35px;
+      line-height: 33px;
       font-size: 20px;
       color: white;
-      background: url(./images/Rectangle.png);
+      background: url(./images/Rectangle.png) no-repeat;
       background-size: 100%;
       div {
         zoom: 0.8;

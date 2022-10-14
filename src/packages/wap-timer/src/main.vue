@@ -343,7 +343,7 @@
       font-weight: bold;
     }
     .bgimg {
-      width: 372px;
+      width: 374px;
       // width: 4.47rem;
       position: fixed;
       z-index: 305; //文档全屏301
