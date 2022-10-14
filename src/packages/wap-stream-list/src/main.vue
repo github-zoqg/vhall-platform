@@ -17,9 +17,16 @@
       <div
         class="vmp-stream-list__local-container"
         :class="{
-          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
+          'vmp-stream-list__main-screen':
+            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen
         }"
         v-show="micServer.state.isSpeakOn"
+        :style="{
+          transform:
+            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen
+              ? translateXNum
+              : 'translateX(0px)'
+        }"
       >
         <div class="vmp-stream-list__remote-container-h">
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
@@ -127,7 +134,8 @@
     useMicServer,
     useRoomBaseServer,
     useMediaCheckServer,
-    useGroupServer
+    useGroupServer,
+    useMsgServer
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
@@ -147,7 +155,8 @@
         lang: {},
         languageList: [],
         streamInfo,
-        timmer: null
+        timmer: null,
+        translateXNum: 'translateX(0px)'
       };
     },
     computed: {
@@ -314,6 +323,10 @@
           !!this.$domainStore.state.docServer.currentCid &&
           this.speakerAndShowLayout == 1
         );
+      },
+      // 1：无延迟直播
+      isNoDelay() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     watch: {
@@ -346,6 +359,14 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
+      useMsgServer().$onMsg('ROOM_MSG', msg => {
+        // 主讲人变更 | 主画面变更
+        if (msg.data.type == 'vrtc_big_screen_set') {
+          this.$nextTick(() => {
+            this.streamCenter();
+          });
+        }
+      });
       // 检测是否支持连麦&&互动或分组&&直播状态，不支持直接进行提示
       if (
         useMediaCheckServer().state.isBrowserNotSupport &&
@@ -450,6 +471,8 @@
         const defDom = document.getElementsByClassName('vmp-stream-list__remote-container');
         let remoteNum = this.remoteSpeakers.length;
         remoteNum = remoteNum + (this.isDocMainScreen ? 1 : 0);
+        console.log('streamCenter---', remoteNum, defDom.length, defDom);
+        this.translateXNum = `translateX(${-(window.innerWidth - minW * remoteNum) / 2}px)`;
         const setStreamDomPos = () => {
           for (const element of defDom) {
             element.style.transform = `translateX(0px)`;
@@ -462,13 +485,23 @@
                 element.className.indexOf('vmp-stream-list__mini-dom') == -1) &&
                 !this.isDocMainScreen)
             ) {
-              element.style.transform = `translateX(${
-                -(window.innerWidth - minW * remoteNum) / 2
-              }px)`;
+              element.style.transform = this.translateXNum;
             }
           }
+          // 本人上麦&&本人为主画面&&未开启文档融屏
+          if (
+            this.isSpeakOn &&
+            this.joinInfo.third_party_user_id != this.mainScreen &&
+            !this.isDocMainScreen
+          ) {
+            const localDom = this.$refs.vmp_stream_list__local_container;
+            console.log('localDom', localDom);
+            localDom.style.transform = `translateX(${
+              -(window.innerWidth - minW * remoteNum) / 2
+            }px)`;
+          }
         };
-        if (remoteNum > 1 && remoteNum < 6) {
+        if (this.isSpeakOn && remoteNum > 1 && remoteNum < 6) {
           domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
           setStreamDomPos();
         } else {

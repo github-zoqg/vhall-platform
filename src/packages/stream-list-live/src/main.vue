@@ -321,11 +321,13 @@
             const mainScreenSpeaker = this.speakerList.find(
               speaker => speaker.accountId == msg.data.room_join_id
             );
-            // 开启文档融屏时，不设置旁路主画面
+            // 非合并模式 或 合并模式下开启文档融屏，不设置旁路主画面
+            const docCloudStatus =
+              this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout;
             if (
               mainScreenSpeaker.streamId &&
-              !this.$domainStore.state.docServer.switchStatus &&
-              this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1
+              (docCloudStatus != 1 ||
+                (docCloudStatus == 1 && !this.$domainStore.state.docServer.switchStatus))
             ) {
               this.interactiveServer.setBroadCastScreen(mainScreenSpeaker.streamId);
             }
