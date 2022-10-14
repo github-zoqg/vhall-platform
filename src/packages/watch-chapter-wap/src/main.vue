@@ -177,6 +177,11 @@
         .title {
           color: var(--theme-chapter-font-color-active);
         }
+        &.step-info {
+          .title {
+            width: 70%;
+          }
+        }
         .time {
           color: var(--theme-chapter-font-color-active);
         }
@@ -191,6 +196,9 @@
         width: 100%;
         padding: 27px 24px;
         line-height: 40px;
+      }
+      &:last-child {
+        padding-bottom: 100px;
       }
     }
     .chapter-info {

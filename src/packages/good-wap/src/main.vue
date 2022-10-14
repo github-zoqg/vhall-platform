@@ -402,7 +402,7 @@
             }
             i {
               color: var(--theme-tab-content-good-price-font);
-              font-size: 10px;
+              font-size: 16px;
               height: 10px;
             }
             .price {
@@ -410,7 +410,7 @@
               color: var(--theme-tab-content-good-price-font);
             }
             .price ::v-deep > .remainder {
-              font-size: 10px;
+              font-size: 16px;
             }
             .buy {
               display: inline-block;
