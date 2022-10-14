@@ -77,7 +77,7 @@ export default {
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',
-    children: ['comWapStreamLocal']
+    children: ['comWapStreamLocal', 'comDocWap']
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'
