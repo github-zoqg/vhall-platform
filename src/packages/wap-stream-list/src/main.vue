@@ -12,8 +12,7 @@
         'vmp-stream-list-h0': isStreamListH0,
         'vmp-stream-list-h-all': isStreamListHAll,
         'vmp-stream-list-no-speack': !micServer.state.isSpeakOn,
-        'vmp-stream-list-stream-center':
-          speakerAndShowLayout == 1 && isCenterStrean && micServer.state.isSpeakOn
+        'vmp-stream-list-stream-center': speakerAndShowLayout == 1 && isCenterStrean
       }"
       ref="vmp_stream_list"
     >
@@ -45,13 +44,7 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen':
-              speakerAndShowLayout == 1
-                ? !isShareScreen &&
-                  !isOpenInsertFile &&
-                  !isDocMainScreen &&
-                  speaker.accountId == mainScreen
-                : speaker.accountId == mainScreen,
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen && !isDocMainScreen,
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':

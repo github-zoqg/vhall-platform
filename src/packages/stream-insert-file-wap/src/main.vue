@@ -1,10 +1,7 @@
 <template>
   <div
     id="vmp-wap-insert-file"
-    :class="{
-      'vmp-wap-insert-file-main-screen': isMergeMode,
-      'vmp-wap-insert-file-main-screen-top': isMergeMode && !isSpeakOn
-    }"
+    :class="{ 'vmp-wap-insert-file-main-screen': isMergeMode }"
     v-show="isOpenInsertFile"
   >
     <!-- 订阅桌面共享容器 -->
@@ -20,10 +17,6 @@
     computed: {
       isOpenInsertFile() {
         return this.insertFileServer.state.insertStreamInfo.streamId;
-      },
-      // 是否是上麦状态
-      isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
       },
       // 是否是合并模式
       isMergeMode() {
@@ -100,9 +93,6 @@
       height: @desk-h;
       left: calc((100% - @desk-w) / 2);
       top: 85px;
-      &-top {
-        top: 0;
-      }
     }
   }
 </style>

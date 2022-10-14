@@ -2,10 +2,7 @@
   <div
     id="vmp-wap-desktop-screen-wrap"
     class="vmp-wap-desktop-screen"
-    :class="{
-      'vmp-wap-desktop-main-screen': isMergeMode,
-      'vmp-wap-desktop-main-screen-top': isMergeMode && !isSpeakOn
-    }"
+    :class="{ 'vmp-wap-desktop-main-screen': isMergeMode }"
     v-show="isShareScreen"
     @click.stop="showMask"
   >
@@ -53,10 +50,6 @@
       // 是否是合并模式
       isMergeMode() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
-      },
-      // 是否是上麦状态
-      isSpeakOn() {
-        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     watch: {
@@ -231,8 +224,5 @@
     height: @desk-h;
     left: calc((100% - @desk-w) / 2);
     top: 85px;
-    &-top {
-      top: 0;
-    }
   }
 </style>
