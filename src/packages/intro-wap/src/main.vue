@@ -175,7 +175,7 @@
     flex-direction: column;
 
     .vmp-intor-haveIcon {
-      width: calc(100% - 82px);
+      width: calc(100% - 84px);
       .vmp-intro-block-content,
       .vmp-intro-block {
         padding-right: 0;
