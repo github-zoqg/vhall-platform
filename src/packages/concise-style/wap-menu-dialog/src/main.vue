@@ -1,7 +1,7 @@
 <template>
   <div :class="['vmp-wap-menu-dialog', isInGroup ? 'last-position' : '']">
     <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
-    <span class="menu_icon-pointer"></span>
+    <!-- <span class="menu_icon-pointer"></span> -->
     <van-popup
       class="wap-menu-van-popup"
       v-model="menuDialogVisible"
