@@ -501,7 +501,7 @@
             }px)`;
           }
         };
-        if (this.isSpeakOn && remoteNum > 1 && remoteNum < 6) {
+        if (remoteNum > 1 && remoteNum < 6) {
           domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
           setStreamDomPos();
         } else {
