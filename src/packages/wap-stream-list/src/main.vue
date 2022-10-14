@@ -11,8 +11,10 @@
       :class="{
         'vmp-stream-list-h0': isStreamListH0,
         'vmp-stream-list-h-all': isStreamListHAll,
-        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn
+        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn,
+        'vmp-stream-list-stream-center': speakerAndShowLayout == 1 && isCenterStrean
       }"
+      ref="vmp_stream_list"
     >
       <div
         class="vmp-stream-list__local-container"
@@ -21,12 +23,6 @@
             !isDocMainScreen && joinInfo.third_party_user_id == mainScreen
         }"
         v-show="micServer.state.isSpeakOn"
-        :style="{
-          transform:
-            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen
-              ? translateXNum
-              : 'translateX(0px)'
-        }"
       >
         <div class="vmp-stream-list__remote-container-h">
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
@@ -49,8 +45,7 @@
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
-              speaker.accountId == mainScreen && remoteSpeakers.length > 11,
-            'vmp-stream-list__mini-dom': speaker.accountId != mainScreen
+              speaker.accountId == mainScreen && remoteSpeakers.length > 11
           }"
         >
           <div class="vmp-stream-list__remote-container-h">
@@ -134,8 +129,7 @@
     useMicServer,
     useRoomBaseServer,
     useMediaCheckServer,
-    useGroupServer,
-    useMsgServer
+    useGroupServer
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
@@ -155,8 +149,7 @@
         lang: {},
         languageList: [],
         streamInfo,
-        timmer: null,
-        translateXNum: 'translateX(0px)'
+        timmer: null
       };
     },
     computed: {
@@ -324,9 +317,11 @@
           this.speakerAndShowLayout == 1
         );
       },
-      // 1：无延迟直播
-      isNoDelay() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      // 远端流总宽度是否超过桌面宽度
+      isCenterStrean() {
+        const w = this.$refs.vmp_stream_list?.offsetWidth || 0;
+        console.log('w-w', w, window.innerWidth);
+        return w < window.innerWidth;
       }
     },
     watch: {
@@ -340,11 +335,6 @@
           });
         },
         immediate: true
-      },
-      isDocMainScreen: {
-        handler(val) {
-          this.streamCenter();
-        }
       }
     },
     beforeCreate() {
@@ -359,14 +349,6 @@
       this.languageList = this.roomBaseServer.state.languages.langList;
       this.lang = this.roomBaseServer.state.languages.lang;
 
-      useMsgServer().$onMsg('ROOM_MSG', msg => {
-        // 主讲人变更 | 主画面变更
-        if (msg.data.type == 'vrtc_big_screen_set') {
-          this.$nextTick(() => {
-            this.streamCenter();
-          });
-        }
-      });
       // 检测是否支持连麦&&互动或分组&&直播状态，不支持直接进行提示
       if (
         useMediaCheckServer().state.isBrowserNotSupport &&
@@ -461,58 +443,10 @@
           true
         );
       },
-      // 合并模式下，上麦流居中
-      streamCenter() {
-        if (this.speakerAndShowLayout != 1) {
-          return;
-        }
-        const domList = document.getElementById('vmp-stream-list');
-        const minW = document.getElementsByClassName('vmp-stream-list__mini-dom')[0]?.offsetWidth;
-        const defDom = document.getElementsByClassName('vmp-stream-list__remote-container');
-        let remoteNum = this.remoteSpeakers.length;
-        remoteNum = remoteNum + (this.isDocMainScreen ? 1 : 0);
-        console.log('streamCenter---', remoteNum, defDom.length, defDom);
-        this.translateXNum = `translateX(${-(window.innerWidth - minW * remoteNum) / 2}px)`;
-        const setStreamDomPos = () => {
-          for (const element of defDom) {
-            element.style.transform = `translateX(0px)`;
-          }
-          for (const element of defDom) {
-            // 文档主画面、互动流主画面 位置处理
-            if (
-              element.className.indexOf('doc-main-screen') != -1 ||
-              ((element.className.indexOf('vmp-stream-list__main-screen') != -1 ||
-                element.className.indexOf('vmp-stream-list__mini-dom') == -1) &&
-                !this.isDocMainScreen)
-            ) {
-              element.style.transform = this.translateXNum;
-            }
-          }
-          // 本人上麦&&本人为主画面&&未开启文档融屏
-          if (
-            this.isSpeakOn &&
-            this.joinInfo.third_party_user_id != this.mainScreen &&
-            !this.isDocMainScreen
-          ) {
-            const localDom = this.$refs.vmp_stream_list__local_container;
-            console.log('localDom', localDom);
-            localDom.style.transform = `translateX(${
-              -(window.innerWidth - minW * remoteNum) / 2
-            }px)`;
-          }
-        };
-        if (remoteNum > 1 && remoteNum < 6) {
-          domList.style.transform = `translateX(${(window.innerWidth - minW * remoteNum) / 2}px)`;
-          setStreamDomPos();
-        } else {
-          domList.style.transform = `translateX(0px)`;
-          setStreamDomPos();
-        }
-      },
+
       // 创建betterScroll
       createBScroll() {
         this.$nextTick(() => {
-          this.streamCenter();
           if (this.scroll) {
             this.scroll.refresh();
           } else {
@@ -870,6 +804,11 @@
       display: flex;
       justify-content: center;
     }
+    &-stream-center {
+      display: flex;
+      justify-content: center;
+    }
+
     // 未上麦样式进行覆盖
     &-no-speack {
       display: flex;
