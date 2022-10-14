@@ -31,7 +31,10 @@
       <div
         v-if="speakerAndShowLayout == 1"
         v-show="isDocMainScreen"
-        class="vmp-stream-list__remote-container vmp-stream-list__main-screen doc-main-screen"
+        class="vmp-stream-list__remote-container doc-main-screen vmp-stream-list__main-screen"
+        :class="{
+          'doc-hidden': isShareScreen || isOpenInsertFile
+        }"
       >
         <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
       </div>
@@ -260,6 +263,9 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      isOpenInsertFile() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
       },
       // 小组协作中
       showGroupMask() {
@@ -803,6 +809,9 @@
     .doc-main-screen {
       display: flex;
       justify-content: center;
+      &.doc-hidden {
+        display: none;
+      }
     }
     &-stream-center {
       display: flex;

@@ -18,7 +18,9 @@
     <div
       :class="[
         mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
-        isShareScreen || (isOpenInsertFile && !isAudio) ? 'vmp-wap-body-special__show' : ''
+        (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
+          ? 'vmp-wap-body-special__show'
+          : ''
       ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
@@ -209,6 +211,9 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      isMergeMode() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
       }
     },
     beforeCreate() {
