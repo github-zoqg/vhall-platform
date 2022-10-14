@@ -149,7 +149,7 @@
 </script>
 <style lang="less">
   .vmp-recommend {
-    padding: 16px 0 0 0;
+    padding: 24px 0 0 0;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
