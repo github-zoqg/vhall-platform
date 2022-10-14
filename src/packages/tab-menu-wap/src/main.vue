@@ -2,6 +2,7 @@
   <section
     :class="['vmp-tab-menu', isConcise ? ' tab-menu__concise' : '']"
     v-if="!embedObj.embedVideo"
+    v-show="visibleMenu.length > 0"
   >
     <!-- <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
