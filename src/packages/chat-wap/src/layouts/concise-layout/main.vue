@@ -282,7 +282,7 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.initViewData();
-      this.listenEvents();
+      // TODO: 问答开关消息收到两条 —— this.listenEvents();
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
