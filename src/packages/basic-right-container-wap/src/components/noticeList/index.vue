@@ -1,6 +1,14 @@
 <template>
   <div class="icon-wrap-notice" v-if="noticeNum && isShowIcon">
-    <img src="./images/notice-icon.png" alt="" @click="getNoticeList()" />
+    <img
+      :src="
+        noticeNum - noticeNumIsWatch
+          ? require('./images/icon_num.png')
+          : require('./images/notice-icon.png')
+      "
+      alt=""
+      @click="getNoticeList()"
+    />
     <span class="dot" v-if="noticeNum - noticeNumIsWatch">
       <div align="center">
         {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
@@ -105,6 +113,8 @@
         if (groupInitData.isInGroup) return;
         // 公告消息
         this.noticeServer.$on('room_announcement', msg => {
+          // 展示icon数量+1
+          !this.isShowIcon && this.roomBaseServer.setShowIconNum(true);
           this.isShowIcon = true;
           this.noticeNum = this.noticeNum + 1;
           this.noticeList.unshift({
@@ -119,6 +129,8 @@
       getNoticeInfo() {
         this.noticeNum = this.noticeLatestInfo.total || 0;
         if (this.noticeNum && this.noticeLatestInfo.list[0].created_at) {
+          // 展示icon数量+1
+          !this.isShowIcon && this.roomBaseServer.setShowIconNum(true);
           this.isShowIcon = true;
           this.pageInfo = {
             pos: 0,
@@ -172,33 +184,34 @@
 
 <style lang="less">
   .icon-wrap-notice {
-    margin-bottom: 10px;
-    width: 84px;
-    height: 84px;
+    margin-top: 24px;
+    width: 60px;
+    height: 60px;
     position: relative;
     font-size: 28px;
-    background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
+    // background: linear-gradient(180deg, #fca810 0%, #fe7d00 100%);
     border-radius: 50%;
     img {
-      width: 84px;
-      height: 84px;
+      width: 60px;
+      height: 60px;
     }
     .van-overlay {
       background-color: rgba(0, 0, 0, 0.7) !important;
     }
     .dot {
       position: absolute;
-      top: -5px;
-      right: -5px;
-      width: 35px;
-      height: 35px;
-      line-height: 35px;
-      font-size: 18px;
-      border-radius: 50%;
-      background-color: #ff0005;
+      top: -10px;
+      right: -12px;
+      width: 30px;
+      height: 30px;
+      line-height: 33px;
+      font-size: 20px;
       color: white;
-      content: '';
-      border: 2px solid white;
+      background: url(./images/Rectangle.png) no-repeat;
+      background-size: 100%;
+      div {
+        zoom: 0.8;
+      }
     }
     .popup_base {
       width: 100vw;
