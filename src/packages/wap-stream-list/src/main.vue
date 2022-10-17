@@ -12,7 +12,7 @@
         'vmp-stream-list-h0': isStreamListH0,
         'vmp-stream-list-h-all': isStreamListHAll,
         'vmp-stream-list-no-speack': !micServer.state.isSpeakOn,
-        'vmp-stream-list-stream-center': speakerAndShowLayout == 1 && isCenterStrean
+        'vmp-stream-list-stream-center': speakerAndShowLayout == 1 && isCenterStream
       }"
       ref="vmp_stream_list"
     >
@@ -324,10 +324,13 @@
         );
       },
       // 远端流总宽度是否超过桌面宽度
-      isCenterStrean() {
-        const w = this.$refs.vmp_stream_list?.offsetWidth || 0;
-        console.log('w-w', w, window.innerWidth);
-        return w < window.innerWidth;
+      isCenterStream() {
+        let num = this.remoteSpeakers.length;
+        if (this.isDocMainScreen) {
+          num = num + 1;
+        }
+        console.log('w-w', num);
+        return num < 6;
       }
     },
     watch: {
@@ -341,6 +344,16 @@
           });
         },
         immediate: true
+      },
+      isCenterStream: {
+        handler(val) {
+          if (val && this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.destroy();
+            this.scroll = null;
+          }
+        }
       }
     },
     beforeCreate() {
