@@ -1,29 +1,22 @@
 <template>
   <div class="lottery-accept">
-    <header class="title">{{ title }}</header>
+    <lotteryTitle :title="$t('interact_tools.interact_tools_1091')" />
     <div class="form-wrap">
       <ul class="form">
         <li class="form-item" v-for="(item, index) in winForm" :key="index">
           <div :class="[item.is_required === 1 ? 'required' : '', 'form-item__input']">
-            <div class="input-warp">
-              <input
-                class="form-inpput"
-                v-model="item.field_value"
-                type="text"
-                :maxlength="item.maxLength"
-                :placeholder="$tdefault(item.placeholder)"
-                autocomplete="off"
-              />
-            </div>
-          </div>
-          <div class="form-item__error">
-            <span v-if="item.error">
-              {{ item.field_key | errorMsg }}
-            </span>
+            <input
+              class="form-inpput"
+              v-model="item.field_value"
+              type="text"
+              :maxlength="item.maxLength"
+              :placeholder="$tdefault(item.placeholder)"
+              autocomplete="off"
+            />
           </div>
         </li>
       </ul>
-      <button @click="submit" :class="['submit-btn', verified ? '' : 'disabled']">
+      <button @click="submit" :class="['vmp-lottery-btn', verified ? '' : 'disabled']">
         {{ $t('interact_tools.interact_tools_1019') }}
       </button>
       <!-- 隐私合规（嵌入不展示） -->
@@ -38,31 +31,19 @@
 
 <script>
   import props from './props';
+  import lotteryTitle from './lottery-title.vue';
   export default {
     name: 'LotteryAccept',
+    components: {
+      lotteryTitle
+    },
     mixins: [props],
     inject: ['lotteryServer'],
     data() {
       return {
         winForm: [], // 中奖信息表单
-        verified: false
+        verified: false // 是否可提交
       };
-    },
-    computed: {
-      title() {
-        return this.fitment.title || this.$t('interact_tools.interact_tools_1003');
-      }
-    },
-    filters: {
-      errorMsg(fieldKey = '') {
-        const map = {
-          name: '姓名',
-          address: '地址',
-          phone: '手机号'
-        };
-        const field = map[fieldKey] || '';
-        return `请输入正确的信息${field}`;
-      }
     },
     watch: {
       winForm: {
@@ -78,6 +59,21 @@
       this.initFromInfo();
     },
     methods: {
+      fmtRemark() {
+        const remark = [];
+        this.winForm.map(item => {
+          remark.push({
+            field_value: item.field_value, // 前端的新增值,其余的
+            field: item.field,
+            field_key: item.field_key,
+            is_required: item.is_required,
+            is_system: item.is_system,
+            placeholder: item.placeholder,
+            rank: item.rank
+          });
+        });
+        return JSON.stringify(remark);
+      },
       initFromInfo() {
         this.lotteryServer.getDrawPrizeInfo().then(res => {
           if (res.data && res.data.length > 0) {
@@ -91,6 +87,7 @@
               item.error = false;
             });
             this.winForm = res.data;
+            this.fillUserInfo();
           }
         });
       },
@@ -98,24 +95,25 @@
        * @description 验证数据
        */
       verify() {
-        let relt = true;
-        this.winForm.map(item => {
+        const errorItem = this.winForm.find(item => {
           if (item.field_key == 'phone' && (item.field_value !== '' || item.is_required === 1)) {
             // 当手机号为必填,或者有输入手机号才正则校验
             const phone = item.field_value.replace(/\s/g, '');
             const regs = /^1(3|4|5|6|7|8|9)\d{9}$/;
             if (!regs.test(phone)) {
-              item.error = true;
-              relt = false;
+              return true;
             }
           } else if (item.is_required === 1 && item.field_value == '') {
-            item.error = true;
-            relt = false;
-          } else {
-            item.error = false;
+            return true;
           }
+          return false;
         });
-        return relt;
+        if (errorItem) {
+          this.$toast(`请输入正确的信息${errorItem.field}`);
+          return false;
+        } else {
+          return true;
+        }
       },
       submit() {
         if (!this.verify()) return false;
@@ -126,19 +124,14 @@
           .acceptPrize({
             lottery_user_name: this.winForm[0].field_value,
             lottery_user_phone: this.winForm[1].field_value,
-            lottery_user_remark: JSON.stringify(this.winForm),
+            lottery_user_remark: this.fmtRemark(this.winForm),
             lottery_id: this.lotteryId
           })
           .then(res => {
             if (res.code === 200) {
               this.lotteryServer.$emit(this.lotteryServer.Events.LOTTERY_SUBMIT);
               this.lotteryServer.initIconStatus();
-              if (this.showWinnerList) {
-                this.$emit('navTo', 'LotterySuccess');
-              } else {
-                this.$toast(this.$t('interact_tools.interact_tools_1013'));
-                this.$emit('close');
-              }
+              this.$emit('navTo', 'LotterySuccess');
             } else {
               failure(res);
             }
@@ -146,12 +139,33 @@
           .catch(err => {
             failure(err);
           });
+      },
+      // 用户信息预填
+      fillUserInfo() {
+        this.lotteryServer.getLotteryUserInfo().then(res => {
+          const data = res.data;
+          res.data &&
+            this.winForm.map(item => {
+              if (item.field_key == 'name') {
+                // 当手机号为必填,或者有输入手机号才正则校验
+                item.field_value = data.lottery_user_name;
+                item.error = false;
+              } else if (item.field_key == 'phone') {
+                item.field_value = data.lottery_user_phone;
+              } else if (item.field_key == 'address') {
+                item.field_value = data.lottery_user_address;
+              }
+            });
+        });
       }
     }
   };
 </script>
 <style lang="less">
   .lottery-accept {
+    position: relative;
+    background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
+    border-radius: 20px 20px 0px 0px;
     .title {
       height: 100px;
       font-weight: 500;
@@ -161,26 +175,34 @@
       line-height: 100px;
     }
     .form-wrap {
-      padding: 0 8px; // 给滚动条样式留空间
-      margin: 50px 0 60px;
+      padding: 0 8px 48px; // 给滚动条样式留空间
     }
     .form {
       padding: 0 24px;
-      max-height: 498px;
+      max-height: 300px;
       overflow: auto;
     }
     .form-item {
+      // padding: 24px 32px;
+      height: 88px;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      &:not(:last-child) {
+        margin-bottom: 16px;
+      }
       &__input {
+        line-height: 88px;
         position: relative;
-        padding-left: 37px;
-        border-bottom: 1px solid rgba(#f0f0f0);
+        padding-left: 55px;
+        // border-bottom: 1px solid rgba(#f0f0f0);
         &.required:before {
           display: inline-block;
           width: 12px;
           height: 12px;
           position: absolute;
-          top: 10px;
-          left: 12px;
+          top: 3px;
+          left: 32px;
           content: '*';
           font-size: 24px;
           color: #fb2626;
@@ -196,8 +218,8 @@
       }
     }
     .input-warp {
-      height: 32px;
-      margin: 12px 0 25px;
+      // height: 32px;
+      // margin: 12px 0 25px;
     }
     .form-inpput {
       width: 100%;
@@ -208,17 +230,9 @@
         color: #bfbfbf;
       }
     }
-    .submit-btn {
+    .vmp-lottery-btn {
       display: block;
-      width: 686px;
-      height: 90px;
-      margin: 0 auto;
-      background: #fb2626;
-      border-radius: 45px;
-      line-height: 90px;
-      text-align: center;
-      font-size: 32px;
-      color: #fff;
+      margin: 48px auto 0;
       &.disabled {
         pointer-events: none;
         opacity: 0.4;

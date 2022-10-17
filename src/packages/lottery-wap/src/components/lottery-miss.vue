@@ -1,14 +1,8 @@
 <template>
   <div class="no-win-lottery">
-    <img class="no-win-lottery-img" :src="noLotteryImg" alt srcset />
-    <p class="lottery-result">{{ $t('interact_tools.interact_tools_1022') }}</p>
-    <p class="no-win-tip">
-      {{
-        `${$t('interact_tools.interact_tools_1010')},${$t(
-          'interact_tools.interact_tools_1011'
-        ).toLocaleLowerCase()}`
-      }}!
-    </p>
+    <div class="no-win-lottery-img" />
+    <p class="no-win-result">{{ text }}</p>
+    <p class="no-win-tip">{{ $t('interact_tools.interact_tools_1011') }}</p>
     <button class="vmp-lottery-btn" v-if="showWinnerList" @click="navToWinnerList">
       {{ $t('interact_tools.interact_tools_1012') }}
     </button>
@@ -19,6 +13,13 @@
   export default {
     name: 'LotteryMiss',
     mixins: [props],
+    computed: {
+      text() {
+        return `${this.$t('interact_tools.interact_tools_1074')},${this.$t(
+          'interact_tools.interact_tools_1010'
+        )}`;
+      }
+    },
     methods: {
       navToWinnerList() {
         this.$emit('navTo', 'LotteryWinner');
@@ -28,30 +29,36 @@
 </script>
 <style lang="less">
   .no-win-lottery {
-    padding: 60px;
+    background: linear-gradient(37.94deg, #fffbe8 3.86%, #fbf0e6 84.36%);
+    border-radius: 20px;
+    padding: 56px 0;
     text-align: center;
-    background: linear-gradient(55.05deg, #fdf1ed 9.38%, #f3f2ff 101.37%);
-    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+    width: 640px;
+    // height: 524px;
     .no-win-lottery-img {
-      display: inline-block;
-      width: 256.83px;
-      height: 158px;
-      margin: 46px auto 15px;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+      background-image: url('../img/lottery-miss.png');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
-    .lottery-result {
+    .no-win-result {
+      color: #fce09e;
       font-weight: 500;
       font-size: 32px;
-      line-height: 45px;
+      line-height: 44px;
       text-align: center;
-      color: #5b3521;
-      margin-bottom: 10px;
+      color: #262626;
     }
     .no-win-tip {
+      margin-top: 16px;
       font-size: 28px;
-      line-height: 39px;
-      text-align: center;
-      color: #5b3521;
-      margin-bottom: 74px;
+      line-height: 40px;
+      color: #262626;
+    }
+    .vmp-lottery-btn {
+      margin-top: 64px;
     }
   }
 </style>
