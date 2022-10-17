@@ -1028,6 +1028,11 @@
           if (this.$route.query.assistantType) {
             return;
           }
+          if (this.$domainStore.state.roomBaseServer.clientType == 'record') {
+            // 如果是录制页面，结束录制不会派发结束直播的消息，domain中的自动重置逻辑不会触发
+            // 所以需要单独执行 handleLiveOver
+            this.docServer.handleLiveOver();
+          }
           this.setDisplayMode('normal');
           // 通知默认菜单和工具栏默认为文档
           window.$middleEventSdk?.event?.send(
