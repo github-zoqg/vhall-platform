@@ -282,7 +282,6 @@
     created() {
       this.childrenCom = window.$serverConfig[this.cuid].children;
       this.initViewData();
-      // TODO: 问答开关消息收到两条 —— this.listenEvents();
       // 给聊天服务保存一份关键词
       // this.chatServer.setKeywordList(this.keywordList);
     },
@@ -368,41 +367,6 @@
         this.webinar = webinar;
         this.roomId = interact.room_id;
         this.isEmbed = embed;
-      },
-      listenEvents() {
-        const qaServer = useQaServer();
-        const chatServer = useChatServer();
-        //收到问答打开
-        qaServer.$on(qaServer.Events.QA_OPEN, msg => {
-          chatServer.addChatToList({
-            content: {
-              //观看端显示编辑后的问答名称，发起端不变，消息体默认返回“问答”
-              text_content:
-                this.roleName == 1 || !msg.data.name || msg.data.name == '问答'
-                  ? this.$t('chat.chat_1026', { n: this.$t('common.common_1004') })
-                  : this.$t('chat.chat_1026', { n: msg.data.name })
-            },
-            roleName: msg.data.role_name,
-            nickname: msg.data.nick_name,
-            type: msg.data.type,
-            interactStatus: true
-          });
-        });
-        //收到问答关闭
-        qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
-          chatServer.addChatToList({
-            content: {
-              text_content:
-                this.roleName == 1 || !msg.data.name || msg.data.name == '问答'
-                  ? this.$t('chat.chat_1081', { n: this.$t('common.common_1004') })
-                  : this.$t('chat.chat_1081', { n: msg.data.name })
-            },
-            roleName: msg.data.role_name,
-            nickname: msg.data.nick_name,
-            type: msg.data.type,
-            interactStatus: true
-          });
-        });
       },
       listenChatServer() {
         const chatServer = useChatServer();
