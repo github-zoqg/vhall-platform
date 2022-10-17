@@ -194,7 +194,10 @@
                     class="vmp-wap-player-control-icons-left-time"
                     v-if="!isLiving && !isWarnPreview"
                   >
-                    {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+                    <template v-if="totalTime > 0">
+                      {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+                    </template>
+                    <template v-else>--:--/--:--</template>
                   </span>
                 </span>
                 <!-- 右侧icon集合 倍速和画质 -->

@@ -47,11 +47,16 @@
                 @click="videoPlayBtn"
               ></i>
               <div class="vmp-center-box" :class="isVod ? '' : 'vmp-center-box__hidden'">
-                <span>
-                  {{ currentTime | secondToDate }}
-                </span>
-                <span>/</span>
-                <span>{{ totalTime | secondToDate }}</span>
+                <template v-if="totalTime > 0">
+                  <span>
+                    {{ currentTime | secondToDate }}
+                  </span>
+                  <span>/</span>
+                  <span>{{ totalTime | secondToDate }}</span>
+                </template>
+                <template v-else>
+                  <span>--:--/--:--</span>
+                </template>
               </div>
             </div>
             <div class="vmp-video-preview-wrap-controller-icons-right">
@@ -172,9 +177,10 @@
             this._firstInit = true;
           }
           console.log('初始化播放器成功');
-          this.totalTime = this.playerServer.getDuration(() => {
-            console.log('获取总时间失败');
-          }); // 获取视频总时长
+          this.totalTime =
+            this.playerServer.getDuration(() => {
+              console.log('获取总时间失败');
+            }) || 0; // 获取视频总时长
           this.initSlider(); // 初始化播放进度条
           this.listen();
           await this.$nextTick(0);
