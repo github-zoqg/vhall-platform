@@ -8,6 +8,7 @@
       :lazy-render="false"
       round
       position="bottom"
+      :style="{ height: `${popHeight}px` }"
     >
       <span class="filter_one"></span>
       <span class="filter_two"></span>
@@ -26,7 +27,8 @@
     data() {
       return {
         menuDialogVisible: false,
-        childrenComp: []
+        childrenComp: [],
+        popHeight: 708
       };
     },
     watch: {},
@@ -41,9 +43,19 @@
     mounted() {},
     beforeDestroy() {},
     methods: {
-      openMenusPanel() {
+      async openMenusPanel() {
         this.menuDialogVisible = true;
+        await this.$nextTick(() => {});
+        this.computeDialogHeight();
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitComputedMenuWidth'));
+      },
+      computeDialogHeight() {
+        const blockIsOffsetTop = document.getElementsByClassName('vmp-block');
+        const baseDomHeight = document.body.clientHeight;
+        const offsetTop = blockIsOffsetTop ? blockIsOffsetTop[0].offsetTop : 0;
+        if (offsetTop && offsetTop > 0) {
+          this.popHeight = Number(baseDomHeight - offsetTop);
+        }
       }
     }
   };
@@ -79,7 +91,7 @@
   }
   .wap-menu-van-popup {
     width: 100%;
-    height: 708px;
+    // min-height: 708px;
     left: 0px;
     bottom: 0;
     background: linear-gradient(174.42deg, #ffffff 7.78%, #ffffff 57.2%);
