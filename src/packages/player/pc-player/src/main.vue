@@ -161,13 +161,16 @@
               ></i>
             </div>
             <div class="controller-tools-left-time" v-if="!isLiving && !isWarnPreview">
-              <span class="controller-tools-left-time-current">
-                {{ currentTime | secondToDate }}
-              </span>
-              <span>/</span>
-              <span class="controller-tools-left-time-total">
-                {{ totalTime | secondToDate }}
-              </span>
+              <template v-if="totalTime > 0">
+                <span class="controller-tools-left-time-current">
+                  {{ currentTime | secondToDate }}
+                </span>
+                <span>/</span>
+                <span class="controller-tools-left-time-total">{{ totalTime | secondToDate }}</span>
+              </template>
+              <template v-else>
+                <span>--:--/--:--</span>
+              </template>
             </div>
           </div>
           <div class="controller-tools-right">
@@ -941,10 +944,11 @@
         getRecordTotalTimer = setInterval(() => {
           try {
             this.totalTime =
-              this.playerServer &&
-              this.playerServer.getDuration(() => {
-                console.log('获取视频总时长失败');
-              });
+              (this.playerServer &&
+                this.playerServer.getDuration(() => {
+                  console.log('获取视频总时长失败');
+                })) ||
+              0;
             this.totalTime > 0 && clearInterval(getRecordTotalTimer);
           } catch (error) {
             console.log(error);
