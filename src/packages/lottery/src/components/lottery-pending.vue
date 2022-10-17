@@ -28,10 +28,12 @@
         </span>
       </p>
       <div
-        v-if="mode !== 'live'"
+        v-if="mode !== 'live' && btnImgUrl"
         :class="['start-lottery-btn', `order-${fitment.img_order}`]"
         @click="handleClickStartLottery"
-      ></div>
+      >
+        <img class="start-lottery-btn-ae" :src="btnImgUrl" alt="" />
+      </div>
     </div>
     <button
       v-if="mode === 'live'"
@@ -131,13 +133,19 @@
         loading: false,
         joined: false,
         endLotteryDisable: false, // 结束抽奖防抖3秒
-        inProgress: false // 动画演示中(已点击,立刻抽奖)
+        inProgress: false, // 动画演示中(已点击,立刻抽奖)
+        btnImgUrl: null // 按钮的图片地址
       };
     },
     mounted() {
       if (this.fitment.img_order !== 0) {
         this.initSvgaResource();
       }
+    },
+    beforeDestroy() {
+      // 删除资源实例
+      player && player.destroy && player.destroy();
+      parser && parser.destroy && parser.destroy();
     },
     methods: {
       // 点击参与抽奖
@@ -187,10 +195,10 @@
         }
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
-          if (this.mode === 'live') {
-            player.setImage(resourceItem.coverBtnImgUrl, resourceItem.imageKey);
-          }
           player.setVideoItem(videoItem);
+          if (this.mode === 'watch') {
+            this.btnImgUrl = resourceItem.coverBtnImgUrl;
+          }
           if (this.mode === 'live') {
             this.startAnimation();
           } else {
@@ -200,12 +208,10 @@
               this.startAnimation();
             } else {
               if (this.needJoin) {
-                player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+                this.btnImgUrl = resourceItem.sendBtnImgUrl;
               }
-              player.startAnimationWithRange({
-                location: 1,
-                length: 15
-              });
+              // 停止播放
+              player.stepToFrame(0, false);
             }
           }
         });
@@ -229,11 +235,6 @@
           clearTimeout(st);
           this.endLotteryDisable = false;
         }, 3000);
-      },
-      judgeInProgress() {
-        const cacheKey = `lottery_${this.lotteryId}_cache`;
-        const cache = sessionStorage.getItem(cacheKey);
-        return;
       }
     }
   };
@@ -301,7 +302,6 @@
       color: #fff;
     }
     .lottery-pending-animation {
-      // display: inline-block;
       display: block;
       margin: 0 auto;
       width: 328px;
@@ -377,12 +377,23 @@
       // background: yellow;
       &.order-1 {
         top: 120px;
-        left: 154px;
+        left: 153px;
         height: 75px;
         width: 75px;
+        &::before {
+          content: '';
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          top: -16px;
+          left: 50%;
+          transform: translate(-50%);
+          background-image: url('../img/lottery-arrow.png');
+          background-size: contain;
+        }
       }
       &.order-2 {
-        top: 300px;
+        top: 306px;
         left: 110px;
         height: 60px;
         width: 160px;
@@ -402,6 +413,30 @@
         background: #ffd1c9;
         color: #fff;
         pointer-events: none;
+      }
+    }
+    // 按钮图片与效果
+    .start-lottery-btn-ae {
+      display: inline-block;
+      position: relative; // 用文档流提高层级
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 10;
+      animation-name: zoom;
+      animation-duration: 600ms;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      animation-direction: alternate-reverse;
+      &:active {
+        z-index: 10;
+        animation-iteration-count: 1;
+        animation-duration: 300ms;
+      }
+    }
+    @keyframes zoom {
+      to {
+        transform: scale(1.1);
       }
     }
   }
