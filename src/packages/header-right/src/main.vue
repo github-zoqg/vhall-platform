@@ -642,6 +642,8 @@
         if (this.isStreamYun && !this.director_stream) return false;
         if (this.isThirdStream) {
           await this.roomBaseServer.getInavToolStatus();
+          // getInavToolStatus接口回重制start_type状态，所以需要重新设置第三方推流开启状态
+          this.roomBaseServer.setInavToolStatus('start_type', 4);
           if (this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1) {
             this.$message.warning('合并模式不支持三方推流');
             return;
