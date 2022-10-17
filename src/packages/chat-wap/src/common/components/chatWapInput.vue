@@ -1,5 +1,9 @@
 <template>
-  <div class="chat-input-modal" :class="smFix ? 'smFix' : ''" v-show="visible">
+  <div
+    class="chat-input-modal"
+    :class="[smFix ? 'smFix' : '', isConcise ? `chat-input-modal__${showTabType}` : '']"
+    v-show="visible"
+  >
     <div class="input-info">
       <div class="send-box" @touchend.prevent="operateEmoji">
         <i class="iconfonts vh-iconfont vh-line-expression" v-show="!showEmoji" title="表情"></i>
@@ -113,6 +117,16 @@
         } else {
           return false;
         }
+      },
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return skin_json_wap?.style == 3;
       }
     },
     mounted() {
@@ -470,6 +484,43 @@
       /* placeholder字体大小  */
       font-size: 14px;
       color: #bfbfbf;
+    }
+
+    /* 问答 & 私聊 */
+    &.chat-input-modal__qa,
+    &.chat-input-modal__private {
+      background-color: var(--theme-qa-sendBox-model-bg-color);
+      box-shadow: 0px -1px 1px var(--theme-qa-sendBox-box-shadow-color);
+      .input-info {
+        .send-box {
+          // 表情按钮icon字体色
+          color: var(--theme-qa-sendBox-emoji-font-color);
+          .send-menu {
+            // 发送消息按钮icon字体色
+            color: var(--theme-qa-sendBox-send-active-font-color);
+            background-color: var(--theme-qa-sendBox-send-bg-color);
+            &.noMsg {
+              // 发送消息按钮icon禁用字体色
+              color: var(--theme-qa-sendBox-send-font-color);
+            }
+          }
+        }
+        .textarea {
+          textarea {
+            background-color: var(--theme-qa-sendBox-input-bg-color);
+            color: var(--theme-qa-sendBox-input-font-color);
+          }
+          .el-textarea__inner::-webkit-input-placeholder {
+            color: var(--theme-qa-sendBox-input-placeholder-color);
+          }
+        }
+      }
+      .inputGroup {
+        .text-limit {
+          background-color: var(--theme-qa-sendBox-input-bg-color);
+          color: var(--theme-qa-sendBox-input-max-font-color);
+        }
+      }
     }
   }
 </style>
