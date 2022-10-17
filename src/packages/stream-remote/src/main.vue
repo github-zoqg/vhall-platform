@@ -218,7 +218,7 @@
                 stream.attributes.roleName == 1 ||
                 stream.attributes.role == 4)
             "
-            @click="setOwner(stream.accountId)"
+            @click="setOwner(true)"
           ></span>
         </el-tooltip>
 
@@ -286,9 +286,11 @@
         timmer: null,
         isSafari: navigator.userAgent.match(/Version\/([\d.]+).*Safari/),
         popAlert: {
-          text: '切换主画面将中断插播视频或桌面共享操作，是否继续？',
+          text: '切换主讲人或主画面将中断插播视频或桌面共享操作，是否继续？',
           visible: false,
-          confirm: true
+          confirm: true,
+          type: 'main', // main:主画面；presenter:主讲人
+          accountId: null
         }
       };
     },
@@ -478,7 +480,11 @@
           // 正在插播
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStopInsert'));
         }
-        this.setMainScreen();
+        if (this.popAlert.type == 'main') {
+          this.setMainScreen();
+        } else {
+          this.setOwner();
+        }
         this.popAlert.visible = false;
       },
       // 关闭弹窗
@@ -741,14 +747,16 @@
        * @param {Number | String} accountId 用户ID
        * @Function void()
        */
-      setOwner(accountId, setMainScreen = true) {
-        // if (accountId) {
-        //   const streamInfo = this.getDesktopAndIntercutInfo();
-        //   const users = streamInfo.remoteUsers.concat(streamInfo.localUser);
-        //   const mainScreenUser = users.find(u => u.accountId == accountId) || { streams: [] };
-        //   const mainScreenStream = mainScreenUser.streams.find(s => s.streamType == 2) || {};
-        //   if (!mainScreenStream.streamId) return EventBus.$emit('BIGSCREENSET_FAILED');
-        // }
+      setOwner(alert, setMainScreen = true) {
+        if (alert) {
+          const stream = this.interactiveServer.getDesktopAndIntercutInfo();
+          if (stream) {
+            this.popAlert.visible = true;
+            this.popAlert.type = 'presenter';
+            return;
+          }
+        }
+
         window.vhallReportForProduct?.toStartReporting(110169, [110170, 110171], {
           rejection_method: encodeURIComponent('流画面处设置嘉宾为主讲人'),
           guest_info: this.stream
@@ -758,7 +766,7 @@
         }
         this.interactiveServer
           .setSpeaker({
-            receive_account_id: accountId || this.stream.accountId
+            receive_account_id: this.stream.accountId
           })
           .then(res => {
             window.vhallReportForProduct?.toResultsReporting(110170, {
@@ -780,6 +788,7 @@
           const stream = this.interactiveServer.getDesktopAndIntercutInfo();
           if (stream) {
             this.popAlert.visible = true;
+            this.popAlert.type = 'main';
             return;
           }
         }
