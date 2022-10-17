@@ -29,7 +29,7 @@ export default {
   '--theme-chat-msg-reply-after': ' ',
   '--theme-chat-msg-interact-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
-  // 聊天输入框输入状态
+  // 聊天输入框输入状态[聊天]
   '--theme-chat-sendBox-model-bg-color': '#2a2a2a',
   '--theme-chat-sendBox-box-shadow-color': '#141414',
   '--theme-chat-sendBox-emoji-font-color': 'rgba(255, 255, 255, 0.65)',
@@ -41,6 +41,18 @@ export default {
   '--theme-chat-sendBox-input-font-color': '#ffffff',
   '--theme-chat-sendBox-input-scroll-bg-color': 'rgba(255, 255, 255, 0.45)',
   '--theme-chat-sendBox-input-max-font-color': 'rgba(255, 255, 255, 0.45)',
+  // 聊天输入框输入状态[问答 & 私聊]
+  '--theme-qa-sendBox-model-bg-color': '#ffffff',
+  '--theme-qa-sendBox-box-shadow-color': '#d9d9d9',
+  '--theme-qa-sendBox-emoji-font-color': 'rgba(0, 0, 0, 0.65)',
+  '--theme-qa-sendBox-send-font-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-qa-sendBox-send-bg-color': 'rgba(0, 0, 0, 0.06)',
+  '--theme-qa-sendBox-send-active-font-color': 'rgba(0, 0, 0, 0.85)',
+  '--theme-qa-sendBox-input-bg-color': 'rgba(0, 0, 0, 0.06)',
+  '--theme-qa-sendBox-input-placeholder-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-qa-sendBox-input-font-color': '#262626',
+  '--theme-qa-sendBox-input-scroll-bg-color': 'rgba(0, 0, 0, 0.45)',
+  '--theme-qa-sendBox-input-max-font-color': 'rgba(0, 0, 0, 0.45)',
   '--theme-tab-content-intro-title-font': '#262626',
   '--theme-tab-content-intro-subTitle-font': ' ',
   '--theme-tab-content-intro-introLink-font': ' ',
