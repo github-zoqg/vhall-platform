@@ -273,11 +273,11 @@
       &__content-main {
         padding-bottom: 24px;
         color: var(--theme-tab-content-intro-subTitle-font);
-        word-break: break-all;
+        word-break: break-word;
         line-height: 1.4;
-        p {
-          word-break: break-all;
-        }
+        // p {
+        //   word-break: break-word;
+        // }
 
         img {
           margin: 16px 0;
