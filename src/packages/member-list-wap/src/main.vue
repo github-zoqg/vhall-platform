@@ -9,6 +9,14 @@
         <div class="member-list-item" v-for="item in list" :key="item['account_id']">
           <div class="avatar-box">
             <img :src="item && item['avatar'] ? item['avatar'] : defaultAvatar" alt="" />
+            <img
+              v-show="[1, '1', 3, '3'].includes(item.device_type)"
+              class="member-list-item__avatar-wrapper__phone"
+              width="9"
+              height="12"
+              :src="phoneImg"
+              alt
+            />
           </div>
 
           <div class="info-name">{{ item['nickname'] }}</div>
@@ -35,6 +43,8 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/app-shared/assets/img/phone_wap.png';
+
   import { uniqBy, throttle } from 'lodash';
   import { useRoomBaseServer, useMemberServer, useGroupServer, useMsgServer } from 'middle-domain';
   export default {
@@ -53,6 +63,8 @@
         },
         // 默认头像
         defaultAvatar: defaultAvatar,
+        //手机图片标识
+        phoneImg: phoneImg,
         // 是否全部加载完成
         finished: false,
         // 是否是在刷新
@@ -370,11 +382,12 @@
     height: 100%;
     position: relative;
     overflow: hidden;
+    padding-bottom: 100px;
     .member-list-wrap {
       width: 100%;
       height: 100%;
       overflow-y: auto;
-      padding-bottom: 20px;
+      padding-bottom: 100px;
     }
     .member-list-item {
       margin: 0 0;
@@ -388,14 +401,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(173, 225, 255, 1);
+      // background: #ffffff;
       border-radius: 100%;
+      position: relative;
       img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 50%;
         display: block;
+      }
+      .member-list-item__avatar-wrapper__phone {
+        position: absolute;
+        width: 12px;
+        height: 17px;
+        right: -2px;
+        bottom: -2px;
       }
     }
     .info-name {

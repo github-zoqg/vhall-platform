@@ -45,7 +45,7 @@
       // height: 24px;
       font-size: 28px;
       font-weight: 400;
-      color: #3562fa !important;
+      color: #1e4edc !important;
       line-height: 28px;
       word-break: break-all;
       margin: 20px 0px;
