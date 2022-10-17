@@ -740,12 +740,13 @@
       async menuDialogComputed() {
         if (this.isEmbedVideo) return;
         await this.$nextTick();
+        console.log('啥啥啥', this.visibleMenu, this.selectedId);
         if (this.visibleMenu.length == 1) {
           // 默认显示菜单中的第一个
           this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
         }
-        this.scrollToItem({ id: this.selectedId });
-        this.computedWidth();
       }
     }
   };

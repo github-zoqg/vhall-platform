@@ -1,5 +1,5 @@
 <template>
-  <div :class="['vmp-wap-menu-dialog', isInGroup ? 'last-position' : '']">
+  <div class="vmp-wap-menu-dialog">
     <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
     <!-- <span class="menu_icon-pointer"></span> -->
     <van-popup
@@ -57,9 +57,6 @@
     align-items: center;
     position: relative;
     text-align: left;
-    &.last-position {
-      margin-left: 24px;
-    }
     /* 极简模式下弹出来的样式，很多都需要重置 */
     .menu_icon-concise {
       width: 50px;

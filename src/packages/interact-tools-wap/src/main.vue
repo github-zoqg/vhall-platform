@@ -1,8 +1,8 @@
 <template>
   <div :class="['vmp-interact-tools-wap', isConcise ? 'vmp-interact-tools-wap__concise' : '']">
-    <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+    <div class="icon-wrapper">
       <!-- TODO:支付牌照问题 -->
-      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift">
+      <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
         <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
         <GiftCard
           @showLogin="showLogin"
@@ -25,7 +25,11 @@
         />
       </div> -->
       <!-- 邀请卡 -->
-      <div v-if="showInviteCard && !localRoomInfo.isEmbed" class="share-box" @click="report">
+      <div
+        v-if="showInviteCard && !localRoomInfo.isEmbed && !isInGroup"
+        class="share-box"
+        @click="report"
+      >
         <a
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
@@ -38,7 +42,7 @@
         <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
       </div>
       <!-- 点赞 -->
-      <div v-if="localRoomInfo.showLike">
+      <div v-if="localRoomInfo.showLike && !isInGroup">
         <!-- <i class="vh-saas-iconfont vh-saas-a-color-givealike"></i> -->
         <Parise :hideChatHistory="joinInfoInGift.hideChatHistory" :localRoomInfo="localRoomInfo" />
       </div>
@@ -106,24 +110,33 @@
       };
     },
     computed: {
+      // 是否在小组中
+      isInGroup() {
+        return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
       // 是否展示自定义菜单组件
       isShowMenuByConcise() {
         // 进入了小组 & 当前展示成员列表 & 极简模式
+        console.log('当前数据', this.visibleMenuLength);
         return this.isConcise && this.visibleMenuLength > 0;
       }
     },
     created() {
-      window.interactTools = this;
+      if (!this.isInGroup) {
+        window.interactTools = this;
+      }
       if (this.isConcise) {
         this.childrenComp = window.$serverConfig[this.cuid].children;
       }
     },
     mounted() {
-      this.joinInfoInGift = {
-        avatar: this.roomBaseState.watchInitData.join_info.avatar,
-        nickname: this.roomBaseState.watchInitData.join_info.nickname,
-        hideChatHistory: this.configList['ui.hide_chat_history'] == 1
-      };
+      if (!this.isInGroup) {
+        this.joinInfoInGift = {
+          avatar: this.roomBaseState.watchInitData.join_info.avatar,
+          nickname: this.roomBaseState.watchInitData.join_info.nickname,
+          hideChatHistory: this.configList['ui.hide_chat_history'] == 1
+        };
+      }
     },
     methods: {
       showLogin() {
