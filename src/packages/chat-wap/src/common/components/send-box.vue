@@ -88,14 +88,10 @@
             />
           </div>
         </div>
-        <div class="icon-wrapper" v-if="!groupInitData.isInGroup">
+        <div class="icon-wrapper">
           <!-- 底部互动工具组件 comChatWap-->
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
-      </div>
-      <!-- 底部区域 自定义菜单入口 【进入了小组】 -->
-      <div class="icon-menu-concise" v-if="isShowMenuByConcise">
-        <vmp-air-container :oneself="true" :cuid="childrenCom[3]"></vmp-air-container>
       </div>
     </div>
     <chat-wap-input
