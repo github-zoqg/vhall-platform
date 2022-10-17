@@ -187,7 +187,9 @@
       hideItem() {
         return (
           this.configList['initiate_embed_function_close'] &&
-          (this.$route.query.liveT || this.$route.query.live_token)
+          (this.$route.query.liveT ||
+            this.$route.query.live_token ||
+            this.$route.query.assistant_token)
         );
       },
       // 是否开启了桌面共享
