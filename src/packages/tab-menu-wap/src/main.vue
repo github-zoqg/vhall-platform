@@ -370,8 +370,8 @@
             type: msg.data.type,
             interactStatus: true
           });
-          if (this.visibleMenu.length == 1) {
-            // 默认显示菜单中的第一个
+          if (this.visibleMenu && this.visibleMenu.length == 1) {
+            // 若开启了问答后，菜单总数为1，那么默认菜单第一个被选中。
             this.selectDefault();
           }
         });
@@ -741,7 +741,8 @@
         if (this.isEmbedVideo) return;
         await this.$nextTick();
         console.log('啥啥啥', this.visibleMenu, this.selectedId);
-        if (this.visibleMenu.length == 1) {
+        // 初始化也好，消息事件触发之后；若点击菜单小icon图标，当前菜单总数 超过0个时，默认第一个选中。
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
           // 默认显示菜单中的第一个
           this.selectDefault();
           this.scrollToItem({ id: this.selectedId });
