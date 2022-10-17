@@ -1,36 +1,37 @@
 <template>
   <section class="vmp-intro">
     <section class="vmp-intro-main">
-      <section class="vmp-intro-block">
-        <header class="vmp-intro-block__headtitle">
-          <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
-            <img :src="noDelayIconUrl" />
-          </i>
-          {{ languagesInfo.subject }}
-        </header>
-        <main class="vmp-intro-block__detail">
-          <p>
-            <!-- <i class="vh-iconfont vh-line-time" /> -->
-            {{ startTime }}
-          </p>
-          <!-- 预约人数 -->
-          <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p class="num" v-if="watchInitData.subscribe.show">
-              <i18n path="appointment.appointment_1018">
-                <span place="n">{{ watchInitData.subscribe.num }}</span>
-              </i18n>
+      <div :class="{ 'vmp-intor-haveIcon': showIconNum }">
+        <section class="vmp-intro-block">
+          <header class="vmp-intro-block__headtitle">
+            <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
+              <img :src="noDelayIconUrl" />
+            </i>
+            {{ languagesInfo.subject }}
+          </header>
+          <main class="vmp-intro-block__detail">
+            <p>
+              <!-- <i class="vh-iconfont vh-line-time" /> -->
+              {{ startTime }}
             </p>
-          </template>
-          <!-- 在线人数 -->
-          <template v-if="watchInitData.status != 'subscribe'">
-            <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-            <p v-if="watchInitData.online.show">
-              <!-- <i class="vh-iconfont vh-line-user"></i> -->
-              {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
-            </p>
-          </template>
-        </main>
-        <!-- <div
+            <!-- 预约人数 -->
+            <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
+              <p class="num" v-if="watchInitData.subscribe.show">
+                <i18n path="appointment.appointment_1018">
+                  <span place="n">{{ watchInitData.subscribe.num }}</span>
+                </i18n>
+              </p>
+            </template>
+            <!-- 在线人数 -->
+            <template v-if="watchInitData.status != 'subscribe'">
+              <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+              <p v-if="watchInitData.online.show">
+                <i class="vh-iconfont vh-line-group"></i>
+                {{ personCountTxt | formatHotNum }}
+              </p>
+            </template>
+          </main>
+          <!-- <div
           class="vmp-intro-block__auth"
           v-if="
             !isEmbed &&
@@ -61,11 +62,12 @@
             }}
           </span>
         </div> -->
-      </section>
-      <section class="vmp-intro-block vmp-intro-block-content">
-        <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
-        <main class="vmp-intro-block__content-main" v-html="content"></main>
-      </section>
+        </section>
+        <section class="vmp-intro-block vmp-intro-block-content">
+          <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
+          <main class="vmp-intro-block__content-main" v-html="content"></main>
+        </section>
+      </div>
       <aside>
         <a
           class="vmp-intro-link"
@@ -141,6 +143,10 @@
       // 简介富文本正文 Type:String
       content() {
         return this.languagesInfo.introduction || '<p></p>';
+      },
+      // 展示icon数量
+      showIconNum() {
+        return this.$domainStore.state.roomBaseServer.showIconNum;
       }
     },
     created() {
@@ -167,6 +173,14 @@
     position: relative;
     display: flex;
     flex-direction: column;
+
+    .vmp-intor-haveIcon {
+      width: calc(100% - 84px);
+      .vmp-intro-block-content,
+      .vmp-intro-block {
+        padding-right: 0;
+      }
+    }
 
     .vmp-intro-block {
       padding: 32px 24px 0 24px;
@@ -257,6 +271,9 @@
         }
         .num {
           color: var(--theme-component-subscribe);
+        }
+        .vh-line-group {
+          margin-right: 10px;
         }
       }
 
