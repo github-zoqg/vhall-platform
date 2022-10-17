@@ -1,41 +1,64 @@
 <template>
   <div class="vmp-lottery-pending">
-    <!-- 标题 -->
-    <p v-if="fitment.title" class="lottery-title">{{ fitment.title }}</p>
-    <!-- 发送参与 -->
-    <i18n v-if="needJoin" path="interact_tools.interact_tools_1065" tag="p">
-      <span class="lottery-remark" place="n">{{ lotteryInfo.command }}</span>
-    </i18n>
-    <p v-else class="lottery-remark">
-      {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}....` }}
-    </p>
-    <div class="lottery-pending-wrap">
-      <img
-        :class="[`machine-${fitment.img_order}`, 'lottery-pending-animation']"
-        :src="fitment.url"
-        alt
-      />
+    <div v-if="needJoin" class="lottery-send-command-container">
+      <span class="lottery-send-command">
+        <i18n path="interact_tools.interact_tools_1065" tag="p">
+          <span class="lottery-command" place="n">{{ lotteryInfo.command }}</span>
+        </i18n>
+      </span>
     </div>
-    <button
-      v-if="needJoin"
-      :class="['vmp-lottery-btn', `order-${fitment.img_order}`]"
-      @click="joinLottery"
-    >
-      {{ $t('interact_tools.interact_tools_1008') }}
-    </button>
-    <div class="close-btn-wrap">
-      <i class="vh-iconfont vh-line-circle-close vmp-close-btn" @click="close"></i>
+    <!-- 自定义图片的抽奖样式 -->
+    <template v-if="isCustom">
+      <div class="vmp-lottery-pending-custom">
+        <div class="lottery-pending-animation">
+          <img class="lottery-pending-animation-img" :src="fitment.url" alt />
+        </div>
+        <button v-if="needJoin" class="vmp-lottery-btn" @click="joinLottery">
+          {{ $t('interact_tools.interact_tools_1008') }}
+        </button>
+      </div>
+    </template>
+    <!-- 自定义图片的抽奖样式 -->
+    <div v-else class="vmp-lottery-pending-container">
+      <acclaim v-if="!needJoin && inProgress" class="acclaim-panel"></acclaim>
+      <div id="lottery-svga"></div>
+      <p :class="['lottery-remark', `order-${fitment.img_order}`]">
+        <span class="remark-text">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
+      </p>
+      <div
+        :class="['start-lottery-btn', `order-${fitment.img_order}`]"
+        @touchstart="handleClickStartLottery"
+      ></div>
     </div>
   </div>
 </template>
 <script>
   import props from './props';
+  import acclaim, { acclaimAE } from '../art/acclaim/index.vue';
+  import {
+    slotmachineResource,
+    turnplateResource,
+    capsuleResource
+  } from '@/app-shared/utils/lotterySvga';
   import { useChatServer } from 'middle-domain';
+  import SVGA from 'svgaplayerweb';
+  let player, parser;
+
+  const animationEffectArr = [null, turnplateResource, slotmachineResource, capsuleResource];
+
   export default {
     name: 'LotteryPending',
     inject: ['lotteryServer'],
     mixins: [props],
+    components: {
+      acclaim
+    },
     computed: {
+      isCustom() {
+        return this.fitment.img_order === 0;
+      },
       // 显示
       needJoin() {
         return (
@@ -75,11 +98,25 @@
     data() {
       return {
         loading: false,
-        joined: false
+        joined: false,
+        inProgress: false
       };
     },
+    mounted() {
+      if (this.fitment.img_order !== 0) {
+        this.initSvgaResource();
+      }
+    },
     methods: {
-      //
+      // 点击参与抽奖
+      handleClickStartLottery() {
+        if (this.needJoin && !this.joined) {
+          this.joinLottery();
+        } else {
+          this.startAnimation();
+        }
+      },
+      // 发送口令
       joinLottery() {
         if (this.needLoginStatus) {
           return this.$emit('needLogin');
@@ -95,14 +132,51 @@
               useChatServer().sendMsg(msg);
               this.joined = true;
               this.$toast(this.$t('chat.chat_1010'));
+              if (!this.isCustom) {
+                this.startAnimation();
+              }
             }
           })
           .finally(() => {
             this.loading = false;
           });
       },
-      close() {
-        this.$emit('close');
+      initSvgaResource() {
+        player = new SVGA.Player('#lottery-svga');
+        parser = new SVGA.Parser('#lottery-svga');
+        console.log('this.fitment', this.fitment);
+        let itemIdx = this.fitment.img_order;
+        if (![1, 2, 3].includes(this.fitment.img_order)) {
+          itemIdx = 1;
+        }
+        const resourceItem = animationEffectArr[itemIdx];
+        parser.load(resourceItem.svgaUrl, videoItem => {
+          player.setVideoItem(videoItem);
+          const cacheKey = `lottery_${this.lotteryId}_cache`;
+          const cache = sessionStorage.getItem(cacheKey);
+          if (cache) {
+            this.startAnimation();
+          } else {
+            if (this.needJoin) {
+              player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+            }
+            player.startAnimationWithRange({
+              location: 1,
+              length: 15
+            });
+          }
+        });
+      },
+      startAnimation() {
+        const cacheKey = `lottery_${this.lotteryId}_cache`;
+        sessionStorage.setItem(cacheKey, 1);
+        acclaimAE();
+        if (this.inProgress) return false;
+        this.inProgress = true;
+        player.startAnimationWithRange({
+          location: 30,
+          length: 60
+        });
       }
     }
   };
@@ -110,65 +184,152 @@
 <style lang="less">
   .vmp-lottery-pending {
     text-align: center;
-    color: #ffebc9;
-    text-shadow: 0px 3px 6px rgba(218, 111, 17, 0.6);
-    .lottery-title {
-      font-weight: 500;
-      font-size: 32px;
-      margin-bottom: 6px;
-      line-height: 44px;
+    .acclaim-panel {
+      width: 680px;
+      height: 400px;
+      position: absolute;
+      top: -120px;
+      left: 0;
     }
-    .lottery-remark {
-      font-size: 24px;
-      line-height: 32px;
-    }
-    .lottery-pending-wrap {
-      width: 700px;
-      height: 550px;
-      background-image: url('../img/lottery-pendding-bg.png');
-      background-size: 100%;
-      background-repeat: no-repeat;
-      background-position: center;
+    .vmp-lottery-pending-container {
+      width: 640px;
+      height: 760px;
       position: relative;
     }
-    .lottery-pending-animation {
-      position: absolute;
-      width: 475px; // 默认的转轮
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      &.machine-2 {
-        // 老虎机
-        width: 520px;
-        // 老虎机的设计图问题,需要css手动偏移
-        transform: translate(-48%, -50%);
+    .lottery-send-command-container {
+      display: inline-block;
+      position: relative;
+      text-align: center;
+      padding: 8px 0;
+      margin-bottom: 44px;
+      background: linear-gradient(89.99deg, #ff1d00 -7.32%, rgba(255, 79, 57, 0.2) 63.55%);
+      background-color: rgba(initial, 0.65;);
+      box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.25);
+      border-radius: 26px;
+      &::before {
+        // 大的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -24px;
+        bottom: -20px;
+        width: 40px;
+        height: 50px;
+        background-image: url('../img/star-1.png');
+        background-size: contain;
       }
-      &.machine-3 {
-        // 扭蛋
-        width: 500px;
+      &::after {
+        // 小的⭐️
+        content: '';
+        display: inline-block;
+        position: absolute;
+        right: -32px;
+        bottom: 0;
+        width: 16px;
+        height: 30px;
+        background-image: url('../img/star-2.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+    }
+    .lottery-send-command {
+      display: inline-block;
+      padding: 0 12px;
+      color: #fce09e;
+    }
+    .lottery-command {
+      color: #fff;
+    }
+    #lottery-svga {
+      width: 100%;
+      height: 100%;
+    }
+    .lottery-pending-animation {
+      display: block;
+      margin: 0 auto;
+      width: 640px;
+      height: 640px;
+      .lottery-pending-animation-img {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+    .lottery-remark {
+      display: inline-block;
+      position: absolute;
+      color: #fff;
+      font-size: 28px;
+      top: 550px;
+      left: 50%;
+      height: 40px;
+      transform: translate(-50%);
+      text-align: center;
+      overflow: hidden;
+      &.order-1 {
+        font-size: 24px;
+        width: 220px;
+        top: 640px;
+        color: #fff1ce;
+      }
+      &.order-2 {
+        width: 300px;
+        top: 118px;
+        color: #fff;
+      }
+      &.order-3 {
+        width: 180px;
+        top: 486px;
+        color: #fff;
+      }
+      .remark-text {
+        white-space: nowrap;
+        position: absolute;
+        transform: translateX(100%);
+        left: 0;
+        animation: move2left 5s linear infinite;
+      }
+      // 文字往左移
+      @keyframes move2left {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+    }
+    .start-lottery-btn {
+      display: inline-block;
+      height: 150px;
+      width: 150px;
+      position: absolute;
+      // background: yellow;
+      top: 250px;
+      left: 300px;
+      &.order-1 {
+        top: 236px;
+        left: 260px;
+        height: 120px;
+        width: 120px;
+      }
+      &.order-2 {
+        top: 560px;
+        left: 160px;
+        height: 140px;
+        width: 330px;
+      }
+      &.order-3 {
+        top: 600px;
+        left: 360px;
+        height: 100px;
+        width: 180px;
       }
     }
     .vmp-lottery-btn {
-      // 默认为转盘
-      background: linear-gradient(273.71deg, #ff2313 0%, #fd620c 96.61%);
-      &.order-2 {
-        // 老虎机
-        background: linear-gradient(273.71deg, #fb721d 0%, #f9a61d 96.61%);
-      }
-      &.order-3 {
-        // 扭蛋
-        background: linear-gradient(273.19deg, #046ffd 7.83%, #00b9f5 97.59%);
-      }
-    }
-    .close-btn-wrap {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .vmp-close-btn {
-      color: #fff;
-      font-size: 54px;
-      display: inline-block;
-      height: 58px;
+      display: block;
+      margin: 32px auto 0;
     }
   }
 </style>

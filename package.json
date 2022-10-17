@@ -1,7 +1,7 @@
 {
   "name": "middle-platform",
-  "version": "7.10.12",
-  "domainVersion": "1.5.16",
+  "version": "7.10.13",
+  "domainVersion": "1.5.18",
   "private": true,
   "scripts": {
     "/---/": "-------------saas业务线相关命令----------------",
