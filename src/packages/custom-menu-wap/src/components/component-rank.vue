@@ -129,6 +129,7 @@
       color: var(--theme-tab-content-rank-title-font);
     }
     position: relative;
+    min-height: 488px;
   }
   header {
     position: relative;
