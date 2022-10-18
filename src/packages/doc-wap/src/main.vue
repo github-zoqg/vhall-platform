@@ -676,7 +676,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 9;
+        z-index: 7;
         &:nth-last-child(1) {
           margin-right: 32px;
         }
@@ -702,7 +702,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 10;
+      z-index: 7;
 
       .vh-iconfont {
         font-size: 30px;
