@@ -11,7 +11,7 @@
       <div class="vmp-subject-pagination">
         <el-pagination
           v-show="total > pageInfo.limit"
-          background="true"
+          :background="true"
           layout="total, prev, pager, next, jumper"
           :total="total"
           :page-size="pageInfo.limit"

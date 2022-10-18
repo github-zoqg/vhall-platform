@@ -476,7 +476,17 @@
         height: 640px;
       }
       .el-col-xl-1920 {
-        width: 20%;
+        width: 20% !important;
+        // width: 282px !important; // 包含左右12px间距
+        // box-sizing: content-box;
+        // padding-left: 12px;
+        // padding-right: 12px;
+        // &:nth-child(5n) {
+        //   padding-right: 0;
+        // }
+        // &:nth-child(5n - 4) {
+        //   padding-left: 0;
+        // }
       }
     }
   }
