@@ -528,8 +528,8 @@
       // 开启文档云融屏
       isOpenDocStream: {
         handler(newval) {
-          // 开启融屏的前置条件是否满足
-          if (!newval.precondition) return;
+          // 开启融屏的前置条件是否满足 || 是否是客户端嵌入页
+          if (!newval.precondition || this.$route?.query.assistantType) return;
           if (newval.docStatus) {
             console.log('open-doc-yun-stream');
             this.openDocYunStream();
