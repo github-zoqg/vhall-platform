@@ -12,7 +12,8 @@
         'vmp-stream-list-h0': isStreamListH0,
         'vmp-stream-list-h-all': isStreamListHAll,
         'vmp-stream-list-no-speack': !micServer.state.isSpeakOn,
-        'vmp-stream-list-stream-center': speakerAndShowLayout == 1 && isCenterStream
+        'vmp-stream-list-stream-center':
+          speakerAndShowLayout == 1 && isCenterStream && micServer.state.isSpeakOn
       }"
       ref="vmp_stream_list"
     >
