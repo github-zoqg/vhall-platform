@@ -413,7 +413,8 @@
       /**
        * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
        */
-      resize() {
+      async resize() {
+        await this.$nextTick();
         const { width, height } = this.getDocViewRect();
         if (!width || !height) return;
         if (
@@ -437,7 +438,7 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            if (!this.isDocMainScreen) {
+            if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
               //竖屏的 正常显示
               w = window.innerWidth;
               h = (9 * w) / 16;
@@ -739,6 +740,7 @@
       bottom: 0;
       left: 0;
       right: 0;
+      width: 100% !important;
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
       // 播放器的层级是1-12
