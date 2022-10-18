@@ -536,6 +536,7 @@
           font-size: 14px;
           color: #999;
           cursor: pointer;
+          margin-right: auto;
           /* hack处理，增加hover的区域大小 */
           &:after {
             content: '';
