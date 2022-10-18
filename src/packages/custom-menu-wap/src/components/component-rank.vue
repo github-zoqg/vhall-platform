@@ -210,6 +210,7 @@
     z-index: 3;
     -ms-overflow-style: none;
     overflow: -moz-scrollbars-none;
+    width: 100%;
     &::-webkit-scrollbar {
       width: 0;
     }
