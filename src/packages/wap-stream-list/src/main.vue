@@ -405,7 +405,7 @@
         let skin_json_wap = {
           style: 1
         };
-        const skinInfo = this.roomBaseState.skinInfo;
+        const skinInfo = this.roomBaseServer.state.skinInfo;
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
           skin_json_wap = skinInfo.skin_json_wap;
         }
