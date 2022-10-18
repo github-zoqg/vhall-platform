@@ -489,7 +489,7 @@
         .chat-setting-btn--chat-auth {
           position: relative;
           display: inline-flex;
-          margin-right: 10px;
+          margin-right: auto;
           font-size: 14px;
           color: #999;
           cursor: pointer;
