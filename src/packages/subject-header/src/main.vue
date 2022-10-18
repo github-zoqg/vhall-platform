@@ -117,7 +117,7 @@
 <style lang="less">
   .vmp-subject-header {
     width: 100%;
-    height: 64px;
+    height: 72px;
     background: #fff;
     &_container {
       width: 100%;
@@ -171,20 +171,27 @@
         flex: 0 0 220px;
         &_share {
           text-align: center;
-          font-size: 14px;
+          font-size: 12px;
           cursor: pointer;
-          color: #666;
+          color: #666666;
           margin-top: 18px;
-          padding-right: 14px;
+          padding-right: 24px;
           span {
             display: block;
-            padding-top: 3px;
+            padding-top: 6px;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 14px;
           }
         }
         &_login {
-          padding: 16px 0 0 10px;
+          padding: 18px 0;
+          margin-right: 24px;
         }
         &_unlogin {
+          height: 36px;
+          line-height: 36px;
           p {
             width: 36px;
             height: 36px;
