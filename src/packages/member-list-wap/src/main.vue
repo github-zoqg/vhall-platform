@@ -8,7 +8,19 @@
       <van-list v-model="loading" :finished="finished" finished-text="" @load="loadMore">
         <div class="member-list-item" v-for="item in list" :key="item['account_id']">
           <div class="avatar-box">
-            <img :src="item && item['avatar'] ? item['avatar'] : defaultAvatar" alt="" />
+            <img
+              :src="item && item['avatar'] ? item['avatar'] : defaultAvatar"
+              alt=""
+              :class="{ avatar_border: item['avatar'] }"
+            />
+            <img
+              v-show="[1, '1', 3, '3'].includes(item.device_type)"
+              class="vmp-wrapper__phone"
+              width="9"
+              height="12"
+              :src="phoneImg"
+              alt
+            />
           </div>
 
           <div class="info-name">{{ item['nickname'] }}</div>
@@ -35,12 +47,14 @@
 </template>
 <script>
   import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import phoneImg from '@/app-shared/assets/img/phone.png';
   import { uniqBy, throttle } from 'lodash';
   import { useRoomBaseServer, useMemberServer, useGroupServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpMemberListWap',
     data() {
       return {
+        phoneImg,
         // 成员列表
         list: [],
         // 是否正在加载
@@ -393,12 +407,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
       img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 50%;
         display: block;
+      }
+      .vmp-wrapper__phone {
+        width: 14px;
+        height: 20px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+      .avatar_border {
         border: 2px solid #e3e3e3;
       }
     }
