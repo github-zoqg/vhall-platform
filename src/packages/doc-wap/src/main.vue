@@ -234,6 +234,11 @@
             this.docServer.zoomReset();
           }, 50);
         }
+      },
+      isDocMainScreen() {
+        this.$nextTick(() => {
+          this.resize();
+        });
       }
     },
     beforeCreate() {
@@ -245,7 +250,7 @@
     mounted() {
       console.log('[doc] wap mounted');
       // 初始化文档server的getDocViewRect方法
-      this.docServer.getDocViewRect = this.getDocViewRect;
+      this.docServer.getDocViewRect = this.getDocViewRect.bind(this);
 
       // 初始计算一次文档区域
       this.getDocViewRect();
@@ -436,6 +441,10 @@
               //竖屏的 正常显示
               w = window.innerWidth;
               h = (9 * w) / 16;
+            } else {
+              //竖屏的 主画面显示
+              h = this.$refs.docWrapper.offsetHeight;
+              w = (16 / 9) * h;
             }
           }
         } else {
