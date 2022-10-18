@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import DomainStore from '@/app-shared/domain-store/index';
 import { getQueryString } from '@/app-shared/utils/tool';
-import { bu_appId } from './businessData';
+import { bu_appId } from '@/app-shared/global-data/businessData';
 
 import {
   setBaseUrl,
@@ -41,7 +41,10 @@ setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: linkToken ? '' : localStorage.getItem('token') || '', //如果地址栏有token则不设置token。优先级
   'biz-id': 2, //业务线标识 saas: 2 知客: 4
-  'biz-application-id': bu_appId[process.env.VUE_APP_SAAS_ENV]
+  'biz-application-id':
+    process.env.VUE_APP_SAAS_ENV_DESC == 'old'
+      ? bu_appId[process.env.VUE_APP_SAAS_ENV]
+      : bu_appId[`${process.env.VUE_APP_SAAS_ENV}_new`]
 });
 
 setResponseInterceptors(e => {
