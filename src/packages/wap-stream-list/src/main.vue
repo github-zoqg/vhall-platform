@@ -62,7 +62,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup && !isConcise"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -152,7 +152,8 @@
         lang: {},
         languageList: [],
         streamInfo,
-        timmer: null
+        timmer: null,
+        isConcise: false
       };
     },
     computed: {
@@ -391,6 +392,7 @@
 
       this.addSDKEvents();
       this.fiveDown();
+      this.getIsConcise();
     },
     beforeDestroy() {
       if (this.scroll) {
@@ -399,6 +401,20 @@
     },
 
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.roomBaseState.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
         this.$nextTick(() => {
