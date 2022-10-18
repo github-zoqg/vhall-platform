@@ -168,7 +168,7 @@
         display: flex;
         justify-items: center;
         justify-content: flex-end;
-        flex: 0 0 220px;
+        flex: 0 0 280px;
         &_share {
           text-align: center;
           font-size: 12px;
