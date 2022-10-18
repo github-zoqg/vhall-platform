@@ -2,8 +2,8 @@
   <div class="vmp-member-item">
     <div class="vmp-member-item__avatar-wrapper">
       <img
-        width="28"
-        height="28"
+        width="24"
+        height="24"
         class="vmp-member-item__avatar-wrapper__avatar"
         :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
       />
@@ -16,19 +16,21 @@
         alt
       />
     </div>
-    <span
-      class="vmp-member-item__name"
-      :class="{
-        'vmp-member-item__name-limit':
-          isShowMyPresentation &&
-          tabIndex === 1 &&
-          currentSpeakerId != userInfo.account_id &&
-          userInfo.is_speak &&
-          ![2, '2'].includes(userInfo.device_status)
-      }"
-    >
-      {{ userInfo.nickname }}
-    </span>
+    <el-tooltip :content="userInfo.nickname" popper-class="vmp-member-item-popper-width">
+      <span
+        class="vmp-member-item__name"
+        :class="{
+          'vmp-member-item__name-limit':
+            isShowMyPresentation &&
+            tabIndex === 1 &&
+            currentSpeakerId != userInfo.account_id &&
+            userInfo.is_speak &&
+            ![2, '2'].includes(userInfo.device_status)
+        }"
+      >
+        {{ userInfo.nickname }}
+      </span>
+    </el-tooltip>
     <span
       class="vmp-member-item__role"
       :class="userInfo.role_name | roleClassFilter"
@@ -107,13 +109,13 @@
         </template>
         <template v-if="tabIndex === 1">
           <!--我要演示-->
-          <i
+          <!-- <i
             v-if="isShowMyPresentation"
             class="vmp-member-item__control__up-mic widthAuto"
             @click="myPresentation(userInfo.account_id)"
           >
             我要演示
-          </i>
+          </i> -->
           <!--上麦-->
           <i
             v-if="isShowUpMic"
@@ -442,6 +444,14 @@
             disable: false,
             text: '升为组长',
             sequence: 6
+          },
+          //我要演示 （主持人）
+          {
+            command: 'setMyPresentation',
+            isShow: 'isShowMyPresentation',
+            disable: false,
+            text: '我要演示',
+            sequence: 7
           }
         ],
         //观看端操作项
@@ -511,7 +521,8 @@
             this.roleName == '1' &&
             this.userInfo.account_id == this.userId &&
             this.userInfo.is_speak &&
-            this.mainScreen != this.userInfo.account_id)
+            this.mainScreen != this.userInfo.account_id) ||
+          (this.roleName == '1' && this.isInGroup)
         );
       },
       //发起端演示的是否是选中的用户
@@ -785,6 +796,10 @@
           case 'setLeader':
             this.$emit('operateUser', { type: 'setLeader', params: this.userInfo });
             break;
+          // 我要演示
+          case 'setMyPresentation':
+            this.myPresentation();
+            break;
           default:
             break;
         }
@@ -834,6 +849,9 @@
 </script>
 
 <style lang="less">
+  .vmp-member-item-popper-width {
+    max-width: 300px;
+  }
   .vmp-member-item {
     position: relative;
     color: #999;
@@ -860,21 +878,22 @@
       &__phone {
         position: absolute;
         right: -1px;
-        bottom: 3px;
+        bottom: 10px;
       }
     }
     &__name {
       display: inline-block;
-      max-width: 55px;
+      max-width: 126px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       vertical-align: middle;
       margin-left: 9px;
       color: var(--group-name-font-color);
+      font-size: 14px;
     }
     &__name-limit {
-      max-width: 38px;
+      max-width: 98px;
     }
     &__role {
       display: inline-block;

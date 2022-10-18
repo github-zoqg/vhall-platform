@@ -388,8 +388,8 @@
       }
     }
     .avatar-box {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -403,14 +403,14 @@
       }
     }
     .info-name {
-      max-width: 4rem;
+      max-width: 3.3rem;
       margin-left: 16px;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
       word-break: break-all;
       vertical-align: middle;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 400;
       color: var(--theme-group-name-color);
       line-height: 30px;
