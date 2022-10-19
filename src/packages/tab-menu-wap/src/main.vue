@@ -814,7 +814,7 @@
         align-items: center;
         min-width: 24px;
         text-align: center;
-        font-size: 14px;
+        font-size: 24px;
         color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
