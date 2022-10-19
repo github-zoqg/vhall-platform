@@ -8,6 +8,7 @@
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
       'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
+    :style="{ borderColor: mainBackground }"
   >
     <!-- 左翻页 -->
     <span
