@@ -174,10 +174,12 @@
         border-radius: 4px;
         flex-shrink: 0;
         .ad_img {
-          width: 100%;
           height: 100%;
-          object-fit: cover;
-          object-position: left top;
+          width: 100%;
+          -o-object-fit: contain;
+          object-fit: contain;
+          -o-object-position: center;
+          object-position: center;
           border-radius: 4px;
           &.ad_bg_1 {
             object-fit: fill;
