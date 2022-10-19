@@ -419,7 +419,7 @@
               height: 52px;
               line-height: 32px;
               border: 1px solid var(--theme-tab-content-good-buyBorder-font);
-              background-color: var(--theme-tab-content-good-buy-bg);
+              background-color: var(--theme-tab-content-good-buy-bg) !important;
               border-radius: 32px;
               color: var(--theme-tab-content-good-buy-font);
               font-style: normal;
@@ -442,16 +442,17 @@
             color: var(--theme-tab-content-good-describe-font);
           }
         }
-        &:active {
-          background-color: var(--theme-tab-content-good-bg-active);
-          .vh-goods_item-info {
-            .buy {
-              border: 1px solid var(--theme-tab-content-good-buyBorder-font-active);
-              background-color: var(--theme-tab-content-good-buy-bg-active);
-              color: var(--theme-tab-content-good-buy-font-active);
-            }
-          }
-        }
+        // 废弃商品hover效果
+        // &:active {
+        //   background-color: var(--theme-tab-content-good-bg-active);
+        //   .vh-goods_item-info {
+        //     .buy {
+        //       border: 1px solid var(--theme-tab-content-good-buyBorder-font-active);
+        //       background-color: var(--theme-tab-content-good-buy-bg-active);
+        //       color: var(--theme-tab-content-good-buy-font-active);
+        //     }
+        //   }
+        // }
       }
     }
   }
