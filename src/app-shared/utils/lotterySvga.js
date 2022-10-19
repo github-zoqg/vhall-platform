@@ -1,5 +1,4 @@
-// const publicPath = process.env.VUE_APP_STATIC_BASE + '/common-static/svga/lottery/7.5.4/';
-const publicPath = process.env.VUE_APP_STATIC_BASE + '/common-static/svga/lottery/test/';
+const publicPath = process.env.VUE_APP_STATIC_BASE + '/common-static/svga/lottery/7.5.4_patch/';
 
 export const slotmachineResource = {
   svgaUrl: publicPath + 'lottery-slotmachine.svga',
