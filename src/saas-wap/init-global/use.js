@@ -78,7 +78,7 @@ import VmpWapSignUpForm from '@/packages/wap-sign-up-form';
 // 预约页面
 import VmpSubscribeBody from '@/packages/wap-subscribe-body';
 // 红包
-import VmpRedPacketWap from '@/packages/red-packet-wap/index';
+// import VmpRedPacketWap from '@/packages/red-packet-wap/index';
 // 口令红包
 import VmpRedPacketCommandWap from '@/packages/red-packet-command-wap/index';
 
@@ -144,7 +144,7 @@ Vue.use(VmpLotteryWap);
 Vue.use(VmpChapterWap);
 Vue.use(VmpQaWap);
 Vue.use(VmpQuestionnaireWap);
-Vue.use(VmpRedPacketWap);
+// Vue.use(VmpRedPacketWap);
 Vue.use(VmpRedPacketCommandWap);
 Vue.use(VmpSubscribeBody);
 Vue.use(VmpWapSignUpForm);

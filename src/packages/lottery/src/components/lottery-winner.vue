@@ -28,11 +28,14 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import Ribbon from '../art/ribbon/winner.vue';
   import LotteryTitle from './lottery-title.vue';
   import props from './props';
   import '@/app-shared/assets/css/D-DIN-Bold/stylesheet.css';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+  /**
+   * @description 中奖列表(发起端)
+   */
   export default {
     name: 'LotteryWinner',
     mixins: [props],
