@@ -8,7 +8,6 @@
       'vmp-dom__mini': isUseNoDelayLayout && miniElement == 'stream-list',
       'is-share-screen': isUseNoDelayLayout && isShareScreen
     }"
-    :style="{ borderColor: mainBackground }"
   >
     <!-- 左翻页 -->
     <span
@@ -300,7 +299,12 @@
           console.log('mainBackground---', val);
           this.$nextTick(() => {
             const dom = document.getElementById('vmp-stream-list');
-            dom.setAttribute('style', `--main-bg-color:${val}`);
+            dom.setAttribute(
+              'style',
+              `--main-bg-color:${val};border-color: ${
+                this.mainBackground == '#000' ? '#1f1f1f' : this.mainBackground
+              }`
+            );
           });
         },
         immediate: true
