@@ -10,9 +10,9 @@
       position="bottom"
       :style="{ height: `${popHeight}px` }"
     >
-      <span class="filter_one"></span>
-      <span class="filter_two"></span>
-      <span class="filter_three"></span>
+      <div class="bg-colors-one"></div>
+      <div class="bg-colors-two"></div>
+      <div class="bg-colors-three"></div>
       <!-- 菜单 -->
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
     </van-popup>
@@ -88,14 +88,7 @@
     .vmp-interact-tools-wap .vh-iconfont {
       font-size: 12px;
     }
-  }
-  .wap-menu-van-popup {
-    width: 100%;
-    // min-height: 708px;
-    left: 0px;
-    bottom: 0;
-    background: linear-gradient(174.42deg, #ffffff 7.78%, #ffffff 57.2%);
-    .filter_one {
+    .bg-colors-one {
       position: absolute;
       width: 470px;
       height: 470px;
@@ -104,7 +97,7 @@
       background: #c6d2ff;
       filter: blur(200px);
     }
-    .filter_two {
+    .bg-colors-two {
       position: absolute;
       width: 470px;
       height: 470px;
@@ -113,7 +106,7 @@
       background: #a8faff;
       filter: blur(200px);
     }
-    .filter_three {
+    .bg-colors-three {
       position: absolute;
       width: 470px;
       height: 470px;
@@ -121,6 +114,13 @@
       top: -273px;
       background: #f7d6ff;
       filter: blur(200px);
+    }
+    .wap-menu-van-popup {
+      width: 100%;
+      // min-height: 708px;
+      left: 0px;
+      bottom: 0;
+      background: linear-gradient(174.42deg, #ffffff 7.78%, #ffffff 57.2%);
     }
   }
 </style>
