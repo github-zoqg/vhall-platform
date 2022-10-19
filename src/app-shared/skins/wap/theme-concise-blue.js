@@ -12,7 +12,7 @@ export default {
   '--theme-tab-menu-tip': '#3552EA',
   '--theme-tab-menu-bg': ' ',
   '--theme-tab-menu-box-bg': ' ',
-  '--theme-tab-menu-border': '1px solid rgba(53, 82, 234, 0.2)',
+  '--theme-tab-menu-border': '1px solid rgba(0, 0, 0, 0.06)',
   '--theme-header-bg': ' ',
   '--theme-header-font-color': ' ',
   '--theme-header-icon-color': ' ',

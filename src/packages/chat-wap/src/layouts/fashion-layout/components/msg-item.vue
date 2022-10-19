@@ -542,7 +542,7 @@
           padding: 10px 12px;
           word-break: break-all;
           color: var(--theme-chat-msg-font);
-          font-size: 26px;
+          font-size: 28px;
           .chat-text {
             img {
               width: 34px;

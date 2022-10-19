@@ -880,7 +880,7 @@
           display: flex;
           align-items: center;
           line-height: 1.2;
-          font-size: 30px;
+          font-size: 28px;
         }
 
         .tips {
