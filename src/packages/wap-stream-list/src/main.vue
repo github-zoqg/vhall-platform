@@ -29,16 +29,6 @@
           <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
         </div>
       </div>
-      <div
-        v-if="speakerAndShowLayout == 1"
-        v-show="isDocMainScreen"
-        class="vmp-stream-list__remote-container doc-main-screen vmp-stream-list__main-screen"
-        :class="{
-          'doc-hidden': isShareScreen || isOpenInsertFile
-        }"
-      >
-        <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
-      </div>
       <template v-if="remoteSpeakers.length">
         <div
           v-for="speaker in remoteSpeakers"
@@ -834,13 +824,6 @@
       height: 0;
       .vmp-stream-list__main-screen {
         top: 0;
-      }
-    }
-    .doc-main-screen {
-      display: flex;
-      justify-content: center;
-      &.doc-hidden {
-        display: none;
       }
     }
     &-stream-center {

@@ -45,6 +45,18 @@
       <!-- wap端订阅插播的容器 -->
       <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
 
+      <!-- wap 合并模式下的融屏文档 -->
+      <div
+        v-if="isMergeMode"
+        v-show="isDocMainScreen"
+        class="doc-main-screen vmp-stream-list__main-screen"
+        :class="{
+          'doc-hidden': isShareScreen || isOpenInsertFile,
+          'doc-main-screen-top': !this.isSpeakOn
+        }"
+      >
+        <vmp-air-container :oneself="true" :cuid="childrenComp[4]"></vmp-air-container>
+      </div>
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -212,8 +224,21 @@
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
       isMergeMode() {
         return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
+      },
+      // 是否开启文档主画面
+      isDocMainScreen() {
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.isMergeMode
+        );
       }
     },
     beforeCreate() {
@@ -543,6 +568,14 @@
         color: #262626;
         font-size: 28px;
         line-height: 40px;
+      }
+    }
+    .doc-main-screen {
+      &-top {
+        top: 0;
+      }
+      &.doc-hidden {
+        display: none;
       }
     }
   }

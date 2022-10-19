@@ -287,18 +287,16 @@
       // 点击文档显示操作工具（3s）
       clickDocShowTool() {
         this.$nextTick(() => {
-          document
-            .getElementsByClassName('vmp-wap-stream-wrap-mask')[0]
-            .addEventListener('click', e => {
-              if (!this.clickDocShowTool) return;
-              this.timmer && clearTimeout(this.timmer);
-              if (this.$parent.showPlayIcon) return; //播放中
-              this.showTools = true;
-              this.timmer = setTimeout(() => {
-                this.showTools = false;
-                this.timmer = null;
-              }, 3000);
-            });
+          document.getElementById('docWrapper').addEventListener('click', e => {
+            if (!this.clickDocShowTool) return;
+            this.timmer && clearTimeout(this.timmer);
+            if (this.$parent.showPlayIcon) return; //播放中
+            this.showTools = true;
+            this.timmer = setTimeout(() => {
+              this.showTools = false;
+              this.timmer = null;
+            }, 3000);
+          });
         });
       },
       // 文档移动后还原
