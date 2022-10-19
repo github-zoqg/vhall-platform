@@ -149,7 +149,7 @@ export default {
   '--theme-chat-msg-reply-name-font': ' ',
   '--theme-chat-msg-reply-content': ' ',
   '--theme-chapter-list-bg': ' ',
-  '--theme-chapter-font-color-title': ' ',
-  '--theme-chapter-font-color-time': ' ',
+  '--theme-chapter-font-color-title': '#262626',
+  '--theme-chapter-font-color-time': 'rgba(0, 0, 0, 0.65)',
   '--theme-chapter-font-color-active': '#C99F67'
 };
