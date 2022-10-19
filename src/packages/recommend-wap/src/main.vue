@@ -229,19 +229,20 @@
       position: relative;
       line-height: 30px;
       background-color: var(--theme-tab-content-recommend-bg);
-      &:active {
-        background-color: var(--theme-tab-content-recommend-active-bg);
-        .recommend-item__content {
-          border-bottom: 1px solid transparent;
-          &__info {
-            &-link {
-              background: var(--theme-tab-content-recommend-buy-active-bg);
-              border: 1px solid var(--theme-tab-content-recommend-buy-active-border);
-              color: var(--theme-tab-content-recommend-buy-active-font);
-            }
-          }
-        }
-      }
+      // 废弃每列hover效果
+      // &:active {
+      //   background-color: var(--theme-tab-content-recommend-active-bg);
+      //   .recommend-item__content {
+      //     border-bottom: 1px solid transparent;
+      //     &__info {
+      //       &-link {
+      //         background: var(--theme-tab-content-recommend-buy-active-bg);
+      //         border: 1px solid var(--theme-tab-content-recommend-buy-active-border);
+      //         color: var(--theme-tab-content-recommend-buy-active-font);
+      //       }
+      //     }
+      //   }
+      // }
       &::after {
         content: '';
         display: none;
