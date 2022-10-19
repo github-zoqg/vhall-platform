@@ -1469,7 +1469,7 @@
     }
 
     &.vmp-doc-une--normal.has-stream-list {
-      top: 80px;
+      top: 81px;
     }
     &.vmp-doc-une--normal.no-delay-layout {
       top: 0px;
