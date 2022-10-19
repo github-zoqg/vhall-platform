@@ -187,7 +187,7 @@
       color: var(--theme-tab-content-rank-rule-active-font);
       i {
         color: #666666;
-        font-size: 14px !important;
+        font-size: 20px !important;
         margin-left: 12px;
       }
     }

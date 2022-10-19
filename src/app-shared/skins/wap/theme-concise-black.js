@@ -12,7 +12,7 @@ export default {
   '--theme-tab-menu-tip': '#FB2626',
   '--theme-tab-menu-bg': ' ',
   '--theme-tab-menu-box-bg': ' ',
-  '--theme-tab-menu-border': '1px solid rgba(53, 82, 234, 0.2)',
+  '--theme-tab-menu-border': '1px solid rgba(0, 0, 0, 0.06)',
   '--theme-header-bg': ' ',
   '--theme-header-font-color': ' ',
   '--theme-header-icon-color': ' ',
@@ -149,7 +149,7 @@ export default {
   '--theme-chat-msg-reply-name-font': ' ',
   '--theme-chat-msg-reply-content': ' ',
   '--theme-chapter-list-bg': ' ',
-  '--theme-chapter-font-color-title': ' ',
-  '--theme-chapter-font-color-time': ' ',
-  '--theme-chapter-font-color-active': '#FB2626'
+  '--theme-chapter-font-color-title': '#262626',
+  '--theme-chapter-font-color-time': 'rgba(0, 0, 0, 0.65)',
+  '--theme-chapter-font-color-active': '#fb2626'
 };
