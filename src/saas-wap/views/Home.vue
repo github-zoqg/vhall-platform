@@ -39,6 +39,10 @@
   import { setPage } from '../page-config/index';
   import skins from '@/app-shared/skins/wap';
 
+  import redDefaultBg from '@/app-shared/assets/img/wap/theme/default_red.png';
+  import blueDefaultBg from '@/app-shared/assets/img/wap/theme/default_blue.png';
+  import goldenDefaultBg from '@/app-shared/assets/img/wap/theme/default_golden.png';
+
   export default {
     name: 'Home',
     components: {
@@ -391,13 +395,19 @@
               app.style.background = `rgba(0, 0, 0, 0.06)`;
             }
           } else {
-            app.style.backgroundImage = `url(${
-              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
-              style +
-              '_' +
-              theme +
-              '.png'
-            })`;
+            if (style == 'main' && ['red', 'blue', 'golden'].includes(theme)) {
+              app.style.backgroundImage = `url(${
+                theme === 'red' ? redDefaultBg : theme == 'blue' ? blueDefaultBg : goldenDefaultBg
+              })`;
+            } else {
+              app.style.backgroundImage = `url(${
+                '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
+                style +
+                '_' +
+                theme +
+                '.png'
+              })`;
+            }
             app.style.backgroundSize = 'cover';
           }
         }

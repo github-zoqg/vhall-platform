@@ -341,6 +341,7 @@
           height: 200px;
           float: left;
           background: rgba(0, 0, 0, 1);
+          border-radius: 4px;
           img {
             width: 100%;
             height: 100%;
