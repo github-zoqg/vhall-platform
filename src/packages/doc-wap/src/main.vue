@@ -596,6 +596,10 @@
         right: 0;
         bottom: 0;
         overflow: hidden;
+        // 解决文档点击事件无效的问题
+        .upper-canvas {
+          pointer-events: none;
+        }
 
         .doc-box {
           top: 0;
