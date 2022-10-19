@@ -102,7 +102,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import MsgItem from './components/msg-item.vue';
   import ImgPreview from './components/img-preview';
   import ChatUserControl from './components/chat-user-control';

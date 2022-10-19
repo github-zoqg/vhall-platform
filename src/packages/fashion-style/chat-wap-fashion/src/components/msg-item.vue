@@ -299,7 +299,7 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
   export default {
     props: {
