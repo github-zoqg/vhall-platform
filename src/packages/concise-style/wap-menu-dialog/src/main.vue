@@ -10,9 +10,9 @@
       position="bottom"
       :style="{ height: `${popHeight}px` }"
     >
-      <div class="bg-colors-one"></div>
+      <!-- <div class="bg-colors-one"></div>
       <div class="bg-colors-two"></div>
-      <div class="bg-colors-three"></div>
+      <div class="bg-colors-three"></div> -->
       <!-- 菜单 -->
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
     </van-popup>
@@ -120,7 +120,9 @@
       // min-height: 708px;
       left: 0px;
       bottom: 0;
-      background: linear-gradient(174.42deg, #ffffff 7.78%, #ffffff 57.2%);
+      // background: linear-gradient(174.42deg, #ffffff 7.78%, #ffffff 57.2%);
+      background: url('./images/gradient_bg.png') repeat-x;
+      background-size: cover;
     }
   }
 </style>

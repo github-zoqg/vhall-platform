@@ -6,7 +6,10 @@
           class="chapter-info"
           :data-time="item.createTime"
           @click.stop="changeTime(item.createTime)"
-          :class="{ active: select == item.createTime }"
+          :class="{
+            active: select == item.createTime,
+            'no-border': index === chapterData.length - 1 && !(item.sub && item.sub.length > 0)
+          }"
         >
           <i
             class="vh-saas-iconfont vh-saas-line-Live vmp-chapter-icon"
@@ -21,7 +24,10 @@
             v-for="(sub, i) in item.sub"
             :key="item.cid + '-step' + i"
             @click.stop="changeTime(sub.createTime)"
-            :class="{ active: select == sub.createTime }"
+            :class="{
+              active: select == sub.createTime,
+              'no-border': index === chapterData.length - 1 && i == item.sub.length - 1
+            }"
           >
             <i
               class="vh-saas-iconfont vh-saas-line-Live vmp-chapter-icon"
@@ -193,8 +199,9 @@
       }
       div {
         height: 100%;
-        width: 100%;
-        padding: 27px 24px;
+        width: calc(100% - 48px);
+        padding: 27px 0;
+        margin: 0 24px;
         line-height: 40px;
       }
       &:last-child {
@@ -205,6 +212,10 @@
       display: flex;
       flex-direction: row;
       justify-content: space-around;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      &.no-border {
+        border-bottom: none;
+      }
     }
     .title {
       display: inline-block;
@@ -227,6 +238,10 @@
       width: calc(100% - 48px);
       padding: 27px 0 27px 24px;
       margin-left: 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      &.no-border {
+        border-bottom: none;
+      }
     }
     .posit {
       position: absolute;
