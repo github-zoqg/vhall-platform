@@ -224,6 +224,7 @@
             cursor: pointer;
             align-items: center;
             justify-content: center;
+            height: 36px;
             p {
               width: 36px;
               height: 36px;
