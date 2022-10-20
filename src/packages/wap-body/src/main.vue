@@ -49,10 +49,10 @@
       <div
         v-if="isMergeMode"
         v-show="isDocMainScreen"
-        class="doc-main-screen vmp-stream-list__main-screen"
+        class="vmp-wap-doc-main-screen"
         :class="{
           'doc-hidden': isShareScreen || (isOpenInsertFile && !isAudio),
-          'doc-main-screen-top': !this.isSpeakOn
+          'vmp-wap-doc-main-screen-top': !this.isSpeakOn
         }"
       >
         <vmp-air-container :oneself="true" :cuid="childrenComp[4]"></vmp-air-container>
@@ -421,6 +421,8 @@
   };
 </script>
 <style lang="less">
+  @desk-w: 597px;
+  @desk-h: 337px;
   .vmp-wap-body {
     position: relative;
     height: 100%;
@@ -570,7 +572,12 @@
         line-height: 40px;
       }
     }
-    .doc-main-screen {
+    .vmp-wap-doc-main-screen {
+      position: absolute;
+      width: @desk-w;
+      height: @desk-h;
+      left: calc((100% - @desk-w) / 2);
+      top: 85px;
       &-top {
         top: 0;
       }

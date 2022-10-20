@@ -336,6 +336,11 @@
         },
         immediate: true
       },
+      isDocMainScreen: {
+        handler(val) {
+          this.createBScroll();
+        }
+      },
       isCenterStream: {
         handler(val) {
           if (val && this.scroll && this.scroll.scrollX != 0) {
