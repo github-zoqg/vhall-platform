@@ -34,10 +34,10 @@
 </script>
 <style lang="less">
   .vmp-custom-menu-qrcode {
+    padding: 0 0;
     max-width: 100%;
     height: auto;
-    padding: 0 0;
-    margin-top: 24px;
+    margin: 24px auto 0 auto;
     .comqrcode-previewbox {
       width: 100%;
       height: 100%;
@@ -63,6 +63,11 @@
         width: 100%;
         height: 100%;
       }
+    }
+  }
+  .tab-menu__concise {
+    .vmp-custom-menu-qrcode {
+      max-width: 70%;
     }
   }
 </style>
