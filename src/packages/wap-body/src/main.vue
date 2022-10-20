@@ -575,7 +575,7 @@
         top: 0;
       }
       &.doc-hidden {
-        display: none;
+        visibility: hidden;
       }
     }
   }
