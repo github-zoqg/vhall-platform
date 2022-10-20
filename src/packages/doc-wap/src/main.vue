@@ -704,7 +704,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 7;
+      z-index: 6;
 
       .vh-iconfont {
         font-size: 30px;

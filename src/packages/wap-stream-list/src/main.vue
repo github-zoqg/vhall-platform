@@ -21,7 +21,8 @@
         class="vmp-stream-list__local-container"
         :class="{
           'vmp-stream-list__main-screen':
-            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen
+            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen,
+          'vmp-stream-list__mini-window__main-screen': joinInfo.third_party_user_id == mainScreen // 播放器是mini状态的主屏class
         }"
         v-show="micServer.state.isSpeakOn"
       >
@@ -35,6 +36,7 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
+            'vmp-stream-list__mini-window__main-screen': speaker.accountId == mainScreen, // 播放器是mini状态的主屏class
             'vmp-stream-list__main-screen': speaker.accountId == mainScreen && !isDocMainScreen,
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,

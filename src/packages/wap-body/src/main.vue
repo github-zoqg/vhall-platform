@@ -525,7 +525,7 @@
           height: 100%;
           width: 100%;
         }
-        .vmp-stream-list__main-screen {
+        .vmp-stream-list__mini-window__main-screen {
           position: absolute;
           top: 0;
           left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
