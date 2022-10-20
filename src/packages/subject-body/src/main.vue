@@ -1,42 +1,47 @@
 <template>
   <div class="vmp-subject-body">
     <div class="vmp-subject-body_info">
-      <div class="vmp-subject-body_main">
-        <div class="subject_left">
-          <div class="subject_left_main">
-            <img :class="`subject_img subject_bg_${imageCropperMode}`" :src="subjectImage" />
-          </div>
-          <div class="subject_left_detail">
-            <p>
-              <i class="vh-iconfont vh-line-video-camera"></i>
-              {{ subjectDetailInfo.webinar_num }}
-            </p>
-            <p v-if="subjectDetailInfo.hide_pv">
-              <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-              {{ subjectDetailInfo.pv }}
-            </p>
-            <p v-if="subjectDetailInfo.hide_appointment">
-              <i class="vh-iconfont vh-line-appointments"></i>
-              {{ subjectDetailInfo.order_num }}
-            </p>
-          </div>
+      <div class="subject_left">
+        <div class="subject_left_main">
+          <img :class="`subject_img subject_bg_${imageCropperMode}`" :src="subjectImage" />
         </div>
-        <div class="subject_right">
-          <el-scrollbar>
-            <div class="subject_right_text" v-html="subjectIntroInfo"></div>
-          </el-scrollbar>
+        <div class="subject_left_detail">
+          <p>
+            <i class="vh-iconfont vh-line-video-camera"></i>
+            {{ subjectDetailInfo.webinar_num }}
+          </p>
+          <p v-if="subjectDetailInfo.hide_pv">
+            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+            {{ subjectDetailInfo.pv }}
+          </p>
+          <p v-if="subjectDetailInfo.hide_appointment">
+            <i class="vh-iconfont vh-line-appointments"></i>
+            {{ subjectDetailInfo.order_num }}
+          </p>
         </div>
+      </div>
+      <div class="subject_right">
+        <el-scrollbar>
+          <div class="subject_right_text" v-html="subjectIntroInfo"></div>
+        </el-scrollbar>
       </div>
     </div>
     <div class="vmp-subject-body_list">
       <el-row :gutter="24" class="subject_lives">
+        <!--:xs="24" :sm="12" :md="12" :lg="8" :xl="6"
+        col-xl-*  一般用于2k屏设备（min-width：1920px）
+        col-lg-*  一般用于大屏设备（min-width：1200px）
+        col-md-*  一般用于中屏设备（min-width：992px）
+        col-sm-*  一般用于小屏设备（min-width：768px）
+        col-xs  -*用于超小型设备（max-width：768px）
+        -->
         <el-col
           class="subject_lives_liveItem"
-          :xs="24"
-          :sm="12"
-          :md="12"
+          :xs="6"
+          :sm="6"
+          :md="6"
           :lg="6"
-          :xl="6"
+          :xl="1920"
           v-for="(item, index) in webinarList"
           :key="index"
         >
@@ -64,7 +69,6 @@
           </div>
         </el-col>
       </el-row>
-      <div class="subject_nomore">已经到底啦～</div>
     </div>
   </div>
 </template>
@@ -256,20 +260,16 @@
 </script>
 <style lang="less">
   .vmp-subject-body {
+    margin-top: 20px;
+    width: 1200px;
+    margin: 0 auto;
     &_info {
-      background: #f7f7f7;
-      border-radius: 4px;
-      .vmp-subject-body_main {
-        width: 100%;
-        height: 690px;
-        display: flex;
-        margin-top: 20px;
-      }
+      display: flex;
       .subject_left {
-        width: calc(100% - 384px);
+        width: calc(100% - 380px);
         &_main {
           width: 100%;
-          height: 632px;
+          height: 460px;
           border-radius: 4px;
           background-color: #1a1a1a;
           flex: 1;
@@ -290,7 +290,7 @@
         }
         &_detail {
           display: flex;
-          padding: 19px 24px;
+          padding: 18px 24px;
           background: #fff;
           border-radius: 0 0 4px 4px;
           p {
@@ -313,9 +313,9 @@
         background: #fff;
         border-radius: 4px;
         width: 360px;
-        // height: 100%;
+        height: 472px;
         overflow-y: auto;
-        padding: 8px 0;
+        padding: 24px 0;
         img {
           width: 100%;
           height: 100%;
@@ -323,7 +323,7 @@
         }
         &_text {
           color: #1a1a1a;
-          height: calc(100% - 592px);
+          height: calc(100% - 577px);
           word-break: break-all;
           line-height: 1.5;
           padding: 0 24px;
@@ -332,10 +332,11 @@
           }
           p {
             font-style: normal;
-            padding: 5px 0;
             font-size: 14px;
+            line-height: 20px;
+            margin-bottom: 24px;
             img {
-              margin: 5px 0;
+              margin: 0 0 24px 0;
             }
           }
           .show-link {
@@ -463,26 +464,34 @@
       }
     }
   }
+  @media screen and (min-width: 1920px) {
+    .vmp-subject-body {
+      width: 1506px;
+      .subject_left {
+        &_main {
+          height: 632px;
+        }
+      }
+      .subject_right {
+        height: 640px;
+      }
+      .el-col-xl-1920 {
+        width: 20% !important;
+        // width: 282px !important; // 包含左右12px间距
+        // box-sizing: content-box;
+        // padding-left: 12px;
+        // padding-right: 12px;
+        // &:nth-child(5n) {
+        //   padding-right: 0;
+        // }
+        // &:nth-child(5n - 4) {
+        //   padding-left: 0;
+        // }
+      }
+    }
+  }
   ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background-color: #bbbbbb !important;
-  }
-  @media (min-width: 1920px) {
-    .vmp-subject-body {
-      width: 1510px;
-      margin: 0 auto;
-    }
-    .el-col-xl-6 {
-      width: 20%;
-    }
-  }
-  @media (min-width: 1600px) {
-    .vmp-subject-body {
-      width: 1510px;
-      margin: 0 auto;
-    }
-    .el-col-xl-6 {
-      width: 20%;
-    }
   }
 </style>
