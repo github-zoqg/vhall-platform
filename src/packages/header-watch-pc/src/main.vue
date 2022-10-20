@@ -8,10 +8,7 @@
     <div class="vmp-header-watch_left">
       <!-- 品牌设置-标识图片 -->
       <div class="left_logo" v-if="webinarTag && webinarTag.view_status == 1" @click="goLogoUrl">
-        <img
-          :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogoUrl"
-          alt=""
-        />
+        <img :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogo" alt="" />
       </div>
     </div>
     <div class="vmp-header-watch_center">
@@ -117,12 +114,12 @@
 <script>
   import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
-  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+  import { defaultAvatar, defaultLogo } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpHeaderWatch',
     data() {
       return {
-        defaultLogoUrl: require('./img/logo-red@2x.png'),
+        defaultLogo: defaultLogo,
         webinarInfo: {
           userinfo: {
             nickname: ''
