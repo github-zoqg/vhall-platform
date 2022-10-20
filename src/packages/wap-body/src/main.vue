@@ -51,7 +51,7 @@
         v-show="isDocMainScreen"
         class="doc-main-screen vmp-stream-list__main-screen"
         :class="{
-          'doc-hidden': isShareScreen || isOpenInsertFile,
+          'doc-hidden': isShareScreen || (isOpenInsertFile && !isAudio),
           'doc-main-screen-top': !this.isSpeakOn
         }"
       >

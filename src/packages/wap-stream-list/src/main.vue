@@ -256,9 +256,6 @@
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
       },
-      isOpenInsertFile() {
-        return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
-      },
       // 小组协作中
       showGroupMask() {
         // 分组活动 + 自己不在小组 + 主持人不在小组 + 不存在主画面 + 不存在桌面共享

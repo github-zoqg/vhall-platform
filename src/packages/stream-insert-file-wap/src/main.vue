@@ -5,7 +5,7 @@
       'vmp-wap-insert-file-main-screen': isMergeMode,
       'vmp-wap-insert-file-main-screen-top': isMergeMode && !isSpeakOn
     }"
-    v-show="isOpenInsertFile"
+    v-show="isOpenInsertFile && !isAudio"
   >
     <!-- 订阅桌面共享容器 -->
   </div>
@@ -20,6 +20,10 @@
     computed: {
       isOpenInsertFile() {
         return this.insertFileServer.state.insertStreamInfo.streamId;
+      },
+      // 是否是音频插播
+      isAudio() {
+        return !this.$domainStore.state.insertFileServer.insertStreamInfo.has_video;
       },
       // 是否是合并模式
       isMergeMode() {
