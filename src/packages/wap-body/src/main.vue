@@ -51,7 +51,7 @@
         v-show="isDocMainScreen"
         class="doc-main-screen vmp-stream-list__main-screen"
         :class="{
-          'doc-hidden': isShareScreen || (isOpenInsertFile && !isAudio),
+          'doc-hidden': isShareScreen || (isOpenInsertFile && !isAudio) || mini,
           'doc-main-screen-top': !this.isSpeakOn
         }"
       >
@@ -540,6 +540,10 @@
           top: 0;
           height: 100%;
         }
+      }
+      .vmp-wap-insert-file-main-screen,
+      .vmp-wap-desktop-screen {
+        display: none;
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
       .vmp-wap-stream-wrap-mask-screen {
