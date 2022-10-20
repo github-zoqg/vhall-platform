@@ -128,9 +128,10 @@ const playerMixins = {
             console.log('获取当前视频播放时间失败----------');
           });
 
-          this.totalTime = this.playerServer.getDuration(() => {
-            console.log('获取视频总时长失败');
-          });
+          this.totalTime =
+            this.playerServer.getDuration(() => {
+              console.log('获取视频总时长失败');
+            }) || 0;
           if (this.isWarnPreview) {
             window.sessionStorage.setItem('recordIds', this.warmUpVideoList.join(','));
             window.sessionStorage.setItem('warm_recordId', this.warmUpVideoList[this.playIndex]);
@@ -244,10 +245,11 @@ const playerMixins = {
       getRecordTotalTimer = setInterval(() => {
         try {
           this.totalTime =
-            this.playerServer &&
-            this.playerServer.getDuration(() => {
-              console.log('获取视频总时长失败');
-            });
+            (this.playerServer &&
+              this.playerServer.getDuration(() => {
+                console.log('获取视频总时长失败');
+              })) ||
+            0;
           this.totalTime > 0 && clearInterval(getRecordTotalTimer);
         } catch (error) {
           console.log(error);
