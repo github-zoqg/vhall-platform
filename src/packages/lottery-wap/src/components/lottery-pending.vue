@@ -13,6 +13,9 @@
         <div class="lottery-pending-animation">
           <img class="lottery-pending-animation-img" :src="fitment.url" alt />
         </div>
+        <span class="remark-text-fitment">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
         <button v-if="needJoin" class="vmp-lottery-btn" @click="joinLottery">
           {{ $t('interact_tools.interact_tools_1008') }}
         </button>
@@ -231,6 +234,9 @@
         background-size: contain;
         background-repeat: no-repeat;
       }
+    }
+    .remark-text-fitment {
+      color: #fff;
     }
     .lottery-send-command {
       display: inline-block;
