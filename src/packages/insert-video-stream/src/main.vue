@@ -263,9 +263,10 @@
         const { interactiveServer, roomBaseServer, micServer } = this.$domainStore.state;
         return (
           (roomBaseServer.watchInitData.join_info.role_name == 2 &&
-            roomBaseServer.watchInitData.webinar.mode == 3 &&
-            roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
-            (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+            ((roomBaseServer.watchInitData.webinar.mode == 3 &&
+              roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
+              (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+              roomBaseServer.watchInitData.webinar.mode == 2)) ||
           interactiveServer.initInteractiveFailed
         );
       },
