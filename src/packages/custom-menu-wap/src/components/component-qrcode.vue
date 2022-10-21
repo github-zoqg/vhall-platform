@@ -67,7 +67,8 @@
   }
   .tab-menu__concise {
     .vmp-custom-menu-qrcode {
-      max-width: 70%;
+      max-width: 50%;
+      /* 最小手机，自定义菜单高度大约为375px * 225px; */
     }
   }
 </style>
