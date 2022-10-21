@@ -269,7 +269,6 @@
       // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.setSkinInfo();
-      this.getIsConcise();
       this.selectDefault();
       this.setSetingHeight();
       this.computedWidth();
@@ -290,20 +289,6 @@
     },
 
     methods: {
-      getIsConcise() {
-        let skin_json_wap = {
-          style: 1
-        };
-        const skinInfo = this.roomBaseState.skinInfo;
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = skinInfo.skin_json_wap;
-        }
-        if (skin_json_wap?.style == 3) {
-          this.isConcise = true;
-        } else {
-          this.isConcise = false;
-        }
-      },
       /**
        * 计算 设置tab-content高度
        */
