@@ -69,6 +69,17 @@
       },
       isVod() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 5;
+      },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
       }
     },
     watch: {
@@ -84,10 +95,12 @@
       useMenuServer().$on('tab-switched', async data => {
         // 需要展示icon tab
         // console.log(data.cuid, 'data.cuid');
-        if (['comChatWap', 'comIntroWap'].includes(data.cuid)) {
-          this.showIcon = true;
-        } else {
-          this.showIcon = false;
+        if (!this.isConcise) {
+          if (['comChatWap', 'comIntroWap'].includes(data.cuid)) {
+            this.showIcon = true;
+          } else {
+            this.showIcon = false;
+          }
         }
       });
     },
