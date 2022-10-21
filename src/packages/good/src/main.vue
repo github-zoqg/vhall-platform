@@ -58,7 +58,8 @@
         total: 0,
         pageLock: false,
         showBottom: false,
-        bottomText: ''
+        bottomText: '',
+        goodsListJson: []
       };
     },
     computed: {
@@ -101,6 +102,8 @@
         } else {
           wrap.addEventListener('scroll', this.scrollLoadGoodsList, true);
         }
+        // 商品更新
+        this.goodServer.$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       scrollLoadGoodsList: debounce(function (e) {
         if (this.isSubscribe) {
@@ -227,6 +230,37 @@
           this.bottomText = '';
           this.showBottom = false;
         }
+      },
+      //
+      queryGoodsListJson(data) {
+        this.goodServer
+          .queryGoodsListJson({
+            url: 'https://t-alistatic01.e.vhall.com/goods/develop/goods_963046586_20221020071456.json'
+          })
+          .then(res => {
+            console.log(res, this.goodServer.state.goodsListJson, 'goodsListJson');
+            this.goodsListJson = res;
+            this.clearBottomInfo();
+            this.analogPage('msg');
+          })
+          .catch(() => {
+            this.clearBottomInfo();
+          });
+      },
+      // 分页模拟
+      analogPage(type) {
+        console.log('analogPage', this.pos);
+        // if (type == 'msg') {
+        return (this.goodsList = this.goodsList.concat(this.goodsListJson.slice(0, this.pos)));
+        // }
+        // if (this.goodsList.length < this.goodsListJson.length) {
+        //   this.goodsList = this.goodsList.concat(
+        //     this.goodsListJson.slice(this.pos, this.limit + this.pos)
+        //   );
+        //   this.pos += this.limit;
+        // } else {
+        //   this.clearBottomInfo();
+        // }
       }
     },
     destroyed() {

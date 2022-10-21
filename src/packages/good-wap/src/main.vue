@@ -109,7 +109,8 @@
         num: 1,
         limit: 10,
         pos: 0,
-        totalPages: 0
+        totalPages: 0,
+        goodsListJson: []
       };
     },
     computed: {
@@ -136,6 +137,9 @@
       //     });
       //   }
       // });
+      this.goodServer.$on('goods_update_info', data => {
+        this.queryGoodsListJson(data);
+      });
     },
     mounted() {
       this.initConfig();
@@ -253,6 +257,30 @@
           console.log('当前是手机端打开-其它');
           window.open(url, '_blank');
         }
+      },
+      //
+      queryGoodsListJson(data) {
+        this.goodServer
+          .queryGoodsListJson({
+            url: 'https://t-alistatic01.e.vhall.com/goods/develop/goods_963046586_20221020071456.json'
+          })
+          .then(res => {
+            console.log(res, 'goodsListJson');
+            this.goodsListJson = res;
+            this.loading = false;
+            this.analogPage();
+          });
+      },
+      // 分页模拟
+      analogPage(type) {
+        // console.log('analogPage', this.pos);
+        // if (type == 'msg') {
+        this.goodsList = this.goodsListJson.slice(0, this.pos);
+        // } else {
+        //   this.goodsList = this.goodsList.concat(
+        //     this.goodsListJson.slice(this.pos, this.limit + this.pos)
+        //   );
+        // }
       }
     }
   };
