@@ -1479,8 +1479,8 @@
     &.vmp-doc-une--mini {
       position: absolute;
       width: 360px;
-      height: 204px;
-      min-height: 204px;
+      height: 202px;
+      min-height: 202px;
       top: 0;
       right: 0;
       z-index: 10;

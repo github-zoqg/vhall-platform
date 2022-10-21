@@ -169,6 +169,6 @@
   // .vmp-basic-center
   .vmp-basic-center__mainscreen-pos {
     width: 100%;
-    padding-top: 56.25%;
+    padding-top: calc(56.25% - 0.5px);
   }
 </style>
