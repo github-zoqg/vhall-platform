@@ -582,8 +582,8 @@
           document.querySelector('.vmp-basic-bd').classList.remove('small_player');
         }
       });
-      this.setSetingHeight();
       this.getIsConcise();
+      this.setSetingHeight();
     },
     methods: {
       getIsConcise() {

@@ -269,6 +269,7 @@
       // if (this.isTryVideo && this.isSubscribe) return;
       await this.$nextTick(0);
       this.setSkinInfo();
+      this.getIsConcise();
       this.selectDefault();
       this.setSetingHeight();
       this.computedWidth();
@@ -289,11 +290,26 @@
     },
 
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.roomBaseState.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       /**
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
+        if (this.isSubscribe || this.isConcise || this.isEmbedVideo || this.embedObj.embedVideo)
+          return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true ? 130 : 422;
