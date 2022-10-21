@@ -293,20 +293,36 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isConcise || this.isEmbedVideo || this.embedObj.embedVideo)
-          return;
-        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-        // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-        let baseHeight = playerHeight + 71 + 94;
-        let classname = '.tab-content';
-        if (this.embedObj.embed) {
-          baseHeight = playerHeight;
-          classname = '.tab-content-embed';
+        if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
+        if (this.isConcise) {
+          const h_header = document.querySelector('#header').clientHeight;
+          const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
+          const h_block = document.querySelector('.vmp-block').clientHeight;
+          const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
+          if (h_block == 0) {
+            let classname = '.tab-content';
+            if (this.isEmbed) {
+              classname = '.tab-content-embed';
+            }
+            const tabDom = document.querySelector(classname);
+            if (tabDom) {
+              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
+            }
+          }
+        } else {
+          let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+          // postcss 换算基数为75 头部+播放器区域高为 522px
+          let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+          let baseHeight = playerHeight + 71 + 94;
+          let classname = '.tab-content';
+          if (this.embedObj.embed) {
+            baseHeight = playerHeight;
+            classname = '.tab-content-embed';
+          }
+          let popHeight =
+            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+          document.querySelector(classname).style.height = popHeight;
         }
-        let popHeight =
-          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-        document.querySelector(classname).style.height = popHeight;
       },
       computedWidth() {
         if (this.isEmbedVideo) return;
