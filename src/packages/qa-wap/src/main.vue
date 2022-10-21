@@ -127,6 +127,10 @@
       },
       isWapBodyDocSwitch() {
         this.changeChatHeight();
+      },
+      qaList() {
+        //观察问答列表变动，如果有新消息，滚动到底部 【参考私聊】
+        this.scrollBottom();
       }
     },
     components: {
