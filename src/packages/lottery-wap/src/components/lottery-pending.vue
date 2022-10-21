@@ -13,6 +13,9 @@
         <div class="lottery-pending-animation">
           <img class="lottery-pending-animation-img" :src="fitment.url" alt />
         </div>
+        <span class="remark-text-fitment">
+          {{ fitment.text || `${$t('interact_tools.interact_tools_1002')}` }}
+        </span>
         <button v-if="needJoin" class="vmp-lottery-btn" @click="joinLottery">
           {{ $t('interact_tools.interact_tools_1008') }}
         </button>
@@ -30,7 +33,13 @@
       <div
         :class="['start-lottery-btn', `order-${fitment.img_order}`]"
         @touchstart="handleClickStartLottery"
-      ></div>
+      >
+        <img
+          :class="['start-lottery-btn-ae', btnActived ? 'active' : '']"
+          :src="btnImgUrl"
+          alt=""
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -99,13 +108,22 @@
       return {
         loading: false,
         joined: false,
-        inProgress: false
+        inProgress: false,
+        btnImgUrl: null,
+        timer: null,
+        btnActived: false //按钮是否持续按的激活状态
       };
     },
     mounted() {
       if (this.fitment.img_order !== 0) {
         this.initSvgaResource();
       }
+    },
+    beforeDestroy() {
+      // 删除资源实例
+      player && player.destroy && player.destroy();
+      parser && parser.destroy && parser.destroy();
+      this.clearTimer();
     },
     methods: {
       // 点击参与抽奖
@@ -114,6 +132,7 @@
           this.joinLottery();
         } else {
           this.startAnimation();
+          this.activeBtn();
         }
       },
       // 发送口令
@@ -152,18 +171,16 @@
         const resourceItem = animationEffectArr[itemIdx];
         parser.load(resourceItem.svgaUrl, videoItem => {
           player.setVideoItem(videoItem);
+          this.btnImgUrl = resourceItem.coverBtnImgUrl;
           const cacheKey = `lottery_${this.lotteryId}_cache`;
           const cache = sessionStorage.getItem(cacheKey);
           if (cache) {
             this.startAnimation();
           } else {
             if (this.needJoin) {
-              player.setImage(resourceItem.sendBtnImgUrl, resourceItem.imageKey);
+              this.btnImgUrl = resourceItem.sendBtnImgUrl;
             }
-            player.startAnimationWithRange({
-              location: 1,
-              length: 15
-            });
+            player.stepToFrame(0, false);
           }
         });
       },
@@ -177,6 +194,21 @@
           location: 30,
           length: 60
         });
+      },
+      // 按钮点击的激活状态
+      activeBtn() {
+        this.btnActived = true;
+        this.clearTimer();
+        this.timer = setTimeout(() => {
+          this.btnActived = false;
+          this.clearTimer();
+        }, 200);
+      },
+      clearTimer() {
+        if (this.timer) {
+          clearTimeout(this.timer);
+          this.timer = null;
+        }
       }
     }
   };
@@ -231,6 +263,9 @@
         background-size: contain;
         background-repeat: no-repeat;
       }
+    }
+    .remark-text-fitment {
+      color: #fff;
     }
     .lottery-send-command {
       display: inline-block;
@@ -305,14 +340,24 @@
       height: 150px;
       width: 150px;
       position: absolute;
-      // background: yellow;
       top: 250px;
       left: 300px;
       &.order-1 {
-        top: 236px;
-        left: 260px;
-        height: 120px;
-        width: 120px;
+        top: 210px;
+        left: 232px;
+        height: 180px;
+        width: 180px;
+        &::before {
+          content: '';
+          width: 60px;
+          height: 60px;
+          position: absolute;
+          top: -32px;
+          left: 50%;
+          transform: translate(-50%);
+          background-image: url('../img/lottery-arrow.png');
+          background-size: contain;
+        }
       }
       &.order-2 {
         top: 560px;
@@ -330,6 +375,29 @@
     .vmp-lottery-btn {
       display: block;
       margin: 32px auto 0;
+    }
+    // 按钮图片与效果
+    .start-lottery-btn-ae {
+      display: inline-block;
+      position: relative; // 用文档流提高层级
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 10;
+      animation-name: zoom;
+      animation-duration: 600ms;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      animation-direction: alternate-reverse;
+      &.active {
+        // animation-iteration-count: 1;
+        animation-duration: 100ms;
+      }
+    }
+    @keyframes zoom {
+      to {
+        transform: scale(1.1);
+      }
     }
   }
 </style>
