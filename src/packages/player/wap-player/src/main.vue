@@ -420,6 +420,19 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      // 是不是极简风格
+      isConcise() {
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skin_json_wap = {
+          style: 1,
+          backGroundColor: 2
+        };
+        // todo 直播间三期的skinInfo.skin_json_wap可能为对象，不需要json转换了
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+        }
+        return skin_json_wap.style == 3;
       }
     },
     data() {
@@ -480,8 +493,8 @@
         isSmallPlayer: false,
         imageCropperMode: 1,
         circleSliderVal: 0,
-        initIndex,
-        isConcise: false //判断是否是极简模式
+        initIndex
+        // isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -584,18 +597,18 @@
       });
       this.setSetingHeight();
 
-      let skin_json_wap = {
-        style: 1
-      };
-      const skinInfo = this.roomBaseState.skinInfo;
-      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
-      }
-      if (skin_json_wap?.style == 3) {
-        this.isConcise = true;
-      } else {
-        this.isConcise = false;
-      }
+      // let skin_json_wap = {
+      //   style: 1
+      // };
+      // const skinInfo = this.roomBaseState.skinInfo;
+      // if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+      //   skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+      // }
+      // if (skin_json_wap?.style == 3) {
+      //   this.isConcise = true;
+      // } else {
+      //   this.isConcise = false;
+      // }
     },
     methods: {
       /**
@@ -603,20 +616,37 @@
        */
       setSetingHeight() {
         if (this.isSubscribe) return;
-        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-        // postcss 换算基数为75 头部+播放器区域高为 522px
-        let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
-        let baseHeight = playerHeight + 71 + 90;
-        let classname = '.tab-content';
-        if (this.isEmbed) {
-          baseHeight = playerHeight;
-          classname = '.tab-content-embed';
-        }
-        const tabDom = document.querySelector(classname);
-        if (tabDom) {
-          const popHeight =
-            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-          tabDom.style.height = popHeight;
+        if (this.isConcise) {
+          const h_header = document.querySelector('#header').clientHeight;
+          const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
+          const h_block = document.querySelector('.vmp-block').clientHeight;
+          const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
+          if (h_block == 0) {
+            let classname = '.tab-content';
+            if (this.isEmbed) {
+              classname = '.tab-content-embed';
+            }
+            const tabDom = document.querySelector(classname);
+            if (tabDom) {
+              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
+            }
+          }
+        } else {
+          let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+          // postcss 换算基数为75 头部+播放器区域高为 522px
+          let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
+          let baseHeight = playerHeight + 71 + 90;
+          let classname = '.tab-content';
+          if (this.isEmbed) {
+            baseHeight = playerHeight;
+            classname = '.tab-content-embed';
+          }
+          const tabDom = document.querySelector(classname);
+          if (tabDom) {
+            const popHeight =
+              document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+            tabDom.style.height = popHeight;
+          }
         }
       },
       // 解析图片地址
