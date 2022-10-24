@@ -2,13 +2,24 @@
   <!-- pc专题详情页 -->
   <div
     class="vmp-watch-subject"
-    @scroll="handleScroll"
     v-loading="state === 0"
     element-loading-text="加载中"
     element-loading-background="rgba(255, 255, 255, 0.1)"
   >
     <template v-if="state == 1">
       <vmp-air-container cuid="layerSubjectRoot"></vmp-air-container>
+      <div class="vmp-subject-pagination">
+        <el-pagination
+          v-show="total > pageInfo.limit"
+          :background="true"
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          :page-size="pageInfo.limit"
+          :current-page="pageNum"
+          @current-change="currentChangeHandler"
+          align="center"
+        ></el-pagination>
+      </div>
     </template>
     <template v-if="state == 2">
       <div class="vmp-watch-subject_error">
@@ -30,7 +41,7 @@
         pageNum: 1,
         pageInfo: {
           pos: 0,
-          limit: 10
+          limit: 20
         }
       };
     },
@@ -55,6 +66,11 @@
             subject_id: this.$route.query.id
           });
           if (res.code !== 200) {
+            if ([511006, 511007].includes(res.code)) {
+              localStorage.removeItem('token');
+              window.location.reload();
+              return;
+            }
             this.state = 2;
             return;
           }
@@ -89,17 +105,6 @@
         };
         subjectServer.getWebinarList(params);
       },
-      handleScroll(e) {
-        let scrollTop = e.target.scrollTop;
-        let scrollBottom = e.target.scrollHeight - scrollTop - e.target.clientHeight;
-        if (scrollBottom < 10) {
-          if (this.pageNum >= this.maxPage) {
-            return;
-          }
-          this.pageNum++;
-          this.getWebinarMoreList();
-        }
-      },
       async initSubjectAuth() {
         const subjectServer = useSubjectServer();
         const visitorId = localStorage.getItem('visitorId');
@@ -110,6 +115,10 @@
         };
         // 如果已经鉴权过，就直接进入观看端，否则走鉴权
         await subjectServer.initSubjectInfo(params);
+      },
+      currentChangeHandler(num) {
+        this.pageNum = num;
+        this.getWebinarMoreList();
       }
     }
   };
@@ -136,6 +145,41 @@
         line-height: 22px;
         padding-top: 12px;
         padding-left: 20px;
+      }
+    }
+    .vmp-subject-bd {
+      background: #f7f7f7;
+      padding-top: 21px;
+    }
+  }
+
+  // 分页样式重置
+  .vmp-subject-pagination {
+    margin-bottom: 48px;
+    .el-pagination {
+      &.is-background {
+        .btn-next,
+        .btn-prev {
+          border: 1px solid #cccccc;
+          background-color: transparent;
+        }
+        .el-pager {
+          li {
+            background-color: transparent;
+          }
+        }
+        .el-input__inner {
+          background: transparent;
+        }
+        .el-pager {
+          .number {
+            border: 1px solid #cccccc;
+            &:not(.disabled).active {
+              background-color: #fb3a32;
+              border-color: transparent;
+            }
+          }
+        }
       }
     }
   }

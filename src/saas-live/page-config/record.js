@@ -44,6 +44,10 @@ export default {
         cuid: 'recordComStreamLocal',
         method: 'stopPush',
         args: ['$0']
+      },
+      {
+        cuid: 'recordComDocUne',
+        method: 'liveOver'
       }
     ],
     emitClickStartLive: [

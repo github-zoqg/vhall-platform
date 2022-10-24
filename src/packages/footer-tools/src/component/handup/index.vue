@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-handup">
+  <div class="vmp-handup" v-if="liveStatus == 1">
     <div v-if="isInteractLive && !isBanned && !allBanned">
       <el-button
         @click="handleHandClick"
@@ -84,6 +84,10 @@
       // 组内角色
       groupRole() {
         return this.$domainStore.state.groupServer.groupInitData?.join_role;
+      },
+      //当前直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     created() {

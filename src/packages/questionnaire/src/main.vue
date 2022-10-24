@@ -139,12 +139,12 @@
             发布
           </el-button>
           <!-- 隐私合规（嵌入不展示） -->
-          <vmp-privacy-compliance
+          <!-- <vmp-privacy-compliance
             scene="liveQuestion"
             clientType="pc"
             compType="2"
             v-if="prevQuestionnaireId"
-          ></vmp-privacy-compliance>
+          ></vmp-privacy-compliance> -->
         </section>
       </section>
     </el-dialog>
@@ -285,7 +285,9 @@
       hideItem() {
         return (
           this.configList['initiate_embed_function_close'] &&
-          (this.$route.query.liveT || this.$route.query.live_token)
+          (this.$route.query.liveT ||
+            this.$route.query.live_token ||
+            this.$route.query.assistant_token)
         );
       }
     },
@@ -1012,7 +1014,7 @@
     padding: 10px 20px 20px;
     background: #f7f7f7;
     &.preview {
-      padding: 0;
+      padding: 0 0 60px;
       background: #fff;
       .q-btns {
         display: none; // 隐藏提交问卷

@@ -3,6 +3,7 @@ import DomainStore from '@/app-shared/domain-store/index';
 import {
   setBaseUrl,
   setRequestHeaders,
+  setResponseInterceptors,
   useDocServer,
   useInteractiveServer,
   useRoomBaseServer,
@@ -31,6 +32,12 @@ setBaseUrl({
  */
 setRequestHeaders({
   platform: 10
+});
+setResponseInterceptors(e => {
+  //如果是本地token（非地址栏中的token或live_token）失效，清空token
+  if ([511006, 511007].includes(e?.data?.code)) {
+    localStorage.removeItem('token');
+  }
 });
 
 // 平台标识

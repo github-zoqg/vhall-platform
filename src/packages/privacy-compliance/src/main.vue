@@ -177,6 +177,19 @@
         margin-bottom: 0;
         text-align: left;
       }
+      /* wap端 - 短信鉴权 */
+      &.scene_smsVerification {
+        margin-top: 32px;
+        margin-bottom: 10px;
+        padding: 0 0;
+        span {
+          font-size: 24px;
+        }
+        a {
+          font-size: 24px;
+          line-height: 44px;
+        }
+      }
     }
     /* PC端样式设置 */
     &.client_pc {
@@ -191,17 +204,11 @@
         padding: 0 0;
       }
       &.scene_lottery {
-        position: absolute;
-        padding: 0 0;
-        margin: 0 0;
-        width: 300px;
-        bottom: 53px;
-        text-align: center;
-        padding-left: 6px;
+        width: 100%;
+        // text-align: center;
         span {
           font-size: 12px;
           line-height: 17px;
-          color: #ffffff;
         }
         a {
           font-size: 12px;
@@ -219,16 +226,16 @@
       }
       &.client_pc {
         &.scene_lottery {
-          width: 278px;
+          // width: 278px;
           bottom: 34px;
           padding-left: 0;
         }
       }
       &.client_mobile {
         &.scene_lottery {
-          &.language__en {
-            text-align: center;
-          }
+          // &.language__en {
+          // text-align: center;
+          // }
         }
         &.scene_signForm {
           &.language__en {
@@ -241,9 +248,9 @@
   @media (min-width: 375px) {
     .vmp-privacy-compliance {
       &.client_mobile {
-        &.scene_lottery {
-          text-align: center;
-        }
+        // &.scene_lottery {
+        // text-align: center;
+        // }
         &.scene_signForm {
           text-align: center;
         }

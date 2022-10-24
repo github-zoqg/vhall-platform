@@ -108,7 +108,8 @@ export default {
     appointment_1030: 'The event organizer set up a trial',
     appointment_1031: 'Please be patient',
     appointment_1032: 'Whitelist',
-    appointment_1033: 'The rehearsal has started, please watch it live'
+    appointment_1033: 'The rehearsal has started, please watch it live',
+    appointment_1034: 'Submit and receive SMS'
   },
   nav: {
     nav_1001: 'Sponsor',
@@ -211,8 +212,8 @@ export default {
     login_1041: '',
     login_1042: '',
     login_1043: '',
-    login_1044: '',
-    login_1045: '',
+    login_1044: 'Please enter phone number',
+    login_1045: 'verification code',
     login_1046: '',
     login_1047: '',
     login_1048: '',
@@ -223,7 +224,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: '',
+    login_1056: 'Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -561,7 +562,14 @@ export default {
     interact_tools_1087: 'Rocket',
     interact_tools_1088: 'Aircraft',
     interact_tools_1089: 'Salute',
-    interact_tools_1090: 'Car'
+    interact_tools_1090: 'Car',
+    interact_tools_1091: 'Receive prizes',
+    interact_tools_1092: 'Winning result',
+    interact_tools_1093: 'This round of prize "{n}"',
+    interact_tools_1094: 'No winner',
+    interact_tools_1095: 'Name',
+    interact_tools_1096: 'Phone',
+    interact_tools_1097: 'Address'
   },
   setting: {
     setting_1002: 'View settings',
@@ -932,13 +940,17 @@ export default {
     other_1017: 'Agree and continue',
     other_1018: 'Refuse',
     other_1019: 'got it',
-    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually"
+    other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
+    other_1021:
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
     privacy_1002: 'Submit and agree to the "{n}" and "{n1}"',
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
-    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first'
+    privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
+    privacy_1007: 'Please check the agreement first'
   }
 };

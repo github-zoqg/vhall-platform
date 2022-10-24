@@ -170,7 +170,7 @@ export default {
       icon: 'vh-saas-iconfont vh-saas-a-line-Desktopsharing',
       text: 'aside_menu.aside_menu_1002',
       kind: 'desktopShare',
-      auth: true
+      auth: 'desktop_share'
     },
     handleClick: [
       {
@@ -346,7 +346,7 @@ export default {
   // 上麦流列表
   comStreamList: {
     component: 'VmpStreamListLive',
-    children: ['comStreamLocal', 'comPcPlayerLiveYun']
+    children: ['comStreamLocal', 'comPcPlayerLiveYun', 'comStreamRemote']
   },
   // 本地流
   comStreamLocal: {
@@ -371,6 +371,23 @@ export default {
       {
         cuid: 'pannelHeaderRight',
         method: 'handleUnpublishComplate'
+      }
+    ]
+  },
+  // 远端流组件
+  comStreamRemote: {
+    component: 'VmpStreamRemote',
+    emitClickStopShare: [
+      {
+        cuid: 'comDesktopScreen',
+        method: 'stopShare',
+        args: ['$0']
+      }
+    ],
+    emitClickStopInsert: [
+      {
+        cuid: 'comInsertStream',
+        method: 'closeInsertvideoHandler'
       }
     ]
   },

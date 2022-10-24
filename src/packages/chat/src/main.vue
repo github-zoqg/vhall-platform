@@ -895,10 +895,14 @@
         useChatServer()
           .setAllBanned(params)
           .then(res => {
-            this.allBanned = data.status;
-            //数据上报埋点--全体禁言切换
-            window.vhallReportForProduct?.report(data.status ? 110116 : 110117);
-            return res;
+            if (res.code == 200) {
+              this.allBanned = data.status;
+              //数据上报埋点--全体禁言切换
+              window.vhallReportForProduct?.report(data.status ? 110116 : 110117);
+              return res;
+            } else {
+              this.$message.error(res.msg);
+            }
           })
           .catch(error => {
             this.$message.error(error.msg);

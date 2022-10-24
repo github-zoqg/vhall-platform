@@ -579,7 +579,13 @@
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           ...this.$route.query
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          params.clientType = 'embed';
+          params.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(params).then(res => {
+          this.isSubscribeShow = false; // 先关闭弹窗
           if (res.code == 200) {
             if (res.data.status == 'live') {
               let pageUrl = '';
@@ -605,6 +611,7 @@
         });
       },
       handleAuthErrorCode(code, msg) {
+        this.isSubscribeShow = false; // 先关闭弹窗
         this.isWhiteCheck = false; // 是否白名单验证
         switch (code) {
           case 510008: // 未登录
@@ -642,6 +649,16 @@
             break;
           case 512523:
             this.webinarPayAuth();
+            break;
+          case 513421:
+            // 短信预约填写手机号(无需验证)
+            window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitSmsPhone'));
+            break;
+          case 513422:
+            // 短信预约填写手机号(需要手机验证)
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitSmsPhoneWithVerify')
+            );
             break;
           default:
             this.$toast(this.$tec(code) || msg);
@@ -788,6 +805,11 @@
           visitor_id: this.roomBaseServer.state.watchInitData.visitor_id,
           ...this.$route.query
         };
+        if (this.isEmbed) {
+          // 消息通知 - 添加参数字段
+          params.clientType = 'embed';
+          params.embed_type = this.isEmbedVideo ? 'video' : 'full';
+        }
         this.subscribeServer.watchAuth(params).then(res => {
           if (res.code == 200) {
             if (res.data.status == 'live') {
@@ -808,10 +830,13 @@
                 window.location.reload();
               }, 1000);
             }
-          } else if (res.code === 512525) {
-            this.toSignupPage();
+            // } else if (res.code === 512525) {
+            //   this.toSignupPage();
+            // } else {
+            //   this.$toast(this.$tec(res.code) || res.msg);
+            // }
           } else {
-            this.$toast(this.$tec(res.code) || res.msg);
+            this.handleAuthErrorCode(res.code, res.msg);
           }
         });
       },
@@ -881,6 +906,11 @@
       // 同意观看协议后回调
       handleAgreeWitthTerms() {
         this.subOption.needAgreement = false;
+        const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
+        this.authCheck(type);
+      },
+      // 已提交了短信通知手机号
+      handleNoticeWechatSubmitSuccess() {
         const type = this.subOption.verify == 6 ? 4 : this.subOption.verify;
         this.authCheck(type);
       }

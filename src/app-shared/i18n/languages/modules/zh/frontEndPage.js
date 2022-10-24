@@ -107,7 +107,8 @@ export default {
     appointment_1030: '活动主办方设置了试看',
     appointment_1031: '请耐心等待',
     appointment_1032: '白名单',
-    appointment_1033: '彩排已开始，请观看直播吧'
+    appointment_1033: '彩排已开始，请观看直播吧',
+    appointment_1034: '提交手机号接收消息提醒'
   },
   nav: {
     nav_1001: '主办方',
@@ -556,7 +557,14 @@ export default {
     interact_tools_1087: '火箭',
     interact_tools_1088: '飞机',
     interact_tools_1089: '礼炮',
-    interact_tools_1090: '汽车'
+    interact_tools_1090: '汽车',
+    interact_tools_1091: '领奖信息',
+    interact_tools_1092: '中奖详情',
+    interact_tools_1093: '本轮奖品 “{n}”',
+    interact_tools_1094: '当前无中奖用户',
+    interact_tools_1095: '您的姓名',
+    interact_tools_1096: '手机号码',
+    interact_tools_1097: '收货地址'
   },
   setting: {
     setting_1002: '观看设置',
@@ -906,13 +914,16 @@ export default {
     other_1017: '同意并继续',
     other_1018: '拒绝',
     other_1019: '知道了',
-    other_1020: '很遗憾无法继续为您提供服务，您可以手动关闭页面'
+    other_1020: '很遗憾无法继续为您提供服务，您可以手动关闭页面',
+    other_1021: '注：嘉宾、助理通过正式直播地址参与彩排'
   },
   privacy: {
     privacy_1001: '阅读并同意{n}及{n1}',
     privacy_1002: '提交即同意{n}及{n1}',
     privacy_1003: '《用户保护协议》',
     privacy_1004: '《隐私政策》',
-    privacy_1005: '请先阅读并同意隐私政策及用户服务协议'
+    privacy_1005: '请先阅读并同意隐私政策及用户服务协议',
+    privacy_1006: '提交并同意《隐私政策》及《用户保护协议》',
+    privacy_1007: '请先勾选协议'
   }
 };

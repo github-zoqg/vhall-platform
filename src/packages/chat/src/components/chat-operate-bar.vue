@@ -328,14 +328,14 @@
       },
       //切换全体禁言开关状态
       toggleMutedAllStatus(val) {
-        if (this.liveStatus !== 1) {
-          if (this.$route.query.assistantType) {
-            cl_toast('error', '直播未开始禁止调用');
-          } else {
-            this.$message.error('直播未开始禁止调用');
-          }
-          return;
-        }
+        // if (this.liveStatus !== 1) {
+        //   if (this.$route.query.assistantType) {
+        //     cl_toast('error', '直播未开始禁止调用');
+        //   } else {
+        //     this.$message.error('直播未开始禁止调用');
+        //   }
+        //   return;
+        // }
         this.setAllBanned(val);
         window.vhallReportForProduct?.report(val ? 110116 : 110117);
       },

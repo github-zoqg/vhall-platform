@@ -434,7 +434,10 @@
       },
       // 点击查看抽奖信息
       checkLotteryDetail(e, msgData) {
-        this.emitLotteryEvent(msgData?.content?.msg?.data);
+        if (msgData.isCheck) {
+          // 防止未中奖也弹窗
+          this.emitLotteryEvent(msgData?.content?.msg?.data);
+        }
       },
       // 点击查看问卷
       checkQuestionDetail(questionnaire_id) {
@@ -537,10 +540,10 @@
 
       .avatar-wrap {
         position: relative;
-        margin-right: 10px;
+        // margin-right: 10px;
         .chat-avatar {
-          width: 56px;
-          height: 56px;
+          width: 52px;
+          height: 52px;
           border-radius: 50%;
           display: block;
           // border: 2px solid #e3e3e3;
@@ -694,6 +697,7 @@
           font-size: 28px;
           background-color: var(--theme-chat-msg-bg);
           border-radius: 0px 16px 16px 16px;
+          max-width: 572px;
           span {
             word-break: break-word;
           }
