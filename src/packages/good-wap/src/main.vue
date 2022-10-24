@@ -260,13 +260,14 @@
       },
       //
       queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
         this.goodServer
           .queryGoodsListJson({
-            url: 'https://t-alistatic01.e.vhall.com/goods/develop/goods_963046586_20221020071456.json'
+            url: data.data.cnd_url
           })
           .then(res => {
             console.log(res, 'goodsListJson');
-            this.goodsListJson = res;
+            this.goodsListJson = res.goods_list;
             this.loading = false;
             this.analogPage();
           });
@@ -275,7 +276,16 @@
       analogPage(type) {
         // console.log('analogPage', this.pos);
         // if (type == 'msg') {
-        this.goodsList = this.goodsListJson.slice(0, this.pos);
+        this.goodsList = this.goodsListJson.slice(0, this.pos + 10);
+        this.goodsList.map(item => {
+          if (item.discount_price && Number(item.discount_price) > 0) {
+            item.showDiscountPrice = true;
+            item.discountText = this.filterDiscount(item.discount_price);
+          } else {
+            item.showDiscountPrice = false;
+          }
+          item.priceText = this.filterDiscount(item.price);
+        });
         // } else {
         //   this.goodsList = this.goodsList.concat(
         //     this.goodsListJson.slice(this.pos, this.limit + this.pos)

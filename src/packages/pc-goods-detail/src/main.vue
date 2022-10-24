@@ -57,6 +57,7 @@
 </template>
 
 <script>
+  import { useGoodServer } from 'middle-domain';
   export default {
     name: 'VmpGoodDetailPc',
     data() {
@@ -64,7 +65,8 @@
         show: false, //是否显示
         info: {}, //商品详情
         defaultImg: '',
-        selectDefaultImgIndex: 0
+        selectDefaultImgIndex: 0,
+        isExist: true
       };
     },
     methods: {
@@ -77,6 +79,8 @@
         this.info = data;
         this.show = true;
         this.chooseDefaultImg(0);
+        // 商品更新
+        useGoodServer().$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       handleClose() {
         this.show = false;
@@ -85,12 +89,24 @@
        * 访问店铺
        */
       link(val) {
+        if (!this.isExist) {
+          this.$message.warning('');
+          this.handleClose();
+          this.isExist = true;
+          return;
+        }
         window.open(val);
       },
       /**
        * 购买
        */
       handleBuy(info) {
+        if (!this.isExist) {
+          this.$message.warning('');
+          this.handleClose();
+          this.isExist = true;
+          return;
+        }
         window.open(info.goods_url);
         // 数据埋点
         window.vhallReportForWatch?.report(170030, {
@@ -101,6 +117,23 @@
       chooseDefaultImg(index) {
         this.defaultImg = this.info.img_list[index].img_url;
         this.selectDefaultImgIndex = index;
+      },
+      // 获取商品Json
+      queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
+        useGoodServer()
+          .queryGoodsListJson({
+            url: data.data.cnd_url
+          })
+          .then(res => {
+            console.log(res, 'goodsListJson');
+            let obj = res.goods_list.find(i => i.goods_id == this.info.goods_id);
+            if (obj) {
+              this.isExist = true;
+            } else {
+              this.isExist = false;
+            }
+          });
       }
     }
   };

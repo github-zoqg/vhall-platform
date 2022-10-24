@@ -233,13 +233,14 @@
       },
       //
       queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
         this.goodServer
           .queryGoodsListJson({
-            url: 'https://t-alistatic01.e.vhall.com/goods/develop/goods_963046586_20221020071456.json'
+            url: data.data.cnd_url
           })
           .then(res => {
             console.log(res, this.goodServer.state.goodsListJson, 'goodsListJson');
-            this.goodsListJson = res;
+            this.goodsListJson = res.goods_list;
             this.clearBottomInfo();
             this.analogPage('msg');
           })
@@ -250,17 +251,16 @@
       // 分页模拟
       analogPage(type) {
         console.log('analogPage', this.pos);
-        // if (type == 'msg') {
-        return (this.goodsList = this.goodsList.concat(this.goodsListJson.slice(0, this.pos)));
-        // }
-        // if (this.goodsList.length < this.goodsListJson.length) {
-        //   this.goodsList = this.goodsList.concat(
-        //     this.goodsListJson.slice(this.pos, this.limit + this.pos)
-        //   );
-        //   this.pos += this.limit;
-        // } else {
-        //   this.clearBottomInfo();
-        // }
+        this.goodsList = this.goodsListJson.slice(0, this.pos + 10);
+        this.goodsList.forEach(item => {
+          if (item.discount_price && Number(item.discount_price) > 0) {
+            item.showDiscountPrice = true;
+            item.discoutText = this.filterDiscout(item.discount_price);
+          } else {
+            item.showDiscountPrice = false;
+          }
+          item.priceText = this.filterDiscout(item.price);
+        });
       }
     },
     destroyed() {

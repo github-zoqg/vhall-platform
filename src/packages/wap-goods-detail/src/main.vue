@@ -52,6 +52,7 @@
 </template>
 
 <script>
+  import { useGoodServer } from 'middle-domain';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   export default {
     name: 'VmpGoodsDetail',
@@ -60,7 +61,8 @@
         show: false,
         showTaoTip: false,
         info: {},
-        current: 0
+        current: 0,
+        isExist: true
       };
     },
     // mounted() {
@@ -75,11 +77,19 @@
         console.log('detail---------->', data);
         this.info = data;
         this.show = true;
+        // 商品更新
+        useGoodServer().$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       /**
        * 购买
        */
       handleBuy(url) {
+        if (!this.isExist) {
+          this.$toast(this.$t(''));
+          this.handleClose();
+          this.isExist = true;
+          return;
+        }
         // 数据埋点
         window.vhallReportForWatch?.report(170030, {
           goods_id: this.info.goods_id,
@@ -111,6 +121,23 @@
       },
       onChange(index) {
         this.current = index;
+      },
+      // 获取商品Json
+      queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
+        useGoodServer()
+          .queryGoodsListJson({
+            url: data.data.cnd_url
+          })
+          .then(res => {
+            // console.log(res, 'goodsListJson');
+            let obj = res.goods_list.find(i => i.goods_id == this.info.goods_id);
+            if (obj) {
+              this.isExist = true;
+            } else {
+              this.isExist = false;
+            }
+          });
       }
     }
   };
