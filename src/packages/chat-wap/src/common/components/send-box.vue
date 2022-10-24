@@ -541,10 +541,15 @@
           }
 
           &-say {
-            float: left;
+            // float: left;
             height: 60px;
             line-height: 60px;
             padding-left: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
           }
         }
       }
