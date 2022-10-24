@@ -287,6 +287,7 @@
       // this.chatServer.setKeywordList(this.keywordList);
     },
     mounted() {
+      this.setSetingHeight();
       this.listenChatServer();
       this.showWelcomeTxt();
       // if (!this.isShowChatHistoryBtn) {
@@ -310,6 +311,25 @@
       window.removeEventListener('focusout', this.focusoutIOS);
     },
     methods: {
+      /**
+       * 计算 设置tab-content高度
+       */
+      setSetingHeight() {
+        const h_header = document.querySelector('#header').clientHeight;
+        const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
+        const h_block = document.querySelector('.vmp-block').clientHeight;
+        const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
+        if (h_block == 0) {
+          let classname = '.tab-content';
+          if (this.isEmbed) {
+            classname = '.tab-content-embed';
+          }
+          const tabDom = document.querySelector(classname);
+          if (tabDom) {
+            tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
+          }
+        }
+      },
       //初始化eventbus
       initEvent() {
         EventBus.$on('showEmoji', e => {
