@@ -22,7 +22,8 @@
           </div>
           <p v-else class="vmp-user-account-pwd__sTitle">{{ $t('account.account_1038') }}</p>
           <el-form-item v-if="pwdData.type == 'edit'" key="old_pwd" prop="old_pwd">
-            <PwdInput
+            <el-input
+              type="password"
               v-model.trim="pwdForm.old_pwd"
               clearable
               :placeholder="!pwdCaptVo.old_pwd_focus ? $t('account.account_1039') : ''"
@@ -48,10 +49,11 @@
                   class="vh-iconfont vh-line-view"
                 ></i>
               </span>
-            </PwdInput>
+            </el-input>
           </el-form-item>
           <el-form-item key="pasword" prop="password">
-            <PwdInput
+            <el-input
+              type="password"
               v-model.trim="pwdForm.password"
               clearable
               :placeholder="
@@ -83,10 +85,11 @@
                   class="vh-iconfont vh-line-view"
                 ></i>
               </span>
-            </PwdInput>
+            </el-input>
           </el-form-item>
           <el-form-item key="new_password" prop="new_password">
-            <PwdInput
+            <el-input
+              type="password"
               v-model.trim="pwdForm.new_password"
               clearable
               :placeholder="
@@ -118,7 +121,7 @@
                   class="vh-iconfont vh-line-view"
                 ></i>
               </span>
-            </PwdInput>
+            </el-input>
           </el-form-item>
         </el-form>
         <div slot="footer">
@@ -136,12 +139,12 @@
 </template>
 
 <script>
-  import PwdInput from './pwd-input.vue';
+  // import PwdInput from './pwd-input.vue';
   import { useUserServer } from 'middle-domain';
   export default {
-    components: {
-      PwdInput
-    },
+    // components: {
+    //   PwdInput
+    // },
     props: {
       value: {
         type: Boolean,
