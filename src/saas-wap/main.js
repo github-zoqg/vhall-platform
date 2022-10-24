@@ -19,7 +19,7 @@ import './init-global/use';
 // 全局混入
 import '@/app-shared/mixins/index';
 // 全局指令
-// import '@/app-shared/directives/index';
+import '@/app-shared/directives/index';
 // 全局过滤器
 import '@/app-shared/filters/index';
 // 导入样式及皮肤

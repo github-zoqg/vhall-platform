@@ -20,7 +20,8 @@
           class="virtual-list"
           v-if="virtual.showlist"
           ref="chatlist"
-          :style="{ height: chatlistHeight + 'px', overflow: allowScroll ? 'auto' : 'hidden' }"
+          :style="{ height: chatlistHeight + 'px' }"
+          :class="{ overflow: overflow }"
           :keeps="50"
           :estimate-size="100"
           :data-key="'count'"
@@ -34,6 +35,7 @@
           }"
           @totop="onTotop"
           @tobottom="toBottom"
+          @resized="onItemRendered"
         >
           <div
             class="chat_loading"
@@ -654,6 +656,17 @@
           ));
         }
         return (this.renderList = this.chatList);
+      },
+      onItemRendered() {
+        if (!this.$refs.chatlist) {
+          return;
+        }
+        // first page items are all mounted, scroll to bottom
+        if (!this.isFirstPageReady && this.$refs.chatlist.getSizes() >= this.pageSize) {
+          this.isFirstPageReady = true;
+          this.setVirtualListToBottom();
+        }
+        this.checkOverflow();
       }
     }
   };
@@ -693,7 +706,8 @@
       //   background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.1));
       // }
       // TODO: 首条置底
-      /*     .virtual-list {
+      .virtual-list {
+        position: relative;
         height: 100%;
         overflow-y: auto;
         display: flex;
@@ -701,14 +715,14 @@
         &.overflow {
           flex-direction: column;
         }
-      } */
-
-      .virtual-list {
-        height: 100%;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
       }
+
+      // .virtual-list {
+      //   height: 100%;
+      //   overflow-y: auto;
+      //   display: flex;
+      //   flex-direction: column;
+      // }
 
       > div:first-of-type {
         padding-top: 8px;
