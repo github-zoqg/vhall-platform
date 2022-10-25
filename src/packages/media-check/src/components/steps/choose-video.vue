@@ -92,7 +92,7 @@
       }
     },
     mounted() {
-      this.startVideoPreview({ action: 'preview' });
+      // this.startVideoPreview({ action: 'preview' });
     },
     methods: {
       setSelectedId(id) {
@@ -105,7 +105,6 @@
       async startVideoPreview({ action = 'preview' }) {
         try {
           await this.stopVideoPreview();
-
           const streamId = await this.server.startVideoPreview({
             videoNode: 'vh-device-check-video',
             videoDevice: this.selectedId
