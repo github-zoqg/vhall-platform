@@ -16,8 +16,15 @@
             <header class="vmp-rebroadcast-search">
               <span class="my-live">
                 我的直播
-                <i class="vh-iconfont vh-line-question"></i>
-                <div class="tips">暂只支持转播直播</div>
+                <!-- 提示信息 -->
+                <el-tooltip placement="right">
+                  <div class="tips" slot="content">
+                    1、暂只支持转播直播
+                    <br />
+                    2、合并模式的直播不支持被转播
+                  </div>
+                  <i class="el-tooltip vh-iconfont vh-line-question help-icon"></i>
+                </el-tooltip>
               </span>
               <el-button type="mini" round @click="getList">刷新</el-button>
               <el-input
