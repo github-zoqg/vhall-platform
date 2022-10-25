@@ -583,7 +583,7 @@
         const localMap = new Map([
           ['media-check.selected.video', this.mediaState.video || ''],
           ['media-check.selected.audioInput', this.mediaState.audioInput || ''],
-          ['media-check.selected.audioOutput', this.mediaState.audioInput || ''],
+          ['media-check.selected.audioOutput', this.mediaState.audioOutput || ''],
           [`saveCanvasObj_${this.webinar.id}`, canvasObj],
           [`selectVideoType_${this.webinar.id}`, this.mediaState.videoType || 'camera']
         ]);
