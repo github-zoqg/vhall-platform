@@ -15,7 +15,8 @@ const htmlConfig = {
       staticVhallyun: 'static.vhallyun.com',
       s1: 's1.e.vhall.com',
       s2: 's2.e.vhall.com',
-      s3: 's3.e.vhall.com'
+      s3: 's3.e.vhall.com',
+      s4: 's4.e.vhall.com'
     }
   }
 };
