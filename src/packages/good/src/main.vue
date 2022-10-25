@@ -171,7 +171,7 @@
         window.open(good.goods_url);
       },
       queryGoodsList() {
-        if (this.pageLock || this.pos + this.limit >= this.total) {
+        if (this.pageLock || this.goodsList.length >= this.total) {
           return false;
         }
         this.pageLock = true;
@@ -219,7 +219,7 @@
           this.goodsList = list;
         }
         this.total = data.total;
-        this.pos = data.pos;
+        // this.pos = data.pos;
         this.limit = data.limit;
       },
       clearBottomInfo() {
