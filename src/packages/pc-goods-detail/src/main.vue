@@ -90,7 +90,7 @@
        */
       link(val) {
         if (!this.isExist) {
-          this.$message.warning('');
+          this.$message.warning(this.$t('nav.nav_1056'));
           this.handleClose();
           this.isExist = true;
           return;
@@ -102,7 +102,7 @@
        */
       handleBuy(info) {
         if (!this.isExist) {
-          this.$message.warning('');
+          this.$message.warning(this.$t('nav.nav_1056'));
           this.handleClose();
           this.isExist = true;
           return;

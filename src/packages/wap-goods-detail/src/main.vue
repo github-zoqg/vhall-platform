@@ -85,7 +85,7 @@
        */
       handleBuy(url) {
         if (!this.isExist) {
-          this.$toast(this.$t(''));
+          this.$toast(this.$t('nav.nav_1056'));
           this.handleClose();
           this.isExist = true;
           return;
