@@ -1,7 +1,10 @@
 <template>
   <div
     class="chat-input-modal"
-    :class="[smFix ? 'smFix' : '', isConcise ? `chat-input-modal__${showTabType}` : '']"
+    :class="[
+      smFix ? 'smFix' : '',
+      isFullScreen || isConcise ? `chat-input-modal__${showTabType}` : ''
+    ]"
     v-show="visible"
   >
     <div class="input-info">
@@ -127,6 +130,10 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap?.style == 3;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     mounted() {

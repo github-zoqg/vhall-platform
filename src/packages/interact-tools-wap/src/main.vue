@@ -1,5 +1,10 @@
 <template>
-  <div :class="['vmp-interact-tools-wap', isConcise ? 'vmp-interact-tools-wap__concise' : '']">
+  <div
+    :class="[
+      'vmp-interact-tools-wap',
+      isFullScreen || isConcise ? 'vmp-interact-tools-wap__concise' : ''
+    ]"
+  >
     <div class="icon-wrapper">
       <!-- TODO:支付牌照问题 -->
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
@@ -106,7 +111,8 @@
         qwe: 1,
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         childrenComp: [],
-        visibleMenuLength: 0
+        visibleMenuLength: 0,
+        isFullScreen: webinarData.webinar_show_type == 0 // 竖屏直播
       };
     },
     computed: {
@@ -118,14 +124,14 @@
       isShowMenuByConcise() {
         // 进入了小组 & 当前展示成员列表 & 极简模式
         console.log('当前数据', this.visibleMenuLength);
-        return this.isConcise && this.visibleMenuLength > 0;
+        return (this.isFullScreen || this.isConcise) && this.visibleMenuLength > 0;
       }
     },
     created() {
       if (!this.isInGroup) {
         window.interactTools = this;
       }
-      if (this.isConcise) {
+      if (this.isFullScreen || this.isConcise) {
         this.childrenComp = window.$serverConfig[this.cuid].children;
       }
     },

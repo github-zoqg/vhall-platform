@@ -1,6 +1,6 @@
 <template>
   <section
-    :class="['vmp-tab-menu', isConcise ? ' tab-menu__concise' : '']"
+    :class="['vmp-tab-menu', isConcise || isFullScreen ? ' tab-menu__concise' : '']"
     v-if="!embedObj.embedVideo"
     v-show="visibleMenu.length > 0"
   >
@@ -60,7 +60,7 @@
     <section class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content
         ref="tabContent"
-        :menu="isConcise ? conciseMenu : menu"
+        :menu="isConcise || isFullScreen ? conciseMenu : menu"
         :auth="auth"
         @noticeHint="handleHint"
       />
@@ -140,7 +140,7 @@
           return item.visible === true;
         });
         let conciseVisibleMenu = [];
-        if (this.isConcise) {
+        if (this.isConcise || this.isFullScreen) {
           conciseVisibleMenu = otherVisibleMenu.filter(item => {
             // 如果是简洁模式，菜单抛开 - 聊天tab
             if (item.type == 3) return false;
@@ -151,7 +151,7 @@
         }
         let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
         console.log('当前菜单个数', visibleMenu.length, this.menu);
-        if (this.isConcise) {
+        if (this.isConcise || this.isFullScreen) {
           // // 告知外部当前可展示的自定义菜单个数
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
@@ -220,6 +220,10 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap?.speakerAndShowLayout;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     watch: {
@@ -294,7 +298,7 @@
        */
       setSetingHeight() {
         if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
-        if (this.isConcise) {
+        if (this.isConcise || this.isFullScreen) {
           const h_header = document.querySelector('#header').clientHeight;
           const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
           const h_block = document.querySelector('.vmp-block').clientHeight;

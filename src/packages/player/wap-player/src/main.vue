@@ -74,7 +74,7 @@
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span v-if="!isConcise" @click="changePlayerSize(true)">
+            <span v-if="!isConcise || !isFullScreen" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span>
@@ -420,6 +420,10 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     data() {
@@ -605,7 +609,7 @@
        */
       setSetingHeight() {
         if (this.isSubscribe) return;
-        if (this.isConcise) {
+        if (this.isConcise || this.isFullScreen) {
           const h_header = document.querySelector('#header').clientHeight;
           const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
           const h_block = document.querySelector('.vmp-block').clientHeight;

@@ -55,7 +55,11 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup && !isConcise"
+        v-if="
+          roomBaseServer.state.watchInitData.pv.show &&
+          !isInGroup &&
+          (!isConcise || !this.isFullScreen)
+        "
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -322,6 +326,10 @@
         }
         console.log('w-w', num);
         return num < 6;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     watch: {

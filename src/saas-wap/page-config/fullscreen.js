@@ -1,5 +1,5 @@
 /**
- * wap观看端 竖屏配置
+ * 【竖屏直播】wap观看端主直播页面配置
  */
 export default {
   // 根节点
@@ -7,7 +7,9 @@ export default {
     component: 'VmpAirContainer',
     children: [
       'comHeaderWatch',
+      'layerNeck',
       'layerBody',
+      'layerBodyBlock',
       'layerBodyCenter',
       'comAllDialog',
       'comGoodsDetail',
@@ -16,7 +18,7 @@ export default {
   },
   // 顶部组件
   comHeaderWatch: {
-    component: 'VmpHeaderWatchWap',
+    component: 'VmpConciseHeaderWatchWap',
     children: [],
     emitClickLogin: [
       {
@@ -31,16 +33,34 @@ export default {
       }
     ]
   },
+  // 颈部容器
+  layerNeck: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-neck',
+    children: ['comNoticeWap']
+  },
   // 中间主区域容器
   layerBody: {
     component: 'VmpContainer',
     className: 'vmp-basic-bd',
     children: ['comWapBody']
   },
+  // 中间主区域容器
+  layerBodyBlock: {
+    component: 'VmpContainer',
+    className: 'vmp-block',
+    children: ['comBodyBlock']
+  },
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
+    children: [
+      'comWapPlayer',
+      'comWapStreamList',
+      'comWapDesktopScreen',
+      'comWapInsertFIle',
+      'comDocWap'
+    ]
   },
   // 播放器
   comWapPlayer: {
@@ -76,7 +96,10 @@ export default {
   },
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
-    children: ['comTabMenuWap', 'comContainerRight', 'comNoticeWap']
+    children: ['comChatWap', 'comContainerRight']
+  },
+  comBodyBlock: {
+    component: 'VmpConciseBodyBlockWap'
   },
   comTabMenuWap: {
     component: 'VmpTabMenuWap',
@@ -97,7 +120,14 @@ export default {
         { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员列表
         { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } // 问答
       ]
-    }
+    },
+    emitVisibleMenuLength: [
+      {
+        cuid: ['comInteractToolsWap'],
+        method: 'setVisibleMenuLength',
+        args: ['$0']
+      }
+    ]
   },
   // 自定义菜单组件
   comCustomMenuWap: {
@@ -126,13 +156,24 @@ export default {
     children: ['comInteractToolsWap'],
     options: {}
   },
-  // 简介
+  // 互动工具组件
   comInteractToolsWap: {
     component: 'VmpInteractToolsWap',
     emitNeedLogin: {
       cuid: ['compRegLoginWap'],
       method: 'open'
-    }
+    },
+    children: ['comWapMenuDialog']
+  },
+  // 自定义菜单-简洁mosh
+  comWapMenuDialog: {
+    component: 'VmpWapMenuDialog',
+    emitComputedMenuWidth: {
+      cuid: ['comTabMenuWap'],
+      method: 'menuDialogComputed'
+    },
+    children: ['comTabMenuWap'],
+    options: {}
   },
   // 聊天
   comChatWap: {
@@ -179,12 +220,17 @@ export default {
         args: ['$0']
       }
     ],
-    children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
+    children: [
+      'comInteractToolsWap',
+      'comWapRewardEffect',
+      'comWapRewardEffectSVGA',
+      'comWapMenuDialog'
+    ],
     options: {}
   },
   // 礼物动画组件
   comWapRewardEffect: {
-    component: 'VmpWapRewardEffect'
+    component: 'VmpConciseWapRewardEffect'
   },
   // 礼物动画组件-SVGA
   comWapRewardEffectSVGA: {
@@ -229,7 +275,7 @@ export default {
   comRecommendWap: {
     component: 'VmpRecommendWap'
   },
-  // 章节组件
+  // // 章节组件
   comChapterWap: {
     component: 'VmpChapterWap'
   },

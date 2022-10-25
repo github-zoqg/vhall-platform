@@ -195,6 +195,7 @@
       if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
         skin_json_wap = skinInfo.skin_json_wap;
       }
+
       return {
         roomBaseState,
         //定时器
@@ -216,7 +217,8 @@
         isShowMyQA: false,
         childrenCom: [],
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
-        visibleMenuLength: 0
+        visibleMenuLength: 0,
+        isFullScreen: this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0 // 竖屏直播
       };
     },
     computed: {
@@ -311,7 +313,11 @@
       // 是否展示自定义菜单组件
       isShowMenuByConcise() {
         // 进入了小组 & 当前展示成员列表 & 极简模式
-        return this.groupInitData.isInGroup && this.currentTab == 3 && this.isConcise;
+        return (
+          this.groupInitData.isInGroup &&
+          this.currentTab == 3 &&
+          (this.isConcise || this.isFullScreen)
+        );
       }
     },
     watch: {

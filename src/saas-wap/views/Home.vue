@@ -2,7 +2,7 @@
   <div
     :class="[
       { 'vmp-basic-layout__noHeader': !showHeader },
-      isConcise ? 'vmp-concise-layout' : 'vmp-basic-layout'
+      isConcise || isFullScreen ? 'vmp-concise-layout' : 'vmp-basic-layout'
     ]"
   >
     <van-loading
@@ -65,6 +65,10 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap.style == 3;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       },
       /**
        * 是否显示头部
@@ -357,7 +361,11 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
 
-        if (skin_json_wap?.style == 3) {
+        // 竖屏直播
+        if (this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0) {
+          console.log('------竖屏直播------');
+          setPage('fullscreen');
+        } else if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
         }

@@ -26,7 +26,7 @@
       </p>
     </nav>
     <div
-      :class="['rule-content', isConcise ? 'rule-content__concise' : '']"
+      :class="['rule-content', isFullScreen || isConcise ? 'rule-content__concise' : '']"
       v-show="showRule"
       v-html="currentTab == 1 ? info.inContent : info.rewardContent"
     ></div>
@@ -75,6 +75,10 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap?.style == 3;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     beforeCreate() {
