@@ -54,7 +54,13 @@ export default {
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
+    children: [
+      'comWapPlayer',
+      'comWapStreamList',
+      'comWapDesktopScreen',
+      'comWapInsertFIle',
+      'comDocWap'
+    ]
   },
   // 播放器
   comWapPlayer: {
@@ -95,65 +101,83 @@ export default {
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap'
   },
-  // comTabMenuWap: {
-  //   component: 'VmpTabMenuWap',
-  //   options: {
-  //     /**
-  //      * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
-  //      * 此配置主要涉及到type对应哪个cuid
-  //      */
-  //     menuConfig: [
-  //       { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
-  //       { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, //文档
-  //       { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
-  //       { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
-  //       { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
-  //       { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
-  //       { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
-  //       { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
-  //       { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员列表
-  //       { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } // 问答
-  //     ]
-  //   }
-  // },
+  comTabMenuWap: {
+    component: 'VmpTabMenuWap',
+    options: {
+      /**
+       * 菜单配置不是最终的显示，而是较全的配置表，具体显示要结合接口具体给过来哪些数据
+       * 此配置主要涉及到type对应哪个cuid
+       */
+      menuConfig: [
+        { type: 1, cuid: 'comCustomMenuWap', text: '' }, //自定义菜单
+        { type: 2, cuid: 'comDocWap', text: 'menu.menu_1001', visible: false }, //文档
+        { type: 3, cuid: 'comChatWap', text: 'menu.menu_1002' }, // 聊天
+        { type: 'private', cuid: 'comPrivateChatWap', text: 'common.common_1008' }, // 私聊
+        { type: 4, cuid: 'comIntroWap', text: 'menu.menu_1003' }, // 简介
+        { type: 5, cuid: 'comGoodSaasWap', text: 'menu.menu_1004' }, // 商品
+        { type: 6, cuid: 'comRecommendWap', text: 'menu.menu_1005' }, // 广告、推荐
+        { type: 7, cuid: 'comChapterWap', text: 'menu.menu_1013' }, // 章节
+        { type: 8, cuid: 'comMemberListWap', text: '' }, // 成员列表
+        { type: 'v5', cuid: 'comQa', text: 'common.common_1004' } // 问答
+      ]
+    },
+    emitVisibleMenuLength: [
+      {
+        cuid: ['comInteractToolsWap'],
+        method: 'setVisibleMenuLength',
+        args: ['$0']
+      }
+    ]
+  },
   // 自定义菜单组件
-  // comCustomMenuWap: {
-  //   component: 'VmpCustomMenuWap',
-  //   emitDeleteMenu: [
-  //     {
-  //       cuid: 'comTabMenuWap',
-  //       method: 'setVisible',
-  //       args: ['$0']
-  //     },
-  //     {
-  //       cuid: 'comSubcribeTabMenuWap',
-  //       method: 'setVisible',
-  //       args: ['$0']
-  //     }
-  //   ]
-  // },
+  comCustomMenuWap: {
+    component: 'VmpCustomMenuWap',
+    emitDeleteMenu: [
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comSubcribeTabMenuWap',
+        method: 'setVisible',
+        args: ['$0']
+      }
+    ]
+  },
   // 文档组件
-  // comDocWap: {
-  //   component: 'VmpDocWap',
-  //   emitShowMenuTab: {
-  //     cuid: ['comTabMenuWap'],
-  //     method: 'changeDocStatus',
-  //     args: ['$0']
-  //   },
-  //   children: ['comInteractToolsWap'],
-  //   options: {}
-  // },
+  comDocWap: {
+    component: 'VmpDocWap',
+    emitShowMenuTab: {
+      cuid: ['comTabMenuWap'],
+      method: 'changeDocStatus',
+      args: ['$0']
+    },
+    children: ['comInteractToolsWap'],
+    options: {}
+  },
   // 互动工具组件
   comInteractToolsWap: {
     component: 'VmpInteractToolsWap',
     emitNeedLogin: {
       cuid: ['compRegLoginWap'],
       method: 'open'
-    }
+    },
+    children: ['comWapMenuDialog']
+  },
+  // 自定义菜单-简洁mosh
+  comWapMenuDialog: {
+    component: 'VmpWapMenuDialog',
+    emitComputedMenuWidth: {
+      cuid: ['comTabMenuWap'],
+      method: 'menuDialogComputed'
+    },
+    children: ['comTabMenuWap'],
+    options: {}
   },
   // 聊天
   comChatWap: {
-    component: 'VmpConciseChatWap',
+    component: 'VmpChatWap',
     addTab: [
       {
         cuid: ['comTabMenuWap'],
@@ -196,7 +220,12 @@ export default {
         args: ['$0']
       }
     ],
-    children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
+    children: [
+      'comInteractToolsWap',
+      'comWapRewardEffect',
+      'comWapRewardEffectSVGA',
+      'comWapMenuDialog'
+    ],
     options: {}
   },
   // 礼物动画组件
@@ -208,62 +237,62 @@ export default {
     component: 'VmpWapRewardEffectFullScreen'
   },
   // 私聊组件
-  // comPrivateChatWap: {
-  //   component: 'VmpWapPrivateChat',
-  //   options: {},
-  //   emitShowTab: [
-  //     {
-  //       cuid: 'comTabMenuWap',
-  //       method: 'setVisible'
-  //     },
-  //     {
-  //       cuid: 'comTabMenuWap',
-  //       method: 'setTipsVisible',
-  //       args: ['$0']
-  //     }
-  //   ]
-  // },
+  comPrivateChatWap: {
+    component: 'VmpWapPrivateChat',
+    options: {},
+    emitShowTab: [
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setVisible'
+      },
+      {
+        cuid: 'comTabMenuWap',
+        method: 'setTipsVisible',
+        args: ['$0']
+      }
+    ]
+  },
   // 简介组件
-  // comIntroWap: {
-  //   component: 'VmpIntroWap',
-  //   addTab: [
-  //     {
-  //       cuid: ['comGoodSaasWap'],
-  //       method: 'addItem'
-  //     }
-  //   ]
-  // },
+  comIntroWap: {
+    component: 'VmpIntroWap',
+    addTab: [
+      {
+        cuid: ['comGoodSaasWap'],
+        method: 'addItem'
+      }
+    ]
+  },
   // 商品组件
-  // comGoodSaasWap: {
-  //   component: 'VmpGoodListWap',
-  //   emitShowDetail: {
-  //     cuid: ['comGoodsDetail'],
-  //     method: 'open',
-  //     args: ['$0']
-  //   }
-  // },
+  comGoodSaasWap: {
+    component: 'VmpGoodListWap',
+    emitShowDetail: {
+      cuid: ['comGoodsDetail'],
+      method: 'open',
+      args: ['$0']
+    }
+  },
   // 推荐组件
-  // comRecommendWap: {
-  //   component: 'VmpRecommendWap'
-  // },
+  comRecommendWap: {
+    component: 'VmpRecommendWap'
+  },
   // // 章节组件
-  // comChapterWap: {
-  //   component: 'VmpChapterWap'
-  // },
+  comChapterWap: {
+    component: 'VmpChapterWap'
+  },
   // 成员列表组件
-  // comMemberListWap: {
-  //   component: 'VmpMemberListWap'
-  // },
+  comMemberListWap: {
+    component: 'VmpMemberListWap'
+  },
   // 问答组件
-  // comQa: {
-  //   component: 'VmpQaWap',
-  //   emitClickLogin: [
-  //     {
-  //       cuid: 'compRegLoginWap',
-  //       method: 'open'
-  //     }
-  //   ]
-  // },
+  comQa: {
+    component: 'VmpQaWap',
+    emitClickLogin: [
+      {
+        cuid: 'compRegLoginWap',
+        method: 'open'
+      }
+    ]
+  },
   // 右侧浮动容器
   comContainerRight: {
     component: 'VmpContainerRightWap',

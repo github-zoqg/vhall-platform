@@ -268,7 +268,7 @@
     // .flex();
     position: absolute;
     left: 0px;
-    top: 24px;
+    top: 16px;
     z-index: 100;
 
     .reward-effect-box {

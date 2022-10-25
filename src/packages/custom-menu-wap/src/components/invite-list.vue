@@ -18,13 +18,20 @@
           <span v-else class="rank-num">{{ index + 1 }}</span>
           <span class="avatar">
             <img :src="item.img_url ? item.img_url : defaultAvatar" />
+            <span class="jop_img" v-if="index <= 2"></span>
           </span>
           <span class="name">{{ item.nick_name }}</span>
         </div>
         <!-- <div>
           邀请 &nbsp; <span>{{ item.invites }}</span>&nbsp; 人
         </div> -->
-        <div class="invite-info">{{ $t('nav.nav_1037', { n: item.invites }) }}</div>
+        <div class="invite-info">
+          <i18n path="nav.nav_1037">
+            <span place="n" class="invite_num_color">
+              {{ item.invites }}
+            </span>
+          </i18n>
+        </div>
       </li>
     </ul>
   </section>
@@ -60,7 +67,8 @@
   @import '../styles/list.less';
   .invite-wrap {
     background: var(--theme-tab-content-rank-bg-font);
-    width: 94%;
+    width: 100%;
+    padding: 0 24px;
     height: 90%;
     margin: 0px auto;
   }
@@ -69,24 +77,34 @@
     .invite-item {
       display: flex;
       align-items: center;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 40px;
       .name {
         color: var(--theme-tab-content-rank-title-font);
+        margin-left: 12px;
+        text-align: left;
       }
     }
     .rank-icon,
     .rank-num {
       display: inline-block;
-      width: 36px;
-      height: 48px;
-      margin-right: 20px;
+      width: 38px;
+      height: 46px;
+      margin-right: 16px;
       text-align: center;
       line-height: 48px !important;
     }
-    .avatar img {
-      border: none !important;
+    .avatar {
+      display: inline-block;
+      vertical-align: middle;
     }
     .invite-info {
       color: var(--theme-tab-content-rank-content-font);
+      .invite_num_color {
+        color: var(--theme-tab-content-rank-li-num-color);
+      }
     }
   }
 </style>

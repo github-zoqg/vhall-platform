@@ -93,16 +93,13 @@ import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 // 短信通知提交手机号
 import VmpSmsVerification from '@/packages/sms-verification';
 // ------------------------------【极简风格】引入组件------start----------
-import VmpConciseChatWap from '@/packages/concise-style/chat-wap';
 import VmpConciseBodyBlockWap from '@/packages/concise-style/wap-block';
 import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap';
 // 送礼物飘屏动画
 import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
+// 弹出自定义菜单框
+import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // ------------------------------【极简风格】引入组件------end----------
-
-// ------------------------------【时尚风格】引入组件------start----------
-import VmpChatWapFashion from '@/packages/fashion-style/chat-wap-fashion';
-// ------------------------------【时尚风格】引入组件------end----------
 
 // 全局注册组件
 Vue.use(VmpContainer);
@@ -155,13 +152,8 @@ Vue.use(VmpViewRestrictionWap);
 Vue.use(VmpPrivacyCompliance);
 Vue.use(VmpSmsVerification);
 // ------------------------------【极简风格】注册组件------start----------
-Vue.use(VmpConciseChatWap);
 Vue.use(VmpConciseBodyBlockWap);
 Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
+Vue.use(VmpWapMenuDialog);
 // ------------------------------【极简风格】注册组件------end----------
-
-// ------------------------------【时尚风格】注册组件------start----------
-Vue.use(VmpChatWapFashion);
-
-// ------------------------------【时尚风格】注册组件------end----------

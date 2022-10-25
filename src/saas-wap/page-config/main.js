@@ -40,7 +40,13 @@ export default {
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
+    children: [
+      'comWapPlayer',
+      'comWapStreamList',
+      'comWapDesktopScreen',
+      'comWapInsertFIle',
+      'comDocWap'
+    ]
   },
   // 播放器
   comWapPlayer: {

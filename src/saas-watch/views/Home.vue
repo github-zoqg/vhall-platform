@@ -34,7 +34,7 @@
   import authCheck from '../mixins/chechAuth';
   import ErrorPage from './ErrorPage';
   import skins from '@/app-shared/skins/watch';
-  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
+  // import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
 
   export default {
     name: 'Home',
@@ -389,13 +389,13 @@
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
-          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
+          skin_json_pc = skinInfo.skin_json_pc;
         }
 
-        if (skin_json_pc?.chatLayout == 2) {
-          // 设置聊天组件为左右风格
-          updatePageNode('comChat', 'component', 'VmpFashionChat');
-        }
+        // if (skin_json_pc?.chatLayout == 2) {
+        //   // 设置聊天组件为左右风格
+        //   updatePageNode('comChat', 'component', 'VmpFashionChat');
+        // }
 
         // 设置主题，如果没有就用传统风格白色
         const style = styleMap[skin_json_pc?.style || 1];

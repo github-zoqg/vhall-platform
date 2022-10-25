@@ -431,7 +431,12 @@
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
               const { miniElement } = useRoomBaseServer().state;
               const { switchStatus } = useDocServer().state;
-              if (miniElement === 'player' || !switchStatus) return;
+              if (
+                miniElement === 'player' ||
+                !switchStatus ||
+                this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1
+              )
+                return;
 
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')
@@ -445,7 +450,12 @@
             if (this.isNoDelay == 0 && !useMicServer().getSpeakerStatus()) {
               const { miniElement } = useRoomBaseServer().state;
               const { switchStatus } = useDocServer().state;
-              if (miniElement === 'doc' || !switchStatus) return;
+              if (
+                miniElement === 'doc' ||
+                !switchStatus ||
+                this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1
+              )
+                return;
 
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitClickExchangeView')

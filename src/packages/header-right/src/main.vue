@@ -289,7 +289,11 @@
         }
         this.calculateLiveDuration();
         // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
-        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
+        if (
+          !useMicServer().getSpeakerStatus() ||
+          this.isThirdStream ||
+          watchInitData.rebroadcast.isRebroadcasting
+        ) {
           this.liveStep = 3;
         } else {
           this.liveStep = 2;
@@ -640,6 +644,15 @@
       async handleStartClick(event, thirdPullStreamvalidate = false) {
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
+        if (this.isThirdStream) {
+          await this.roomBaseServer.getInavToolStatus();
+          // getInavToolStatus接口回重制start_type状态，所以需要重新设置第三方推流开启状态
+          this.roomBaseServer.setInavToolStatus('start_type', 4);
+          if (this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1) {
+            this.$message.warning('合并模式不支持三方推流');
+            return;
+          }
+        }
         //mode2  需要校验url，调用单独接口
         if (this.isThirdStream && this.thirdPullStreamMode == 2 && !thirdPullStreamvalidate) {
           this.checkValidatePullUrl();
