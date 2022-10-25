@@ -273,6 +273,7 @@
 
           this.rebroadcastRoomId = this.currentRoomId; // 记录
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'startRebroadcast'));
+          this.interactiveServer.stopBroadCast();
           this.$message.success(`转播成功！`);
           this.close();
         } catch (err) {
@@ -292,7 +293,8 @@
             source_id: this.domainState.sourceWebinarId
           });
 
-          if (res.code !== 200) {
+          if (res.code == 200) {
+            this.interactiveServer.startBroadCast();
             this.$message.error('停止转播失败!');
           }
         } catch (error) {
