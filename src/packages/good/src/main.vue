@@ -241,6 +241,7 @@
           .then(res => {
             console.log(res, this.goodServer.state.goodsListJson, 'goodsListJson');
             this.goodsListJson = res.goods_list;
+            this.total = res.total;
             this.clearBottomInfo();
             this.analogPage('msg');
           })

@@ -268,6 +268,7 @@
           .then(res => {
             console.log(res, 'goodsListJson');
             this.goodsListJson = res.goods_list;
+            this.total = res.total;
             this.loading = false;
             this.analogPage();
           });
