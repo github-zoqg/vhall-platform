@@ -220,7 +220,7 @@
         }
         this.total = data.total;
         // this.pos = data.pos;
-        this.limit = data.limit;
+        // this.limit = data.limit;
       },
       clearBottomInfo() {
         if (this.pos + this.limit >= this.total) {

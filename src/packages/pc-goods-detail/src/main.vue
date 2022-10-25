@@ -65,8 +65,7 @@
         show: false, //是否显示
         info: {}, //商品详情
         defaultImg: '',
-        selectDefaultImgIndex: 0,
-        isExist: true
+        selectDefaultImgIndex: 0
       };
     },
     methods: {
@@ -89,51 +88,46 @@
        * 访问店铺
        */
       link(val) {
-        if (!this.isExist) {
-          this.$message.warning(this.$t('nav.nav_1056'));
-          this.handleClose();
-          this.isExist = true;
-          return;
-        }
-        window.open(val);
+        useGoodServer()
+          .getGoodDetail({
+            webinar_id: this.$route.params.id,
+            goods_id: this.info.goods_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              window.open(val);
+            } else {
+              this.$message.warning(this.$t('nav.nav_1056'));
+              this.handleClose();
+            }
+          });
       },
       /**
        * 购买
        */
       handleBuy(info) {
-        if (!this.isExist) {
-          this.$message.warning(this.$t('nav.nav_1056'));
-          this.handleClose();
-          this.isExist = true;
-          return;
-        }
-        window.open(info.goods_url);
-        // 数据埋点
-        window.vhallReportForWatch?.report(170030, {
-          goods_id: info.goods_id,
-          goods_name: encodeURIComponent(info.name)
-        });
+        useGoodServer()
+          .getGoodDetail({
+            webinar_id: this.$route.params.id,
+            goods_id: this.info.goods_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              window.open(info.goods_url);
+              // 数据埋点
+              window.vhallReportForWatch?.report(170030, {
+                goods_id: info.goods_id,
+                goods_name: encodeURIComponent(info.name)
+              });
+            } else {
+              this.$message.warning(this.$t('nav.nav_1056'));
+              this.handleClose();
+            }
+          });
       },
       chooseDefaultImg(index) {
         this.defaultImg = this.info.img_list[index].img_url;
         this.selectDefaultImgIndex = index;
-      },
-      // 获取商品Json
-      queryGoodsListJson(data) {
-        // console.log(data, 'queryGoodsListJson');
-        useGoodServer()
-          .queryGoodsListJson({
-            url: data.data.cnd_url
-          })
-          .then(res => {
-            console.log(res, 'goodsListJson');
-            let obj = res.goods_list.find(i => i.goods_id == this.info.goods_id);
-            if (obj) {
-              this.isExist = true;
-            } else {
-              this.isExist = false;
-            }
-          });
       }
     }
   };

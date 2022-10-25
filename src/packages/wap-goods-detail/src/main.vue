@@ -84,36 +84,42 @@
        * 购买
        */
       handleBuy(url) {
-        if (!this.isExist) {
-          this.$toast(this.$t('nav.nav_1056'));
-          this.handleClose();
-          this.isExist = true;
-          return;
-        }
-        // 数据埋点
-        window.vhallReportForWatch?.report(170030, {
-          goods_id: this.info.goods_id,
-          goods_name: encodeURIComponent(this.info.name)
-        });
-        if (this.info.tao_password) {
-          this.showTaoTip = true;
-        } else {
-          if (window.vhallReport) {
-            window.vhallReport.report('GOOD_RECOMMEND', {
-              event: dayjs().format('YYYY-MM-DD hh:mm'),
-              market_tools_id: this.info.goods_id,
-              market_tools_status: 1 // 购买
-            });
-          }
-          const { system } = getBrowserType();
-          if ('ios' === system) {
-            console.log('当前是手机端打开-ios');
-            window.location.href = url;
-          } else {
-            console.log('当前是手机端打开-其它');
-            window.open(url);
-          }
-        }
+        useGoodServer()
+          .getGoodDetail({
+            webinar_id: this.$route.params.id,
+            goods_id: this.info.goods_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              // 数据埋点
+              window.vhallReportForWatch?.report(170030, {
+                goods_id: this.info.goods_id,
+                goods_name: encodeURIComponent(this.info.name)
+              });
+              if (this.info.tao_password) {
+                this.showTaoTip = true;
+              } else {
+                if (window.vhallReport) {
+                  window.vhallReport.report('GOOD_RECOMMEND', {
+                    event: dayjs().format('YYYY-MM-DD hh:mm'),
+                    market_tools_id: this.info.goods_id,
+                    market_tools_status: 1 // 购买
+                  });
+                }
+                const { system } = getBrowserType();
+                if ('ios' === system) {
+                  console.log('当前是手机端打开-ios');
+                  window.location.href = url;
+                } else {
+                  console.log('当前是手机端打开-其它');
+                  window.open(url);
+                }
+              }
+            } else {
+              this.$toast(this.$t('nav.nav_1056'));
+              this.handleClose();
+            }
+          });
       },
       handleClose() {
         this.show = false;
@@ -121,23 +127,6 @@
       },
       onChange(index) {
         this.current = index;
-      },
-      // 获取商品Json
-      queryGoodsListJson(data) {
-        // console.log(data, 'queryGoodsListJson');
-        useGoodServer()
-          .queryGoodsListJson({
-            url: data.data.cnd_url
-          })
-          .then(res => {
-            // console.log(res, 'goodsListJson');
-            let obj = res.goods_list.find(i => i.goods_id == this.info.goods_id);
-            if (obj) {
-              this.isExist = true;
-            } else {
-              this.isExist = false;
-            }
-          });
       }
     }
   };
