@@ -10,7 +10,7 @@
       <div class="table-list">
         <div class="table-list_item" v-for="(user, index) in signList" :key="index">
           <span class="sign-avatar">
-            <img :src="user.signer_avatar ? user.signer_avatar : defaultAvater" alt="" />
+            <img :src="user.signer_avatar ? user.signer_avatar : defaultAvatar" alt="" />
           </span>
           <span class="sign-name text-overflow">{{ user.signer_nickname }}</span>
           <span class="sign-time">{{ signTime(user.created_at) }}</span>
