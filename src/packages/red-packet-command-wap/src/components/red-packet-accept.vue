@@ -9,13 +9,7 @@
         alt=""
         @click="openRedPacket"
       />
-      <img
-        v-if="redPacketInfo && redPacketInfo.avatar"
-        :src="redPacketInfo.avatar || ''"
-        alt=""
-        class="vhsaas-red-packet-avatar"
-      />
-      <img v-else src="../images/avatar_default@2x.png" alt="" class="vhsaas-red-packet-avatar" />
+      <img :src="redPacketInfo.avatar || defaultAvatar" alt="" class="vhsaas-red-packet-avatar" />
       <p class="vhsaas-red-packet-sender">
         {{
           (redPacketInfo && redPacketInfo.nickname ? redPacketInfo.nickname : '') | overHidden(8)
@@ -26,6 +20,7 @@
   </div>
 </template>
 <script>
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'RedPacketAccept',
     inject: ['redPacketServer'],
@@ -41,7 +36,8 @@
       return {
         accepted: false, // 是否已领取
         opened: false, // 完成红包打开
-        opening: false // 点击抢红包请求中
+        opening: false, // 点击抢红包请求中
+        defaultAvatar
       };
     },
     computed: {

@@ -73,8 +73,7 @@
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  // import { uuid } from '@/app-shared/utils/tool';
-
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpPcRewardEffect',
     data() {
@@ -98,7 +97,7 @@
       },
       // 默认用户头像
       default_user_avatar() {
-        return require('./images/default_avatar.png');
+        return defaultAvatar;
       }
     },
     created() {

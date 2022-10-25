@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import props from './props';
   import LotteryTitle from './lottery-title.vue';
   import Ribbon from '../art/ribbon/winner.vue';

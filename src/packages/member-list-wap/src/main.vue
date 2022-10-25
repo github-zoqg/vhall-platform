@@ -42,10 +42,9 @@
   </div>
 </template>
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
-  import phoneImg from '@/app-shared/assets/img/phone_wap.png';
-
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { uniqBy, throttle } from 'lodash';
+  import phoneImg from '@/app-shared/assets/img/phone_wap.png';
   import { useRoomBaseServer, useMemberServer, useGroupServer, useMsgServer } from 'middle-domain';
   export default {
     name: 'VmpMemberListWap',

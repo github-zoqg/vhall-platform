@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     props: {
       source: {
