@@ -529,11 +529,18 @@
       },
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
-
-        const chatIndex = this.menu.findIndex(el => el.type === 3);
-        const hasMember = this.menu.includes(el => el.type === 'notice');
-        if (chatIndex <= -1) return;
-        const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        let index = 0;
+        if (this.isConcise) {
+          // 极简风格，菜单顺序：问答>私聊>简介
+          index = 0;
+        } else {
+          // 查找聊天的下标区域
+          const chatIndex = this.menu.findIndex(el => el.type === 3);
+          // 是否包含广告位置
+          const hasMember = this.menu.includes(el => el.type === 'notice');
+          if (chatIndex <= -1) return;
+          index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        }
         const QAName =
           this.roleName == 1 ||
           !roomState.interactToolStatus.question_name ||
