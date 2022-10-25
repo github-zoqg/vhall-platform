@@ -117,8 +117,8 @@
 
 <script>
   import { useRoomBaseServer, useQaServer } from 'middle-domain';
-  import smallEmoji from '@/packages/chat/src/components/emoji.vue';
-  import { textToEmoji, textToEmojiText } from '@/packages/chat/src/js/emoji';
+  import smallEmoji from '@/packages/chat/src/common/components/emoji.vue';
+  import { textToEmoji, textToEmojiText } from '@/packages/chat/src/common/js/emoji';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import Vue from 'vue';
 
