@@ -67,6 +67,12 @@ export default {
         method: 'checkStartPush'
       }
     ],
+    emitStartLiveSuccess: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'startLiveSuccess'
+      }
+    ],
     emitClickCheckValidatePullUrl: [
       {
         cuid: 'comThirdStream',
@@ -372,6 +378,13 @@ export default {
         cuid: 'pannelHeaderRight',
         method: 'handleUnpublishComplate'
       }
+    ],
+    openCheckMediaDialog: [
+      {
+        cuid: 'comMediaSetting',
+        method: 'showCheck',
+        args: ['$0']
+      }
     ]
   },
   // 远端流组件
@@ -650,7 +663,20 @@ export default {
   },
   // 媒体检查
   comPcMediaCheck: {
-    component: 'VmpPcMediaCheck'
+    component: 'VmpPcMediaCheck',
+    emitInitLocalStream: [
+      {
+        cuid: 'comStreamLocal',
+        method: 'initLocalStream',
+        args: ['$0']
+      }
+    ],
+    emitRecheckMedia: [
+      {
+        cuid: 'pannelHeaderRight',
+        method: 'handleRecheck'
+      }
+    ]
   },
   // 互动工具-计时器设置
   liveTimerSet: {

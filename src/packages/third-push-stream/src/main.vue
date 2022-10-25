@@ -105,8 +105,7 @@
 </template>
 <script>
   import { useRoomBaseServer, useMsgServer } from 'middle-domain';
-  import { boxEventOpitons } from '@/app-shared/utils/tool';
-  import { copy } from '@/packages/chat/src/js/utils';
+  import { boxEventOpitons, doCopy } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpThirdStream',
     data() {
@@ -217,13 +216,12 @@
         this.isShowThirdStream = false;
       },
       doCopy(type) {
-        copy(type == 1 ? this.thirdWatchWebUrl : this.thirdPlayUrl).then(res => {
-          this.$message({
-            message: '复制成功！',
-            showClose: true,
-            type: 'success',
-            customClass: 'zdy-info-box'
-          });
+        doCopy(type == 1 ? this.thirdWatchWebUrl : this.thirdPlayUrl);
+        this.$message({
+          message: '复制成功！',
+          showClose: true,
+          type: 'success',
+          customClass: 'zdy-info-box'
         });
       },
       //校验拉流地址非法性

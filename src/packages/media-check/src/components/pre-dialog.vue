@@ -6,7 +6,8 @@
       :confirm="true"
       title="设备检测"
       confirmText="立即检测"
-      cancelText="暂不检测"
+      :cancelText="firstVisit == 1 ? '暂不检测' : ''"
+      :isShowClose="firstVisit == 1"
       @onClose="popAlertCheckClose"
       @onSubmit="popAlertCheckSubmit"
       @onCancel="popAlertCheckClose"
@@ -43,7 +44,8 @@
     data() {
       return {
         popAlertCheckVisible: true,
-        popAlertCheckConfirmVisible: false
+        popAlertCheckConfirmVisible: false,
+        firstVisit: false //浏览器首次加载强制检测
       };
     },
     created() {
@@ -69,6 +71,11 @@
         if (this.liveType == 1) {
           this.popAlertCheckVisible = false;
         }
+        this.firstVisit = localStorage.getItem('firstVisit') || '';
+        // if (!this.firstVisit) {
+        //   //浏览器首次加载强制检测
+        //   localStorage.setItem('firstVisit', '1');
+        // }
       },
       show() {
         this.popAlertCheckVisible = true;
@@ -82,7 +89,8 @@
         window.vhallReportForProduct?.report(110005); // 埋点:设备检测-暂不检测
         this.popAlertCheckVisible = false;
         await this.$nextTick();
-        this.popAlertCheckConfirmVisible = true;
+        this.$emit('closeTestEquDialog');
+        // this.popAlertCheckConfirmVisible = true;
       },
       popAlertCheckConfirm() {
         this.popAlertCheckConfirmVisible = false;

@@ -585,6 +585,7 @@
               this.calculateLiveDuration();
             }
           }
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStartLiveSuccess'));
         } else {
           this.liveStep = 3;
         }

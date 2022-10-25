@@ -7,6 +7,7 @@
           class="vmp-media-setting-item__content"
           :placeholder="$t('form.form_1018')"
           v-model="mediaState.audioInput"
+          v-if="devices.length != 0"
         >
           <el-option
             v-for="item in devices"
@@ -14,6 +15,14 @@
             :value="item.deviceId"
             :label="item.label"
           ></el-option>
+        </el-select>
+        <el-select
+          class="vmp-media-setting-item__content"
+          value=""
+          v-if="devices.length == 0"
+          disabled
+        >
+          <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
         </el-select>
       </section>
 
@@ -75,6 +84,9 @@
        */
       async setAudioInput(id) {
         if (!this.$refs.previewAudio) return;
+        if (this.devices.length === 0) {
+          return;
+        }
 
         const mediaOptions = { audio: { deviceId: id } };
         const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);

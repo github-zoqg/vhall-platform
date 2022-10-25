@@ -77,9 +77,11 @@
     <!--设备禁用弹窗 -->
     <saas-alert
       :visible="popAlert.visible"
+      :confirm="true"
       @onClose="closeConfirm"
-      @onCancel="closeConfirm"
-      :knowText="$t('account.account_1062')"
+      @onSubmit="handleDoCheck"
+      :confirmText="$t('interact.interact_1042')"
+      :showQA="true"
     >
       <main slot="content">{{ popAlert.text }}</main>
     </saas-alert>
@@ -89,6 +91,7 @@
       @onClose="hostAlertVisible = false"
       @onSubmit="handleCheck"
       retry="检查设备"
+      :showQA="true"
     >
       <main slot="content">
         因设备问题导致直播中断，请检查设备。
@@ -203,6 +206,10 @@
           this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
           this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
         );
+      },
+      // 直播状态
+      liveStatus() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       }
     },
     beforeCreate() {
@@ -258,6 +265,14 @@
       closeConfirm() {
         this.popAlert.visible = false;
       },
+      // 展示 设备检测 弹框
+      showCheck(type) {
+        // 主持人开播前创建本地流失败
+        if (type == 'createLocalStreamError' || type == 'NotAllowed') {
+          this.popAlert.visible = true;
+          this.popAlert.text = '设备采集失败，请检查设备或网络。';
+        }
+      },
       /**
        * 展示弹窗
        */
@@ -270,6 +285,14 @@
        */
       handleCheck() {
         this.hostAlertVisible = false;
+        this.isRepublishMode = true;
+        this.showMediaSetting();
+      },
+      /**
+       * 设备被禁用，重新检查设备
+       */
+      handleDoCheck() {
+        this.popAlert.visible = false;
         this.isRepublishMode = true;
         this.showMediaSetting();
       },
@@ -405,7 +428,7 @@
          */
         const videoTypeChanged = diffOptions.videoType !== undefined;
         if (diffOptions.video && !videoTypeChanged) {
-          window?.vhallReport.report(110143, {
+          window?.vhallReportForProduct.report(110143, {
             report_extra: { dn: diffOptions.video }
           });
         }
@@ -415,7 +438,7 @@
          * 触发条件：保存时+麦克风需要重新推流时
          */
         if (diffOptions.audioInput) {
-          window?.vhallReport.report(110144, {
+          window?.vhallReportForProduct.report(110144, {
             report_extra: { dn: diffOptions.audioInput }
           });
         }
@@ -480,6 +503,17 @@
         if (watchInitData?.join_info?.role_name == '1') {
           const { audioInput, audioOutput, video, devices } = this.mediaState;
           console.log(devices);
+          window?.vhallReportForProduct?.report(110305, {
+            audioInput,
+            audioOutput,
+            video,
+            devices,
+            definition: this.mediaState.rate || 'RTC_VIDEO_PROFILE_360P_16x9_M',
+            layout: this.mediaState.layout || 0,
+            screen_definition: this.mediaState.screenRate,
+            video_type: this.mediaState.videoType || 'camera',
+            streamUrl: this.mediaState.canvasImgUrl
+          });
           // 保存的配置上传服务器
           await this.mediaSettingServer.setStream({
             room_id: watchInitData.interact.room_id,
@@ -522,7 +556,9 @@
         );
 
         // 获取扬声器
-        await this.mediaSettingServer.getSpeakers(item => item.label);
+        await this.mediaSettingServer.getSpeakers(
+          d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
+        );
 
         return true;
       },
@@ -545,14 +581,14 @@
         });
 
         const localMap = new Map([
+          ['media-check.selected.video', this.mediaState.video || ''],
+          ['media-check.selected.audioInput', this.mediaState.audioInput || ''],
+          ['media-check.selected.audioOutput', this.mediaState.audioInput || ''],
           [`saveCanvasObj_${this.webinar.id}`, canvasObj],
           [`selectVideoType_${this.webinar.id}`, this.mediaState.videoType || 'camera']
         ]);
 
         const sessionMap = new Map([
-          ['selectedVideoDeviceId', this.mediaState.video || ''],
-          ['selectedAudioDeviceId', this.mediaState.audioInput || ''],
-          ['selectedAudioOutputDeviceId', this.mediaState.audioInput || ''],
           ['selectedRate', this.mediaState.rate || ''],
           ['selectedScreenRate', this.mediaState.screenRate || ''],
           ['layout', this.mediaState.layout || ''],
@@ -600,36 +636,36 @@
 
         // 视频
         if (videoInputDevices.length > 0) {
-          const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
-          const lastSelect = this.mediaState.video || sessionVideoId;
+          const localVideoId = localStorage.getItem('media-check.selected.video');
+          const lastSelect = this.mediaState.video || localVideoId;
           const curSelect = getCurSelect(videoInputDevices, lastSelect);
           this.mediaState.video = curSelect || videoInputDevices[0].deviceId;
         } else {
           this.mediaState.video = '';
-          sessionStorage.removeItem('selectedVideoDeviceId');
+          localStorage.removeItem('media-check.selected.video');
         }
 
         // 麦克风
         if (audioInputDevices.length > 0) {
-          const sessionAudioId = sessionStorage.getItem('selectedAudioDeviceId');
-          const lastSelect = this.mediaState.audioInput || sessionAudioId;
+          const localAudioId = localStorage.getItem('media-check.selected.audioInput');
+          const lastSelect = this.mediaState.audioInput || localAudioId;
           const curSelect = getCurSelect(audioInputDevices, lastSelect);
           this.mediaState.audioInput = curSelect || audioInputDevices[0].deviceId;
         } else {
           this.mediaState.audioInput = '';
-          sessionStorage.removeItem('selectedAudioDeviceId');
+          localStorage.removeItem('media-check.selected.audioInput');
         }
 
         // 扬声器
         if (audioOutputDevices.length > 0) {
-          const sessionAudioOutputId = sessionStorage.getItem('selectedAudioOutputDeviceId');
-          const lastSelect = this.mediaState.audioOutput || sessionAudioOutputId;
+          const localAudioOutputId = localStorage.getItem('media-check.selected.audioOutput');
+          const lastSelect = this.mediaState.audioOutput || localAudioOutputId;
           const curSelect = getCurSelect(audioOutputDevices, lastSelect);
 
           this.mediaState.audioOutput = curSelect || audioOutputDevices[0].deviceId;
         } else {
           this.mediaState.audioOutput = '';
-          sessionStorage.removeItem('selectedAudioOutputDeviceId');
+          localStorage.removeItem('media-check.selected.audioOutput');
         }
       }
     }

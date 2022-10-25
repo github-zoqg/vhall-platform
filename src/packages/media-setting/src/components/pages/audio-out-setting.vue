@@ -14,6 +14,7 @@
           v-model="mediaState.audioOutput"
           :placeholder="$t('form.form_1018')"
           @change="audioOutputChange"
+          v-if="devices.length != 0"
         >
           <el-option
             v-for="item in devices"
@@ -21,6 +22,14 @@
             :value="item.deviceId"
             :label="item.label"
           ></el-option>
+        </el-select>
+        <el-select
+          class="vmp-media-setting-item__content"
+          value=""
+          v-if="devices.length == 0"
+          disabled
+        >
+          <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
         </el-select>
       </section>
       <section class="vmp-media-seting-item">
@@ -114,7 +123,7 @@
       playAudio: debounce(function () {
         if (!this.$refs.outputAudioPlayer) return;
         if (!this.isPaused) return this.$refs.outputAudioPlayer.pause();
-        if (!this.mediaState.audioOutput && !this.isSafari)
+        if (this.devices.length == 0 || (!this.mediaState.audioOutput && !this.isSafari))
           return this.$message.warning('无可用的扬声器');
         this.$refs.outputAudioPlayer.play();
       }, 500),
