@@ -103,7 +103,8 @@
         themeClass: {
           bgColor: '',
           pageBg: '#fb2626'
-        }
+        },
+        isConcise: false
       };
     },
     computed: {
@@ -199,17 +200,6 @@
       isNoDelay() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
-      // 是否是手机端 - 简洁模式
-      isConcise() {
-        let skin_json_wap = {
-          style: 1
-        };
-        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = skinInfo.skin_json_wap;
-        }
-        return !!(skin_json_wap?.style == 3);
-      },
       // 当前连麦+演示模式：0分离模式；1合并模式
       speakerAndShowLayout() {
         let skin_json_wap = {
@@ -289,39 +279,34 @@
     },
 
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       /**
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
-        if (this.isConcise) {
-          const h_header = document.querySelector('#header').clientHeight;
-          const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
-          const h_block = document.querySelector('.vmp-block').clientHeight;
-          const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
-          if (h_block == 0) {
-            let classname = '.tab-content';
-            if (this.isEmbed) {
-              classname = '.tab-content-embed';
-            }
-            const tabDom = document.querySelector(classname);
-            if (tabDom) {
-              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
-            }
-          }
-        } else {
-          let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-          // postcss 换算基数为75 头部+播放器区域高为 522px
-          let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-          let baseHeight = playerHeight + 71 + 94;
-          let classname = '.tab-content';
-          if (this.embedObj.embed) {
-            baseHeight = playerHeight;
-            classname = '.tab-content-embed';
-          }
-          let popHeight =
-            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-          document.querySelector(classname).style.height = popHeight;
+        if (this.isSubscribe || this.isConcise || this.isEmbedVideo || this.embedObj.embedVideo)
+          return;
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 71 + 94;
+        let classname = '.tab-content';
+        if (this.embedObj.embed) {
+          baseHeight = playerHeight;
+          classname = '.tab-content-embed';
         }
       },
       computedWidth() {
