@@ -571,13 +571,14 @@
       },
       // 开播后,清除嘉宾的初始化流
       async clearGuestStream() {
+        if (this.joinInfo.role_name != 4) return;
         console.log('clearGuestStream---');
         if (this.pendingStream) {
           // 开播前的check 本地流正在初始化中，检测异步创建的本地流，若本地流在初始化过程中，待初始化完销毁此流
           await this.checkPendingStream();
         }
         let local = this.interactiveServer.state.localSpeaker;
-        if (this.joinInfo.role_name == 4 && this.initLocalSpeaker?.streamId) {
+        if (this.initLocalSpeaker?.streamId) {
           this.interactiveServer.destroyStream({ streamId: this.initLocalSpeaker.streamId });
         }
         if (local.streamId && local.audioMuted) {
@@ -1308,7 +1309,7 @@
         if (this.localStreamId || this.initLocalSpeaker.streamId) {
           if (this.joinInfo.role_name == 1 && this.initLocalSpeaker.streamId) {
             // 主持人，存在本地初始化流直接推流，不再重复创建
-            return new Promise.resolve();
+            return Promise.resolve();
           }
           console.log(
             '防止重复推流-销毁本地流',
