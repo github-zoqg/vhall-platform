@@ -471,14 +471,16 @@
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;
+          padding: 20px;
           border-top-right-radius: 0px;
           border-bottom-right-radius: 0px;
           overflow: hidden;
           display: inline-block;
           img {
             display: block;
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
+            border: 1px solid #eee;
             object-fit: scale-down;
             border-top-right-radius: 0px;
             border-bottom-right-radius: 0px;
