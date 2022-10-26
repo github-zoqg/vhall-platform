@@ -44,10 +44,9 @@
 </script>
 <style lang="less">
   .vmp-custom-menu-imglink {
-    margin-bottom: 16px;
     box-sizing: border-box;
-    padding: 0px 24px;
-
+    padding: 0 0;
+    margin-top: 24px;
     .qr-previewbox {
       .qrbox {
         position: relative;

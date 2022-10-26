@@ -20,9 +20,11 @@
         </div>
         <div class="vh-goods_item-info">
           <div class="vh-goods_item-info__top">
-            <div class="name" :class="{ showEllipse: computeFieldLength(good.name) > 15 }">
-              {{ good.name }}
-            </div>
+            <div
+              class="name"
+              :class="{ showEllipse: computeFieldLength(good.name) > 15 }"
+              v-text="good.name"
+            ></div>
             <div
               class="describe"
               style="
@@ -31,9 +33,8 @@
                 -webkit-line-clamp: 1;
                 overflow: hidden;
               "
-            >
-              {{ good.description }}
-            </div>
+              v-text="good.description"
+            ></div>
           </div>
           <div>
             <div
@@ -41,9 +42,8 @@
                 visibility: good.showDiscountPrice ? 'visible' : 'hidden'
               }"
               class="discount_price"
-            >
-              ￥{{ good.price }}
-            </div>
+              v-text="`￥${good.price}`"
+            ></div>
             <div class="other-info">
               <div v-if="good.showDiscountPrice" class="discount">
                 <span class="price-tip">{{ $t('menu.menu_1006') }}</span>
@@ -270,6 +270,7 @@
       width: 100%;
       // height: 100%;
       overflow: hidden;
+      padding-top: 24px;
       margin-bottom: 100px;
       touch-action: pan-y;
       /* .vh-goods_item {
@@ -331,7 +332,7 @@
         border-color: var(--theme-tab-content-good-split-bg);
       }
       .vh-goods_item {
-        padding: 24px 32px 18px 32px;
+        padding: 16px 24px;
         /* border-bottom: 1px solid #f0f0f0; */
         clear: both;
         background-color: var(--theme-tab-content-good-bg);
@@ -339,18 +340,20 @@
           width: 200px;
           height: 200px;
           float: left;
+          background: rgba(0, 0, 0, 1);
+          border-radius: 4px;
           img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
+            object-fit: scale-down;
+            border-radius: 4px;
           }
         }
         &-info {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding-left: 24px;
+          padding-left: 16px;
           width: calc(100% - 200px);
           .name {
             color: #262626;
@@ -372,7 +375,7 @@
           .describe {
             color: #595959;
             font-size: 24px;
-            padding-top: 10px;
+            padding-top: 8px;
             line-height: 30px;
           }
           .discount_price {
@@ -389,32 +392,39 @@
             position: relative;
             .discount {
               .price-tip {
-                padding: 2px 5px;
+                padding: 3px 4px;
                 background: var(--theme-tab-content-good-priceTag-bg);
                 border-radius: 2px;
-                color: #fb2626;
-                font-size: 14px;
+                color: var(--theme-tab-content-good-priceTag-font);
+                font-size: 20px;
+                line-height: 20px;
+                margin-right: 8px;
               }
             }
             i {
               color: var(--theme-tab-content-good-price-font);
-              font-size: 10px;
+              font-size: 16px;
+              height: 10px;
             }
             .price {
               font-size: 28px;
               color: var(--theme-tab-content-good-price-font);
             }
             .price ::v-deep > .remainder {
-              font-size: 10px;
+              font-size: 16px;
             }
             .buy {
               display: inline-block;
-              width: 110px;
-              height: 54px;
-              line-height: 50px;
+              padding: 9px 24px;
+              min-width: 96px;
+              height: 52px;
+              line-height: 32px;
+              border: 1px solid var(--theme-tab-content-good-buyBorder-font);
+              background-color: var(--theme-tab-content-good-buy-bg) !important;
               border-radius: 32px;
-              border: 1px solid var(--theme-color);
-              color: var(--theme-color);
+              color: var(--theme-tab-content-good-buy-font);
+              font-style: normal;
+              font-weight: 400;
               font-size: 24px;
               text-align: center;
               background: transparent;
@@ -433,6 +443,17 @@
             color: var(--theme-tab-content-good-describe-font);
           }
         }
+        // 废弃商品hover效果
+        // &:active {
+        //   background-color: var(--theme-tab-content-good-bg-active);
+        //   .vh-goods_item-info {
+        //     .buy {
+        //       border: 1px solid var(--theme-tab-content-good-buyBorder-font-active);
+        //       background-color: var(--theme-tab-content-good-buy-bg-active);
+        //       color: var(--theme-tab-content-good-buy-font-active);
+        //     }
+        //   }
+        // }
       }
     }
   }

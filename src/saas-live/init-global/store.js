@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import DomainStore from '@/app-shared/domain-store/index';
 import { getQueryString } from '@/app-shared/utils/tool';
-import { bu_appId } from './businessData';
+import { bu_appId } from '@/app-shared/global-data/businessData';
 
 import {
   setBaseUrl,
@@ -32,12 +32,21 @@ setBaseUrl({
 });
 const linkToken =
   getQueryString('token') || getQueryString('liveT') || getQueryString('live_token') || '';
+
+/**
+ * 平台标识
+ * wiki:
+ */
 setRequestHeaders({
   platform: 7, // 7:PC网页版
   token: linkToken ? '' : localStorage.getItem('token') || '', //如果地址栏有token则不设置token。优先级
   'biz-id': 2, //业务线标识 saas: 2 知客: 4
-  'biz-application-id': bu_appId[process.env.VUE_APP_SAAS_ENV]
+  'biz-application-id':
+    process.env.VUE_APP_SAAS_ENV_DESC == 'old'
+      ? bu_appId[process.env.VUE_APP_SAAS_ENV]
+      : bu_appId[`${process.env.VUE_APP_SAAS_ENV}_new`]
 });
+
 setResponseInterceptors(e => {
   //进入发起端，如果是本地token（非地址栏中的token或live_token）失效，清空token刷新页面跳转到B端登录页
   if ([512506, 512507, 511058, 511005, 511006, 511007, 510008].includes(e.data.code)) {

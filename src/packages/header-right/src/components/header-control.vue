@@ -2,7 +2,7 @@
   <div class="header-right_control">
     <div
       class="header-right_control_icon"
-      :style="userInfo.avatar ? { 'background-image': `url(${userInfo.avatar})` } : {}"
+      :style="{ 'background-image': `url(${userInfo.avatar || defaultAvatar})` }"
     >
       <div class="header-right_control_wrap">
         <div class="header-right_control_wrap-head">
@@ -82,6 +82,7 @@
     useUserServer,
     useMediaSettingServer
   } from 'middle-domain';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'HeaderControl',
     computed: {
@@ -122,7 +123,11 @@
       //是否显示第三方推流组件
       isShowThirdPushStream() {
         // mode == 2: 支持第三方推流 并且不能是无延迟直播， 配置项configList['btn_thirdway'] == 1
-        return this.configList['btn_thirdway'] && this.webinarInfo.no_delay_webinar == 0;
+        return (
+          this.configList['btn_thirdway'] &&
+          this.webinarInfo.no_delay_webinar == 0 &&
+          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1
+        );
       },
       // 媒体设置icon展示
       showSetting() {
@@ -150,7 +155,8 @@
       return {
         roomBaseState: null,
         userInfo: {}, // 用户头图和名称、角色
-        webinarInfo: {} //活动下信息
+        webinarInfo: {}, //活动下信息
+        defaultAvatar
       };
     },
     created() {
@@ -243,7 +249,7 @@
       font-size: 20px;
       cursor: pointer;
       border-radius: 50%;
-      background: url('../img/my-dark@2x.png') no-repeat;
+      // background: url('../img/my-dark@2x.png') no-repeat;
       background-size: 100% 100%;
       // background-color: hsla(0, 0%, 88.6%, 0.15);
     }

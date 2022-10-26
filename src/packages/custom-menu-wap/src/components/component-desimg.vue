@@ -18,10 +18,12 @@
 <style lang="less">
   .vmp-custom-menu-desimg {
     font-size: 28px;
-    line-height: 40px;
+    // line-height: 40px;
     font-weight: 400;
     color: var(--theme-tab-content-word-font);
-    overflow-x: hidden;
+    // overflow-x: hidden;
+    padding: 0 0;
+    margin-top: 24px;
     img {
       width: 100%;
       /* pointer-events: none; */

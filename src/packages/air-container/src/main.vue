@@ -22,7 +22,6 @@
         }
       }
       return widgets.map(item => {
-        console.log(props)
         return createElement(
           item.component,
           {

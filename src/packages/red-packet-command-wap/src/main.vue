@@ -131,6 +131,6 @@
     z-index: 28;
   }
   .van-overlay {
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.7);
   }
 </style>

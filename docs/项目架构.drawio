@@ -1,10 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram id="jk-mDYcw6juqVpxIaa4l" name="第 1 页">
-        <mxGraphModel dx="3294" dy="1982" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#ffffff" math="0" shadow="0">
+        <mxGraphModel dx="3219" dy="1689" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#ffffff" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="407" value="" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontColor=#ffffff;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                <mxCell id="407" value="" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontColor=#ffffff;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="-20" y="-50" width="1570" height="1200" as="geometry"/>
                 </mxCell>
                 <mxCell id="167" value="&lt;span style=&quot;font-size: 18px&quot;&gt;domainSDK&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
@@ -41,15 +41,6 @@
                 </mxCell>
                 <mxCell id="196" value="&lt;span style=&quot;font-size: 18px&quot;&gt;PC观看端&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="420" y="130" width="110" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="197" style="edgeStyle=none;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;fontColor=#1A1A1A;" parent="1" source="194" target="194" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="200" value="" style="endArrow=classic;html=1;fontColor=#1A1A1A;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="405" y="92" as="sourcePoint"/>
-                        <mxPoint x="405" y="136" as="targetPoint"/>
-                    </mxGeometry>
                 </mxCell>
                 <mxCell id="206" value="" style="endArrow=none;dashed=1;html=1;fontColor=#1A1A1A;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -309,13 +300,13 @@
                 <mxCell id="354" value="&lt;font style=&quot;font-size: 36px&quot; color=&quot;#000000&quot;&gt;......&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="271.5" y="396.75" width="38.5" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="355" value="&lt;span style=&quot;font-size: 18px&quot;&gt;控制台&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="355" value="&lt;span style=&quot;font-size: 18px&quot;&gt;控制台&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="700" y="130" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="360" value="&lt;span style=&quot;font-size: 18px&quot;&gt;admin&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="360" value="&lt;span style=&quot;font-size: 18px&quot;&gt;admin&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="840" y="130" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="361" value="" style="curved=1;endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fillColor=#1ba1e2;strokeColor=#006EAF;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="215" target="363">
+                <mxCell id="361" value="" style="curved=1;endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fillColor=#1ba1e2;strokeColor=#006EAF;strokeWidth=2;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="215" target="363" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="740" y="510" as="sourcePoint"/>
                         <mxPoint x="1150" y="400" as="targetPoint"/>
@@ -325,118 +316,118 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="363" value="" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#7EA6E0;fillColor=#E9BDFF;" vertex="1" parent="1">
+                <mxCell id="363" value="" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#7EA6E0;fillColor=#E9BDFF;" parent="1" vertex="1">
                     <mxGeometry x="1160" y="20" width="320" height="780" as="geometry"/>
                 </mxCell>
-                <mxCell id="364" value="&lt;font style=&quot;font-size: 14px&quot;&gt;资料下载组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="364" value="&lt;font style=&quot;font-size: 14px&quot;&gt;资料下载组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="255" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="365" value="&lt;font style=&quot;font-size: 14px&quot;&gt;左侧菜单栏组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="365" value="&lt;font style=&quot;font-size: 14px&quot;&gt;左侧菜单栏组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="333" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="366" value="&lt;span style=&quot;font-size: 14px&quot;&gt;聊天组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="366" value="&lt;span style=&quot;font-size: 14px&quot;&gt;聊天组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="170" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="367" value="&lt;font style=&quot;font-size: 14px&quot;&gt;分屏组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="367" value="&lt;font style=&quot;font-size: 14px&quot;&gt;分屏组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="449.99999999999994" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="368" value="&lt;font style=&quot;font-size: 14px&quot;&gt;专题列表组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="368" value="&lt;font style=&quot;font-size: 14px&quot;&gt;专题列表组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="530" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="369" value="&lt;font style=&quot;font-size: 14px&quot;&gt;专题详情组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="369" value="&lt;font style=&quot;font-size: 14px&quot;&gt;专题详情组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="570" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="370" value="&lt;font style=&quot;font-size: 14px&quot;&gt;媒体检测组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="370" value="&lt;font style=&quot;font-size: 14px&quot;&gt;媒体检测组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="373" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="371" value="&lt;font style=&quot;font-size: 14px&quot;&gt;播放器组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="371" value="&lt;font style=&quot;font-size: 14px&quot;&gt;播放器组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="372.99999999999994" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="372" value="&lt;font style=&quot;font-size: 14px&quot;&gt;分组设置组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="372" value="&lt;font style=&quot;font-size: 14px&quot;&gt;分组设置组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="294" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="373" value="&lt;span style=&quot;font-size: 14px&quot;&gt;报名表单组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="373" value="&lt;span style=&quot;font-size: 14px&quot;&gt;报名表单组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="570" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="374" value="&lt;span style=&quot;font-size: 14px&quot;&gt;转播组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="374" value="&lt;span style=&quot;font-size: 14px&quot;&gt;转播组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="610" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="375" value="&lt;span style=&quot;font-size: 14px&quot;&gt;c端个人中心组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="375" value="&lt;span style=&quot;font-size: 14px&quot;&gt;c端个人中心组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="650" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="376" value="&lt;span style=&quot;font-size: 14px&quot;&gt;自定义菜单组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="376" value="&lt;span style=&quot;font-size: 14px&quot;&gt;自定义菜单组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="610" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="377" value="&lt;span style=&quot;font-size: 14px&quot;&gt;推广组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="377" value="&lt;span style=&quot;font-size: 14px&quot;&gt;推广组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="650" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="378" value="&lt;span style=&quot;font-size: 14px&quot;&gt;点赞组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="378" value="&lt;span style=&quot;font-size: 14px&quot;&gt;点赞组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="690" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="379" value="&lt;span style=&quot;font-size: 14px&quot;&gt;虚拟人数组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="379" value="&lt;span style=&quot;font-size: 14px&quot;&gt;虚拟人数组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="530" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="380" value="&lt;span style=&quot;font-size: 14px&quot;&gt;公告展示组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="380" value="&lt;span style=&quot;font-size: 14px&quot;&gt;公告展示组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="490.6600000000001" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="381" value="&lt;span style=&quot;font-size: 14px&quot;&gt;公告列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="381" value="&lt;span style=&quot;font-size: 14px&quot;&gt;公告列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="450" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="382" value="&lt;font style=&quot;font-size: 14px&quot;&gt;聊天审核组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="382" value="&lt;font style=&quot;font-size: 14px&quot;&gt;聊天审核组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="130" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="383" value="&lt;span style=&quot;font-size: 14px&quot;&gt;私聊组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="383" value="&lt;span style=&quot;font-size: 14px&quot;&gt;私聊组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="90" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="384" value="&lt;span style=&quot;font-size: 14px&quot;&gt;小组群聊组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="384" value="&lt;span style=&quot;font-size: 14px&quot;&gt;小组群聊组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="50" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="385" value="&lt;span style=&quot;font-size: 14px&quot;&gt;观看端头部组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="385" value="&lt;span style=&quot;font-size: 14px&quot;&gt;观看端头部组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="50" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="386" value="&lt;font style=&quot;font-size: 14px&quot;&gt;插播组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="386" value="&lt;font style=&quot;font-size: 14px&quot;&gt;插播组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="255" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="387" value="&lt;font style=&quot;font-size: 14px&quot;&gt;互动管理组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="387" value="&lt;font style=&quot;font-size: 14px&quot;&gt;互动管理组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="214" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="388" value="&lt;span style=&quot;font-size: 14px&quot;&gt;发起端头部组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="388" value="&lt;span style=&quot;font-size: 14px&quot;&gt;发起端头部组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="90" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="389" value="&lt;span style=&quot;font-size: 14px&quot;&gt;c端登录组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="389" value="&lt;span style=&quot;font-size: 14px&quot;&gt;c端登录组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="130" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="390" value="&lt;span style=&quot;font-size: 14px&quot;&gt;成员列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="390" value="&lt;span style=&quot;font-size: 14px&quot;&gt;成员列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="414" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="391" value="&lt;span style=&quot;font-size: 14px&quot;&gt;文档列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="391" value="&lt;span style=&quot;font-size: 14px&quot;&gt;文档列表组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="214" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="392" value="&lt;span style=&quot;font-size: 14px&quot;&gt;文档组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="392" value="&lt;span style=&quot;font-size: 14px&quot;&gt;文档组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="170" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="393" value="&lt;span style=&quot;font-size: 14px&quot;&gt;本地推流组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="393" value="&lt;span style=&quot;font-size: 14px&quot;&gt;本地推流组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="333" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="396" value="&lt;span style=&quot;font-size: 14px&quot;&gt;远端流订阅组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="396" value="&lt;span style=&quot;font-size: 14px&quot;&gt;远端流订阅组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="293.99999999999994" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="397" value="&lt;span style=&quot;font-size: 14px&quot;&gt;媒体设置组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="397" value="&lt;span style=&quot;font-size: 14px&quot;&gt;媒体设置组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="414" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="400" value="&lt;span style=&quot;font-size: 14px&quot;&gt;多语言组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="400" value="&lt;span style=&quot;font-size: 14px&quot;&gt;多语言组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1340" y="690" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="401" value="&lt;font style=&quot;font-size: 14px&quot;&gt;桌面共享组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="401" value="&lt;font style=&quot;font-size: 14px&quot;&gt;桌面共享组件&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="490.65999999999997" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="402" value="&lt;span style=&quot;font-size: 14px&quot;&gt;互动连麦组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="402" value="&lt;span style=&quot;font-size: 14px&quot;&gt;互动连麦组件&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="1190" y="730" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="403" value="&lt;font style=&quot;font-size: 20px&quot; color=&quot;#000000&quot;&gt;&lt;b style=&quot;line-height: 100%&quot;&gt;. . . . . .&lt;/b&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="403" value="&lt;font style=&quot;font-size: 20px&quot; color=&quot;#000000&quot;&gt;&lt;b style=&quot;line-height: 100%&quot;&gt;. . . . . .&lt;/b&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="1360" y="730" width="70" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="404" value="&lt;span style=&quot;font-size: 18px&quot;&gt;轻享&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" vertex="1" parent="1">
+                <mxCell id="404" value="&lt;span style=&quot;font-size: 18px&quot;&gt;轻享&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1A1A1A;fillColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="587" y="30" width="100" height="40" as="geometry"/>
                 </mxCell>
             </root>

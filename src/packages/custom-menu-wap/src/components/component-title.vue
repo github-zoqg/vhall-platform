@@ -17,8 +17,8 @@
 
 <style lang="less">
   .vmp-custom-menu-title {
-    margin-bottom: 16px;
-
+    margin-top: 16px;
+    padding: 0 0;
     &__content {
       margin: 20px 0px;
       font-size: 28px;

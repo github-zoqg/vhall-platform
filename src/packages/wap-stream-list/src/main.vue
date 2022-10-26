@@ -11,13 +11,18 @@
       :class="{
         'vmp-stream-list-h0': isStreamListH0,
         'vmp-stream-list-h-all': isStreamListHAll,
-        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn
+        'vmp-stream-list-no-speack': !micServer.state.isSpeakOn,
+        'vmp-stream-list-stream-center':
+          speakerAndShowLayout == 1 && isCenterStream && micServer.state.isSpeakOn
       }"
+      ref="vmp_stream_list"
     >
       <div
         class="vmp-stream-list__local-container"
         :class="{
-          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen
+          'vmp-stream-list__main-screen':
+            !isDocMainScreen && joinInfo.third_party_user_id == mainScreen,
+          'vmp-stream-list__mini-window__main-screen': joinInfo.third_party_user_id == mainScreen // 播放器是mini状态的主屏class
         }"
         v-show="micServer.state.isSpeakOn"
       >
@@ -31,7 +36,8 @@
           :key="speaker.accountId"
           class="vmp-stream-list__remote-container"
           :class="{
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen,
+            'vmp-stream-list__mini-window__main-screen': speaker.accountId == mainScreen, // 播放器是mini状态的主屏class
+            'vmp-stream-list__main-screen': speaker.accountId == mainScreen && !isDocMainScreen,
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
@@ -49,7 +55,7 @@
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup"
+        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup && !isConcise"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -76,6 +82,7 @@
       </div>
       <!-- 进入全屏 -->
       <div
+        v-if="!isDocMainScreen"
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
@@ -138,7 +145,8 @@
         lang: {},
         languageList: [],
         streamInfo,
-        timmer: null
+        timmer: null,
+        isConcise: false
       };
     },
     computed: {
@@ -289,9 +297,31 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skinJsonWap = {};
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skinJsonWap = JSON.parse(skinInfo.skin_json_wap);
+          skinJsonWap = skinInfo.skin_json_wap;
         }
         return skinJsonWap?.videoBackGroundColor || '#000';
+      },
+      speakerAndShowLayout() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout;
+      },
+      // 是否开启文档主画面
+      isDocMainScreen() {
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.speakerAndShowLayout == 1
+        );
+      },
+      // 远端流总宽度是否超过桌面宽度
+      isCenterStream() {
+        let num = this.remoteSpeakers.length;
+        if (this.isDocMainScreen) {
+          num = num + 1;
+        }
+        console.log('w-w', num);
+        return num < 6;
       }
     },
     watch: {
@@ -305,6 +335,21 @@
           });
         },
         immediate: true
+      },
+      isDocMainScreen: {
+        handler(val) {
+          this.createBScroll();
+        }
+      },
+      isCenterStream: {
+        handler(val) {
+          if (val && this.scroll && this.scroll.scrollX != 0) {
+            window.sc = this.scroll;
+            this.scroll.scrollTo(0);
+            this.scroll.destroy();
+            this.scroll = null;
+          }
+        }
       }
     },
     beforeCreate() {
@@ -342,6 +387,7 @@
 
       this.addSDKEvents();
       this.fiveDown();
+      this.getIsConcise();
     },
     beforeDestroy() {
       if (this.scroll) {
@@ -350,6 +396,20 @@
     },
 
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.roomBaseServer.state.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       // 设置主画面   补充：设置主画面时，需要实时更改主画面的位置，不然会出现界面混乱等问题
       setBigScreen(msg) {
         this.$nextTick(() => {
@@ -769,6 +829,10 @@
       .vmp-stream-list__main-screen {
         top: 0;
       }
+    }
+    &-stream-center {
+      display: flex;
+      justify-content: center;
     }
 
     // 未上麦样式进行覆盖

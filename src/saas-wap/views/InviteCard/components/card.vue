@@ -155,8 +155,7 @@
 
 <script>
   import Html2canvas from 'html2canvas';
-  import defaultAvatarImg from '../img/default_avatar.png';
-
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
   import { sleep, parseImgOssQueryString } from '@/app-shared/utils/tool';
@@ -214,7 +213,7 @@
         const res = await this.inviteServer.createInvite(params);
         const data = res.data;
 
-        this.webinarInfo.avatar = data.avatar || defaultAvatarImg;
+        this.webinarInfo.avatar = data.avatar || defaultAvatar;
         this.webinarInfo.title = data.invite_card.title;
         this.webinarInfo.img = data.invite_card.img;
         this.webinarInfo.company = data.invite_card.company;

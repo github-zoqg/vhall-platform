@@ -46,7 +46,7 @@
 <script>
   import VirtualList from 'vue-virtual-scroll-list';
   import msgItem from './components/msg-item';
-  import SendBox from '@/packages/chat-wap/src/components/send-box';
+  import SendBox from '@/packages/chat-wap/src/common/components/send-box';
   import {
     useRoomBaseServer,
     useQaServer,
@@ -56,7 +56,7 @@
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import emitter from '@/app-shared/mixins/emitter';
-  import EventBus from '@/packages/chat-wap/src/js/Events.js';
+  import EventBus from '@/packages/chat-wap/src/common/js/Events.js';
   import { isMse } from '@/app-shared/utils/isMse';
   export default {
     name: 'VmpQaWap',
@@ -127,6 +127,10 @@
       },
       isWapBodyDocSwitch() {
         this.changeChatHeight();
+      },
+      qaList() {
+        //观察问答列表变动，如果有新消息，滚动到底部 【参考私聊】
+        this.scrollBottom();
       }
     },
     components: {
@@ -355,87 +359,6 @@
         height: 100%;
         overflow: hidden;
         position: relative;
-        .qa-item-wrapper {
-          padding: 0 30px;
-          &.qa-last-ios-progress {
-            padding-bottom: 34px;
-          }
-          .question {
-            padding: 20px 0;
-          }
-          .answer {
-            padding: 20px;
-            background: var(--theme-tab-content-qa-replyText-bg);
-            border-radius: 8px;
-          }
-          .user {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            color: #666666;
-            padding: 1px;
-            .avatar-box {
-              width: 70px;
-              height: 70px;
-              border: 2px solid #e3e3e3;
-              border-radius: 50%;
-              overflow: hidden;
-              margin-right: 20px;
-              display: inline-block;
-            }
-            .avatar {
-              width: 100%;
-              height: 100%;
-              display: block;
-            }
-            .role {
-              margin-right: 10px;
-              padding: 3px 10px;
-              line-height: 28px;
-              border-radius: 50px;
-              font-size: 20px;
-              &.host {
-                color: rgba(251, 38, 38, 1);
-                background-color: rgba(251, 38, 38, 0.15);
-              }
-              &.assistant {
-                color: rgba(10, 127, 245, 1);
-                background-color: rgba(10, 127, 245, 0.15);
-              }
-              &.guest {
-                color: rgba(10, 127, 245, 1);
-                background-color: rgba(10, 127, 245, 0.15);
-              }
-            }
-            .nick-name {
-              color: var(--theme-tab-content-qa-text-font);
-              flex: 1;
-              line-height: 50px;
-              font-size: 26px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              font-weight: bolder;
-              white-space: nowrap;
-            }
-            .time {
-              color: var(--theme-tab-content-qa-text-font);
-            }
-          }
-          .content {
-            line-height: 40px;
-            color: #444444;
-            // text-align: justify;
-            word-break: break-word;
-            .question-label {
-              color: var(--theme-tab-content-qa-qaLabel-font);
-              float: left;
-            }
-            .question-reply {
-              display: inline-block;
-              color: var(--theme-tab-content-qa-replyText-font);
-            }
-          }
-        }
       }
       .new-msg-tips {
         position: absolute;

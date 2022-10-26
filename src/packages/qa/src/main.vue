@@ -108,7 +108,7 @@
   import { debounce } from 'lodash';
   import ChatOperator from './components/chat-operator';
   import MsgItem from './components/msg-item';
-  // import { textToEmojiText } from '@/packages/chat/src/js/emoji';
+  // import { textToEmojiText } from ''@/packages/chat/src/common/js/emoji';
   import {
     useRoomBaseServer,
     useQaServer,
