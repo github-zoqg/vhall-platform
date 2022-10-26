@@ -303,6 +303,7 @@
                 }
                 this.setPollingAlert(title);
               }
+              this.videoPollingServer.getStreamsAndUpdatePollingList();
             })
             .catch(() => {
               // 当前已经有人开始视频轮询了
@@ -357,6 +358,7 @@
               .then(res => {
                 if (res.code === 200 && !this.isPausedPolling) {
                   this.changeTime();
+                  this.videoPollingServer.getStreamsAndUpdatePollingList();
                 } else {
                   clearInterval(this.countTimer);
                 }
