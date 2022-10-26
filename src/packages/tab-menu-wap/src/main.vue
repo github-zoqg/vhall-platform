@@ -103,8 +103,7 @@
         themeClass: {
           bgColor: '',
           pageBg: '#fb2626'
-        },
-        isConcise: false
+        }
       };
     },
     computed: {
@@ -113,6 +112,21 @@
       //     'background-color': this.themeClass.pageBg
       //   };
       // },
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+        console.log(skinInfo);
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -279,20 +293,6 @@
     },
 
     methods: {
-      getIsConcise() {
-        let skin_json_wap = {
-          style: 1
-        };
-        const { skinInfo } = this.$domainStore.state.roomBaseServer;
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = skinInfo.skin_json_wap;
-        }
-        if (skin_json_wap?.style == 3) {
-          this.isConcise = true;
-        } else {
-          this.isConcise = false;
-        }
-      },
       /**
        * 计算 设置tab-content高度
        */
