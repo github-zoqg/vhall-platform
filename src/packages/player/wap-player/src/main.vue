@@ -14,7 +14,10 @@
           />
         </div>
         <!-- 播放 按钮 -->
-        <div v-show="!isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
+        <div
+          v-show="!isPlayering && !isVodEnd && !isSmallPlayer && !isFullScreen"
+          class="vmp-wap-player-pause"
+        >
           <p @click="startPlay">
             <i class="vh-iconfont vh-line-video-play"></i>
           </p>
@@ -121,7 +124,7 @@
         <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
         <div
           class="vmp-wap-player-footer"
-          v-show="isPlayering && !isSmallPlayer"
+          v-show="isPlayering && !isSmallPlayer && !isFullScreen"
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
           <div class="vmp-wap-player-control">
@@ -531,6 +534,11 @@
             this.playerServer.play();
           }
         }
+      },
+      isPlayering() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerStatus', [this.isPlayering])
+        );
       }
     },
     beforeCreate() {

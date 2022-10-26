@@ -20,7 +20,7 @@ export const drag = {
     },
     inserted(el, binding, vnode) {
       // console.log('-----drag - inserted-----', el, binding, vnode);
-      if (!binding.value.close) {
+      if (!binding.value?.close) {
         positionParams.el = el;
         el.addEventListener('touchstart', doTouchstart);
         el.addEventListener('touchend', doTouchend);
@@ -30,7 +30,7 @@ export const drag = {
     update(el, binding, vnode, oldVnode) {
       positionParams.el = el;
       // console.log('-----drag - update-----', el, binding, vnode, oldVnode);
-      if (!binding.value.close) {
+      if (!binding.value?.close) {
         // console.log('open drag');
         el.addEventListener('touchstart', doTouchstart);
         el.addEventListener('touchend', doTouchend);

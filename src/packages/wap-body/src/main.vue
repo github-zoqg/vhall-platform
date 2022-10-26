@@ -1,5 +1,12 @@
 <template>
-  <div class="vmp-wap-body" :class="[wapBodyClass, isShowWapBody ? '' : 'vmp-wap-body__hide']">
+  <div
+    class="vmp-wap-body"
+    :class="[
+      wapBodyClass,
+      isShowWapBody ? '' : 'vmp-wap-body__hide',
+      isFullScreen ? 'isFullScreen' : ''
+    ]"
+  >
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd"
@@ -22,8 +29,7 @@
           ? 'vmp-wap-body-special__show'
           : ''
       ]"
-      @touchstart="touchstart($event)"
-      @touchmove.prevent="touchmove($event)"
+      v-drag
     >
       <!-- 播放器 -->
       <vmp-air-container
@@ -239,6 +245,10 @@
           !!this.$domainStore.state.docServer.currentCid &&
           this.isMergeMode
         );
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     beforeCreate() {
@@ -588,6 +598,13 @@
       &.doc-hidden {
         visibility: hidden;
       }
+    }
+    &.isFullScreen {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
   }
 </style>

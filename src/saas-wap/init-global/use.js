@@ -94,6 +94,7 @@ import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 import VmpSmsVerification from '@/packages/sms-verification';
 // ------------------------------【极简风格】引入组件------start----------
 import VmpConciseBodyBlockWap from '@/packages/concise-style/wap-block';
+import VmpConciseCenterWap from '@/packages/concise-style/wap-center';
 import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap';
 // 送礼物飘屏动画
 import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
@@ -157,3 +158,4 @@ Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
 Vue.use(VmpWapMenuDialog);
 // ------------------------------【极简风格】注册组件------end----------
+Vue.use(VmpConciseCenterWap);
