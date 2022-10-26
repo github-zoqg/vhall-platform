@@ -1,5 +1,5 @@
 <template>
-  <div id="header" class="vh-concise-header-box">
+  <div id="header" class="vh-concise-header-box" :class="isFullScreen ? 'isFullScreen' : ''">
     <section class="vh-concise-header-box__rehearsal" v-if="isRehearsal && isLiving">
       <span class="dot"></span>
       {{ $t('nav.nav_1055') }}
@@ -86,21 +86,13 @@
         attentionStatus: 0, // 关注状态
         // headInfo: null,
         // showSponsor: true,
-        userInfo: {},
-        themeClass: {
-          bgColor: 'light',
-          background: '#cccccc',
-          pageStyle: '' // icon默认色
-        }
+        userInfo: {}
       };
     },
     mounted() {
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
-
-      //设置品牌皮肤
-      this.setSkinInfo(this.skinInfo);
     },
     computed: {
       // 直播中
@@ -179,20 +171,13 @@
       // 是否为嵌入页
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     methods: {
-      /**
-       * 设置品牌设置信息
-       */
-      setSkinInfo(skin) {
-        if (skin && skin.skin_json_wap && skin.status == 1) {
-          const { bgColor, pageStyle, background } = skin.skin_json_wap || '';
-          this.themeClass.pageStyle = pageStyle;
-          this.themeClass.background = background;
-          this.themeClass.bgColor = bgColor;
-        }
-      },
       /**
        * 初始化登录信息
        */
@@ -383,6 +368,20 @@
       margin-top: 16px;
       .host-user-info__middle-num {
         margin-top: 0;
+      }
+    }
+    &.isFullScreen {
+      .vh-concise-header-box__2 {
+        margin: 0;
+        padding: 18px 0;
+        background: none;
+        border-radius: 0;
+        p {
+          margin-right: 12px;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 7px 16px;
+          border-radius: 40px;
+        }
       }
     }
   }
