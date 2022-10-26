@@ -94,7 +94,7 @@ export default {
     appointment_1017: '立即预约',
     appointment_1018: '已预约{n}人',
     appointment_1019: '这里空空如也',
-    appointment_1020: '权限验证',
+    appointment_1020: '观看验证',
     appointment_1021: '密码错误',
     appointment_1022: '请输入密码',
     appointment_1023: '付费{n}观看',

@@ -22,7 +22,7 @@
       </div>
       <section class="subject-header">
         <h2 class="subject-title">{{ detailInfo.title }}</h2>
-        <p class="subject-create-time">{{ detailInfo.created_at }}</p>
+        <!-- <p class="subject-create-time">{{ detailInfo.created_at }}</p> -->
         <div class="subject-info">
           <p>
             共&nbsp;
@@ -558,7 +558,7 @@
     }
     .subject-header {
       width: calc(100% - 40px);
-      height: 186px;
+      // height: 186px;
       margin: 0 20px;
       padding: 20px 0;
       border-bottom: 4.1px solid #e2e2e2;
@@ -569,6 +569,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        padding: 0 0 25px;
       }
       .subject-create-time {
         font-size: 24px;

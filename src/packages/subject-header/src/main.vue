@@ -9,7 +9,7 @@
       <div class="subject_title">
         <div class="subject_title_intro">
           <p>{{ subjectInfo.title }}</p>
-          <span>{{ subjectInfo.created_at }}</span>
+          <!-- <span>{{ subjectInfo.created_at }}</span> -->
         </div>
       </div>
       <div class="subject_collapse">

@@ -21,9 +21,9 @@
           <div class="vh-chose-active-item__title ellipsis">
             {{ item.title }}
           </div>
-          <div class="vh-chose-active-item__info">
+          <!-- <div class="vh-chose-active-item__info">
             {{ item.created_at.substr(0, 16) }}
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -246,7 +246,7 @@
     &__title {
       width: 100%;
       min-height: 36px;
-      max-height: 76px;
+      // max-height: 76px;
       font-size: 28px;
       font-weight: 400;
       color: var(--theme-tab-content-project-title-font);
@@ -285,7 +285,7 @@
       display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
-      -webkit-line-clamp: 2; /** 显示的行数 **/
+      -webkit-line-clamp: 3; /** 显示的行数 **/
       overflow: hidden; /** 隐藏超出的内容 **/
       text-overflow: ellipsis;
     }
