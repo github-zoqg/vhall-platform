@@ -77,8 +77,6 @@
         console.log('detail---------->', data);
         this.info = data;
         this.show = true;
-        // 商品更新
-        useGoodServer().$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       /**
        * 购买

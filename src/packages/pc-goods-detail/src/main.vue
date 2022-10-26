@@ -78,8 +78,6 @@
         this.info = data;
         this.show = true;
         this.chooseDefaultImg(0);
-        // 商品更新
-        useGoodServer().$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       handleClose() {
         this.show = false;

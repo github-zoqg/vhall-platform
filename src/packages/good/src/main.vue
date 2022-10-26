@@ -234,6 +234,11 @@
       //
       queryGoodsListJson(data) {
         // console.log(data, 'queryGoodsListJson');
+        // 开启自定义菜单
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowGoodsTab', [{ type: 5 }])
+        );
+
         this.goodServer
           .queryGoodsListJson({
             url: data.data.cnd_url
