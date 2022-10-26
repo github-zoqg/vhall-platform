@@ -365,6 +365,9 @@
         if (this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0) {
           console.log('------竖屏直播------');
           setPage('fullscreen');
+          skins.setTheme(skins.themes[`theme_fullScreen_default`]);
+          this.drawBody('main', 'black', {});
+          return;
         } else if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
