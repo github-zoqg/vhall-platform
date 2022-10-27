@@ -43,7 +43,10 @@
         </div>
       </div>
     </div>
-    <div v-if="showEmoji" class="send-box__bottom--emoji">
+    <div
+      v-if="showEmoji"
+      :class="['send-box__bottom--emoji', isConcise ? `chat-emoji__${showTabType}` : '']"
+    >
       <div class="imgs">
         <img
           :src="item.src"
@@ -426,6 +429,10 @@
       position: relative;
       width: 100%;
       height: 356px;
+      &.chat-emoji__qa,
+      &.chat-emoji__private {
+        height: 296px;
+      }
       box-sizing: border-box;
       overflow-y: scroll;
       background-color: #f0f0f0;
