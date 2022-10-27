@@ -149,7 +149,7 @@
           width: 100%;
         }
         p {
-          padding-top: 13px;
+          padding-top: 22px;
           line-height: 24px;
           color: #1a1a1a;
           font-size: 18px;
