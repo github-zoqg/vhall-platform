@@ -26,8 +26,8 @@ export default {
   '--theme-chat-msg-reply-name-font': 'rgba(0, 0, 0, 0.45)',
   '--theme-chat-msg-reply-after': 'rgba(0, 0, 0, 0.25)',
   '--theme-chat-msg-timeline': 'rgba(0, 0, 0, 0.85)',
-  '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
-  '--theme-chat-input-placeholder-font': 'rgba(0, 0, 0, 0.45)',
+  '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.25)',
+  '--theme-chat-input-placeholder-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-chat-msg-interact-bg': ' ',
   '--theme-chat-sendBox-bg': ' ',
   // 聊天输入框输入状态

@@ -585,7 +585,7 @@
       }
 
       .interact-wrapper {
-        margin-left: 32px;
+        margin-left: 20px;
         text-align: right;
         padding-right: 8px;
 
@@ -685,8 +685,8 @@
   }
 
   .user-avatar-wrap__avatar {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     vertical-align: middle;
     display: inline-flex;
     border-radius: 100%;

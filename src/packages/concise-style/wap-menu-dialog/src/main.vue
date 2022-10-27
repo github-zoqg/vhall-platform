@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-wap-menu-dialog">
-    <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
+    <div class="tool">
+      <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
+    </div>
     <!-- <span class="menu_icon-pointer"></span> -->
     <van-popup
       class="wap-menu-van-popup"

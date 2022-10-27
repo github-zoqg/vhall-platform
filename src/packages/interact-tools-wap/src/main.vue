@@ -6,9 +6,23 @@
     ]"
   >
     <div class="icon-wrapper">
-      <!-- TODO:支付牌照问题 -->
+      <div class="good" v-if="localRoomInfo.isShowGift && isFullScreen">
+        <div class="tool">
+          <img class="good-img" src="./img/icon_good.png" @click="openGoods" />
+        </div>
+        <GiftCard
+          @showLogin="showLogin"
+          ref="gifts"
+          :isEmbed="localRoomInfo.isEmbed"
+          :joinInfoInGift="joinInfoInGift"
+          :roomId="localRoomInfo.room_id"
+          :localRoomInfo="localRoomInfo"
+        />
+      </div>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
-        <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
+        <div class="tool">
+          <img class="gift-img" src="./img/icon_gift.png" @click="openGifts" />
+        </div>
         <GiftCard
           @showLogin="showLogin"
           ref="gifts"
@@ -39,7 +53,9 @@
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
-          <img class="tool share-img" src="./img/icon_share.png" />
+          <div class="tool">
+            <img class="share-img" src="./img/icon_share.png" />
+          </div>
         </a>
       </div>
       <!-- 极简模式下, 菜单入口 -->
@@ -148,7 +164,7 @@
       showLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      opneGifts() {
+      openGifts() {
         this.$refs.gifts.showgift();
       },
       openReward() {
@@ -163,7 +179,8 @@
       setVisibleMenuLength(len = 0) {
         console.log('当前菜单是否进入', len);
         this.visibleMenuLength = len;
-      }
+      },
+      openGoods() {}
     }
   };
 </script>
@@ -174,7 +191,7 @@
       display: flex;
       & > div {
         font-size: 43px;
-        margin-right: 24px;
+        margin-right: 20px;
         display: flex;
         align-items: center;
         &:last-child {
@@ -182,8 +199,18 @@
         }
       }
       .tool {
-        width: 48px;
-        height: 48px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(6, 6, 6, 0.25);
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
     }
     .vh-saas-iconfont,
@@ -194,10 +221,6 @@
     .share-box {
       position: relative;
       top: 2px;
-      .tool {
-        width: 50px;
-        height: 50px;
-      }
     }
     .redpacket-box {
       position: relative;

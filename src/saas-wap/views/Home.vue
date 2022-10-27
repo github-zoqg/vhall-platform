@@ -360,9 +360,8 @@
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
           skin_json_wap = skinInfo.skin_json_wap;
         }
-
         // 竖屏直播
-        if (this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0) {
+        if (this.isFullScreen) {
           console.log('------竖屏直播------');
           setPage('fullscreen');
           skins.setTheme(skins.themes[`theme_fullScreen_default`]);
@@ -400,7 +399,11 @@
         } else {
           if (style == 'main' && (theme == 'black' || theme == 'white')) {
             if (theme == 'black') {
-              document.body.style.background = `#262626`; // 黑色
+              if (this.isFullScreen) {
+                document.body.style.background = `#000`; // 黑色
+              } else {
+                document.body.style.background = `#262626`; // 黑色
+              }
             }
             if (theme == 'white') {
               app.style.background = `rgba(0, 0, 0, 0.06)`;
