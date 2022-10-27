@@ -451,7 +451,18 @@
 
         const ignoreKeys = ['devices', 'videoPreviewStreamId', 'videoPreviewStream'];
         let diff = getDiffObject(source, { ...this.mediaState }, { ignoreKeys });
-
+        let diff2 = getDiffObject(
+          source,
+          {
+            video: localStorage.getItem('media-check.selected.video'),
+            audioInput: localStorage.getItem('media-check.selected.audioInput'),
+            audioOutput: localStorage.getItem('media-check.selected.audioOutput')
+          },
+          {}
+        );
+        console.log('diif-->', diff, diff2);
+        diff = Object.assign(diff, diff2);
+        console.log('diif--merge -->', diff);
         if (this.isRepublishMode) {
           diff = Object.assign(diff, {
             isRepublishMode: true
