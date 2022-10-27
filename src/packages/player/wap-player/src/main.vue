@@ -798,6 +798,9 @@
         this.marquee = unionConfig['screen-config'] && unionConfig['screen-config'].data;
         this.water = unionConfig['water-mark'] && unionConfig['water-mark'].data;
         this.playerOtherOptions = unionConfig['basic-config'] && unionConfig['basic-config'].data;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerOtherOptions', [this.playerOtherOptions])
+        );
         this.initPlayer();
         // const { webinar } = this.roomBaseState.watchInitData;
         // this.playerServer

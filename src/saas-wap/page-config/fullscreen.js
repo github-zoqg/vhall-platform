@@ -107,6 +107,13 @@ export default {
         method: 'getQualitys',
         args: ['$0', '$1']
       }
+    ],
+    emitPlayerOtherOptions: [
+      {
+        cuid: 'comHeaderWatch',
+        method: 'getPlayerOtherOptions',
+        args: ['$0']
+      }
     ]
   },
   comWapStreamList: {

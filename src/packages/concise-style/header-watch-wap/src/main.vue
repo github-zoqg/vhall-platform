@@ -93,21 +93,19 @@
     >
       <div class="more-content">
         <div class="list">
-          <div class="item">
+          <div class="item" v-if="playerOtherOptions.barrage_button">
             <div class="iconGroup" @click="updateBarrage">
               <span
-                :class="`vh-iconfont ${
-                  danmuIsOpen ? 'vh-line-barrage-on1' : 'vh-line-barrage-off1'
-                }`"
+                :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
               ></span>
             </div>
             <div class="text">{{ danmuIsOpen ? $t('nav.nav_1057') : $t('nav.nav_1058') }}</div>
           </div>
-          <div class="item">
+          <div class="item" v-if="languageList.length > 1">
             <div class="iconGroup" @click="updateLang">
               <span :class="`vh-iconfont ${lang.key == 1 ? 'vh-line_en' : 'vh-line_cn'}`"></span>
             </div>
-            <div class="text">{{ langs[lang.key == 1 ? 1 : 0].label }}</div>
+            <div class="text">{{ languageList[lang.key == 1 ? 1 : 0].label }}</div>
           </div>
           <div class="item">
             <div
@@ -172,23 +170,30 @@
           label: '简体中文',
           type: 'zh'
         },
-        langs: [
-          {
-            key: 1,
-            label: '简体中文',
-            type: 'zh'
-          },
-          {
-            key: 2,
-            label: 'English',
-            type: 'en'
-          }
-        ],
+        // langs: [
+        //   {
+        //     key: 1,
+        //     label: '简体中文',
+        //     type: 'zh'
+        //   },
+        //   {
+        //     key: 2,
+        //     label: 'English',
+        //     type: 'en'
+        //   }
+        // ],
         currentQualitys: {
           def: 'same'
         }, // 当前清晰度
         qualitysList: [], // 清晰度列表
-        showQualityCard: false
+        showQualityCard: false,
+        languageList: [],
+        playerOtherOptions: {
+          barrage_button: 0,
+          progress_bar: 0,
+          speed: 0,
+          autoplay: false
+        }
       };
     },
     mounted() {
@@ -196,6 +201,7 @@
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
       this.lang = this.$domainStore.state.roomBaseServer.languages.lang;
+      this.languageList = this.$domainStore.state.roomBaseServer.languages.langList;
     },
     computed: {
       // 直播中
@@ -365,7 +371,7 @@
       },
       // 修改多语言
       updateLang() {
-        const newLang = this.langs[this.lang.key == 1 ? 1 : 0];
+        const newLang = this.languageList[this.lang.key == 1 ? 1 : 0];
         localStorage.setItem('lang', newLang.key);
         const params = this.$route.query;
         // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
@@ -418,6 +424,11 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitPlayerUpdateQuality', [item])
         );
+      },
+      // 获取跑马灯、水印等播放器配置
+      getPlayerOtherOptions(options) {
+        this.playerOtherOptions = options;
+        console.log('【playerOtherOptions】', this.playerOtherOptions);
       }
     }
   };
@@ -566,7 +577,7 @@
         align-items: center;
         justify-content: center;
         .item {
-          margin: 0 53px;
+          margin: 0 44px;
           display: flex;
           align-items: center;
           flex-direction: column;
@@ -584,6 +595,7 @@
             font-weight: 400;
             font-size: 24px;
             margin-top: 8px;
+            text-align: center;
           }
         }
       }
