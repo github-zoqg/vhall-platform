@@ -112,6 +112,21 @@
       //     'background-color': this.themeClass.pageBg
       //   };
       // },
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+        console.log(skinInfo);
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -199,17 +214,6 @@
       isNoDelay() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       },
-      // 是否是手机端 - 简洁模式
-      isConcise() {
-        let skin_json_wap = {
-          style: 1
-        };
-        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = skinInfo.skin_json_wap;
-        }
-        return !!(skin_json_wap?.style == 3);
-      },
       // 当前连麦+演示模式：0分离模式；1合并模式
       speakerAndShowLayout() {
         let skin_json_wap = {
@@ -293,36 +297,20 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isEmbedVideo || this.embedObj.embedVideo) return;
-        if (this.isConcise) {
-          const h_header = document.querySelector('#header').clientHeight;
-          const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
-          const h_block = document.querySelector('.vmp-block').clientHeight;
-          const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
-          if (h_block == 0) {
-            let classname = '.tab-content';
-            if (this.isEmbed) {
-              classname = '.tab-content-embed';
-            }
-            const tabDom = document.querySelector(classname);
-            if (tabDom) {
-              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
-            }
-          }
-        } else {
-          let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
-          // postcss 换算基数为75 头部+播放器区域高为 522px
-          let playerHeight = this.isSmallPlayer == true ? 130 : 422;
-          let baseHeight = playerHeight + 71 + 94;
-          let classname = '.tab-content';
-          if (this.embedObj.embed) {
-            baseHeight = playerHeight;
-            classname = '.tab-content-embed';
-          }
-          let popHeight =
-            document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
-          document.querySelector(classname).style.height = popHeight;
+        if (this.isSubscribe || this.isConcise || this.isEmbedVideo || this.embedObj.embedVideo)
+          return;
+        let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
+        // postcss 换算基数为75 头部+播放器区域高为 522px
+        let playerHeight = this.isSmallPlayer == true ? 130 : 422;
+        let baseHeight = playerHeight + 71 + 94;
+        let classname = '.tab-content';
+        if (this.embedObj.embed) {
+          baseHeight = playerHeight;
+          classname = '.tab-content-embed';
         }
+        let popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+        document.querySelector(classname).style.height = popHeight;
       },
       computedWidth() {
         if (this.isEmbedVideo) return;
@@ -529,11 +517,18 @@
       },
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
-
-        const chatIndex = this.menu.findIndex(el => el.type === 3);
-        const hasMember = this.menu.includes(el => el.type === 'notice');
-        if (chatIndex <= -1) return;
-        const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        let index = 0;
+        if (this.isConcise) {
+          // 极简风格，菜单顺序：问答>私聊>简介
+          index = 0;
+        } else {
+          // 查找聊天的下标区域
+          const chatIndex = this.menu.findIndex(el => el.type === 3);
+          // 是否包含广告位置
+          const hasMember = this.menu.includes(el => el.type === 'notice');
+          if (chatIndex <= -1) return;
+          index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        }
         const QAName =
           this.roleName == 1 ||
           !roomState.interactToolStatus.question_name ||

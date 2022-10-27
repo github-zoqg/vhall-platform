@@ -128,7 +128,7 @@
     position: relative;
     font-size: 28px;
     .vh-line-audit {
-      padding-right: 8px;
+      padding-right: 12px;
       border-right: 3px solid var(--theme-chat-input-placeholder-font);
     }
   }
