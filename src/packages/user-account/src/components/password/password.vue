@@ -23,7 +23,7 @@
           <p v-else class="vmp-user-account-pwd__sTitle">{{ $t('account.account_1038') }}</p>
           <el-form-item v-if="pwdData.type == 'edit'" key="old_pwd" prop="old_pwd">
             <el-input
-              type="password"
+              :type="pwdCaptVo.old_pwd_show ? 'password' : 'text'"
               v-model.trim="pwdForm.old_pwd"
               clearable
               :placeholder="!pwdCaptVo.old_pwd_focus ? $t('account.account_1039') : ''"
@@ -53,7 +53,7 @@
           </el-form-item>
           <el-form-item key="pasword" prop="password">
             <el-input
-              type="password"
+              :type="pwdCaptVo.pwd_show ? 'password' : 'text'"
               v-model.trim="pwdForm.password"
               clearable
               :placeholder="
@@ -89,7 +89,7 @@
           </el-form-item>
           <el-form-item key="new_password" prop="new_password">
             <el-input
-              type="password"
+              :type="pwdCaptVo.new_pwd_show ? 'password' : 'text'"
               v-model.trim="pwdForm.new_password"
               clearable
               :placeholder="
