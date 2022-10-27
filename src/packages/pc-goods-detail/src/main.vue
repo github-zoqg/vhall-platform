@@ -57,6 +57,7 @@
 </template>
 
 <script>
+  import { useGoodServer } from 'middle-domain';
   export default {
     name: 'VmpGoodDetailPc',
     data() {
@@ -85,18 +86,42 @@
        * 访问店铺
        */
       link(val) {
-        window.open(val);
+        useGoodServer()
+          .getGoodDetail({
+            webinar_id: this.$route.params.id,
+            goods_id: this.info.goods_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              window.open(val);
+            } else {
+              this.$message.warning(this.$t('nav.nav_1056'));
+              this.handleClose();
+            }
+          });
       },
       /**
        * 购买
        */
       handleBuy(info) {
-        window.open(info.goods_url);
-        // 数据埋点
-        window.vhallReportForWatch?.report(170030, {
-          goods_id: info.goods_id,
-          goods_name: encodeURIComponent(info.name)
-        });
+        useGoodServer()
+          .getGoodDetail({
+            webinar_id: this.$route.params.id,
+            goods_id: this.info.goods_id
+          })
+          .then(res => {
+            if (res.code == 200) {
+              window.open(info.goods_url);
+              // 数据埋点
+              window.vhallReportForWatch?.report(170030, {
+                goods_id: info.goods_id,
+                goods_name: encodeURIComponent(info.name)
+              });
+            } else {
+              this.$message.warning(this.$t('nav.nav_1056'));
+              this.handleClose();
+            }
+          });
       },
       chooseDefaultImg(index) {
         this.defaultImg = this.info.img_list[index].img_url;

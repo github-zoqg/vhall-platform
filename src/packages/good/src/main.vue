@@ -58,7 +58,8 @@
         total: 0,
         pageLock: false,
         showBottom: false,
-        bottomText: ''
+        bottomText: '',
+        goodsListJson: []
       };
     },
     computed: {
@@ -101,6 +102,8 @@
         } else {
           wrap.addEventListener('scroll', this.scrollLoadGoodsList, true);
         }
+        // 商品更新
+        this.goodServer.$on('goods_update_info', data => this.queryGoodsListJson(data));
       },
       scrollLoadGoodsList: debounce(function (e) {
         if (this.isSubscribe) {
@@ -168,7 +171,7 @@
         window.open(good.goods_url);
       },
       queryGoodsList() {
-        if (this.pageLock || this.pos + this.limit >= this.total) {
+        if (this.pageLock || this.goodsList.length >= this.total) {
           return false;
         }
         this.pageLock = true;
@@ -216,8 +219,8 @@
           this.goodsList = list;
         }
         this.total = data.total;
-        this.pos = data.pos;
-        this.limit = data.limit;
+        // this.pos = data.pos;
+        // this.limit = data.limit;
       },
       clearBottomInfo() {
         if (this.pos + this.limit >= this.total) {
@@ -227,6 +230,43 @@
           this.bottomText = '';
           this.showBottom = false;
         }
+      },
+      //
+      queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
+        // 开启自定义菜单
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowGoodsTab', [{ type: 5 }])
+        );
+
+        this.goodServer
+          .queryGoodsListJson({
+            url: data.data.cnd_url
+          })
+          .then(res => {
+            console.log(res, this.goodServer.state.goodsListJson, 'goodsListJson');
+            this.goodsListJson = res.goods_list;
+            this.total = res.total;
+            this.clearBottomInfo();
+            this.analogPage('msg');
+          })
+          .catch(() => {
+            this.clearBottomInfo();
+          });
+      },
+      // 分页模拟
+      analogPage(type) {
+        console.log('analogPage', this.pos);
+        this.goodsList = this.goodsListJson.slice(0, this.pos + 10);
+        this.goodsList.forEach(item => {
+          if (item.discount_price && Number(item.discount_price) > 0) {
+            item.showDiscountPrice = true;
+            item.discoutText = this.filterDiscout(item.discount_price);
+          } else {
+            item.showDiscountPrice = false;
+          }
+          item.priceText = this.filterDiscout(item.price);
+        });
       }
     },
     destroyed() {
@@ -432,14 +472,16 @@
         .vh-goods_item-cover {
           width: 200px;
           height: 200px;
+          padding: 20px;
           border-top-right-radius: 0px;
           border-bottom-right-radius: 0px;
           overflow: hidden;
           display: inline-block;
           img {
             display: block;
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
+            border: 1px solid #eee;
             object-fit: scale-down;
             border-top-right-radius: 0px;
             border-bottom-right-radius: 0px;

@@ -109,7 +109,8 @@
         num: 1,
         limit: 10,
         pos: 0,
-        totalPages: 0
+        totalPages: 0,
+        goodsListJson: []
       };
     },
     computed: {
@@ -136,6 +137,9 @@
       //     });
       //   }
       // });
+      this.goodServer.$on('goods_update_info', data => {
+        this.queryGoodsListJson(data);
+      });
     },
     mounted() {
       this.initConfig();
@@ -253,6 +257,45 @@
           console.log('当前是手机端打开-其它');
           window.open(url, '_blank');
         }
+      },
+      //
+      queryGoodsListJson(data) {
+        // console.log(data, 'queryGoodsListJson');
+        // 开启自定义菜单
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitShowGoodsTab', [{ type: 5 }])
+        );
+        this.goodServer
+          .queryGoodsListJson({
+            url: data.data.cnd_url
+          })
+          .then(res => {
+            console.log(res, 'goodsListJson');
+            this.goodsListJson = res.goods_list;
+            this.total = res.total;
+            this.loading = false;
+            this.analogPage();
+          });
+      },
+      // 分页模拟
+      analogPage(type) {
+        // console.log('analogPage', this.pos);
+        // if (type == 'msg') {
+        this.goodsList = this.goodsListJson.slice(0, this.pos + 10);
+        this.goodsList.map(item => {
+          if (item.discount_price && Number(item.discount_price) > 0) {
+            item.showDiscountPrice = true;
+            item.discountText = this.filterDiscount(item.discount_price);
+          } else {
+            item.showDiscountPrice = false;
+          }
+          item.priceText = this.filterDiscount(item.price);
+        });
+        // } else {
+        //   this.goodsList = this.goodsList.concat(
+        //     this.goodsListJson.slice(this.pos, this.limit + this.pos)
+        //   );
+        // }
       }
     }
   };

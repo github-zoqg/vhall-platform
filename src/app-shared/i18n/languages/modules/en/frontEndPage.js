@@ -166,7 +166,8 @@ export default {
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
     nav_1054: 'Audience simulated viewing address during rehearsal',
-    nav_1055: 'in rehearsal'
+    nav_1055: 'in rehearsal',
+    nav_1056: 'Has been off the shelves'
   },
   login: {
     login_1001: 'Account login',
