@@ -750,8 +750,9 @@
         }
       },
       // setVisible的外层封装
-      setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
+      async setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
         this.setVisible({ visible, type, id, name });
+        await this.$nextTick();
         if (this.visibleMenu && this.visibleMenu.length > 0) {
           // 默认显示菜单中的第一个
           this.selectDefault();
