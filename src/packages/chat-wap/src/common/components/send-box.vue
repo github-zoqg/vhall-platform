@@ -570,6 +570,7 @@
         }
         .span__speak__disable {
           color: #bfbfbf;
+          padding-left: 12px;
         }
       }
 

@@ -309,6 +309,9 @@
           baseHeight = playerHeight;
           classname = '.tab-content-embed';
         }
+        let popHeight =
+          document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
+        document.querySelector(classname).style.height = popHeight;
       },
       computedWidth() {
         if (this.isEmbedVideo) return;
