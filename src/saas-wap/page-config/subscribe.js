@@ -127,6 +127,11 @@ export default {
       cuid: ['comGoodsDetail'],
       method: 'open',
       args: ['$0']
+    },
+    emitShowGoodsTab: {
+      cuid: ['comSubcribeTabMenuWap'],
+      method: 'setGoodsVisibleAndSelect',
+      args: ['$0']
     }
   },
   // 推荐组件

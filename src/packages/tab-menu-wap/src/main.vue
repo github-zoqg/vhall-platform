@@ -749,6 +749,16 @@
           document.msExitFullscreen();
         }
       },
+      // setVisible的外层封装
+      setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
+        this.setVisible({ visible, type, id, name });
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
+        }
+      },
       // 极简模式下，弹出框点开后初始化宽度计算效果。
       async menuDialogComputed() {
         if (this.isEmbedVideo) return;
