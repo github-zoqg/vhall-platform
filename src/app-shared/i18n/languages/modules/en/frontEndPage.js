@@ -95,7 +95,7 @@ export default {
     appointment_1017: 'Reserve Now',
     appointment_1018: '{n} Reserved',
     appointment_1019: "Nothing's here",
-    appointment_1020: 'Permission validation',
+    appointment_1020: 'Watch verification',
     appointment_1021: 'Wrong password',
     appointment_1022: 'Please enter the password',
     appointment_1023: 'Pay {n}',
