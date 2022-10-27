@@ -431,7 +431,7 @@
       height: 356px;
       &.chat-emoji__qa,
       &.chat-emoji__private {
-        height: 296px;
+        height: 250px;
       }
       box-sizing: border-box;
       overflow-y: scroll;
