@@ -304,7 +304,7 @@
         margin-right: 8px;
         border-radius: 4px;
         overflow: hidden;
-        background: #000000;
+        // background: #000000;
         img {
           display: block;
           width: 100%;
