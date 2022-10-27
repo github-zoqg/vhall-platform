@@ -455,7 +455,7 @@
       }
       &__attention {
         margin-left: 12px;
-        padding: 8px 16px;
+        padding: 11px 16px;
         border-radius: 30px;
         color: var(--theme-header-attention-color);
         font-size: 24px;
@@ -560,7 +560,7 @@
   }
   .more-van-popup {
     .more-content {
-      padding: 65px 0;
+      padding: 67px 0 0;
       .list {
         display: flex;
         align-items: center;
@@ -588,7 +588,8 @@
         }
       }
       .cancel {
-        margin-top: 37px;
+        margin-top: 32px;
+        padding: 39px 0;
         font-weight: 400;
         font-size: 32px;
         text-align: center;
@@ -597,6 +598,21 @@
   }
   .quality-van-popup {
     .quality-content {
+      .list {
+        .item {
+          width: 100%;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 400;
+          font-size: 32px;
+          color: #262626;
+          &.active {
+            color: #fb2626;
+          }
+        }
+      }
     }
   }
 </style>

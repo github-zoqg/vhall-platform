@@ -1,5 +1,4 @@
 import screenfull from 'screenfull';
-import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
 const playerMixins = {
   data() {
