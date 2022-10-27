@@ -788,6 +788,12 @@
               this.play();
             }
           }
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerQuality', [
+              this.currentQualitys,
+              this.qualitysList
+            ])
+          );
           // this.$nextTick(() => {
           //   if (this.water && this.water.watermark_open == 1 && !this.isWarnPreview) {
           //     const watermarkContainer = document.getElementById('vh-watermark-container');

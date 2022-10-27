@@ -50,26 +50,104 @@
         >
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
+        <!-- 更多 -->
+        <span class="vh-concise-header-box__tool-box__btn" v-if="isFullScreen">
+          <i class="vh-iconfont vh-full-more" @click="openMore"></i>
+        </span>
       </section>
     </section>
     <!-- 不显示头部，只显示在线人数和热度的情况 -->
     <section class="vh-concise-header-box__2" v-else>
-      <!-- 在线人数\热度 -->
-      <div
-        class="host-user-info__middle-num"
-        v-if="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
-      >
-        <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-        <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
-          <i class="vh-iconfont vh-line-user"></i>
-          <span>{{ personCount | formatHotNum }}</span>
-        </p>
-        <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
-          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          <span>{{ hotNum | formatHotNum }}</span>
-        </p>
-      </div>
+      <section class="host-user-info">
+        <!-- 在线人数\热度 -->
+        <div
+          class="host-user-info__middle-num"
+          v-if="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
+        >
+          <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+          <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
+            <i class="vh-iconfont vh-line-user"></i>
+            <span>{{ personCount | formatHotNum }}</span>
+          </p>
+          <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
+            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+            <span>{{ hotNum | formatHotNum }}</span>
+          </p>
+        </div>
+      </section>
+      <section class="vh-concise-header-box__tool-box" v-if="isFullScreen">
+        <!-- 更多 -->
+        <span class="vh-concise-header-box__tool-box__btn">
+          <i class="vh-iconfont vh-full-more" @click="openMore"></i>
+        </span>
+      </section>
     </section>
+    <van-popup
+      class="more-van-popup"
+      v-model="showMoreCard"
+      get-container="#app"
+      safe-area-inset-bottom
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="more-content">
+        <div class="list">
+          <div class="item">
+            <div class="iconGroup" @click="updateBarrage">
+              <span
+                :class="`vh-iconfont ${
+                  danmuIsOpen ? 'vh-line-barrage-on1' : 'vh-line-barrage-off1'
+                }`"
+              ></span>
+            </div>
+            <div class="text">{{ danmuIsOpen ? $t('nav.nav_1057') : $t('nav.nav_1058') }}</div>
+          </div>
+          <div class="item">
+            <div class="iconGroup" @click="updateLang">
+              <span :class="`vh-iconfont ${lang.key == 1 ? 'vh-line_en' : 'vh-line_cn'}`"></span>
+            </div>
+            <div class="text">{{ langs[lang.key == 1 ? 1 : 0].label }}</div>
+          </div>
+          <div class="item">
+            <div
+              class="iconGroup"
+              @click="
+                showQualityCard = true;
+                showMoreCard = false;
+              "
+            >
+              <span class="vh-iconfont vh-line_hd"></span>
+            </div>
+            <div class="text">{{ formatQualityText(currentQualitys.def) }}</div>
+          </div>
+        </div>
+        <div class="cancel" @click="showMoreCard = false">{{ $t('account.account_1063') }}</div>
+      </div>
+    </van-popup>
+    <van-popup
+      class="quality-van-popup"
+      v-model="showQualityCard"
+      get-container="#app"
+      safe-area-inset-bottom
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="quality-content">
+        <div class="list">
+          <div
+            class="item"
+            v-for="item in qualitysList"
+            :key="item.def"
+            :class="{ active: currentQualitys.def == item.def }"
+            @click="changeQualitys(item)"
+          >
+            {{ formatQualityText(item.def) }}
+          </div>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -86,13 +164,38 @@
         attentionStatus: 0, // 关注状态
         // headInfo: null,
         // showSponsor: true,
-        userInfo: {}
+        userInfo: {},
+        showMoreCard: false,
+        danmuIsOpen: false, // 弹幕是否开启
+        lang: {
+          key: 1,
+          label: '简体中文',
+          type: 'zh'
+        },
+        langs: [
+          {
+            key: 1,
+            label: '简体中文',
+            type: 'zh'
+          },
+          {
+            key: 2,
+            label: 'English',
+            type: 'en'
+          }
+        ],
+        currentQualitys: {
+          def: 'same'
+        }, // 当前清晰度
+        qualitysList: [], // 清晰度列表
+        showQualityCard: false
       };
     },
     mounted() {
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
+      this.lang = this.$domainStore.state.roomBaseServer.languages.lang;
     },
     computed: {
       // 直播中
@@ -250,6 +353,71 @@
               this.attentionStatus = 1;
             });
         }
+      },
+      // 打开更多
+      openMore() {
+        this.showMoreCard = true;
+      },
+      // 开启/关闭弹幕
+      updateBarrage() {
+        this.danmuIsOpen = !this.danmuIsOpen;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitPlayerDoBarrage'));
+      },
+      // 修改多语言
+      updateLang() {
+        const newLang = this.langs[this.lang.key == 1 ? 1 : 0];
+        localStorage.setItem('lang', newLang.key);
+        const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
+        if (params.lang) {
+          params.lang = newLang.key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
+      },
+      formatQualityText(val) {
+        let text;
+        switch (val) {
+          case 'same':
+            text = this.$t('player.player_1002');
+            break;
+          case '720p':
+            text = this.$t('player.player_1005');
+            break;
+          case '480p':
+            text = this.$t('player.player_1003');
+            break;
+          case 'a':
+            text = this.$t('player.player_1006');
+            break;
+          case '360p':
+            text = this.$t('player.player_1004');
+            break;
+          default:
+            text = this.$t('player.player_1004');
+        }
+        return text;
+      },
+      getQualitys(currentQualitys, qualitysList) {
+        console.log('==-=-=-=-=-=-=-=', currentQualitys, qualitysList);
+        this.currentQualitys = currentQualitys;
+        this.qualitysList = qualitysList;
+      },
+      // 修改视频清晰度
+      changeQualitys(item) {
+        this.showQualityCard = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerUpdateQuality', [item])
+        );
       }
     }
   };
@@ -357,21 +525,26 @@
       }
     }
     &__2 {
-      display: inline-flex;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 6px 16px;
-      font-size: 20px;
-      line-height: 20px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 40px;
-      margin-left: 24px;
-      margin-top: 16px;
-      .host-user-info__middle-num {
-        margin-top: 0;
+      .host-user-info {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 16px;
+        font-size: 20px;
+        line-height: 20px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 40px;
+        margin-left: 24px;
+        margin-top: 16px;
+        .host-user-info__middle-num {
+          margin-top: 0;
+        }
       }
     }
     &.isFullScreen {
-      .vh-concise-header-box__2 {
+      .vh-concise-header-box__2 .host-user-info {
         margin: 0;
         padding: 18px 0;
         background: none;
@@ -383,6 +556,47 @@
           border-radius: 40px;
         }
       }
+    }
+  }
+  .more-van-popup {
+    .more-content {
+      padding: 65px 0;
+      .list {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .item {
+          margin: 0 53px;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          .iconGroup {
+            width: 72px;
+            height: 72px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+          }
+          .text {
+            font-weight: 400;
+            font-size: 24px;
+            margin-top: 8px;
+          }
+        }
+      }
+      .cancel {
+        margin-top: 37px;
+        font-weight: 400;
+        font-size: 32px;
+        text-align: center;
+      }
+    }
+  }
+  .quality-van-popup {
+    .quality-content {
     }
   }
 </style>

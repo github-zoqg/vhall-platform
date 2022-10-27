@@ -32,6 +32,19 @@ export default {
         cuid: 'comOfficial',
         method: 'openOfficial'
       }
+    ],
+    emitPlayerDoBarrage: [
+      {
+        cuid: 'comWapPlayer',
+        method: 'openBarrage'
+      }
+    ],
+    emitPlayerUpdateQuality: [
+      {
+        cuid: 'comWapPlayer',
+        method: 'changeQualitys',
+        args: ['$0']
+      }
     ]
   },
   // 颈部容器
@@ -86,6 +99,13 @@ export default {
         cuid: 'comWapCenter',
         method: 'updatePlayStatus',
         args: ['$0']
+      }
+    ],
+    emitPlayerQuality: [
+      {
+        cuid: 'comHeaderWatch',
+        method: 'getQualitys',
+        args: ['$0', '$1']
       }
     ]
   },

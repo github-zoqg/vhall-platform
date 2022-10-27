@@ -1,4 +1,6 @@
 import screenfull from 'screenfull';
+import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+
 const playerMixins = {
   data() {
     return {
@@ -325,6 +327,7 @@ const playerMixins = {
     },
     // 修改视频清晰度
     changeQualitys(item) {
+      console.log(item);
       let sucess = true;
       this.playerServer.setQuality(item, err => {
         sucess = false;
