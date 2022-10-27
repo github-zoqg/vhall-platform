@@ -698,7 +698,7 @@
   }
   .vmp-chat-wap-concise {
     height: 100%;
-    overflow: hidden;
+    // overflow: hidden;
     position: relative;
     .virtual-content {
       height: 100%;
