@@ -370,7 +370,7 @@
             this.applyTime = 30;
             this._applyInterval = setInterval(() => {
               this.applyTime = this.applyTime - 1;
-              if (this.applyTime == 0 && !this._applyInterval) {
+              if (this.applyTime == 0 && this._applyInterval) {
                 this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
                 clearInterval(this._applyInterval);
                 this.isApplying = false;
