@@ -2,8 +2,8 @@
   <section class="vmp-custom-menu">
     <div v-show="!loading" class="vmp-custom-menu-wrapper">
       <component
-        v-for="(block, index) in customTabs"
         :is="block.componentName"
+        v-for="(block, index) in customTabs"
         :key="index"
         :info="block"
         :room-id="roomId"
@@ -98,8 +98,14 @@
     &-wrapper {
       height: 100%;
       width: 100%;
-      padding: 16px 30px 100px 30px;
       overflow: auto;
+      padding: 0 30px 100px 30px;
+      section:first-child {
+        &.rank-list {
+          margin-left: -30px;
+          margin-right: -30px;
+        }
+      }
     }
   }
 </style>

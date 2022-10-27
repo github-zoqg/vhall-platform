@@ -148,7 +148,7 @@
 
 <script>
   import { useCustomMenuServer } from 'middle-domain';
-
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'component-rank',
     props: {
@@ -161,7 +161,7 @@
         bangdan1: require('../assets/imgs/bangdan-1.png'),
         bangdan2: require('../assets/imgs/bangdan-2.png'),
         bangdan3: require('../assets/imgs/bangdan-3.png'),
-        avatar: require('../assets/imgs/avatar.png'),
+        avatar: defaultAvatar,
 
         loading: false,
         pageLock: false,

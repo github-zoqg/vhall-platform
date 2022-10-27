@@ -122,9 +122,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
-                    <!-- <div class="lf-content"> -->
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -185,8 +183,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -271,8 +268,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -308,8 +304,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -403,8 +398,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -440,8 +434,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -526,8 +519,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -595,8 +587,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -760,6 +751,7 @@
 </template>
 
 <script>
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import {
     useRoomBaseServer,
     useQaAdminServer,
@@ -770,7 +762,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
-  import { textToEmoji } from '@/packages/chat/src/js/emoji';
+  import { textToEmoji } from '@/packages/chat/src/common/js/emoji';
   import { getQueryString } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -825,7 +817,8 @@
           visible: false,
           confirm: true,
           type: null
-        }
+        },
+        defaultAvatar
       };
     },
     computed: {

@@ -43,10 +43,10 @@
     useMsgServer,
     useMenuServer
   } from 'middle-domain';
-  import sendBox from '@/packages/chat-wap/src/components/send-box';
+  import sendBox from '@/packages/chat-wap/src/common/components/send-box';
   import VirtualList from 'vue-virtual-scroll-list';
   import emitter from '@/app-shared/mixins/emitter';
-  import EventBus from '@/packages/chat-wap/src/js/Events.js';
+  import EventBus from '@/packages/chat-wap/src/common/js/Events.js';
   import { isMse } from '@/app-shared/utils/isMse';
   export default {
     name: 'VmpWapPrivateChat',
@@ -112,7 +112,7 @@
     },
     watch: {
       //观察私聊列表变动，如果有新消息，滚动到底部
-      chatList: function () {
+      privateChatList: function () {
         // if (this.isBottom()) {
         this.scrollBottom();
         // }
@@ -235,7 +235,7 @@
       },
       //滚动到目标处
       scrollToTarget() {
-        const index = this.chatList.length - this.unReadMessageCount;
+        const index = this.privateChatList.length - this.unReadMessageCount;
         this.$refs.chatlist.scrollToIndex(index);
         this.unReadMessageCount = 0;
         this.isHasUnreadAtMeMsg = false;

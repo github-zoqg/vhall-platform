@@ -2,6 +2,10 @@
   <div
     id="vmp-wap-desktop-screen-wrap"
     class="vmp-wap-desktop-screen"
+    :class="{
+      'vmp-wap-desktop-main-screen': isMergeMode,
+      'vmp-wap-desktop-main-screen-top': isMergeMode && !isSpeakOn
+    }"
     v-show="isShareScreen"
     @click.stop="showMask"
   >
@@ -45,6 +49,13 @@
       // 互动是否初始化完成
       isInstanceInit() {
         return this.$domainStore.state.interactiveServer.isInstanceInit;
+      },
+      // 是否是合并模式
+      isMergeMode() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     watch: {
@@ -209,6 +220,18 @@
         font-size: 16px;
         color: #999;
       }
+    }
+  }
+  // 合并模式下，桌面共享只占主画面
+  @desk-w: 597px;
+  @desk-h: 337px;
+  .vmp-wap-desktop-main-screen {
+    width: @desk-w;
+    height: @desk-h;
+    left: calc((100% - @desk-w) / 2);
+    top: 85px;
+    &-top {
+      top: 0;
     }
   }
 </style>

@@ -31,7 +31,7 @@
 <script>
   import { useAttentionServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
 
   export default {
     name: 'VmpHeaderWatchWap',
@@ -123,7 +123,7 @@
        */
       setSkinInfo(skin) {
         if (skin && skin.skin_json_wap && skin.status == 1) {
-          const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_wap) || '';
+          const { bgColor, pageStyle, background } = skin.skin_json_wap || '';
           this.themeClass.pageStyle = pageStyle;
           this.themeClass.background = background;
           this.themeClass.bgColor = bgColor;

@@ -108,7 +108,7 @@
     useMenuServer
   } from 'middle-domain';
   import TaskQueue from './taskQueue';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import Sources from './source/index.js';
   // import { uuid } from '@/app-shared/utils/tool';
 

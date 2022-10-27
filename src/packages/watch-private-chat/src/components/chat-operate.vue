@@ -69,9 +69,9 @@
 
 <script>
   import OverlayScrollbars from 'overlayscrollbars';
-  import Emoji from '@/packages/chat/src/components/emoji';
-  import { textToEmoji } from '@/packages/chat/src/js/emoji';
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import Emoji from '@/packages/chat/src/common/components/emoji';
+  import { textToEmoji } from '@/packages/chat/src/common/js/emoji';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'vmpWatchPrivateChatOperate',

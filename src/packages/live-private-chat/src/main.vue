@@ -140,12 +140,12 @@
 </template>
 
 <script>
-  import imgPreview from '@/packages/chat/src/components/img-preview';
-  import emoji from '@/packages/chat/src/components/emoji';
+  import imgPreview from '@/packages/chat/src/common/components/img-preview';
+  import emoji from '@/packages/chat/src/common/components/emoji';
   import chatList from './components/chat-list';
   import comUpload from '@/app-shared/components/com-upload';
   import { useChatServer, useRoomBaseServer } from 'middle-domain';
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpLivePrivateChat',
     components: {

@@ -244,7 +244,7 @@
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
-          skin_json_pc = JSON.parse(skinInfo.skin_json_pc);
+          skin_json_pc = skinInfo.skin_json_pc;
         }
 
         // if (skin_json_pc?.chatLayout == 2) {
