@@ -104,7 +104,7 @@
     <login-wap ref="loginWap"></login-wap>
     <!-- 权限弹窗 -->
     <confirm-auth
-      title="权限验证"
+      :title="$t('appointment.appointment_1020')"
       :width="'100%'"
       v-if="isShowCheck"
       @authSubmit="authSubmit"
