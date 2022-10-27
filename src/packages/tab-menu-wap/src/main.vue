@@ -491,7 +491,9 @@
           this.setVisible({ visible: val, type: 2 });
           if (val) {
             const obj = this.getItem({ type: 2 });
-            this.select({ type: obj.type, id: obj.id });
+            if (obj) {
+              this.select({ type: obj.type, id: obj.id });
+            }
           } else {
             this.roomBaseServer.state.isWapBodyDocSwitch = false;
           }

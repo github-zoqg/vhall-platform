@@ -68,13 +68,7 @@ export default {
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: [
-      'comWapPlayer',
-      'comWapStreamList',
-      'comWapDesktopScreen',
-      'comWapInsertFIle',
-      'comDocWap'
-    ]
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
   // 播放器
   comWapPlayer: {
@@ -134,7 +128,8 @@ export default {
     children: ['comChatWap', 'comContainerRight']
   },
   comBodyBlock: {
-    component: 'VmpConciseBodyBlockWap'
+    component: 'VmpConciseBodyBlockWap',
+    children: ['comDocWap']
   },
   comWapCenter: {
     component: 'VmpConciseCenterWap',
