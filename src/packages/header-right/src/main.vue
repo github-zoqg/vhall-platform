@@ -368,23 +368,27 @@
             }
             this.isApplying = true;
             this.applyTime = 30;
-            this._applyInterval = setInterval(async () => {
+            this._applyInterval = setInterval(() => {
               this.applyTime = this.applyTime - 1;
-              if (this.applyTime == 0) {
+              if (this.applyTime == 0 && this._applyInterval) {
                 this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
                 clearInterval(this._applyInterval);
                 this.isApplying = false;
                 window.vhallReportForProduct?.toStartReporting(110160, 110161);
-                const { code, msg, request_id } = await useMicServer().speakOff();
-                window.vhallReportForProduct?.toResultsReporting(110161, {
-                  request_id,
-                  event_type: 'interface',
-                  code,
-                  msg
-                });
-                if (code === 513035) {
-                  this.$message.error(msg);
-                }
+                useMicServer()
+                  .speakOff()
+                  .then(res => {
+                    const { code, msg, request_id } = res;
+                    window.vhallReportForProduct?.toResultsReporting(110161, {
+                      request_id,
+                      event_type: 'interface',
+                      code,
+                      msg
+                    });
+                    if (code === 513035) {
+                      this.$message.error(msg);
+                    }
+                  });
               }
             }, 1000);
           });
