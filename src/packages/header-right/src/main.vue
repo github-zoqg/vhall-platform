@@ -289,7 +289,11 @@
         }
         this.calculateLiveDuration();
         // 补充逻辑：若是网页上显示第三方发起->则直接修改状态至3
-        if (!useMicServer().getSpeakerStatus() || this.isThirdStream) {
+        if (
+          !useMicServer().getSpeakerStatus() ||
+          this.isThirdStream ||
+          watchInitData.rebroadcast.isRebroadcasting
+        ) {
           this.liveStep = 3;
         } else {
           this.liveStep = 2;

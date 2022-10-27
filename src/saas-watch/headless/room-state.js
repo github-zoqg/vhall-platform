@@ -97,6 +97,9 @@ export default async function () {
     (liveMode == 3 || liveMode == 2)
   ) {
     // 获取媒体许可，设置设备状态
+    if (roomBaseServer.state.interactToolStatus.video_polling) {
+      await mediaCheckServer.getMediaInputPermission({ isNeedBroadcast: false });
+    }
     useVideoPollingServer().init({ isWatch: true });
   }
 
