@@ -159,7 +159,7 @@ export default {
     },
     emitShowGoodsTab: {
       cuid: ['comSubscribeTabMenu'],
-      method: 'setVisible',
+      method: 'setGoodsVisibleAndSelect',
       args: ['$0']
     }
   },
