@@ -10,5 +10,6 @@
 export const bu_appId = {
   test_new: 'f14ed109',
   test: 'fd8d3653',
+  development: 'fd8d3653',
   production: '15df4d3f'
 };
