@@ -8,6 +8,7 @@ export default {
     children: [
       'comWapBody',
       'comHeaderWatch',
+      'layerJaw',
       'layerNeck',
       'layerBody',
       'layerBodyBlock',
@@ -46,6 +47,11 @@ export default {
         args: ['$0']
       }
     ]
+  },
+  layerJaw: {
+    component: 'VmpContainer',
+    className: 'vmp-basic-jaw',
+    children: ['comContainerRight']
   },
   // 颈部容器
   layerNeck: {
@@ -125,7 +131,7 @@ export default {
   },
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
-    children: ['comChatWap', 'comContainerRight']
+    children: ['comChatWap']
   },
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap',
