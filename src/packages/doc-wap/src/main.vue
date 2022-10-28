@@ -126,7 +126,8 @@
         isPortrait: true, // 是否是竖屏  设备
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
-        showTools: false
+        showTools: false,
+        isShowPoster: true
       };
     },
     computed: {
@@ -175,7 +176,11 @@
       },
       // 是否观众可见
       switchStatus() {
-        return this.docServer.state.switchStatus;
+        if (this.isFullScreen) {
+          return this.docServer.state.switchStatus && !this.isShowPoster;
+        } else {
+          return this.docServer.state.switchStatus;
+        }
       },
       // 页码
       pageNum() {
@@ -548,6 +553,9 @@
           //设备横向 旋转即退出全屏
           this.fullscreen();
         }
+      },
+      getPlayerPoster(val) {
+        this.isShowPoster = val;
       }
     },
     beforeDestroy() {

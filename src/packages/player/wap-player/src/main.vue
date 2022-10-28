@@ -15,7 +15,9 @@
         </div>
         <!-- 播放 按钮 -->
         <div
-          v-show="!isPlayering && !isVodEnd && !isSmallPlayer && !isFullScreen"
+          v-show="
+            !isPlayering && !isVodEnd && !isSmallPlayer && (!isFullScreen || (mini && isFullScreen))
+          "
           class="vmp-wap-player-pause"
         >
           <p @click="startPlay">
@@ -80,7 +82,7 @@
             <span v-if="!isConcise || !isFullScreen" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
-            <span>
+            <span v-if="!isFullScreen">
               <span class="hot_num hot_num_display">
                 <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                 {{ hotNum | formatHotNum }}
@@ -488,7 +490,8 @@
         imageCropperMode: 1,
         circleSliderVal: 0,
         initIndex,
-        isConcise: false //判断是否是极简模式
+        isConcise: false, //判断是否是极简模式
+        mini: false // mini播放器
       };
     },
     watch: {
@@ -538,6 +541,11 @@
       isPlayering() {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitPlayerStatus', [this.isPlayering])
+        );
+      },
+      isShowPoster() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
         );
       }
     },
@@ -983,6 +991,9 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeChatHeight', [data])
         );
+      },
+      getPlayerMini(val) {
+        this.mini = val;
       }
     }
   };
@@ -1501,5 +1512,10 @@
     .small_player {
       height: 130px !important;
     }
+  }
+
+  .isMini .vmp-wap-player-pause p {
+    width: 54px;
+    height: 54px;
   }
 </style>

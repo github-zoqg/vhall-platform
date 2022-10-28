@@ -4,7 +4,8 @@
     :class="[
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
-      isFullScreen ? 'isFullScreen' : ''
+      isFullScreen ? 'isFullScreen' : '',
+      mini ? 'isMini' : ''
     ]"
   >
     <!-- 直播结束 -->
@@ -101,7 +102,7 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   import alertBox from '@/app-shared/components/confirm.vue';
   export default {
@@ -117,7 +118,8 @@
         imageCropperMode: 1,
         isLivingEnd: false,
         mini: false,
-        isShowLiveStartNotice: false
+        isShowLiveStartNotice: false,
+        isShowPoster: true
       };
     },
     computed: {
@@ -238,17 +240,46 @@
       },
       // 是否开启文档主画面
       isDocMainScreen() {
-        return (
-          this.$domainStore.state.docServer.switchStatus &&
-          this.$domainStore.state.interactiveServer.isInstanceInit &&
-          this.webinarType == 1 &&
-          !!this.$domainStore.state.docServer.currentCid &&
-          this.isMergeMode
-        );
+        if (this.isFullScreen) {
+          return (
+            this.$domainStore.state.docServer.switchStatus &&
+            this.webinarType == 1 &&
+            !!this.$domainStore.state.docServer.currentCid
+          );
+        } else {
+          return (
+            this.$domainStore.state.docServer.switchStatus &&
+            this.$domainStore.state.interactiveServer.isInstanceInit &&
+            this.webinarType == 1 &&
+            !!this.$domainStore.state.docServer.currentCid &&
+            this.isMergeMode
+          );
+        }
       },
       // 竖屏直播
       isFullScreen() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 竖屏，是否显示文档，文档播放器是否互换位置
+      updateMini() {
+        const { isFullScreen, isDocMainScreen, isWapBodyDocSwitch, isShowPoster } = this;
+        return { isFullScreen, isDocMainScreen, isWapBodyDocSwitch, isShowPoster };
+      }
+    },
+    watch: {
+      updateMini(val) {
+        console.log('【isFullScreen, isDocMainScreen, isWapBodyDocSwitch,isShowPoster】：', val);
+        if (
+          val.isFullScreen &&
+          val.isDocMainScreen &&
+          !val.isWapBodyDocSwitch &&
+          !val.isShowPoster
+        ) {
+          this.mini = true;
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerMini', [this.mini])
+          );
+        }
       }
     },
     beforeCreate() {
@@ -426,6 +457,9 @@
           // 此时调用完，设备状态要么是1  要么是2
           await this.checkMediaPermission();
         }
+      },
+      getPlayerPoster(val) {
+        this.isShowPoster = val;
       }
     }
   };
@@ -605,6 +639,18 @@
       position: fixed;
       top: 0;
       left: 0;
+      &.isMini {
+        z-index: 9999;
+        width: 0;
+        height: 0;
+      }
+      .vmp-wap-body-mini {
+        top: 16px;
+        right: 16px;
+        left: auto;
+        width: 160px;
+        height: 284px;
+      }
     }
   }
 </style>

@@ -68,7 +68,19 @@ export default {
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle'],
+    emitPlayerMini: [
+      {
+        cuid: 'comWapPlayer',
+        method: 'getPlayerMini',
+        args: ['$0']
+      },
+      {
+        cuid: 'comWapCenter',
+        method: 'getPlayerMini',
+        args: ['$0']
+      }
+    ]
   },
   // 播放器
   comWapPlayer: {
@@ -106,6 +118,18 @@ export default {
       {
         cuid: 'comHeaderWatch',
         method: 'getPlayerOtherOptions',
+        args: ['$0']
+      }
+    ],
+    emitPlayerPoster: [
+      {
+        cuid: 'comWapBody',
+        method: 'getPlayerPoster',
+        args: ['$0']
+      },
+      {
+        cuid: 'comDocWap',
+        method: 'getPlayerPoster',
         args: ['$0']
       }
     ]

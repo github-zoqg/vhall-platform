@@ -16,12 +16,18 @@ export const drag = {
   option: {
     bind(el, binding, vnode) {
       positionParams.el = el;
+      // positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
+      // positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
       // console.log('-----drag - bind-----', el, binding, vnode);
+      // console.log('open inserted', positionParams);
     },
     inserted(el, binding, vnode) {
       // console.log('-----drag - inserted-----', el, binding, vnode);
       if (!binding.value?.close) {
         positionParams.el = el;
+        positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
+        positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
+        // console.log('open inserted', positionParams);
         el.addEventListener('touchstart', doTouchstart);
         el.addEventListener('touchend', doTouchend);
         el.addEventListener('touchmove', doTouchmove);
@@ -31,7 +37,9 @@ export const drag = {
       positionParams.el = el;
       // console.log('-----drag - update-----', el, binding, vnode, oldVnode);
       if (!binding.value?.close) {
-        // console.log('open drag');
+        positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
+        positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
+        // console.log('open drag', positionParams);
         el.addEventListener('touchstart', doTouchstart);
         el.addEventListener('touchend', doTouchend);
         el.addEventListener('touchmove', doTouchmove);

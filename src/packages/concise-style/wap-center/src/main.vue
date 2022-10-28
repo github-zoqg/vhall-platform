@@ -1,7 +1,7 @@
 <template>
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
-    <div v-show="!isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
+    <div v-show="!mini && !isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
       <p @click="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -25,7 +25,8 @@
         isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
-        childrenComp: []
+        childrenComp: [],
+        mini: false
       };
     },
     watch: {},
@@ -50,6 +51,9 @@
       // 改变播放状态
       updatePlayStatus(val) {
         this.isPlayering = val;
+      },
+      getPlayerMini(val) {
+        this.mini = val;
       }
     }
   };
