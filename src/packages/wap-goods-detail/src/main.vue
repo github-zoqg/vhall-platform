@@ -33,10 +33,10 @@
         </div>
       </div>
       <div class="vh-goods-wrapper-detail-btn">
-        <span v-if="info.shop_url" @click.stop="handleBuy(info.shop_url)">
+        <span v-if="info.shop_url" @click.stop="handleBuy('shop_url')">
           {{ $t('menu.menu_1009') }}
         </span>
-        <span @click.stop="handleBuy(info.goods_url)">{{ $t('menu.menu_1007') }}</span>
+        <span @click.stop="handleBuy('goods_url')">{{ $t('menu.menu_1007') }}</span>
       </div>
     </div>
     <!-- 复制口令 -->
@@ -81,7 +81,7 @@
       /**
        * 购买
        */
-      handleBuy(url) {
+      handleBuy(type) {
         useGoodServer()
           .getGoodDetail({
             webinar_id: this.$route.params.id,
@@ -94,7 +94,13 @@
                 goods_id: this.info.goods_id,
                 goods_name: encodeURIComponent(this.info.name)
               });
-              if (this.info.tao_password) {
+              let url = '';
+              if (type == 'goods_url') {
+                url = res.data.goods_url;
+              } else {
+                url = res.data.shop_url;
+              }
+              if (res.data.tao_password) {
                 this.showTaoTip = true;
               } else {
                 if (window.vhallReport) {
