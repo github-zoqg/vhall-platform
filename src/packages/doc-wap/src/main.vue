@@ -7,7 +7,8 @@
       `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
-      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`
+      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
+      isFullScreen ? 'isFullScreen' : ''
     ]"
     :style="{
       height:
@@ -206,6 +207,10 @@
           !!this.$domainStore.state.docServer.currentCid &&
           this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
         );
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     watch: {
@@ -720,6 +725,15 @@
         .vh-iconfont {
           margin-left: 6px;
         }
+      }
+    }
+
+    &.isFullScreen {
+      .pageGroup {
+        margin-top: -64px;
+      }
+      .tools {
+        margin-top: -72px;
       }
     }
 

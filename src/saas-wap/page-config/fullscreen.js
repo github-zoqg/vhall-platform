@@ -133,11 +133,11 @@ export default {
     children: ['comChatWap']
   },
   comBodyBlock: {
-    component: 'VmpConciseBodyBlockWap',
-    children: ['comDocWap']
+    component: 'VmpConciseBodyBlockWap'
   },
   comWapCenter: {
     component: 'VmpConciseCenterWap',
+    children: ['comDocWap'],
     emitPlayerPlay: [
       {
         cuid: 'comWapPlayer',

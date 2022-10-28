@@ -606,16 +606,18 @@
         const vsl = this.$refs.chatlist;
         console.log(IdList);
         this.$nextTick(() => {
-          const offset = IdList.reduce((previousValue, currentSid) => {
-            const previousSize =
-              typeof previousValue === 'string'
-                ? vsl.getSize(Number(previousValue))
-                : previousValue;
-            console.log(previousValue);
-            console.log(vsl.getSize(Number(currentSid)));
-            return previousSize + vsl.getSize(Number(currentSid));
-          });
-          vsl.scrollToOffset(offset);
+          if (IdList.length != 0) {
+            const offset = IdList.reduce((previousValue, currentSid) => {
+              const previousSize =
+                typeof previousValue === 'string'
+                  ? vsl.getSize(Number(previousValue))
+                  : previousValue;
+              console.log(previousValue);
+              console.log(vsl.getSize(Number(currentSid)));
+              return previousSize + vsl.getSize(Number(currentSid));
+            });
+            vsl.scrollToOffset(offset);
+          }
         });
         setTimeout(() => {
           this.allowScroll = true;
