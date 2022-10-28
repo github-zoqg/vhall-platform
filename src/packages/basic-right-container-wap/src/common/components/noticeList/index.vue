@@ -10,7 +10,7 @@
       @click="getNoticeList()"
     />
     <slot></slot>
-    <span class="dot" v-if="noticeNum - noticeNumIsWatch">
+    <span :class="'dot' + iconStyle" v-if="noticeNum - noticeNumIsWatch">
       <div align="center">
         {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
       </div>
@@ -206,7 +206,7 @@
     .van-overlay {
       background-color: rgba(0, 0, 0, 0.7) !important;
     }
-    .dot {
+    .dot1 {
       position: absolute;
       top: -10px;
       right: -12px;
@@ -214,12 +214,25 @@
       height: 30px;
       line-height: 33px;
       font-size: 20px;
-      color: white;
+      color: #ffffff;
       background: url(./images/Rectangle.png) no-repeat;
       background-size: 100%;
       div {
         zoom: 0.8;
       }
+    }
+    .dot2 {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      line-height: 18px;
+      text-align: center;
+      font-size: 14px;
+      color: #ffffff;
+      background: #fb2626;
     }
     .popup_base {
       width: 100vw;
