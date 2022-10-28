@@ -101,7 +101,7 @@
                     class="item"
                     :key="`btn${btnItem.type}`"
                     v-if="index < 3"
-                    @click="handleCommand(btnItem.type, scope.row)"
+                    @click="handleCommand(btnItem, scope.row)"
                   >
                     {{ btnItem.name }}
                   </span>
@@ -123,7 +123,7 @@
                     >
                       <template v-for="(btnItem, index) in scope.row.btnList">
                         <el-dropdown-item
-                          :command="btnItem.type"
+                          :command="btnItem"
                           :key="`btn${btnItem.type}`"
                           v-if="index >= 3"
                         >
@@ -247,35 +247,68 @@
         });
       },
       // 更多列表的操作
-      handleCommand(functionName, selectedExam) {
-        if (!functionName) return;
+      handleCommand(btnVo, selectedExam) {
+        if (!btnVo.type) return;
         if (selectedExam) {
           this.selectedExam = selectedExam;
         }
-        eval(`this.${functionName}()`);
+        eval(`this.${btnVo.type}(${btnVo.disabled})`);
       },
       // 下拉框显示是, 中转当前选中变量
       dropDownVisibleChange(row) {
         this.selectedExam = row;
       },
       // 公布
-      publish() {
+      publish(btnIsDisabled) {
         console.log('公布成绩');
+        this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {});
       },
       // 成绩
-      score() {},
+      score(btnIsDisabled) {
+        console.log('公布成绩');
+      },
       // 推送
-      push() {},
+      push(btnIsDisabled) {
+        if (btnIsDisabled) {
+          this.$message.error('已推送快问快答不支持再次推送');
+        } else {
+          // 正常编辑
+        }
+      },
       // 编辑
-      edit() {},
+      edit(btnIsDisabled) {
+        if (btnIsDisabled) {
+          this.$message.error('已推送的快问快答不支持编辑，建议进行「复制」');
+        } else {
+          // 正常编辑
+        }
+      },
       // 收卷
-      close() {},
+      close(btnIsDisabled) {
+        this.$confirm('收卷后将不能继续答卷，确定收卷？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(() => {});
+      },
       // 复制
-      copy() {},
+      copy(btnIsDisabled) {},
       // 预览
-      preview() {},
+      preview(btnIsDisabled) {},
       // 删除
-      del() {},
+      del(btnIsDisabled) {
+        if (btnIsDisabled) {
+          this.$message.error('已推送的快问快答不支持删除');
+        } else {
+          // 正常删除
+        }
+      },
       // 查询列表接口
       initQueryList() {
         this.queryExamList(true);
