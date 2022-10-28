@@ -210,7 +210,7 @@
     bottom: 0;
     width: 100%;
     height: 1114px;
-    z-index: 1001;
+    z-index: 2101;
     border-radius: 32px 32px 0 0;
     margin-bottom: env(safe-area-inset-bottom);
     .vh-goods-wrapper-detail-imgs {

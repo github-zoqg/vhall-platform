@@ -10,14 +10,20 @@
         <div class="tool">
           <img class="good-img" src="./img/icon_good.png" @click="openGoods" />
         </div>
-        <GiftCard
-          @showLogin="showLogin"
-          ref="gifts"
-          :isEmbed="localRoomInfo.isEmbed"
-          :joinInfoInGift="joinInfoInGift"
-          :roomId="localRoomInfo.room_id"
-          :localRoomInfo="localRoomInfo"
-        />
+        <van-popup
+          class="goods-van-popup"
+          v-model="showGoodsCard"
+          get-container="#app"
+          safe-area-inset-bottom
+          round
+          position="bottom"
+          :closeable="false"
+        >
+          <div class="goods-content">
+            <!-- good组件-->
+            <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+          </div>
+        </van-popup>
       </div>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
         <div class="tool">
@@ -128,7 +134,8 @@
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         childrenComp: [],
         visibleMenuLength: 0,
-        isFullScreen: webinarData.webinar_show_type == 0 // 竖屏直播
+        isFullScreen: webinarData.webinar_show_type == 0, // 竖屏直播
+        showGoodsCard: false
       };
     },
     computed: {
@@ -180,7 +187,9 @@
         console.log('当前菜单是否进入', len);
         this.visibleMenuLength = len;
       },
-      openGoods() {}
+      openGoods() {
+        this.showGoodsCard = true;
+      }
     }
   };
 </script>
@@ -243,5 +252,8 @@
         }
       }
     }
+  }
+  .goods-van-popup {
+    height: 1114px;
   }
 </style>

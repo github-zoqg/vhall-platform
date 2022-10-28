@@ -208,7 +208,7 @@ export default {
       cuid: ['compRegLoginWap'],
       method: 'open'
     },
-    children: ['comWapMenuDialog']
+    children: ['comWapMenuDialog', 'comGoodSaasWap']
   },
   // 自定义菜单-简洁mosh
   comWapMenuDialog: {
