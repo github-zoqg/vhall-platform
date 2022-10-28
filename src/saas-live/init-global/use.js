@@ -38,6 +38,7 @@ import VmpRebroadCastStream from '@/packages/rebroadcast-stream';
 import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
+import VmpExam from '@/packages/exam'; // 快问快答
 import VmpSignLive from '@/packages/sign-module/sign-live';
 import VmpQa from '@/packages/qa';
 import VmpRedPacketLive from '@/packages/red-packet/live';
@@ -98,6 +99,7 @@ Vue.use(VmpRebroadCastStream);
 Vue.use(VmpRecommend);
 Vue.use(VmpLotteryLive);
 Vue.use(VmpQuestionnaire);
+Vue.use(VmpExam);
 Vue.use(VmpSignLive);
 Vue.use(VmpQa);
 Vue.use(VmpRecordVideoSuccess);
