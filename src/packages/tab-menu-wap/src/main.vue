@@ -1,5 +1,9 @@
 <template>
-  <section class="vmp-tab-menu" v-if="!embedObj.embedVideo">
+  <section
+    :class="['vmp-tab-menu', isConcise ? ' tab-menu__concise' : '']"
+    v-if="!embedObj.embedVideo"
+    v-show="visibleMenu.length > 0"
+  >
     <!-- <template v-if="isTryVideo && isSubscribe">
       <div class="vmp-tab-menu__try">
         <div class="try-img">
@@ -53,8 +57,13 @@
     </div>
 
     <!-- 正文区域 -->
-    <section class="vmp-tab-menu__main">
-      <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
+    <section class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
+      <tab-content
+        ref="tabContent"
+        :menu="isConcise ? conciseMenu : menu"
+        :auth="auth"
+        @noticeHint="handleHint"
+      />
     </section>
     <!-- </template> -->
   </section>
@@ -74,7 +83,7 @@
   } from 'middle-domain';
   import { getItemEntity } from './js/getItemEntity';
   import tabContent from './components/tab-content.vue';
-
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpTabMenuWap',
     components: { tabContent },
@@ -94,8 +103,7 @@
         themeClass: {
           bgColor: '',
           pageBg: '#fb2626'
-        },
-        isConcise: false
+        }
       };
     },
     computed: {
@@ -104,6 +112,21 @@
       //     'background-color': this.themeClass.pageBg
       //   };
       // },
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const { skinInfo } = this.$domainStore.state.roomBaseServer;
+        console.log(skinInfo);
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       isWatch() {
         return !['send', 'record', 'clientEmbed'].includes(
           this.$domainStore.state.roomBaseServer.clientType
@@ -113,13 +136,14 @@
         return this.visibleMenu.findIndex(item => item.id === this.selectedId);
       },
       visibleMenu() {
-        return this.menu.filter(item => {
+        let otherVisibleMenu = this.menu.filter(item => {
           if (!this.isWatch) {
             // 此处逻辑较复杂，请参考tab-menu/readme.md
             if (item.type == 8 && !this.auth.member) return false; // 成员
             if (item.type == 'notice' && !this.auth.notice) return false; // 公告
           } else {
             if (item.type == 7 && !this.auth.chapter) return false; // 章节
+            if (item.type == 5) return item.visible; // 商品
           }
 
           if (this.pageEnv === 'live-room') {
@@ -129,9 +153,31 @@
           if (this.pageEnv === 'live_over' || this.pageEnv === 'subscribe') {
             return (item.status == 1 || item.status == 4) && item.visible;
           }
-
           return item.visible === true;
         });
+        let conciseVisibleMenu = [];
+        if (this.isConcise) {
+          conciseVisibleMenu = otherVisibleMenu.filter(item => {
+            // 如果是简洁模式，菜单抛开 - 聊天tab
+            if (item.type == 3) return false;
+            // 如果是简洁模式，并且 连麦+演示是 合并模式 - 不展示文档tab
+            if (this.speakerAndShowLayout == 1 && item.type == 2) return false;
+            return item.visible === true;
+          });
+        }
+        let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        console.log('当前菜单个数', visibleMenu.length, this.menu);
+        if (this.isConcise) {
+          // // 告知外部当前可展示的自定义菜单个数
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
+          );
+        }
+        return visibleMenu;
+      },
+      // 简洁模式菜单，因外部已有私聊内容，当前正文区域的渲染，需要绕开私聊部分。
+      conciseMenu() {
+        return this.menu.filter(item => item.type != 3);
       },
       // 是否为嵌入页
       embedObj() {
@@ -168,6 +214,17 @@
       },
       isNoDelay() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
+      },
+      // 当前连麦+演示模式：0分离模式；1合并模式
+      speakerAndShowLayout() {
+        let skin_json_wap = {
+          speakerAndShowLayout: 0
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return skin_json_wap?.speakerAndShowLayout;
       }
     },
     watch: {
@@ -237,20 +294,6 @@
     },
 
     methods: {
-      getIsConcise() {
-        let skin_json_wap = {
-          style: 1
-        };
-        const { skinInfo } = this.$domainStore.state.roomBaseServer;
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = skinInfo.skin_json_wap;
-        }
-        if (skin_json_wap?.style == 3) {
-          this.isConcise = true;
-        } else {
-          this.isConcise = false;
-        }
-      },
       /**
        * 计算 设置tab-content高度
        */
@@ -297,7 +340,7 @@
 
         // 自定义皮肤
         await this.$nextTick();
-        const { pageStyle } = JSON.parse(skinInfo.skin_json_pc) || {};
+        const { pageStyle } = skinInfo.skin_json_pc || {};
         this.themeClass.pageBg = pageStyle;
       },
       updateAuth() {
@@ -333,6 +376,10 @@
             type: msg.data.type,
             interactStatus: true
           });
+          if (this.visibleMenu && this.visibleMenu.length == 1) {
+            // 若开启了问答后，菜单总数为1，那么默认菜单第一个被选中。
+            this.selectDefault();
+          }
         });
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
           this.setVisible({ visible: false, type: 'v5' });
@@ -366,8 +413,13 @@
         });
         //收到私聊消息
         chatServer.$on('receivePrivateMsg', () => {
+          console.log('当前私聊消息');
           if (this.webinarInfo.type == 1) {
+            // 如果是直播中，才展示。1-直播中，2-预约，3-结束，4-点播，5-回放
             this.setVisible({ visible: true, type: 'private' });
+            if (this.visibleMenu.length == 1) {
+              this.selectDefault();
+            }
           }
         });
 
@@ -425,12 +477,15 @@
         });
       },
       changeDocStatus(val) {
-        this.setVisible({ visible: val, type: 2 });
-        if (val) {
-          const obj = this.getItem({ type: 2 });
-          this.select({ type: obj.type, id: obj.id });
-        } else {
-          this.roomBaseServer.state.isWapBodyDocSwitch = false;
+        // 如果开启了合并模式，自定义菜单不显示文档
+        if (this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout != 1) {
+          this.setVisible({ visible: val, type: 2 });
+          if (val) {
+            const obj = this.getItem({ type: 2 });
+            this.select({ type: obj.type, id: obj.id });
+          } else {
+            this.roomBaseServer.state.isWapBodyDocSwitch = false;
+          }
         }
       },
       /**
@@ -449,6 +504,13 @@
         // 从接口拉取的配置
         const list = this.$domainStore.state.roomBaseServer.customMenu.list;
         for (const item of list) {
+          // 如果是合并模式，需要把文档从自定义菜单中刨除去
+          if (
+            this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1 &&
+            item.type == 2
+          ) {
+            continue;
+          }
           this.addItem(item);
         }
 
@@ -456,11 +518,18 @@
       },
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
-
-        const chatIndex = this.menu.findIndex(el => el.type === 3);
-        const hasMember = this.menu.includes(el => el.type === 'notice');
-        if (chatIndex <= -1) return;
-        const index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        let index = 0;
+        if (this.isConcise) {
+          // 极简风格，菜单顺序：问答>私聊>简介
+          index = 0;
+        } else {
+          // 查找聊天的下标区域
+          const chatIndex = this.menu.findIndex(el => el.type === 3);
+          // 是否包含广告位置
+          const hasMember = this.menu.includes(el => el.type === 'notice');
+          if (chatIndex <= -1) return;
+          index = hasMember ? chatIndex + 2 : chatIndex + 1;
+        }
         const QAName =
           this.roleName == 1 ||
           !roomState.interactToolStatus.question_name ||
@@ -624,6 +693,9 @@
        */
       async scrollToItem({ id }) {
         await this.$nextTick();
+        if (this.visibleMenu.length <= 0) {
+          return;
+        }
         const rectArr = this.visibleMenu.map(item => {
           try {
             const id = item.id;
@@ -639,10 +711,11 @@
 
         const positionItem = rectArr.find(item => item.id === id);
 
-        this.$refs['menu'].scrollTo({
-          left: positionItem.left,
-          behavior: 'smooth'
-        });
+        positionItem &&
+          this.$refs['menu'].scrollTo({
+            left: positionItem.left - 12, // 左右切换多留出来间距了
+            behavior: 'smooth'
+          });
       },
 
       /**
@@ -660,7 +733,7 @@
         this.scrollToItem({ id: item.id });
         item.tipsVisible = false;
 
-        this.$refs['tabContent'].switchTo(item); // tab-content视图切换
+        this.$refs['tabContent'] && this.$refs['tabContent'].switchTo(item); // tab-content视图切换
 
         await this.$nextTick();
         this.menuServer.$emit('tab-switched', item);
@@ -674,6 +747,30 @@
           document.webkitExitFullscreen();
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
+        }
+      },
+      // setVisible的外层封装
+      async setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
+        this.setVisible({ visible, type, id, name });
+        await this.$nextTick();
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
+        }
+      },
+      // 极简模式下，弹出框点开后初始化宽度计算效果。
+      async menuDialogComputed() {
+        if (this.isEmbedVideo) return;
+        await this.$nextTick();
+        console.log('啥啥啥', this.visibleMenu, this.selectedId);
+        // 初始化也好，消息事件触发之后；若点击菜单小icon图标，当前菜单总数 超过0个时，默认第一个选中。
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
         }
       }
     }
@@ -741,11 +838,16 @@
         align-items: center;
         min-width: 24px;
         text-align: center;
-        font-size: 14px;
+        font-size: 24px;
         color: var(--tab-menu-btn-color);
         height: 100%;
         cursor: pointer;
-
+        &.prev-btn {
+          padding-right: 32px;
+        }
+        &.next-btn {
+          padding-left: 30px;
+        }
         &.disabledClick {
           i {
             color: rgba(140, 140, 140, 0.4);
@@ -757,6 +859,8 @@
         // }
         .vh-iconfont {
           font-weight: 600;
+          font-size: 24px;
+          color: var(--tab-menu-btn-color);
         }
       }
     }
@@ -800,7 +904,7 @@
           display: flex;
           align-items: center;
           line-height: 1.2;
-          font-size: 30px;
+          font-size: 28px;
         }
 
         .tips {

@@ -6,7 +6,8 @@
       `vmp-doc-wap--${displayMode}`,
       `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
-      wapDocClass
+      wapDocClass,
+      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`
     ]"
     :style="{
       height:
@@ -61,7 +62,7 @@
     <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
       {{ pageNum }}/{{ pageTotal }}
     </div>
-    <div class="tools">
+    <div class="tools" v-show="this.displayMode == 'normal' && isDocMainScreen ? showTools : true">
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"
@@ -83,6 +84,7 @@
 
       <!-- 文档播放器位置互换 -->
       <div
+        v-if="!isDocMainScreen"
         v-show="!!currentCid && displayMode != 'fullscreen' && !isNotSupportTrans"
         @click="transposition"
         class="btn-doc-transposition"
@@ -121,7 +123,9 @@
         rebroadcastStopTimer: null,
         rotateNum: 0, //旋转角度
         isPortrait: true, // 是否是竖屏  设备
-        isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell)
+        isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
+        timmer: null,
+        showTools: false
       };
     },
     computed: {
@@ -192,6 +196,16 @@
           !!this.roomBaseServer.state.interactToolStatus.is_adi_watch_doc &&
           this.currentType === 'document'
         );
+      },
+      // 是否开启文档主画面
+      isDocMainScreen() {
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+        );
       }
     },
     watch: {
@@ -220,6 +234,11 @@
             this.docServer.zoomReset();
           }, 50);
         }
+      },
+      isDocMainScreen() {
+        this.$nextTick(() => {
+          this.resize();
+        });
       }
     },
     beforeCreate() {
@@ -231,7 +250,7 @@
     mounted() {
       console.log('[doc] wap mounted');
       // 初始化文档server的getDocViewRect方法
-      this.docServer.getDocViewRect = this.getDocViewRect;
+      this.docServer.getDocViewRect = this.getDocViewRect.bind(this);
 
       // 初始计算一次文档区域
       this.getDocViewRect();
@@ -244,6 +263,7 @@
           this.recoverLastDocs();
         });
       }
+      this.clickDocShowTool();
       //this.resizeDoc();
       window.addEventListener('resize', this.resizeDoc);
     },
@@ -264,7 +284,21 @@
           // For better watching experience, please use landscape mode
         }
       },
-
+      // 点击文档显示操作工具（3s）
+      clickDocShowTool() {
+        this.$nextTick(() => {
+          document.getElementById('docWrapper').addEventListener('click', e => {
+            if (!this.clickDocShowTool) return;
+            this.timmer && clearTimeout(this.timmer);
+            if (this.$parent.showPlayIcon) return; //播放中
+            this.showTools = true;
+            this.timmer = setTimeout(() => {
+              this.showTools = false;
+              this.timmer = null;
+            }, 3000);
+          });
+        });
+      },
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
@@ -377,7 +411,8 @@
       /**
        * 屏幕缩放，文档在wap端实际上用的屏幕的宽度
        */
-      resize() {
+      async resize() {
+        await this.$nextTick();
         const { width, height } = this.getDocViewRect();
         if (!width || !height) return;
         if (
@@ -401,9 +436,15 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            //竖屏的 正常显示
-            w = window.innerWidth;
-            h = (9 * w) / 16;
+            if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
+              //竖屏的 正常显示
+              w = window.innerWidth;
+              h = (9 * w) / 16;
+            } else {
+              //竖屏的 主画面显示
+              h = this.$refs.docWrapper.offsetHeight;
+              w = (16 / 9) * h;
+            }
           }
         } else {
           // 未锁屏，设备横向
@@ -555,6 +596,10 @@
         right: 0;
         bottom: 0;
         overflow: hidden;
+        // 解决文档点击事件无效的问题
+        .upper-canvas {
+          pointer-events: none;
+        }
 
         .doc-box {
           top: 0;
@@ -633,7 +678,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 9;
+        z-index: 7;
         &:nth-last-child(1) {
           margin-right: 32px;
         }
@@ -659,7 +704,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 10;
+      z-index: 6;
 
       .vh-iconfont {
         font-size: 30px;
@@ -678,6 +723,18 @@
       }
     }
 
+    // 开启文档云融屏，文档为主画面
+    &.vmp-doc-wap-main-screen {
+      width: (422-85) * 16/9px !important;
+      height: calc(422px - 85px) !important;
+      min-height: calc(422px - 85px) !important;
+      .pageGroup {
+        margin-top: -50px !important;
+      }
+      .tools {
+        margin-top: -60px !important;
+      }
+    }
     // 全屏模式下
     &.vmp-doc-wap--fullscreen {
       position: fixed;
@@ -685,6 +742,7 @@
       bottom: 0;
       left: 0;
       right: 0;
+      width: 100% !important;
       height: 100% !important;
       background-color: rgba(0, 0, 0, 0.9);
       // 播放器的层级是1-12

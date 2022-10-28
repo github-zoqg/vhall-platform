@@ -18,7 +18,9 @@
     <div
       :class="[
         mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
-        isShareScreen || (isOpenInsertFile && !isAudio) ? 'vmp-wap-body-special__show' : ''
+        (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
+          ? 'vmp-wap-body-special__show'
+          : ''
       ]"
       @touchstart="touchstart($event)"
       @touchmove.prevent="touchmove($event)"
@@ -43,6 +45,18 @@
       <!-- wap端订阅插播的容器 -->
       <vmp-air-container :cuid="childrenComp[3]" :oneself="true" v-show="!isLivingEnd" />
 
+      <!-- wap 合并模式下的融屏文档 -->
+      <div
+        v-if="isMergeMode"
+        v-show="isDocMainScreen"
+        class="vmp-wap-doc-main-screen"
+        :class="{
+          'doc-hidden': isShareScreen || (isOpenInsertFile && !isAudio) || mini,
+          'vmp-wap-doc-main-screen-top': !this.isSpeakOn
+        }"
+      >
+        <vmp-air-container :oneself="true" :cuid="childrenComp[4]"></vmp-air-container>
+      </div>
       <!--
         注意：
           由于互动组件监听的互动的各种消息，包含同意上麦，监听后进行上麦操作
@@ -209,6 +223,22 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      isMergeMode() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
+      },
+      // 是否开启文档主画面
+      isDocMainScreen() {
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.isMergeMode
+        );
       }
     },
     beforeCreate() {
@@ -391,6 +421,8 @@
   };
 </script>
 <style lang="less">
+  @desk-w: 597px;
+  @desk-h: 337px;
   .vmp-wap-body {
     position: relative;
     height: 100%;
@@ -495,7 +527,7 @@
           height: 100%;
           width: 100%;
         }
-        .vmp-stream-list__main-screen {
+        .vmp-stream-list__mini-window__main-screen {
           position: absolute;
           top: 0;
           left: 0 !important; // 由于小屏后，和产品沟通，只展示主画面
@@ -510,6 +542,10 @@
           top: 0;
           height: 100%;
         }
+      }
+      .vmp-wap-insert-file-main-screen,
+      .vmp-wap-desktop-screen {
+        display: none;
       }
       .vmp-wap-stream-wrap-mask > .vmp-wap-stream-wrap-mask-heat,
       .vmp-wap-stream-wrap-mask-screen {
@@ -538,6 +574,19 @@
         color: #262626;
         font-size: 28px;
         line-height: 40px;
+      }
+    }
+    .vmp-wap-doc-main-screen {
+      position: absolute;
+      width: @desk-w;
+      height: @desk-h;
+      left: calc((100% - @desk-w) / 2);
+      top: 85px;
+      &-top {
+        top: 0;
+      }
+      &.doc-hidden {
+        visibility: hidden;
       }
     }
   }

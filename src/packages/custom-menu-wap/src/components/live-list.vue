@@ -181,10 +181,10 @@
     flex-direction: column;
     overflow: hidden;
     box-sizing: border-box;
-    width: calc(50% - 28px);
+    width: calc(50% - 16px);
     height: 306px;
-    margin: 20px 14px;
-    border-radius: 6px;
+    margin: 24px 8px 0 8px;
+    border-radius: 8px;
     overflow: hidden;
     background: var(--theme-tab-content-live-card-bg);
 
@@ -195,6 +195,7 @@
       background-size: 400% 400%;
       background: #000;
       animation: gradientBG 15s ease infinite;
+      border-radius: 8px;
       .img_box_bg {
         display: inline-block;
         position: absolute;
@@ -202,6 +203,7 @@
         top: 0;
         width: 100%;
         height: 100%;
+        border-radius: 8px;
         &.box_bg_1 {
           object-fit: fill;
         }
@@ -254,20 +256,22 @@
           position: absolute;
           left: 18px;
           bottom: 15px;
-          line-height: 20px;
-          font-size: 12px;
-          font-weight: 400;
           color: #ffffff;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 24px;
+          line-height: 20px;
           z-index: 4;
         }
         .vh-saas-line-heat {
-          font-size: 12px;
-          margin-right: 16px;
+          font-size: 18px;
+          margin-right: 12px;
           margin-top: 2px;
+          color: #ffffff;
           &:before {
             display: inline-block;
-            width: 14px !important;
-            height: 14px !important;
+            width: 20px !important;
+            height: 20px !important;
           }
         }
       }
@@ -296,17 +300,17 @@
     }
     &__title {
       width: 100%;
-      min-height: 36px;
-      max-height: 76px;
+      min-height: 40px;
+      max-height: 84px;
       font-size: 28px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: var(--theme-tab-content-live-title-font);
-      line-height: 36px;
-      margin-top: 4px;
+      line-height: 40px;
+      margin-top: 12px;
       box-sizing: border-box;
-      padding: 0px 8px;
-      margin-bottom: 2px;
+      padding: 0 0;
+      margin-bottom: 4px;
     }
     &__info {
       font-weight: 400;
@@ -314,9 +318,9 @@
       white-space: nowrap;
       font-size: 24px;
       color: var(--theme-tab-content-live-info-font);
-      line-height: 42px;
+      line-height: 32px;
       text-align: left;
-      padding: 0px 8px;
+      padding: 0px 0;
     }
     .liveTag {
       color: #fff;

@@ -78,7 +78,7 @@
       setSkinInfo(skin) {
         if (skin && skin.skin_json_pc && skin.status == 1) {
           this.$nextTick(() => {
-            const { pageStyle } = JSON.parse(skin.skin_json_pc) || '';
+            const { pageStyle } = skin.skin_json_pc || '';
             this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
             this.themeClass.pageBg = pageStyle;
           });

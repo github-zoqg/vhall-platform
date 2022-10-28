@@ -8,10 +8,7 @@
     <div class="vmp-header-watch_left">
       <!-- 品牌设置-标识图片 -->
       <div class="left_logo" v-if="webinarTag && webinarTag.view_status == 1" @click="goLogoUrl">
-        <img
-          :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogoUrl"
-          alt=""
-        />
+        <img :src="webinarTag && webinarTag.logo_url ? webinarTag.logo_url : defaultLogo" alt="" />
       </div>
     </div>
     <div class="vmp-header-watch_center">
@@ -83,14 +80,13 @@
       <!-- 登录、基础信息 -->
       <div class="right_login">
         <div class="right_login_unuser" @click="goLogin" v-if="!isLogin">
-          <p><img src="./img/my-dark@2x.png" alt="" /></p>
+          <p><img :src="defaultAvatar" alt="" /></p>
           <span>{{ $t('nav.nav_1005') }}</span>
         </div>
         <div class="right_login_user" v-else>
           <div class="right_login_user_dropdown">
             <p>
-              <img v-if="userInfo.avatar" :src="userInfo.avatar" alt="" />
-              <img v-else src="./img/my-dark@2x.png" alt="" />
+              <img :src="userInfo.avatar || defaultAvatar" alt="" />
             </p>
             <span>{{ userInfo.nick_name | overHidden(8) }}</span>
             <div class="right_login_user_list">
@@ -118,11 +114,12 @@
 <script>
   import { useRoomBaseServer, useAttentionServer, useUserServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { defaultAvatar, defaultLogo } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpHeaderWatch',
     data() {
       return {
-        defaultLogoUrl: require('./img/logo-red@2x.png'),
+        defaultLogo: defaultLogo,
         webinarInfo: {
           userinfo: {
             nickname: ''
@@ -137,7 +134,8 @@
           iconClass: 'icon-default' // icon默认色
         },
         isAttention: false,
-        isLogin: Boolean(window.localStorage.getItem('token'))
+        isLogin: Boolean(window.localStorage.getItem('token')),
+        defaultAvatar
       };
     },
     computed: {
@@ -295,7 +293,7 @@
       setSkinInfo(skin) {
         if (skin && skin.skin_json_pc && skin.status == 1) {
           this.$nextTick(() => {
-            const { bgColor, pageStyle, background } = JSON.parse(skin.skin_json_pc) || '';
+            const { bgColor, pageStyle, background } = skin.skin_json_pc || '';
             this.themeClass.iconClass = pageStyle == '#FB3A32' ? 'icon-revert' : 'icon-default';
             this.themeClass.pageBg = pageStyle; // 观看端风格/颜色
             this.themeClass.bgColor =

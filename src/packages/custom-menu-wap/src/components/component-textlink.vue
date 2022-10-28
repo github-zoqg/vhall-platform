@@ -36,16 +36,16 @@
 </script>
 <style lang="less">
   .vmp-custom-menu-textlink {
-    margin-bottom: 30px;
     width: 100%;
     box-sizing: border-box;
-    padding: 0px 24px;
+    padding: 0 0;
+    margin-top: 24px;
     .textlink {
       width: 100%;
       // height: 24px;
       font-size: 28px;
       font-weight: 400;
-      color: #3562fa !important;
+      color: #1e4edc !important;
       line-height: 28px;
       word-break: break-all;
       margin: 20px 0px;

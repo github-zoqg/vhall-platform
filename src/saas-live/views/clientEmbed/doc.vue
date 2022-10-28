@@ -20,6 +20,7 @@
   import chrome from '../Chrome.vue';
   import tip from '../MsgTip.vue';
   import { Domain, useRoomBaseServer } from 'middle-domain';
+  import clientMsgApi from '@/app-shared/utils/clientMsgApi';
   export default {
     components: {
       chrome,
@@ -113,12 +114,12 @@
             window.JsCallQtMsg(JSON.stringify({ type: 'esc', msg: true }));
           }
         });
-        window.QtCallFunctionPage = _msg => {
+        clientMsgApi.onQtCallFunctionPage(_msg => {
           let msg = Number(_msg);
           console.error('展示当前点击的消息转换-------', _msg);
           // 判断执行对应方法
           this.handleAssitant(msg);
-        };
+        });
         // 切换大小窗，显示/隐藏文档工具栏
         window.QtCallJsChangeDocTool = _msg => {
           const msg = Number(_msg);

@@ -216,7 +216,7 @@
         <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
-            @click="setOwner()"
+            @click="setOwner(true)"
           ></span>
         </el-tooltip>
 
@@ -224,7 +224,7 @@
         <el-tooltip content="设为主画面" v-else placement="bottom">
           <span
             class="vmp-stream-local__shadow-icon vh-saas-iconfont vh-saas-line-speaker1"
-            @click="setMainScreen(false)"
+            @click="setMainScreen(true)"
           ></span>
         </el-tooltip>
         <!-- <el-tooltip content="下麦" placement="bottom">
@@ -257,6 +257,20 @@
       <div slot="content">
         <span>{{ PopAlertOffline.text }}</span>
       </div>
+    </saas-alert>
+
+    <!-- 设置主画面弹窗 -->
+    <saas-alert
+      :visible="popAlert.visible"
+      :confirm="popAlert.confirm"
+      :knowText="'知道了'"
+      :confirmText="'继续'"
+      :cancelText="'取消'"
+      @onSubmit="stopShareOrInsert"
+      @onClose="closeConfirm"
+      @onCancel="closeConfirm"
+    >
+      <main slot="content">{{ popAlert.text }}</main>
     </saas-alert>
   </div>
 </template>
@@ -295,7 +309,14 @@
           visible: false,
           text: ''
         },
-        pendingStream: false
+        pendingStream: false,
+        popAlert: {
+          text: '切换主讲人或主画面将中断插播视频或桌面共享操作，是否继续？',
+          visible: false,
+          confirm: true,
+          type: 'main', // main:主画面；presenter:主讲人
+          accountId: null
+        }
       };
     },
     components: {
@@ -478,6 +499,21 @@
       // 是否是上麦状态
       isSpeakOn() {
         return this.$domainStore.state.micServer.isSpeakOn;
+      },
+      accountId() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id;
+      },
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
+      },
+      // 是否是当前用户插播
+      isCurrentRoleInsert() {
+        return (
+          // 当前正在插播，插播人id等于当前用户id
+          this.$domainStore.state.insertFileServer.isInsertFilePushing &&
+          this.$domainStore.state.insertFileServer.insertStreamInfo.userInfo.accountId ==
+            this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
+        );
       }
     },
     beforeCreate() {
@@ -543,6 +579,28 @@
     },
     methods: {
       closePollingDialog() {},
+      // 停止桌面共享或插播
+      stopShareOrInsert() {
+        if (this.isShareScreen && this.accountId == this.desktopShareInfo.accountId) {
+          // 自己正在发起桌面共享
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickStopShare', 'setMainScreen')
+          );
+        } else if (this.isCurrentRoleInsert) {
+          // 正在插播
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitClickStopInsert'));
+        }
+        if (this.popAlert.type == 'main') {
+          this.setMainScreen();
+        } else {
+          this.setOwner();
+        }
+        this.popAlert.visible = false;
+      },
+      // 关闭弹窗
+      closeConfirm() {
+        this.popAlert.visible = false;
+      },
       /**
        * 描述
        * 问题1：fix https://www.tapd.cn/58046813/bugtrace/bugs/view?bug_id=1158046813001005974
@@ -833,7 +891,14 @@
             useDocServer().state.switchStatus &&
             this.isNoDelay === 0
           ) {
-            useRoomBaseServer().setChangeElement('player');
+            // 开启合并模式
+            if (
+              this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+            ) {
+              useRoomBaseServer().setChangeElement('');
+            } else {
+              useRoomBaseServer().setChangeElement('player');
+            }
           }
 
           // 如果是嘉宾开启了分屏，不需要初始化互动实例
@@ -1599,17 +1664,25 @@
 
       /**
        * 设置主讲人
-       * @param {Number | String} accountId 用户ID
+       * @param {Number | String}
        * @Function void()
        */
-      setOwner(accountId, setMainScreen = true) {
+      setOwner(alert, setMainScreen = true) {
+        if (alert) {
+          const stream = this.interactiveServer.getDesktopAndIntercutInfo();
+          if (stream) {
+            this.popAlert.visible = true;
+            this.popAlert.type = 'presenter';
+            return;
+          }
+        }
         if (setMainScreen) {
           this.setMainScreen();
         }
         window.vhallReportForProduct?.toStartReporting(110176, 110177);
         this.interactiveServer
           .setSpeaker({
-            receive_account_id: accountId || this.joinInfo.third_party_user_id
+            receive_account_id: this.joinInfo.third_party_user_id
           })
           .then(res => {
             window.vhallReportForProduct?.toResultsReporting(110177, {
@@ -1625,7 +1698,16 @@
       },
 
       //  设为主画面
-      setMainScreen() {
+      setMainScreen(opt) {
+        if (opt) {
+          // 若当前在桌面共享或插播，不允许设置主画面
+          const stream = this.interactiveServer.getDesktopAndIntercutInfo();
+          if (stream) {
+            this.popAlert.visible = true;
+            this.popAlert.type = 'main';
+            return;
+          }
+        }
         this.interactiveServer
           .setMainScreen({
             receive_account_id: this.joinInfo.third_party_user_id

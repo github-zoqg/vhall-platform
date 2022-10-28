@@ -94,7 +94,7 @@ export default {
     appointment_1017: '立即预约',
     appointment_1018: '已预约{n}人',
     appointment_1019: '这里空空如也',
-    appointment_1020: '权限验证',
+    appointment_1020: '观看验证',
     appointment_1021: '密码错误',
     appointment_1022: '请输入密码',
     appointment_1023: '付费{n}观看',
@@ -165,7 +165,8 @@ export default {
     nav_1052: '复制失败',
     nav_1053: '主办方',
     nav_1054: '彩排下观众模拟观看地址',
-    nav_1055: '彩排中'
+    nav_1055: '彩排中',
+    nav_1056: '商品已下架'
   },
   login: {
     login_1001: '账号登录',

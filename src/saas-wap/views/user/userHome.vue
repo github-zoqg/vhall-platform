@@ -91,7 +91,7 @@
                       alt="" /> -->
                     <span>{{ item.pv | formatHotNum }}</span>
                   </span>
-                  <span class="v-date pull-right">
+                  <span class="v-date pull-right" v-if="tabType === 'live'">
                     {{ tabType === 'live' ? item.start_time : item.created_at.substring(0, 16) }}
                   </span>
                 </div>

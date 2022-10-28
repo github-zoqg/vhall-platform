@@ -420,19 +420,6 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
-      },
-      // 是不是极简风格
-      isConcise() {
-        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
-        let skin_json_wap = {
-          style: 1,
-          backGroundColor: 2
-        };
-        // todo 直播间三期的skinInfo.skin_json_wap可能为对象，不需要json转换了
-        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
-        }
-        return skin_json_wap.style == 3;
       }
     },
     data() {
@@ -493,8 +480,8 @@
         isSmallPlayer: false,
         imageCropperMode: 1,
         circleSliderVal: 0,
-        initIndex
-        // isConcise: false //判断是否是极简模式
+        initIndex,
+        isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -595,22 +582,24 @@
           document.querySelector('.vmp-basic-bd').classList.remove('small_player');
         }
       });
+      this.getIsConcise();
       this.setSetingHeight();
-
-      // let skin_json_wap = {
-      //   style: 1
-      // };
-      // const skinInfo = this.roomBaseState.skinInfo;
-      // if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-      //   skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
-      // }
-      // if (skin_json_wap?.style == 3) {
-      //   this.isConcise = true;
-      // } else {
-      //   this.isConcise = false;
-      // }
     },
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.roomBaseState.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       /**
        * 计算 设置tab-content高度
        */

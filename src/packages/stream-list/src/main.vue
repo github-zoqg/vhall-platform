@@ -249,7 +249,7 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skinJsonPc = {};
         if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
-          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+          skinJsonPc = skinInfo.skin_json_pc;
         }
         return skinJsonPc?.videoBackGroundColor || '#000';
       }
@@ -299,7 +299,12 @@
           console.log('mainBackground---', val);
           this.$nextTick(() => {
             const dom = document.getElementById('vmp-stream-list');
-            dom.setAttribute('style', `--main-bg-color:${val}`);
+            dom.setAttribute(
+              'style',
+              `--main-bg-color:${val};border-color: ${
+                this.mainBackground == '#000' ? '#1f1f1f' : this.mainBackground
+              }`
+            );
           });
         },
         immediate: true

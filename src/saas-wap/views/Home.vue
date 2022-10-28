@@ -37,8 +37,11 @@
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
-  import { updatePageNode } from '@/app-shared/utils/pageConfigUtil';
   import skins from '@/app-shared/skins/wap';
+
+  import redDefaultBg from '@/app-shared/assets/img/wap/theme/default_red.png';
+  import blueDefaultBg from '@/app-shared/assets/img/wap/theme/default_blue.png';
+  import goldenDefaultBg from '@/app-shared/assets/img/wap/theme/default_golden.png';
 
   export default {
     name: 'Home',
@@ -59,7 +62,7 @@
           backGroundColor: 2
         };
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+          skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap.style == 3;
       },
@@ -348,24 +351,15 @@
           style: 1,
           backGroundColor: 2
         };
-        // let skin_json_wap = JSON.parse(sessionStorage.getItem('skinInfoWap')) || {
-        //   style: 1,
-        //   backGroundColor: 1
-        // };
 
         const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-          skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
+          skin_json_wap = skinInfo.skin_json_wap;
         }
-
-        // sessionStorage.setItem('skinInfoWap', JSON.stringify(skin_json_wap));
 
         if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
-        } else if (skin_json_wap?.style == 2) {
-          // 设置聊天组件为左右风格
-          updatePageNode('comChatWap', 'component', 'VmpChatWapFashion');
         }
         // 设置主题，如果没有就用传统风格白色
         const style = styleMap[skin_json_wap?.style || 1];
@@ -401,13 +395,19 @@
               app.style.background = `rgba(0, 0, 0, 0.06)`;
             }
           } else {
-            app.style.backgroundImage = `url(${
-              '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
-              style +
-              '_' +
-              theme +
-              '.png'
-            })`;
+            if (style == 'main' && ['red', 'blue', 'golden'].includes(theme)) {
+              app.style.backgroundImage = `url(${
+                theme === 'red' ? redDefaultBg : theme == 'blue' ? blueDefaultBg : goldenDefaultBg
+              })`;
+            } else {
+              app.style.backgroundImage = `url(${
+                '//cnstatic01.e.vhall.com/common-static/middle/images/saas-wap/theme/skins/' +
+                style +
+                '_' +
+                theme +
+                '.png'
+              })`;
+            }
             app.style.backgroundSize = 'cover';
           }
         }
