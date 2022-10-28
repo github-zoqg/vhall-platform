@@ -3,12 +3,13 @@
     <img
       :src="
         noticeNum - noticeNumIsWatch
-          ? require('./images/icon_num.png')
-          : require('./images/notice-icon.png')
+          ? require(iconStyle == 1 ? './images/icon_num.png' : './images/notice-icon2.png')
+          : require(iconStyle == 1 ? './images/notice-icon.png' : './images/notice-icon2.png')
       "
       alt=""
       @click="getNoticeList()"
     />
+    <slot></slot>
     <span class="dot" v-if="noticeNum - noticeNumIsWatch">
       <div align="center">
         {{ noticeNum - noticeNumIsWatch > 99 ? '99+' : noticeNum - noticeNumIsWatch }}
@@ -60,6 +61,13 @@
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'QuestionnaireIcon',
+    props: {
+      iconStyle: {
+        default: 1,
+        type: Number,
+        required: false
+      } // 1为传统风格icon，2为新版icon
+    },
     data() {
       return {
         noticeNum: 0,

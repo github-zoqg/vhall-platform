@@ -1,5 +1,5 @@
 <template>
-  <component :cuid="cuid" :event-smelled="true" :is="layout"></component>
+  <component :cuid="cuid" :event-smelled="true" :icon-style="iconStyle" :is="layout"></component>
 </template>
 
 <script>
@@ -16,7 +16,8 @@
 
     data() {
       return {
-        layout: 'defaultLayout' // 默认传统风格
+        layout: 'defaultLayout', // 默认传统风格
+        iconStyle: 1 // 图标风格
       };
     },
 
@@ -29,6 +30,7 @@
         // 竖屏直播
         if (this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0) {
           this.layout = 'fullscreenLayout';
+          this.iconStyle = 2;
         }
       }
     }

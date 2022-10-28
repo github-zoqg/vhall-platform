@@ -12,6 +12,13 @@ export default {
     questionnaireIcon,
     noticeList
   },
+  props: {
+    iconStyle: {
+      default: 1,
+      type: Number,
+      required: false
+    } // 1为传统风格icon，2为新版icon
+  },
   data() {
     return {
       showTimer: false,

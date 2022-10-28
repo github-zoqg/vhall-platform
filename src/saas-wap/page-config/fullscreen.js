@@ -50,7 +50,6 @@ export default {
   },
   layerJaw: {
     component: 'VmpContainer',
-    className: 'vmp-basic-jaw',
     children: ['comContainerRight']
   },
   // 颈部容器
