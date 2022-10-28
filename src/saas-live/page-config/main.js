@@ -109,6 +109,7 @@ export default {
       'comLottery',
       'comSignLive',
       'comQuestionnaire',
+      'comExam',
       'comRedPacket'
     ]
   },
@@ -221,6 +222,12 @@ export default {
         method: 'open'
       }
     ],
+    emitOpenExam: [
+      {
+        cuid: ['comExam'],
+        method: 'open'
+      }
+    ],
     emitOpenSign: [
       {
         cuid: ['comSignLive'],
@@ -326,6 +333,10 @@ export default {
   // 问卷组件
   comQuestionnaire: {
     component: 'VmpQuestionnaire'
+  },
+  // 快问快答组件
+  comExam: {
+    component: 'VmpExam'
   },
   // 红包组件
   comRedPacket: {

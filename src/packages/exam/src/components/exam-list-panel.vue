@@ -1,0 +1,445 @@
+<template>
+  <div class="exam-list-panel">
+    <!-- 内层嵌套对话框 -->
+    <el-dialog
+      width="400px"
+      title="提示"
+      :show-close="false"
+      custom-class="exam-dlg-share-tip"
+      :close-on-click-modal="false"
+      :visible.sync="innerVisible"
+      top="30vh"
+      append-to-body
+    >
+      <p class="tip-text">保存同时共享至资料管理，便于其他活动使用？</p>
+      <p><el-checkbox v-model="isShare">共享到资料管理</el-checkbox></p>
+      <div class="dialog-footer">
+        <el-button type="primary" round @click="handleShareSubmit">确 定</el-button>
+        <el-button round @click="handleShareCancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 快问快答—列表 -->
+    <div>
+      <!-- 无数据 -->
+      <div class="vmp-exam-cur__empty" v-show="examList.length === 0">
+        <img src="../img/no-file.png" />
+        <p>您还没有快问快答，快来创建吧！</p>
+        <div>
+          <!-- 创建按钮 -->
+          <el-button type="primary" round @click="handleCreateExam">创建</el-button>
+        </div>
+      </div>
+      <!-- 有数据 -->
+      <div class="vmp-exam-cur__inner" v-show="examList.length > 0">
+        <div class="vmp-exam-cur__hd">
+          <!-- 创建按钮 -->
+          <el-button type="primary" round @click="handleCreateExam">创建</el-button>
+          <!-- 资料库按钮
+          <el-button round @click="openSelectDialog">
+            {{ $t('doc.doc_1015') }}
+          </el-button> -->
+          <!-- 搜索框 -->
+          <el-input
+            class="input-search"
+            placeholder="请输入名称"
+            v-model="queryParams.keyword"
+            clearable
+            @clear="initQueryList"
+            @keydown.enter.stop.native="initQueryList()"
+          >
+            <i slot="prefix" class="el-input__icon el-icon-search" @click="initQueryList"></i>
+          </el-input>
+        </div>
+        <div class="vmp-exam-cur__bd">
+          <el-table
+            :data="examList"
+            style="width: 100%"
+            height="320px"
+            v-loadMore="moreLoadData"
+            @cell-mouse-enter="handleCellMouseEnter"
+            @cell-mouse-leave="handleCellMouseLeave"
+          >
+            <!-- 未搜索到数据展示 -->
+            <template slot="empty">
+              <img src="@/app-shared/assets/img/no-search.png" />
+              <p>暂未搜索到您想要的内容</p>
+            </template>
+            <!-- 表格展示 -->
+            <el-table-column prop="title" label="名称" width="180">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" :content="scope.row.title">
+                  <p class="file-name custom-tooltip-content">
+                    <span class="file-name__text">
+                      {{ scope.row.title }}
+                    </span>
+                  </p>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间" width="170">
+              <template slot-scope="scope">
+                {{ scope.row.created_at }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="total_score" label="总分"></el-table-column>
+            <el-table-column prop="questions_count" label="题数"></el-table-column>
+            <el-table-column label="限时(分)" width="170">
+              <template slot-scope="scope">
+                {{ scope.row.limit_time }}
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" width="170">
+              <template slot-scope="scope">
+                {{ ['未推送', '答题中', '成绩待公布', '成绩已公布'][scope.row.status] }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="180" fixed="right">
+              <template slot-scope="scope">
+                <template v-for="(btnItem, index) in scope.row.btnList">
+                  <span
+                    class="item"
+                    :key="`btn${btnItem.type}`"
+                    v-if="index < 3"
+                    @click="handleCommand(btnItem.type, scope.row)"
+                  >
+                    {{ btnItem.name }}
+                  </span>
+                </template>
+                <span
+                  @click.prevent.stop
+                  class="item"
+                  v-if="scope.row.btnList && scope.row.btnList.length >= 3"
+                >
+                  <el-dropdown
+                    @command="handleCommand"
+                    @visible-change="dropDownVisibleChange(scope.row)"
+                  >
+                    <span class="colorItem">更多</span>
+                    <el-dropdown-menu
+                      style="width: 140px; text-align: center"
+                      slot="dropdown"
+                      class="exam-more"
+                    >
+                      <template v-for="(btnItem, index) in scope.row.btnList">
+                        <el-dropdown-item
+                          :command="btnItem.type"
+                          :key="`btn${btnItem.type}`"
+                          v-if="index >= 3"
+                        >
+                          {{ btnItem.name }}
+                        </el-dropdown-item>
+                      </template>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 资料库 -->
+  </div>
+</template>
+<script>
+  import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
+  export default {
+    name: 'VmpExamListPanel',
+    mixins: [tableCellTooltip],
+    directives: {
+      drag(el) {
+        el.onmousedown = function (e) {
+          const disx = e.pageX - el.offsetLeft;
+          const disy = e.pageY - el.offsetTop;
+          document.onmousemove = function (e) {
+            let l = e.pageX - disx;
+            let t = e.pageY - disy;
+            if (l < 230) {
+              l = 230;
+            }
+            if (l > window.innerWidth - 170) {
+              l = window.innerWidth - 170;
+            }
+            if (t < 5) {
+              t = 5;
+            }
+            if (t > window.innerHeight - 240) {
+              t = window.innerHeight - 240;
+            }
+            el.style.left = l + 'px';
+            el.style.top = t + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = document.onmouseup = null;
+          };
+        };
+      }
+    },
+    data() {
+      return {
+        innerVisible: false,
+        isShare: false, // 是否共享到资料库
+        keyword: '', // 搜索关键字
+        loading: false, // 列表请求加载中
+        queryParams: {
+          // 快问快答-列表搜索参数
+          limit: 10,
+          pos: 0,
+          pageNum: 1,
+          keyword: ''
+        },
+        examList: [],
+        totalPages: 0,
+        total: 0,
+        selectedExam: null
+      };
+    },
+    methods: {
+      // 创建快问快答
+      handleCreateExam() {},
+      // 共享到资料库 —— 确定
+      handleShareSubmit() {},
+      // 共享到资料库 —— 取消
+      handleShareCancel() {},
+      // 点击打开资料库
+      openSelectDialog() {},
+      // 转换每行可操作的按钮
+      setBtnList(item) {
+        const baseBtnList = [
+          { type: 'publish', name: '公布', disabled: true },
+          { type: 'score', name: '成绩', disabled: true },
+          { type: 'push', name: '推送', disabled: true },
+          { type: 'edit', name: '编辑', disabled: true },
+          { type: 'close', name: '收卷', disabled: true },
+          { type: 'copy', name: '复制', disabled: true },
+          { type: 'preview', name: '预览', disabled: true },
+          { type: 'del', name: '删除', disabled: true }
+        ];
+        baseBtnList.map(sItem => {
+          // 状态 0.未推送 1.答题中 2.成绩待公布 3.成绩已公布
+          if (item.status == 1 && ['close', 'copy', 'preview'].includes(sItem.type)) {
+            // 答题中（收卷、复制、预览）可以点击，其余不可点击
+            sItem.disabled = false;
+          } else if (
+            [2, 3].includes(Number(item.status)) &&
+            ['publish', 'score', 'push', 'copy', 'preview'].includes(sItem.type)
+          ) {
+            // 成绩待公布 or 已公布（公布、成绩、推送、复制、预览）可以点击，其余不可点击
+            sItem.disabled = false;
+          } else {
+            // 默认未推送 （推送、编辑、复制、删除、预览）可以点击，其余不可点击
+            sItem.disabled = !['push', 'edit', 'copy', 'del', 'preview'].includes(sItem.type);
+          }
+        });
+        return baseBtnList.filter(sItem => {
+          if (item.status == 1) {
+            // 答题中，仅展示（收卷、复制、预览、推送、编辑、删除），不展示（推送、成绩）
+            return !['push', 'score'].includes(sItem.type);
+          } else if ([2, 3].includes(Number(item.status))) {
+            // 成绩待公布 or 已公布，仅展示（公布、成绩、推送、复制、预览、编辑、删除），不展示（收卷）
+            return sItem.type != 'close';
+          } else {
+            // 默认未推送，仅展示（推送、复制、预览、编辑、删除），不展示（公布、成绩、收卷）
+            return !['publish', 'score', 'close'].includes(sItem.type);
+          }
+        });
+      },
+      // 更多列表的操作
+      handleCommand(functionName, selectedExam) {
+        if (!functionName) return;
+        if (selectedExam) {
+          this.selectedExam = selectedExam;
+        }
+        eval(`this.${functionName}()`);
+      },
+      // 下拉框显示是, 中转当前选中变量
+      dropDownVisibleChange(row) {
+        this.selectedExam = row;
+      },
+      // 公布
+      publish() {
+        console.log('公布成绩');
+      },
+      // 成绩
+      score() {},
+      // 推送
+      push() {},
+      // 编辑
+      edit() {},
+      // 收卷
+      close() {},
+      // 复制
+      copy() {},
+      // 预览
+      preview() {},
+      // 删除
+      del() {},
+      // 查询列表接口
+      initQueryList() {
+        this.queryExamList(true);
+      },
+      /**
+       * @description 条件搜索列表
+       */
+      queryExamList(refresh = false) {
+        if (refresh) {
+          this.queryParams = {
+            limit: 10,
+            pos: 0,
+            pageNum: 1,
+            keyword: ''
+          };
+          this.examList = [];
+        }
+        this.loading = true;
+        this.queryParams.keyword = this.keyword;
+        // TODO 调用查询接口
+        this.loading = false;
+        let res = {
+          data: {
+            list: [
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' },
+              { status: 1, title: 'adfasfasdf' }
+            ]
+          }
+        };
+        const dataList = res.data.list || [];
+        dataList.map(item => {
+          item.btnList = this.setBtnList(item);
+        });
+        this.examList = this.examList.concat(dataList);
+        this.total = res.data.total;
+        this.firstLoad = true;
+        this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
+      },
+      moreLoadData() {
+        console.log('查看是否触发滑动查询');
+        if (this.queryParams.pageNum >= this.totalPages) {
+          return false;
+        }
+        this.queryParams.pageNum++;
+        this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
+        this.queryExamList();
+      },
+      // 初始化界面
+      initComp() {
+        this.initQueryList();
+      }
+    }
+  };
+</script>
+<style lang="less">
+  // 内嵌对话框，挂载到body下 【是否共享到资料库】
+  .exam-dlg-share-tip {
+    width: 400px;
+    height: 200px;
+    box-shadow: 0 12px 42px 0 rgb(51 51 51 / 24%);
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    margin-top: -10%;
+
+    .tip-text {
+      padding-bottom: 10px;
+    }
+    .el-checkbox {
+      font-weight: 400 !important;
+    }
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #606266 !important;
+    }
+
+    .dialog-footer {
+      text-align: right;
+      margin-top: 20px;
+      padding-left: 130px;
+    }
+  }
+
+  /* 快问快答 - 列表相关 */
+  .exam-list-panel {
+    .vmp-exam-cur__empty {
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      p {
+        line-height: 20px;
+        margin-top: 8px;
+        margin-bottom: 30px;
+        font-size: 15px;
+        color: @font-light-second;
+      }
+      .el-button {
+        width: 120px;
+      }
+    }
+    .vmp-exam-cur {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .vmp-exam-cur__hd {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 16px 0;
+    }
+    .vmp-exam-cur__bd {
+      padding-top: 10px;
+      .el-button.el-button--text {
+        color: #666;
+        border: 0;
+        margin-left: 0;
+        font-size: 14px;
+        padding: 2px 8px;
+      }
+    }
+    .input-search {
+      width: 220px;
+      margin-left: auto;
+      .el-input__inner {
+        border-radius: 100px;
+      }
+    }
+    .el-table .cell .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      &__text {
+        vertical-align: middle;
+      }
+    }
+    .el-table th > .cell {
+      font-weight: normal;
+    }
+    .el-table th:first-child .cell,
+    .el-table tr td:first-child .cell {
+      padding-left: 24px;
+    }
+
+    .el-table--enable-row-hover .el-table__body tr:hover > td {
+      background-color: #f7f7f7;
+      .el-button--text {
+        color: #fb3a32;
+      }
+    }
+  }
+</style>
