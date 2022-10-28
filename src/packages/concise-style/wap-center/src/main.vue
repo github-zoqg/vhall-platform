@@ -6,6 +6,10 @@
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
     </div>
+    <div class="docGroup">
+      <!-- good组件-->
+      <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
+    </div>
   </div>
 </template>
 
@@ -20,12 +24,15 @@
         isShowPoster: true, //是否展示活动图片背景
         isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
-        isVodEnd: false // 回放结束
+        isVodEnd: false, // 回放结束
+        childrenComp: []
       };
     },
     watch: {},
     computed: {},
-    beforeCreate() {},
+    created() {
+      this.childrenComp = window.$serverConfig[this.cuid].children;
+    },
     mounted() {},
     beforeDestroy() {},
     methods: {

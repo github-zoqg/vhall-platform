@@ -128,11 +128,11 @@ export default {
     children: ['comChatWap', 'comContainerRight']
   },
   comBodyBlock: {
-    component: 'VmpConciseBodyBlockWap',
-    children: ['comDocWap']
+    component: 'VmpConciseBodyBlockWap'
   },
   comWapCenter: {
     component: 'VmpConciseCenterWap',
+    children: ['comDocWap'],
     emitPlayerPlay: [
       {
         cuid: 'comWapPlayer',
