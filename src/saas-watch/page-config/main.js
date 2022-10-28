@@ -418,6 +418,11 @@ export default {
       cuid: ['comGoodsDetailPc'],
       method: 'open',
       args: ['$0']
+    },
+    emitShowGoodsTab: {
+      cuid: ['comTabMenu'],
+      method: 'setVisible',
+      args: ['$0']
     }
   },
   // 推荐

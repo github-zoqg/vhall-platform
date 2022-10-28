@@ -1,7 +1,8 @@
 /**
  * 获取头像
  * */
-import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+
 function getAvatar(avatar) {
   if (!avatar) {
     return defaultAvatar;

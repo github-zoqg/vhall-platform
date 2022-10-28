@@ -21,9 +21,9 @@
           <div class="vh-chose-active-item__title">
             {{ item.title }}
           </div>
-          <div class="vh-chose-active-item__info">
+          <!-- <div class="vh-chose-active-item__info">
             {{ item.created_at.substr(0, 16) }}
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -241,8 +241,8 @@
       color: var(--theme-tab-content-project-title-font);
       line-height: 20px;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
       overflow: hidden;
       text-overflow: ellipsis;
       text-align: left;
@@ -339,12 +339,11 @@
       color: @font-light-normal;
       line-height: 24px;
       margin: 12px 16px 7px 16px;
-      -webkit-line-clamp: 2;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
       /* autoprefixer: ignore next */
       -webkit-box-orient: vertical;
     }

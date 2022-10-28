@@ -10,7 +10,7 @@
       <div class="table-list">
         <div class="table-list_item" v-for="(user, index) in signList" :key="index">
           <span class="sign-avatar">
-            <img :src="user.signer_avatar ? user.signer_avatar : defaultAvater" alt="" />
+            <img :src="user.signer_avatar ? user.signer_avatar : defaultAvatar" alt="" />
           </span>
           <span class="sign-name text-overflow">{{ user.signer_nickname }}</span>
           <span class="sign-time">{{ signTime(user.created_at) }}</span>
@@ -26,6 +26,7 @@
 
 <script>
   import { useSignServer } from 'middle-domain';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'SignResult',
     props: {
@@ -50,7 +51,7 @@
       return {
         signImg: require('../img/sign@2x.png'),
         signImgZero: require('../img/sign_zero@2x.png'),
-        defaultAvater: require('../img/avatar.png'),
+        defaultAvatar,
         signTotal: 10,
         signList: []
       };

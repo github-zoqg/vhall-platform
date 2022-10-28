@@ -299,9 +299,9 @@
 </template>
 <script>
   import EventBus from '../../../common/js/Events.js';
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'msgItem',
     props: {

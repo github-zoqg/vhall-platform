@@ -143,6 +143,7 @@
             if (item.type == 'notice' && !this.auth.notice) return false; // 公告
           } else {
             if (item.type == 7 && !this.auth.chapter) return false; // 章节
+            if (item.type == 5) return item.visible; // 商品
           }
 
           if (this.pageEnv === 'live-room') {
@@ -758,6 +759,17 @@
           document.webkitExitFullscreen();
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
+        }
+      },
+      // setVisible的外层封装
+      async setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
+        this.setVisible({ visible, type, id, name });
+        await this.$nextTick();
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
         }
       },
       // 极简模式下，弹出框点开后初始化宽度计算效果。

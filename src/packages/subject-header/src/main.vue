@@ -9,7 +9,7 @@
       <div class="subject_title">
         <div class="subject_title_intro">
           <p>{{ subjectInfo.title }}</p>
-          <span>{{ subjectInfo.created_at }}</span>
+          <!-- <span>{{ subjectInfo.created_at }}</span> -->
         </div>
       </div>
       <div class="subject_collapse">
@@ -149,7 +149,7 @@
           width: 100%;
         }
         p {
-          padding-top: 13px;
+          padding-top: 22px;
           line-height: 24px;
           color: #1a1a1a;
           font-size: 18px;

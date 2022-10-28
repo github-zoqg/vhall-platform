@@ -95,7 +95,7 @@ export default {
     appointment_1017: 'Reserve Now',
     appointment_1018: '{n} Reserved',
     appointment_1019: "Nothing's here",
-    appointment_1020: 'Permission validation',
+    appointment_1020: 'Watch verification',
     appointment_1021: 'Wrong password',
     appointment_1022: 'Please enter the password',
     appointment_1023: 'Pay {n}',
@@ -166,7 +166,8 @@ export default {
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
     nav_1054: 'Audience simulated viewing address during rehearsal',
-    nav_1055: 'in rehearsal'
+    nav_1055: 'in rehearsal',
+    nav_1056: 'Has been off the shelves'
   },
   login: {
     login_1001: 'Account login',

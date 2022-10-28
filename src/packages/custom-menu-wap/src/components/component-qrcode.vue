@@ -1,5 +1,8 @@
 <template>
-  <div class="vmp-custom-menu-qrcode" :class="{ 'qrcode-subscribe-page': type == 'subscribe' }">
+  <div
+    class="vmp-custom-menu-qrcode"
+    :class="{ 'qrcode-subscribe-page': type == 'subscribe', 'qrcode-subscribe': isSubscribe }"
+  >
     <div class="comqrcode-previewbox">
       <div class="qrbox">
         <img :src="info.imageSrc" alt="" />
@@ -28,7 +31,12 @@
         domain_url: ''
       };
     },
-
+    computed: {
+      // 是否是预约页
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status === 'subscribe';
+      }
+    },
     methods: {}
   };
 </script>
@@ -69,6 +77,9 @@
     .vmp-custom-menu-qrcode {
       max-width: 50%;
       /* 最小手机，自定义菜单高度大约为375px * 225px; */
+      &.qrcode-subscribe {
+        max-width: 100%;
+      }
     }
   }
 </style>

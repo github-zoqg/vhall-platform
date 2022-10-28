@@ -269,6 +269,11 @@ export default {
       cuid: ['comGoodsDetail'],
       method: 'open',
       args: ['$0']
+    },
+    emitShowGoodsTab: {
+      cuid: ['comTabMenuWap'],
+      method: 'setVisible',
+      args: ['$0']
     }
   },
   // 推荐组件

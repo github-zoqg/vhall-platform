@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/packages/chat/src/common/img/my-dark@2x.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpWatchPrivateChatMsgTemplate',
     filters: {

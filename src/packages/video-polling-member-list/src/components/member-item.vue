@@ -16,8 +16,8 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
   import phoneImg from '@/app-shared/assets/img/phone.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpMemberItem',
     filters: {},

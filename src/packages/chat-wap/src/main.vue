@@ -6,6 +6,7 @@
   import defaultLayout from './layouts/default-layout/main.vue';
   import fashionLayout from './layouts/fashion-layout/main.vue';
   import conciseLayout from './layouts/concise-layout/main.vue';
+
   export default {
     name: 'VmpChatWap',
 

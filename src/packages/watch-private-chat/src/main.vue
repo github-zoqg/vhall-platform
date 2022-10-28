@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/default_avatar.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import msgItem from './components/msg-item';
   import chatOperate from './components/chat-operate';
   import { useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
