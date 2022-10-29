@@ -12,6 +12,11 @@
       class="vmp-stream-local__stream-box"
       :id="`stream-${joinInfo.third_party_user_id}`"
     ></section>
+    <div v-if="initLocalSpeaker.streamId && liveStatus != 1" class="init-pop-scroll">
+      <p class="content">
+        <span>直播未开始，摄像头和麦克风仅自己可见</span>
+      </p>
+    </div>
     <!-- videoMuted 的时候显示流占位图; 开启分屏的时候显示分屏占位图 -->
     <section
       v-if="(localSpeaker.videoMuted || isShowSplitScreenPlaceholder) && mode != 1"
@@ -158,12 +163,6 @@
             @click="fullScreen"
           ></span>
         </el-tooltip>
-      </p>
-      <p
-        v-if="initLocalSpeaker.streamId && liveStatus != 1"
-        class="vmp-stream-local__shadow-second-line text-pop"
-      >
-        直播前打开或关闭设备，直播中生效
       </p>
     </section>
 
@@ -371,7 +370,7 @@
         console.log('-------localSpeaker更新--------', local, this.initLocalSpeaker);
         return (
           local ||
-          this.initLocalSpeaker ||
+          (this.initLocalSpeaker.streamId ? this.initLocalSpeaker : {}) ||
           this.$domainStore.state.videoPollingServer.localPollinger ||
           {}
         );
@@ -635,23 +634,9 @@
           // 开播前的check 本地流正在初始化中，检测异步创建的本地流，若本地流在初始化过程中，待初始化完销毁此流
           await this.checkPendingStream();
         }
-        let local = this.interactiveServer.state.localSpeaker;
         if (this.initLocalSpeaker?.streamId) {
           this.interactiveServer.destroyStream({ streamId: this.initLocalSpeaker.streamId });
-        }
-        if (local.streamId && local.audioMuted) {
-          this.interactiveServer.setDeviceStatus({
-            device: 1,
-            status: 0,
-            receive_account_id: this.joinInfo.third_party_user_id
-          });
-        }
-        if (local.streamId && local.videoMuted) {
-          this.interactiveServer.setDeviceStatus({
-            device: 2,
-            status: 0,
-            receive_account_id: this.joinInfo.third_party_user_id
-          });
+          this.interactiveServer.setLocalSpeaker({ streamId: null });
         }
       },
       // 开始直播成功的回调
@@ -1086,7 +1071,7 @@
       },
       // 媒体切换后进行无缝切换
       async switchStreamType(param) {
-        console.log('--switchStreamType--', param);
+        console.log('--switchStreamType--', param, this.liveStatus);
         // 音视频/图片推流 方式变更
         const { videoType, canvasImgUrl, isRepublishMode } = param;
         const { isPolling } = this.videoPollingServer.state;
@@ -1371,9 +1356,20 @@
           // check 本地流正在初始化中
           await this.checkPendingStream();
         }
+        console.log(
+          'createLocalStream=====',
+          this.localStreamId,
+          this.initLocalSpeaker,
+          this.liveStatus,
+          opt
+        );
         if (this.localStreamId || this.initLocalSpeaker.streamId) {
-          if (this.joinInfo.role_name == 1 && this.initLocalSpeaker.streamId) {
-            // 主持人，存在本地初始化流直接推流，不再重复创建
+          if (
+            this.joinInfo.role_name == 1 &&
+            this.initLocalSpeaker.streamId &&
+            opt.source == 'startPushOnce'
+          ) {
+            // 主持人，开始直播，存在本地初始化流直接推流，不再重复创建
             return Promise.resolve();
           }
           console.log(
@@ -1385,7 +1381,7 @@
           });
           this.interactiveServer.setDefMuted();
         }
-        console.log('创建本地流createLocalStream');
+        console.log('创建本地流createLocalStream', opt);
         this.pendingStream = true;
         if (this.$domainStore.state.mediaSettingServer.videoType == 'camera') {
           window.vhallReportForProduct?.toResultsReporting(110187, {
@@ -1543,13 +1539,13 @@
           console.log('handleClickMuteDevice-curStatus', !curStatus);
           if (deviceType == 'video') {
             this.interactiveServer.muteVideo({
-              streamId: this.localStreamId,
+              streamId: this.initLocalSpeaker.streamId,
               isMute: !curStatus // 是否禁用设备
             });
             this.interactiveServer.setLocalSpeaker({ videoMuted: !curStatus });
           } else {
             this.interactiveServer.muteAudio({
-              streamId: this.localStreamId,
+              streamId: this.initLocalSpeaker.streamId,
               isMute: !curStatus // 是否禁用设备
             });
             this.interactiveServer.setLocalSpeaker({ audioMuted: !curStatus });
@@ -1772,6 +1768,14 @@
 </script>
 
 <style lang="less">
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
   .vmp-stream-local {
     width: 100%;
     height: 100%;
@@ -1780,6 +1784,32 @@
       &:hover {
         .vmp-stream-local__shadow-box {
           display: flex;
+        }
+      }
+    }
+    .init-pop-scroll {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      box-sizing: border-box;
+      display: flex;
+      font-size: 12px;
+      color: #fff;
+      align-items: center;
+      justify-content: center;
+
+      .content {
+        flex: 1;
+        overflow: hidden;
+        span {
+          width: auto;
+          display: block;
+          padding-left: 105%;
+          padding-right: 120%;
+          white-space: nowrap;
+          animation: marquee 20s linear infinite;
         }
       }
     }
@@ -1998,11 +2028,6 @@
       .vmp-stream-local__shadow-second-line {
         line-height: 36px;
         min-width: 130px;
-        &.text-pop {
-          font-size: 12px;
-          color: #fff;
-          margin-top: 15px;
-        }
       }
       .vmp-stream-local__shadow-label {
         display: inline-block;

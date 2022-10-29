@@ -125,6 +125,17 @@
         <span v-html="noDefaultPopAlert.text"></span>
       </main>
     </saas-alert>
+    <!-- 嘉宾上麦前的设备禁用提示 -->
+    <saas-alert
+      :visible="micfrontPopAlert.visible"
+      :isShowClose="false"
+      :knowText="'确定'"
+      @onClose="closeFrontConfirm"
+    >
+      <main slot="content">
+        <span v-html="micfrontPopAlert.text"></span>
+      </main>
+    </saas-alert>
   </div>
 </template>
 
@@ -167,7 +178,12 @@
         },
         deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status,
         countDownTime: Number,
-        countDownTimer: null // 开播倒计时计时器
+        countDownTimer: null, // 开播倒计时计时器
+        micfrontPopAlert: {
+          // 嘉宾上麦前的禁用提示
+          text: '检测到您的设备（摄像头或麦克风）处于关闭状态，上麦后会自动打开。',
+          visible: false
+        }
       };
     },
     computed: {
@@ -329,13 +345,15 @@
       mediaCheckClick() {
         const device_status = useMediaCheckServer().state.deviceInfo.device_status;
         if (device_status == 1) {
-          this.handleApplyClick();
+          // this.handleApplyClick();
+          this.showConfirmPop();
         } else if (device_status == 0) {
           useMediaCheckServer()
             .getMediaInputPermission({ isNeedBroadcast: false })
             .then(flag => {
               if (flag) {
-                this.handleApplyClick();
+                // this.handleApplyClick();
+                this.showConfirmPop();
               } else {
                 this.$message.warning(this.$t('interact.interact_1039'));
               }
@@ -343,6 +361,19 @@
         } else {
           this.$message.warning(this.$t('interact.interact_1039'));
         }
+      },
+      showConfirmPop() {
+        const { videoMuted, audioMuted } = this.interactiveServer.state.localSpeaker;
+        if (videoMuted || audioMuted) {
+          this.micfrontPopAlert.visible = true;
+        } else {
+          this.handleApplyClick();
+        }
+      },
+      closeFrontConfirm() {
+        console.log('closeFrontConfirm-----');
+        this.micfrontPopAlert.visible = false;
+        this.handleApplyClick();
       },
       // 嘉宾点击申请上麦
       handleApplyClick() {
