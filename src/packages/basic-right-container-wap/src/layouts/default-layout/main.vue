@@ -37,6 +37,7 @@
 
 <style lang="less">
   .vmp-container-right-wap {
+    width: fit-content;
     .base-box {
       display: flex;
       flex-direction: column;
