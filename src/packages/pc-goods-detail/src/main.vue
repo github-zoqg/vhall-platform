@@ -93,7 +93,7 @@
           })
           .then(res => {
             if (res.code == 200) {
-              window.open(val);
+              window.open(res.data.shop_url);
             } else {
               this.$message.warning(this.$t('nav.nav_1056'));
               this.handleClose();
@@ -111,7 +111,7 @@
           })
           .then(res => {
             if (res.code == 200) {
-              window.open(info.goods_url);
+              window.open(res.data.goods_url);
               // 数据埋点
               window.vhallReportForWatch?.report(170030, {
                 goods_id: info.goods_id,
