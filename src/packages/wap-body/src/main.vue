@@ -198,6 +198,10 @@
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
+      // 竖屏直播下 文档和播放器是否互换位置。 默认 文档主画面，播放器小屏 false
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -262,20 +266,33 @@
       },
       // 竖屏，是否显示文档，文档播放器是否互换位置
       updateMini() {
-        const { isFullScreen, isDocMainScreen, isWapBodyDocSwitch, isShowPoster } = this;
-        return { isFullScreen, isDocMainScreen, isWapBodyDocSwitch, isShowPoster };
+        const { isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen, isShowPoster } = this;
+        return { isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen, isShowPoster };
       }
     },
     watch: {
       updateMini(val) {
-        console.log('【isFullScreen, isDocMainScreen, isWapBodyDocSwitch,isShowPoster】：', val);
+        console.log(
+          '【isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen,isShowPoster】：',
+          val
+        );
         if (
           val.isFullScreen &&
           val.isDocMainScreen &&
-          !val.isWapBodyDocSwitch &&
+          !val.isWapBodyDocSwitchFullScreen &&
           !val.isShowPoster
         ) {
           this.mini = true;
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerMini', [this.mini])
+          );
+        } else if (
+          val.isFullScreen &&
+          val.isDocMainScreen &&
+          val.isWapBodyDocSwitchFullScreen &&
+          !val.isShowPoster
+        ) {
+          this.mini = false;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitPlayerMini', [this.mini])
           );

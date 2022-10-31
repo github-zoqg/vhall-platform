@@ -8,7 +8,8 @@
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
       `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
-      isFullScreen ? 'isFullScreen' : ''
+      isFullScreen ? 'isFullScreen' : '',
+      isWapBodyDocSwitchFullScreen ? 'isWapBodyDocSwitchFullScreen' : ''
     ]"
     :style="{
       height:
@@ -161,6 +162,10 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      // 竖屏直播 wap-body和文档是否切换位置
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
       },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
@@ -316,7 +321,12 @@
 
       // 文档播放器互换位置
       transposition() {
-        this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
+        if (this.isFullScreen) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
+            !this.isWapBodyDocSwitchFullScreen;
+        } else {
+          this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
+        }
       },
 
       // 初始化事件
@@ -597,6 +607,15 @@
       .tools {
         margin-top: -88px !important;
       }
+    }
+
+    &.isWapBodyDocSwitchFullScreen {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      left: auto;
+      height: 160px;
+      width: 284px;
     }
     .vmp-doc-une__content {
       flex: 1;

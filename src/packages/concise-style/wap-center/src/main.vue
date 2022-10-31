@@ -7,7 +7,7 @@
       </p>
     </div>
     <div class="docGroup">
-      <!-- good组件-->
+      <!-- doc组件-->
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
     </div>
   </div>
