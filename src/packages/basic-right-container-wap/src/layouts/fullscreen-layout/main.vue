@@ -59,6 +59,7 @@
 
 <style lang="less">
   .vmp-container-right-fullscreen-wap {
+    width: fit-content;
     padding-top: 16px;
     .base-box {
       display: flex;

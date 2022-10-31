@@ -1,6 +1,14 @@
 /**
  * 【竖屏直播】wap观看端主直播页面配置
  */
+// 清屏事件配置
+const emitCleanScreenChange = [
+  {
+    cuid: 'comWapCenter',
+    method: 'getPlayerMini',
+    args: ['$0']
+  }
+];
 export default {
   // 根节点
   layerRoot: {
@@ -49,26 +57,38 @@ export default {
     ]
   },
   layerJaw: {
-    component: 'VmpContainer',
-    children: ['comContainerRight']
+    component: 'VmpCleanScreen',
+    className: 'vmp-basic-jaw',
+    children: ['comContainerRight'],
+    // 清屏事件
+    emitCleanScreenChange
   },
   // 颈部容器
   layerNeck: {
-    component: 'VmpContainer',
+    component: 'VmpCleanScreen',
     className: 'vmp-basic-neck',
-    children: ['comNoticeWap']
+    children: ['comNoticeWap'],
+    // 清屏事件
+    emitCleanScreenChange
   },
   // 中间主区域容器
   layerBody: {
-    component: 'VmpContainer',
+    component: 'VmpCleanScreen',
     className: 'vmp-basic-bd',
-    children: ['comWapCenter']
+    children: ['comWapCenter'],
+    options: {
+      isSelf: false
+    },
+    // 清屏事件
+    emitCleanScreenChange
   },
   // 中间主区域容器
   layerBodyBlock: {
-    component: 'VmpContainer',
+    component: 'VmpCleanScreen',
     className: 'vmp-block',
-    children: ['comBodyBlock']
+    children: ['comBodyBlock'],
+    // 清屏事件
+    emitCleanScreenChange
   },
   // 中间主区域内容容器
   comWapBody: {
