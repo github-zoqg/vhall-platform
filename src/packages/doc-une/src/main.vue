@@ -704,7 +704,7 @@
           w = width;
           h = height;
         }
-        return { width: w, height: h };
+        return { width: w, height: Math.ceil(h) };
       },
       /**
        * 初始化各种事件
@@ -1474,7 +1474,7 @@
     }
 
     &.vmp-doc-une--normal.has-stream-list {
-      top: 81px;
+      top: 80px;
     }
     &.vmp-doc-une--normal.no-delay-layout {
       top: 0px;
