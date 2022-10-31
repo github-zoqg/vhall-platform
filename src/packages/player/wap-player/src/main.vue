@@ -74,15 +74,17 @@
         </div>
         <div
           class="vmp-wap-player-header"
-          v-show="roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer"
+          v-show="
+            roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer && !isFullScreen
+          "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span v-if="!isConcise || !isFullScreen" @click="changePlayerSize(true)">
+            <span v-if="!isConcise" @click="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
-            <span v-if="!isFullScreen">
+            <span>
               <span class="hot_num hot_num_display">
                 <i class="vh-saas-iconfont vh-saas-line-heat"></i>
                 {{ hotNum | formatHotNum }}
