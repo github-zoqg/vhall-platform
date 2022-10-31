@@ -194,7 +194,10 @@
                     class="vmp-wap-player-control-icons-left-time"
                     v-if="!isLiving && !isWarnPreview"
                   >
-                    {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+                    <template v-if="totalTime > 0">
+                      {{ currentTime | secondToDate }}/{{ totalTime | secondToDate }}
+                    </template>
+                    <template v-else>--:--/--:--</template>
                   </span>
                 </span>
                 <!-- 右侧icon集合 倍速和画质 -->
@@ -579,27 +582,29 @@
           document.querySelector('.vmp-basic-bd').classList.remove('small_player');
         }
       });
+      this.getIsConcise();
       this.setSetingHeight();
-
-      let skin_json_wap = {
-        style: 1
-      };
-      const skinInfo = this.roomBaseState.skinInfo;
-      if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
-        skin_json_wap = JSON.parse(skinInfo.skin_json_wap);
-      }
-      if (skin_json_wap?.style == 3) {
-        this.isConcise = true;
-      } else {
-        this.isConcise = false;
-      }
     },
     methods: {
+      getIsConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.roomBaseState.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        if (skin_json_wap?.style == 3) {
+          this.isConcise = true;
+        } else {
+          this.isConcise = false;
+        }
+      },
       /**
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe) return;
+        if (this.isSubscribe || this.isConcise) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;

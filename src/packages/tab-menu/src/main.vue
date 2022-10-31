@@ -40,7 +40,7 @@
       </span>
     </header>
 
-    <main class="vmp-tab-menu__main">
+    <main class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content ref="tabContent" :menu="menu" :auth="auth" @noticeHint="handleHint" />
     </main>
   </section>
@@ -103,6 +103,7 @@
             if (item.type == 'notice' && !this.auth.notice) return false; // 公告
           } else {
             if (item.type == 7 && !this.auth.chapter) return false; // 章节
+            if (item.type == 5) return item.visible; // 商品
           }
 
           // pageEnv判断
@@ -211,6 +212,10 @@
             type: msg.data.type,
             interactStatus: true
           });
+          if (this.visibleMenu.length == 1) {
+            // 默认显示菜单中的第一个
+            this.selectDefault();
+          }
         });
         //收到问答关闭消息
         qaServer.$on(qaServer.Events.QA_CLOSE, msg => {
@@ -228,6 +233,8 @@
             type: msg.data.type,
             interactStatus: true
           });
+          // 默认显示菜单中的第一个
+          this.selectDefault();
         });
         //收到问答修改消息
         qaServer.$on(qaServer.Events.QA_SET, msg => {
@@ -245,6 +252,9 @@
         chatServer.$on('receivePrivateMsg', () => {
           if (this.webinarInfo.type == 1) {
             this.setVisible({ visible: true, type: 'private' });
+          }
+          if (this.visibleMenu.length == 1) {
+            this.selectDefault();
           }
         });
 
@@ -528,6 +538,17 @@
         if (index > 0 && lastItem !== undefined) {
           const { type, id } = lastItem;
           this.select({ type, id });
+        }
+      },
+      // 预约页-商品调整
+      async setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
+        this.setVisible({ visible, type, id, name });
+        await this.$nextTick();
+        if (this.visibleMenu && this.visibleMenu.length > 0) {
+          // 默认显示菜单中的第一个
+          this.selectDefault();
+          this.scrollToItem({ id: this.selectedId });
+          this.computedWidth();
         }
       }
     }

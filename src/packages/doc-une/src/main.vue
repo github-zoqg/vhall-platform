@@ -155,21 +155,23 @@
   import {
     useRoomBaseServer,
     useDocServer,
-    useMsgServer,
     useGroupServer,
     useInteractiveServer,
     useMemberServer,
     useRebroadcastServer,
     useDesktopShareServer,
     usePlayerServer,
-    useMicServer
+    useMicServer,
+    useSplitScreenServer
   } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import {
     cl_handleScreen,
     cl_setDocMenu,
-    cl_moveToDoc
+    cl_moveToDoc,
+    cl_docComplete
   } from '@/app-shared/client/client-methods.js';
+  import clientMsgApi from '@/app-shared/utils/clientMsgApi';
   export default {
     name: 'VmpDocUne',
     components: { VmpDocToolbar },
@@ -283,6 +285,7 @@
         // 1、发起端没有开启桌面共享时展示
         // 2、主持人开启桌面共享时，如果开了文档，助理端优先展示文档
         // 3、观看端，主持人开启了观众可见或者在小组中或者有演示权限,不能是单视频嵌入页
+        // 4. 未上麦的观众 | 未出实话互动 | 合并模式不显示文档
         if (this.isWatch) {
           if (!this.isEmbedVideo) {
             if (this.hasDocPermission) {
@@ -291,7 +294,14 @@
               if (this.micServer.state.isSpeakOn && this.isShareScreen) {
                 return false;
               } else {
-                return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+                if (
+                  !this.$domainStore.state.interactiveServer.isInstanceInit &&
+                  this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1
+                ) {
+                  return false;
+                } else {
+                  return this.docServer.state.switchStatus || this.groupServer.state.isInGroup;
+                }
               }
             }
           } else {
@@ -406,6 +416,62 @@
       // 互动无延迟 未上麦观众是否使用类似旁路布局
       isUseNoDelayLayout() {
         return !this.localSpeaker.accountId && this.webinarMode == 3 && this.isNoDelay == 1;
+      },
+      isHostPermission() {
+        const { watchInitData, interactToolStatus } = this.$domainStore.state.roomBaseServer;
+        return (
+          watchInitData.join_info.role_name == 1 ||
+          interactToolStatus.doc_permission == watchInitData.join_info.third_party_user_id
+        );
+      },
+      isGroupLeader() {
+        const { groupInitData } = this.$domainStore.state.groupServer;
+        return (
+          groupInitData.isInGroup &&
+          this.watchInitData.join_info.third_party_user_id == groupInitData.doc_permission
+        );
+      },
+      isOpenSplitScreen() {
+        return this.$domainStore.state.splitScreenServer.isOpenSplitScreen;
+      },
+      // 是否开启文档云融屏功能
+      isOpenDocStream() {
+        /**
+         * 开启文档融屏需同时满足一下条件
+         * 1.主持人/嘉宾，分组中的组长
+         * 2.开启观众可见
+         * 3.互动实例初始化成功 || 开启分屏
+         * 4.直播中
+         * 5.演示文档/白板加载完成（主讲人自己/演示者演示文档）
+         * 6.存在文档id
+         * 7.开启文档融屏功能
+         */
+        const docStatus =
+          this.$domainStore.state.docServer.switchStatus &&
+          !!this.$domainStore.state.docServer.currentCid;
+        const precondition =
+          (this.isHostPermission || this.isGroupLeader) &&
+          (this.$domainStore.state.interactiveServer.isInstanceInit || this.isOpenSplitScreen) &&
+          this.webinarType == 1 &&
+          this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout == 1;
+
+        console.table({
+          docStatus,
+          precondition,
+          isHostPermission: this.isHostPermission,
+          isGroupLeader: this.isGroupLeader,
+          switchStatus: this.$domainStore.state.docServer.switchStatus,
+          isInstanceInit: this.$domainStore.state.interactiveServer.isInstanceInit,
+          isOpenSplitScreen: this.isOpenSplitScreen,
+          liveStatus: this.webinarType,
+          currentCid: this.$domainStore.state.docServer.currentCid,
+          speakerAndShowLayout: this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout
+        });
+
+        return {
+          docStatus,
+          precondition
+        };
       }
     },
     watch: {
@@ -413,12 +479,19 @@
       ['docServer.state.switchStatus'](newval) {
         if (this.isWatch && [4, 5].includes(this.webinarType)) {
           // 如果是回放会点播,文档显示与不显示是切换处理
-          if (newval) {
+          // 如果当前场次开启云渲染，不能把播放器设为小屏
+          if (newval && this.roomBaseServer.state.interactToolStatus.speakerAndShowLayout != 1) {
             useRoomBaseServer().setChangeElement('player');
           } else {
             // 文档不可见设置小屏''
             useRoomBaseServer().setChangeElement('');
           }
+        }
+        if (this.$route?.query.assistantType) {
+          cl_docComplete({
+            doc_loaded: !!this.currentCid,
+            switch: this.docServer.state.switchStatus
+          });
         }
       },
       // 通道变更
@@ -451,6 +524,20 @@
       // 演示者变更时,隐藏缩列图列表
       presenterId() {
         this.thumbnailShow = false;
+      },
+      // 开启文档云融屏
+      isOpenDocStream: {
+        handler(newval) {
+          // 开启融屏的前置条件是否满足 || 是否是客户端嵌入页
+          if (!newval.precondition || this.$route?.query.assistantType) return;
+          if (newval.docStatus) {
+            console.log('open-doc-yun-stream');
+            this.openDocYunStream();
+          } else {
+            console.log('close-doc-yun-stream');
+            this.closeDocYunStream();
+          }
+        }
       }
     },
     beforeCreate() {
@@ -461,11 +548,27 @@
       this.interactiveServer = useInteractiveServer();
       this.memberServer = useMemberServer();
       this.micServer = useMicServer();
+      this.splitScreenServer = useSplitScreenServer();
     },
     created() {
       window.addEventListener('keydown', this.listenKeydown);
     },
     methods: {
+      // 开启文档云融屏
+      openDocYunStream() {
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.openDocCloudStreamEvent();
+        } else {
+          this.interactiveServer.openDocCloudStream();
+        }
+      },
+      closeDocYunStream() {
+        if (this.isOpenSplitScreen) {
+          this.splitScreenServer.closeDocCloudStreamEvent();
+        } else {
+          this.interactiveServer.closeDocCloudStream();
+        }
+      },
       /**
        * 全屏切换
        */
@@ -692,6 +795,26 @@
 
         // 文档不存在或已删除
         this.docServer.$on('dispatch_doc_not_exit', this.dispatchDocNotExit);
+
+        if (this.$route?.query.assistantType) {
+          // 当前文档加载完成
+          this.docServer.$on('dispatch_doc_load_complete', () => {
+            cl_docComplete({
+              doc_loaded: !!this.currentCid,
+              switch: this.docServer.state.switchStatus
+            });
+          });
+
+          clientMsgApi.onQtCallFunctionPage(msg => {
+            // 客户端请求获取文档云渲染相关参数事件
+            if (msg === 1 || msg === 2 || msg === 15) {
+              cl_docComplete({
+                doc_loaded: !!this.currentCid,
+                switch: this.docServer.state.switchStatus
+              });
+            }
+          });
+        }
       },
 
       listenKeydown(e) {
@@ -1028,6 +1151,11 @@
           if (this.$route.query.assistantType) {
             return;
           }
+          if (this.$domainStore.state.roomBaseServer.clientType == 'record') {
+            // 如果是录制页面，结束录制不会派发结束直播的消息，domain中的自动重置逻辑不会触发
+            // 所以需要单独执行 handleLiveOver
+            this.docServer.handleLiveOver();
+          }
           this.setDisplayMode('normal');
           // 通知默认菜单和工具栏默认为文档
           window.$middleEventSdk?.event?.send(
@@ -1346,7 +1474,7 @@
     }
 
     &.vmp-doc-une--normal.has-stream-list {
-      top: 80px;
+      top: 81px;
     }
     &.vmp-doc-une--normal.no-delay-layout {
       top: 0px;
@@ -1356,8 +1484,8 @@
     &.vmp-doc-une--mini {
       position: absolute;
       width: 360px;
-      height: 204px;
-      min-height: 204px;
+      height: 202px;
+      min-height: 202px;
       top: 0;
       right: 0;
       z-index: 10;

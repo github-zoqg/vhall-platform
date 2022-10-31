@@ -263,9 +263,10 @@
         const { interactiveServer, roomBaseServer, micServer } = this.$domainStore.state;
         return (
           (roomBaseServer.watchInitData.join_info.role_name == 2 &&
-            roomBaseServer.watchInitData.webinar.mode == 3 &&
-            roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
-            (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+            ((roomBaseServer.watchInitData.webinar.mode == 3 &&
+              roomBaseServer.watchInitData.webinar.no_delay_webinar != 1 &&
+              (!micServer.isSpeakOn || !interactiveServer.isInstanceInit)) ||
+              roomBaseServer.watchInitData.webinar.mode == 2)) ||
           interactiveServer.initInteractiveFailed
         );
       },
@@ -816,6 +817,7 @@
       // 订阅插播流
       subscribeInsert() {
         //观众加载旁路播放器的情况下，不走订阅插播流
+        console.log('subscribeInsert---', this.isPlayerInit);
         if (this.isPlayerInit) return;
         const opt = {
           videoNode: 'vmp-insert-subscribe-stream', // 远端流显示容器，必填
@@ -847,6 +849,7 @@
       // 取消订阅插播流
       unsubscribeInsert() {
         // 观众加载旁路播放器的情况下，不走取消订阅插播流
+        console.log('unsubscribeInsert---', this.isPlayerInit);
         if (this.isPlayerInit) return;
         // 隐藏插播流组件
         this.insertFileStreamVisible = false;

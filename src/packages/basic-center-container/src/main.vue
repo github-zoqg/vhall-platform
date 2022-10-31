@@ -59,7 +59,7 @@
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skinJsonPc = {};
         if (skinInfo?.skin_json_pc && skinInfo.skin_json_pc != 'null') {
-          skinJsonPc = JSON.parse(skinInfo.skin_json_pc);
+          skinJsonPc = skinInfo.skin_json_pc;
         }
         return skinJsonPc?.videoBackGroundColor || '#000';
       }
@@ -169,6 +169,6 @@
   // .vmp-basic-center
   .vmp-basic-center__mainscreen-pos {
     width: 100%;
-    padding-top: 56.25%;
+    padding-top: calc(56.25% - 0.5px);
   }
 </style>

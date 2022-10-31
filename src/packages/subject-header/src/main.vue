@@ -9,7 +9,7 @@
       <div class="subject_title">
         <div class="subject_title_intro">
           <p>{{ subjectInfo.title }}</p>
-          <span>{{ subjectInfo.created_at }}</span>
+          <!-- <span>{{ subjectInfo.created_at }}</span> -->
         </div>
       </div>
       <div class="subject_collapse">
@@ -117,7 +117,7 @@
 <style lang="less">
   .vmp-subject-header {
     width: 100%;
-    height: 64px;
+    height: 72px;
     background: #fff;
     &_container {
       width: 100%;
@@ -149,7 +149,7 @@
           width: 100%;
         }
         p {
-          padding-top: 13px;
+          padding-top: 22px;
           line-height: 24px;
           color: #1a1a1a;
           font-size: 18px;
@@ -168,23 +168,30 @@
         display: flex;
         justify-items: center;
         justify-content: flex-end;
-        flex: 0 0 220px;
+        flex: 0 0 280px;
         &_share {
           text-align: center;
-          font-size: 14px;
+          font-size: 12px;
           cursor: pointer;
-          color: #666;
+          color: #666666;
           margin-top: 18px;
-          padding-right: 14px;
+          padding-right: 24px;
           span {
             display: block;
-            padding-top: 3px;
+            padding-top: 6px;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 14px;
           }
         }
         &_login {
-          padding: 16px 0 0 10px;
+          padding: 18px 0;
+          margin-right: 24px;
         }
         &_unlogin {
+          height: 36px;
+          line-height: 36px;
           p {
             width: 36px;
             height: 36px;
@@ -217,6 +224,7 @@
             cursor: pointer;
             align-items: center;
             justify-content: center;
+            height: 36px;
             p {
               width: 36px;
               height: 36px;

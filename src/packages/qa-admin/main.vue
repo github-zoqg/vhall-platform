@@ -122,9 +122,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
-                    <!-- <div class="lf-content"> -->
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -185,8 +183,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -271,8 +268,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -308,8 +304,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -403,8 +398,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -440,8 +434,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -526,8 +519,7 @@
                     <span class="await-id" v-if="item.sequence">
                       {{ `${item.sequence}`.padStart(2, '0') }}
                     </span>
-                    <img v-if="item.avatar" class="avatar" :src="item.avatar" />
-                    <img v-else class="avatar" src="./images/answer_default.png" />
+                    <img class="avatar" :src="item.avatar || defaultAvatar" />
                     <el-tooltip
                       class="item"
                       effect="dark"
@@ -595,8 +587,7 @@
                     :key="ite.id"
                   >
                     <p class="answer-title">
-                      <img v-if="ite.avatar" class="avatar" :src="ite.avatar" />
-                      <img v-else class="avatar" src="./images/answer_default.png" />
+                      <img class="avatar" :src="ite.avatar || defaultAvatar" />
                       <el-tooltip
                         class="item"
                         effect="dark"
@@ -760,6 +751,7 @@
 </template>
 
 <script>
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import {
     useRoomBaseServer,
     useQaAdminServer,
@@ -770,7 +762,7 @@
   } from 'middle-domain';
   import { debounce } from 'lodash';
   import PrivateChat from '@/packages/live-private-chat/src/main.vue';
-  import { textToEmoji } from '@/packages/chat/src/js/emoji';
+  import { textToEmoji } from '@/packages/chat/src/common/js/emoji';
   import { getQueryString } from '@/app-shared/utils/tool';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
   export default {
@@ -825,7 +817,8 @@
           visible: false,
           confirm: true,
           type: null
-        }
+        },
+        defaultAvatar
       };
     },
     computed: {
@@ -980,7 +973,7 @@
         this.textReply();
       },
       // 检索问答
-      handleSearchQaList() {
+      handleSearchQaList(isReload = true) {
         const searchContent = this.exactSearch[`exactSearch${this.activeIndex}`];
         if (searchContent) {
           this.qaServer.setState('isSearch', true);
@@ -991,7 +984,15 @@
         // 原来数组顺序 0 - 未回复；1-标记为直播中回答；2-文字回复；3-不处理
         // 现在数组顺序 0 - 未回复；1-文字回复；2-不处理；3-标记为直播中回答
         const queryStatusList = [0, 3, 1, 2]; //当前数组对应查询类型为 ['未回复', '已回复', '不处理', '在直播中回答']
-        this.getQuestionAnswerByTab(queryStatusList[this.activeIndex], 0, searchContent);
+        if (isReload) {
+          this.getQuestionAnswerByTab(queryStatusList[this.activeIndex], 0, searchContent);
+        } else {
+          this.getQuestionAnswerByTab(
+            queryStatusList[this.activeIndex],
+            (this.activeObj.page - 1) * this.page_size,
+            searchContent
+          );
+        }
       },
       clearSearchQaList() {
         this.exactSearch[`exactSearch${this.activeIndex}`] = '';
@@ -1120,14 +1121,17 @@
       // 更多（私聊 & 在直播中回答）: 修复42302-标记为直播中回答时数组移除错误问题后引入的 不处理错误问题。
       replyBut(val) {
         if (val.type == 'audio') {
+          // 标记为直播中回答
           this.reply(val.type, val.item, val.index);
         } else {
+          // 其它场景
           this.reply(val, val.item, val.index);
         }
       },
       reply: debounce(async function (val, item, index) {
         if (typeof val == 'object') {
           if (val.type == 'private') {
+            // 私聊
             await this.$refs.privateChat.openModal();
             this.$nextTick(() => {
               this.$refs.privateChat.addChatItem({
@@ -1139,39 +1143,44 @@
               });
             });
           } else {
-            this.qaServer
-              .replyUserQuestion({
-                question_id: val.item.id,
-                room_id: this.baseObj.interact.room_id,
-                type: 1,
-                is_open: 1
-              })
-              .then(res => {
-                if (res.code != 200) {
-                  this.$message.error(res.msg);
-                }
-              });
+            // 其它
+            this.sendReplyUserQuestion(item, 1);
           }
         } else {
+          // 回复
           if (val == 'text') {
+            // 文字回复
             this.qaServer.replayIsText(item, index);
           } else if (val == 'audio') {
             // 设置为直播中回答
-            this.qaServer
-              .replyUserQuestion({
-                question_id: item.id,
-                room_id: this.baseObj.interact.room_id,
-                type: 2,
-                is_open: 1
-              })
-              .then(res => {
-                if (res.code != 200) {
-                  this.$message.error(res.msg);
-                }
-              });
+            this.sendReplyUserQuestion(item, 2);
           }
         }
       }, 300),
+      // 减少冗余代码
+      sendReplyUserQuestion(item, type) {
+        this.qaServer
+          .replyUserQuestion({
+            question_id: item.id,
+            room_id: this.baseObj.interact.room_id,
+            type: type,
+            is_open: 1
+          })
+          .then(res => {
+            if (res.code != 200) {
+              this.$message.error(res.msg);
+            } else {
+              // 执行成功，判断下当前awaitList数据情况，若为0，当前tab还停留在未回复，刷新页面数据
+              if (
+                this.awaitList &&
+                this.awaitList.length < this.page_size &&
+                this.activeObj.count > 0
+              ) {
+                this.handleSearchQaList(false);
+              }
+            }
+          });
+      },
       async messClick() {
         console.warn('qa messClick---------->', this.priteChatList);
         this.privateFlag = true;

@@ -1,5 +1,12 @@
 <template>
-  <div id="vmp-wap-insert-file" v-show="isOpenInsertFile">
+  <div
+    id="vmp-wap-insert-file"
+    :class="{
+      'vmp-wap-insert-file-main-screen': isMergeMode,
+      'vmp-wap-insert-file-main-screen-top': isMergeMode && !isSpeakOn
+    }"
+    v-show="isOpenInsertFile && !isAudio"
+  >
     <!-- 订阅桌面共享容器 -->
   </div>
 </template>
@@ -13,6 +20,17 @@
     computed: {
       isOpenInsertFile() {
         return this.insertFileServer.state.insertStreamInfo.streamId;
+      },
+      // 是否是音频插播
+      isAudio() {
+        return !this.$domainStore.state.insertFileServer.insertStreamInfo.has_video;
+      },
+      // 是否是合并模式
+      isMergeMode() {
+        return this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1;
+      },
+      isSpeakOn() {
+        return this.$domainStore.state.micServer.isSpeakOn;
       }
     },
     beforeCreate() {
@@ -70,6 +88,8 @@
 </script>
 
 <style lang="less">
+  @desk-w: 597px;
+  @desk-h: 337px;
   #vmp-wap-insert-file {
     width: 100%;
     height: 100%;
@@ -77,5 +97,15 @@
     top: 0;
     left: 0;
     z-index: 1;
+    // 合并模式下，桌面共享只占主画面
+    &.vmp-wap-insert-file-main-screen {
+      width: @desk-w;
+      height: @desk-h;
+      left: calc((100% - @desk-w) / 2);
+      top: 85px;
+      &-top {
+        top: 0;
+      }
+    }
   }
 </style>

@@ -16,7 +16,8 @@ export default {
   '--theme-header-icon-color': 'rgba(255, 255, 255, 0.45)',
   '--theme-header-icon-rehearsal-color': '#fb2626',
   // 聊天区域
-  '--theme-chat-input-bg': 'rgba(0, 0, 0, 0.1)',
+  '--theme-chat-input-bg': 'rgba(255, 255, 255, 0.1)',
+  '--theme-chat-input-placeholder-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-chat-msg-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-chat-msg-timeline': 'rgba(255, 255, 255, 0.65)',
   '--theme-chat-msg-gift-font': 'rgba(255, 255, 255, 0.65)',
@@ -45,7 +46,7 @@ export default {
   '--theme-color-sub': '#ffd1c9',
   //分组
   '--theme-group-color': 'rgba(255, 255, 255, 0.65)',
-  '--theme-group-name-color': 'rgba(255, 255, 255, 0.45)',
+  '--theme-group-name-color': '#FFFFFF',
   //菜单-内容
   '--tab-menu-btn-color': 'rgba(255, 255, 255, 0.45)',
   //简介
@@ -54,56 +55,90 @@ export default {
   '--theme-tab-content-intro-introLink-font': 'rgba(255, 255, 255, 0.45)',
   '--theme-tab-content-intro-introLink-bg': 'transparent',
   //商品
-  '--theme-tab-content-good-name-font': '#ffffff',
+  '--theme-tab-content-good-name-font': '#FFFFFF',
   '--theme-tab-content-good-describe-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-good-discountPrice-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-good-priceTag-bg': '#fff2f0',
-  '--theme-tab-content-good-price-font': '#fff',
-  '--theme-tab-content-good-buy-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-good-buyBorder-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-good-bg': '#262626',
+  '--theme-tab-content-good-discountPrice-font': 'rgba(255, 255, 255, 0.25)',
+  '--theme-tab-content-good-priceTag-bg': 'rgba(255, 240, 240, 1)',
+  '--theme-tab-content-good-priceTag-font': 'rgba(251, 58, 50, 1)',
+  '--theme-tab-content-good-price-font': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-buy-bg': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-buy-font': '#FFFFFF',
+  '--theme-tab-content-good-buyBorder-font': 'rgba(251, 38, 38, 1)',
+  // '--theme-tab-content-good-buy-bg-active': 'rgba(251, 38, 38, 1)',
+  // '--theme-tab-content-good-buy-font-active': '#FFFFFF',
+  // '--theme-tab-content-good-buyBorder-font-active': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-bg': ' ',
+  '--theme-tab-content-good-bg-active': 'rgba(255, 255, 255, 0.06)',
   '--theme-tab-content-good-split-bg': 'rgba(255, 255, 255, 0.06)',
-  //排行榜
+  '--theme-tab-content-good-detail-mask-bg': 'rgba(0, 0, 0, 1)',
+  '--theme-tab-content-good-detail-content-bg': 'rgba(38, 38, 38, 1)',
+  '--theme-tab-content-good-detail-btn-shadow-color': '#333333',
+  '--theme-tab-content-good-detail-btn-store-bg': '',
+  '--theme-tab-content-good-detail-btn-store-font': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-detail-btn-store-border': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-detail-btn-buy-bg': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-good-detail-btn-buy-font': '#FFFFFF',
+  '--theme-tab-content-good-detail-btn-buy-border': 'rgba(251, 38, 38, 1)',
+  // 排行榜
   '--theme-tab-content-rank-title-font': '#fff',
-  '--theme-tab-content-rank-rule-active-font': '#fb2626',
-  '--theme-tab-content-rank-rule-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-rank-rule-bg': 'rgba(255, 255, 255, 0.06)',
+  '--theme-tab-content-rank-rule-active-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-rank-rule-font': '',
+  '--theme-tab-content-rank-rule-bg': '',
   '--theme-tab-content-rank-rule-content-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-rank-rule-content-bg': 'rgba(255, 255, 255, 0.06)',
-  '--theme-tab-content-rank-content-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-rank-rule-content-bg': '#000000',
+  '--theme-tab-content-rank-content-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-tab-content-rank-noData-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-rank-li-border-color': '',
+  '--theme-tab-content-rank-li-label-color': '#FFFFFF',
+  '--theme-tab-content-rank-li-num-color': 'rgba(251, 38, 38, 1)',
   '--theme-tab-content-rank-bg-font': 'transparent',
-  //图文组件
-  '--theme-tab-content-word-font': 'rgba(255, 255, 255, 0.65)',
-  //直播
-  '--theme-tab-content-live-title-font': '#fff',
+  // 自定义菜单-图文组件
+  '--theme-tab-content-word-font': 'rgba(255, 255, 255, 1)',
+  // 自定义菜单-直播组件
+  '--theme-tab-content-live-title-font': 'rgba(255, 255, 255, 1)',
   '--theme-tab-content-live-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-live-card-bg': '#383838',
-  //专题
-  '--theme-tab-content-project-title-font': '#fff',
+  '--theme-tab-content-live-card-bg': ' ',
+  // 自定义菜单-专题组件
+  '--theme-tab-content-project-title-font': 'rgba(255, 255, 255, 1)',
   '--theme-tab-content-project-info-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-project-card-bg': '#383838',
-  //自定义菜单
-  '--theme-tab-content-title-font': '#fff',
-  //推荐
-  '--theme-tab-content-recommend-title-font': '#fff',
-  '--theme-tab-content-recommend-buy-font': 'rgba(255, 255, 255, 0.65)',
-  '--theme-tab-content-recommend-buy-border': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-recommend-bg': '#262626',
+  '--theme-tab-content-project-card-bg': ' ',
+  // 自定义菜单-标题组件
+  '--theme-tab-content-title-font': 'rgba(255, 255, 255, 1)',
+  // 自定义菜单-分割线组件
+  '--theme-tab-content-link-border': 'rgba(255, 255, 255, 0.1)',
+  // 广告推荐
+  '--theme-tab-content-recommend-bg': '',
+  '--theme-tab-content-recommend-active-bg': 'rgba(255, 255, 255, 0.06)',
   '--theme-tab-content-recommend-border': 'rgba(255, 255, 255, 0.06)',
-  '--theme-tab-content-recommend-bg-font': '#fb2626',
+  '--theme-tab-content-recommend-title-font': '#FFFFFF',
+  '--theme-tab-content-recommend-buy-bg': 'rgba(251, 38, 38, 1)',
+  '--theme-tab-content-recommend-buy-font': '#FFFFFF',
+  '--theme-tab-content-recommend-buy-border': 'rgba(251, 38, 38, 1)',
+  // '--theme-tab-content-recommend-buy-active-bg': 'rgba(251, 38, 38, 1)',
+  // '--theme-tab-content-recommend-buy-active-font': '#FFFFFF',
+  // '--theme-tab-content-recommend-buy-active-border': 'rgba(251, 38, 38, 1)',
   //文档
   '--theme-tab-content-doc-font': 'rgba(255, 255, 255, 0.45)',
   //问答
-  '--theme-tab-content-qa-text-font': 'rgba(255, 255, 255, 0.45)',
-  '--theme-tab-content-qa-replyText-font': '#fff',
-  '--theme-tab-content-qa-replyText-bg': 'rgba(255, 255, 255, 0.08)',
-  '--theme-tab-content-qa-qaLabel-font': '#fc9600',
-  '--theme-tab-content-qa-onlyMe-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-qa-chat-sendBox-bg': 'transparent',
+  '--theme-qa-chat-sendBox-shadow': 'unset',
+  '--theme-qa-chat-input-bg': 'rgba(255, 255, 255, 0.1)',
+  '--theme-qa-chat-input-space-color': 'rgba(255, 255, 255, 0.25)',
+  '--theme-qa-chat-input-placeholder-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-onlyMe-check': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-name-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-qa-content-font': '#ffffff',
+  '--theme-tab-content-qa-question-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-time-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-qa-content-bg': 'rgba(0, 0, 0, 0.85)',
+  '--theme-tab-content-qa-onlyMe-font': ' rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-qa-onlyMe-checkbox-active-border': 'rgba(251, 58, 50, 1)',
+  '--theme-tab-content-qa-onlyMe-checkbox-active-bg': 'rgba(251, 58, 50, 1)',
   //私聊
   '--theme-tab-content-private-name-font': 'rgba(255, 255, 255, 0.65)',
   '--theme-tab-content-private-content-font': '#fff',
-  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.65)',
+  '--theme-tab-content-private-time-font': 'rgba(255, 255, 255, 0.45)',
+  '--theme-tab-content-private-content-bg': 'rgba(0, 0, 0, 0.85)',
   //组件
   '--theme-component-qa': '#fb2626',
   '--theme-component-subscribe': '#fb2626',
@@ -119,6 +154,6 @@ export default {
   // 章节
   '--theme-chapter-list-bg': '#262626',
   '--theme-chapter-font-color-title': '#ffffff',
-  '--theme-chapter-font-color-time': 'rgba(255,255,255,0.45)',
-  '--theme-chapter-font-color-active': '#fb2626'
+  '--theme-chapter-font-color-time': 'rgba(255, 255, 255, 0.65)',
+  '--theme-chapter-font-color-active': '#FB2626'
 };

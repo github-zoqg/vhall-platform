@@ -209,22 +209,22 @@
         <div v-if="findStep === 3" class="step-3">
           <el-form ref="resetPassword" :model="dynamicForm" :rules="loginRules">
             <el-form-item prop="password">
-              <pwd-input
+              <el-input
                 v-model.trim="dynamicForm.password"
                 :placeholder="$t('login.login_1052')"
                 :maxlength="30"
                 type="password"
                 auto-complete="off"
-              ></pwd-input>
+              ></el-input>
             </el-form-item>
             <el-form-item prop="checkPassword">
-              <pwd-input
+              <el-input
                 v-model.trim="dynamicForm.checkPassword"
                 :placeholder="$t('login.login_1053')"
                 type="password"
                 :maxlength="30"
                 auto-complete="off"
-              ></pwd-input>
+              ></el-input>
             </el-form-item>
             <div class="login-btn">
               <el-button
@@ -250,12 +250,12 @@
   </div>
 </template>
 <script>
-  import PwdInput from './components/pwd-input';
+  // import PwdInput from './components/pwd-input';
   import NECaptcha from './components/NECaptcha';
   import { useUserServer } from 'middle-domain';
   export default {
     components: {
-      PwdInput,
+      // PwdInput,
       NECaptcha
     },
     data() {

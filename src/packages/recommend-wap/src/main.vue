@@ -149,8 +149,7 @@
 </script>
 <style lang="less">
   .vmp-recommend {
-    // background: #fff;
-    // padding: 0px 32px;
+    padding: 24px 0 0 0;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -162,51 +161,26 @@
       margin-bottom: 100px;
       overflow: hidden;
     }
-    /* .recommend-item {
-        width: 330px;
-        // height: 230px;
-        margin: 15px;
-        float: left;
-        a {
-          display: inline-block;
-          width: 330px;
-          height: 230px;
-          margin-bottom: 30px;
-        }
-        .banner {
-          width: 100%;
-          height: 186px;
-          border-radius: 8px;
-          object-fit: scale-down;
-          border: 1px solid #e6e6e6;
-        }
-        .title {
-          margin-top: 15px;
-          font-size: 28px;
-          font-weight: bold;
-          color: rgba(51, 51, 51, 1);
-          line-height: 30px;
-          height: 34px;
-        }
-      }
-      */
     .recommend-item__content {
       display: flex;
-      padding: 24px 0;
+      padding: 16px 0;
+      margin: 0 24px;
       border-bottom: 1px solid var(--theme-tab-content-recommend-border);
       background-color: var(--theme-tab-content-recommend-bg);
       &__cover {
         width: 240px;
-        height: 135px;
+        height: 136px;
         background: #1a1a1a;
-        border-radius: 16px;
+        border-radius: 4px;
         flex-shrink: 0;
         .ad_img {
-          width: 100%;
           height: 100%;
-          object-fit: cover;
-          object-position: left top;
-          border-radius: 12px;
+          width: 100%;
+          -o-object-fit: contain;
+          object-fit: contain;
+          -o-object-position: center;
+          object-position: center;
+          border-radius: 4px;
           &.ad_bg_1 {
             object-fit: fill;
           }
@@ -220,11 +194,13 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding-left: 24px;
+        padding-left: 16px;
         &-title {
           color: var(--theme-tab-content-recommend-title-font);
+          font-style: normal;
+          font-weight: 400;
           font-size: 28px;
-          line-height: 38px;
+          line-height: 39px;
           display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
           /* autoprefixer: ignore next */
           -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
@@ -233,22 +209,42 @@
         }
         &-link {
           display: inline-block;
-          width: 120px;
-          height: 54px;
-          line-height: 54px;
-          border-radius: 32px;
-          border: 1px solid var(--theme-color);
-          color: var(--theme-color);
+          margin-right: auto;
+          // width: 120px;
+          // height: 50px;
+          // line-height: 50px;
+          padding: 8px 24px;
+          line-height: 34px;
+          border-radius: 26px;
+          font-style: normal;
+          font-weight: 400;
           font-size: 24px;
           text-align: center;
+          background: var(--theme-tab-content-recommend-buy-bg);
+          border: 1px solid var(--theme-tab-content-recommend-buy-border);
+          color: var(--theme-tab-content-recommend-buy-font);
         }
       }
     }
     .van-cell {
-      padding: 0px 32px;
+      padding: 0 0;
       position: relative;
       line-height: 30px;
       background-color: var(--theme-tab-content-recommend-bg);
+      // 废弃每列hover效果
+      // &:active {
+      //   background-color: var(--theme-tab-content-recommend-active-bg);
+      //   .recommend-item__content {
+      //     border-bottom: 1px solid transparent;
+      //     &__info {
+      //       &-link {
+      //         background: var(--theme-tab-content-recommend-buy-active-bg);
+      //         border: 1px solid var(--theme-tab-content-recommend-buy-active-border);
+      //         color: var(--theme-tab-content-recommend-buy-active-font);
+      //       }
+      //     }
+      //   }
+      // }
       &::after {
         content: '';
         display: none;

@@ -161,13 +161,16 @@
               ></i>
             </div>
             <div class="controller-tools-left-time" v-if="!isLiving && !isWarnPreview">
-              <span class="controller-tools-left-time-current">
-                {{ currentTime | secondToDate }}
-              </span>
-              <span>/</span>
-              <span class="controller-tools-left-time-total">
-                {{ totalTime | secondToDate }}
-              </span>
+              <template v-if="totalTime > 0">
+                <span class="controller-tools-left-time-current">
+                  {{ currentTime | secondToDate }}
+                </span>
+                <span>/</span>
+                <span class="controller-tools-left-time-total">{{ totalTime | secondToDate }}</span>
+              </template>
+              <template v-else>
+                <span>--:--/--:--</span>
+              </template>
             </div>
           </div>
           <div class="controller-tools-right">
@@ -439,7 +442,10 @@
       },
       isVisibleMiniElement() {
         // 添加插播桌面共享后，再添加插播桌面共享场景的处理
-        return this.$domainStore.state.docServer.switchStatus;
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout != 1
+        );
       },
       isSubscribe() {
         return (
@@ -941,10 +947,11 @@
         getRecordTotalTimer = setInterval(() => {
           try {
             this.totalTime =
-              this.playerServer &&
-              this.playerServer.getDuration(() => {
-                console.log('获取视频总时长失败');
-              });
+              (this.playerServer &&
+                this.playerServer.getDuration(() => {
+                  console.log('获取视频总时长失败');
+                })) ||
+              0;
             this.totalTime > 0 && clearInterval(getRecordTotalTimer);
           } catch (error) {
             console.log(error);

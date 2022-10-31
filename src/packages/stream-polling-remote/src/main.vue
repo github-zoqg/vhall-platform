@@ -19,7 +19,7 @@
     <!-- 底部流信息 -->
     <section class="vmp-polling-stream__bottom">
       <span class="vmp-polling-stream__bottom-nickname">
-        {{ stream.attributes.nickname }}
+        {{ stream.attributes.nickname || stream.attributes.nickName }}
       </span>
       <span
         class="vmp-polling-stream__bottom-signal"
@@ -103,7 +103,7 @@
       if (this._netWorkStatusInterval) {
         clearInterval(this._netWorkStatusInterval);
       }
-
+      this.unsubscribeRemoteStream();
       useMsgServer().$offMsg('JOIN', this.handleUserJoin);
       useMsgServer().$offMsg('LEFT', this.handleUserLeave);
     },
@@ -173,6 +173,9 @@
           videos.forEach(video => {
             video.play();
           });
+      },
+      unsubscribeRemoteStream() {
+        this.interactiveServer.unSubscribeStream(this.stream.streamId);
       },
       subscribeRemoteStream() {
         let videoNode = `stream-${this.stream.streamId}`;

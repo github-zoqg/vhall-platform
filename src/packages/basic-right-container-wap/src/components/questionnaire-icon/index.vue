@@ -3,8 +3,14 @@
     class="icon-wrap"
     v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
   >
-    <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" />
-    <i class="dot" v-if="questionnaireServerState.dotVisible" />
+    <img
+      src="./images/questionnaire_no.png"
+      alt=""
+      @click="clickQuestionnaireIcon"
+      v-if="questionnaireServerState.dotVisible"
+    />
+    <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" v-else />
+    <!-- <i class="dot" v-if="questionnaireServerState.dotVisible" /> -->
     <!-- 问卷列表弹框 -->
     <div class="popup_base" v-if="showQuestionList"></div>
     <van-popup
@@ -149,7 +155,7 @@
 
 <style lang="less" scoped>
   .icon-wrap {
-    margin-bottom: 10px;
+    // margin-bottom: 10px;
     width: 84px;
     height: 84px;
     position: relative;

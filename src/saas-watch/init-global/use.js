@@ -52,7 +52,7 @@ import { OverlayScrollbarsPlugin } from 'overlayscrollbars-vue';
 import VmpSignWatch from '@/packages/sign-module/sign-watch';
 import VmpWatchPayFee from '@/packages/pay-fee-auth/';
 import VmpQuestionnaireWatch from '@/packages/questionnaire/watch';
-import VmpRedPacketWatch from '@/packages/red-packet/watch';
+// import VmpRedPacketWatch from '@/packages/red-packet/watch';
 import VmpRedPacketCommandWatch from '@/packages/red-packet-command/watch';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 import VmpInsertStream from '@/packages/insert-video-stream';
@@ -80,10 +80,6 @@ import VmpViewRestriction from '@/packages/view-restriction/index';
 // 专题预览页
 import VmpSubjectBody from '@/packages/subject-body/index';
 import VmpSubjectHeader from '@/packages/subject-header/index';
-
-// ------------------------------【时尚风格】引入组件------start----------
-import VmpFashionChat from '@/packages/fashion-style/chat-fashion';
-// ------------------------------【时尚风格】引入组件------end----------
 
 // 全局注册组件
 // Vue.use(ElementUI);
@@ -133,7 +129,7 @@ Vue.use(VmpIntro);
 Vue.use(VmpLivingEnd);
 Vue.use(VmpSignWatch);
 Vue.use(VmpWatchPayFee);
-Vue.use(VmpRedPacketWatch);
+// Vue.use(VmpRedPacketWatch);
 Vue.use(VmpRedPacketCommandWatch);
 
 Vue.use(VmpSubscribeBody);
@@ -152,7 +148,3 @@ Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
 Vue.use(VmpPrivacyCompliance);
-
-// ------------------------------【时尚风格】注册组件------start----------
-Vue.use(VmpFashionChat);
-// ------------------------------【时尚风格】注册组件------end----------

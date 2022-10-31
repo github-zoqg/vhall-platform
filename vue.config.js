@@ -3,17 +3,17 @@
  */
 const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk');
+// const chalk = require('chalk');
 const _ = require('lodash');
 const webpack = require('webpack');
 const btool = require('./scripts/btool');
 const resolve = dir => path.join(__dirname, dir);
-const pathConfig = require('./scripts/path-config');
+// const pathConfig = require('./scripts/path-config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 //按需加载lodash
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+// const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // 是否开发环境
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';

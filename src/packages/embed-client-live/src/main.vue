@@ -60,7 +60,7 @@
   import { browserSupport } from '@/app-shared/utils/getBrowserType.js';
   import { QWebChannel } from '@/app-shared/utils/qwebchannel';
   import { getQueryString } from '@/app-shared/utils/tool';
-  import { sessionOrLocal } from '@/packages/chat/src/js/utils';
+  import { sessionOrLocal } from '@/packages/chat/src/common/js/utils';
   import { clientMixin } from '../mixins/clientMixin';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {

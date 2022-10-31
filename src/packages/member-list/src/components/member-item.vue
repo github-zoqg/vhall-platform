@@ -279,7 +279,7 @@
 </template>
 
 <script>
-  import defaultAvatar from '@/app-shared/assets/img/my-dark@2x.png';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import phoneImg from '@/app-shared/assets/img/phone.png';
   export default {
     name: 'VmpMemberItem',
@@ -643,7 +643,9 @@
       isShowSpeakerFlag() {
         if (this.tabIndex === 1) {
           const options = [
-            this.mode !== 6 && this.mainScreen === this.userInfo.account_id,
+            this.mode !== 6 &&
+              this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission ===
+                this.userInfo.account_id,
             this.mode === 6 && [1, '1'].includes(this.userInfo.role_name)
           ];
           return options.some(value => !!value);

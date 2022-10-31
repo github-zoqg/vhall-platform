@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="vmp-media-setting__basic-setting">
     <main>
       <section class="vmp-media-setting-item" v-if="roleName == 1">
         <label class="vmp-media-setting-item__label">画质选择</label>
@@ -45,11 +45,10 @@
         </el-select>
       </section>
 
-      <section
-        class="vmp-media-setting-item"
-        v-if="liveMode != LIVE_MODE_MAP['VIDEO'] && roleName == 1"
-      >
-        <label class="vmp-media-setting-item__label">观看端布局(视频)</label>
+      <section class="vmp-media-setting-item" v-if="roleName == 1">
+        <label class="vmp-media-setting-item__label vmp-media-setting-item__label-layout">
+          观看端布局(视频)
+        </label>
         <section class="vmp-media-setting-item__content">
           <div
             class="vmp-media-setting-item-layout__item"
@@ -95,6 +94,7 @@
   import TiledImg from '../../assets/img/tiled.png';
   import TiledReverseImg from '../../assets/img/tiled-reverse.png';
   import GridImg from '../../assets/img/grid.png';
+  import TopSpeakerImg from '../../assets/img/top-speaker.png';
   export default {
     name: 'BasicSetting',
     data() {
@@ -119,7 +119,8 @@
         layoutConfig: Object.freeze([
           { id: 'CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE', img: FloatImg, text: '主次浮窗' },
           { id: 'CANVAS_ADAPTIVE_LAYOUT_TILED_MODE', img: TiledImg, text: '主次平铺' },
-          { id: 'CANVAS_ADAPTIVE_LAYOUT_GRID_MODE', img: GridImg, text: '均匀排列' }
+          { id: 'CANVAS_ADAPTIVE_LAYOUT_GRID_MODE', img: GridImg, text: '均匀排列' },
+          { id: 'CANVAS_ADAPTIVE_LAYOUT_TILED_EXT1_MODE', img: TopSpeakerImg, text: '顶部成员' }
         ]),
         LIVE_MODE_MAP
       };
@@ -256,44 +257,56 @@
 </script>
 
 <style lang="less">
-  .vmp-media-setting-item__content {
-    display: flex;
-    justify-content: space-between;
-
+  .vmp-media-setting__basic-setting {
     .vmp-media-setting-item-layout__item {
-      border: 1px solid #c4c4c4;
-      width: 72px;
-      height: 50px;
-      border-radius: 4px;
-      background-size: 100%;
-      user-select: none;
-      cursor: pointer;
+      padding-bottom: 10px;
+    }
+    .vmp-media-setting-item__label-layout {
+      height: 46px;
+    }
 
-      &--selected {
-        border: 1px solid #fb3a32;
-      }
+    .vmp-media-setting-item__content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
 
-      &.disabled {
-        cursor: not-allowed;
-      }
-
-      img {
-        width: 100%;
-        height: 100%;
+      .vmp-media-setting-item-layout__item {
+        background-size: 100%;
         user-select: none;
-        pointer-events: none;
-      }
+        cursor: pointer;
 
-      p {
-        margin-top: 2px;
-        color: #666;
-        font-size: 12px;
-        text-align: center;
+        &.disabled {
+          cursor: not-allowed;
+        }
+
+        img {
+          border: 1px solid #c4c4c4;
+          border-radius: 3px;
+          width: 68px;
+          height: 46px;
+          user-select: none;
+          pointer-events: none;
+        }
+
+        &--selected {
+          img {
+            border: 1px solid #fb3a32;
+          }
+        }
+
+        p {
+          margin-top: 2px;
+          color: #666;
+          font-size: 12px;
+          text-align: center;
+        }
       }
     }
-  }
-
-  .vmp-media-setting-tips__content {
-    margin-bottom: 8px;
+    .vmp-media-setting-tips {
+      margin-top: -26px;
+      .vmp-media-setting-tips__content {
+        margin-bottom: 8px;
+      }
+    }
   }
 </style>

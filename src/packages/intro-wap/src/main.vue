@@ -1,36 +1,37 @@
 <template>
-  <section class="vmp-intro">
+  <section :class="['vmp-intro', isConcise ? ' vmp-intro__concise' : '']">
     <section class="vmp-intro-main">
-      <section class="vmp-intro-block">
-        <header class="vmp-intro-block__headtitle">
-          <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
-            <img :src="noDelayIconUrl" />
-          </i>
-          {{ languagesInfo.subject }}
-        </header>
-        <main class="vmp-intro-block__detail">
-          <p>
-            <!-- <i class="vh-iconfont vh-line-time" /> -->
-            {{ startTime }}
-          </p>
-          <!-- 预约人数 -->
-          <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
-            <p class="num" v-if="watchInitData.subscribe.show">
-              <i18n path="appointment.appointment_1018">
-                <span place="n">{{ watchInitData.subscribe.num }}</span>
-              </i18n>
+      <div :class="{ 'vmp-intor-haveIcon': showIconNum }">
+        <section class="vmp-intro-block">
+          <header class="vmp-intro-block__headtitle">
+            <i v-if="mode !== 6 && isNoDelay" class="delay-icon">
+              <img :src="noDelayIconUrl" />
+            </i>
+            {{ languagesInfo.subject }}
+          </header>
+          <main class="vmp-intro-block__detail">
+            <p>
+              <!-- <i class="vh-iconfont vh-line-time" /> -->
+              {{ startTime }}
             </p>
-          </template>
-          <!-- 在线人数 -->
-          <template v-if="watchInitData.status != 'subscribe'">
-            <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-            <p v-if="watchInitData.online.show">
-              <!-- <i class="vh-iconfont vh-line-user"></i> -->
-              {{ $t('common.common_1013') }}:{{ personCountTxt | formatHotNum }}
-            </p>
-          </template>
-        </main>
-        <!-- <div
+            <!-- 预约人数 -->
+            <template v-if="watchInitData.status == 'subscribe' && webinar.type == 2">
+              <p class="num" v-if="watchInitData.subscribe.show">
+                <i18n path="appointment.appointment_1018">
+                  <span place="n">{{ watchInitData.subscribe.num }}</span>
+                </i18n>
+              </p>
+            </template>
+            <!-- 在线人数 -->
+            <template v-if="watchInitData.status != 'subscribe' && !isConcise">
+              <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+              <p v-if="watchInitData.online.show">
+                <i class="vh-iconfont vh-line-group"></i>
+                {{ personCountTxt | formatHotNum }}
+              </p>
+            </template>
+          </main>
+          <!-- <div
           class="vmp-intro-block__auth"
           v-if="
             !isEmbed &&
@@ -61,11 +62,12 @@
             }}
           </span>
         </div> -->
-      </section>
-      <section class="vmp-intro-block vmp-intro-block-content">
-        <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
-        <main class="vmp-intro-block__content-main" v-html="content"></main>
-      </section>
+        </section>
+        <section class="vmp-intro-block vmp-intro-block-content">
+          <!-- <header class="vmp-intro-block__title">{{ $t('common.common_1017') }}</header> -->
+          <main class="vmp-intro-block__content-main" v-html="content"></main>
+        </section>
+      </div>
       <aside>
         <a
           class="vmp-intro-link"
@@ -141,6 +143,21 @@
       // 简介富文本正文 Type:String
       content() {
         return this.languagesInfo.introduction || '<p></p>';
+      },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
+      },
+      // 展示icon数量
+      showIconNum() {
+        return this.$domainStore.state.roomBaseServer.showIconNum;
       }
     },
     created() {
@@ -168,8 +185,16 @@
     display: flex;
     flex-direction: column;
 
+    .vmp-intor-haveIcon {
+      width: calc(100% - 84px);
+      .vmp-intro-block-content,
+      .vmp-intro-block {
+        padding-right: 0;
+      }
+    }
+
     .vmp-intro-block {
-      padding: 32px 24px 0 24px;
+      padding: 24px 24px 0 24px;
       background-color: var(--theme-tab-content-intro-introLink-bg);
       position: relative;
 
@@ -183,7 +208,7 @@
       }
 
       &__headtitle {
-        font-size: 36px;
+        font-size: 32px;
         text-overflow: -o-ellipsis-lastline;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -194,7 +219,7 @@
         -webkit-box-orient: vertical;
         word-break: break-all;
         font-weight: 500;
-        line-height: 48px;
+        line-height: 50px;
         color: var(--theme-tab-content-intro-title-font);
         .delay-icon {
           display: inline-block;
@@ -236,7 +261,7 @@
         justify-content: space-between;
         align-items: center;
         color: var(--theme-tab-content-intro-subTitle-font);
-        margin-top: 2px;
+        margin-top: 7px;
         p {
           // i {
           //   margin-right: 8px;
@@ -258,16 +283,19 @@
         .num {
           color: var(--theme-component-subscribe);
         }
+        .vh-line-group {
+          margin-right: 10px;
+        }
       }
 
       &__content-main {
         padding-bottom: 24px;
         color: var(--theme-tab-content-intro-subTitle-font);
-        word-break: break-all;
+        word-break: break-word;
         line-height: 1.4;
-        p {
-          word-break: break-all;
-        }
+        // p {
+        //   word-break: break-word;
+        // }
 
         img {
           margin: 16px 0;
@@ -310,6 +338,10 @@
         text-align: center;
         display: block;
       }
+    }
+
+    &__concise {
+      /* 简洁模式 */
     }
   }
 </style>
