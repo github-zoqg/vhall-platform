@@ -322,6 +322,7 @@
         font-style: normal;
         font-weight: 400;
         font-size: 24px;
+        word-break: break-all;
         line-height: 34px;
         color: var(--theme-tab-content-good-describe-font);
       }
