@@ -20,7 +20,7 @@
           "
           class="vmp-wap-player-pause"
         >
-          <p @click="startPlay">
+          <p @click.stop="startPlay">
             <i class="vh-iconfont vh-line-video-play"></i>
           </p>
         </div>
@@ -65,7 +65,7 @@
           </p>
         </div> -->
           <!-- 回放播放结束 -->
-          <div class="vmp-wap-player-ending-box" @click="startPlay">
+          <div class="vmp-wap-player-ending-box" @click.stop="startPlay">
             <p class="vmp-wap-player-ending-box-noraml">
               <i class="vh-iconfont vh-line-refresh-left"></i>
             </p>
@@ -79,7 +79,7 @@
         >
           <!-- 播放器缩小按钮 -->
           <template v-if="isAudio">
-            <span v-if="!isConcise || !isFullScreen" @click="changePlayerSize(true)">
+            <span v-if="!isConcise || !isFullScreen" @click.stop="changePlayerSize(true)">
               <i class="vh-iconfont vh-line-arrow-left"></i>
             </span>
             <span v-if="!isFullScreen">
@@ -88,7 +88,7 @@
                 {{ hotNum | formatHotNum }}
               </span>
               <span
-                @click="openLanguage"
+                @click.stop="openLanguage"
                 v-if="languageList.length > 1"
                 class="hot_num language_btn"
               >
@@ -103,7 +103,11 @@
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
               {{ hotNum | formatHotNum }}
             </span>
-            <span @click="openLanguage" v-if="languageList.length > 1" class="hot_num language_btn">
+            <span
+              @click.stop="openLanguage"
+              v-if="languageList.length > 1"
+              class="hot_num language_btn"
+            >
               {{ lang.key == 1 ? 'CN' : 'EN' }}
               <i class="vh-iconfont vh-line-arrow-down"></i>
             </span>
@@ -153,7 +157,7 @@
               <i18n path="player.player_1012">
                 <span place="n" class="red">{{ currentTime | secondToDate }}</span>
               </i18n>
-              <i class="vh-iconfont vh-line-close" @click="isPickupVideo = false"></i>
+              <i class="vh-iconfont vh-line-close" @click.stop="isPickupVideo = false"></i>
             </div>
             <div class="vmp-wap-player-control-slider">
               <div
@@ -183,7 +187,7 @@
               <div class="vmp-wap-player-control-icons">
                 <span class="vmp-wap-player-control-icons-left">
                   <i
-                    @click="startPlay"
+                    @click.stop="startPlay"
                     :class="[
                       'vh-iconfont',
                       isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play',
@@ -209,18 +213,18 @@
                 <div class="vmp-wap-player-control-icons-right">
                   <span
                     class="icons-quality icons-speed"
-                    @click="openSpeed"
+                    @click.stop="openSpeed"
                     v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview"
                   >
                     {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
                   </span>
-                  <span @click="openQuality" v-if="!isWarnPreview" class="icons-quality">
+                  <span @click.stop="openQuality" v-if="!isWarnPreview" class="icons-quality">
                     {{ formatQualityText(currentQualitys.def) }}
                   </span>
 
                   <span
                     class="barrageSpan"
-                    @click="openBarrage"
+                    @click.stop="openBarrage"
                     v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
                   >
                     <i
@@ -229,7 +233,7 @@
                       }`"
                     ></i>
                   </span>
-                  <span v-if="!isAudio && !isWarnPreview" @click="enterFullscreen">
+                  <span v-if="!isAudio && !isWarnPreview" @click.stop="enterFullscreen">
                     <i
                       :class="`vh-iconfont ${
                         isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -245,7 +249,7 @@
         <!-- 小屏控制按钮 -->
         <div v-show="isSmallPlayer" class="foot_control">
           <div class="control_left">
-            <span class="pos" @click="startPlay">
+            <span class="pos" @click.stop="startPlay">
               <van-circle
                 v-model="circleSliderVal"
                 :rate="parseInt(totalTime)"
@@ -272,7 +276,7 @@
             <span class="set_center" @click.stop="refresh" v-if="isLiving">
               <i class="vh-iconfont vh-line-refresh-left"></i>
             </span>
-            <span @click="changePlayerSize(false)">
+            <span @click.stop="changePlayerSize(false)">
               <i class="vh-iconfont vh-line-arrow-right"></i>
             </span>
           </div>
@@ -289,7 +293,7 @@
               v-for="item in UsableSpeed"
               :key="item"
               :class="{ 'popup-active': currentSpeed == item }"
-              @click="changeSpeed(item)"
+              @click.stop="changeSpeed(item)"
             >
               {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
             </li>
@@ -306,7 +310,7 @@
               v-for="item in qualitysList"
               :key="item.def"
               :class="{ 'popup-active': currentQualitys.def == item.def }"
-              @click="changeQualitys(item)"
+              @click.stop="changeQualitys(item)"
             >
               {{ formatQualityText(item.def) }}
             </li>
@@ -318,7 +322,7 @@
               v-for="(item, index) in languageList"
               :key="index"
               :class="{ 'popup-active': item.key == lang.key }"
-              @click="changeLang(item.key)"
+              @click.stop="changeLang(item.key)"
             >
               {{ item.label }}
             </li>

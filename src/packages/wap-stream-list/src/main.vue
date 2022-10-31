@@ -1,6 +1,7 @@
 <template>
   <div
     class="vmp-wap-stream-wrap"
+    :class="isFullScreen ? 'vmp-wap-stream-wrap__fullscreen' : ''"
     ref="vmp-wap-stream-wrap"
     :style="{ background: mainBackground }"
     @click.stop.prevent="videoShowIcon"
@@ -114,7 +115,7 @@
           v-for="(item, index) in languageList"
           :key="index"
           :class="{ 'popup-active': item.key == lang.key }"
-          @click="changeLang(item.key)"
+          @click.stop="changeLang(item.key)"
         >
           {{ item.label }}
         </li>
@@ -600,6 +601,9 @@
     height: 422px;
     width: 100%;
     position: relative;
+    &__fullscreen {
+      height: 100%;
+    }
     // 小组协作中
     &-group {
       position: absolute;

@@ -2,7 +2,7 @@
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
     <div v-show="!mini && !isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
-      <p @click="startPlay">
+      <p @click.stop="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
     </div>
