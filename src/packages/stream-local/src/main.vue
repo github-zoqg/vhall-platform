@@ -660,6 +660,7 @@
               receive_account_id: this.joinInfo.third_party_user_id
             });
           }
+          this.interactiveServer._clearLocalSpeaker();
         }
       },
       // 清除"开播前"的流初始化状态
@@ -1076,6 +1077,9 @@
         const { videoType, canvasImgUrl, isRepublishMode } = param;
         const { isPolling } = this.videoPollingServer.state;
         if (this.liveStatus != 1) {
+          if (this.$domainStore.state.mediaSettingServer.videoType == 'picture') {
+            await this.$refs.imgPushStream.updateCanvasImg();
+          }
           // 未开播前的切换设备操作
           try {
             await this.createLocalStream({ source: 'switchStreamType_init' });
@@ -1083,6 +1087,7 @@
           } catch (error) {
             console.log('init-check-createLocalStream', error);
           }
+          return;
         }
 
         try {
