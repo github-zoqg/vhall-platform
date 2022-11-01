@@ -3,8 +3,9 @@
     v-model="popupVisible"
     :position="pending ? 'center' : 'bottom'"
     :class="[pending ? 'pending' : '', 'vmp-lottery']"
-    get-container="body"
     overlay-class="vmp-lottery-popup-overlay"
+    :overlay-style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
+    :style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
     round
   >
     <i
@@ -33,7 +34,13 @@
 
 <script>
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
-  import { useLotteryServer, useRoomBaseServer, useChatServer, useMsgServer } from 'middle-domain';
+  import {
+    useLotteryServer,
+    useRoomBaseServer,
+    useChatServer,
+    useMsgServer,
+    useZIndexServer
+  } from 'middle-domain';
 
   export default {
     name: 'VmpLotteryWap',
@@ -53,7 +60,9 @@
       };
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         visible: true,
         popupVisible: false, // 主窗口显隐
         fitment: {}, // 抽奖设置
@@ -73,9 +82,23 @@
         return ['LotteryPending', 'LotteryMiss', 'LotteryWin'].includes(this.lotteryView);
       }
     },
+    watch: {
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.lottery }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.lottery': {
+        handler(val) {
+          if (document.querySelector('.vmp-lottery-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-lottery-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
+      }
+    },
     beforeCreate() {
       this.lotteryServer = useLotteryServer({ mode: 'watch' });
       this.msgServer = useMsgServer();
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initMsgEvent();
@@ -96,6 +119,7 @@
           const res = await this.lotteryServer.checkLotteryResult(msg.lottery_id);
           const take_award = res?.data?.take_award;
           const lotteryView = take_award === 0 ? 'LotteryWin' : 'LotterySubmitDetail';
+          this.zIndexServer.setDialogZIndex('lottery');
           await this.changeView(lotteryView);
         } catch (err) {
           console.warn('获取中奖信息接口: ', err);
@@ -145,6 +169,7 @@
           lotteryMiss();
         }
 
+        this.zIndexServer.setDialogZIndex('lottery');
         await this.changeView(lotteryView);
       },
       /**
@@ -173,6 +198,7 @@
         const msgData = msg.data;
         this.setFitment(msgData);
         this.lotteryId = msgData.lottery_id;
+        this.zIndexServer.setDialogZIndex('lottery');
         useChatServer().addChatToList({
           content: {
             text_content: this.$t('interact_tools.interact_tools_1021')
@@ -193,6 +219,7 @@
         this.showWinnerList = !!msgData.publish_winner;
         this.setFitment(msgData);
         this.close(); // 先关闭,防止异步
+        this.zIndexServer.setDialogZIndex('lottery');
         const winnerList = msgData.lottery_winners.split(',');
 
         // 遍历是否存在key
@@ -325,6 +352,7 @@
         this.lotteryId = lottery.id;
         this.showWinnerList = !!lottery.publish_winner;
         this.setFitment(lottery);
+        this.zIndexServer.setDialogZIndex('lottery');
         await this.changeView(LotteryView);
       }
     }

@@ -1,5 +1,9 @@
 <template>
-  <div class="vmp-question-wap" v-show="popupVisible">
+  <div
+    class="vmp-question-wap"
+    v-show="popupVisible"
+    :style="{ zIndex: zIndexServerState.zIndexMap.questionnaire }"
+  >
     <!-- <van-popup
     v-model="popupVisible"
     position="bottom"
@@ -18,13 +22,20 @@
   <!-- </van-popup> -->
 </template>
 <script>
-  import { useQuestionnaireServer, useChatServer, useMsgServer } from 'middle-domain';
+  import {
+    useQuestionnaireServer,
+    useChatServer,
+    useMsgServer,
+    useZIndexServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpQuestionnaireWap',
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         popupVisible: false,
         questionLastId: '', // 最后一个问卷id
         questionnaireId: '' // 当前问卷Id
@@ -37,6 +48,7 @@
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
       this.questionnaireServer = useQuestionnaireServer({ mode: 'watch' });
       this.msgServer = useMsgServer();
     },
@@ -70,6 +82,7 @@
             this.$toast(this.$t('form.form_1087'));
           } else {
             this.popupVisible = true;
+            this.zIndexServer.setDialogZIndex('questionnaire');
             this.$nextTick(() => {
               this.questionnaireServer.renderQuestionnaire4Wap('#qs-content-box', questionnaireId);
             }); // 等dom渲染
@@ -111,6 +124,7 @@
             }
             this.questionnaireServer.setDotVisible(true);
             this.popupVisible = true;
+            this.zIndexServer.setDialogZIndex('questionnaire');
             await this.$nextTick();
             this.questionnaireServer.renderQuestionnaire4Wap(
               '#qs-content-box',
@@ -147,7 +161,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 303;
     .qs-content-box {
       z-index: 23;
       width: 100%;
