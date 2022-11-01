@@ -7,7 +7,7 @@
       title="快问快答"
       @open="open"
       top="12vh"
-      width="800px"
+      width="943px"
       custom-class="vmp-exam-dialog"
     >
       <div class="exam-main-center">
@@ -70,7 +70,10 @@
 </script>
 <style lang="less">
   .vmp-exam-dialog {
-    height: 560px;
+    height: 558px;
+    .el-dialog__header {
+      padding: 24px 32px 8px 32px;
+    }
   }
   // element-ui el-tabs 样式重写
   /*-----------------------------------------重置Tab 开始 ---------------------------------------------*/

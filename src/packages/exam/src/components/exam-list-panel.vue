@@ -66,73 +66,54 @@
               <p>暂未搜索到您想要的内容</p>
             </template>
             <!-- 表格展示 -->
-            <el-table-column prop="title" label="名称" width="180">
+            <el-table-column
+              prop="title"
+              label="名称"
+              width="220"
+              fixed="left"
+              :show-overflow-tooltip="true"
+            >
               <template slot-scope="scope">
-                <el-tooltip placement="top" :content="scope.row.title">
+                <!--  <el-tooltip placement="top" :content="scope.row.title">
                   <p class="file-name custom-tooltip-content">
                     <span class="file-name__text">
                       {{ scope.row.title }}
                     </span>
                   </p>
-                </el-tooltip>
+                </el-tooltip> -->
+                {{ scope.row.title }}
               </template>
             </el-table-column>
             <el-table-column label="创建时间" width="170">
               <template slot-scope="scope">
-                {{ scope.row.created_at }}
+                {{ scope.row.created_at_str }}
               </template>
             </el-table-column>
             <el-table-column prop="total_score" label="总分"></el-table-column>
             <el-table-column prop="questions_count" label="题数"></el-table-column>
             <el-table-column label="限时(分)" width="170">
               <template slot-scope="scope">
-                {{ scope.row.limit_time }}
+                {{ scope.row.limit_time_str }}
               </template>
             </el-table-column>
             <el-table-column label="状态" width="170">
               <template slot-scope="scope">
-                {{ ['未推送', '答题中', '成绩待公布', '成绩已公布'][scope.row.status] }}
+                <span class="statusTag" :class="scope.row.status_css">
+                  {{ scope.row.status_str }}
+                </span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="180" fixed="right">
+            <el-table-column label="操作" width="348" fixed="right">
               <template slot-scope="scope">
-                <template v-for="(btnItem, index) in scope.row.btnList">
+                <template v-for="btnItem in scope.row.btnList">
                   <span
-                    class="item"
+                    :class="`item ${btnItem.disabled ? 'is-disabled' : ''}`"
                     :key="`btn${btnItem.type}`"
-                    v-if="index < 3"
                     @click="handleCommand(btnItem, scope.row)"
                   >
                     {{ btnItem.name }}
                   </span>
                 </template>
-                <span
-                  @click.prevent.stop
-                  class="item"
-                  v-if="scope.row.btnList && scope.row.btnList.length >= 3"
-                >
-                  <el-dropdown
-                    @command="handleCommand"
-                    @visible-change="dropDownVisibleChange(scope.row)"
-                  >
-                    <span class="colorItem">更多</span>
-                    <el-dropdown-menu
-                      style="width: 140px; text-align: center"
-                      slot="dropdown"
-                      class="exam-more"
-                    >
-                      <template v-for="(btnItem, index) in scope.row.btnList">
-                        <el-dropdown-item
-                          :command="btnItem"
-                          :key="`btn${btnItem.type}`"
-                          v-if="index >= 3"
-                        >
-                          {{ btnItem.name }}
-                        </el-dropdown-item>
-                      </template>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </span>
               </template>
             </el-table-column>
           </el-table>
@@ -205,7 +186,7 @@
       handleShareCancel() {},
       // 点击打开资料库
       openSelectDialog() {},
-      // 转换每行可操作的按钮
+      // 转换每行可操作的按钮 [设置按钮是否可点击 -> 通过状态过滤是否展示 -> 依据可点击按钮在前进行排序]
       setBtnList(item) {
         const baseBtnList = [
           { type: 'publish', name: '公布', disabled: true },
@@ -219,24 +200,21 @@
         ];
         baseBtnList.map(sItem => {
           // 状态 0.未推送 1.答题中 2.成绩待公布 3.成绩已公布
-          if (item.status == 1 && ['close', 'copy', 'preview'].includes(sItem.type)) {
+          if (item.status == 1) {
             // 答题中（收卷、复制、预览）可以点击，其余不可点击
-            sItem.disabled = false;
-          } else if (
-            [2, 3].includes(Number(item.status)) &&
-            ['publish', 'score', 'push', 'copy', 'preview'].includes(sItem.type)
-          ) {
+            sItem.disabled = !['close', 'copy', 'preview'].includes(sItem.type);
+          } else if ([2, 3].includes(Number(item.status))) {
             // 成绩待公布 or 已公布（公布、成绩、推送、复制、预览）可以点击，其余不可点击
-            sItem.disabled = false;
+            sItem.disabled = !['publish', 'score', 'push', 'copy', 'preview'].includes(sItem.type);
           } else {
             // 默认未推送 （推送、编辑、复制、删除、预览）可以点击，其余不可点击
             sItem.disabled = !['push', 'edit', 'copy', 'del', 'preview'].includes(sItem.type);
           }
         });
-        return baseBtnList.filter(sItem => {
+        let filterList = baseBtnList.filter(sItem => {
           if (item.status == 1) {
-            // 答题中，仅展示（收卷、复制、预览、推送、编辑、删除），不展示（推送、成绩）
-            return !['push', 'score'].includes(sItem.type);
+            // 答题中，仅展示（收卷、复制、预览、推送、编辑、删除），不展示（公布、成绩）
+            return !['publish', 'score'].includes(sItem.type);
           } else if ([2, 3].includes(Number(item.status))) {
             // 成绩待公布 or 已公布，仅展示（公布、成绩、推送、复制、预览、编辑、删除），不展示（收卷）
             return sItem.type != 'close';
@@ -244,6 +222,9 @@
             // 默认未推送，仅展示（推送、复制、预览、编辑、删除），不展示（公布、成绩、收卷）
             return !['publish', 'score', 'close'].includes(sItem.type);
           }
+        });
+        return filterList.sort((lastVo, nextVo) => {
+          return lastVo.disabled - nextVo.disabled;
         });
       },
       // 更多列表的操作
@@ -333,28 +314,81 @@
         let res = {
           data: {
             list: [
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' },
-              { status: 1, title: 'adfasfasdf' }
+              {
+                id: 1,
+                title: 'Apple产品功能知识点①',
+                created_at: '2022-10-23 00:00:00',
+                updated_at: '2022-10-23 00:00:00',
+                total_score: 100,
+                questions_count: 10,
+                limit_time_switch: 1,
+                limit_time: 70,
+                auto_push_switch: 0,
+                status: 0
+              },
+              {
+                id: 2,
+                title: 'Apple产品功能知识点2',
+                created_at: '2022-10-23 00:00:00',
+                updated_at: '2022-10-23 00:00:00',
+                total_score: 100,
+                questions_count: 10,
+                limit_time_switch: 0,
+                limit_time: 0,
+                auto_push_switch: 0,
+                status: 1
+              },
+              {
+                id: 3,
+                title: 'Apple产品功能知识点3',
+                created_at: '2022-10-23 00:00:00',
+                updated_at: '2022-10-23 00:00:00',
+                total_score: 100,
+                questions_count: 10,
+                limit_time_switch: 0,
+                limit_time: 0,
+                auto_push_switch: 0,
+                status: 2
+              },
+              {
+                id: 4,
+                title:
+                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
+                created_at: '2022-10-23 00:00:00',
+                updated_at: '2022-10-23 00:00:00',
+                total_score: 100,
+                questions_count: 10,
+                limit_time_switch: 0,
+                limit_time: 0,
+                auto_push_switch: 0,
+                status: 3
+              },
+              {
+                id: 5,
+                title:
+                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
+                created_at: '2022-10-23 00:00:00',
+                updated_at: '2022-10-23 00:00:00',
+                total_score: 100,
+                questions_count: 10,
+                limit_time_switch: 0,
+                limit_time: 0,
+                auto_push_switch: 0,
+                status: 0
+              }
             ]
           }
         };
         const dataList = res.data.list || [];
         dataList.map(item => {
-          item.btnList = this.setBtnList(item);
+          let btnList = this.setBtnList(item);
+          item.btnList = btnList;
+          console.log(item.btnList.length);
+          item.created_at_str = item.created_at.substring(0, 16);
+          item.updated_at_str = item.updated_at.substring(0, 16);
+          item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
+          item.status_css = ['no-push', 'answer', 'no-publish', 'publish'][item.status];
+          item.status_str = ['未推送', '答题中', '成绩待公布', '成绩已公布'][item.status];
         });
         this.examList = this.examList.concat(dataList);
         this.total = res.data.total;
@@ -407,6 +441,29 @@
 
   /* 快问快答 - 列表相关 */
   .exam-list-panel {
+    .statusTag {
+      font-size: 14px;
+      &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      &.no-push::before {
+        background: #8c8c8c;
+      }
+      &.answer::before {
+        background: #fb2626;
+      }
+      &.no-publish::before {
+        background: #fc9600;
+      }
+      &.publish::before {
+        background: #14ba6a;
+      }
+    }
     .vmp-exam-cur__empty {
       height: 380px;
       display: flex;
@@ -433,10 +490,9 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 16px 0;
+      padding: 24px 0;
     }
     .vmp-exam-cur__bd {
-      padding-top: 10px;
       .el-button.el-button--text {
         color: #666;
         border: 0;
@@ -446,10 +502,13 @@
       }
     }
     .input-search {
-      width: 220px;
+      width: 180px;
       margin-left: auto;
+      .el-button.is-round {
+        padding: 7px 24px;
+      }
       .el-input__inner {
-        border-radius: 100px;
+        border-radius: 20px;
       }
     }
     .el-table .cell .file-name {
@@ -472,6 +531,31 @@
       background-color: #f7f7f7;
       .el-button--text {
         color: #fb3a32;
+      }
+    }
+    .item {
+      margin-left: 16px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+      color: rgba(0, 0, 0, 0.85);
+      cursor: pointer;
+      &:hover,
+      &:active,
+      &:focus {
+        color: #fb3232;
+      }
+      &:first-child {
+        margin-left: 0;
+      }
+      &.is-disabled {
+        color: rgba(0, 0, 0, 0.25);
+        &:hover,
+        &:active,
+        &:focus {
+          color: rgba(0, 0, 0, 0.25);
+        }
       }
     }
   }
