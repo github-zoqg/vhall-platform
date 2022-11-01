@@ -603,11 +603,14 @@
     position: relative;
     &__fullscreen {
       height: 100%;
-      // 无延迟竖屏直播，画面铺满屏幕
       .vmp-stream-list {
         &__remote-container {
+          // 无延迟竖屏直播，画面铺满屏幕
           .licode_stream {
             object-fit: cover;
+          }
+          .vmp-stream-local__bottom {
+            display: none;
           }
         }
       }

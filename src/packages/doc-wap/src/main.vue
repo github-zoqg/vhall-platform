@@ -1,5 +1,6 @@
 <template>
   <div
+    @click.stop
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[
