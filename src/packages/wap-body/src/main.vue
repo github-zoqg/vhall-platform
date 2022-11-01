@@ -5,7 +5,7 @@
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
       isFullScreen ? 'isFullScreen' : '',
-      mini ? 'isMini' : ''
+      !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
     <!-- 直播结束 -->
@@ -25,7 +25,7 @@
     </div>
     <div
       :class="[
-        mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
+        mini || !isWapBodyDocSwitchFullScreen ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
           ? 'vmp-wap-body-special__show'
           : ''
@@ -102,7 +102,7 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   import alertBox from '@/app-shared/components/confirm.vue';
   export default {
@@ -244,61 +244,20 @@
       },
       // 是否开启文档主画面
       isDocMainScreen() {
-        if (this.isFullScreen) {
-          return (
-            this.$domainStore.state.docServer.switchStatus &&
-            this.webinarType == 1 &&
-            !!this.$domainStore.state.docServer.currentCid
-          );
-        } else {
-          return (
-            this.$domainStore.state.docServer.switchStatus &&
-            this.$domainStore.state.interactiveServer.isInstanceInit &&
-            this.webinarType == 1 &&
-            !!this.$domainStore.state.docServer.currentCid &&
-            this.isMergeMode
-          );
-        }
+        return (
+          this.$domainStore.state.docServer.switchStatus &&
+          this.$domainStore.state.interactiveServer.isInstanceInit &&
+          this.webinarType == 1 &&
+          !!this.$domainStore.state.docServer.currentCid &&
+          this.isMergeMode
+        );
       },
       // 竖屏直播
       isFullScreen() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
-      },
-      // 竖屏，是否显示文档，文档播放器是否互换位置
-      updateMini() {
-        const { isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen, isShowPoster } = this;
-        return { isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen, isShowPoster };
       }
     },
-    watch: {
-      updateMini(val) {
-        console.log(
-          '【isFullScreen, isDocMainScreen, isWapBodyDocSwitchFullScreen,isShowPoster】：',
-          val
-        );
-        if (
-          val.isFullScreen &&
-          val.isDocMainScreen &&
-          !val.isWapBodyDocSwitchFullScreen &&
-          !val.isShowPoster
-        ) {
-          this.mini = true;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerMini', [this.mini])
-          );
-        } else if (
-          val.isFullScreen &&
-          val.isDocMainScreen &&
-          val.isWapBodyDocSwitchFullScreen &&
-          !val.isShowPoster
-        ) {
-          this.mini = false;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerMini', [this.mini])
-          );
-        }
-      }
-    },
+    watch: {},
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
@@ -395,6 +354,7 @@
           if (msg.data.type == 'live_over') {
             this.isLivingEnd = true;
             this.mini = false;
+            // this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
           // 分组直播 没有结束讨论 直接结束直播
           if (msg.data.type == 'group_switch_end') {

@@ -16,7 +16,10 @@
         <!-- 播放 按钮 -->
         <div
           v-show="
-            !isPlayering && !isVodEnd && !isSmallPlayer && (!isFullScreen || (mini && isFullScreen))
+            !isPlayering &&
+            !isVodEnd &&
+            !isSmallPlayer &&
+            (!isFullScreen || (!isWapBodyDocSwitchFullScreen && isFullScreen))
           "
           class="vmp-wap-player-pause"
         >
@@ -436,6 +439,10 @@
       // 竖屏直播
       isFullScreen() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
       }
     },
     data() {
@@ -497,8 +504,7 @@
         imageCropperMode: 1,
         circleSliderVal: 0,
         initIndex,
-        isConcise: false, //判断是否是极简模式
-        mini: false // mini播放器
+        isConcise: false //判断是否是极简模式
       };
     },
     watch: {
@@ -550,10 +556,16 @@
           boxEventOpitons(this.cuid, 'emitPlayerStatus', [this.isPlayering])
         );
       },
-      isShowPoster() {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
-        );
+      isShowPoster: {
+        handler(val) {
+          if (this.isShowPoster) {
+            this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
+          }
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
+          );
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -998,9 +1010,6 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeChatHeight', [data])
         );
-      },
-      getPlayerMini(val) {
-        this.mini = val;
       }
     }
   };
@@ -1521,9 +1530,12 @@
     }
   }
 
-  .isMini .vmp-wap-player-pause p {
+  .vmp-wap-body-mini .vmp-wap-player-pause p {
     width: 54px;
     height: 54px;
+    i {
+      font-size: 24px;
+    }
   }
   .isFullScreen .playerBox video {
     object-fit: cover;

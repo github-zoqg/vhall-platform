@@ -163,7 +163,7 @@
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
-      // 竖屏直播 wap-body和文档是否切换位置
+      // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
       },
@@ -181,11 +181,7 @@
       },
       // 是否观众可见
       switchStatus() {
-        if (this.isFullScreen) {
-          return this.docServer.state.switchStatus && !this.isShowPoster;
-        } else {
-          return this.docServer.state.switchStatus;
-        }
+        return this.docServer.state.switchStatus;
       },
       // 页码
       pageNum() {
@@ -254,6 +250,17 @@
         this.$nextTick(() => {
           this.resize();
         });
+      },
+      switchStatus: {
+        handler(val) {
+          // 开启文档
+          if (val) {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+          } else {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {

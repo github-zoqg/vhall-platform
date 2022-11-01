@@ -1,7 +1,10 @@
 <template>
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
-    <div v-show="!mini && !isPlayering && !isVodEnd && !isSmallPlayer" class="vmp-wap-player-pause">
+    <div
+      v-show="isWapBodyDocSwitchFullScreen && !isPlayering && !isVodEnd && !isSmallPlayer"
+      class="vmp-wap-player-pause"
+    >
       <p @click.stop="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -30,7 +33,12 @@
       };
     },
     watch: {},
-    computed: {},
+    computed: {
+      // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      }
+    },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
