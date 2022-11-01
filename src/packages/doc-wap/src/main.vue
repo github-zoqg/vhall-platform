@@ -316,6 +316,11 @@
           });
         });
       },
+      // 消缩放、移动模式。
+      cancelZoom() {
+        this.restore();
+        this.docServer.cancelZoom();
+      },
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();

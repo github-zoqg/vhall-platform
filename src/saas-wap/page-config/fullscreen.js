@@ -174,6 +174,12 @@ export default {
   comWapCenter: {
     component: 'VmpConciseCenterWap',
     children: ['comDocWap'],
+    emitDocCancleZoom: [
+      {
+        cuid: 'comDocWap',
+        method: 'cancelZoom'
+      }
+    ],
     emitDocResize: [
       {
         cuid: 'comDocWap',

@@ -69,6 +69,9 @@
           this.$nextTick(() => {
             // 派发事件：docResize
             window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));
+            if (newVal) {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocCancleZoom'));
+            }
           });
         }
       }
