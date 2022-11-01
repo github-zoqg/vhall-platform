@@ -2,7 +2,13 @@
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
     <div
-      v-show="!noDelayWebinar && !mini && !isPlayering && !isVodEnd && !isSmallPlayer"
+      v-show="
+        !noDelayWebinar &&
+        isWapBodyDocSwitchFullScreen &&
+        !isPlayering &&
+        !isVodEnd &&
+        !isSmallPlayer
+      "
       class="vmp-wap-player-pause"
     >
       <p @click.stop="startPlay">

@@ -245,6 +245,17 @@
         this.$nextTick(() => {
           this.resize();
         });
+      },
+      switchStatus: {
+        handler(val) {
+          // 开启文档
+          if (val) {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+          } else {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
+          }
+        },
+        immediate: true
       }
     },
     beforeCreate() {
