@@ -603,6 +603,14 @@
     position: relative;
     &__fullscreen {
       height: 100%;
+      // 无延迟竖屏直播，画面铺满屏幕
+      .vmp-stream-list {
+        &__remote-container {
+          .licode_stream {
+            object-fit: cover;
+          }
+        }
+      }
     }
     // 小组协作中
     &-group {
