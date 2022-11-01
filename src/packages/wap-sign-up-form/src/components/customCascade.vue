@@ -22,7 +22,11 @@
         active-color="#fb3a32"
         :field-names="{ text: 'label' }"
         @finish="onConfirm"
-      />
+      >
+        <template #option="item">
+          <pre>{{ item.subject }}</pre>
+        </template>
+      </van-cascader>
     </van-popup>
   </div>
 </template>

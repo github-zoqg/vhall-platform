@@ -7,7 +7,9 @@
       </header>
       <div class="vmp-wap-sign-up-form__content">
         <div class="vmp-wap-sign-up-form__content__title-box">
-          <h1 class="title-box__title-text">{{ formInfo.title }}</h1>
+          <h1 class="title-box__title-text">
+            <pre>{{ formInfo.title }}</pre>
+          </h1>
           <p
             ref="intro"
             v-if="formInfo.intro"
@@ -20,7 +22,9 @@
                 : ''
             ]"
           >
-            {{ formInfo.intro }}
+            <span>
+              <pre>{{ formInfo.intro }}</pre>
+            </span>
             <span
               @click="changeFoldStatus(false)"
               class="text-tail"
@@ -46,7 +50,9 @@
               :key="tab.code"
               @click="switchTab(tab.code)"
             >
-              {{ tab.text }}
+              <span>
+                <pre>{{ tab.text }}</pre>
+              </span>
             </p>
           </template>
         </div>
@@ -62,7 +68,9 @@
               <span v-if="!!question.is_must" class="star" style="font-family: monospace">*</span>
               <span class="num" v-if="quesIndex < 9">0{{ quesIndex + 1 }}.</span>
               <span class="num" v-else>{{ quesIndex + 1 }}.</span>
-              <span class="label">{{ convertLanguage(question.subject, question) }}</span>
+              <span class="label">
+                <pre>{{ convertLanguage(question.subject, question) }}</pre>
+              </span>
             </p>
             <!-- 输入框 -->
             <template
@@ -108,7 +116,7 @@
                       isMultiOther: radioItem.type === 1 && radioItem.id == form[question.id]
                     }"
                   >
-                    {{ radioItem.subject }}
+                    <pre>{{ radioItem.subject }}</pre>
                   </span>
                   <textarea
                     v-model="form[`${question.id}${radioItem.id}`]"
@@ -138,7 +146,7 @@
                   }"
                 >
                   <i class="vh-iconfont vh-line-check"></i>
-                  {{ checkItem.subject }}
+                  <pre>{{ checkItem.subject }}</pre>
                 </span>
                 <textarea
                   @click.stop="preventClick"
@@ -275,7 +283,7 @@
                 class="privacy-item vh-iconfont vh-line-check"
                 :class="{ active: form[privacy.id] }"
               ></i>
-              <span v-html="privacyText"></span>
+              <pre v-html="privacyText"></pre>
             </div>
             <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
           </li>
@@ -1918,6 +1926,10 @@
     overflow-y: auto;
     position: relative;
     background: #fff;
+    pre {
+      font-family: Arial, 'Microsoft Yahei' !important;
+      display: inline;
+    }
     &__wrap {
       .cover-pic {
         width: 100%;
