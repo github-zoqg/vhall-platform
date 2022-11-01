@@ -895,7 +895,7 @@
       font-size: 14px;
     }
     &__name-limit {
-      max-width: 98px;
+      max-width: 76px;
     }
     &__role {
       display: inline-block;
