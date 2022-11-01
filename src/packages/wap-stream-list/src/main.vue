@@ -449,6 +449,10 @@
           console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
+          // 竖屏直播，并且有文档展示的时候，需要将视频置为大屏
+          if (this.switchStatus && this.isFullScreen) {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
+          }
         });
 
         // 接收设为主画面消息  主直播间
@@ -522,7 +526,7 @@
 
       // 恢复播放
       replayPlay() {
-        if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
+        if (this.isFullScreen && this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
           this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
         }
         console.log('点击了恢复播放------', this.playAbort);
