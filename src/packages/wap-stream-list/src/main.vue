@@ -155,6 +155,14 @@
       };
     },
     computed: {
+      // 竖屏直播，文档播放器位置切换的状态
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 是否观众可见
+      switchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
@@ -514,6 +522,9 @@
 
       // 恢复播放
       replayPlay() {
+        if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+        }
         console.log('点击了恢复播放------', this.playAbort);
         this.playAbort.forEach(stream => {
           this.interactiveServer
