@@ -2,10 +2,10 @@
  * 【竖屏直播】wap观看端主直播页面配置
  */
 // 清屏事件配置
-const emitCleanScreenChange = [
+const emitClearScreenChange = [
   {
     cuid: 'comWapCenter',
-    method: 'getPlayerMini',
+    method: 'cls',
     args: ['$0']
   }
 ];
@@ -57,55 +57,43 @@ export default {
     ]
   },
   layerJaw: {
-    component: 'VmpCleanScreen',
+    component: 'VmpClearScreen',
     className: 'vmp-basic-jaw',
     children: ['comContainerRight'],
     // 清屏事件
-    emitCleanScreenChange
+    emitClearScreenChange
   },
   // 颈部容器
   layerNeck: {
-    component: 'VmpCleanScreen',
+    component: 'VmpClearScreen',
     className: 'vmp-basic-neck',
     children: ['comNoticeWap'],
     // 清屏事件
-    emitCleanScreenChange
+    emitClearScreenChange
   },
   // 中间主区域容器
   layerBody: {
-    component: 'VmpCleanScreen',
+    component: 'VmpClearScreen',
     className: 'vmp-basic-bd',
     children: ['comWapCenter'],
     options: {
       isSelf: false
     },
     // 清屏事件
-    emitCleanScreenChange
+    emitClearScreenChange
   },
   // 中间主区域容器
   layerBodyBlock: {
-    component: 'VmpCleanScreen',
+    component: 'VmpClearScreen',
     className: 'vmp-block',
     children: ['comBodyBlock'],
     // 清屏事件
-    emitCleanScreenChange
+    emitClearScreenChange
   },
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle'],
-    emitPlayerMini: [
-      {
-        cuid: 'comWapPlayer',
-        method: 'getPlayerMini',
-        args: ['$0']
-      },
-      {
-        cuid: 'comWapCenter',
-        method: 'getPlayerMini',
-        args: ['$0']
-      }
-    ]
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
   },
   // 播放器
   comWapPlayer: {
@@ -147,21 +135,25 @@ export default {
       }
     ],
     emitPlayerPoster: [
+      // 设置文档是否被覆盖
       {
-        cuid: 'comWapBody',
-        method: 'getPlayerPoster',
-        args: ['$0']
-      },
-      {
-        cuid: 'comDocWap',
-        method: 'getPlayerPoster',
+        cuid: 'comWapCenter',
+        method: 'setDocContainerCovered',
         args: ['$0']
       }
     ]
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',
-    children: ['comWapStreamLocal']
+    children: ['comWapStreamLocal'],
+    emitStreamListPoster: [
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comWapCenter',
+        method: 'setDocContainerCovered',
+        args: ['$0']
+      }
+    ]
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'

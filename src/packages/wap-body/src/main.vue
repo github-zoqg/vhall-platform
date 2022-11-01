@@ -118,8 +118,7 @@
         imageCropperMode: 1,
         isLivingEnd: false,
         mini: false,
-        isShowLiveStartNotice: false,
-        isShowPoster: true
+        isShowLiveStartNotice: false
       };
     },
     computed: {
@@ -434,9 +433,6 @@
           // 此时调用完，设备状态要么是1  要么是2
           await this.checkMediaPermission();
         }
-      },
-      getPlayerPoster(val) {
-        this.isShowPoster = val;
       }
     }
   };

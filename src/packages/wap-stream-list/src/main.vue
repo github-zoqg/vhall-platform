@@ -135,6 +135,7 @@
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import { streamInfo } from '@/app-shared/utils/stream-utils';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapStreamList',
 
@@ -342,6 +343,11 @@
       }
     },
     watch: {
+      showPlayIcon() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
+        );
+      },
       // 设置主画面背景色
       mainBackground: {
         handler(val) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="clean-screen-container" :class="[className]" @click="cleanScreen">
+  <div class="clear-screen-container" :class="[className]" @click="clearScreen">
     <component
       v-for="item of subWidgets"
       :is="item.component"
@@ -11,9 +11,9 @@
 <script>
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   // 清屏状态，所有实例共享
-  let isCleanScreen = false;
+  let isClearScreen = false;
   export default {
-    name: 'VmpCleanScreen',
+    name: 'VmpClearScreen',
     props: {
       cuid: {
         type: String,
@@ -64,12 +64,12 @@
       }
     },
     methods: {
-      cleanScreen(e) {
+      clearScreen(e) {
         if (!this.isSelf || (this.isSelf && e.target === e.currentTarget)) {
-          alert(isCleanScreen);
-          isCleanScreen = !isCleanScreen;
+          alert(isClearScreen);
+          isClearScreen = !isClearScreen;
           window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitCleanScreenChange', [isCleanScreen])
+            boxEventOpitons(this.cuid, 'emitClearScreenChange', [isClearScreen])
           );
         }
       }
@@ -77,7 +77,7 @@
   };
 </script>
 <style lang="less">
-  .clean-screen-container {
+  .clear-screen-container {
     position: relative;
   }
 </style>

@@ -17,7 +17,10 @@
     </div>
     <div
       class="vmp-concise-center-wap__doc-container"
-      :class="switchDrag ? 'doc-container__mini' : ''"
+      :class="{
+        'doc-container__mini': switchDrag,
+        'doc-container__becovered': isDocBeCovered
+      }"
       v-drag="{ close: !switchDrag }"
     >
       <!-- doc组件-->
@@ -38,7 +41,8 @@
         isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
-        childrenComp: []
+        childrenComp: [],
+        isDocBeCovered: false // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
       };
     },
     computed: {
@@ -72,8 +76,6 @@
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
     },
-    mounted() {},
-    beforeDestroy() {},
     methods: {
       startPlay() {
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
@@ -93,8 +95,8 @@
       updatePlayStatus(val) {
         this.isPlayering = val;
       },
-      getPlayerMini(val) {
-        this.mini = val;
+      setDocContainerCovered(val) {
+        this.isDocBeCovered = val;
       }
     }
   };
@@ -155,6 +157,9 @@
             }
           }
         }
+      }
+      &.doc-container__becovered {
+        z-index: -1;
       }
     }
   }

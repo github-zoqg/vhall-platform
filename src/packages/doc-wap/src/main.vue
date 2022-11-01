@@ -127,8 +127,7 @@
         isPortrait: true, // 是否是竖屏  设备
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
-        showTools: false,
-        isShowPoster: true
+        showTools: false
       };
     },
     computed: {
@@ -570,9 +569,6 @@
           //设备横向 旋转即退出全屏
           this.fullscreen();
         }
-      },
-      getPlayerPoster(val) {
-        this.isShowPoster = val;
       }
     },
     beforeDestroy() {

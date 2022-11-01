@@ -2,7 +2,7 @@ import Vue from 'vue';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
-import VmpCleanScreen from '@/packages/clean-screen';
+import VmpClearScreen from '@/packages/clear-screen';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
 import VmpWapPlayer from '@/packages/player/wap-player';
 import VmpDocWap from '@/packages/doc-wap';
@@ -106,7 +106,7 @@ import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
-Vue.use(VmpCleanScreen);
+Vue.use(VmpClearScreen);
 Vue.use(VmpHeaderWatchWap);
 Vue.use(VmpWapPlayer);
 Vue.use(VmpDocWap);
