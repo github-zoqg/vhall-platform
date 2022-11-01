@@ -241,17 +241,6 @@
         const { isInsertFilePushing, insertStreamInfo } = insertFileServer.state;
         console.log('---点击插播文件按钮----', insertStreamInfo);
 
-        if (watchInitData.webinar_show_type == 0 && watchInitData.webinar.no_delay_webinar != 1) {
-          this.$alert('竖屏直播只有无延迟模式才支持插播文件', '', {
-            title: '提示',
-            confirmButtonText: '知道了',
-            // center: true,
-            customClass: 'zdy-message-box',
-            cancelButtonClass: 'zdy-confirm-cancel'
-          });
-          return false;
-        }
-
         // 如果是直播状态需要判断当前主持人是否是用网页发起直播
         // 嘉宾：设为主讲人的时候 可以插播
         // 助理： 如果是网页发起，一直都有插播。如果是客户端发起，不支持插播文件，存在提示
