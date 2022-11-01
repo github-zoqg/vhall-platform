@@ -230,7 +230,9 @@
         if (result === 'fail') {
           this.reset();
         } else {
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitRecheckMedia'));
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitRecheckMedia', [true])
+          );
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitInitLocalStream', 'checked')
           );

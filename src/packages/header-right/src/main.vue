@@ -468,12 +468,15 @@
        *      2、检测麦克风设备
        *          可用 则本地修改deviceStatus值
        *               检测是否在直播中，若在直播中，则liveStep = 3
+       * deviceStatus: 设备检测之后刷新按钮状态
        * @date 2022-03-24
        * @returns {any}
        */
-      async handleRecheck() {
-        await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
-        if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+      async handleRecheck(deviceStatus = false) {
+        if (!deviceStatus) {
+          await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        }
+        if (useMediaCheckServer().state.deviceInfo?.device_status == 1 || deviceStatus) {
           this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
