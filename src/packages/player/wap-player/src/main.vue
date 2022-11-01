@@ -31,6 +31,7 @@
               : `vmp-wap-player-vod_${this.warmUpVideoList[this.initIndex]}`
           "
           style="width: 100%; height: 100%"
+          class="playerBox"
           @click.stop.prevent="videoShowIcon"
         >
           <!-- 视频容器 -->
@@ -1523,5 +1524,8 @@
   .isMini .vmp-wap-player-pause p {
     width: 54px;
     height: 54px;
+  }
+  .isFullScreen .playerBox video {
+    object-fit: cover;
   }
 </style>
