@@ -182,6 +182,12 @@ export default {
   comWapCenter: {
     component: 'VmpConciseCenterWap',
     children: ['comDocWap'],
+    emitDocResize: [
+      {
+        cuid: 'comDocWap',
+        method: 'resize'
+      }
+    ],
     emitPlayerPlay: [
       {
         cuid: 'comWapPlayer',

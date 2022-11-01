@@ -8,8 +8,7 @@
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
       `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
-      isFullScreen ? 'isFullScreen' : '',
-      isWapBodyDocSwitchFullScreen ? 'isWapBodyDocSwitchFullScreen' : ''
+      isFullScreen ? 'isFullScreen' : ''
     ]"
     :style="{
       height:
@@ -163,10 +162,6 @@
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
-      // 竖屏直播 wap-body和文档是否切换位置
-      isWapBodyDocSwitchFullScreen() {
-        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
-      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
@@ -181,11 +176,7 @@
       },
       // 是否观众可见
       switchStatus() {
-        if (this.isFullScreen) {
-          return this.docServer.state.switchStatus && !this.isShowPoster;
-        } else {
-          return this.docServer.state.switchStatus;
-        }
+        return this.docServer.state.switchStatus;
       },
       // 页码
       pageNum() {
@@ -208,7 +199,7 @@
           this.currentType === 'document'
         );
       },
-      // 是否开启文档主画面
+      // 是否开启文档云渲染
       isDocMainScreen() {
         return (
           this.$domainStore.state.docServer.switchStatus &&
@@ -323,7 +314,7 @@
       transposition() {
         if (this.isFullScreen) {
           this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
-            !this.isWapBodyDocSwitchFullScreen;
+            !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
         } else {
           this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
         }
@@ -456,7 +447,11 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
+            if (this.isFullScreen) {
+              // 如果是竖屏直播，文档高度根据宽度计算
+              w = this.$refs.docWrapper.offsetWidth;
+              h = (9 * w) / 16;
+            } else if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
               //竖屏的 正常显示
               w = window.innerWidth;
               h = (9 * w) / 16;
@@ -609,14 +604,6 @@
       }
     }
 
-    &.isWapBodyDocSwitchFullScreen {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      left: auto;
-      height: 160px;
-      width: 284px;
-    }
     .vmp-doc-une__content {
       flex: 1;
       position: relative;

@@ -1525,7 +1525,4 @@
     width: 54px;
     height: 54px;
   }
-  .isFullScreen .playerBox video {
-    object-fit: cover;
-  }
 </style>
