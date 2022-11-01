@@ -318,8 +318,10 @@
       },
       // 消缩放、移动模式。
       cancelZoom() {
-        this.restore();
-        this.docServer.cancelZoom();
+        if (this.currentCid) {
+          this.restore();
+          this.docServer.cancelZoom();
+        }
       },
       // 文档移动后还原
       restore() {
@@ -465,7 +467,7 @@
           } else {
             if (this.isFullScreen) {
               // 如果是竖屏直播，文档高度根据宽度计算
-              w = this.$refs.docWrapper.offsetWidth;
+              w = this.$refs.docWrapper.parentElement.offsetWidth;
               h = (9 * w) / 16;
             } else if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
               //竖屏的 正常显示
