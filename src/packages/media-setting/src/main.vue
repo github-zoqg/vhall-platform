@@ -174,7 +174,8 @@
           visible: false
         },
         hostAlertVisible: false,
-        alertStatus: false
+        alertStatus: false,
+        timeoutCache: 0
       };
     },
     computed: {
@@ -210,6 +211,15 @@
       // 直播状态
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
+      }
+    },
+    watch: {
+      selectedMenuItem: {
+        handler(val) {
+          if (val === 'video-setting' && this.timeoutCache) {
+            clearTimeout(this.timeoutCache);
+          }
+        }
       }
     },
     beforeCreate() {
@@ -306,7 +316,7 @@
       async closeMediaSetting() {
         this.isShow = false;
         // TODO: 需要等待SDK更新，SDK销毁流异步处理有问题。
-        setTimeout(() => {
+        this.timeoutCache = setTimeout(() => {
           this?.$refs['videoSetting']?.destroyStream();
         }, 5000);
         this?.$refs['audioOutSetting']?.pauseAudio();
@@ -340,10 +350,11 @@
       async reset() {
         try {
           this.loading = true;
+          this.selectedMenuItem = 'basic-setting';
           this.setDefaultVideoType();
           await this.getDevices();
           this.setDefaultSelected();
-          this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
+          // this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
           this.getStateCapture();
           this.loading = false;
         } catch (error) {
