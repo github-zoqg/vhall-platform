@@ -141,10 +141,10 @@
       background: #fff;
       &.doc-container__mini {
         position: fixed;
-        height: 168px;
-        left: 55%;
-        top: 70%;
-        width: 300px;
+        top: 16px;
+        right: 16px;
+        height: 160px;
+        width: 284px;
         z-index: 5000;
         overflow: hidden;
         // 文档小窗的样式

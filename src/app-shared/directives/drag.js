@@ -2,94 +2,90 @@
  * @description 自定义元素实现弹框拖拽指令
  * @param close 开关 false 默认打开  v-drag="{ close: false }"
  */
-let positionParams = {
-  x: 0,
-  y: 0,
-  startX: 0,
-  startY: 0,
-  endX: 0,
-  endY: 0,
-  el: null
-};
+
 export const drag = {
   name: 'drag',
   option: {
-    bind(el, binding, vnode) {
-      positionParams.el = el;
-      // positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
-      // positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
-      // console.log('-----drag - bind-----', el, binding, vnode);
-      // console.log('open inserted', positionParams);
-    },
+    // bind(el, binding, vnode) { },
     inserted(el, binding, vnode) {
       // console.log('-----drag - inserted-----', el, binding, vnode);
-      if (!binding.value?.close) {
-        positionParams.el = el;
-        positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
-        positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
-        // console.log('open inserted', positionParams);
-        el.addEventListener('touchstart', doTouchstart);
-        el.addEventListener('touchend', doTouchend);
-        el.addEventListener('touchmove', doTouchmove);
-      }
+      el.$vhallDrag = {
+        dragClose: binding.value?.close,
+        doTouchstart: genDoTouchstart(el),
+        doTouchend: genDoTouchend(el),
+        doTouchmove: genDoTouchmove(el),
+        positionParams: {
+          x: window.innerWidth - el.clientWidth - el.offsetLeft,
+          y: window.innerHeight - el.clientHeight - el.offsetTop,
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0
+        }
+      };
+      el.addEventListener('touchstart', el.$vhallDrag.doTouchstart);
+      el.addEventListener('touchend', el.$vhallDrag.doTouchend);
+      el.addEventListener('touchmove', el.$vhallDrag.doTouchmove);
     },
     update(el, binding, vnode, oldVnode) {
-      positionParams.el = el;
       // console.log('-----drag - update-----', el, binding, vnode, oldVnode);
-      if (!binding.value?.close) {
-        positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
-        positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
-        // console.log('open drag', positionParams);
-        el.addEventListener('touchstart', doTouchstart);
-        el.addEventListener('touchend', doTouchend);
-        el.addEventListener('touchmove', doTouchmove);
-      } else {
-        // console.log('close drag');
-        el.removeEventListener('touchstart', doTouchstart);
-        el.removeEventListener('touchend', doTouchend);
-        el.removeEventListener('touchmove', doTouchmove);
-        el.style.inset = null;
-      }
+      el.$vhallDrag.dragClose = binding.value?.close;
+      el.$vhallDrag.positionParams.x = window.innerWidth - el.clientWidth - el.offsetLeft;
+      el.$vhallDrag.positionParams.y = window.innerHeight - el.clientHeight - el.offsetTop;
     },
     unbind(el, binding, vnode) {
       // console.log('-----drag - unbind-----', el, binding, vnode);
+      el.removeEventListener('touchstart', el.$vhallDrag.doTouchstart);
+      el.removeEventListener('touchend', el.$vhallDrag.doTouchend);
+      el.removeEventListener('touchmove', el.$vhallDrag.doTouchmove);
     }
   }
 };
-function doTouchstart(e) {
-  positionParams.startX = e.touches[0].pageX;
-  positionParams.startY = e.touches[0].pageY;
+
+function genDoTouchstart(targetEl) {
+  return function (e) {
+    if (!targetEl.$vhallDrag.dragClose) {
+      targetEl.$vhallDrag.positionParams.startX = e.touches[0].pageX;
+      targetEl.$vhallDrag.positionParams.startY = e.touches[0].pageY;
+    }
+  };
 }
-function doTouchend(e) {
-  positionParams.x = positionParams.endX;
-  positionParams.y = positionParams.endY;
-  positionParams.startX = 0;
-  positionParams.startY = 0;
+function genDoTouchend(targetEl) {
+  return function (e) {
+    if (!targetEl.$vhallDrag.dragClose) {
+      targetEl.$vhallDrag.positionParams.x = targetEl.$vhallDrag.positionParams.endX;
+      targetEl.$vhallDrag.positionParams.y = targetEl.$vhallDrag.positionParams.endY;
+      targetEl.$vhallDrag.positionParams.startX = 0;
+      targetEl.$vhallDrag.positionParams.startY = 0;
+    }
+  };
 }
-function doTouchmove(e) {
-  if (e.touches.length > 0) {
-    let offsetX = e.touches[0].pageX - positionParams.startX;
-    let offsetY = e.touches[0].pageY - positionParams.startY;
-    let x = positionParams.x - offsetX;
-    let y = positionParams.y - offsetY;
-    if (x + positionParams.el.offsetWidth > document.documentElement.offsetWidth) {
-      x = document.documentElement.offsetWidth - positionParams.el.offsetWidth;
+function genDoTouchmove(targetEl) {
+  return function (e) {
+    if (!targetEl.$vhallDrag.dragClose && e.touches.length > 0) {
+      let offsetX = e.touches[0].pageX - targetEl.$vhallDrag.positionParams.startX;
+      let offsetY = e.touches[0].pageY - targetEl.$vhallDrag.positionParams.startY;
+      let x = targetEl.$vhallDrag.positionParams.x - offsetX;
+      let y = targetEl.$vhallDrag.positionParams.y - offsetY;
+      if (x + targetEl.offsetWidth > document.documentElement.offsetWidth) {
+        x = document.documentElement.offsetWidth - targetEl.offsetWidth;
+      }
+      if (y + targetEl.offsetHeight > document.documentElement.offsetHeight) {
+        y = document.documentElement.offsetHeight - targetEl.offsetHeight;
+      }
+      if (x < 0) {
+        x = 0;
+      }
+      if (y < 0) {
+        y = 0;
+      }
+      targetEl.style.right = x + 'px';
+      targetEl.style.left = 'auto';
+      targetEl.style.bottom = y + 'px';
+      targetEl.style.top = 'auto';
+      targetEl.$vhallDrag.positionParams.endX = x;
+      targetEl.$vhallDrag.positionParams.endY = y;
+      e.preventDefault();
     }
-    if (y + positionParams.el.offsetHeight > document.documentElement.offsetHeight) {
-      y = document.documentElement.offsetHeight - positionParams.el.offsetHeight;
-    }
-    if (x < 0) {
-      x = 0;
-    }
-    if (y < 0) {
-      y = 0;
-    }
-    positionParams.el.style.right = x + 'px';
-    positionParams.el.style.left = 'auto';
-    positionParams.el.style.bottom = y + 'px';
-    positionParams.el.style.top = 'auto';
-    positionParams.endX = x;
-    positionParams.endY = y;
-    e.preventDefault();
-  }
+  };
 }
