@@ -300,7 +300,7 @@
                   >
                     <template>
                       <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                        <pre v-html="privacyText"></pre>
+                        <p v-html="privacyText"></p>
                       </el-checkbox>
                     </template>
                   </el-form-item>
@@ -689,7 +689,7 @@
                 <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
                   <template>
                     <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                      <pre v-html="privacyText"></pre>
+                      <p v-html="privacyText"></p>
                     </el-checkbox>
                   </template>
                 </el-form-item>

@@ -283,7 +283,7 @@
                 class="privacy-item vh-iconfont vh-line-check"
                 :class="{ active: form[privacy.id] }"
               ></i>
-              <pre v-html="privacyText"></pre>
+              <span v-html="privacyText"></span>
             </div>
             <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
           </li>
