@@ -674,7 +674,8 @@ export default {
     emitRecheckMedia: [
       {
         cuid: 'pannelHeaderRight',
-        method: 'handleRecheck'
+        method: 'handleRecheck',
+        args: ['$0']
       }
     ]
   },
