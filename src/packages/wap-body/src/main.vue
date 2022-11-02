@@ -5,7 +5,7 @@
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
       isPortraitLive ? 'isPortraitLive' : '',
-      !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
+      isPortraitLive && !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
     <!-- 直播结束 -->
@@ -30,6 +30,10 @@
           : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
           ? 'vmp-wap-body-special__show'
+          : '',
+        isStreamContainerStickTop ? 'vmp-wap-body-sticktop' : '',
+        isStreamContainerStickTop && !isWapBodyDocSwitchFullScreen
+          ? 'vmp-wap-body-sticktop__hide'
           : ''
       ]"
       v-drag
@@ -120,7 +124,8 @@
         imageCropperMode: 1,
         isLivingEnd: false,
         mini: false,
-        isShowLiveStartNotice: false
+        isShowLiveStartNotice: false,
+        isStreamContainerStickTop: false // 视频流容器是否吸顶（问卷弹窗的时候）
       };
     },
     computed: {
@@ -295,7 +300,11 @@
         location.reload();
       },
       questionnaireVisible(flag) {
-        this.mini = flag;
+        if (this.isPortraitLive) {
+          this.isStreamContainerStickTop = flag;
+        } else {
+          this.mini = flag;
+        }
       },
       listenEvents() {
         // 开启分组讨论
@@ -625,6 +634,22 @@
         left: auto;
         width: 160px;
         height: 284px;
+      }
+      .vmp-wap-body-sticktop {
+        width: 100%;
+        height: 5.62667rem;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 5000;
+        overflow: hidden;
+        &__hide {
+          z-index: -1;
+          opacity: 0;
+        }
+        .licode_stream {
+          object-fit: contain;
+        }
       }
     }
   }

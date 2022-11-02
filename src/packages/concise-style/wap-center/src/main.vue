@@ -20,7 +20,8 @@
       :class="{
         'doc-container__mini': switchDrag,
         'doc-container__sticktop': isDocStickTop,
-        'doc-container__becovered': isDocBeCovered || !switchStatus
+        'doc-container__becovered':
+          isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
       }"
       v-drag="{ close: !switchDrag }"
     >
@@ -107,6 +108,10 @@
       // 设置文档容器是否置顶
       setDocContainerStickTop(val) {
         this.isDocStickTop = val;
+        this.$nextTick(() => {
+          // 派发事件：docResize
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));
+        });
       }
     }
   };
