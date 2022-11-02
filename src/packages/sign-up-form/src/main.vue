@@ -494,7 +494,7 @@
                     <pre v-else-if="quesIndex < 9">{{
                       `0${quesIndex + 1}.${convertLanguage(question.subject, question)}`
                     }}</pre>
-                    <pre v-eles>{{
+                    <pre v-else>{{
                       `${quesIndex + 1}.${convertLanguage(question.subject, question)}`
                     }}</pre>
                   </template>
