@@ -776,6 +776,7 @@
   // import defaultHeader from './img/formHeader.png';
   import { useRoomBaseServer, useSignUpFormServer, useSubjectServer } from 'middle-domain';
   import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { debounce } from 'lodash';
   import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSignUpForm',
@@ -1922,7 +1923,7 @@
         this.privacyText = text;
       },
       //提交报名表单
-      submitForm() {
+      submitForm: debounce(function () {
         this.reportForWatch();
         this.$refs.form.validate((valid, object) => {
           console.log(object);
@@ -1992,9 +1993,9 @@
             return false;
           }
         });
-      },
-      //我已报名--验证
-      submitVerify() {
+      }, 500),
+      // 我已报名--验证
+      submitVerify: debounce(function () {
         this.$refs.verifyForm.validate(valid => {
           if (valid) {
             const params = {
@@ -2048,7 +2049,7 @@
             return false;
           }
         });
-      },
+      }, 500),
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
         // 当前是正常活动点开
