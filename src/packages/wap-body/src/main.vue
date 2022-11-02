@@ -25,7 +25,9 @@
     </div>
     <div
       :class="[
-        mini || !isWapBodyDocSwitchFullScreen ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
+        mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)
+          ? 'vmp-wap-body-mini'
+          : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
           ? 'vmp-wap-body-special__show'
           : ''
