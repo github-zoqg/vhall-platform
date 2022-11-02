@@ -1929,6 +1929,8 @@
     pre {
       font-family: Arial, 'Microsoft Yahei' !important;
       display: inline;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
     &__wrap {
       .cover-pic {

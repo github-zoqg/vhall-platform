@@ -25,7 +25,8 @@
             tabIndex === 1 &&
             currentSpeakerId != userInfo.account_id &&
             userInfo.is_speak &&
-            ![2, '2'].includes(userInfo.device_status)
+            ![2, '2'].includes(userInfo.device_status),
+          'vmp-member-item__name_ingroup': isHost && isInGroup
         }"
       >
         {{ userInfo.nickname }}
@@ -894,7 +895,8 @@
       color: var(--group-name-font-color);
       font-size: 14px;
     }
-    &__name-limit {
+    &__name-limit,
+    &__name_ingroup {
       max-width: 76px;
     }
     &__role {

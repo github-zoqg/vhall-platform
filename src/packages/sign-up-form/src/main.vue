@@ -300,7 +300,7 @@
                   >
                     <template>
                       <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                        <p v-html="privacyText"></p>
+                        <pre v-html="privacyText"></pre>
                       </el-checkbox>
                     </template>
                   </el-form-item>
@@ -691,7 +691,7 @@
                 <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
                   <template>
                     <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                      <p v-html="privacyText"></p>
+                      <pre v-html="privacyText"></pre>
                     </el-checkbox>
                   </template>
                 </el-form-item>
@@ -2289,6 +2289,19 @@
         border: 1px solid var(--theme-color);
       }
     }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .privacy-checkbox {
+      .el-checkbox__label {
+        padding-left: 22px;
+      }
+      .el-checkbox__input {
+        position: absolute;
+        top: 2px;
+      }
+    }
     .el-dialog {
       margin-top: 0 !important;
       position: absolute;
@@ -2667,6 +2680,8 @@
     .el-form-item__label {
       pre {
         display: inline;
+        white-space: pre-wrap;
+        word-wrap: break-word;
       }
     }
   }
