@@ -1,5 +1,6 @@
 import Vue from 'vue';
-
+// 瀑布流
+import { VueMasonryPlugin } from 'vue-masonry';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -62,6 +63,8 @@ import VmpMicInvited from '@/packages/mic-invited/index';
 import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
 // 隐私合规文案
 import VmpPrivacyCompliance from '@/packages/privacy-compliance';
+// 瀑布流组件
+Vue.use(VueMasonryPlugin);
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -115,6 +118,7 @@ Vue.use(VmpStreamPollingRemote);
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpStreamDesktopScreen);
+
 // Vue.use(VmpEmbedClient);
 Vue.use(VmpMicInvited);
 Vue.use(VmpPcPlayerLiveYun);
