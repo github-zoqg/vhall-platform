@@ -281,7 +281,12 @@
       // 复制
       copy(btnIsDisabled) {},
       // 预览
-      preview(btnIsDisabled) {},
+      preview(btnIsDisabled) {
+        this.$emit('examBtnClick', {
+          type: 'preview',
+          currentRow: this.selectedExam
+        });
+      },
       // 删除
       del(btnIsDisabled) {
         if (btnIsDisabled) {

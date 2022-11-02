@@ -336,7 +336,19 @@ export default {
   },
   // 快问快答组件
   comExam: {
-    component: 'VmpExam'
+    component: 'VmpExam',
+    children: ['comExamPreview'],
+    emitOpenPreview: [
+      {
+        cuid: 'comExamPreview',
+        method: 'openPreview',
+        args: ['$0']
+      }
+    ]
+  },
+  // 快问快答组件 - 预览组件
+  comExamPreview: {
+    component: 'VmpExamPreview'
   },
   // 红包组件
   comRedPacket: {
