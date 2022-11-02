@@ -686,7 +686,7 @@
         // first page items are all mounted, scroll to bottom
         if (!this.isFirstPageReady && this.$refs.chatlist.getSizes() >= this.pageSize) {
           this.isFirstPageReady = true;
-          this.setVirtualListToBottom();
+          this.scrollBottom();
         }
         this.checkOverflow();
       }
