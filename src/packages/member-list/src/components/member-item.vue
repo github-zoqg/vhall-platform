@@ -886,7 +886,7 @@
     }
     &__name {
       display: inline-block;
-      max-width: 126px;
+      max-width: 102px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
