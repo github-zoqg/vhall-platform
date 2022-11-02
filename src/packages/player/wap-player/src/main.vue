@@ -1537,4 +1537,8 @@
       font-size: 24px;
     }
   }
+
+  .isFullScreen .playerBox video {
+    object-fit: cover;
+  }
 </style>
