@@ -19,15 +19,26 @@
           </el-tabs>
         </div>
         <!-- 快问快答 内容区域 -->
-        <exam-list-panel ref="examListPanel" v-if="tabType == 'table'"></exam-list-panel>
+        <exam-list-panel
+          ref="examListPanel"
+          v-if="tabType == 'table'"
+          @examBtnClick="handleExamBtnClick"
+        ></exam-list-panel>
         <exam-user-panel ref="examUserPanel" v-else></exam-user-panel>
       </div>
     </el-dialog>
+    <!-- 快问快答 - 预览 -->
+    <vmp-air-container
+      :cuid="childrenComp[0]"
+      :oneself="true"
+      v-show="currentRow"
+    ></vmp-air-container>
   </div>
 </template>
 <script>
   import ExamListPanel from './components/exam-list-panel.vue';
   import ExamUserPanel from './components/exam-user-panel.vue';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpExam',
     components: {
@@ -37,10 +48,14 @@
     data() {
       return {
         dialogVisible: false,
-        tabType: 'table'
+        tabType: 'table',
+        childrenComp: [],
+        currentRow: null
       };
     },
-    beforeCreate() {},
+    created() {
+      this.childrenComp = window.$serverConfig[this.cuid].children;
+    },
     methods: {
       /**
        * 对话框打开事事件
@@ -56,6 +71,18 @@
       // 切换tab
       handleClick(tab, event) {
         this.initPage();
+      },
+      // 列表回调
+      handleExamBtnClick(vo) {
+        this.currentRow = vo?.currentRow || null;
+        if (vo.type == 'preview') {
+          // 预览
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitOpenPreview', [
+              vo.currentRow ? JSON.stringify(vo.currentRow) : null
+            ])
+          );
+        }
       },
       async initPage() {
         await this.$nextTick(() => {});

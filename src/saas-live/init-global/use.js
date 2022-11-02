@@ -1,5 +1,6 @@
 import Vue from 'vue';
-
+// 瀑布流
+import { VueMasonryPlugin } from 'vue-masonry';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -39,6 +40,7 @@ import VmpRecommend from '@/packages/recommend';
 import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
 import VmpExam from '@/packages/exam'; // 快问快答
+import VmpExamPreview from '@/packages/exam-preview'; // 快问快答-预览
 import VmpSignLive from '@/packages/sign-module/sign-live';
 import VmpQa from '@/packages/qa';
 import VmpRedPacketLive from '@/packages/red-packet/live';
@@ -61,6 +63,8 @@ import VmpMicInvited from '@/packages/mic-invited/index';
 import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
 // 隐私合规文案
 import VmpPrivacyCompliance from '@/packages/privacy-compliance';
+// 瀑布流组件
+Vue.use(VueMasonryPlugin);
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -100,6 +104,7 @@ Vue.use(VmpRecommend);
 Vue.use(VmpLotteryLive);
 Vue.use(VmpQuestionnaire);
 Vue.use(VmpExam);
+Vue.use(VmpExamPreview);
 Vue.use(VmpSignLive);
 Vue.use(VmpQa);
 Vue.use(VmpRecordVideoSuccess);
@@ -113,6 +118,7 @@ Vue.use(VmpStreamPollingRemote);
 //初始化滚动插件，也可以考虑局部引用，这个可能会有其他组件使用
 Vue.use(OverlayScrollbarsPlugin);
 Vue.use(VmpStreamDesktopScreen);
+
 // Vue.use(VmpEmbedClient);
 Vue.use(VmpMicInvited);
 Vue.use(VmpPcPlayerLiveYun);
