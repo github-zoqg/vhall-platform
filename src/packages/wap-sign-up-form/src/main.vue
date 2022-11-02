@@ -391,9 +391,9 @@
     getQueryString,
     replaceHtml,
     delUrlParams,
-    parseImgOssQueryString,
-    debounce
+    parseImgOssQueryString
   } from '@/app-shared/utils/tool';
+  import { debounce } from 'lodash';
   import {
     useSignUpFormServer,
     useRoomBaseServer,
@@ -1094,7 +1094,7 @@
         this.onValidate(question);
       },
       //提交报名表单
-      submit: debounce(async function () {
+      submit: debounce(function () {
         this.reportForWatch();
         this.list.forEach(question => {
           // 表单验证
@@ -1131,7 +1131,7 @@
             firstErrRef.focus();
           }
         }
-      }, 3000),
+      }, 500),
       signStartConfirm() {
         this.isSubmitSuccess = false;
         location.replace(
@@ -1707,7 +1707,7 @@
         return false;
       },
       //我已报名--验证
-      submitVerify: debounce(async function () {
+      submitVerify: debounce(function () {
         this.onValidateVerify(true);
         this.isPhoneValidate && this.onValidateVerify(false);
         if (!this.errPhone && !this.errCode) {
@@ -1761,7 +1761,7 @@
         } else {
           this.errPhone ? this.$refs.verifyphone.focus() : this.$refs.verifycode.focus();
         }
-      }, 3000),
+      }, 500),
       // 数据上报
       reportForWatch() {
         try {
