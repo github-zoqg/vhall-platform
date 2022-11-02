@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-wap-player">
+  <div class="vmp-wap-player" :class="isAppStartType ? 'vmp-wap-player__app' : ''">
     <template v-if="encrypt">
       <!-- <div class="vmp-wap-player-prompt">
         <van-loading color="#fb2626" />
@@ -363,6 +363,11 @@
       controlEventPoint
     },
     computed: {
+      // 是否是app或移动sdk发起
+      isAppStartType() {
+        const startType = this.$domainStore.state.roomBaseServer.watchInitData?.switch?.start_type;
+        return startType == 2 || startType == 3;
+      },
       //判断是否是音频直播模式
       isAudio() {
         return this.roomBaseState.watchInitData.webinar.mode == 1;
@@ -1538,7 +1543,9 @@
     }
   }
 
-  .isFullScreen .playerBox video {
-    object-fit: cover;
+  .isFullScreen .vmp-wap-player__app {
+    .playerBox video {
+      object-fit: cover;
+    }
   }
 </style>

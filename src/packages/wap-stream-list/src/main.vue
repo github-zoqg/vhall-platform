@@ -1,7 +1,10 @@
 <template>
   <div
     class="vmp-wap-stream-wrap"
-    :class="isFullScreen ? 'vmp-wap-stream-wrap__fullscreen' : ''"
+    :class="{
+      'vmp-wap-stream-wrap__fullscreen': isFullScreen,
+      'vmp-wap-stream-wrap__fullscreen-app': isAppStartType
+    }"
     ref="vmp-wap-stream-wrap"
     :style="{ background: mainBackground }"
     @click.stop.prevent="videoShowIcon"
@@ -156,6 +159,11 @@
       };
     },
     computed: {
+      // 是否是app或移动sdk发起
+      isAppStartType() {
+        const startType = this.$domainStore.state.roomBaseServer.watchInitData?.switch?.start_type;
+        return startType == 2 || startType == 3;
+      },
       // 竖屏直播，文档播放器位置切换的状态
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
@@ -622,14 +630,22 @@
     height: 422px;
     width: 100%;
     position: relative;
+    // 竖屏直播样式
     &__fullscreen {
       height: 100%;
+      // app发起的竖屏直播
+      &-app {
+        .vmp-stream-list {
+          &__remote-container {
+            // 无延迟竖屏直播，画面铺满屏幕
+            .licode_stream {
+              object-fit: cover;
+            }
+          }
+        }
+      }
       .vmp-stream-list {
         &__remote-container {
-          // 无延迟竖屏直播，画面铺满屏幕
-          .licode_stream {
-            object-fit: cover;
-          }
           .vmp-stream-local__bottom {
             display: none;
           }
