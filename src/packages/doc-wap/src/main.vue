@@ -9,7 +9,7 @@
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
       `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
-      isFullScreen ? 'isFullScreen' : ''
+      isPortraitLive ? 'isPortraitLive' : ''
     ]"
     :style="{
       height:
@@ -210,7 +210,7 @@
         );
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -248,6 +248,7 @@
       },
       switchStatus: {
         handler(val) {
+          if (!this.isPortraitLive) return;
           // 开启文档
           if (val) {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
@@ -330,7 +331,7 @@
 
       // 文档播放器互换位置
       transposition() {
-        if (this.isFullScreen) {
+        if (this.isPortraitLive) {
           this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
             !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
         } else {
@@ -465,7 +466,7 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            if (this.isFullScreen) {
+            if (this.isPortraitLive) {
               // 如果是竖屏直播，文档高度根据宽度计算
               w = this.$refs.docWrapper.parentElement.offsetWidth;
               h = (9 * w) / 16;
@@ -757,7 +758,7 @@
       }
     }
 
-    &.isFullScreen {
+    &.isPortraitLive {
       .pageGroup {
         margin-top: -64px;
       }

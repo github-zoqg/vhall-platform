@@ -1,6 +1,6 @@
 <template>
   <section
-    :class="['vmp-tab-menu', isConcise || isFullScreen ? ' tab-menu__concise' : '']"
+    :class="['vmp-tab-menu', isConcise || isPortraitLive ? ' tab-menu__concise' : '']"
     v-if="!embedObj.embedVideo"
     v-show="visibleMenu.length > 0"
   >
@@ -60,7 +60,7 @@
     <section class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content
         ref="tabContent"
-        :menu="isConcise || isFullScreen ? conciseMenu : menu"
+        :menu="isConcise || isPortraitLive ? conciseMenu : menu"
         :auth="auth"
         @noticeHint="handleHint"
       />
@@ -156,7 +156,7 @@
           return item.visible === true;
         });
         let conciseVisibleMenu = [];
-        if (this.isConcise || this.isFullScreen) {
+        if (this.isConcise || this.isPortraitLive) {
           conciseVisibleMenu = otherVisibleMenu.filter(item => {
             // 如果是简洁模式，菜单抛开 - 聊天tab
             if (item.type == 3) return false;
@@ -167,7 +167,7 @@
         }
         let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
         console.log('当前菜单个数', visibleMenu.length, this.menu);
-        if (this.isConcise || this.isFullScreen) {
+        if (this.isConcise || this.isPortraitLive) {
           // // 告知外部当前可展示的自定义菜单个数
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
@@ -227,7 +227,7 @@
         return skin_json_wap?.speakerAndShowLayout;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -305,7 +305,7 @@
         if (
           this.isSubscribe ||
           this.isConcise ||
-          this.isFullScreen ||
+          this.isPortraitLive ||
           this.isEmbedVideo ||
           this.embedObj.embedVideo
         )

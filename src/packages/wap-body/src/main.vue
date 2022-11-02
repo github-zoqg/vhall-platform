@@ -4,7 +4,7 @@
     :class="[
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
-      isFullScreen ? 'isFullScreen' : '',
+      isPortraitLive ? 'isPortraitLive' : '',
       !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
@@ -252,7 +252,7 @@
         );
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -606,7 +606,7 @@
         visibility: hidden;
       }
     }
-    &.isFullScreen {
+    &.isPortraitLive {
       width: 100vw;
       height: 100vh;
       position: fixed;

@@ -2,8 +2,8 @@
   <div
     class="vmp-wap-stream-wrap"
     :class="{
-      'vmp-wap-stream-wrap__fullscreen': isFullScreen,
-      'vmp-wap-stream-wrap__fullscreen-app': isAppStartType
+      'vmp-wap-stream-wrap__portrait': isPortraitLive,
+      'vmp-wap-stream-wrap__portrait-app': isAppStartType
     }"
     ref="vmp-wap-stream-wrap"
     :style="{ background: mainBackground }"
@@ -62,7 +62,7 @@
         v-if="
           roomBaseServer.state.watchInitData.pv.show &&
           !isInGroup &&
-          (!isConcise || !this.isFullScreen)
+          (!isConcise || !this.isPortraitLive)
         "
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
@@ -346,7 +346,7 @@
         return num < 6;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -464,7 +464,7 @@
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
           // 竖屏直播，并且有文档展示的时候，需要将视频置为大屏
-          if (this.switchStatus && this.isFullScreen) {
+          if (this.switchStatus && this.isPortraitLive) {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
           }
         });
@@ -540,7 +540,7 @@
 
       // 恢复播放
       replayPlay() {
-        if (this.isFullScreen && this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
+        if (this.isPortraitLive && this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
           this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
         }
         console.log('点击了恢复播放------', this.playAbort);
@@ -631,7 +631,7 @@
     width: 100%;
     position: relative;
     // 竖屏直播样式
-    &__fullscreen {
+    &__portrait {
       height: 100%;
       // app发起的竖屏直播
       &-app {

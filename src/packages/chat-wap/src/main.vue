@@ -29,9 +29,9 @@
     methods: {
       initComponent() {
         // 竖屏直播
-        const isFullScreen =
+        const isPortraitLive =
           this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
-        if (isFullScreen) {
+        if (isPortraitLive) {
           this.layout = 'conciseLayout';
           return;
         }

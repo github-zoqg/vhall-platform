@@ -5,19 +5,19 @@
         src="../assets/imgs/noData_red.png"
         alt=""
         srcset=""
-        v-show="(isFullScreen || isConcise) && ![4, 5].includes(backGroundColor)"
+        v-show="(isPortraitLive || isConcise) && ![4, 5].includes(backGroundColor)"
       />
       <img
         src="../assets/imgs/noData_golden.png"
         alt=""
         srcset=""
-        v-show="(isFullScreen || isConcise) && backGroundColor == 4"
+        v-show="(isPortraitLive || isConcise) && backGroundColor == 4"
       />
       <img
         src="../assets/imgs/noData_blue.png"
         alt=""
         srcset=""
-        v-show="(isFullScreen || isConcise) && backGroundColor == 5"
+        v-show="(isPortraitLive || isConcise) && backGroundColor == 5"
       />
     </div>
     <p>
@@ -49,7 +49,7 @@
         return !!(skin_json_wap?.style == 3);
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       },
       backGroundColor() {

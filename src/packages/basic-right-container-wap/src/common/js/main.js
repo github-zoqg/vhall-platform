@@ -53,7 +53,7 @@ export default {
       return !!(skin_json_wap?.style == 3);
     },
     // 竖屏直播
-    isFullScreen() {
+    isPortraitLive() {
       return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
     }
   },
@@ -70,7 +70,7 @@ export default {
     useMenuServer().$on('tab-switched', async data => {
       // 需要展示icon tab
       // console.log(data.cuid, 'data.cuid');
-      if (!this.isConcise || !this.isFullScreen) {
+      if (!this.isConcise || !this.isPortraitLive) {
         if (['comChatWap', 'comIntroWap'].includes(data.cuid)) {
           this.showIcon = true;
         } else {

@@ -19,7 +19,7 @@
             !isPlayering &&
             !isVodEnd &&
             !isSmallPlayer &&
-            (!isFullScreen || (!isWapBodyDocSwitchFullScreen && isFullScreen))
+            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
           "
           class="vmp-wap-player-pause"
         >
@@ -79,7 +79,7 @@
         <div
           class="vmp-wap-player-header"
           v-show="
-            roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer && !isFullScreen
+            roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer && !isPortraitLive
           "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
@@ -136,7 +136,7 @@
         <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
         <div
           class="vmp-wap-player-footer"
-          v-show="isPlayering && !isSmallPlayer && !isFullScreen"
+          v-show="isPlayering && !isSmallPlayer && !isPortraitLive"
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
           <div class="vmp-wap-player-control">
@@ -442,7 +442,7 @@
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       },
       // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
@@ -563,6 +563,7 @@
       },
       isShowPoster: {
         handler(val) {
+          if (!this.isPortraitLive) return;
           if (this.isShowPoster) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
@@ -648,7 +649,7 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isConcise || this.isFullScreen) return;
+        if (this.isSubscribe || this.isConcise || this.isPortraitLive) return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
         let playerHeight = this.isSmallPlayer == true && !this.isWapBodyDocSwitch ? 130 : 422;
@@ -1543,7 +1544,7 @@
     }
   }
 
-  .isFullScreen .vmp-wap-player__app {
+  .isPortraitLive .vmp-wap-player__app {
     .playerBox video {
       object-fit: cover;
     }

@@ -218,7 +218,7 @@
         childrenCom: [],
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         visibleMenuLength: 0,
-        isFullScreen: this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0 // 竖屏直播
+        isPortraitLive: this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0 // 竖屏直播
       };
     },
     computed: {
@@ -316,7 +316,7 @@
         return (
           this.groupInitData.isInGroup &&
           this.currentTab == 3 &&
-          (this.isConcise || this.isFullScreen)
+          (this.isConcise || this.isPortraitLive)
         );
       }
     },

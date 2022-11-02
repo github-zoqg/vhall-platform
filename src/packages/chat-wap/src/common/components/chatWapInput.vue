@@ -3,7 +3,7 @@
     class="chat-input-modal"
     :class="[
       smFix ? 'smFix' : '',
-      isFullScreen || isConcise ? `chat-input-modal__${showTabType}` : ''
+      isPortraitLive || isConcise ? `chat-input-modal__${showTabType}` : ''
     ]"
     v-show="visible"
   >
@@ -135,7 +135,7 @@
         return skin_json_wap?.style == 3;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },

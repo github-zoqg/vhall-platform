@@ -1,5 +1,5 @@
 <template>
-  <div id="header" class="vh-concise-header-box" :class="isFullScreen ? 'isFullScreen' : ''">
+  <div id="header" class="vh-concise-header-box" :class="isPortraitLive ? 'isPortraitLive' : ''">
     <section class="vh-concise-header-box__rehearsal" v-if="isRehearsal && isLiving">
       <span class="dot"></span>
       {{ $t('nav.nav_1055') }}
@@ -51,7 +51,7 @@
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
         <!-- 更多 -->
-        <span class="vh-concise-header-box__tool-box__btn" v-if="isFullScreen">
+        <span class="vh-concise-header-box__tool-box__btn" v-if="isPortraitLive">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
         </span>
       </section>
@@ -75,7 +75,7 @@
           </p>
         </div>
       </section>
-      <section class="vh-concise-header-box__tool-box" v-if="isFullScreen">
+      <section class="vh-concise-header-box__tool-box" v-if="isPortraitLive">
         <!-- 更多 -->
         <span class="vh-concise-header-box__tool-box__btn">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
@@ -282,7 +282,7 @@
         return this.$domainStore.state.roomBaseServer.embedObj;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -554,7 +554,7 @@
         }
       }
     }
-    &.isFullScreen {
+    &.isPortraitLive {
       .vh-concise-header-box__2 .host-user-info {
         margin: 0;
         padding: 18px 0;
