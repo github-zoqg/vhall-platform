@@ -84,7 +84,7 @@
     methods: {
       startPlay() {
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
-          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+          this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = false;
         }
         this.isPlayering ? this.pause() : this.play();
       },

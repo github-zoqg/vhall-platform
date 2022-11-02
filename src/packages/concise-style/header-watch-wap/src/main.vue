@@ -51,7 +51,7 @@
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
         <!-- 更多 -->
-        <span class="vh-concise-header-box__tool-box__btn" v-if="isPortraitLive">
+        <span class="vh-concise-header-box__tool-box__btn more" v-if="isPortraitLive">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
         </span>
       </section>
@@ -75,7 +75,7 @@
           </p>
         </div>
       </section>
-      <section class="vh-concise-header-box__tool-box" v-if="isPortraitLive">
+      <section class="vh-concise-header-box__tool-box more" v-if="isPortraitLive">
         <!-- 更多 -->
         <span class="vh-concise-header-box__tool-box__btn">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
@@ -146,6 +146,29 @@
         </div>
       </div>
     </van-popup>
+    <van-popup
+      class="quality-van-popup speed-van-popup"
+      v-model="showSpeedCard"
+      safe-area-inset-bottom
+      get-container="#app"
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="quality-content speed-content">
+        <div class="list">
+          <div
+            class="item"
+            v-for="item in UsableSpeed"
+            :key="item.def"
+            :class="{ active: currentSpeed == item }"
+            @click.stop="changeSpeed(item)"
+          >
+            {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
+          </div>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -193,7 +216,10 @@
           progress_bar: 0,
           speed: 0,
           autoplay: false
-        }
+        },
+        currentSpeed: 1, // 当前倍速
+        UsableSpeed: [], // 视频倍速列表
+        showSpeedCard: false
       };
     },
     mounted() {
@@ -414,7 +440,6 @@
         return text;
       },
       getQualitys(currentQualitys, qualitysList) {
-        console.log('==-=-=-=-=-=-=-=', currentQualitys, qualitysList);
         this.currentQualitys = currentQualitys;
         this.qualitysList = qualitysList;
       },
@@ -429,6 +454,23 @@
       getPlayerOtherOptions(options) {
         this.playerOtherOptions = options;
         console.log('【playerOtherOptions】', this.playerOtherOptions);
+      },
+      openQualityCard(val) {
+        this.showQualityCard = val;
+      },
+      getSpeeds(currentSpeed, speedsList) {
+        this.currentSpeed = currentSpeed;
+        this.UsableSpeed = speedsList;
+      },
+      openSpeedCard(val) {
+        this.showSpeedCard = val;
+      },
+      // 修改视频倍速
+      changeSpeed(item) {
+        this.showSpeedCard = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerUpdateSpeed', [item])
+        );
       }
     }
   };

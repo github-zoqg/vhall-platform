@@ -30,7 +30,7 @@
           ? 'vmp-wap-body-special__show'
           : ''
       ]"
-      v-drag
+      v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
     >
       <!-- 播放器 -->
       <vmp-air-container

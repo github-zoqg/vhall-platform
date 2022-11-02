@@ -21,6 +21,7 @@ export default {
       'layerBody',
       'layerBodyBlock',
       'layerBodyCenter',
+      // 'layerBodyFooter',
       'comAllDialog',
       'comGoodsDetail',
       'comUserAccountWap'
@@ -52,6 +53,13 @@ export default {
       {
         cuid: 'comWapPlayer',
         method: 'changeQualitys',
+        args: ['$0']
+      }
+    ],
+    emitPlayerUpdateSpeed: [
+      {
+        cuid: 'comWapPlayer',
+        method: 'changeSpeed',
         args: ['$0']
       }
     ]
@@ -141,6 +149,21 @@ export default {
         method: 'setDocContainerCovered',
         args: ['$0']
       }
+    ],
+    emitPlayerOpenQuality: [
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comHeaderWatch',
+        method: 'openQualityCard',
+        args: ['$0']
+      }
+    ],
+    emitPlayerSpeed: [
+      {
+        cuid: 'comHeaderWatch',
+        method: 'getSpeeds',
+        args: ['$0', '$1']
+      }
     ]
   },
   comWapStreamList: {
@@ -167,6 +190,13 @@ export default {
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
     children: ['comChatWap']
+  },
+  layerBodyFooter: {
+    component: 'VmpConciseCenterWap',
+    children: ['comWapPlayerControlVod']
+  },
+  comWapPlayerControlVod: {
+    component: 'VmpPlayerControlVodWap'
   },
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap'

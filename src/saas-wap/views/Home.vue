@@ -2,7 +2,9 @@
   <div
     :class="[
       { 'vmp-basic-layout__noHeader': !showHeader },
-      isConcise || isPortraitLive ? 'vmp-concise-layout' : 'vmp-basic-layout'
+      isConcise || isPortraitLive ? 'vmp-concise-layout' : 'vmp-basic-layout',
+      isPortraitLive ? 'isPortraitLive' : '',
+      isPortraitLive && !isLiving ? 'isVod' : ''
     ]"
   >
     <van-loading
@@ -87,6 +89,10 @@
       // 主办方配置
       webinarTag() {
         return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       }
     },
     beforeRouteEnter(to, from, next) {
