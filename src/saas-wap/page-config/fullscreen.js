@@ -472,6 +472,11 @@ export default {
     component: 'VmpQuestionnaireWap',
     emitQuestionnaireVisible: [
       {
+        cuid: 'comWapCenter',
+        method: 'setDocContainerStickTop',
+        args: ['$0']
+      },
+      {
         cuid: 'comWapBody',
         method: 'questionnaireVisible',
         args: ['$0']

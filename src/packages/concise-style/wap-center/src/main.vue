@@ -19,7 +19,8 @@
       class="vmp-concise-center-wap__doc-container"
       :class="{
         'doc-container__mini': switchDrag,
-        'doc-container__becovered': isDocBeCovered
+        'doc-container__sticktop': isDocStickTop,
+        'doc-container__becovered': isDocBeCovered || !switchStatus
       }"
       v-drag="{ close: !switchDrag }"
     >
@@ -42,7 +43,8 @@
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
         childrenComp: [],
-        isDocBeCovered: false // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
+        isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
+        isDocStickTop: false // 文档是否吸顶（问卷弹出的情况）
       };
     },
     computed: {
@@ -98,8 +100,13 @@
       updatePlayStatus(val) {
         this.isPlayering = val;
       },
+      // 设置文档容器是否隐藏（z-index:-1）
       setDocContainerCovered(val) {
         this.isDocBeCovered = val;
+      },
+      // 设置文档容器是否置顶
+      setDocContainerStickTop(val) {
+        this.isDocStickTop = val;
       }
     }
   };
@@ -145,6 +152,28 @@
         right: 16px;
         height: 160px;
         width: 284px;
+        z-index: 5000;
+        overflow: hidden;
+        // 文档小窗的样式
+        .vmp-doc-wap {
+          .pageGroup {
+            display: none;
+          }
+          .tools {
+            .btn-doc-rotate,
+            .btn-doc-fullscreen,
+            .btn-doc-restore {
+              display: none;
+            }
+          }
+        }
+      }
+      &.doc-container__sticktop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 422px;
+        width: 100%;
         z-index: 5000;
         overflow: hidden;
         // 文档小窗的样式

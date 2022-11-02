@@ -218,7 +218,7 @@
     }
   }
   .close-btn {
-    position: fixed;
+    position: absolute;
     width: 48px;
     height: 48px;
     top: 16px;
