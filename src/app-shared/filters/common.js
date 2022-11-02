@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { padZero } from '@/app-shared/utils/handle-time';
 /**
  * 原知客用到
  */
@@ -120,15 +121,17 @@ Vue.filter('filterAmount', val => {
 // 播放器回放时间转化
 Vue.filter('secondToDate', (val, type) => {
   // type= 1 :表示章节
-  let time = dayjs.duration(val, 'seconds');
-  let hours = time.hours();
-  let minutes = time.minutes();
-  let seconds = time.seconds();
-  let totalTime = '00:00';
-  if (hours || type == 1) {
-    totalTime = time.format('HH:mm:ss');
+  let time = val;
+  let hours = padZero(Math.floor(time / (60 * 60)));
+  time = time % (60 * 60);
+  let minutes = padZero(Math.floor(time / 60));
+  time = time % 60;
+  let seconds = padZero(Math.floor(time));
+  let totalTime = '';
+  if (hours != '00' || type == 1) {
+    totalTime = hours + ':' + minutes + ':' + seconds;
   } else {
-    totalTime = time.format('mm:ss');
+    totalTime = minutes + ':' + seconds;
   }
   return totalTime;
 });
