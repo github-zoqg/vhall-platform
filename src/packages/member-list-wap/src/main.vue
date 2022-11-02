@@ -435,7 +435,7 @@
       font-style: normal;
       font-weight: 400;
       font-size: 28px;
-      line-height: 28px;
+      line-height: 48px;
     }
     .info-role {
       text-align: center;
