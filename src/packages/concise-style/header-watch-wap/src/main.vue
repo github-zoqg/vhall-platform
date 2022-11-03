@@ -93,14 +93,14 @@
     >
       <div class="more-content">
         <div class="list">
-          <div class="item" v-if="playerOtherOptions.barrage_button">
+          <!--  <div class="item" v-if="playerOtherOptions.barrage_button">
             <div class="iconGroup" @click="updateBarrage">
               <span
                 :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
               ></span>
             </div>
             <div class="text">{{ danmuIsOpen ? $t('nav.nav_1057') : $t('nav.nav_1058') }}</div>
-          </div>
+          </div> -->
           <div class="item" v-if="languageList.length > 1">
             <div class="iconGroup" @click="updateLang">
               <span :class="`vh-iconfont ${lang.key == 1 ? 'vh-line_en' : 'vh-line_cn'}`"></span>
@@ -211,12 +211,12 @@
         qualitysList: [], // 清晰度列表
         showQualityCard: false,
         languageList: [],
-        playerOtherOptions: {
-          barrage_button: 0,
-          progress_bar: 0,
-          speed: 0,
-          autoplay: false
-        },
+        // playerOtherOptions: {
+        //   barrage_button: 0,
+        //   progress_bar: 0,
+        //   speed: 0,
+        //   autoplay: false
+        // },
         currentSpeed: 1, // 当前倍速
         UsableSpeed: [], // 视频倍速列表
         showSpeedCard: false
@@ -450,11 +450,11 @@
           boxEventOpitons(this.cuid, 'emitPlayerUpdateQuality', [item])
         );
       },
-      // 获取跑马灯、水印等播放器配置
-      getPlayerOtherOptions(options) {
-        this.playerOtherOptions = options;
-        console.log('【playerOtherOptions】', this.playerOtherOptions);
-      },
+      // // 获取跑马灯、水印等播放器配置
+      // getPlayerOtherOptions(options) {
+      //   this.playerOtherOptions = options;
+      //   console.log('【playerOtherOptions】', this.playerOtherOptions);
+      // },
       openQualityCard(val) {
         this.showQualityCard = val;
       },

@@ -1,7 +1,7 @@
 <template>
   <div
     class="vmp-wap-player"
-    :class="(isAppStartType ? 'vmp-wap-player__app' : '', !isLiving ? 'isVod' : '')"
+    :class="[isAppStartType ? 'vmp-wap-player__app' : '', !isLiving ? 'isVod' : '']"
   >
     <template v-if="encrypt">
       <!-- <div class="vmp-wap-player-prompt">
@@ -43,8 +43,16 @@
           <!-- 视频容器 -->
         </div>
         <!-- 直播结束 -->
-        <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
-          <p v-if="!isPortraitLive">{{ $t('player.player_1014') }}</p>
+        <div
+          class="vmp-wap-player-audie"
+          v-if="
+            (isAudio || audioStatus) &&
+            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+          "
+        >
+          <p v-show="!(!isWapBodyDocSwitchFullScreen && isPortraitLive)">
+            {{ $t('player.player_1014') }}
+          </p>
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
@@ -670,6 +678,20 @@
         this.$nextTick(() => {
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitPlayerVodEnd', [val])
+          );
+        });
+      },
+      audioStatus(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerAudioStatus', [val])
+          );
+        });
+      },
+      isAudio(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerIsAudio', [val])
           );
         });
       }

@@ -135,13 +135,13 @@ export default {
         args: ['$0', '$1']
       }
     ],
-    emitPlayerOtherOptions: [
-      {
-        cuid: 'comHeaderWatch',
-        method: 'getPlayerOtherOptions',
-        args: ['$0']
-      }
-    ],
+    // emitPlayerOtherOptions: [
+    //   {
+    //     cuid: 'comHeaderWatch',
+    //     method: 'getPlayerOtherOptions',
+    //     args: ['$0']
+    //   }
+    // ],
     emitPlayerPoster: [
       // 设置文档是否被覆盖
       {
@@ -202,6 +202,22 @@ export default {
       {
         cuid: 'comWapCenter',
         method: 'getIsSmallPlayer',
+        args: ['$0']
+      }
+    ],
+    emitPlayerAudioStatus: [
+      //选中清晰度是否是音频模式
+      {
+        cuid: 'comWapCenter',
+        method: 'getAudioStatus',
+        args: ['$0']
+      }
+    ],
+    emitPlayerIsAudio: [
+      //判断是否是音频直播模式
+      {
+        cuid: 'comWapCenter',
+        method: 'getIsAudio',
         args: ['$0']
       }
     ]

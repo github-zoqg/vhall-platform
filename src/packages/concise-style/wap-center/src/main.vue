@@ -30,6 +30,11 @@
       </div>
     </div>
 
+    <!-- 音频直播 -->
+    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlayering">
+      <p>{{ $t('player.player_1014') }}</p>
+    </div>
+
     <div
       class="vmp-concise-center-wap__doc-container"
       :class="{
@@ -62,7 +67,9 @@
         isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
         isDocStickTop: false, // 文档是否吸顶（问卷弹出的情况）
         imageCropperMode: 1,
-        webinarsBgImg: ''
+        webinarsBgImg: '',
+        audioStatus: false, // 选中清晰度是否是音频模式
+        isAudio: false //判断是否是音频直播模式
       };
     },
     computed: {
@@ -141,6 +148,12 @@
       },
       getIsSmallPlayer(val) {
         this.IsSmallPlayer = val;
+      },
+      getAudioStatus(val) {
+        this.audioStatus = val;
+      },
+      getIsAudio(val) {
+        this.IsAudio = val;
       }
     }
   };
@@ -176,6 +189,21 @@
           font-size: 46px;
           color: #f5f5f5;
         }
+      }
+    }
+    > .vmp-wap-player-audie {
+      display: block !important;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('./img/video.gif') no-repeat;
+      background-size: 100% 100%;
+      p {
+        font-size: 28px;
+        color: #fff;
+        margin-top: 40%;
+        text-align: center;
       }
     }
     &__doc-container {
