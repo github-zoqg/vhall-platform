@@ -172,6 +172,38 @@ export default {
         method: 'openSpeedCard',
         args: ['$0']
       }
+    ],
+    emitPlayerImageCropperMode: [
+      // 获取图片
+      {
+        cuid: 'comWapCenter',
+        method: 'getImageCropperMode',
+        args: ['$0']
+      }
+    ],
+    emitPlayerWebinarsBgImg: [
+      // 获取图片
+      {
+        cuid: 'comWapCenter',
+        method: 'getWebinarsBgImg',
+        args: ['$0']
+      }
+    ],
+    emitPlayerVodEnd: [
+      // 回放结束标识
+      {
+        cuid: 'comWapCenter',
+        method: 'getVodEnd',
+        args: ['$0']
+      }
+    ],
+    emitPlayerIsSmallPlayer: [
+      // 小窗标识
+      {
+        cuid: 'comWapCenter',
+        method: 'getIsSmallPlayer',
+        args: ['$0']
+      }
     ]
   },
   comWapStreamList: {

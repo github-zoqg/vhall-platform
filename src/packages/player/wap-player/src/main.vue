@@ -48,7 +48,7 @@
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
-          v-show="isVodEnd && !isPlayering"
+          v-show="isVodEnd && !isPlayering && !isPortraitLive"
           :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
@@ -245,7 +245,12 @@
                   <span
                     class="barrageSpan"
                     @click.stop="openBarrage"
-                    v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
+                    v-if="
+                      playerOtherOptions.barrage_button &&
+                      !isWarnPreview &&
+                      !isTryPreview &&
+                      !isPortraitLive
+                    "
                   >
                     <i
                       :class="`barrage vh-iconfont ${
@@ -253,7 +258,10 @@
                       }`"
                     ></i>
                   </span>
-                  <span v-if="!isAudio && !isWarnPreview" @click.stop="enterFullscreen">
+                  <span
+                    v-if="!isAudio && !isWarnPreview && !isPortraitLive"
+                    @click.stop="enterFullscreen"
+                  >
                     <i
                       :class="`vh-iconfont ${
                         isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -433,7 +441,7 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
+        const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
         let webinarUrl = cover;
         if (webinar.img_url) {
           if (cropperImage(webinar.img_url)) {
@@ -447,16 +455,14 @@
           if (warmup.warmup_img_url) {
             if (cropperImage(warmup.warmup_img_url)) {
               this.handlerImageInfo(warmup.warmup_img_url);
-              return warmup.warmup_img_url;
+              webinarUrl = warmup.warmup_img_url;
             } else {
-              return warmup.warmup_img_url + ossimg;
+              webinarUrl = warmup.warmup_img_url + ossimg;
             }
-          } else {
-            return webinarUrl;
           }
-        } else {
-          return webinarUrl;
         }
+        console.log('this.cuid', this.cuid, webinarUrl);
+        return webinarUrl;
       },
       // 初始化了第几个
       initPlayerIndex() {
@@ -582,6 +588,11 @@
             document.querySelector('.vmp-basic-bd').classList.remove('small_player');
           }
           this.setSetingHeight();
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerIsSmallPlayer', [val])
+            );
+          });
         }
       },
       currentSpeed(val) {
@@ -637,11 +648,30 @@
           if (this.isShowPoster) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
-          );
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
+            );
+          });
         },
         immediate: true
+      },
+      webinarsBgImg: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerWebinarsBgImg', [val])
+            );
+          });
+        },
+        immediate: true
+      },
+      isVodEnd(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerVodEnd', [val])
+          );
+        });
       }
     },
     beforeCreate() {
@@ -752,6 +782,11 @@
       handlerImageInfo(url) {
         let obj = parseImgOssQueryString(url);
         this.imageCropperMode = Number(obj.mode);
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
+          );
+        });
         console.log(this.imageCropperMode, '???mode');
       },
       startPlay() {
@@ -1681,7 +1716,7 @@
         width: 100%;
         height: 100px;
         display: block !important;
-        z-index: 5;
+        z-index: 99;
         .vmp-wap-player-control {
           height: 85px;
         }
@@ -1724,6 +1759,13 @@
     .vmp-wap-player__app {
       .playerBox video {
         object-fit: cover;
+      }
+    }
+
+    .vmp-wap-player-ending {
+      background: none !important;
+      &-box {
+        background: none !important;
       }
     }
   }
