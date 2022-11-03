@@ -1131,7 +1131,7 @@
             firstErrRef.focus();
           }
         }
-      }, 500),
+      }, 1000),
       signStartConfirm() {
         this.isSubmitSuccess = false;
         location.replace(
@@ -1761,7 +1761,7 @@
         } else {
           this.errPhone ? this.$refs.verifyphone.focus() : this.$refs.verifycode.focus();
         }
-      }, 500),
+      }, 1000),
       // 数据上报
       reportForWatch() {
         try {
