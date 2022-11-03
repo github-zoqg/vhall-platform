@@ -1027,7 +1027,13 @@
       },
       openSpeed() {
         if (this.isPortraitLive && !this.isLiving) {
-          this.showSpeedCard = true;
+          if (this.isWapBodyDocSwitchFullScreen) {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerOpenSpeed', [true])
+            );
+          } else {
+            this.showSpeedCard = true;
+          }
         } else {
           this.iconShow = true;
           this.isOpenSpeed = true;

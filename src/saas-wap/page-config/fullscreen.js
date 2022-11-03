@@ -164,6 +164,14 @@ export default {
         method: 'getSpeeds',
         args: ['$0', '$1']
       }
+    ],
+    emitPlayerOpenSpeed: [
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comHeaderWatch',
+        method: 'openSpeedCard',
+        args: ['$0']
+      }
     ]
   },
   comWapStreamList: {
