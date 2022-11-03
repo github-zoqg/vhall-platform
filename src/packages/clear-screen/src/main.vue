@@ -9,9 +9,7 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
-  // 清屏状态，所有实例共享
-  let isClearScreen = false;
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'VmpClearScreen',
     props: {
@@ -63,14 +61,13 @@
         return rlt;
       }
     },
+    created() {
+      this.roomBaseServer = useRoomBaseServer();
+    },
     methods: {
       clearScreen(e) {
         if (!this.isSelf || (this.isSelf && e.target === e.currentTarget)) {
-          alert(isClearScreen);
-          isClearScreen = !isClearScreen;
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClearScreenChange', [isClearScreen])
-          );
+          this.roomBaseServer.state.isClearScreen = !this.roomBaseServer.state.isClearScreen;
         }
       }
     }

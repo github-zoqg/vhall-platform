@@ -1,14 +1,6 @@
 /**
  * 【竖屏直播】wap观看端主直播页面配置
  */
-// 清屏事件配置
-const emitClearScreenChange = [
-  {
-    cuid: 'comWapCenter',
-    method: 'cls',
-    args: ['$0']
-  }
-];
 export default {
   // 根节点
   layerRoot: {
@@ -59,17 +51,13 @@ export default {
   layerJaw: {
     component: 'VmpClearScreen',
     className: 'vmp-basic-jaw',
-    children: ['comContainerRight'],
-    // 清屏事件
-    emitClearScreenChange
+    children: ['comContainerRight']
   },
   // 颈部容器
   layerNeck: {
     component: 'VmpClearScreen',
     className: 'vmp-basic-neck',
-    children: ['comNoticeWap'],
-    // 清屏事件
-    emitClearScreenChange
+    children: ['comNoticeWap']
   },
   // 中间主区域容器
   layerBody: {
@@ -78,17 +66,13 @@ export default {
     children: ['comWapCenter'],
     options: {
       isSelf: false
-    },
-    // 清屏事件
-    emitClearScreenChange
+    }
   },
   // 中间主区域容器
   layerBodyBlock: {
     component: 'VmpClearScreen',
     className: 'vmp-block',
-    children: ['comBodyBlock'],
-    // 清屏事件
-    emitClearScreenChange
+    children: ['comBodyBlock']
   },
   // 中间主区域内容容器
   comWapBody: {
@@ -166,7 +150,7 @@ export default {
   },
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
-    children: ['comChatWap']
+    children: ['comChatWap', 'comChatClearScreen']
   },
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap'
@@ -272,6 +256,11 @@ export default {
     },
     children: ['comTabMenuWap'],
     options: {}
+  },
+  // 聊天区清屏组件
+  comChatClearScreen: {
+    component: 'VmpClearScreen',
+    className: 'vmp-chat-wap-concise__clearscreen'
   },
   // 聊天
   comChatWap: {
