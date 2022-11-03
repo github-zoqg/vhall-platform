@@ -351,10 +351,19 @@
       }
     },
     watch: {
-      showPlayIcon() {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
-        );
+      showPlayIcon: {
+        handler() {
+          // 防止页面初始化报错故添加timeout：目标组件不存在
+          setTimeout(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
+            );
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
+            );
+          });
+        },
+        immediate: true
       },
       // 设置主画面背景色
       mainBackground: {
