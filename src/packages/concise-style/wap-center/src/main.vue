@@ -2,13 +2,7 @@
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
     <div
-      v-show="
-        !noDelayWebinar &&
-        isWapBodyDocSwitchFullScreen &&
-        !isPlayering &&
-        !isVodEnd &&
-        !isSmallPlayer
-      "
+      v-show="isWapBodyDocSwitchFullScreen && !isPlayering && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
     >
       <p @click.stop="startPlay">
@@ -88,6 +82,10 @@
       // 竖屏直播，文档播放器位置切换的状态
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       }
     },
     watch: {
@@ -111,7 +109,11 @@
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
           this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = false;
         }
-        this.isPlayering ? this.pause() : this.play();
+        if (this.noDelayWebinar && this.webinarType == 1) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStreamPlay'));
+        } else {
+          this.isPlayering ? this.pause() : this.play();
+        }
       },
       // 播放
       play() {

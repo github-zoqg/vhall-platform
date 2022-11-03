@@ -51,7 +51,10 @@
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
         <!-- 更多 -->
-        <span class="vh-concise-header-box__tool-box__btn more" v-if="isPortraitLive">
+        <span
+          class="vh-concise-header-box__tool-box__btn more"
+          v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
+        >
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
         </span>
       </section>
@@ -75,7 +78,10 @@
           </p>
         </div>
       </section>
-      <section class="vh-concise-header-box__tool-box more" v-if="isPortraitLive">
+      <section
+        class="vh-concise-header-box__tool-box more"
+        v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
+      >
         <!-- 更多 -->
         <span class="vh-concise-header-box__tool-box__btn">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
@@ -107,7 +113,7 @@
             </div>
             <div class="text">{{ languageList[lang.key == 1 ? 1 : 0].label }}</div>
           </div>
-          <div class="item">
+          <div class="item" v-if="!noDelayWebinar">
             <div
               class="iconGroup"
               @click="
@@ -310,6 +316,10 @@
       // 竖屏直播
       isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 是否是无延迟活动
+      noDelayWebinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       }
     },
     methods: {

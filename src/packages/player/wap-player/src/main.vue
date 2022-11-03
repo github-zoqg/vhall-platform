@@ -18,12 +18,7 @@
         </div>
         <!-- 播放 按钮 -->
         <div
-          v-show="
-            !isPlayering &&
-            !isVodEnd &&
-            !isSmallPlayer &&
-            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
-          "
+          v-show="!isPlayering && !isVodEnd && !isSmallPlayer && !isPortraitLive"
           class="vmp-wap-player-pause"
         >
           <p @click.stop="startPlay">

@@ -283,6 +283,12 @@ export default {
         cuid: 'comWapPlayer',
         method: 'pause'
       }
+    ],
+    emitStreamPlay: [
+      {
+        cuid: 'comWapStreamList',
+        method: 'replayPlay'
+      }
     ]
   },
   comTabMenuWap: {
