@@ -72,6 +72,7 @@
                   >
                     | 无延迟
                   </span>
+                  <span v-if="item.webinar_show_type == 0">| 竖屏</span>
                 </span>
                 <img
                   :class="`bg-cover bg-cover_${item.itemMode}`"
@@ -190,7 +191,7 @@
          * webinar_type  1音频直播 2视频直播 3互动直播 5 定时直播 6 分组直播
          */
         const liveTypeStr = ['', '直播', '预告', '结束', '点播', '回放'];
-        const liveStatusStr = ['', '音频直播', '视频直播', '互动直播', '', '', '分组直播'];
+        const liveStatusStr = ['', '音频', '视频', '互动', '', '', '分组'];
         let str = liveTypeStr[val.webinar_state];
         if (val.webinar_state != 4 && val.webinar_type != 5) {
           str += ` | ${liveStatusStr[val.webinar_type]}`;
