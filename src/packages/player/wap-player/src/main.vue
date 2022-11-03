@@ -191,7 +191,7 @@
                 v-model="sliderVal"
                 active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
-                @change="changeSlider"
+                @input="changeSlider"
               >
                 <div slot="button">
                   <img src="./img/player.png" alt />
