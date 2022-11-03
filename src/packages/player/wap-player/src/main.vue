@@ -44,7 +44,7 @@
         </div>
         <!-- 直播结束 -->
         <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
-          <p>{{ $t('player.player_1014') }}</p>
+          <p v-if="!isPortraitLive">{{ $t('player.player_1014') }}</p>
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
@@ -984,7 +984,7 @@
           }
         };
         // 跑马灯
-        if (this.marquee && this.marquee.scrolling_open == 1) {
+        if (this.marquee && this.marquee.scrolling_open == 1 && !this.isPortraitLive) {
           let marqueeText = '';
           if (this.marquee.text_type == 1) {
             marqueeText = this.marquee.text;

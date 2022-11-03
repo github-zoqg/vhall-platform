@@ -97,7 +97,7 @@
             </span>
           </div>
         </div>
-        <div class="vmp-player-living-audio" v-if="isAudio || audioStatus">
+        <div class="vmp-player-living-audio" v-if="isAudio || audioStatus ">
           <div>{{ $t('player.player_1014') }}</div>
         </div>
         <div
