@@ -79,7 +79,8 @@
           // 预览
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitOpenPreview', [
-              vo.currentRow ? JSON.stringify(vo.currentRow) : null
+              vo.currentRow ? JSON.stringify(vo.currentRow) : null,
+              'mock'
             ])
           );
         }

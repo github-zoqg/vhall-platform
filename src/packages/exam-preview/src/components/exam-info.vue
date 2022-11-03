@@ -1,108 +1,130 @@
 <template>
-  <div class="vmp-exam-info" :style="`max-width: ${maxWidth};max-height: ${maxHeight};`">
-    <div class="vmp-exam-info--title">
-      <h1 v-text="previewInfo.title"></h1>
-    </div>
-    <!--
-      题目类型：subject_type（图片题 img-text；文字题 text；）
-      选择类型：type（单选 radio；多选 checkbox；）
-      排列方式：layout_type（单列 1；多列 2；）
-      图文排列方式：layout_css （上图下文：1；左图右文：2）
-      -->
-    <div
-      class="vmp-exam-info--question"
-      v-for="(item, index) in previewInfo.jsonData"
-      :key="`qt_${index}`"
-    >
-      <!-- 图片题 （selectType: 1单选；2多选。支持单选 or 多选）-->
-      <h1>
-        <span>{{ index + 1 }}.</span>
-        <span v-text="item.title"></span>
-      </h1>
-      <!-- 瀑布流 -->
-      <div
-        class="exam-way__waterfallFlow"
-        v-masonry:update
-        item-selector=".vmp-exam-info--option"
-        v-if="waterfallFlow"
-      >
-        <template v-if="item.detail">
-          <div
-            v-masonry-tile:update
-            :class="`vmp-exam-info--option ${item.layout_type == 1 ? 'max-width' : 'min-width'} ${
-              item.layout_css == 1 ? 'top-bottom' : 'left-right'
-            }`"
-            v-for="(sonItem, sonIndex) in item.detail.list"
-            :key="`qt_${index}_son${sonIndex}`"
-          >
-            <img
-              v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
-              lazy
-              :src="sonItem.imgUrl"
-              :preview-src-list="[sonItem.imgUrl]"
-            />
-            <div class="vmp-exam-info--text">
-              <el-radio
-                v-model="item.answer"
-                :label="sonItem.key"
-                :name="`radio_${item.id}`"
-                v-if="item.type === 'radio'"
-              ></el-radio>
-              <el-checkbox
-                v-model="item.answer"
-                :label="sonItem.key"
-                :name="`checkbox_${item.id}`"
-                v-if="item.type === 'checkbox'"
-              ></el-checkbox>
-              <div>{{ sonItem.key + '、' + sonItem.value }}</div>
-            </div>
-          </div>
-        </template>
+  <div>
+    <div class="vmp-exam-info" :style="`max-width: ${maxWidth};max-height: ${maxHeight};`">
+      <div class="vmp-exam-info--title">
+        <h1 v-text="previewInfo.title"></h1>
       </div>
-      <!-- 非瀑布流 -->
-      <div class="exam-way__no__waterfallFlow" v-else>
-        <template v-if="item.detail">
-          <div
-            :class="`vmp-exam-info--option ${item.layout_type == 1 ? 'max-width' : 'min-width'} ${
-              item.layout_css == 1 ? 'top-bottom' : 'left-right'
-            }`"
-            v-for="(sonItem, sonIndex) in item.detail.list"
-            :key="`qt_${index}_son${sonIndex}`"
-          >
-            <img
-              v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
-              lazy
-              :src="sonItem.imgUrl"
-              :preview-src-list="[sonItem.imgUrl]"
-            />
-            <div class="vmp-exam-info--text">
-              <el-radio
-                v-model="item.answer"
-                :label="sonItem.key"
-                :name="`radio_${item.id}`"
-                v-if="item.type === 'radio'"
-              ></el-radio>
-              <el-checkbox
-                v-model="item.answer"
-                :label="sonItem.key"
-                :name="`checkbox_${item.id}`"
-                v-if="item.type === 'checkbox'"
-              ></el-checkbox>
-              <div>{{ sonItem.key + '、' + sonItem.value }}</div>
+      <!--
+        题目类型：subject_type（图片题 img-text；文字题 text；）
+        选择类型：type（单选 radio；多选 checkbox；）
+        排列方式：layout_type（单列 1；多列 2；）
+        图文排列方式：layout_css （上图下文：1；左图右文：2）
+        -->
+      <div
+        class="vmp-exam-info--question"
+        v-for="(item, index) in questionList"
+        :key="`qt_${index}`"
+      >
+        <!-- 图片题 （selectType: 1单选；2多选。支持单选 or 多选）-->
+        <h1>
+          <span>{{ item.sortNo }}.</span>
+          <span v-text="item.title"></span>
+        </h1>
+        <!-- 瀑布流[题目-答案区域] -->
+        <div
+          class="exam-way__waterfallFlow"
+          v-masonry:update
+          item-selector=".vmp-exam-info--option"
+          v-if="waterfallFlow"
+        >
+          <template v-if="item.detail">
+            <div
+              v-masonry-tile:update
+              :class="`vmp-exam-info--option page-${answerType} ${
+                item.layout_type == 1 ? 'max-width' : 'min-width'
+              } ${item.layout_css == 1 ? 'top-bottom' : 'left-right'}`"
+              v-for="(sonItem, sonIndex) in item.detail.list"
+              :key="`qt_${index}_son${sonIndex}`"
+            >
+              <img
+                v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
+                lazy
+                :src="sonItem.imgUrl"
+                :preview-src-list="[sonItem.imgUrl]"
+                width="100%"
+                height="100%"
+              />
+              <div class="vmp-exam-info--text">
+                <el-radio
+                  v-model="item.answer"
+                  :label="sonItem.key"
+                  :name="`radio_${item.id}`"
+                  v-if="item.type === 'radio'"
+                ></el-radio>
+                <el-checkbox
+                  v-model="item.answer"
+                  :label="sonItem.key"
+                  :name="`checkbox_${item.id}`"
+                  v-if="item.type === 'checkbox'"
+                ></el-checkbox>
+                <div>{{ sonItem.key + '、' + sonItem.value }}</div>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
+        <!-- 非瀑布流[题目-答案区域] -->
+        <div class="exam-way__no__waterfallFlow" v-else>
+          <template v-if="item.detail">
+            <div
+              :class="`vmp-exam-info--option page-${answerType} ${
+                item.layout_type == 1 ? 'max-width' : 'min-width'
+              } ${item.layout_css == 1 ? 'top-bottom' : 'left-right'}`"
+              v-for="(sonItem, sonIndex) in item.detail.list"
+              :key="`qt_${index}_son${sonIndex}`"
+            >
+              <img
+                v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
+                lazy
+                :src="sonItem.imgUrl"
+                :preview-src-list="[sonItem.imgUrl]"
+                width="100%"
+                height="100%"
+              />
+              <div class="vmp-exam-info--text">
+                <el-radio
+                  v-model="item.answer"
+                  :label="sonItem.key"
+                  :name="`radio_${item.id}`"
+                  v-if="item.type === 'radio'"
+                ></el-radio>
+                <el-checkbox
+                  v-model="item.answer"
+                  :label="sonItem.key"
+                  :name="`checkbox_${item.id}`"
+                  v-if="item.type === 'checkbox'"
+                ></el-checkbox>
+                <div>{{ sonItem.key + '、' + sonItem.value }}</div>
+              </div>
+            </div>
+          </template>
+        </div>
+        <!-- 答案结果 -->
+        <div class="vmp-exam-info--result" v-if="answerType == 'show'">
+          <label>分数：</label>
+          <span>{{ item.score }}</span>
+          <strong>|</strong>
+          <label>正确答案：</label>
+          <span class="success__tag">
+            {{ item.releaseAnswerStr }}
+          </span>
+          <strong>|</strong>
+          <label>您的答案：</label>
+          <span>{{ item.answer }}</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'VmpExamInfo',
     data() {
       return {
         loading: false,
+        answerIndex: 0, // 当前答题序号
+        isFirst: true, // 是否是第一道题
+        isEnd: false, // 是否最后一题
+        questionList: [], // 可答题数组
         previewInfo: {
           title: '苹果2022年新品发布会，极致体验知识大盘点',
           extension: '扩展字段',
@@ -110,11 +132,14 @@
           jsonData: [
             {
               id: 2435359,
+              sortNo: 1, // 模拟题号
+              releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 1,
               layout_css: 1,
               title: '单选题1231231',
               answer: 'B',
+              releaseAnswer: 'C',
               type: 'radio',
               score: 2,
               detail: {
@@ -150,11 +175,14 @@
             },
             {
               id: 24353591,
+              sortNo: 2, // 模拟题号
+              releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 2,
               layout_css: 1,
               title: '单选题1231231',
               answer: 'A',
+              releaseAnswer: 'C',
               type: 'checkbox',
               score: 2,
               detail: {
@@ -190,11 +218,14 @@
             },
             {
               id: 24353591,
+              sortNo: 3, // 模拟题号
+              releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 1,
               layout_css: 2,
               title: '单选题1231231',
               answer: 'C',
+              releaseAnswer: 'C',
               type: 'checkbox',
               score: 2,
               detail: {
@@ -230,12 +261,15 @@
             },
             {
               id: 24353591,
+              sortNo: 4, // 模拟题号
+              releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'text',
               layout_type: 1,
               layout_css: 1,
               title:
                 '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
               answer: 'A',
+              releaseAnswer: 'C',
               type: 'radio',
               score: 2,
               detail: {
@@ -262,12 +296,15 @@
             },
             {
               id: 24353591,
+              sortNo: 5, // 模拟题号
+              releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'text',
               layout_type: 2,
               layout_css: 1,
               title:
                 '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
               answer: ['A', 'B'],
+              releaseAnswer: ['C'],
               type: 'checkbox',
               score: 2,
               detail: {
@@ -329,12 +366,40 @@
         required: false,
         type: Boolean,
         default: true
+      },
+      // 是否做答模式
+      answerType: {
+        required: false,
+        type: String,
+        default: 'mock' // mock--模拟做题；release--真实答题；show--展示查看
+      },
+      // 每次展示的提数
+      limit: {
+        required: false,
+        type: Number,
+        default: 1
       }
     },
-    beforeCreate() {
-      this.roomBaseServer = useRoomBaseServer();
-      this.groupServer = useGroupServer();
+    watch: {
+      answerIndex: {
+        handler() {
+          const questionAlls = this.previewInfo.jsonData;
+          let questionList = questionAlls.filter((item, index) => {
+            if (this.limit <= 1) {
+              return index == this.answerIndex;
+            } else {
+              let lastAnswerIndex = this.answerIndex == 0 ? 0 : this.answerIndex;
+              let nexAnswerIndex = this.answerIndex + this.limit;
+              return index >= lastAnswerIndex && index < nexAnswerIndex;
+            }
+          });
+          this.questionList = questionList;
+        },
+        immediate: true,
+        deep: true
+      }
     },
+    beforeCreate() {},
     methods: {
       // 活动下预览快问快答
       previewExamInfo() {
@@ -349,7 +414,20 @@
             resData.jsonData = resData.question_detail
               ? JSON.stringify(resData.question_detail)
               : {};
+            resData.jsonData.map((item, index) => {
+              item.sortNo = index + 1;
+              item.releaseAnswerStr = item.releaseAnswer
+                ? item.releaseAnswerStr.join('、')
+                : item.releaseAnswer;
+            });
             this.previewInfo = resData;
+            // 通知外部题目变化
+            this.$emit('change', {
+              total: this.previewInfo.jsonData.length,
+              findIndex: this.answerIndex,
+              isFirst: this.isFirst,
+              isEnd: this.isEnd
+            });
           })
           .catch(e => {
             this.loading = false;
@@ -357,9 +435,81 @@
           });
       },
       // 页面初始化
-      initComp() {
+      async initComp() {
         console.log('触发成绩单查询。。。');
+        this.resetQuestion();
+        await this.$nextTick(() => {});
         // this.previewExamInfo();
+        this.$emit('change', {
+          total: this.previewInfo.jsonData.length,
+          findIndex: this.answerIndex,
+          isFirst: this.isFirst,
+          isEnd: this.isEnd
+        });
+      },
+      // 上一题，序号变更
+      lastQuestion() {
+        let lastAnswerIndex = this.answerIndex - this.limit;
+        if (lastAnswerIndex < 0) {
+          this.isFirst = true;
+          return;
+        } else if (lastAnswerIndex == 0) {
+          this.isFirst = true;
+          this.answerIndex = lastAnswerIndex;
+        } else {
+          this.isFirst = false;
+          this.answerIndex = lastAnswerIndex;
+        }
+        // 如果是答题状态
+        if (this.answerType == 'release') {
+          // TODO 触发接口
+        }
+        // 通知外部题目变化
+        this.$emit('change', {
+          total: this.previewInfo.jsonData.length,
+          findIndex: lastAnswerIndex,
+          isFirst: this.isFirst,
+          isEnd: false
+        });
+      },
+      // 下一题，序号变更
+      nextQuestion() {
+        let nextAnswerIndex = this.answerIndex + this.limit;
+        if (nextAnswerIndex >= this.previewInfo.jsonData.length) {
+          // 当前已经是最后一题
+          this.isEnd = true;
+          return;
+        } else if (nextAnswerIndex == this.previewInfo.jsonData.length - 1) {
+          // 当前已经是最后一题
+          this.isEnd = true;
+          this.answerIndex = nextAnswerIndex;
+        } else {
+          this.isEnd = false;
+          this.answerIndex = nextAnswerIndex;
+        }
+        // 如果是答题状态
+        if (this.answerType == 'release') {
+          // TODO 触发接口
+        }
+        // 通知外部题目变化
+        this.$emit('change', {
+          total: this.previewInfo.jsonData.length,
+          findIndex: nextAnswerIndex,
+          isFirst: false,
+          isEnd: this.isEnd
+        });
+      },
+      // 重置答题记录
+      resetQuestion() {
+        this.answerIndex = 0; // 当前答题序号
+        this.isFirst = 0; // 是否是第一道题
+        this.isEnd = 0; // 是否最后一题
+        this.$emit('change', {
+          total: 0,
+          findIndex: 0,
+          isFirst: 0,
+          isEnd: 0
+        });
       }
     },
     created() {
@@ -368,6 +518,7 @@
   };
 </script>
 <style lang="less" scoped>
+  /* 答题面板 */
   .vmp-exam-info {
     margin: 24px auto 0 auto;
     overflow-x: hidden;
@@ -457,6 +608,19 @@
         padding: 8px 8px;
         margin-right: 16px;
       }
+      /* 预览和答题模式样式 */
+      &.page-show {
+        &.max-width {
+          width: 100%;
+          border: none;
+          padding: 0 0;
+        }
+        &.min-width {
+          width: 50%;
+          border: none;
+          padding: 0 0;
+        }
+      }
     }
     .exam-way__no__waterfallFlow {
       // 非瀑布流
@@ -466,6 +630,19 @@
         &:nth-child(2n - 1) {
           margin-right: 16px;
         }
+      }
+    }
+    &--result {
+      margin-bottom: 16px;
+      label {
+      }
+      span {
+        &.success__tag {
+          color: #0fba5a;
+        }
+      }
+      strong {
+        margin: 0 8px;
       }
     }
   }

@@ -295,6 +295,58 @@
         </div>
       </template>
     </div>
+
+    <!-- 快问快答 -->
+    <template>
+      <!-- 发起了快问快答 -->
+      <div class="msg-item-template">
+        <div class="msg-item-template__interact">
+          <div class="msg-item-template__interact-content">
+            <span class="interact-content__role-name host">主持人</span>
+            <span class="interact-content__nick-name">你别闹你别闹你别...</span>
+            <div class="interact-content__more-text">发起了快问快答《Apple产品功能知识》</div>
+          </div>
+        </div>
+      </div>
+      <!-- 公布成绩排行榜 -->
+      <div class="msg-item-template">
+        <div class="msg-item-template__interact">
+          <div class="msg-item-template__interact-content">
+            <span class="interact-content__role-name host">主持人</span>
+            <span class="interact-content__nick-name">你别闹你别闹你别...</span>
+            <div class="interact-content__more-text">公布成绩排行榜《Apple产品功能知识》</div>
+          </div>
+        </div>
+      </div>
+      <!-- 结束了问答 -->
+      <div class="msg-item-template">
+        <div class="msg-item-template__interact">
+          <div class="msg-item-template__interact-content">
+            <span class="interact-content__role-name host">主持人</span>
+            <span class="interact-content__nick-name">你别闹你别闹你别...</span>
+            <div class="interact-content__more-text">结束了快问快答《Apple产品功能知识》</div>
+          </div>
+        </div>
+      </div>
+      <!-- 快问快答已结束 -->
+      <div class="msg-item-template">
+        <div class="msg-item-template__interact">
+          <div class="msg-item-template__interact-content">
+            <div class="interact-content__more-text">快问快答已结束</div>
+            <div class="interact-content__more-text">《Apple产品功能知识》</div>
+          </div>
+        </div>
+      </div>
+      <!-- 快问快答已结束 -->
+      <div class="msg-item-template">
+        <div class="msg-item-template__interact">
+          <div class="msg-item-template__interact-content">
+            <div class="interact-content__more-text">快问快答已结束， 公布成绩排行榜</div>
+            <div class="interact-content__more-text">《Apple产品功能知识》</div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 <script>
@@ -832,6 +884,17 @@
           font-size: 14px;
           line-height: 22px;
           color: var(--chat-font-color-msg-nickname);
+          margin-right: 4px;
+        }
+        .interact-content__more-text {
+          display: block;
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 14px;
+          line-height: 22px;
+          color: var(--chat-font-color-msg-text);
           margin-right: 4px;
         }
         .interact-content__role-name {
