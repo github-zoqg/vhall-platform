@@ -385,7 +385,7 @@
                 v-for="item in UsableSpeed"
                 :key="item.def"
                 :class="{ active: currentSpeed == item }"
-                @click.stop="changeSpeed(item)"
+                @click.stop="changePreSpeeds(item)"
               >
                 {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
               </div>
@@ -583,6 +583,16 @@
           }
           this.setSetingHeight();
         }
+      },
+      currentSpeed(val) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerSpeed', [this.currentSpeed, this.UsableSpeed])
+        );
+      },
+      currentQualitys(val) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerQuality', [this.currentQualitys, this.qualitysList])
+        );
       },
       sliderVal(val) {
         this.circleSliderVal = val;
@@ -1663,49 +1673,62 @@
   }
 
   .isPortraitLive {
-    .isVod .vmp-wap-player-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100px;
-      display: block !important;
-      z-index: 5;
-      .vmp-wap-player-control {
-        height: 85px;
-      }
-      .vmp-wap-player-control-icons {
-        padding-top: 24px;
-      }
-      .vmp-wap-player-control-slider {
-        margin-top: 0;
-      }
-
-      .vmp-wap-player-control-icons-right {
-        display: flex;
-        align-items: center;
-        span {
-          margin-left: 32px;
-          vertical-align: middle;
+    .isVod {
+      .vmp-wap-player-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        display: block !important;
+        z-index: 5;
+        .vmp-wap-player-control {
+          height: 85px;
         }
-        .box {
-          border: 3px solid #fff;
-          border-radius: 24px;
+        .vmp-wap-player-control-icons {
+          padding-top: 24px;
+        }
+        .vmp-wap-player-control-slider {
+          margin-top: 0;
+        }
+
+        .vmp-wap-player-control-icons-right {
           display: flex;
           align-items: center;
-          height: 32px;
-          min-width: 63px;
-          justify-content: center;
-          padding: 0;
-          font-size: 20px;
+          span {
+            margin-left: 32px;
+            vertical-align: middle;
+          }
+          .box {
+            border: 3px solid #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            height: 32px;
+            min-width: 63px;
+            justify-content: center;
+            padding: 0;
+            font-size: 20px;
+          }
+          .language_btn {
+          }
+          .icons-quality {
+            font-size: 20px;
+          }
+          .barrage {
+            font-size: 36px;
+          }
         }
-        .language_btn {
-        }
-        .icons-quality {
-          font-size: 20px;
-        }
-        .barrage {
-          font-size: 36px;
+      }
+
+      .vmp-wap-player-tips {
+      }
+    }
+    .vmp-wap-body-mini {
+      .isVod {
+        .vmp-wap-player-tips {
+          position: fixed;
+          bottom: 60px;
         }
       }
     }
