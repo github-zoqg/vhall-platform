@@ -1993,7 +1993,7 @@
             return false;
           }
         });
-      }, 500),
+      }, 1000),
       // 我已报名--验证
       submitVerify: debounce(function () {
         this.$refs.verifyForm.validate(valid => {
@@ -2049,7 +2049,7 @@
             return false;
           }
         });
-      }, 500),
+      }, 1000),
       // 获取当前活动状态，如果直播中，跳转到直播间
       getWebinarStatus(isSubmitForm) {
         // 当前是正常活动点开
