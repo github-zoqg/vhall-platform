@@ -308,14 +308,17 @@
       }
       this.countDownTime =
         new Date(
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
+          this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time.replace(/-/g, '/')
         ).getTime() - new Date().getTime();
       // 倒计时大于0小于24小时
       if (this.countDownTime > 0) {
         this.countDownTimer = setInterval(() => {
           this.countDownTime =
             new Date(
-              this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time
+              this.$domainStore.state.roomBaseServer.watchInitData.webinar.start_time.replace(
+                /-/g,
+                '/'
+              )
             ).getTime() - new Date().getTime();
 
           if (this.countDownTime <= 0) {
