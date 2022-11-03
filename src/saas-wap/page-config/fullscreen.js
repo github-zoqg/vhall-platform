@@ -13,6 +13,7 @@ export default {
       'layerBody',
       'layerBodyBlock',
       'layerBodyCenter',
+      // 'layerBodyFooter',
       'comAllDialog',
       'comGoodsDetail',
       'comUserAccountWap'
@@ -44,6 +45,13 @@ export default {
       {
         cuid: 'comWapPlayer',
         method: 'changeQualitys',
+        args: ['$0']
+      }
+    ],
+    emitPlayerUpdateSpeed: [
+      {
+        cuid: 'comWapPlayer',
+        method: 'changeSpeed',
         args: ['$0']
       }
     ]
@@ -111,18 +119,89 @@ export default {
         args: ['$0', '$1']
       }
     ],
-    emitPlayerOtherOptions: [
-      {
-        cuid: 'comHeaderWatch',
-        method: 'getPlayerOtherOptions',
-        args: ['$0']
-      }
-    ],
+    // emitPlayerOtherOptions: [
+    //   {
+    //     cuid: 'comHeaderWatch',
+    //     method: 'getPlayerOtherOptions',
+    //     args: ['$0']
+    //   }
+    // ],
     emitPlayerPoster: [
       // 设置文档是否被覆盖
       {
         cuid: 'comWapCenter',
         method: 'setDocContainerCovered',
+        args: ['$0']
+      }
+    ],
+    emitPlayerOpenQuality: [
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comHeaderWatch',
+        method: 'openQualityCard',
+        args: ['$0']
+      }
+    ],
+    emitPlayerSpeed: [
+      {
+        cuid: 'comHeaderWatch',
+        method: 'getSpeeds',
+        args: ['$0', '$1']
+      }
+    ],
+    emitPlayerOpenSpeed: [
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comHeaderWatch',
+        method: 'openSpeedCard',
+        args: ['$0']
+      }
+    ],
+    emitPlayerImageCropperMode: [
+      // 获取图片
+      {
+        cuid: 'comWapCenter',
+        method: 'getImageCropperMode',
+        args: ['$0']
+      }
+    ],
+    emitPlayerWebinarsBgImg: [
+      // 获取图片
+      {
+        cuid: 'comWapCenter',
+        method: 'getWebinarsBgImg',
+        args: ['$0']
+      }
+    ],
+    emitPlayerVodEnd: [
+      // 回放结束标识
+      {
+        cuid: 'comWapCenter',
+        method: 'getVodEnd',
+        args: ['$0']
+      }
+    ],
+    emitPlayerIsSmallPlayer: [
+      // 小窗标识
+      {
+        cuid: 'comWapCenter',
+        method: 'getIsSmallPlayer',
+        args: ['$0']
+      }
+    ],
+    emitPlayerAudioStatus: [
+      //选中清晰度是否是音频模式
+      {
+        cuid: 'comWapCenter',
+        method: 'getAudioStatus',
+        args: ['$0']
+      }
+    ],
+    emitPlayerIsAudio: [
+      //判断是否是音频直播模式
+      {
+        cuid: 'comWapCenter',
+        method: 'getIsAudio',
         args: ['$0']
       }
     ]
@@ -152,6 +231,13 @@ export default {
     component: 'VmpWapBodyCenter',
     children: ['comChatWap', 'comChatClearScreen']
   },
+  layerBodyFooter: {
+    component: 'VmpConciseCenterWap',
+    children: ['comWapPlayerControlVod']
+  },
+  comWapPlayerControlVod: {
+    component: 'VmpPlayerControlVodWap'
+  },
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap'
   },
@@ -180,6 +266,12 @@ export default {
       {
         cuid: 'comWapPlayer',
         method: 'pause'
+      }
+    ],
+    emitStreamPlay: [
+      {
+        cuid: 'comWapStreamList',
+        method: 'replayPlay'
       }
     ]
   },

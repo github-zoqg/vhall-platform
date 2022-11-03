@@ -4,7 +4,9 @@
       { 'vmp-basic-layout__noHeader': !showHeader },
       { 'vmp-basic-layout__clearscreen': isClearScreen },
       { 'vmp-basic-layout__clearscreen-hide': isClearScreenComplete },
-      isConcise || isPortraitLive ? 'vmp-concise-layout' : 'vmp-basic-layout'
+      isConcise || isPortraitLive ? 'vmp-concise-layout' : 'vmp-basic-layout',
+      isPortraitLive ? 'isPortraitLive' : '',
+      isPortraitLive && webinarType == 5 ? 'isVod' : ''
     ]"
   >
     <van-loading
@@ -93,6 +95,14 @@
       // 主办方配置
       webinarTag() {
         return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       }
     },
     watch: {

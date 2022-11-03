@@ -272,6 +272,14 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 竖屏直播
+      isFullScreen() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
     beforeCreate() {
@@ -320,6 +328,7 @@
         const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
         const h_block = document.querySelector('.vmp-block').clientHeight;
         const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
+        const h_jaw = this.isFullScreen ? document.querySelector('.vmp-basic-jaw').clientHeight : 0;
         if (h_block == 0) {
           let classname = '.tab-content';
           if (this.isEmbed) {
@@ -327,7 +336,12 @@
           }
           const tabDom = document.querySelector(classname);
           if (tabDom) {
-            tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
+            if (!this.isLiving && this.isFullScreen) {
+              tabDom.style.height =
+                window.innerHeight - h_header - h_neck - h_basic - h_jaw - 100 + 'px';
+            } else {
+              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - h_jaw + 'px';
+            }
           }
         }
       },

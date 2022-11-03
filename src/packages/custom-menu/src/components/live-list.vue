@@ -27,6 +27,7 @@
                 >
                   | {{ $t('common.common_1023') }}
                 </span>
+                <span v-if="item.webinar_show_type == 0">| {{ $t('common.common_1036') }}</span>
               </div>
             </span>
           </div>

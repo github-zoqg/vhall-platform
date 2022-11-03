@@ -2,19 +2,33 @@
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
     <div
-      v-show="
-        !noDelayWebinar &&
-        isWapBodyDocSwitchFullScreen &&
-        !isPlayering &&
-        !isVodEnd &&
-        !isSmallPlayer
-      "
+      v-show="isWapBodyDocSwitchFullScreen && !isPlayering && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
     >
       <p @click.stop="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
     </div>
+    <!-- 回放结束（正常回放和试看回放结束） -->
+    <div
+      v-show="isVodEnd && !isPlayering"
+      :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
+      :style="`backgroundImage: url('${webinarsBgImg}')`"
+    >
+      <!-- 回放播放结束 -->
+      <div class="vmp-wap-player-ending-box" @click.stop="startPlay">
+        <p class="vmp-wap-player-ending-box-noraml">
+          <i class="vh-iconfont vh-line-refresh-left"></i>
+        </p>
+        <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
+      </div>
+    </div>
+
+    <!-- 音频直播 -->
+    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlayering">
+      <p>{{ $t('player.player_1014') }}</p>
+    </div>
+
     <div
       class="vmp-concise-center-wap__doc-container"
       :class="{
@@ -45,7 +59,11 @@
         isVodEnd: false, // 回放结束
         childrenComp: [],
         isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
-        isDocStickTop: false // 文档是否吸顶（问卷弹出的情况）
+        isDocStickTop: false, // 文档是否吸顶（问卷弹出的情况）
+        imageCropperMode: 1,
+        webinarsBgImg: '',
+        audioStatus: false, // 选中清晰度是否是音频模式
+        isAudio: false //判断是否是音频直播模式
       };
     },
     computed: {
@@ -64,6 +82,10 @@
       // 竖屏直播，文档播放器位置切换的状态
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       }
     },
     watch: {
@@ -85,9 +107,13 @@
     methods: {
       startPlay() {
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
-          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+          this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = false;
         }
-        this.isPlayering ? this.pause() : this.play();
+        if (this.noDelayWebinar && this.webinarType == 1) {
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStreamPlay'));
+        } else {
+          this.isPlayering ? this.pause() : this.play();
+        }
       },
       // 播放
       play() {
@@ -112,6 +138,24 @@
           // 派发事件：docResize
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));
         });
+      },
+      getImageCropperMode(val) {
+        this.imageCropperMode = val;
+      },
+      getWebinarsBgImg(val) {
+        this.webinarsBgImg = val;
+      },
+      getVodEnd(val) {
+        this.isVodEnd = val;
+      },
+      getIsSmallPlayer(val) {
+        this.IsSmallPlayer = val;
+      },
+      getAudioStatus(val) {
+        this.audioStatus = val;
+      },
+      getIsAudio(val) {
+        this.IsAudio = val;
       }
     }
   };
@@ -147,6 +191,21 @@
           font-size: 46px;
           color: #f5f5f5;
         }
+      }
+    }
+    > .vmp-wap-player-audie {
+      display: block !important;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('./img/video.gif') no-repeat;
+      background-size: 100% 100%;
+      p {
+        font-size: 28px;
+        color: #fff;
+        margin-top: 40%;
+        text-align: center;
       }
     }
     &__doc-container {
@@ -189,7 +248,8 @@
           .tools {
             .btn-doc-rotate,
             .btn-doc-fullscreen,
-            .btn-doc-restore {
+            .btn-doc-restore,
+            .btn-doc-transposition {
               display: none;
             }
           }
@@ -199,5 +259,8 @@
         z-index: -1;
       }
     }
+  }
+  .isVod .vmp-concise-center-wap > .vmp-wap-player-pause {
+    display: none;
   }
 </style>

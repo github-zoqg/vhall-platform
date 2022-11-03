@@ -74,7 +74,7 @@
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
         <img :src="coverImgUrl" alt />
-        <p class="preventClick" @click.stop="replayPlay">
+        <p class="preventClick" v-if="!isPortraitLive" @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>

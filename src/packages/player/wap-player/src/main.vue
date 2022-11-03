@@ -1,5 +1,8 @@
 <template>
-  <div class="vmp-wap-player" :class="isAppStartType ? 'vmp-wap-player__app' : ''">
+  <div
+    class="vmp-wap-player"
+    :class="[isAppStartType ? 'vmp-wap-player__app' : '', !isLiving ? 'isVod' : '']"
+  >
     <template v-if="encrypt">
       <!-- <div class="vmp-wap-player-prompt">
         <van-loading color="#fb2626" />
@@ -19,7 +22,7 @@
             !isPlayering &&
             !isVodEnd &&
             !isSmallPlayer &&
-            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive && isShowPoster))
           "
           class="vmp-wap-player-pause"
         >
@@ -40,12 +43,20 @@
           <!-- 视频容器 -->
         </div>
         <!-- 直播结束 -->
-        <div class="vmp-wap-player-audie" v-if="isAudio || audioStatus">
-          <p>{{ $t('player.player_1014') }}</p>
+        <div
+          class="vmp-wap-player-audie"
+          v-if="
+            (isAudio || audioStatus) &&
+            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+          "
+        >
+          <p v-show="!(!isWapBodyDocSwitchFullScreen && isPortraitLive)">
+            {{ $t('player.player_1014') }}
+          </p>
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
-          v-show="isVodEnd && !isPlayering"
+          v-show="isVodEnd && !isPlayering && !isPortraitLive"
           :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
@@ -120,7 +131,7 @@
           </template>
         </div>
         <!-- 倍速、清晰度切换 -->
-        <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
+        <div class="vmp-wap-player-tips" v-if="(isSetSpeed || isSetQuality) && !isPortraitLive">
           <span v-if="isSetQuality">
             {{ $t('player.player_1009') }}
             <span class="red">{{ formatQualityText(currentQualitys.def) }}</span>
@@ -136,7 +147,11 @@
         <!-- 底部操作栏  点击 暂停 全屏 播放条  -->
         <div
           class="vmp-wap-player-footer"
-          v-show="isPlayering && !isSmallPlayer && !isPortraitLive"
+          v-show="
+            (isPlayering || (isPortraitLive && !isPlayering && isShowPoster)) &&
+            !isSmallPlayer &&
+            (!isPortraitLive || (isPortraitLive && !isLiving))
+          "
           :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
         >
           <div class="vmp-wap-player-control">
@@ -184,7 +199,7 @@
                 v-model="sliderVal"
                 active-color="#fb2626"
                 inactive-color="rgba(255,255,255,.3)"
-                @change="changeSlider"
+                @input="changeSlider"
               >
                 <div slot="button">
                   <img src="./img/player.png" alt />
@@ -218,20 +233,32 @@
                 <!-- 右侧icon集合 倍速和画质 -->
                 <div class="vmp-wap-player-control-icons-right">
                   <span
-                    class="icons-quality icons-speed"
+                    @click.stop="updateLang"
+                    v-if="languageList.length > 1"
+                    class="box language_btn"
+                  >
+                    {{ ['', 'EN', 'CN'][lang.key] }}
+                  </span>
+                  <span
+                    class="box icons-quality icons-speed"
                     @click.stop="openSpeed"
                     v-if="!isLiving && playerOtherOptions.speed && !isWarnPreview"
                   >
                     {{currentSpeed == 1 ? $t('player.player_1007') : currentSpeed.toString().length &lt; 3 ? `${currentSpeed.toFixed(1)}X` : `${currentSpeed}X`}}
                   </span>
-                  <span @click.stop="openQuality" v-if="!isWarnPreview" class="icons-quality">
+                  <span @click.stop="openQuality" v-if="!isWarnPreview" class="box icons-quality">
                     {{ formatQualityText(currentQualitys.def) }}
                   </span>
 
                   <span
                     class="barrageSpan"
                     @click.stop="openBarrage"
-                    v-if="playerOtherOptions.barrage_button && !isWarnPreview && !isTryPreview"
+                    v-if="
+                      playerOtherOptions.barrage_button &&
+                      !isWarnPreview &&
+                      !isTryPreview &&
+                      !isPortraitLive
+                    "
                   >
                     <i
                       :class="`barrage vh-iconfont ${
@@ -239,7 +266,10 @@
                       }`"
                     ></i>
                   </span>
-                  <span v-if="!isAudio && !isWarnPreview" @click.stop="enterFullscreen">
+                  <span
+                    v-if="!isAudio && !isWarnPreview && !isPortraitLive"
+                    @click.stop="enterFullscreen"
+                  >
                     <i
                       :class="`vh-iconfont ${
                         isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'
@@ -334,6 +364,50 @@
             </li>
           </ul>
         </van-popup>
+        <van-popup
+          class="quality-van-popup"
+          v-model="showQualityCard"
+          safe-area-inset-bottom
+          round
+          position="bottom"
+          :closeable="false"
+        >
+          <div class="quality-content">
+            <div class="list">
+              <div
+                class="item"
+                v-for="item in qualitysList"
+                :key="item.def"
+                :class="{ active: currentQualitys.def == item.def }"
+                @click.stop="changePreQualitys(item)"
+              >
+                {{ formatQualityText(item.def) }}
+              </div>
+            </div>
+          </div>
+        </van-popup>
+        <van-popup
+          class="quality-van-popup speed-van-popup"
+          v-model="showSpeedCard"
+          safe-area-inset-bottom
+          round
+          position="bottom"
+          :closeable="false"
+        >
+          <div class="quality-content speed-content">
+            <div class="list">
+              <div
+                class="item"
+                v-for="item in UsableSpeed"
+                :key="item.def"
+                :class="{ active: currentSpeed == item }"
+                @click.stop="changePreSpeeds(item)"
+              >
+                {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
+              </div>
+            </div>
+          </div>
+        </van-popup>
       </div>
     </template>
     <template v-else>
@@ -375,7 +449,7 @@
       // 背景图片
       webinarsBgImg() {
         const cover = '//cnstatic01.e.vhall.com/static/img/mobile/video_default_nologo.png';
-        const { warmup, webinar } = this.roomBaseState.watchInitData;
+        const { warmup, webinar } = this.roomBaseServer.state.watchInitData;
         let webinarUrl = cover;
         if (webinar.img_url) {
           if (cropperImage(webinar.img_url)) {
@@ -389,16 +463,14 @@
           if (warmup.warmup_img_url) {
             if (cropperImage(warmup.warmup_img_url)) {
               this.handlerImageInfo(warmup.warmup_img_url);
-              return warmup.warmup_img_url;
+              webinarUrl = warmup.warmup_img_url;
             } else {
-              return warmup.warmup_img_url + ossimg;
+              webinarUrl = warmup.warmup_img_url + ossimg;
             }
-          } else {
-            return webinarUrl;
           }
-        } else {
-          return webinarUrl;
         }
+        console.log('this.cuid', this.cuid, webinarUrl);
+        return webinarUrl;
       },
       // 初始化了第几个
       initPlayerIndex() {
@@ -509,7 +581,9 @@
         imageCropperMode: 1,
         circleSliderVal: 0,
         initIndex,
-        isConcise: false //判断是否是极简模式
+        isConcise: false, //判断是否是极简模式
+        showQualityCard: false,
+        showSpeedCard: false
       };
     },
     watch: {
@@ -522,7 +596,22 @@
             document.querySelector('.vmp-basic-bd').classList.remove('small_player');
           }
           this.setSetingHeight();
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerIsSmallPlayer', [val])
+            );
+          });
         }
+      },
+      currentSpeed(val) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerSpeed', [this.currentSpeed, this.UsableSpeed])
+        );
+      },
+      currentQualitys(val) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerQuality', [this.currentQualitys, this.qualitysList])
+        );
       },
       sliderVal(val) {
         this.circleSliderVal = val;
@@ -567,11 +656,44 @@
           if (this.isShowPoster) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
-          );
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
+            );
+          });
         },
         immediate: true
+      },
+      webinarsBgImg: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerWebinarsBgImg', [val])
+            );
+          });
+        },
+        immediate: true
+      },
+      isVodEnd(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerVodEnd', [val])
+          );
+        });
+      },
+      audioStatus(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerAudioStatus', [val])
+          );
+        });
+      },
+      isAudio(val) {
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerIsAudio', [val])
+          );
+        });
       }
     },
     beforeCreate() {
@@ -629,6 +751,18 @@
       });
       this.getIsConcise();
       this.setSetingHeight();
+
+      if (this.isPortraitLive && !this.isLiving) {
+        document.querySelector('.vmp-wap-player-footer').addEventListener('touchstart', e => {
+          e.stopPropagation();
+        });
+        document.querySelector('.vmp-wap-player-footer').addEventListener('touchmove', e => {
+          e.stopPropagation();
+        });
+        document.querySelector('.vmp-wap-player-footer').addEventListener('touchend', e => {
+          e.stopPropagation();
+        });
+      }
     },
     methods: {
       getIsConcise() {
@@ -670,6 +804,11 @@
       handlerImageInfo(url) {
         let obj = parseImgOssQueryString(url);
         this.imageCropperMode = Number(obj.mode);
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
+          );
+        });
         console.log(this.imageCropperMode, '???mode');
       },
       startPlay() {
@@ -810,6 +949,9 @@
               this.qualitysList
             ])
           );
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerSpeed', [this.currentSpeed, this.UsableSpeed])
+          );
           // this.$nextTick(() => {
           //   if (this.water && this.water.watermark_open == 1 && !this.isWarnPreview) {
           //     const watermarkContainer = document.getElementById('vh-watermark-container');
@@ -864,7 +1006,7 @@
           }
         };
         // 跑马灯
-        if (this.marquee && this.marquee.scrolling_open == 1) {
+        if (this.marquee && this.marquee.scrolling_open == 1 && !this.isPortraitLive) {
           let marqueeText = '';
           if (this.marquee.text_type == 1) {
             marqueeText = this.marquee.text;
@@ -951,19 +1093,42 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCheckAuth', params));
       },
       openSpeed() {
-        this.iconShow = true;
-        this.isOpenSpeed = true;
+        if (this.isPortraitLive && !this.isLiving) {
+          if (this.isWapBodyDocSwitchFullScreen) {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerOpenSpeed', [true])
+            );
+          } else {
+            this.showSpeedCard = true;
+          }
+        } else {
+          this.iconShow = true;
+          this.isOpenSpeed = true;
+        }
       },
       openQuality() {
-        this.isOpenQuality = true;
-        this.iconShow = true;
+        // 竖屏直播-回放
+        if (this.isPortraitLive && !this.isLiving) {
+          if (this.isWapBodyDocSwitchFullScreen) {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerOpenQuality', [true])
+            );
+          } else {
+            this.showQualityCard = true;
+          }
+        } else {
+          this.isOpenQuality = true;
+          this.iconShow = true;
+        }
       },
       videoShowIcon() {
-        this.iconShow = false;
-        this.isOpenQuality = false;
-        this.isOpenSpeed = false;
-        this.isOpenlang = false;
-        this.fiveDown();
+        if (!this.isPortraitLive) {
+          this.iconShow = false;
+          this.isOpenQuality = false;
+          this.isOpenSpeed = false;
+          this.isOpenlang = false;
+          this.fiveDown();
+        }
       },
       fiveDown() {
         // 5秒后消失
@@ -975,23 +1140,7 @@
       // 切换多语言
       changeLang(key) {
         this.isOpenlang = false;
-        localStorage.setItem('lang', key);
-        const params = this.$route.query;
-        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
-        if (params.lang) {
-          params.lang = key;
-          let sourceUrl =
-            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
-          let queryKeys = '';
-          for (const k in params) {
-            queryKeys += k + '=' + params[k] + '&';
-          }
-          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
-          sourceUrl = sourceUrl + '?' + queryKeys;
-          window.location.href = sourceUrl;
-        } else {
-          window.location.reload();
-        }
+        this.saveLang(key);
       },
       openLanguage() {
         this.iconShow = true;
@@ -1016,6 +1165,39 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeChatHeight', [data])
         );
+      },
+      // 修改多语言
+      updateLang() {
+        const newLang = this.languageList[this.lang.key == 1 ? 1 : 0];
+        this.saveLang(newLang.key);
+      },
+      // 储存多语言
+      saveLang(key) {
+        localStorage.setItem('lang', key);
+        const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
+        if (params.lang) {
+          params.lang = key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
+      },
+      changePreQualitys(item) {
+        this.showQualityCard = false;
+        this.changeQualitys(item);
+      },
+      changePreSpeeds(item) {
+        this.showSpeedCard = false;
+        this.changeSpeed(item);
       }
     }
   };
@@ -1448,6 +1630,9 @@
             margin-left: 34px;
             vertical-align: middle;
           }
+          .language_btn {
+            display: none;
+          }
           .icons-quality {
             padding: 0 12px;
             border: 3px solid #fff;
@@ -1544,9 +1729,66 @@
     }
   }
 
-  .isPortraitLive .vmp-wap-player__app {
-    .playerBox video {
-      object-fit: cover;
+  .isPortraitLive {
+    .isVod {
+      .vmp-wap-player-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        display: block !important;
+        z-index: 99;
+        .vmp-wap-player-control {
+          height: 85px;
+        }
+        .vmp-wap-player-control-icons {
+          padding-top: 24px;
+        }
+        .vmp-wap-player-control-slider {
+          margin-top: 0;
+        }
+
+        .vmp-wap-player-control-icons-right {
+          display: flex;
+          align-items: center;
+          span {
+            margin-left: 32px;
+            vertical-align: middle;
+          }
+          .box {
+            border: 3px solid #fff;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            height: 32px;
+            min-width: 63px;
+            justify-content: center;
+            padding: 0;
+            font-size: 20px;
+          }
+          .language_btn {
+          }
+          .icons-quality {
+            font-size: 20px;
+          }
+          .barrage {
+            font-size: 36px;
+          }
+        }
+      }
+    }
+    .vmp-wap-player__app {
+      .playerBox video {
+        object-fit: cover;
+      }
+    }
+
+    .vmp-wap-player-ending {
+      background: none !important;
+      &-box {
+        background: none !important;
+      }
     }
   }
 </style>

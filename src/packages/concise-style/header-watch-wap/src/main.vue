@@ -51,7 +51,10 @@
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
         <!-- 更多 -->
-        <span class="vh-concise-header-box__tool-box__btn" v-if="isPortraitLive">
+        <span
+          class="vh-concise-header-box__tool-box__btn more"
+          v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
+        >
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
         </span>
       </section>
@@ -75,7 +78,10 @@
           </p>
         </div>
       </section>
-      <section class="vh-concise-header-box__tool-box" v-if="isPortraitLive">
+      <section
+        class="vh-concise-header-box__tool-box more"
+        v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
+      >
         <!-- 更多 -->
         <span class="vh-concise-header-box__tool-box__btn">
           <i class="vh-iconfont vh-full-more" @click="openMore"></i>
@@ -93,21 +99,21 @@
     >
       <div class="more-content">
         <div class="list">
-          <div class="item" v-if="playerOtherOptions.barrage_button">
+          <!--  <div class="item" v-if="playerOtherOptions.barrage_button">
             <div class="iconGroup" @click="updateBarrage">
               <span
                 :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
               ></span>
             </div>
             <div class="text">{{ danmuIsOpen ? $t('nav.nav_1057') : $t('nav.nav_1058') }}</div>
-          </div>
+          </div> -->
           <div class="item" v-if="languageList.length > 1">
             <div class="iconGroup" @click="updateLang">
               <span :class="`vh-iconfont ${lang.key == 1 ? 'vh-line_en' : 'vh-line_cn'}`"></span>
             </div>
             <div class="text">{{ languageList[lang.key == 1 ? 1 : 0].label }}</div>
           </div>
-          <div class="item">
+          <div class="item" v-if="!noDelayWebinar">
             <div
               class="iconGroup"
               @click="
@@ -142,6 +148,29 @@
             @click="changeQualitys(item)"
           >
             {{ formatQualityText(item.def) }}
+          </div>
+        </div>
+      </div>
+    </van-popup>
+    <van-popup
+      class="quality-van-popup speed-van-popup"
+      v-model="showSpeedCard"
+      safe-area-inset-bottom
+      get-container="#app"
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="quality-content speed-content">
+        <div class="list">
+          <div
+            class="item"
+            v-for="item in UsableSpeed"
+            :key="item.def"
+            :class="{ active: currentSpeed == item }"
+            @click.stop="changeSpeed(item)"
+          >
+            {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
           </div>
         </div>
       </div>
@@ -188,12 +217,15 @@
         qualitysList: [], // 清晰度列表
         showQualityCard: false,
         languageList: [],
-        playerOtherOptions: {
-          barrage_button: 0,
-          progress_bar: 0,
-          speed: 0,
-          autoplay: false
-        }
+        // playerOtherOptions: {
+        //   barrage_button: 0,
+        //   progress_bar: 0,
+        //   speed: 0,
+        //   autoplay: false
+        // },
+        currentSpeed: 1, // 当前倍速
+        UsableSpeed: [], // 视频倍速列表
+        showSpeedCard: false
       };
     },
     mounted() {
@@ -284,6 +316,10 @@
       // 竖屏直播
       isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 是否是无延迟活动
+      noDelayWebinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       }
     },
     methods: {
@@ -414,7 +450,6 @@
         return text;
       },
       getQualitys(currentQualitys, qualitysList) {
-        console.log('==-=-=-=-=-=-=-=', currentQualitys, qualitysList);
         this.currentQualitys = currentQualitys;
         this.qualitysList = qualitysList;
       },
@@ -425,10 +460,27 @@
           boxEventOpitons(this.cuid, 'emitPlayerUpdateQuality', [item])
         );
       },
-      // 获取跑马灯、水印等播放器配置
-      getPlayerOtherOptions(options) {
-        this.playerOtherOptions = options;
-        console.log('【playerOtherOptions】', this.playerOtherOptions);
+      // // 获取跑马灯、水印等播放器配置
+      // getPlayerOtherOptions(options) {
+      //   this.playerOtherOptions = options;
+      //   console.log('【playerOtherOptions】', this.playerOtherOptions);
+      // },
+      openQualityCard(val) {
+        this.showQualityCard = val;
+      },
+      getSpeeds(currentSpeed, speedsList) {
+        this.currentSpeed = currentSpeed;
+        this.UsableSpeed = speedsList;
+      },
+      openSpeedCard(val) {
+        this.showSpeedCard = val;
+      },
+      // 修改视频倍速
+      changeSpeed(item) {
+        this.showSpeedCard = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerUpdateSpeed', [item])
+        );
       }
     }
   };

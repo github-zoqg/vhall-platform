@@ -4,7 +4,7 @@
     :class="[
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
-      isPortraitLive ? 'isPortraitLive' : '',
+      isPortraitLive && !isStreamContainerStickTop ? 'isPortraitLive' : '',
       isPortraitLive && !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
@@ -36,7 +36,7 @@
           ? 'vmp-wap-body-sticktop__hide'
           : ''
       ]"
-      v-drag
+      v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
     >
       <!-- 播放器 -->
       <vmp-air-container
