@@ -616,7 +616,7 @@
           padding: 0 0;
         }
         &.min-width {
-          width: 50%;
+          width: calc(50% - 16px);
           border: none;
           padding: 0 0;
         }
