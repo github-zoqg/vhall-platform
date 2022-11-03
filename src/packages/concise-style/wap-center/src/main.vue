@@ -248,7 +248,8 @@
           .tools {
             .btn-doc-rotate,
             .btn-doc-fullscreen,
-            .btn-doc-restore {
+            .btn-doc-restore,
+            .btn-doc-transposition {
               display: none;
             }
           }

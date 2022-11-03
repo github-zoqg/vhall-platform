@@ -4,7 +4,7 @@
     :class="[
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
-      isPortraitLive ? 'isPortraitLive' : '',
+      isPortraitLive && !isStreamContainerStickTop ? 'isPortraitLive' : '',
       isPortraitLive && !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
