@@ -123,7 +123,7 @@
           </template>
         </div>
         <!-- 倍速、清晰度切换 -->
-        <div class="vmp-wap-player-tips" v-if="isSetSpeed || isSetQuality">
+        <div class="vmp-wap-player-tips" v-if="(isSetSpeed || isSetQuality) && !isPortraitLive">
           <span v-if="isSetQuality">
             {{ $t('player.player_1009') }}
             <span class="red">{{ formatQualityText(currentQualitys.def) }}</span>
@@ -1718,17 +1718,6 @@
           .barrage {
             font-size: 36px;
           }
-        }
-      }
-
-      .vmp-wap-player-tips {
-      }
-    }
-    .vmp-wap-body-mini {
-      .isVod {
-        .vmp-wap-player-tips {
-          position: fixed;
-          bottom: 60px;
         }
       }
     }
