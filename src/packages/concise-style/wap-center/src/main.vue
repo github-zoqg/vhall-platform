@@ -46,6 +46,7 @@
     </div>
 
     <div
+      key="vmp-concise-center-wap__doc-container"
       class="vmp-concise-center-wap__doc-container"
       :class="{
         'doc-container__mini': switchDrag,
@@ -245,7 +246,6 @@
     &__doc-container {
       background: #fff;
       position: relative;
-      bottom: 0 !important;
       &.doc-container__mini {
         position: fixed;
         top: 16px;
