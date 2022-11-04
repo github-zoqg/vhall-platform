@@ -22,7 +22,8 @@
             !isPlayering &&
             !isVodEnd &&
             !isSmallPlayer &&
-            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive && isShowPoster))
+            (!isPortraitLive ||
+              (!isWapBodyDocSwitchFullScreen && isPortraitLive && isShowPoster && webinarType != 5))
           "
           class="vmp-wap-player-pause"
         >
@@ -520,6 +521,10 @@
       // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.roomBaseServer.state.watchInitData.webinar.type);
       }
     },
     data() {
