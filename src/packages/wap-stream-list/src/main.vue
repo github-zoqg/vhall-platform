@@ -97,6 +97,14 @@
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
       </div>
+      <!-- 文档播放器切换位置 -->
+      <div
+        v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen"
+        class="vmp-wap-stream-wrap-mask-trans"
+        @click.stop="transposition"
+      >
+        <i class="vh-iconfont vh-line-sort1"></i>
+      </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
         <van-loading color="#ffffff" />
       </div>
@@ -442,6 +450,12 @@
     },
 
     methods: {
+      transposition() {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
+            !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
+        }
+      },
       getIsConcise() {
         let skin_json_wap = {
           style: 1
@@ -779,6 +793,24 @@
         text-align: center;
         transform: translate3d(-32px, -32px, 10px);
         border-radius: 50%;
+      }
+      &-trans {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 7;
+        cursor: pointer;
+        .vh-iconfont {
+          font-size: 30px;
+        }
       }
       &-background {
         position: absolute;
