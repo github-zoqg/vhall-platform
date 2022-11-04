@@ -11,7 +11,7 @@
   >
     <!-- 直播结束 -->
     <div
-      v-if="isLivingEnd"
+      v-if="isLivingEnd && !isPortraitLive"
       :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
@@ -38,6 +38,7 @@
           : '',
         `${rotateNum ? 'rotate' + rotateNum : ''}`
       ]"
+      v-if="!(isLivingEnd && isPortraitLive)"
       v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
     >
       <!-- 播放器 -->
@@ -110,7 +111,7 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   import alertBox from '@/app-shared/components/confirm.vue';
   export default {
@@ -266,7 +267,28 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
-    watch: {},
+    watch: {
+      webinarsBgImg: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerWebinarsBgImg', [val])
+            );
+          });
+        },
+        immediate: true
+      },
+      isLivingEnd: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerLivingEnd', [val])
+            );
+          });
+        },
+        immediate: true
+      }
+    },
     beforeCreate() {
       this.msgServer = useMsgServer();
       this.groupServer = useGroupServer();
@@ -397,6 +419,11 @@
       handlerImageInfo(url) {
         let obj = parseImgOssQueryString(url);
         this.imageCropperMode = Number(obj.mode);
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
+          );
+        });
       },
       // 重置互动SDK实例
       async resetInteractive() {

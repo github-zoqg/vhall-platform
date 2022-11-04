@@ -84,7 +84,31 @@ export default {
   // 中间主区域内容容器
   comWapBody: {
     component: 'VmpWapBody',
-    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle']
+    children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle'],
+    emitPlayerImageCropperMode: [
+      // 获取直播结束图片背景
+      {
+        cuid: 'comWapCenter',
+        method: 'getImageCropperModeLive',
+        args: ['$0']
+      }
+    ],
+    emitPlayerWebinarsBgImg: [
+      // 获取直播结束图片背景
+      {
+        cuid: 'comWapCenter',
+        method: 'getWebinarsBgImgLive',
+        args: ['$0']
+      }
+    ],
+    emitPlayerLivingEnd: [
+      // 获取直播结束标识
+      {
+        cuid: 'comWapCenter',
+        method: 'getLivingEnd',
+        args: ['$0']
+      }
+    ]
   },
   // 播放器
   comWapPlayer: {
@@ -163,18 +187,18 @@ export default {
       }
     ],
     emitPlayerImageCropperMode: [
-      // 获取图片
+      // 获取回放结束图片背景
       {
         cuid: 'comWapCenter',
-        method: 'getImageCropperMode',
+        method: 'getImageCropperModeVod',
         args: ['$0']
       }
     ],
     emitPlayerWebinarsBgImg: [
-      // 获取图片
+      // 获取回放结束图片背景
       {
         cuid: 'comWapCenter',
-        method: 'getWebinarsBgImg',
+        method: 'getWebinarsBgImgVod',
         args: ['$0']
       }
     ],
