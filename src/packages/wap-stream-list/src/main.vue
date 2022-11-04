@@ -348,20 +348,26 @@
       // 竖屏直播
       isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 1：无延迟直播
+      isNoDelay() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar;
       }
     },
     watch: {
       showPlayIcon: {
         handler() {
-          // 防止页面初始化报错故添加timeout：目标组件不存在
-          setTimeout(() => {
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
-            );
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
-            );
-          });
+          if (this.isPortraitLive && this.isNoDelay) {
+            // 防止页面初始化报错故添加timeout：目标组件不存在
+            setTimeout(() => {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
+              );
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
+              );
+            });
+          }
         },
         immediate: true
       },
