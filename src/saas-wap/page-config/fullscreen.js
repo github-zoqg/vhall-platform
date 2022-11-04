@@ -13,7 +13,6 @@ export default {
       'layerBody',
       'layerBodyBlock',
       'layerBodyCenter',
-      // 'layerBodyFooter',
       'comAllDialog',
       'comGoodsDetail',
       'comUserAccountWap'
@@ -238,13 +237,6 @@ export default {
   layerBodyCenter: {
     component: 'VmpWapBodyCenter',
     children: ['comChatWap', 'comChatClearScreen']
-  },
-  layerBodyFooter: {
-    component: 'VmpConciseCenterWap',
-    children: ['comWapPlayerControlVod']
-  },
-  comWapPlayerControlVod: {
-    component: 'VmpPlayerControlVodWap'
   },
   comBodyBlock: {
     component: 'VmpConciseBodyBlockWap'
