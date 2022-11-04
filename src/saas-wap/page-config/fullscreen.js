@@ -369,6 +369,11 @@ export default {
       method: 'rotatePlayer',
       args: ['$0']
     },
+    emitDocScreen: {
+      cuid: ['comWapPlayer'],
+      method: 'getDocScreen',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },

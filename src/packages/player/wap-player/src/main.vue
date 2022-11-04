@@ -163,9 +163,12 @@
             !isSmallPlayer &&
             (!isPortraitLive || (isPortraitLive && !isLiving))
           "
-          :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
+          :class="[
+            iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
+            docScreen == 'fullscreen' ? 'hide' : ''
+          ]"
         >
-          <div class="vmp-wap-player-control">
+          <div class="vmp-wap-player-control" v-show="docScreen != 'fullscreen'">
             <!-- 试看逻辑不加 按照线上 -->
             <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
@@ -602,7 +605,8 @@
         initIndex,
         isConcise: false, //判断是否是极简模式
         showQualityCard: false,
-        showSpeedCard: false
+        showSpeedCard: false,
+        docScreen: '' //文档全屏
       };
     },
     watch: {
@@ -1226,6 +1230,9 @@
       changePreSpeeds(item) {
         this.showSpeedCard = false;
         this.changeSpeed(item);
+      },
+      getDocScreen(val) {
+        this.docScreen = val;
       }
     }
   };
@@ -1786,6 +1793,9 @@
         height: 100px;
         display: block !important;
         z-index: 99;
+        &.hide {
+          display: none !important;
+        }
         .vmp-wap-player-control {
           height: 85px;
         }
