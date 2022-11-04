@@ -260,6 +260,10 @@
         this.resize();
         this.docServer.rotate(this.rotateNum);
         this.docServer.zoomReset();
+        // 派发事件：播放器旋转docResize
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDocRotate', [this.rotateNum])
+        );
       },
       currentCid(newval) {
         //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态

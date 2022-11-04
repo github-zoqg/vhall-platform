@@ -340,6 +340,11 @@ export default {
       method: 'changeDocStatus',
       args: ['$0']
     },
+    emitDocRotate: {
+      cuid: ['comWapBody'],
+      method: 'rotatePlayer',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap'],
     options: {}
   },
