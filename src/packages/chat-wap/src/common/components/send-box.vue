@@ -99,6 +99,7 @@
       :refName="refName"
       @sendMsg="sendMessage"
       :showTabType="currentTab"
+      :cuid="$parent.cuid"
     ></chat-wap-input>
   </div>
 </template>

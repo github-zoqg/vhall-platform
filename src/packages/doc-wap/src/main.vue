@@ -298,6 +298,10 @@
           }
         },
         immediate: true
+      },
+      displayMode(val) {
+        // 派发事件：播放器隐藏控制栏
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocScreen', [val]));
       }
     },
     beforeCreate() {

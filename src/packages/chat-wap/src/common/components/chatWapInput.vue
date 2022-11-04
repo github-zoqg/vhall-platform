@@ -77,6 +77,7 @@
   import { getEmojiList } from '@/packages/chat/src/common/js/emoji';
   import { isMse } from '@/app-shared/utils/isMse';
   import EventBus from '../js/Events.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpChatWapInputModal',
@@ -87,6 +88,10 @@
       },
       refName: {
         default: 'chatWap'
+      },
+      cuid: {
+        type: String,
+        default: ''
       }
     },
     data() {
@@ -107,6 +112,12 @@
         if (!this.showEmoji && !this.visible) {
           this.focusoutIOS();
         }
+      },
+      visible(val) {
+        console.log('....visible', this.cuid);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeChatSendBox', [this.visible])
+        );
       }
     },
     computed: {
@@ -201,7 +212,7 @@
         this.inputValue = '';
         this.showEmoji = false;
         this.$nextTick(() => {
-          this.$refs.textareaChat.blur();
+          this.$refs.textareaChat?.blur();
           this.visible = false;
         });
       },

@@ -338,6 +338,13 @@ export default {
         method: 'setVisibleMenuLength',
         args: ['$0']
       }
+    ],
+    emitVisibleGood: [
+      {
+        cuid: ['comInteractToolsWap'],
+        method: 'getVisibleGood',
+        args: ['$0']
+      }
     ]
   },
   // 自定义菜单组件
@@ -367,6 +374,11 @@ export default {
     emitDocRotate: {
       cuid: ['comWapBody'],
       method: 'rotatePlayer',
+      args: ['$0']
+    },
+    emitDocScreen: {
+      cuid: ['comWapPlayer'],
+      method: 'getDocScreen',
       args: ['$0']
     },
     children: ['comInteractToolsWap'],
@@ -427,6 +439,12 @@ export default {
     emitClickQuestionnaireChatItem: {
       cuid: ['comQuestionnaireWap'],
       method: 'open',
+      args: ['$0']
+    },
+    // 聊天输入框是否显示
+    emitChangeChatSendBox: {
+      cuid: ['comWapPlayer'],
+      method: 'changeChatSendBox',
       args: ['$0']
     },
     emitSetHideEffect: [

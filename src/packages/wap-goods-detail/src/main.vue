@@ -146,6 +146,7 @@
       background: rgba(255, 255, 255, 1);
       overflow: hidden;
       padding: 40px 44px 42px 44px;
+      z-index: 2102 !important;
       .vh-line-close {
         position: absolute;
         right: 36px;

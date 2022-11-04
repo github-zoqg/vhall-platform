@@ -42,6 +42,7 @@
           <i class="vh-iconfont vh-line-sort1"></i>
         </div>
         <div
+          key="vmp-wap-player-container"
           :id="
             warmUpVideoList.length < 2
               ? 'vmp-wap-player'
@@ -161,9 +162,12 @@
             !isSmallPlayer &&
             (!isPortraitLive || (isPortraitLive && !isLiving))
           "
-          :class="[iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true']"
+          :class="[
+            iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
+            docScreen == 'fullscreen' || chatSendBoxVisible ? 'hide' : ''
+          ]"
         >
-          <div class="vmp-wap-player-control">
+          <div class="vmp-wap-player-control" v-show="docScreen != 'fullscreen'">
             <!-- 试看逻辑不加 按照线上 -->
             <!-- <div class="vmp-wap-player-control-preview" v-if="vodType === 'shikan' && isTryPreview">
             <i18n path="appointment.appointment_1012">
@@ -600,7 +604,9 @@
         initIndex,
         isConcise: false, //判断是否是极简模式
         showQualityCard: false,
-        showSpeedCard: false
+        showSpeedCard: false,
+        docScreen: '', //文档全屏
+        chatSendBoxVisible: false
       };
     },
     watch: {
@@ -842,8 +848,10 @@
       },
       // 播放
       play() {
-        this.iconShow = false;
-        this.fiveDown();
+        if (!this.isPortraitLive) {
+          this.iconShow = false;
+          this.fiveDown();
+        }
         // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
         try {
           this.playerServer && this.playerServer.play();
@@ -1224,6 +1232,12 @@
       changePreSpeeds(item) {
         this.showSpeedCard = false;
         this.changeSpeed(item);
+      },
+      getDocScreen(val) {
+        this.docScreen = val;
+      },
+      changeChatSendBox(val) {
+        this.chatSendBoxVisible = val;
       }
     }
   };
@@ -1775,6 +1789,9 @@
   }
 
   .isPortraitLive {
+    .vmp-wap-player-prompt-poster {
+      object-fit: contain;
+    }
     .isVod {
       .vmp-wap-player-footer {
         position: fixed;
@@ -1784,6 +1801,9 @@
         height: 100px;
         display: block !important;
         z-index: 99;
+        &.hide {
+          display: none !important;
+        }
         .vmp-wap-player-control {
           height: 85px;
         }
