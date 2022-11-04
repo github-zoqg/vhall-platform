@@ -14,6 +14,7 @@
         class="vmp-exam-info--question"
         v-for="(item, index) in questionList"
         :key="`qt_${index}`"
+        :data-disabled="isDisabledSave"
       >
         <!-- 图片题 （selectType: 1单选；2多选。支持单选 or 多选）-->
         <h1>
@@ -48,13 +49,13 @@
                 <el-radio
                   v-model="item.answer"
                   :label="sonItem.key"
-                  :name="`radio_${item.id}`"
+                  :name="`radio_yes_${item.id}`"
                   v-if="item.type === 'radio'"
                 ></el-radio>
                 <el-checkbox
                   v-model="item.answer"
                   :label="sonItem.key"
-                  :name="`checkbox_${item.id}`"
+                  :name="`checkbox_yes_${item.id}`"
                   v-if="item.type === 'checkbox'"
                 ></el-checkbox>
                 <div>{{ sonItem.key + '、' + sonItem.value }}</div>
@@ -84,13 +85,14 @@
                 <el-radio
                   v-model="item.answer"
                   :label="sonItem.key"
-                  :name="`radio_${item.id}`"
+                  :name="`radio_no_${item.id}`"
                   v-if="item.type === 'radio'"
                 ></el-radio>
+                {{ item.answer }}, {{ item.id }}
                 <el-checkbox
                   v-model="item.answer"
                   :label="sonItem.key"
-                  :name="`checkbox_${item.id}`"
+                  :name="`checkbox_no_${item.id}`"
                   v-if="item.type === 'checkbox'"
                 ></el-checkbox>
                 <div>{{ sonItem.key + '、' + sonItem.value }}</div>
@@ -131,14 +133,14 @@
           question_detail: '',
           jsonData: [
             {
-              id: 2435359,
+              id: 1,
               sortNo: 1, // 模拟题号
               releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 1,
               layout_css: 1,
-              title: '单选题1231231',
-              answer: 'B',
+              title: '图文题 - 单选',
+              answer: '',
               releaseAnswer: 'C',
               type: 'radio',
               score: 2,
@@ -174,14 +176,14 @@
               imgUrl: ''
             },
             {
-              id: 24353591,
+              id: 2,
               sortNo: 2, // 模拟题号
               releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 2,
               layout_css: 1,
-              title: '单选题1231231',
-              answer: 'A',
+              title: '图文题 - 多选',
+              answer: ['A', 'B'],
               releaseAnswer: 'C',
               type: 'checkbox',
               score: 2,
@@ -217,15 +219,15 @@
               imgUrl: ''
             },
             {
-              id: 24353591,
+              id: 3,
               sortNo: 3, // 模拟题号
               releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'img-text',
               layout_type: 1,
               layout_css: 2,
-              title: '单选题1231231',
-              answer: 'C',
-              releaseAnswer: 'C',
+              title: '图文题 - 多选',
+              answer: ['C'],
+              releaseAnswer: ['C'],
               type: 'checkbox',
               score: 2,
               detail: {
@@ -260,7 +262,7 @@
               imgUrl: ''
             },
             {
-              id: 24353591,
+              id: 4,
               sortNo: 4, // 模拟题号
               releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'text',
@@ -268,7 +270,7 @@
               layout_css: 1,
               title:
                 '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
-              answer: 'A',
+              answer: '',
               releaseAnswer: 'C',
               type: 'radio',
               score: 2,
@@ -295,7 +297,7 @@
               imgUrl: ''
             },
             {
-              id: 24353591,
+              id: 5,
               sortNo: 5, // 模拟题号
               releaseAnswerStr: 'C', // 模拟正确答案
               subject_type: 'text',
@@ -303,7 +305,7 @@
               layout_css: 1,
               title:
                 '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
-              answer: ['A', 'B'],
+              answer: ['C'],
               releaseAnswer: ['C'],
               type: 'checkbox',
               score: 2,
@@ -336,9 +338,9 @@
               imgUrl: ''
             }
           ],
-          auto_push_switch: 0,
-          limit_time: 60,
-          limit_time_switch: 0
+          auto_push_switch: 0, // 自动推送 开关 0.否 1.是
+          limit_time: 60, // 限制时间
+          limit_time_switch: 1 // 限制时间开关 0.否 1.是
         }
       };
     },
@@ -365,7 +367,7 @@
       waterfallFlow: {
         required: false,
         type: Boolean,
-        default: true
+        default: false
       },
       // 是否做答模式
       answerType: {
@@ -384,6 +386,7 @@
       answerIndex: {
         handler() {
           const questionAlls = this.previewInfo.jsonData;
+          // this.questionList = []; // 重新布局定位
           let questionList = questionAlls.filter((item, index) => {
             if (this.limit <= 1) {
               return index == this.answerIndex;
@@ -397,6 +400,22 @@
         },
         immediate: true,
         deep: true
+      }
+    },
+    computed: {
+      // 是否允许点击下一题
+      isDisabledSave() {
+        let questionList = this.questionList;
+        let nullList = questionList.filter((item, index) => {
+          return (
+            (item.type === 'radio' && item.answer == '') ||
+            (item.type == 'checkbox' && item.answer.length == 0)
+          );
+        });
+        // 如若存在没有选择的题目，禁用下一题 or 提交按钮
+        let isDisabledSave = nullList && nullList.length > 0;
+        this.$emit('examCheckOption', isDisabledSave);
+        return isDisabledSave;
       }
     },
     beforeCreate() {},
@@ -428,6 +447,8 @@
               isFirst: this.isFirst,
               isEnd: this.isEnd
             });
+            // 通知外部题目信息
+            this.$emit('examData', this.previewInfo);
           })
           .catch(e => {
             this.loading = false;
@@ -440,12 +461,15 @@
         this.resetQuestion();
         await this.$nextTick(() => {});
         // this.previewExamInfo();
+        // 通知外部题目信息 【模拟】
         this.$emit('change', {
           total: this.previewInfo.jsonData.length,
           findIndex: this.answerIndex,
           isFirst: this.isFirst,
           isEnd: this.isEnd
         });
+        // 通知外部题目信息 【模拟】
+        this.$emit('examData', this.previewInfo);
       },
       // 上一题，序号变更
       lastQuestion() {
