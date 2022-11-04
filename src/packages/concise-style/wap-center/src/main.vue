@@ -46,6 +46,7 @@
     </div>
 
     <div
+      key="vmp-concise-center-wap__doc-container"
       class="vmp-concise-center-wap__doc-container"
       :class="{
         'doc-container__mini': switchDrag,
@@ -244,8 +245,7 @@
     }
     &__doc-container {
       background: #fff;
-      // position: relative;
-      // bottom: 0 !important;
+      position: relative;
       &.doc-container__mini {
         position: fixed;
         top: 16px;
@@ -262,6 +262,7 @@
           .tools {
             .btn-doc-rotate,
             .btn-doc-fullscreen,
+            .btn-pager,
             .btn-doc-restore {
               display: none;
             }
@@ -290,6 +291,9 @@
             .btn-doc-transposition {
               display: none;
             }
+          }
+          .btn-pager {
+            display: none;
           }
         }
       }

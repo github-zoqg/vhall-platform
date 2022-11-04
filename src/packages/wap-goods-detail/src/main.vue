@@ -219,7 +219,7 @@
     height: 1114px;
     z-index: 2101;
     border-radius: 32px 32px 0 0;
-    margin-bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
     .vh-goods-wrapper-detail-imgs {
       height: 720px;
       border-radius: 32px 32px 0 0;

@@ -170,7 +170,7 @@
       // 是否是app或移动sdk发起
       isAppStartType() {
         const startType = this.$domainStore.state.roomBaseServer.watchInitData?.switch?.start_type;
-        return startType == 2 || startType == 3;
+        return (startType == 2 || startType == 3) && this.isPortraitLive;
       },
       // 竖屏直播，文档播放器位置切换的状态
       isWapBodyDocSwitchFullScreen() {

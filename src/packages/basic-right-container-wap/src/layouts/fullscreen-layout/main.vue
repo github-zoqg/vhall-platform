@@ -7,13 +7,13 @@
         class="icon-wrap"
         @clickIcon="checkQuestionnaireIcon"
       >
-        <span class="icon-name">问卷</span>
+        <span class="icon-name">{{ $t('form.form_1074') }}</span>
       </questionnaire-icon>
       <!-- 签到 -->
       <div class="icon-wrap" @click="handleSign" v-show="showSign && webinarType == 1">
         <img v-if="iconStyle == 1" src="../../common/image/icon.png" />
         <img v-else src="../../common/image/icon2.png" />
-        <span class="icon-name">签到</span>
+        <span class="icon-name">{{ $t('interact_tools.interact_tools_1024') }}</span>
       </div>
       <!-- 抽奖 -->
       <lottery-icon
@@ -22,7 +22,7 @@
         class="icon-wrap"
         @clickIcon="checkLotteryIcon"
       >
-        <span class="icon-name">抽奖</span>
+        <span class="icon-name">{{ $t('interact_tools.interact_tools_1003') }}</span>
       </lottery-icon>
       <!-- 红包 -->
       <red-packet-icon
@@ -48,7 +48,7 @@
       </div>
       <!-- 公告列表 -->
       <noticeList :icon-style="iconStyle" class="icon-wrap">
-        <span class="icon-name">公告</span>
+        <span class="icon-name">{{ $t('interact_tools.interact_tools_1086') }}</span>
       </noticeList>
     </div>
     <vmp-air-container :cuid="cuid"></vmp-air-container>
