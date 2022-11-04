@@ -138,6 +138,12 @@
           // 派发事件：docResize
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));
         });
+        this.$nextTick(() => {
+          // 派发事件：设置文档容器是否置顶
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitDocContainerStickTop', [val])
+          );
+        });
       },
       getImageCropperMode(val) {
         this.imageCropperMode = val;
@@ -216,7 +222,7 @@
         right: 16px;
         height: 160px;
         width: 284px;
-        z-index: 5000;
+        z-index: 302;
         overflow: hidden;
         // 文档小窗的样式
         .vmp-doc-wap {
@@ -238,7 +244,7 @@
         right: 0;
         height: 422px;
         width: 100%;
-        z-index: 5000;
+        z-index: 302;
         overflow: hidden;
         // 文档小窗的样式
         .vmp-doc-wap {

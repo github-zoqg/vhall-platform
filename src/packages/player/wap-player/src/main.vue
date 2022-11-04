@@ -533,6 +533,10 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
+      },
+      // 是否是无延迟活动
+      noDelayWebinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       }
     },
     data() {
@@ -666,14 +670,16 @@
       isShowPoster: {
         handler(val) {
           if (!this.isPortraitLive) return;
-          if (this.isShowPoster) {
+          if (this.isShowPoster && !this.noDelayWebinar) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
-          this.$nextTick(() => {
-            window.$middleEventSdk?.event?.send(
-              boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
-            );
-          });
+          if (!this.noDelayWebinar) {
+            this.$nextTick(() => {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
+              );
+            });
+          }
         },
         immediate: true
       },

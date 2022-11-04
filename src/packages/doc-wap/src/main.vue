@@ -4,11 +4,11 @@
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[
-      `vmp-doc-wap--${displayMode}`,
-      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `vmp-doc-wap--${!isDocStickTop ? displayMode : 'normal'}`,
+      `${isPortrait && !isDocStickTop ? 'doc-portrait' : 'doc-landscape'}`,
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
-      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
+      `${isDocMainScreen && !isDocStickTop ? 'vmp-doc-wap-main-screen' : ''}`,
       isPortraitLive ? 'isPortraitLive' : ''
     ]"
     :style="{
@@ -143,7 +143,9 @@
         isPortrait: true, // 是否是竖屏  设备
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
-        showTools: false
+        showTools: false,
+        isDocBeCovered: false,
+        isDocStickTop: false
       };
     },
     computed: {
@@ -276,7 +278,7 @@
         handler(val) {
           if (!this.isPortraitLive) return;
           // 开启文档
-          if (val) {
+          if (val && !this.isDocBeCovered) {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
           } else {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
@@ -603,6 +605,17 @@
           //设备横向 旋转即退出全屏
           this.fullscreen();
         }
+      },
+      // 设置文档容器是否隐藏
+      setDocContainerCovered(val) {
+        this.isDocBeCovered = val;
+      },
+      // 设置文档容器是否置顶
+      setDocContainerStickTop(val) {
+        if (val) {
+          this.restore();
+        }
+        this.isDocStickTop = val;
       }
     },
     beforeDestroy() {
