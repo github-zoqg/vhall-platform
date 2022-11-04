@@ -14,6 +14,7 @@
           <img
             :class="`vmp-wap-player-prompt-poster player_bg_${imageCropperMode}`"
             :src="webinarsBgImg"
+            v-show="!(isVodEnd && !isPlayering && isPortraitLive)"
           />
         </div>
         <!-- 播放 按钮 -->
@@ -1829,7 +1830,7 @@
       }
     }
 
-    .vmp-wap-player-ending {
+    .vmp-wap-player-video > .vmp-wap-player-ending {
       background: none !important;
       &-box {
         background: none !important;

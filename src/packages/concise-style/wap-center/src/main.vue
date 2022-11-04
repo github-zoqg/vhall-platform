@@ -12,8 +12,8 @@
     <!-- 回放结束（正常回放和试看回放结束） -->
     <div
       v-show="isVodEnd && !isPlayering"
-      :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
-      :style="`backgroundImage: url('${webinarsBgImg}')`"
+      :class="`vmp-wap-player-ending ending_bg_${imageCropperModeVod}`"
+      :style="`backgroundImage: url('${webinarsBgImgVod}')`"
     >
       <!-- 回放播放结束 -->
       <div class="vmp-wap-player-ending-box" @click.stop="startPlay">
@@ -21,6 +21,22 @@
           <i class="vh-iconfont vh-line-refresh-left"></i>
         </p>
         <p class="vmp-wap-player-ending-box-reset">{{ $t('player.player_1016') }}</p>
+      </div>
+    </div>
+
+    <!-- 直播结束 -->
+    <div
+      v-if="isLivingEnd"
+      :class="`vmp-wap-body-ending ending_bg_${imageCropperModeLive}`"
+      :style="`backgroundImage: url('${webinarsBgImgLive}')`"
+    >
+      <div class="vmp-wap-body-ending-box">
+        <div class="vmp-wap-body-ending-box-img">
+          <img src="./img/livingEnd@2x.png" alt="" />
+        </div>
+        <h1 class="vmp-wap-body-ending-box-text">
+          {{ $t('player.player_1017') }}
+        </h1>
       </div>
     </div>
 
@@ -60,10 +76,13 @@
         childrenComp: [],
         isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
         isDocStickTop: false, // 文档是否吸顶（问卷弹出的情况）
-        imageCropperMode: 1,
-        webinarsBgImg: '',
+        imageCropperModeVod: 1, //回放结束
+        webinarsBgImgVod: '', //回放结束背景图
+        imageCropperModeLive: 1, //直播结束
+        webinarsBgImgLive: '', //直播结束背景图
         audioStatus: false, // 选中清晰度是否是音频模式
-        isAudio: false //判断是否是音频直播模式
+        isAudio: false, //判断是否是音频直播模式
+        isLivingEnd: false
       };
     },
     computed: {
@@ -145,11 +164,17 @@
           );
         });
       },
-      getImageCropperMode(val) {
-        this.imageCropperMode = val;
+      getImageCropperModeVod(val) {
+        this.imageCropperModeVod = val;
       },
-      getWebinarsBgImg(val) {
-        this.webinarsBgImg = val;
+      getWebinarsBgImgVod(val) {
+        this.webinarsBgImgVod = val;
+      },
+      getImageCropperModeLive(val) {
+        this.imageCropperModeLive = val;
+      },
+      getWebinarsBgImgLive(val) {
+        this.webinarsBgImgLive = val;
       },
       getVodEnd(val) {
         this.isVodEnd = val;
@@ -162,6 +187,9 @@
       },
       getIsAudio(val) {
         this.IsAudio = val;
+      },
+      getLivingEnd(val) {
+        this.isLivingEnd = val;
       }
     }
   };
