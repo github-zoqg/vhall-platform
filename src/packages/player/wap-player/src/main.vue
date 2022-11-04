@@ -444,7 +444,7 @@
       },
       //判断是否是音频直播模式
       isAudio() {
-        return this.roomBaseState.watchInitData.webinar.mode == 1;
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
       },
       // 背景图片
       webinarsBgImg() {
