@@ -1,6 +1,6 @@
 .vmp-concise-layout {
   .vh-concise-header-box,
-  .vmp-basic-jaw,
+  .vmp-basic-jaw .base-box,
   .tab-content {
     transition-duration: 0.5s;
     transition-property: opacity;
@@ -10,7 +10,7 @@
 
 .vmp-basic-layout__clearscreen {
   .vh-concise-header-box,
-  .vmp-basic-jaw,
+  .vmp-basic-jaw .base-box,
   .tab-content {
     opacity: 0;
   }
@@ -18,9 +18,14 @@
 
 .vmp-basic-layout__clearscreen-hide {
   .vh-concise-header-box,
-  .vmp-basic-jaw,
   .tab-content {
     z-index: -1;
+  }
+}
+
+.vmp-basic-layout__clearscreen-hide {
+  .vmp-basic-jaw .base-box {
+    display: none;
   }
 }
 
