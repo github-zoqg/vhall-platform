@@ -647,8 +647,10 @@
           z-index: -1;
           opacity: 0;
         }
-        .licode_stream {
-          object-fit: contain;
+        .vmp-wap-player {
+          video {
+            object-fit: contain;
+          }
         }
       }
     }

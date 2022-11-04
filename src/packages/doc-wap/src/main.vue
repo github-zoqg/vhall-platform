@@ -146,6 +146,10 @@
       };
     },
     computed: {
+      // 竖屏直播，文档播放器位置切换的状态
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
       wapDocClass() {
         if (this.showHeader && this.isWapBodyDocSwitch) {
           return 'vmp-doc-wap__top';
