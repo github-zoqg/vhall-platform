@@ -34,7 +34,7 @@ export default {
     isEmbed() {
       return this.$domainStore.state.roomBaseServer.embedObj.embed;
     },
-    // 是否正在直播
+    // 直播类型
     webinarType() {
       return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
     },
