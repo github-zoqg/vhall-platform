@@ -1063,7 +1063,7 @@
           };
         }
         // 水印
-        if (this.water && this.water.watermark_open == 1) {
+        if (this.water && this.water.watermark_open == 1 && !this.isPortraitLive) {
           const alianMap = new Map([
             [1, 'tl'],
             [2, 'tr'],
