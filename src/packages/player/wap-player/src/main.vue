@@ -56,10 +56,8 @@
         <!-- 直播结束 -->
         <div
           class="vmp-wap-player-audie"
-          v-if="
-            (isAudio || audioStatus) &&
-            (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
-          "
+          v-show="!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive)"
+          v-if="isAudio || audioStatus"
         >
           <p v-show="!(!isWapBodyDocSwitchFullScreen && isPortraitLive)">
             {{ $t('player.player_1014') }}

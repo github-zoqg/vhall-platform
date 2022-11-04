@@ -678,6 +678,7 @@
           transform: rotate(90deg) !important;
         }
       }
+      // 吸顶的样式
       .vmp-wap-body-sticktop {
         width: 100%;
         height: 5.62667rem;
@@ -695,6 +696,9 @@
         .vmp-wap-player {
           video {
             object-fit: contain;
+          }
+          .vmp-wap-player-audie {
+            display: block !important;
           }
         }
         .vmp-wap-stream-wrap {

@@ -85,7 +85,8 @@
     <div
       class="tools"
       v-show="
-        this.displayMode == 'normal' && (isDocMainScreen || isPortraitLive) ? showTools : true
+        (this.displayMode == 'normal' && (isDocMainScreen || isPortraitLive) ? showTools : true) ||
+        isShowTransBtn
       "
     >
       <!-- 文档横屏 -->
