@@ -4,7 +4,8 @@
     :class="[
       wapBodyClass,
       isShowWapBody ? '' : 'vmp-wap-body__hide',
-      isPortraitLive && !isStreamContainerStickTop ? 'isPortraitLive' : '',
+      isPortraitLive ? 'isPortraitLive' : '',
+      isStreamContainerStickTop ? 'vmp-wap-body-container-sticktop' : '',
       isPortraitLive && !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
     ]"
   >
@@ -631,6 +632,9 @@
       position: fixed;
       top: 0;
       left: 0;
+      &.vmp-wap-body-container-sticktop {
+        position: relative;
+      }
       &.isMini {
         z-index: 302; //互动工具层级＞小窗层级＞自定义菜单＞文档全屏
         width: 0;

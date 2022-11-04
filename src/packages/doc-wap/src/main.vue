@@ -47,7 +47,7 @@
         v-show="
           hasPager &&
           pageNum > 1 &&
-          (!isPortraitLive || (isWapBodyDocSwitchFullScreen && isPortraitLive))
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
         "
         @click="handlePage('prev')"
         class="btn-pager btn-pager--prev"
@@ -60,7 +60,7 @@
         v-show="
           hasPager &&
           pageNum < pageTotal &&
-          (!isPortraitLive || (isWapBodyDocSwitchFullScreen && isPortraitLive))
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
         "
         @click="handlePage('next')"
         class="btn-pager btn-pager--next"
@@ -74,7 +74,7 @@
       v-if="
         !!currentCid &&
         !currentCid.startsWith('board') &&
-        (!isPortraitLive || (isWapBodyDocSwitchFullScreen && isPortraitLive))
+        (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
       "
     >
       {{ pageNum }}/{{ pageTotal }}
