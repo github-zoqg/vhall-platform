@@ -359,16 +359,18 @@
         handler() {
           // 防止页面初始化报错故添加timeout：目标组件不存在
           setTimeout(() => {
-            if (this.noDelayWebinar) {
-              if (this.showPlayIcon) {
-                this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
+            if (this.isPortraitLive && this.noDelayWebinar) {
+              if (this.noDelayWebinar) {
+                if (this.showPlayIcon) {
+                  this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
+                }
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
+                );
+                window.$middleEventSdk?.event?.send(
+                  boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
+                );
               }
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
-              );
-              window.$middleEventSdk?.event?.send(
-                boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
-              );
             }
           });
         },

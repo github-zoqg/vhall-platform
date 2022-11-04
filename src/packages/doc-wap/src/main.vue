@@ -4,11 +4,11 @@
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[
-      `vmp-doc-wap--${displayMode}`,
-      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `vmp-doc-wap--${!isDocStickTop ? displayMode : 'normal'}`,
+      `${isPortrait && !isDocStickTop ? 'doc-portrait' : 'doc-landscape'}`,
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
-      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`,
+      `${isDocMainScreen && !isDocStickTop ? 'vmp-doc-wap-main-screen' : ''}`,
       isPortraitLive ? 'isPortraitLive' : ''
     ]"
     :style="{
@@ -143,7 +143,8 @@
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
         showTools: false,
-        isDocBeCovered: false
+        isDocBeCovered: false,
+        isDocStickTop: false
       };
     },
     computed: {
@@ -601,6 +602,13 @@
       // 设置文档容器是否隐藏
       setDocContainerCovered(val) {
         this.isDocBeCovered = val;
+      },
+      // 设置文档容器是否置顶
+      setDocContainerStickTop(val) {
+        if (val) {
+          this.restore();
+        }
+        this.isDocStickTop = val;
       }
     },
     beforeDestroy() {

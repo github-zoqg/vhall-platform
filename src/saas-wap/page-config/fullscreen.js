@@ -279,6 +279,13 @@ export default {
         cuid: 'comWapStreamList',
         method: 'replayPlay'
       }
+    ],
+    emitDocContainerStickTop: [
+      {
+        cuid: 'comDocWap',
+        method: 'setDocContainerStickTop',
+        args: ['$0']
+      }
     ]
   },
   comTabMenuWap: {

@@ -542,7 +542,7 @@
       left: 55%;
       top: 70%;
       width: 300px;
-      z-index: 5000;
+      z-index: 302;
       overflow: hidden;
       .vmp-wap-player-header,
       .vmp-wap-player-footer {
@@ -624,7 +624,7 @@
       top: 0;
       left: 0;
       &.isMini {
-        z-index: 9999;
+        z-index: 302; //互动工具层级＞小窗层级＞自定义菜单＞文档全屏
         width: 0;
         height: 0;
       }
@@ -641,7 +641,7 @@
         position: fixed;
         left: 0;
         top: 0;
-        z-index: 5000;
+        z-index: 302;
         overflow: hidden;
         &__hide {
           z-index: -1;
