@@ -102,9 +102,10 @@
       <!-- 文档播放器位置互换 -->
       <div
         v-if="!isDocMainScreen"
-        v-show="!!currentCid && displayMode != 'fullscreen' && !isNotSupportTrans"
+        v-show="isShowTransBtn"
         @click="transposition"
         class="btn-doc-transposition"
+        :class="isPortraitLive ? 'btn-doc-transposition__portrait' : ''"
       >
         <i class="vh-iconfont vh-line-sort1"></i>
       </div>
@@ -148,6 +149,12 @@
       };
     },
     computed: {
+      isShowTransBtn() {
+        const result =
+          !!this.currentCid && this.displayMode != 'fullscreen' && !this.isNotSupportTrans;
+
+        return !this.isPortraitLive ? result : this.isWapBodyDocSwitchFullScreen && result;
+      },
       // 竖屏直播，文档播放器位置切换的状态
       isWapBodyDocSwitchFullScreen() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
@@ -753,7 +760,12 @@
         &:nth-last-child(1) {
           margin-right: 32px;
         }
+        &.btn-doc-transposition__portrait {
+          margin-right: 12px;
+          margin-top: 8px;
+        }
       }
+
       .vh-iconfont {
         font-size: 30px;
       }

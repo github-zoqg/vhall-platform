@@ -31,6 +31,14 @@
             <i class="vh-iconfont vh-line-video-play"></i>
           </p>
         </div>
+        <!-- 文档播放器互换位置按钮 -->
+        <div
+          v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen"
+          class="vmp-wap-player-trans"
+          @click.stop="transposition"
+        >
+          <i class="vh-iconfont vh-line-sort1"></i>
+        </div>
         <div
           :id="
             warmUpVideoList.length < 2
@@ -776,6 +784,13 @@
       }
     },
     methods: {
+      // 文档播放器互换位置
+      transposition() {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
+            !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
+        }
+      },
       getIsConcise() {
         let skin_json_wap = {
           style: 1
@@ -1334,6 +1349,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      z-index: 5;
       // &-text {
       //   margin-top: 20px;
       // }
@@ -1373,6 +1389,24 @@
           font-size: 46px;
           color: #f5f5f5;
         }
+      }
+    }
+    &-trans {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      cursor: pointer;
+      .vh-iconfont {
+        font-size: 30px;
       }
     }
     &-ending {
