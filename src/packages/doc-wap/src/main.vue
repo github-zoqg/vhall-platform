@@ -47,7 +47,8 @@
         v-show="
           hasPager &&
           pageNum > 1 &&
-          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive)) &&
+          (isPortraitLive ? showTools : true)
         "
         @click="handlePage('prev')"
         class="btn-pager btn-pager--prev"
@@ -60,7 +61,8 @@
         v-show="
           hasPager &&
           pageNum < pageTotal &&
-          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive)) &&
+          (isPortraitLive ? showTools : true)
         "
         @click="handlePage('next')"
         class="btn-pager btn-pager--next"
@@ -71,6 +73,7 @@
 
     <div
       class="pageGroup"
+      v-show="isPortraitLive ? showTools : true"
       v-if="
         !!currentCid &&
         !currentCid.startsWith('board') &&
@@ -79,7 +82,12 @@
     >
       {{ pageNum }}/{{ pageTotal }}
     </div>
-    <div class="tools" v-show="this.displayMode == 'normal' && isDocMainScreen ? showTools : true">
+    <div
+      class="tools"
+      v-show="
+        this.displayMode == 'normal' && (isDocMainScreen || isPortraitLive) ? showTools : true
+      "
+    >
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"

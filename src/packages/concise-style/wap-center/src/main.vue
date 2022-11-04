@@ -262,6 +262,7 @@
           .tools {
             .btn-doc-rotate,
             .btn-doc-fullscreen,
+            .btn-pager,
             .btn-doc-restore {
               display: none;
             }
@@ -290,6 +291,9 @@
             .btn-doc-transposition {
               display: none;
             }
+          }
+          .btn-pager {
+            display: none;
           }
         }
       }
