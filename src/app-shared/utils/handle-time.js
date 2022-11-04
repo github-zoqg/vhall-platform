@@ -64,4 +64,4 @@ const handleChatShowTime = (preMsgTime, curMsgTime) => {
   }
   return dayjs(curMsgTime).format('HH:mm');
 };
-export { handleTime, formatTime, handleChatShowTime };
+export { handleTime, formatTime, handleChatShowTime, padZero };
