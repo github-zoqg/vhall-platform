@@ -142,7 +142,8 @@
         isPortrait: true, // 是否是竖屏  设备
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
-        showTools: false
+        showTools: false,
+        isDocBeCovered: false
       };
     },
     computed: {
@@ -269,7 +270,7 @@
         handler(val) {
           if (!this.isPortraitLive) return;
           // 开启文档
-          if (val) {
+          if (val && !this.isDocBeCovered) {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
           } else {
             this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
@@ -596,6 +597,10 @@
           //设备横向 旋转即退出全屏
           this.fullscreen();
         }
+      },
+      // 设置文档容器是否隐藏
+      setDocContainerCovered(val) {
+        this.isDocBeCovered = val;
       }
     },
     beforeDestroy() {

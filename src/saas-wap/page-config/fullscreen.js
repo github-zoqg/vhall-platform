@@ -131,6 +131,12 @@ export default {
         cuid: 'comWapCenter',
         method: 'setDocContainerCovered',
         args: ['$0']
+      },
+      // 设置文档是否被覆盖
+      {
+        cuid: 'comDocWap',
+        method: 'setDocContainerCovered',
+        args: ['$0']
       }
     ],
     emitPlayerOpenQuality: [
