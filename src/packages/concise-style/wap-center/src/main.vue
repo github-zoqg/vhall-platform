@@ -216,6 +216,8 @@
     }
     &__doc-container {
       background: #fff;
+      position: relative;
+      bottom: 0 !important;
       &.doc-container__mini {
         position: fixed;
         top: 16px;

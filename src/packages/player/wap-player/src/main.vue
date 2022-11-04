@@ -33,6 +33,7 @@
         </div>
         <!-- 文档播放器互换位置按钮 -->
         <div
+          key="vmp-wap-player-trans"
           v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen"
           class="vmp-wap-player-trans"
           @click.stop="transposition"
