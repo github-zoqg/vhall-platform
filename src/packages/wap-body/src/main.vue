@@ -34,7 +34,8 @@
         isStreamContainerStickTop ? 'vmp-wap-body-sticktop' : '',
         isStreamContainerStickTop && !isWapBodyDocSwitchFullScreen
           ? 'vmp-wap-body-sticktop__hide'
-          : ''
+          : '',
+        `${rotateNum ? 'rotate' + rotateNum : ''}`
       ]"
       v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
     >
@@ -125,7 +126,8 @@
         isLivingEnd: false,
         mini: false,
         isShowLiveStartNotice: false,
-        isStreamContainerStickTop: false // 视频流容器是否吸顶（问卷弹窗的时候）
+        isStreamContainerStickTop: false, // 视频流容器是否吸顶（问卷弹窗的时候）
+        rotateNum: 0
       };
     },
     computed: {
@@ -444,6 +446,12 @@
           // 此时调用完，设备状态要么是1  要么是2
           await this.checkMediaPermission();
         }
+      },
+      // 竖屏旋转播放器
+      rotatePlayer(deg) {
+        if (this.isPortraitLive) {
+          this.rotateNum = deg;
+        }
       }
     }
   };
@@ -634,13 +642,19 @@
         left: auto;
         width: 160px;
         height: 284px;
+        &.rotate90 {
+          transform-origin: center;
+          transform: rotate(90deg) !important;
+        }
       }
       .vmp-wap-body-sticktop {
         width: 100%;
         height: 5.62667rem;
         position: fixed;
-        left: 0;
-        top: 0;
+        left: 0 !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         z-index: 302;
         overflow: hidden;
         &__hide {

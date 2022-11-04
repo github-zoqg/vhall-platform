@@ -240,8 +240,10 @@
       }
       &.doc-container__sticktop {
         position: fixed;
-        top: 0;
-        right: 0;
+        left: 0 !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         height: 422px;
         width: 100%;
         z-index: 302;
