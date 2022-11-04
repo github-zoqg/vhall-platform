@@ -16,7 +16,11 @@
         alt
       />
     </div>
-    <el-tooltip :content="userInfo.nickname" popper-class="vmp-member-item-popper-width">
+    <el-tooltip
+      :content="userInfo.nickname"
+      popper-class="vmp-member-item-popper-width"
+      :visible-arrow="false"
+    >
       <span
         class="vmp-member-item__name"
         :class="{
@@ -854,6 +858,8 @@
 <style lang="less">
   .vmp-member-item-popper-width {
     max-width: 300px;
+    background: rgba(0, 0, 0, 0.95) !important;
+    margin-top: 5px !important;
   }
   .vmp-member-item {
     position: relative;
@@ -894,6 +900,8 @@
       margin-left: 9px;
       color: var(--group-name-font-color);
       font-size: 14px;
+      height: 14px;
+      line-height: 1;
     }
     &__name-limit,
     &__name_ingroup {
