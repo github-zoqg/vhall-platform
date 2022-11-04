@@ -42,6 +42,7 @@
           <i class="vh-iconfont vh-line-sort1"></i>
         </div>
         <div
+          key="vmp-wap-player-container"
           :id="
             warmUpVideoList.length < 2
               ? 'vmp-wap-player'
@@ -165,7 +166,7 @@
           "
           :class="[
             iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
-            docScreen == 'fullscreen' ? 'hide' : ''
+            docScreen == 'fullscreen' || chatSendBoxVisible ? 'hide' : ''
           ]"
         >
           <div class="vmp-wap-player-control" v-show="docScreen != 'fullscreen'">
@@ -606,7 +607,8 @@
         isConcise: false, //判断是否是极简模式
         showQualityCard: false,
         showSpeedCard: false,
-        docScreen: '' //文档全屏
+        docScreen: '', //文档全屏
+        chatSendBoxVisible: false
       };
     },
     watch: {
@@ -848,8 +850,10 @@
       },
       // 播放
       play() {
-        this.iconShow = false;
-        this.fiveDown();
+        if (!this.isPortraitLive) {
+          this.iconShow = false;
+          this.fiveDown();
+        }
         // 为了防止 播放器初始化还没完成，就点击了播放器按钮播放
         try {
           this.playerServer && this.playerServer.play();
@@ -1233,6 +1237,9 @@
       },
       getDocScreen(val) {
         this.docScreen = val;
+      },
+      changeChatSendBox(val) {
+        this.chatSendBoxVisible = val;
       }
     }
   };
@@ -1784,6 +1791,9 @@
   }
 
   .isPortraitLive {
+    .vmp-wap-player-prompt-poster {
+      object-fit: contain;
+    }
     .isVod {
       .vmp-wap-player-footer {
         position: fixed;

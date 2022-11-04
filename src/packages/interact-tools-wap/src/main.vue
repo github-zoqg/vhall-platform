@@ -6,7 +6,7 @@
     ]"
   >
     <div class="icon-wrapper">
-      <div class="good" v-if="localRoomInfo.isShowGift && isPortraitLive">
+      <div class="good" v-if="visibleGood && isPortraitLive">
         <div class="tool">
           <img class="good-img" src="./img/icon_good.png" @click="openGoods" />
         </div>
@@ -135,7 +135,8 @@
         childrenComp: [],
         visibleMenuLength: 0,
         isPortraitLive: webinarData.webinar_show_type == 0, // 竖屏直播
-        showGoodsCard: false
+        showGoodsCard: false,
+        visibleGood: false
       };
     },
     computed: {
@@ -189,6 +190,9 @@
       },
       openGoods() {
         this.showGoodsCard = true;
+      },
+      getVisibleGood(val) {
+        this.visibleGood = val;
       }
     }
   };
@@ -255,5 +259,11 @@
   }
   .goods-van-popup {
     height: 1114px;
+    .vh-goods-wrapper {
+      overflow: hidden;
+      .vh-goods_list {
+        overflow: hidden;
+      }
+    }
   }
 </style>

@@ -165,12 +165,26 @@
             return item.visible === true;
           });
         }
-        let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        let visibleMenu =
+          this.isConcise || this.isPortraitLive ? conciseVisibleMenu : otherVisibleMenu;
         console.log('当前菜单个数', visibleMenu.length, this.menu);
         if (this.isConcise || this.isPortraitLive) {
           // // 告知外部当前可展示的自定义菜单个数
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
+          );
+        }
+        if (this.isPortraitLive) {
+          let visibleGood = false;
+          const goods = visibleMenu.filter(e => {
+            return e.type == 5;
+          });
+          if (goods.length != 0) {
+            visibleGood = goods[0].visible;
+          }
+          // // 告知外部是否显示商品
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitVisibleGood', [visibleGood])
           );
         }
         return visibleMenu;
