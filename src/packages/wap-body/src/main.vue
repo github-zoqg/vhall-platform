@@ -697,6 +697,11 @@
             object-fit: contain;
           }
         }
+        .vmp-wap-stream-wrap {
+          .licode_stream {
+            object-fit: contain;
+          }
+        }
       }
     }
   }
