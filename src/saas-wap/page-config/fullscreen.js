@@ -128,13 +128,13 @@ export default {
         args: ['$0']
       }
     ],
-    emitPlayerStatus: [
-      {
-        cuid: 'comWapCenter',
-        method: 'updatePlayStatus',
-        args: ['$0']
-      }
-    ],
+    // emitPlayerStatus: [
+    //   {
+    //     cuid: 'comWapCenter',
+    //     method: 'updatePlayStatus',
+    //     args: ['$0']
+    //   }
+    // ],
     emitPlayerQuality: [
       {
         cuid: 'comHeaderWatch',
@@ -245,15 +245,15 @@ export default {
         method: 'setDocContainerCovered',
         args: ['$0']
       }
-    ],
-    emitStreamShowPlayIcon: [
-      // 设置流组件显示播放按钮
-      {
-        cuid: 'comWapCenter',
-        method: 'updatePlayStatus',
-        args: ['$0']
-      }
     ]
+    // emitStreamShowPlayIcon: [
+    //   // 设置流组件显示播放按钮
+    //   {
+    //     cuid: 'comWapCenter',
+    //     method: 'updatePlayStatus',
+    //     args: ['$0']
+    //   }
+    // ]
   },
   comWapStreamLocal: {
     component: 'VmpWapStreamLocal'

@@ -147,34 +147,7 @@ router.beforeEach(async (to, from, next) => {
   if (res) {
     //处理限流逻辑
     if (res.code == 200) {
-      const VUE_APP_ROUTER_BASE_URL = process.env.VUE_APP_ROUTER_BASE_URL;
-      const VUE_APP_BUILD_VERSION = process.env.VUE_APP_BUILD_VERSION;
-      const VUE_APP_WEB_BASE = process.env.VUE_APP_WEB_BASE; //发起端项目名
-
-      // test
-      // res.data.version = '1.4.8';
-
-      // 如果是B用户配置单独版本
-      if (
-        process.env.NODE_ENV != 'development' &&
-        res.data.version &&
-        res.data.version != VUE_APP_BUILD_VERSION
-      ) {
-        window.location.replace(
-          `${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}/${res.data.version}${to.fullPath}`
-        );
-      } else {
-        // 版本一致或者没有配置版本
-        if (
-          res.data.version == undefined &&
-          window.location.href.indexOf(VUE_APP_BUILD_VERSION) != -1
-        ) {
-          // 如果没有服务配置版本并且地址栏有版本则跳转到无版本地址
-          window.location.replace(`${VUE_APP_WEB_BASE}${VUE_APP_ROUTER_BASE_URL}${to.fullPath}`);
-        } else {
-          next();
-        }
-      }
+      next();
     } else {
       next({
         name: 'PageError',
