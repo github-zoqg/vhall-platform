@@ -24,7 +24,7 @@
     >
       {{ $t('common.common_1001') }}
     </van-loading>
-    <div class="vmp-basic-container" v-if="state === 1">
+    <div class="vmp-basic-container" v-if="state === 1" @click="clearScreen">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
@@ -452,6 +452,12 @@
             }
             app.style.backgroundSize = 'cover';
           }
+        }
+      },
+      clearScreen(e) {
+        const roomBaseServer = useRoomBaseServer();
+        if (this.isPortraitLive && e.target === e.currentTarget) {
+          roomBaseServer.state.isClearScreen = !roomBaseServer.state.isClearScreen;
         }
       }
     }
