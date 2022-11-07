@@ -319,7 +319,7 @@
         // this.timeoutCache = setTimeout(() => {
         //   this?.$refs['videoSetting']?.destroyStream();
         // }, 5000);
-        this?.$refs['audioOutSetting']?.pauseAudio();
+        // this?.$refs['audioOutSetting']?.pauseAudio();
         this.isRepublishMode = false;
         await this.$nextTick();
       },
@@ -496,13 +496,16 @@
           );
           return false;
         }
-
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'saveOptions', diffOptions));
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'saveOptions', diffOptions)
+          );
+        });
       },
       async updateDeviceStatus() {
-        const diffOptions = this._diffOptions;
+        // const diffOptions = this._diffOptions;
 
-        this.updateVideoProfile();
+        await this.updateVideoProfile();
       },
       async updateVideoProfile() {
         const diffOptions = this._diffOptions;
