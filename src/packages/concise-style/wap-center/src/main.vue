@@ -70,7 +70,6 @@
     components: {},
     data() {
       return {
-        isShowPoster: true, //是否展示活动图片背景
         isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
@@ -206,9 +205,11 @@
     width: 100%;
     height: 100%;
     > .vmp-wap-player-pause {
-      height: 100%;
-      width: 100%;
-      position: absolute;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
       display: flex;
       align-items: center;
       justify-content: center;
