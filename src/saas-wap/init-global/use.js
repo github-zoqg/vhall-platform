@@ -100,7 +100,10 @@ import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effec
 // 弹出自定义菜单框
 import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // ------------------------------【极简风格】引入组件------end----------
-
+// ------------------------------ 快问快答-引入组件------start----------
+import VmpExamRankWap from '@/packages/exam-rank-wap';
+import VmpExamCollectWap from '@/packages/exam-collect-wap';
+// ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
@@ -156,4 +159,8 @@ Vue.use(VmpConciseBodyBlockWap);
 Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
 Vue.use(VmpWapMenuDialog);
+// ------------------------------【极简风格】注册组件------end----------
+// ------------------------------ 快问快答------start----------
+Vue.use(VmpExamRankWap);
+Vue.use(VmpExamCollectWap);
 // ------------------------------【极简风格】注册组件------end----------
