@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-container-right-wap" v-if="!isInGroup">
     <div class="base-box" v-show="showIcon">
+      <!-- 快问快答 -->
+      <exam-icon class="icon-wrap" @clickIcon="checkExamIcon" />
       <!-- 问卷 -->
       <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <!-- 签到 -->
@@ -40,13 +42,15 @@
   import redPacketIcon from './components/red-repakcet-icon/index.vue';
   import questionnaireIcon from './components/questionnaire-icon/index.vue';
   import noticeList from './components/noticeList/index.vue';
+  import examIcon from './components/exam-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
     components: {
       lotteryIcon,
       redPacketIcon,
       questionnaireIcon,
-      noticeList
+      noticeList,
+      examIcon
     },
     data() {
       return {
@@ -128,6 +132,12 @@
         console.log(questionnaireId);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
+        );
+      },
+      checkExamIcon(examId) {
+        console.log(examId);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickExamIcon', [examId])
         );
       }
     }
