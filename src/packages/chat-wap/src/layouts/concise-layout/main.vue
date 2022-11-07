@@ -328,9 +328,8 @@
         const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
         const h_block = document.querySelector('.vmp-block').clientHeight;
         const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
-        const h_jaw = this.isPortraitLive
-          ? document.querySelector('.vmp-basic-jaw').clientHeight
-          : 0;
+        // TODO: 未知原因获取vmp-basic-jaw的高度是异常  document.querySelector('.vmp-basic-jaw').clientHeight
+        const h_jaw = this.isPortraitLive ? 44 : 0;
         if (h_block == 0) {
           let classname = '.tab-content';
           if (this.isEmbed) {
@@ -345,15 +344,6 @@
               tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - h_jaw + 'px';
             }
           }
-          console.log(
-            !this.isLiving && this.isPortraitLive,
-            tabDom.style.height,
-            h_header,
-            h_neck,
-            h_block,
-            h_basic,
-            h_jaw
-          );
         }
       },
       //初始化eventbus
