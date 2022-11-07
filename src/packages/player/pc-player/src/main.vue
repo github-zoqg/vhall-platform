@@ -570,7 +570,7 @@
                   text = '';
                 }
               }
-              marqueeText = `${this.marquee.text}-${text}`;
+              marqueeText = `${text}`;
             }
             params.marqueeOption = {
               enable: true,
