@@ -2,7 +2,7 @@
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
     <div
-      v-show="isWapBodyDocSwitchFullScreen && !isPlayering && !isVodEnd && !isSmallPlayer"
+      v-show="isWapBodyDocSwitchFullScreen && !isPlaying && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
     >
       <p @click.stop="startPlay">
@@ -11,7 +11,7 @@
     </div>
     <!-- 回放结束（正常回放和试看回放结束） -->
     <div
-      v-show="isVodEnd && !isPlayering"
+      v-show="isVodEnd && !isPlaying"
       :class="`vmp-wap-player-ending ending_bg_${imageCropperModeVod}`"
       :style="`backgroundImage: url('${webinarsBgImgVod}')`"
     >
@@ -41,7 +41,7 @@
     </div>
 
     <!-- 音频直播 -->
-    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlayering">
+    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying">
       <p>{{ $t('player.player_1014') }}</p>
     </div>
 
@@ -64,13 +64,14 @@
 
 <script>
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { useInteractiveServer } from 'middle-domain';
 
   export default {
     name: 'VmpConciseCenterWap',
     components: {},
     data() {
       return {
-        isPlayering: false, // 是否是播放状态
+        // isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
         childrenComp: [],
@@ -105,6 +106,26 @@
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
+      },
+      // 播放状态
+      isPlaying() {
+        //直播中 无延迟 且 未初始化完成，使用play的播放状态
+        if (
+          (this.noDelayWebinar && !this.isInstanceInit && this.webinarType == 1) ||
+          !this.noDelayWebinar
+        ) {
+          return this.$domainStore.state.playerServer.isPlaying;
+        } else {
+          return this.abortStreams.length == 0 ? true : false;
+        }
+      },
+      // 互动流 - 订阅流--  自动播放失败
+      abortStreams() {
+        return this.interactiveServer.abortStreams;
+      },
+      // 互动 是否初始化完成
+      isInstanceInit() {
+        return this.interactiveServer.state.isInstanceInit;
       }
     },
     watch: {
@@ -122,16 +143,20 @@
     },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
+      this.interactiveServer = useInteractiveServer();
     },
     methods: {
       startPlay() {
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
           this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = false;
         }
-        if (this.noDelayWebinar && this.webinarType == 1) {
-          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStreamPlay'));
+        if (
+          (this.noDelayWebinar && !this.isInstanceInit && this.webinarType == 1) ||
+          !this.noDelayWebinar
+        ) {
+          this.isPlaying ? this.pause() : this.play();
         } else {
-          this.isPlayering ? this.pause() : this.play();
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStreamPlay'));
         }
       },
       // 播放
@@ -142,10 +167,10 @@
       pause() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitPlayerPause'));
       },
-      // 改变播放状态
-      updatePlayStatus(val) {
-        this.isPlayering = val;
-      },
+      // // 改变播放状态
+      // updatePlayStatus(val) {
+      //   this.isPlayering = val;
+      // },
       // 设置文档容器是否隐藏（z-index:-1）
       setDocContainerCovered(val) {
         this.isDocBeCovered = val;

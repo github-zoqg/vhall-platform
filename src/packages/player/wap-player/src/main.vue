@@ -14,13 +14,13 @@
           <img
             :class="`vmp-wap-player-prompt-poster player_bg_${imageCropperMode}`"
             :src="webinarsBgImg"
-            v-show="!(isVodEnd && !isPlayering && isPortraitLive)"
+            v-show="!(isVodEnd && !isPlaying && isPortraitLive)"
           />
         </div>
         <!-- 播放 按钮 -->
         <div
           v-show="
-            !isPlayering &&
+            !isPlaying &&
             !isVodEnd &&
             !isSmallPlayer &&
             (!isPortraitLive ||
@@ -66,7 +66,7 @@
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
-          v-show="isVodEnd && !isPlayering && !isPortraitLive"
+          v-show="isVodEnd && !isPlaying && !isPortraitLive"
           :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
@@ -100,7 +100,7 @@
         <div
           class="vmp-wap-player-header"
           v-show="
-            roomBaseState.watchInitData.pv.show && isPlayering && !isSmallPlayer && !isPortraitLive
+            roomBaseState.watchInitData.pv.show && isPlaying && !isSmallPlayer && !isPortraitLive
           "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
@@ -158,7 +158,7 @@
         <div
           class="vmp-wap-player-footer"
           v-show="
-            (isPlayering || (isPortraitLive && !isPlayering && isShowPoster)) &&
+            (isPlaying || (isPortraitLive && !isPlaying && isShowPoster)) &&
             !isSmallPlayer &&
             (!isPortraitLive || (isPortraitLive && !isLiving))
           "
@@ -224,7 +224,7 @@
                     @click.stop="startPlay"
                     :class="[
                       'vh-iconfont',
-                      isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play',
+                      isPlaying ? 'vh-a-line-videopause' : 'vh-line-video-play',
                       { 'vh-line-left-vod': !isLiving }
                     ]"
                   ></i>
@@ -309,7 +309,7 @@
               >
                 <i
                   class="vh-iconfont"
-                  :class="isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'"
+                  :class="isPlaying ? 'vh-a-line-videopause' : 'vh-line-video-play'"
                 ></i>
               </van-circle>
             </span>
@@ -541,6 +541,10 @@
       // 是否是无延迟活动
       noDelayWebinar() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
+      },
+      // 播放状态
+      isPlaying() {
+        return this.$domainStore.state.playerServer.isPlaying;
       }
     },
     data() {
@@ -556,7 +560,7 @@
         prompt: this.$t('player.player_1010'), // 刚开始点击时展示文案
         loadingFlag: false,
         isShowPoster: true, //是否展示活动图片背景
-        isPlayering: false, // 是否是播放状态
+        // isPlaying: false, // 是否是播放状态
         liveOption: {}, //直播时播放器liveOption参数
         vodOption: {}, //回放时回放id
         vodType: '', //回放的类型 暖场视频还是还是试看
@@ -668,11 +672,12 @@
           }
         }
       },
-      isPlayering() {
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitPlayerStatus', [this.isPlayering])
-        );
-      },
+      // isPlaying() {
+      //   console.log('wap-plyer');
+      //   window.$middleEventSdk?.event?.send(
+      //     boxEventOpitons(this.cuid, 'emitPlayerStatus', [this.isPlaying])
+      //   );
+      // },
       isShowPoster: {
         handler(val) {
           if (!this.isPortraitLive) return;
@@ -844,7 +849,7 @@
         console.log(this.imageCropperMode, '???mode');
       },
       startPlay() {
-        this.isPlayering ? this.pause() : this.play();
+        this.isPlaying ? this.pause() : this.play();
       },
       // 播放
       play() {

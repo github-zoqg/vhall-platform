@@ -35,7 +35,7 @@
         ></div>
         <!-- 暖场视频播放按钮 -->
         <div
-          v-if="isEmbed && isSubscribe && isWarnPreview && !isPlayering"
+          v-if="isEmbed && isSubscribe && isWarnPreview && !isPlaying"
           class="vmp-player-living-play"
         >
           <div class="vmp-player-living-play-normal" @click="startPlay">
@@ -44,7 +44,7 @@
         </div>
         <!-- 直播、回放播放按钮 -->
         <template v-else>
-          <div class="vmp-player-living-btn" v-if="!isPlayering && !isVodEnd">
+          <div class="vmp-player-living-btn" v-if="!isPlaying && !isVodEnd">
             <div
               :class="
                 displayMode == 'mini'
@@ -114,7 +114,7 @@
       </template>
       <!-- 控制条 进度条、弹幕、全屏、时间等 -->
       <div
-        v-show="isPlayering"
+        v-show="isPlaying"
         :class="[
           { 'active-control': hoveVideo, 'previre-control': isTryPreview },
           displayMode == 'mini' ? 'vmp-player-controllerMini' : 'vmp-player-controller'
@@ -156,7 +156,7 @@
             <div class="controller-tools-left-start" @click="startPlay">
               <i
                 :class="`vh-iconfont ${
-                  isPlayering ? 'vh-a-line-videopause' : 'vh-line-video-play'
+                  isPlaying ? 'vh-a-line-videopause' : 'vh-line-video-play'
                 }`"
               ></i>
             </div>
@@ -268,7 +268,7 @@
         </div>
       </div>
       <!-- 试看和断点续播提示 -->
-      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini' && isPlayering">
+      <div class="vmp-player-tips-prew" v-if="displayMode != 'mini' && isPlaying">
         <!-- 试看 -->
         <div v-if="vodType === 'shikan' && isTryPreview">
           <i18n path="appointment.appointment_1012">
@@ -312,7 +312,7 @@
       const initIndex = this.subscribeServer.state.initIndex;
       return {
         displayMode: 'normal', // normal: 正常; mini: 小屏; fullscreen:全屏
-        isPlayering: false, // 是否是播放状态
+        // isPlaying: false, // 是否是播放状态
         isShowPoster: true, //是否展示活动图片背景
         vodType: '', //回放的类型 暖场视频还是还是试看
         liveOption: {}, //直播时播放器liveOption参数
@@ -460,6 +460,10 @@
       isEmbedVideo() {
         // 是不是单视频嵌入
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 播放状态
+      isPlaying() {
+        return this.$domainStore.state.playerServer.isPlaying;
       }
     },
     watch: {
@@ -757,7 +761,7 @@
         );
       },
       startPlay() {
-        this.isPlayering ? this.pause() : this.play();
+        this.isPlaying ? this.pause() : this.play();
       },
       // 播放
       play() {
