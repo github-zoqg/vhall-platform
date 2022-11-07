@@ -62,7 +62,7 @@
         v-if="
           roomBaseServer.state.watchInitData.pv.show &&
           !isInGroup &&
-          (!isConcise || !this.isPortraitLive)
+          !(isConcise || this.isPortraitLive)
         "
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
@@ -90,7 +90,7 @@
       </div>
       <!-- 进入全屏 -->
       <div
-        v-if="!isDocMainScreen"
+        v-if="!isDocMainScreen & !this.isPortraitLive"
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
