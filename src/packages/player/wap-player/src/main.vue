@@ -2,6 +2,7 @@
   <div
     class="vmp-wap-player"
     :class="[isAppStartType ? 'vmp-wap-player__app' : '', !isLiving ? 'isVod' : '']"
+    @click="clearScreen"
   >
     <template v-if="encrypt">
       <!-- <div class="vmp-wap-player-prompt">
@@ -51,6 +52,7 @@
           style="width: 100%; height: 100%"
           class="playerBox"
           @click.stop.prevent="videoShowIcon"
+          @click.stop="clearScreen"
         >
           <!-- 视频容器 -->
         </div>
@@ -795,6 +797,11 @@
       }
     },
     methods: {
+      clearScreen() {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isClearScreen = !this.roomBaseServer.state.isClearScreen;
+        }
+      },
       // 文档播放器互换位置
       transposition() {
         if (this.isPortraitLive) {
