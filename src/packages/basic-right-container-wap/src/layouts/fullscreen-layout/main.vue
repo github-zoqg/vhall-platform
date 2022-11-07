@@ -31,7 +31,7 @@
         v-if="!isEmbed && webinarType == 1"
         @clickIcon="handleRedPacket"
       >
-        <span class="icon-name">红包</span>
+        <span class="icon-name">{{ $t('interact_tools.interact_tools_1098') }}</span>
       </red-packet-icon>
       <!-- 计时器 -->
       <div class="icon-wrap" @click="handleTimer" v-show="showTimer && webinarType == 1">
@@ -44,7 +44,7 @@
           <img src="../../common/image/timer_no2.png" v-else />
         </template>
 
-        <span class="icon-name">计时器</span>
+        <span class="icon-name">{{ $t('interact_tools.interact_tools_1099') }}</span>
       </div>
       <!-- 公告列表 -->
       <noticeList :icon-style="iconStyle" class="icon-wrap">
