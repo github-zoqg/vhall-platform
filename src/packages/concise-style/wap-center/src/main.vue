@@ -4,6 +4,9 @@
     <div
       v-show="isWapBodyDocSwitchFullScreen && !isPlaying && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
+      :class="{
+        'player-container__sticktop': isDocStickTop
+      }"
     >
       <p @click.stop="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
@@ -230,11 +233,12 @@
     width: 100%;
     height: 100%;
     > .vmp-wap-player-pause {
-      height: 100vh;
-      width: 100vw;
+      height: 0;
+      width: 0;
       position: fixed;
-      top: 0;
-      left: 0;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -242,7 +246,9 @@
       background: transparent;
       p {
         width: 108px;
+        min-width: 108px;
         height: 108px;
+        min-height: 108px;
         border-radius: 50%;
         background: rgba(0, 0, 0, 0.4);
         display: flex;
@@ -252,6 +258,14 @@
           font-size: 46px;
           color: #f5f5f5;
         }
+      }
+      &.player-container__sticktop {
+        height: 422px;
+        width: 100vw;
+        top: 0;
+        left: 0;
+        transform: translate(0, 0);
+        z-index: 302;
       }
     }
     > .vmp-wap-player-audie {

@@ -155,9 +155,7 @@
           <div class="controller-tools-left">
             <div class="controller-tools-left-start" @click="startPlay">
               <i
-                :class="`vh-iconfont ${
-                  isPlaying ? 'vh-a-line-videopause' : 'vh-line-video-play'
-                }`"
+                :class="`vh-iconfont ${isPlaying ? 'vh-a-line-videopause' : 'vh-line-video-play'}`"
               ></i>
             </div>
             <div class="controller-tools-left-time" v-if="!isLiving && !isWarnPreview">
