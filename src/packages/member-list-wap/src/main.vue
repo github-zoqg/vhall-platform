@@ -471,7 +471,7 @@
       i {
         display: inline-block;
         vertical-align: middle;
-        font-size: 44px;
+        font-size: 36px;
         margin-right: 8px;
       }
       span {
@@ -479,7 +479,7 @@
         vertical-align: middle;
         font-style: normal;
         font-weight: 400;
-        font-size: 32px;
+        font-size: 28px;
         line-height: 45px;
         color: var(--theme-group-color);
       }
