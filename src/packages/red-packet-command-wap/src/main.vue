@@ -1,6 +1,12 @@
 <!-- 观看页-红包组件（颤动 + 弹出层） -->
 <template>
-  <van-popup class="vmp-red-packet-wap" v-model="dialogVisible" get-container="body">
+  <van-popup
+    class="vmp-red-packet-wap"
+    v-model="dialogVisible"
+    overlay-class="vmp-red-packet-popup-overlay"
+    :overlay-style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
+    :style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
+  >
     <!-- <div class="vhsaas-red-packet" v-if="dialogVisible"> -->
     <div class="vmp-red-packet-wap__container">
       <components
@@ -19,7 +25,12 @@
   </van-popup>
 </template>
 <script>
-  import { useCodeRedPacketServer, useChatServer, useMsgServer } from 'middle-domain';
+  import {
+    useCodeRedPacketServer,
+    useChatServer,
+    useMsgServer,
+    useZIndexServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   const PWD_RED_ENVELOPE_OK = 'pwd_red_envelope_ok'; // 支付成功消息
   export default {
@@ -36,8 +47,10 @@
     },
     data() {
       const redPacketServerState = this.redPacketServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
         redPacketServerState,
+        zIndexServerState,
         dialogVisible: false, // 组件显示
         componentsView: ''
       };
@@ -47,11 +60,25 @@
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
+    watch: {
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.redPacket': {
+        handler(val) {
+          if (document.querySelector('.vmp-red-packet-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-red-packet-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
+      }
+    },
     beforeCreate() {
       this.redPacketServer = useCodeRedPacketServer({
         mode: 'watch'
       });
       this.msgServer = useMsgServer();
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.initEvent();
@@ -69,6 +96,7 @@
             this.componentsView = 'RedPacketAccept';
           }
           this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('redPacket');
         });
       },
       initEvent() {
@@ -97,6 +125,7 @@
       openRedPacket(uuid) {
         this.dialogVisible = true;
         this.open(uuid);
+        this.zIndexServer.setDialogZIndex('redPacket');
       },
       handleGoLogin() {
         this.dialogVisible = false;
