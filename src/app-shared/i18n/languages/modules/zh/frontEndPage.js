@@ -568,7 +568,9 @@ export default {
     interact_tools_1094: '当前无中奖用户',
     interact_tools_1095: '您的姓名',
     interact_tools_1096: '手机号码',
-    interact_tools_1097: '收货地址'
+    interact_tools_1097: '收货地址',
+    interact_tools_1098: '红包',
+    interact_tools_1099: '计时器'
   },
   setting: {
     setting_1002: '观看设置',
@@ -929,6 +931,7 @@ export default {
     privacy_1003: '《用户保护协议》',
     privacy_1004: '《隐私政策》',
     privacy_1005: '请先阅读并同意隐私政策及用户服务协议',
-    privacy_1006: '提交并同意《隐私政策》及《用户保护协议》'
+    privacy_1006: '提交并同意《隐私政策》及《用户保护协议》',
+    privacy_1007: '请先勾选协议'
   }
 };
