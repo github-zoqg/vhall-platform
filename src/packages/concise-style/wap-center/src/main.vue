@@ -1,6 +1,7 @@
 <template>
   <div class="vmp-concise-center-wap">
     <!-- 播放 按钮 -->
+    <!-- {{ isWapBodyDocSwitchFullScreen + '-' + !isPlaying + '-' + !isVodEnd + '-' + !isSmallPlayer }} -->
     <div
       v-show="isWapBodyDocSwitchFullScreen && !isPlaying && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
@@ -78,6 +79,7 @@
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
         childrenComp: [],
+        abortStreams: [], // 自动播放禁止的stream列表
         isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
         isDocStickTop: false, // 文档是否吸顶（问卷弹出的情况）
         imageCropperModeVod: 1, //回放结束
@@ -111,7 +113,7 @@
         return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       },
       // 播放状态
-      isPlaying() {
+      isPlaying(val) {
         //直播中 无延迟 且 未初始化完成，使用play的播放状态
         if (
           (this.noDelayWebinar && !this.isInstanceInit && this.webinarType == 1) ||
@@ -121,10 +123,6 @@
         } else {
           return this.abortStreams.length == 0 ? true : false;
         }
-      },
-      // 互动流 - 订阅流--  自动播放失败
-      abortStreams() {
-        return this.interactiveServer.abortStreams;
       },
       // 互动 是否初始化完成
       isInstanceInit() {
@@ -147,7 +145,9 @@
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.interactiveServer = useInteractiveServer();
+      this.addSDKEvents();
     },
+    mounted() {},
     methods: {
       startPlay() {
         if (this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
@@ -159,6 +159,7 @@
         ) {
           this.isPlaying ? this.pause() : this.play();
         } else {
+          this.abortStreams = [];
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStreamPlay'));
         }
       },
@@ -218,6 +219,14 @@
       },
       getLivingEnd(val) {
         this.isLivingEnd = val;
+      },
+      // 事件监听
+      addSDKEvents() {
+        // 监听到自动播放
+        this.interactiveServer.$on('EVENT_STREAM_PLAYABORT', e => {
+          console.warn('自动播放失败------', e);
+          this.$set(this.abortStreams, this.abortStreams.length, e.data);
+        });
       }
     }
   };

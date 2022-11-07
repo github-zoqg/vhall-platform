@@ -988,4 +988,9 @@
       }
     }
   }
+  .isPortraitLive {
+    .vmp-wap-stream-wrap-mask-pause img {
+      object-fit: contain;
+    }
+  }
 </style>
