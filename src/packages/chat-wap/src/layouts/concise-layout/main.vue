@@ -278,7 +278,7 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
       },
       // 竖屏直播
-      isFullScreen() {
+      isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
       }
     },
@@ -328,7 +328,9 @@
         const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
         const h_block = document.querySelector('.vmp-block').clientHeight;
         const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
-        const h_jaw = this.isFullScreen ? document.querySelector('.vmp-basic-jaw').clientHeight : 0;
+        const h_jaw = this.isPortraitLive
+          ? document.querySelector('.vmp-basic-jaw').clientHeight
+          : 0;
         if (h_block == 0) {
           let classname = '.tab-content';
           if (this.isEmbed) {
@@ -336,13 +338,22 @@
           }
           const tabDom = document.querySelector(classname);
           if (tabDom) {
-            if (!this.isLiving && this.isFullScreen) {
+            if (!this.isLiving && this.isPortraitLive) {
               tabDom.style.height =
                 window.innerHeight - h_header - h_neck - h_basic - h_jaw - 100 + 'px';
             } else {
               tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - h_jaw + 'px';
             }
           }
+          console.log(
+            !this.isLiving && this.isPortraitLive,
+            tabDom.style.height,
+            h_header,
+            h_neck,
+            h_block,
+            h_basic,
+            h_jaw
+          );
         }
       },
       //初始化eventbus
