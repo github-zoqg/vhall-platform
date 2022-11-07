@@ -111,7 +111,7 @@
         if (val) {
           this._clearScreenTimer = setTimeout(() => {
             this.isClearScreenComplete = true;
-          }, 1500);
+          }, 300);
         } else {
           this.isClearScreenComplete = false;
         }
