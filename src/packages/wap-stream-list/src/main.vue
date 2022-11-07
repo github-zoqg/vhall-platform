@@ -55,7 +55,7 @@
       </template>
     </div>
     <!-- wap 蒙层显示信息 -->
-    <div class="vmp-wap-stream-wrap-mask">
+    <div class="vmp-wap-stream-wrap-mask" @click="clearScreen">
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
@@ -81,7 +81,7 @@
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
-        v-if="languageList.length > 1 && !isInGroup"
+        v-if="languageList.length > 1 && !isInGroup && !this.isPortraitLive"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <span @click.stop.prevent="openLanguage">
@@ -455,6 +455,11 @@
     },
 
     methods: {
+      clearScreen(e) {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isClearScreen = !this.roomBaseServer.state.isClearScreen;
+        }
+      },
       transposition() {
         if (this.isPortraitLive) {
           this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
