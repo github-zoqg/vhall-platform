@@ -1,6 +1,6 @@
 <template>
   <span class="icon-wrap-chat_set">
-    <span @click="openSet">
+    <span @click="openSet" v-show="showfliterIcon">
       <i class="vh-iconfont vh-line-audit"></i>
     </span>
     <van-popup
@@ -56,6 +56,11 @@
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
   export default {
     name: 'QuestionnaireIcon',
+    props: {
+      refName: {
+        type: String
+      }
+    },
     data() {
       return {
         noticeNum: 0,
@@ -75,6 +80,10 @@
       noticeLatestInfo() {
         // 最新公告信息
         return this.roomBaseServer.state.noticeInfo;
+      },
+      // 是否展示聊天过滤icon
+      showfliterIcon() {
+        return !['chatWapQA', 'chatWapPrivate'].includes(this.refName);
       }
     },
     watch: {},
