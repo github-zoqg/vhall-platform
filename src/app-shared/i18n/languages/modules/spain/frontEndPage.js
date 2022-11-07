@@ -580,7 +580,9 @@ export default {
     interact_tools_1094: '',
     interact_tools_1095: '',
     interact_tools_1096: '',
-    interact_tools_1097: ''
+    interact_tools_1097: '',
+    interact_tools_1098: '',
+    interact_tools_1099: ''
   },
   setting: {
     setting_1002: '',
@@ -966,6 +968,7 @@ export default {
     privacy_1003: '',
     privacy_1004: '',
     privacy_1005: '',
-    privacy_1006: ''
+    privacy_1006: '',
+    privacy_1007: ''
   }
 };

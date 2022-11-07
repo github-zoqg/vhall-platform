@@ -167,8 +167,8 @@ export default {
     nav_1052: 'Copy failed',
     nav_1053: 'Sponsor',
     nav_1054: 'Audience simulated viewing address during rehearsal',
-    nav_1055: '',
-    nav_1056: '',
+    nav_1055: 'in rehearsal',
+    nav_1056: 'Has been off the shelves',
     nav_1057: 'barrage open',
     nav_1058: 'barrage close'
   },
@@ -228,7 +228,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: '',
+    login_1056: ' Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -573,7 +573,9 @@ export default {
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
     interact_tools_1096: 'Phone Number',
-    interact_tools_1097: 'Adress'
+    interact_tools_1097: 'Adress',
+    interact_tools_1098: 'bonus',
+    interact_tools_1099: 'clock'
   },
   setting: {
     setting_1002: 'View settings',
@@ -956,6 +958,7 @@ export default {
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
     privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
-    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"'
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
+    privacy_1007: 'Please check the agreement first'
   }
 };
