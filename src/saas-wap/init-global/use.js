@@ -103,6 +103,8 @@ import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // ------------------------------ 快问快答-引入组件------start----------
 import VmpExamRankWap from '@/packages/exam-rank-wap';
 import VmpExamCollectWap from '@/packages/exam-collect-wap';
+import VmpExamPreviewWap from '@/packages/exam-preview-wap';
+import VmpExamAnswerWap from '@/packages/exam-answer-wap';
 // ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 Vue.use(VmpContainer);
@@ -163,4 +165,6 @@ Vue.use(VmpWapMenuDialog);
 // ------------------------------ 快问快答------start----------
 Vue.use(VmpExamRankWap);
 Vue.use(VmpExamCollectWap);
+Vue.use(VmpExamPreviewWap);
+Vue.use(VmpExamAnswerWap);
 // ------------------------------【极简风格】注册组件------end----------

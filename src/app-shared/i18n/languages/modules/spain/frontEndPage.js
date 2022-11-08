@@ -45,7 +45,8 @@ export default {
     common_1032: 'Número de espectadores',
     common_1033: '我知道了',
     common_1034: '',
-    common_1035: ''
+    common_1035: '',
+    common_1036: ''
   },
   player: {
     player_1001: 'Grado de calor',
@@ -98,7 +99,7 @@ export default {
     appointment_1017: 'Reservar en seguida',
     appointment_1018: 'han sido reservadas {n} personas',
     appointment_1019: 'Está vacío aquí',
-    appointment_1020: 'Verificación de permisos',
+    appointment_1020: 'Watch verification',
     appointment_1021: 'Error de contraseña',
     appointment_1022: 'Por favor, ingrese la contraseña',
     appointment_1023: 'Paga {n} para ver',
@@ -112,7 +113,7 @@ export default {
     appointment_1031: 'Por favor sea paciente',
     appointment_1032: 'Lista blanca',
     appointment_1033: 'The rehearsal has started, please watch it live',
-    appointment_1034: 'Submit and receive SMS'
+    appointment_1034: ''
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -169,7 +170,10 @@ export default {
     nav_1052: '',
     nav_1053: '',
     nav_1054: 'Share the rehearsal viewing address',
-    nav_1055: ''
+    nav_1055: '',
+    nav_1056: 'Has been off the shelves',
+    nav_1057: '',
+    nav_1058: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',
@@ -362,7 +366,8 @@ export default {
     chat_1095: '',
     chat_1096: '',
     chat_1097: '',
-    chat_1098: 'Hace clic para ver los detalles'
+    chat_1098: 'Hace clic para ver los detalles',
+    chat_1099: ''
   },
   form: {
     form_1001: 'Nombre',
@@ -575,7 +580,9 @@ export default {
     interact_tools_1094: '',
     interact_tools_1095: '',
     interact_tools_1096: '',
-    interact_tools_1097: ''
+    interact_tools_1097: '',
+    interact_tools_1098: '',
+    interact_tools_1099: ''
   },
   setting: {
     setting_1002: '',
@@ -609,7 +616,8 @@ export default {
     setting_1029: 'Ayuda y apoyo',
     setting_1030: '',
     setting_1031: '',
-    setting_1032: ''
+    setting_1032: '',
+    setting_1033: ''
   },
   message: {
     message_1001:
@@ -835,7 +843,8 @@ export default {
     interact_1038: '',
     interact_1039: '',
     interact_1040: '',
-    interact_1041: ''
+    interact_1041: '',
+    interact_1042: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',
@@ -950,7 +959,8 @@ export default {
     other_1017: '',
     other_1018: '',
     other_1019: '',
-    other_1020: ''
+    other_1020: '',
+    other_1021: ''
   },
   privacy: {
     privacy_1001: '',
@@ -958,6 +968,53 @@ export default {
     privacy_1003: '',
     privacy_1004: '',
     privacy_1005: '',
-    privacy_1006: ''
+    privacy_1006: '',
+    privacy_1007: ''
+  },
+  exam: {
+    exam_1001: '',
+    exam_1002: '',
+    exam_1003: '',
+    exam_1004: '',
+    exam_1005: '',
+    exam_1006: 'UTE',
+    exam_1007: '',
+    exam_1008: '',
+    exam_1009: '',
+    exam_1010: '',
+    exam_1011: '',
+    exam_1012: '',
+    exam_1013: '',
+    exam_1014: '',
+    exam_1015: '',
+    exam_1016: '',
+    exam_1017: '',
+    exam_1018: '',
+    exam_1019: '',
+    exam_1020: '',
+    exam_1021: '',
+    exam_1022: '',
+    exam_1023: '',
+    exam_1024: '',
+    exam_1025: '',
+    exam_1026: '',
+    exam_1027: '',
+    exam_1028: '',
+    exam_1029: '',
+    exam_1030: '',
+    exam_1031: '',
+    exam_1032: '',
+    exam_1033: '',
+    exam_1034: '',
+    exam_1035: '',
+    exam_1036: '',
+    exam_1037: '',
+    exam_1038: '显示具体数字即可',
+    exam_1039: '',
+    exam_1040: '',
+    exam_1041: '',
+    exam_1042: '',
+    exam_1043: '',
+    exam_1044: ''
   }
 };

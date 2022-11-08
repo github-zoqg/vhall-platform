@@ -43,7 +43,8 @@ export default {
     common_1032: 'The number',
     common_1033: 'I got it',
     common_1034: 'Saved successfully',
-    common_1035: ''
+    common_1035: '',
+    common_1036: 'Vertical screen'
   },
   player: {
     player_1001: 'Heat',
@@ -95,7 +96,7 @@ export default {
     appointment_1017: 'Reserve Now',
     appointment_1018: '{n} Reserved',
     appointment_1019: "Nothing's here",
-    appointment_1020: 'Watch verification',
+    appointment_1020: 'Permission validation',
     appointment_1021: 'Wrong password',
     appointment_1022: 'Please enter the password',
     appointment_1023: 'Pay {n}',
@@ -167,7 +168,9 @@ export default {
     nav_1053: 'Sponsor',
     nav_1054: 'Audience simulated viewing address during rehearsal',
     nav_1055: 'in rehearsal',
-    nav_1056: 'Has been off the shelves'
+    nav_1056: 'Has been off the shelves',
+    nav_1057: 'barrage open',
+    nav_1058: 'barrage close'
   },
   login: {
     login_1001: 'Account login',
@@ -214,7 +217,7 @@ export default {
     login_1042: '',
     login_1043: '',
     login_1044: 'Please enter phone number',
-    login_1045: 'verification code',
+    login_1045: 'Verification code',
     login_1046: '',
     login_1047: '',
     login_1048: '',
@@ -225,7 +228,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: 'Please enter a valid phone number',
+    login_1056: ' Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -569,8 +572,10 @@ export default {
     interact_tools_1093: 'This round of prize "{n}"',
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
-    interact_tools_1096: 'Phone',
-    interact_tools_1097: 'Address'
+    interact_tools_1096: 'Phone Number',
+    interact_tools_1097: 'Address',
+    interact_tools_1098: 'bonus',
+    interact_tools_1099: 'clock'
   },
   setting: {
     setting_1002: 'View settings',
@@ -603,7 +608,8 @@ export default {
     setting_1029: 'Help and support',
     setting_1030: 'Setting',
     setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving',
-    setting_1032: 'Setting'
+    setting_1032: 'Setting',
+    setting_1033: 'NO Equipment'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',
@@ -826,7 +832,8 @@ export default {
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
-    interact_1041: 'Apply for video interaction'
+    interact_1041: 'Apply for video interaction',
+    interact_1042: 'Check equipment'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -943,7 +950,7 @@ export default {
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
     other_1021:
-      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
@@ -953,5 +960,51 @@ export default {
     privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
     privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
     privacy_1007: 'Please check the agreement first'
+  },
+  exam: {
+    exam_1001: 'Sent a answer',
+    exam_1002: 'Start it',
+    exam_1003: 'Publish',
+    exam_1004: 'Score ranking',
+    exam_1005: 'Count down',
+    exam_1006: 'Unlimited',
+    exam_1007: 'Answering',
+    exam_1008: 'Great! Your answer is exactly right!',
+    exam_1009: 'Unfortunately,your answer is wrong,keep trying!',
+    exam_1010: 'Unfortunately,you have missed the opportunity!',
+    exam_1011: 'Click for details',
+    exam_1012: 'Viewing',
+    exam_1013: 'score',
+    exam_1014: 'Right answer',
+    exam_1015: 'Your answer',
+    exam_1016: 'Correct',
+    exam_1017: 'Error',
+    exam_1018: 'Unanswered',
+    exam_1019: 'Last',
+    exam_1020: 'Next',
+    exam_1021: 'The results are being counted,please wait',
+    exam_1022: 'Answer list',
+    exam_1023: 'Push time',
+    exam_1024: 'Time limit',
+    exam_1025: 'Total score',
+    exam_1026: 'Number',
+    exam_1027: 'Start it',
+    exam_1028: 'Closed',
+    exam_1029: 'Correct',
+    exam_1030: 'Error',
+    exam_1031: 'Unanswered',
+    exam_1032: 'End of Answer,check the details',
+    exam_1033: 'Full list',
+    exam_1034: 'User',
+    exam_1035: 'Accuracy',
+    exam_1036: 'Time',
+    exam_1037: 'My ranking',
+    exam_1038: '',
+    exam_1039: 'Data is loading',
+    exam_1040: 'End of Answer',
+    exam_1041: 'Finished the answer',
+    exam_1042: 'Full score',
+    exam_1043: '',
+    exam_1044: 'employee ID'
   }
 };
