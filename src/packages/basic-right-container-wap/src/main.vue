@@ -134,12 +134,17 @@
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
         );
       },
-      checkExamIcon(examId) {
-        console.log(examId);
-        debugger;
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickExamIcon', [examId])
-        );
+      checkExamIcon(vo) {
+        console.log(vo);
+        if (vo?.type == 'score') {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamIconToScore', [vo.examId])
+          );
+        } else if (vo?.type == 'answer') {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamIconToAnswer', [vo.examId])
+          );
+        }
       }
     }
   };

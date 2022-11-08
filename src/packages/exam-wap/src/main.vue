@@ -31,9 +31,9 @@
         this.examVisible = false;
       },
       async open(examId) {
-        debugger;
         this.examVisible = true;
         this.examId = examId;
+        // 判断当前是否首次答题，若是跳转首次答题区间；若不是，进入答题区间
       }
     },
     beforeCreate() {}
