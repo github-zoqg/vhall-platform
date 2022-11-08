@@ -74,7 +74,6 @@
     data() {
       return {
         dotVisible: false,
-        showExamList: false, // 是否展示快问快答列表
         examListDialogVisible: false,
         finished: true,
         examList: [],
@@ -99,7 +98,6 @@
     },
     methods: {
       async clickExamIcon() {
-        if (this.showExamList) return false;
         await this.getExamList();
         // 获取未作答集合
         let arr = this.examList.filter(item => {
@@ -125,7 +123,6 @@
             this.examListDialogVisible = false;
           }
         } else {
-          this.showExamList = true;
           this.examListDialogVisible = true;
         }
       },
@@ -256,7 +253,6 @@
       },
       // 关闭问卷面板
       closeExamList() {
-        this.showExamList = false;
         this.examListDialogVisible = false;
       },
       initExamEvents() {
