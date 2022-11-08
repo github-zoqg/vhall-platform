@@ -12,10 +12,6 @@
     >
       <div class="vmp-exam-list_container">
         <div class="container-title">
-          <span class="container-title-text">
-            <span class="title_text">快问快答列表</span>
-            <i class="container-title-text-line"></i>
-          </span>
           <i class="vh-iconfont vh-line-close" @click="closeExamListDialog"></i>
         </div>
         <van-list
@@ -24,7 +20,7 @@
           :immediate-check="false"
           offset="30"
           :finished="finished"
-          finished-text="没有更多了"
+          finished-text=""
         >
           <ul v-show="examList && examList.length > 0">
             <li
@@ -33,34 +29,46 @@
               class="container-data__item"
               @click="checkExamInfo(item)"
             >
-              <div class="container-data__left">
-                <div class="container-data__left__item">{{ item.title }}</div>
-                <div class="container-data__left__item">
-                  <label>推送时间：</label>
+              <div class="container-data__title">{{ item.title }}</div>
+              <div class="container-data__info">
+                <div>
+                  <label>{{ $t('exam.exam_1025') }}:</label>
+                  <span class="color-red">{{ item.score }}</span>
+                </div>
+                <div>
+                  <label>{{ $t('exam.exam_1026') }}:</label>
+                  <span>{{ item.question_num }}</span>
+                </div>
+                <div>
+                  <label>{{ $t('exam.exam_1023') }}:</label>
                   <span>{{ item.push_time_str }}</span>
                 </div>
-                <div class="container-data__left__item">
-                  <div>
-                    <label>答题限时：</label>
-                    <span>{{ item.limit_time_switch == 1 ? item.limit_time : '不限时' }}</span>
-                  </div>
-                  <div>
-                    <label>总分：</label>
-                    <span>{{ item.score }}</span>
-                  </div>
-                  <div>
-                    <label>题数：</label>
-                    <span>{{ item.question_num }}</span>
-                  </div>
+                <div>
+                  <label>{{ $t('exam.exam_1024') }}:</label>
+                  <span>
+                    {{ item.limit_time_switch == 1 ? item.limit_time_str : $t('exam.exam_1006') }}
+                  </span>
                 </div>
               </div>
-              <div class="container-data__right">
-                <img src="./images/end.png" class="button_img" v-if="item && item.is_end" alt="" />
-                <div class="button_text" v-else-if="item && item.total_score == item.score">
-                  满分
+              <template v-if="item && item.is_end">
+                <div
+                  class="container-data__position button_text gray"
+                  v-text="$t('exam.exam_1028')"
+                ></div>
+              </template>
+              <template v-else-if="item && item.total_score > 0">
+                <div
+                  class="container-data__position button_text"
+                  v-text="item.total_score == item.score ? $t('exam.exam_1042') : item.total_score"
+                ></div>
+              </template>
+              <template v-else>
+                <div class="container-data__position button_answer">
+                  <van-button type="danger" size="mini" round>
+                    {{ $t('exam.exam_1027') }}
+                  </van-button>
                 </div>
-                <button class="button_answer" v-else>去答题</button>
-              </div>
+              </template>
             </li>
           </ul>
         </van-list>
@@ -148,7 +156,8 @@
             list: [
               {
                 paper_id: 1,
-                title: 'Apple产品功能知识点①',
+                title:
+                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点①',
                 push_time: '2022-11-07 20:10',
                 score: 100, // 试卷总分
                 question_num: 10, // 题目数量
@@ -197,6 +206,19 @@
                 right_rate: '', // 正确率
                 status: 0, // 是否作答 0.否 1.是
                 is_end: true
+              },
+              {
+                paper_id: 5,
+                title: 'Apple产品功能知识点①',
+                push_time: '2022-11-07 20:10',
+                score: 100, // 试卷总分
+                question_num: 10, // 题目数量
+                limit_time: 5, // 限制时间
+                limit_time_switch: 1, // 限制时间开关 0.否 1.是
+                total_score: '60', // 总得分
+                right_rate: '60', // 正确率
+                status: 1, // 是否作答 0.否 1.是
+                is_end: false
               }
             ]
           }
@@ -208,10 +230,18 @@
       renderListResult(resResult) {
         resResult.list.map(item => {
           item.push_time_str = dayjs(item.push_time).format('HH:mm');
+          item.limit_time_str =
+            item.limit_time_switch == 1 ? this.formatStrByMinute(item.limit_time) : '';
         });
         this.examList = resResult.list;
         this.total = resResult.total;
         this.examNum = resResult.total;
+      },
+      // 格式化日期
+      formatStrByMinute(str) {
+        let hour = Math.floor(str / 60);
+        let minute = str - hour * 60;
+        return `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}`;
       },
       // 关闭 快问快答 - 列表弹出框
       closeExamListDialog() {
@@ -299,47 +329,25 @@
       z-index: 30;
     }
     .exam_base {
-      max-height: 680px;
-      background: transparent;
-      background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
-      border-radius: 30px 30px 0 0;
+      width: 100%;
+      left: 0px;
+      bottom: 0;
+      background: url('./images/gradient_bg.png') repeat-x;
+      background-size: cover;
+      box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
+      border-radius: 40px 40px 0px 0px;
     }
     .vmp-exam-list_container {
       max-height: 680px;
       overflow: auto;
       .container-title {
-        height: 142px;
-        background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+        height: 100px;
         text-align: center;
         position: relative;
-        .container-title-text {
-          position: relative;
-          top: 47px;
-          z-index: 2;
-          .title_text {
-            font-weight: 600;
-            text-shadow: 0 0.05333rem 0 #fff;
-            font-size: 40px;
-            line-height: 56px;
-          }
-        }
-        .container-title-text-line {
-          display: inline-block;
-          width: 100%;
-          height: 18px;
-          position: absolute;
-          bottom: 0px;
-          left: 49%;
-          transform: translate(-51%);
-          background: rgba(255, 171, 166, 0.6);
-          border-radius: 36px;
-          content: '';
-          z-index: -1;
-        }
       }
       .container-data {
         max-height: calc(680px - 210px);
-        padding: 0 40px;
+        padding: 0 32px;
         margin-bottom: 68px;
         position: relative;
         overflow: auto;
@@ -356,57 +364,67 @@
                 padding-bottom: 0;
               }
             }
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 0;
-            border-bottom: 1px solid #e6e6e6;
-            &:first-child {
-              padding: 0 0 24px 0;
+            padding: 32px 32px;
+            background: #ffffff;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            .container-data__title {
+              width: 471px;
+              overflow: hidden;
+              word-break: break-all;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              font-weight: bold;
+              margin-top: 0;
+              font-size: 28px;
+              line-height: 40px;
+              color: #262626;
+              margin-bottom: 16px;
             }
-            .container-data__left {
-              &__item {
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
-                margin-top: 4px;
-                &:first-child {
-                  font-weight: bold;
-                  margin-top: 0;
-                }
-                span {
-                  padding: 0 12px 0 0;
-                }
+            .container-data__info {
+              display: flex;
+              justify-content: flex-start;
+              align-items: center;
+              span,
+              label {
+                font-style: normal;
+                font-weight: 400;
+                font-size: 20px;
+                line-height: 28px;
+                color: #595959;
+              }
+              span {
+                padding: 0 8px 0 0;
               }
             }
-            .container-data__right {
-              .button_img {
-                width: 136px;
-                height: 136px;
-              }
-              .button_text {
-                color: #fb2626;
-                font-size: 34px;
-                font-style: italic;
-                font-weight: 500;
-                text-align: center;
-                width: 136px;
-              }
-              .button_answer {
-                display: inline-block;
-                padding: 9px 24px;
-                min-width: 96px;
-                height: 52px;
-                line-height: 32px;
-                border: 1px solid #fb2626;
-                background-color: #fb2626 !important;
-                border-radius: 32px;
-                color: #ffffff;
+            .container-data__position {
+              position: absolute;
+              top: 0;
+              right: 0;
+              &.button_text {
+                padding: 2px 12px;
+                gap: 10px;
+                min-width: 72px;
+                height: 38px;
+                background: linear-gradient(92.5deg, #ff6725 2.09%, #ffae34 98.46%);
+                border-radius: 0px 16px;
                 font-style: normal;
                 font-weight: 400;
                 font-size: 24px;
+                line-height: 34px;
+                color: #ffffff;
                 text-align: center;
-                background: transparent;
+                &.gray {
+                  background: linear-gradient(91.24deg, #dadada 1.06%, #ededed 99.05%);
+                  border-radius: 0px 16px;
+                  color: #595959;
+                }
+              }
+              &.button_answer {
+                top: calc((100% - 56px) / 2);
+                right: 32px;
               }
             }
           }
