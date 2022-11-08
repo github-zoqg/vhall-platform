@@ -1,4 +1,4 @@
-import VmpExamAnswerWap from './src/main.vue';
+import VmpExamAnswerWap from './src/main';
 
 VmpExamAnswerWap.install = function (Vue) {
   Vue.component(VmpExamAnswerWap.name, VmpExamAnswerWap);

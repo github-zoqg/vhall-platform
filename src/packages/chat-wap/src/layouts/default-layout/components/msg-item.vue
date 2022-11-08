@@ -69,6 +69,26 @@
         </div>
       </div>
     </template>
+    <!--
+      收到快问快答 paper_send
+      公布-快问快答-成绩 paper_send_rank
+      快问快答-收卷 paper_end
+      快问快答-自动收卷 paper_auto_end
+      快问快答-自动公布成绩 paper_auto_send_rank
+    -->
+    <template
+      v-else-if="
+        [
+          'paper_send',
+          'paper_send_rank',
+          'paper_end',
+          'paper_auto_end',
+          'paper_auto_send_rank'
+        ].includes(source.type)
+      "
+    >
+      <exam-msg-item :source="source" @checkExamDetail="checkExamDetail"></exam-msg-item>
+    </template>
     <!-- 打赏 -->
     <!-- <template v-else-if="source.type == 'reward_pay_ok'">
       <div class="msg-item new-gift reward_pay_ok">
@@ -335,6 +355,7 @@
 <script>
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
+  import ExamMsgItem from './exam-msg-item.vue';
   export default {
     props: {
       source: {
@@ -354,6 +375,10 @@
         type: Function,
         default: function () {}
       },
+      emitExamEvent: {
+        type: Function,
+        default: function () {}
+      },
       //当前登录人的信息
       joinInfo: {
         type: Object,
@@ -361,6 +386,9 @@
           return {};
         }
       }
+    },
+    components: {
+      ExamMsgItem
     },
     data() {
       return {
@@ -439,6 +467,10 @@
       // 点击查看问卷
       checkQuestionDetail(questionnaire_id) {
         this.emitQuestionnaireEvent(questionnaire_id);
+      },
+      // 点击查看问答相关
+      checkExamDetail(vo) {
+        this.emitExamEvent(vo);
       },
       //处理@消息
       handleAt() {
@@ -742,13 +774,10 @@
         justify-content: center;
       }
       &.new-gift,
-      &.interact {
+      &.interact,
+      &.exam_msg_flex {
         margin: 0 auto;
         width: fit-content;
-        > div {
-          background: var(--theme-chat-msg-interact-bg);
-          border-radius: 40px;
-        }
         .role {
           float: left;
           border-radius: 50px;
@@ -769,6 +798,13 @@
             color: rgba(10, 127, 245, 1);
             background-color: rgba(10, 127, 245, 0.15);
           }
+        }
+      }
+      &.new-gift,
+      &.interact {
+        > div {
+          background: var(--theme-chat-msg-interact-bg);
+          border-radius: 40px;
         }
       }
       .interact-msg {
@@ -819,7 +855,19 @@
           left: 24px;
         }
       }
+      &.exam_msg_flex {
+        display: block;
+        text-align: center;
+        background: var(--theme-chat-msg-interact-bg);
+        border-radius: 40px;
+      }
       .question_msg_bg {
+        &::after {
+          border: 0 !important;
+        }
+      }
+      div.exam_msg_bg {
+        border-radius: 0 !important;
         &::after {
           border: 0 !important;
         }
@@ -912,4 +960,3 @@
     }
   }
 </style>
-width: 40px;

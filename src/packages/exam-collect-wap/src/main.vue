@@ -17,7 +17,7 @@
     data() {
       return {
         examCollectVisible: false, // 快问快答 - 用户信息收集
-        examItem: null
+        examId: null
       };
     },
     computed: {
@@ -31,9 +31,9 @@
         this.examCollectVisible = false;
         this.$emit('close');
       },
-      async open(item) {
+      async open(examId) {
         this.examCollectVisible = true;
-        this.examItem = item;
+        this.examId = examId;
       }
     },
     beforeCreate() {}

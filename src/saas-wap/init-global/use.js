@@ -101,10 +101,12 @@ import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effec
 import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // ------------------------------【极简风格】引入组件------end----------
 // ------------------------------ 快问快答-引入组件------start----------
-import VmpExamRankWap from '@/packages/exam-rank-wap';
-import VmpExamCollectWap from '@/packages/exam-collect-wap';
-import VmpExamPreviewWap from '@/packages/exam-preview-wap';
-import VmpExamAnswerWap from '@/packages/exam-answer-wap';
+import VmpExamWap from '@/packages/exam-wap'; // 快问快答-入口
+import VmpExamRankWap from '@/packages/exam-rank-wap'; // 排行榜
+import VmpExamCollectWap from '@/packages/exam-collect-wap'; // 用户收集
+import VmpExamPreviewWap from '@/packages/exam-preview-wap'; // 预览答题
+import VmpExamAnswerWap from '@/packages/exam-answer-wap'; // 答题
+import VmpExamScoreWap from '@/packages/exam-score-wap'; // 成绩
 // ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 Vue.use(VmpContainer);
@@ -163,8 +165,10 @@ Vue.use(VmpConciseWapRewardEffect);
 Vue.use(VmpWapMenuDialog);
 // ------------------------------【极简风格】注册组件------end----------
 // ------------------------------ 快问快答------start----------
+Vue.use(VmpExamWap);
 Vue.use(VmpExamRankWap);
 Vue.use(VmpExamCollectWap);
 Vue.use(VmpExamPreviewWap);
 Vue.use(VmpExamAnswerWap);
+Vue.use(VmpExamScoreWap);
 // ------------------------------【极简风格】注册组件------end----------

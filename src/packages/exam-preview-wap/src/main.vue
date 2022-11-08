@@ -17,7 +17,7 @@
     data() {
       return {
         examPreviewVisible: false, // 快问快答 - 答题
-        examItem: null
+        examId: null
       };
     },
     computed: {
@@ -30,9 +30,9 @@
       closeDialog() {
         this.examPreviewVisible = false;
       },
-      async open(item) {
+      async open(examId) {
         this.examPreviewVisible = true;
-        this.examItem = item;
+        this.examId = examId;
       }
     },
     beforeCreate() {}

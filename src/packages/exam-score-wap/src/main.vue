@@ -1,22 +1,22 @@
 <template>
-  <!-- 快问快答-答题-->
+  <!-- 快问快答-成绩结果 -->
   <van-popup
     get-container="#otherPopupContainer"
-    class="vmp-exam-answer-wap"
-    v-model="examAnswerVisible"
+    class="vmp-exam-score-wap"
+    v-model="examScoreVisible"
     position="bottom"
     @close="closeDialog"
-    v-if="examAnswerVisible"
+    v-if="examScoreVisible"
   >
-    <div class="vmp-exam-answer-wap__panel">答题</div>
+    <div class="vmp-exam-score-wap__panel">成绩结果</div>
   </van-popup>
 </template>
 <script>
   export default {
-    name: 'VmpExamAnswerWap',
+    name: 'VmpExamScoreWap',
     data() {
       return {
-        examAnswerVisible: false, // 快问快答 - 答题
+        examScoreVisible: false, // 快问快答 - 成绩结果
         examId: null
       };
     },
@@ -26,12 +26,12 @@
       }
     },
     methods: {
-      // 关闭 快问快答 - 答题
+      // 关闭 快问快打 - 排行榜手机弹出框
       closeDialog() {
-        this.examAnswerVisible = false;
+        this.examScoreVisible = false;
       },
       async open(examId) {
-        this.examAnswerVisible = true;
+        this.examScoreVisible = true;
         this.examId = examId;
       }
     },
@@ -39,7 +39,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-exam-answer-wap {
+  .vmp-exam-score-wap {
     height: 844px;
     background: transparent;
     background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
