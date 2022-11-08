@@ -75,7 +75,7 @@
         <div class="interact-gift-box">
           <span class="new-gift-name">{{ source.nickname | overHidden(8) }}&nbsp;</span>
           <span class="new-gift-content">
-            {{ $t('chat.chat_1061') }} {{ source.content.gift_name | overHidden(10) }}
+            {{ $t('chat.chat_1061') }} {{ $tdefault(source.content.gift_name) | overHidden(10) }}
           </span>
           <div
             v-if="source.content.source_status == 1"
