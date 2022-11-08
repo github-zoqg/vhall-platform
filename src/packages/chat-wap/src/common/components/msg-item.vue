@@ -69,6 +69,26 @@
         </div>
       </div>
     </template>
+    <!-- 收到快问快答 -->
+    <template v-else-if="source.type == 'paper_send'">
+      <div class="msg-item interact exam_msg_flex">
+        <div
+          class="interact-msg exam_msg_bg"
+          @tap="checkQuestionDetail(source.content.exam_id)"
+          @click="checkQuestionDetail(source.content.exam_id)"
+        >
+          {{ overHidden(source.nickname, 8) }}
+          <span class="role" :class="source.roleName | roleClassFilter">
+            <span>{{ source.roleName | roleFilter }}</span>
+          </span>
+          {{ source.content.text_content }}
+          <span class="highlight">{{ $t('chat.chat_1093') }}</span>
+        </div>
+        <div class="interact-msg exam_msg_bg">
+          <span class="highlight">{{ source.content.exam_title }}</span>
+        </div>
+      </div>
+    </template>
     <!-- 打赏 -->
     <!-- <template v-else-if="source.type == 'reward_pay_ok'">
       <div class="msg-item new-gift reward_pay_ok">
@@ -821,6 +841,18 @@
           width: 60px;
           position: absolute;
           left: 24px;
+        }
+      }
+      &.exam_msg_flex {
+        display: block;
+        text-align: center;
+        > div {
+          border-radius: none;
+        }
+        .exam_msg_bg {
+          &::after {
+            border: 0 !important;
+          }
         }
       }
       .question_msg_bg {

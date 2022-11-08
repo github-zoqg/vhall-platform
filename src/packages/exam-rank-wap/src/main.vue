@@ -17,7 +17,7 @@
     data() {
       return {
         examRankVisible: false, // 快问快答 - 排行榜
-        examItem: null
+        examId: null
       };
     },
     computed: {
@@ -30,9 +30,9 @@
       closeDialog() {
         this.examRankVisible = false;
       },
-      async open(item) {
+      async open(examId) {
         this.examRankVisible = true;
-        this.examItem = item;
+        this.examId = examId;
       }
     },
     beforeCreate() {}

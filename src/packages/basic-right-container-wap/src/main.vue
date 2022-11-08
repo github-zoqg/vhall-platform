@@ -136,6 +136,7 @@
       },
       checkExamIcon(examId) {
         console.log(examId);
+        debugger;
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickExamIcon', [examId])
         );

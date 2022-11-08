@@ -1,22 +1,22 @@
 <template>
-  <!-- 快问快答-答题-->
+  <!-- 快问快答-入口 -->
   <van-popup
     get-container="#otherPopupContainer"
-    class="vmp-exam-answer-wap"
-    v-model="examAnswerVisible"
+    class="vmp-exam-wap"
+    v-model="examVisible"
     position="bottom"
     @close="closeDialog"
-    v-if="examAnswerVisible"
+    v-if="examVisible"
   >
-    <div class="vmp-exam-answer-wap__panel">答题</div>
+    <div class="vmp-exam-wap__panel">入口</div>
   </van-popup>
 </template>
 <script>
   export default {
-    name: 'VmpExamAnswerWap',
+    name: 'VmpExamWap',
     data() {
       return {
-        examAnswerVisible: false, // 快问快答 - 答题
+        examVisible: false, // 快问快答-入口
         examId: null
       };
     },
@@ -26,12 +26,13 @@
       }
     },
     methods: {
-      // 关闭 快问快答 - 答题
+      // 关闭 快问快答-入口
       closeDialog() {
-        this.examAnswerVisible = false;
+        this.examVisible = false;
       },
       async open(examId) {
-        this.examAnswerVisible = true;
+        debugger;
+        this.examVisible = true;
         this.examId = examId;
       }
     },
@@ -39,7 +40,7 @@
   };
 </script>
 <style lang="less" scoped>
-  .vmp-exam-answer-wap {
+  .vmp-exam-wap {
     height: 844px;
     background: transparent;
     background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);

@@ -70,6 +70,8 @@
     <vmp-exam-collect-wap ref="examCollectDom" @close="closeExamCollect"></vmp-exam-collect-wap>
     <!-- 快问快答-排行榜 -->
     <vmp-exam-rank-wap ref="examRankWapDom"></vmp-exam-rank-wap>
+    <!-- 快问快答-答题 -->
+    <vmp-exam-answer-wap ref="examAnswerWapDom"></vmp-exam-answer-wap>
   </div>
 </template>
 <script>
@@ -98,13 +100,37 @@
       },
       // 是否首次答题
       isFirstAnswer() {
-        return true;
+        return false;
       }
     },
     methods: {
-      clickExamIcon() {
+      async clickExamIcon() {
         if (this.showExamList) return false;
-        this.getExamList();
+        await this.getExamList();
+        // 获取未作答集合
+        let arr = this.examList.filter(item => {
+          if (item.limit_time_switch == 1) {
+            // 未作答 且  答题未超时（开启了限时答题）
+            return item.status == 0 && item.is_end == 0;
+          } else {
+            // 未作答（未开启限时答题）
+            return item.status == 0;
+          }
+        });
+        // 如果只有一份，直接进入到当前答题
+        if (arr.length == 1) {
+          this.openExamAnswer(arr[0]);
+        } else if (this.examList && this.examList.length == 1) {
+          let item = this.examList[0];
+          if (item.status == 1) {
+            // 已作答，已答题，直接查看个人成绩
+          } else if (item.limit_time_switch == 1 && item.is_end == 1) {
+            // 限时答题 & 已超时 & 未作答，toast提示 “很遗憾，您已错过本次答题机会！”
+            this.$toast(this.$t('exam.exam_1010'));
+          }
+        } else {
+          this.showQuestionList = true;
+        }
       },
       moreLoadData() {
         if (this.pageInfo.pageNum >= this.totalPages) {
@@ -214,6 +240,8 @@
             this.$refs.examCollectDom && this.$refs.examCollectDom.open(item);
           } else {
             // 进入答题流程
+            this.examListDialogVisible = false;
+            this.$refs.examAnswerWapDom && this.$refs.examAnswerWapDom.open(item);
           }
         }
       },
@@ -223,9 +251,18 @@
           this.examListDialogVisible = true;
         }
       },
+      // 只剩一份的时候，直接作答
+      openExamAnswer(item) {
+        // 进入答题流程
+        this.examListDialogVisible = false;
+        this.$refs.examAnswerWapDom && this.$refs.examAnswerWapDom.open(item.paper_id);
+      },
       initExamEvents() {
         // 事件监听
       }
+    },
+    created() {
+      // 第一步：检查快问快答 - 图标状态
     },
     mounted() {
       this.initExamEvents();

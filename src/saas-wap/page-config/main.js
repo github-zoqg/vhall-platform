@@ -185,6 +185,16 @@ export default {
         args: ['$0']
       }
     ],
+    emitClickExamRankChatItem: {
+      cuid: ['comExamRankWap'],
+      method: 'open',
+      args: ['$0']
+    },
+    emitClickExamChatItem: {
+      cuid: ['comExamWap'],
+      method: 'open',
+      args: ['$0']
+    },
     children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
     options: {}
   },
@@ -266,7 +276,11 @@ export default {
       'comWatchTimer',
       'comLotteryWap',
       'comRedPacketCommandWap',
-      'comQuestionnaireWap'
+      'comQuestionnaireWap',
+      'comExamWap',
+      'comExamRankWap',
+      'comExamAnswerWap',
+      'comExamScoreWap'
     ], //支付问题暂时屏蔽红包，口令红包替代
     // 打开计时器
     emitOpenTimer: {
@@ -296,6 +310,12 @@ export default {
     // 问卷弹窗
     emitClickQuestionnaireIcon: {
       cuid: ['comQuestionnaireWap'],
+      method: 'open',
+      args: ['$0']
+    },
+    // 快问快答弹窗
+    emitClickExamIcon: {
+      cuid: ['comExamWap'],
       method: 'open',
       args: ['$0']
     }
@@ -449,5 +469,25 @@ export default {
         method: 'open'
       }
     ]
+  },
+  // 快问快答 - 排行榜
+  comExamRankWap: {
+    component: 'VmpExamRankWap'
+  },
+  // 快问快答 - 问答
+  comExamAnswerWap: {
+    component: 'VmpExamAnswerWap'
+  },
+  // 快问快答 - 用户收集
+  comExamCollectWap: {
+    component: 'VmpExamCollectWap'
+  },
+  // 快问快答 - 成绩
+  comExamScoreWap: {
+    component: 'VmpExamScoreWap'
+  },
+  // 快问快答 - 入口
+  comExamWap: {
+    component: 'VmpExamWap'
   }
 };
