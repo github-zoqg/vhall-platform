@@ -259,6 +259,7 @@
   }
   .goods-van-popup {
     height: 1114px;
+    max-height: 80%;
     .vh-goods-wrapper {
       overflow: hidden;
       .vh-goods_list {

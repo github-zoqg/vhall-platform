@@ -573,7 +573,7 @@ export default {
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
     interact_tools_1096: 'Phone Number',
-    interact_tools_1097: 'Adress',
+    interact_tools_1097: 'Address',
     interact_tools_1098: 'bonus',
     interact_tools_1099: 'clock'
   },

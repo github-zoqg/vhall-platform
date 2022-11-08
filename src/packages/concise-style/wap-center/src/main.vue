@@ -45,10 +45,12 @@
     </div>
 
     <!-- 音频直播 -->
-    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying">
+    <div
+      class="vmp-wap-player-audie"
+      v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying && isWapBodyDocSwitchFullScreen"
+    >
       <p>{{ $t('player.player_1014') }}</p>
     </div>
-
     <div
       key="vmp-concise-center-wap__doc-container"
       class="vmp-concise-center-wap__doc-container"
@@ -59,6 +61,16 @@
           isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
       }"
       v-drag="{ close: !switchDrag }"
+      :style="{
+        'z-index':
+          isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
+            ? -1
+            : isDocStickTop
+            ? qaZIndex
+            : switchDrag
+            ? 302
+            : 'auto'
+      }"
     >
       <!-- doc组件-->
       <vmp-air-container :cuid="childrenComp[0]" :oneself="true"></vmp-air-container>
@@ -69,6 +81,7 @@
 <script>
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { useInteractiveServer } from 'middle-domain';
+  import { useZIndexServer } from 'middle-domain';
 
   export default {
     name: 'VmpConciseCenterWap',
@@ -88,7 +101,8 @@
         webinarsBgImgLive: '', //直播结束背景图
         audioStatus: false, // 选中清晰度是否是音频模式
         isAudio: false, //判断是否是音频直播模式
-        isLivingEnd: false
+        isLivingEnd: false,
+        qaZIndex: 302 // 默认问卷推送时，文档吸顶的index
       };
     },
     computed: {
@@ -145,6 +159,7 @@
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.interactiveServer = useInteractiveServer();
+      this.zIndexServer = useZIndexServer();
       this.addSDKEvents();
     },
     mounted() {},
@@ -182,6 +197,9 @@
       // 设置文档容器是否置顶
       setDocContainerStickTop(val) {
         this.isDocStickTop = val;
+        if (val) {
+          this.qaZIndex = this.zIndexServer.state.zIndexMap['questionnaire'] || 302;
+        }
         this.$nextTick(() => {
           // 派发事件：docResize
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));

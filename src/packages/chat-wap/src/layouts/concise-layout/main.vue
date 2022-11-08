@@ -509,19 +509,20 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
+        const newList = JSON.parse(JSON.stringify(list));
         const clientW = document.body.clientWidth;
         const clientH = document.body.clientHeight;
         const ratio = 2;
-        for (let i = 0; i < list.length; i++) {
-          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
-            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+        for (let i = 0; i < newList.length; i++) {
+          if (newList[i].indexOf('?x-oss-process=image/resize') < 0) {
+            newList[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
               clientH * ratio
             },m_lfit`;
           }
         }
-        console.log('preview', list);
+        console.log('preview', newList);
         ImagePreview({
-          images: list,
+          images: newList,
           startPosition: index,
           lazyLoad: true
         });
