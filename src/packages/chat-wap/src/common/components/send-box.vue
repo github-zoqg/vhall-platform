@@ -520,7 +520,9 @@
         flex: 1;
         display: flex;
         align-items: center;
-
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         .content-input__placeholder {
           background-color: var(--theme-chat-input-bg);
           color: var(--theme-chat-input-placeholder-font);
@@ -529,7 +531,9 @@
           height: 60px;
           line-height: 60px;
           padding: 2px 20px;
-
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           .login-btn {
             padding-left: 10px;
             color: #007aff;
