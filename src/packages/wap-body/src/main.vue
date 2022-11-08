@@ -6,12 +6,12 @@
       isShowWapBody ? '' : 'vmp-wap-body__hide',
       isPortraitLive ? 'isPortraitLive' : '',
       isStreamContainerStickTop ? 'vmp-wap-body-container-sticktop' : '',
-      isPortraitLive && !isWapBodyDocSwitchFullScreen ? 'isMini' : ''
+      isPortraitLive && !isWapBodyDocSwitchFullScreen && !isEmbed ? 'isMini' : ''
     ]"
   >
     <!-- 直播结束 -->
     <div
-      v-if="isLivingEnd && !isPortraitLive"
+      v-if="isLivingEnd && !isPortraitLive && !isEmbed"
       :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
@@ -26,7 +26,7 @@
     </div>
     <div
       :class="[
-        mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)
+        (mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)) && !isEmbed
           ? 'vmp-wap-body-mini'
           : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
@@ -277,6 +277,10 @@
       // 竖屏直播
       isPortraitLive() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+      },
+      // 是不是嵌入页
+      isEmbed() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
     watch: {
