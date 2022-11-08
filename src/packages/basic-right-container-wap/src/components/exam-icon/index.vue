@@ -55,7 +55,7 @@
                 </div>
               </div>
               <div class="container-data__right">
-                <img src="./images/end.png" class="button_img" v-if="item && item.isEnd" alt="" />
+                <img src="./images/end.png" class="button_img" v-if="item && item.is_end" alt="" />
                 <div class="button_text" v-else-if="item && item.total_score == item.score">
                   满分
                 </div>
@@ -66,12 +66,6 @@
         </van-list>
       </div>
     </van-popup>
-    <!-- 快问快答-收集用户信息 -->
-    <vmp-exam-collect-wap ref="examCollectDom" @close="closeExamCollect"></vmp-exam-collect-wap>
-    <!-- 快问快答-排行榜 -->
-    <vmp-exam-rank-wap ref="examRankWapDom"></vmp-exam-rank-wap>
-    <!-- 快问快答-答题 -->
-    <vmp-exam-answer-wap ref="examAnswerWapDom"></vmp-exam-answer-wap>
   </div>
 </template>
 <script>
@@ -119,17 +113,20 @@
         });
         // 如果只有一份，直接进入到当前答题
         if (arr.length == 1) {
-          this.openExamAnswer(arr[0]);
+          this.toShowExam(arr[0]);
         } else if (this.examList && this.examList.length == 1) {
           let item = this.examList[0];
           if (item.status == 1) {
             // 已作答，已答题，直接查看个人成绩
+            this.toShowExamRank(item);
           } else if (item.limit_time_switch == 1 && item.is_end == 1) {
             // 限时答题 & 已超时 & 未作答，toast提示 “很遗憾，您已错过本次答题机会！”
             this.$toast(this.$t('exam.exam_1010'));
+            this.examListDialogVisible = false;
           }
         } else {
           this.showExamList = true;
+          this.examListDialogVisible = true;
         }
       },
       moreLoadData() {
@@ -142,7 +139,6 @@
       },
       // 查询 快问快答 - 列表
       getExamList(flag) {
-        this.examListDialogVisible = true;
         const params = {
           webinar_id: '活动ID',
           is_cache: 1,
@@ -151,9 +147,10 @@
         let result = {
           code: 200,
           data: {
-            total: 0,
+            total: 4,
             list: [
               {
+                paper_id: 1,
                 title: 'Apple产品功能知识点①',
                 push_time: '2022-11-07 20:10',
                 score: 100, // 试卷总分
@@ -163,9 +160,10 @@
                 total_score: '100', // 总得分
                 right_rate: '100', // 正确率
                 status: 1, // 是否作答 0.否 1.是
-                isEnd: false
+                is_end: false
               },
               {
+                paper_id: 2,
                 title: 'Apple产品功能知识点②',
                 push_time: '2022-11-07 19:30',
                 score: 100, // 试卷总分
@@ -175,9 +173,10 @@
                 total_score: '', // 总得分
                 right_rate: '', // 正确率
                 status: 0, // 是否作答 0.否 1.是
-                isEnd: false
+                is_end: false
               },
               {
+                paper_id: 3,
                 title: 'Apple产品功能知识点③',
                 push_time: '2022-11-07 19:30',
                 score: 100, // 试卷总分
@@ -187,9 +186,10 @@
                 total_score: '', // 总得分
                 right_rate: '', // 正确率
                 status: 0, // 是否作答 0.否 1.是
-                isEnd: true
+                is_end: true
               },
               {
+                paper_id: 4,
                 title: 'Apple产品功能知识点④',
                 push_time: '2022-11-07 19:15',
                 score: 100, // 试卷总分
@@ -199,7 +199,7 @@
                 total_score: '', // 总得分
                 right_rate: '', // 正确率
                 status: 0, // 是否作答 0.否 1.是
-                isEnd: true
+                is_end: true
               }
             ]
           }
@@ -226,36 +226,38 @@
         };
         this.examListDialogVisible = false;
       },
+      // 看成绩
+      toShowExamRank(item) {
+        this.closeExamList();
+        this.$emit('clickIcon', {
+          examId: item.paper_id,
+          type: 'score'
+        });
+      },
+      // 看答题逻辑
+      toShowExam(item) {
+        this.closeExamList();
+        this.$emit('clickIcon', {
+          examId: item.paper_id,
+          type: 'answer'
+        });
+      },
       // 单个验证逻辑
       checkExamInfo(item) {
-        if (item && item.isEnd) {
+        if (item && item.is_end) {
           // 已结束
         } else if (item && item.total_score == item.score) {
-          // 满分，看成绩, 看排行榜
-          this.$refs.examRankWapDom && this.$refs.examRankWapDom.open(item);
+          // 满分，看成绩
+          this.toShowExamRank(item);
         } else {
-          // 判断是否首次答题
-          if (this.isFirstAnswer) {
-            this.examListDialogVisible = false;
-            this.$refs.examCollectDom && this.$refs.examCollectDom.open(item);
-          } else {
-            // 进入答题流程
-            this.examListDialogVisible = false;
-            this.$refs.examAnswerWapDom && this.$refs.examAnswerWapDom.open(item);
-          }
+          // 进入答题流程
+          this.toShowExam(item);
         }
       },
-      closeExamCollect() {
-        if (this.isFirstAnswer && this.examList && this.examList.length > 0) {
-          // 如果当前是初次答题 && 查询到的列表是大于0的，展示列表；
-          this.examListDialogVisible = true;
-        }
-      },
-      // 只剩一份的时候，直接作答
-      openExamAnswer(item) {
-        // 进入答题流程
+      // 关闭问卷面板
+      closeExamList() {
+        this.showExamList = false;
         this.examListDialogVisible = false;
-        this.$refs.examAnswerWapDom && this.$refs.examAnswerWapDom.open(item.paper_id);
       },
       initExamEvents() {
         // 事件监听

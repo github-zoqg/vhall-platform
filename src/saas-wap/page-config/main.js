@@ -278,7 +278,8 @@ export default {
       'comRedPacketCommandWap',
       'comQuestionnaireWap',
       'comExamWap',
-      'comExamRankWap'
+      'comExamRankWap',
+      'comExamScoreWap'
     ], //支付问题暂时屏蔽红包，口令红包替代
     // 打开计时器
     emitOpenTimer: {
@@ -311,8 +312,14 @@ export default {
       method: 'open',
       args: ['$0']
     },
-    // 快问快答弹窗
-    emitClickExamIcon: {
+    // 快问快答弹窗 - 查看成绩
+    emitClickExamIconToScore: {
+      cuid: ['comExamScoreWap'],
+      method: 'open',
+      args: ['$0']
+    },
+    // 快问快答弹窗 - 答题
+    emitClickExamIconToAnswer: {
       cuid: ['comExamWap'],
       method: 'open',
       args: ['$0']
