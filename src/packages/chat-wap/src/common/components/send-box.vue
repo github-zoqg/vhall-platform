@@ -26,7 +26,7 @@
             @click="saySomething"
           >
             <span @click.stop="">
-              <chatSeting @filterChat="filterChat" />
+              <chatSeting @filterChat="filterChat" :refName="refName" />
             </span>
             <span
               v-if="

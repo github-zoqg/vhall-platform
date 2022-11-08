@@ -753,7 +753,7 @@
       async setGoodsVisibleAndSelect({ visible = true, type, id, name }) {
         this.setVisible({ visible, type, id, name });
         await this.$nextTick();
-        if (this.visibleMenu && this.visibleMenu.length > 0) {
+        if (this.visibleMenu && this.visibleMenu.length == 1) {
           // 默认显示菜单中的第一个
           this.selectDefault();
           this.scrollToItem({ id: this.selectedId });
