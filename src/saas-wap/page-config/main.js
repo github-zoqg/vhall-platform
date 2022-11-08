@@ -278,9 +278,7 @@ export default {
       'comRedPacketCommandWap',
       'comQuestionnaireWap',
       'comExamWap',
-      'comExamRankWap',
-      'comExamAnswerWap',
-      'comExamScoreWap'
+      'comExamRankWap'
     ], //支付问题暂时屏蔽红包，口令红包替代
     // 打开计时器
     emitOpenTimer: {

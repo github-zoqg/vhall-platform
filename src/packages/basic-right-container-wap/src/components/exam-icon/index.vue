@@ -129,7 +129,7 @@
             this.$toast(this.$t('exam.exam_1010'));
           }
         } else {
-          this.showQuestionList = true;
+          this.showExamList = true;
         }
       },
       moreLoadData() {
