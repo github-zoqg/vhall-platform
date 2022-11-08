@@ -316,10 +316,10 @@
       async closeMediaSetting() {
         this.isShow = false;
         // TODO: 需要等待SDK更新，SDK销毁流异步处理有问题。
-        // this.timeoutCache = setTimeout(() => {
-        //   this?.$refs['videoSetting']?.destroyStream();
-        // }, 5000);
-        // this?.$refs['audioOutSetting']?.pauseAudio();
+        this.timeoutCache = setTimeout(() => {
+          this?.$refs['videoSetting']?.destroyStream();
+        }, 5000);
+        this?.$refs['audioOutSetting']?.pauseAudio();
         this.isRepublishMode = false;
         await this.$nextTick();
       },
