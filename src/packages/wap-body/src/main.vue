@@ -40,6 +40,16 @@
       ]"
       v-if="!(isLivingEnd && isPortraitLive)"
       v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
+      :style="{
+        'z-index':
+          isStreamContainerStickTop && !isWapBodyDocSwitchFullScreen
+            ? -1
+            : isStreamContainerStickTop
+            ? playerZIndex
+            : mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)
+            ? 302
+            : 'auto'
+      }"
     >
       <!-- 播放器 -->
       <vmp-air-container
@@ -107,7 +117,8 @@
     useMediaCheckServer,
     useMicServer,
     useInteractiveServer,
-    useMenuServer
+    useMenuServer,
+    useZIndexServer
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
@@ -129,7 +140,8 @@
         mini: false,
         isShowLiveStartNotice: false,
         isStreamContainerStickTop: false, // 视频流容器是否吸顶（问卷弹窗的时候）
-        rotateNum: 0
+        rotateNum: 0,
+        playerZIndex: 302 // 默认问卷推送时，播放器吸顶的index
       };
     },
     computed: {
@@ -295,6 +307,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.menuServer = useMenuServer();
+      this.zIndexServer = useZIndexServer();
     },
     async created() {
       if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3) {
@@ -327,6 +340,9 @@
       questionnaireVisible(flag) {
         if (this.isPortraitLive) {
           this.isStreamContainerStickTop = flag;
+          if (flag) {
+            this.playerZIndex = this.zIndexServer.state.zIndexMap['questionnaire'] || 302;
+          }
         } else {
           this.mini = flag;
         }
