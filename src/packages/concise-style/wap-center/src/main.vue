@@ -45,10 +45,12 @@
     </div>
 
     <!-- 音频直播 -->
-    <div class="vmp-wap-player-audie" v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying">
+    <div
+      class="vmp-wap-player-audie"
+      v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying && isWapBodyDocSwitchFullScreen"
+    >
       <p>{{ $t('player.player_1014') }}</p>
     </div>
-
     <div
       key="vmp-concise-center-wap__doc-container"
       class="vmp-concise-center-wap__doc-container"
