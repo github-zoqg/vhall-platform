@@ -8,6 +8,9 @@
       :class="{
         'player-container__sticktop': isDocStickTop
       }"
+      :style="{
+        'z-index': isDocStickTop ? qaZIndex : 12
+      }"
     >
       <p @click.stop="startPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
