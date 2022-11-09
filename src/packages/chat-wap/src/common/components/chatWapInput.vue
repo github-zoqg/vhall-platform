@@ -48,7 +48,10 @@
     </div>
     <div
       v-if="showEmoji"
-      :class="['send-box__bottom--emoji', isConcise ? `chat-emoji__${showTabType}` : '']"
+      :class="[
+        'send-box__bottom--emoji',
+        isConcise || isPortraitLive ? `chat-emoji__${showTabType}` : ''
+      ]"
     >
       <div class="imgs">
         <img

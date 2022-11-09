@@ -37,6 +37,12 @@
     computed: {
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     created() {
@@ -55,8 +61,12 @@
         const blockIsOffsetTop = document.getElementsByClassName('vmp-block');
         const baseDomHeight = document.body.clientHeight;
         const offsetTop = blockIsOffsetTop ? blockIsOffsetTop[0].offsetTop : 0;
+        console.log(baseDomHeight, offsetTop, '------------', blockIsOffsetTop);
         if (offsetTop && offsetTop > 0) {
           this.popHeight = Number(baseDomHeight - offsetTop);
+          if (this.isPortraitLive) {
+            this.popHeight = Math.max(this.popHeight, 200);
+          }
         }
       }
     }
