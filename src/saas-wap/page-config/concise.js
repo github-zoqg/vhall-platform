@@ -531,8 +531,27 @@ export default {
   comExamScoreWap: {
     component: 'VmpExamScoreWap'
   },
+  // 快问快答 - 预览
+  comExamPreviewWap: {
+    component: 'VmpExamPreviewWap'
+  },
   // 快问快答 - 入口
   comExamWap: {
-    component: 'VmpExamWap'
+    component: 'VmpExamWap',
+    emitExamAnswerOpenWap: [
+      {
+        cuid: 'comExamAnswerWap',
+        method: 'open',
+        args: ['$0']
+      }
+    ],
+    emitExamCollectOpenWap: [
+      {
+        cuid: 'comExamCollectWap',
+        method: 'open',
+        args: ['$0']
+      }
+    ],
+    children: ['comExamCollectWap', 'comExamAnswerWap']
   }
 };

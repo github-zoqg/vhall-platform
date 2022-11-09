@@ -1,23 +1,21 @@
 <template>
-  <!-- 快问快答-入口 -->
-  <van-popup
-    get-container="#otherPopupContainer"
-    class="vmp-exam-wap"
-    v-model="examVisible"
-    position="bottom"
-    @close="closeDialog"
-    v-if="examVisible"
-  >
-    <div class="vmp-exam-wap__panel">入口</div>
-  </van-popup>
+  <!-- 快问快答-鉴权 -->
+  <vmp-air-container
+    :oneself="true"
+    :cuid="childrenCom[0]"
+    v-if="isFirstAnswer"
+  ></vmp-air-container>
+  <vmp-air-container :oneself="true" :cuid="childrenCom[1]" v-else></vmp-air-container>
 </template>
 <script>
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpExamWap',
     data() {
       return {
-        examVisible: false, // 快问快答-入口
-        examId: null
+        examId: null,
+        isFirstAnswer: true, // 是否首次答题
+        childrenCom: []
       };
     },
     computed: {
@@ -26,17 +24,23 @@
       }
     },
     methods: {
-      // 关闭 快问快答-入口
-      closeDialog() {
-        this.examVisible = false;
-      },
       async open(examId) {
-        this.examVisible = true;
         this.examId = examId;
         // 判断当前是否首次答题，若是跳转首次答题区间；若不是，进入答题区间
+        this.isFirstAnswer = false;
+        await this.$nextTick(() => {});
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(
+            this.cuid,
+            this.isFirstAnswer ? 'emitExamCollectOpenWap' : 'emitExamAnswerOpenWap',
+            [examId]
+          )
+        );
       }
     },
-    beforeCreate() {}
+    created() {
+      this.childrenCom = window.$serverConfig[this.cuid].children;
+    }
   };
 </script>
 <style lang="less" scoped>

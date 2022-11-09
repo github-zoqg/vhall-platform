@@ -161,8 +161,9 @@
           background: unset !important;
           &.exam_msg_bg {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: flex-start;
+            align-items: top;
+            flex-wrap: wrap;
             padding: 0px 25px;
             width: 100%;
             border-radius: 40px;
