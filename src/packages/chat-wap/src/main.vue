@@ -30,7 +30,7 @@
       initComponent() {
         // 竖屏直播
         const isPortraitLive =
-          this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0;
         if (isPortraitLive) {
           this.layout = 'conciseLayout';
           return;

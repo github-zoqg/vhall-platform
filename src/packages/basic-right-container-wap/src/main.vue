@@ -28,7 +28,7 @@
     methods: {
       initComponent() {
         // 竖屏直播
-        if (this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0) {
+        if (this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0) {
           this.layout = 'fullscreenLayout';
           this.iconStyle = 2;
         }

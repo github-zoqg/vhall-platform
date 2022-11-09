@@ -546,7 +546,9 @@
       },
       // 竖屏直播
       isPortraitLive() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       },
       // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
       isWapBodyDocSwitchFullScreen() {

@@ -147,7 +147,9 @@
       },
       // 竖屏直播
       isPortraitLive() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     mounted() {

@@ -219,7 +219,8 @@
         childrenCom: [],
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         visibleMenuLength: 0,
-        isPortraitLive: this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0 // 竖屏直播
+        isPortraitLive:
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0 // 竖屏直播
       };
     },
     computed: {

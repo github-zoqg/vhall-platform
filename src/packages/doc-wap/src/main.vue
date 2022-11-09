@@ -159,8 +159,7 @@
     },
     computed: {
       isShowTransBtn() {
-        const result =
-          !!this.currentCid && this.displayMode != 'fullscreen' && !this.isNotSupportTrans;
+        const result = this.displayMode != 'fullscreen' && !this.isNotSupportTrans;
 
         return !this.isPortraitLive ? result : this.isWapBodyDocSwitchFullScreen && result;
       },
@@ -248,7 +247,9 @@
       },
       // 竖屏直播
       isPortraitLive() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar_show_type == 0;
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
