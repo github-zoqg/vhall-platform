@@ -809,6 +809,7 @@
       left: 0;
       top: 0;
       background: transparent;
+      z-index: 1;
     }
   }
 </style>
