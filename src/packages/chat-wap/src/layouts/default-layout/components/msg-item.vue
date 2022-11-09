@@ -387,15 +387,15 @@
         }
       }
     },
-    components: {
-      ExamMsgItem
-    },
     data() {
       return {
         msgContent: '',
         defaultAvatar: defaultAvatar
         // jiantou: require('../img/jiantou.png')
       };
+    },
+    components: {
+      ExamMsgItem
     },
     filters: {
       //角色标签样式
@@ -774,8 +774,7 @@
         justify-content: center;
       }
       &.new-gift,
-      &.interact,
-      &.exam_msg_flex {
+      &.interact {
         margin: 0 auto;
         width: fit-content;
         .role {
@@ -811,7 +810,8 @@
         padding: 4px 24px;
         position: relative;
         border-width: 0;
-        height: 48px;
+        min-height: 48px;
+        height: auto;
         line-height: 40px;
         color: var(--theme-chat-msg-font);
 
@@ -855,19 +855,7 @@
           left: 24px;
         }
       }
-      &.exam_msg_flex {
-        display: block;
-        text-align: center;
-        background: var(--theme-chat-msg-interact-bg);
-        border-radius: 40px;
-      }
       .question_msg_bg {
-        &::after {
-          border: 0 !important;
-        }
-      }
-      div.exam_msg_bg {
-        border-radius: 0 !important;
         &::after {
           border: 0 !important;
         }

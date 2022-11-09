@@ -10,14 +10,15 @@
     <!-- 收到快问快答 -->
     <template v-if="source.type == 'paper_send'">
       <div
-        class="exam_msg_bg"
+        class="interact-msg exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
         </span>
-        {{ overHidden(source.nickname, 8) }}{{ source.content.text_content }}
+        <span class="nickname">{{ overHidden(source.nickname, 8) }}&nbsp;</span>
+        <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
         <span class="highlight">{{ $t('chat.chat_1093') }}</span>
       </div>
       <div
@@ -31,14 +32,15 @@
     <!-- 公布-快问快答-成绩 -->
     <template v-else-if="source.type == 'paper_send_rank'">
       <div
-        class="exam_msg_bg"
+        class="interact-msg exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
         </span>
-        {{ overHidden(source.nickname, 8) }}{{ source.content.text_content }}
+        <span class="nickname">{{ overHidden(source.nickname, 8) }}&nbsp;</span>
+        <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
         <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
@@ -51,7 +53,7 @@
     </template>
     <!-- 快问快答-收卷 -->
     <template v-else-if="source.type == 'paper_end'">
-      <div class="exam_msg_bg">
+      <div class="interact-msg exam_msg_bg">
         {{ source.content.text_content }}
       </div>
       <div class="exam_msg_bg exam_title">
@@ -60,7 +62,7 @@
     </template>
     <!-- 快问快答-自动收卷 -->
     <template v-else-if="source.type == 'paper_auto_end'">
-      <div class="exam_msg_bg">
+      <div class="interact-msg exam_msg_bg">
         {{ source.content.text_content }}
       </div>
       <div class="exam_msg_bg exam_title">
@@ -70,11 +72,11 @@
     <!-- 公布-快问快答-自动公布成绩 -->
     <template v-else-if="source.type == 'paper_auto_send_rank'">
       <div
-        class="exam_msg_bg"
+        class="interact-msg exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        {{ source.content.text_content }}
+        <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
         <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
@@ -146,32 +148,36 @@
   };
 </script>
 <style lang="less">
-  .vmp-chat-wap-msg-item {
+  .vmp-chat-wap-msg-item-fashion {
     .msg-item {
       &.interact {
         &.exam_msg_flex {
           display: block;
           text-align: center;
-          background: var(--theme-chat-msg-interact-bg);
-          border-radius: 40px;
-          padding: 4px 25px;
-          margin: 0 auto 38px auto;
+          color: var(--theme-chat-msg-font);
+          background: var(--theme-chat-msg-bg);
+          border-radius: 30px;
+          padding: 11px 12px;
+          margin: 0 32px 24px 32px;
+          width: calc(100% - 64px);
         }
-        > div {
+        > .interact-msg {
           background: unset !important;
           &.exam_msg_bg {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0px 25px;
-            width: 100%;
+            justify-content: flex-start;
+            align-items: top;
+            flex-wrap: wrap;
+            padding: 0px 0;
             border-radius: 40px;
             font-style: normal;
             font-weight: 400;
             font-size: 24px;
             line-height: 32px;
+            height: auto;
             text-align: center;
-            color: rgba(0, 0, 0, 0.85);
+            color: var(--theme-chat-msg-font);
+            width: 100%;
             .role {
               margin-top: 0;
               line-height: unset;
@@ -186,12 +192,17 @@
               font-size: 20px;
               line-height: 24px;
               text-align: center;
-              color: #595959;
-              margin-top: 4px;
+              margin-top: 8px;
               .highlight {
                 padding-left: 0;
               }
             }
+          }
+        }
+        > div {
+          background: unset !important;
+          &.exam_title {
+            color: #595959;
           }
         }
       }

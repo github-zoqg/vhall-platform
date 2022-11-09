@@ -122,7 +122,9 @@
               content: {
                 text_content: this.$t('exam.exam_1001'),
                 exam_id: msg.questionnaire_id,
-                exam_title: msg.paper_title || '偶像来了！'
+                exam_title:
+                  msg.paper_title ||
+                  '偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！'
               },
               roleName: msg.room_role,
               type: 'paper_send',
@@ -136,7 +138,9 @@
               content: {
                 text_content: this.$t('exam.exam_1003'),
                 exam_id: msg.questionnaire_id,
-                exam_title: msg.paper_title || '偶像来了！'
+                exam_title:
+                  msg.paper_title ||
+                  '偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！'
               },
               roleName: msg.room_role,
               type: 'paper_send_rank',
@@ -151,7 +155,9 @@
               content: {
                 text_content: this.$t('exam.exam_1041'),
                 exam_id: msg.questionnaire_id,
-                exam_title: msg.paper_title || '偶像来了！'
+                exam_title:
+                  msg.paper_title ||
+                  '偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！'
               },
               roleName: msg.room_role,
               type: 'paper_end',
@@ -166,7 +172,9 @@
               content: {
                 text_content: this.$t('exam.exam_1040'),
                 exam_id: msg.questionnaire_id,
-                exam_title: msg.paper_title || '偶像来了！'
+                exam_title:
+                  msg.paper_title ||
+                  '偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！'
               },
               roleName: msg.room_role,
               type: 'paper_auto_end',
@@ -181,7 +189,9 @@
               content: {
                 text_content: this.$t('exam.exam_1032'),
                 exam_id: msg.questionnaire_id,
-                exam_title: msg.paper_title || '偶像来了！'
+                exam_title:
+                  msg.paper_title ||
+                  '偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！偶像来了！'
               },
               roleName: msg.room_role,
               type: 'paper_auto_send_rank',
