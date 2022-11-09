@@ -155,5 +155,22 @@ export default {
   '--theme-chapter-list-bg': '',
   '--theme-chapter-font-color-title': '#262626',
   '--theme-chapter-font-color-time': 'rgba(0, 0, 0, 0.65)',
-  '--theme-chapter-font-color-active': '#FB2626'
+  '--theme-chapter-font-color-active': '#FB2626',
+  // 快问快答
+  '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
+  '--theme-exam-progress-active-bgColor': '#FB2626',
+  '--theme-exam-question-type-bgColor': 'rgba(251, 38, 38, 0.15)',
+  '--theme-exam-question-type-color': 'rgba(251, 38, 38, 1)',
+  '--theme-exam-next-button-bg': '#FB2626',
+  '--theme-exam-next-button-border': '#FB2626',
+  '--theme-exam-next-button-color': 'rgba(255, 255, 255, 1)',
+  '--theme-exam-next-button-active-bg': '#FB2626',
+  '--theme-exam-next-button-active-border': '#FB2626',
+  '--theme-exam-next-button-active-color': 'rgba(255, 255, 255, 1)',
+  '--theme-exam-last-button-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-color': 'rgba(38, 38, 38, 1)',
+  '--theme-exam-last-button-active-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-color': 'rgba(38, 38, 38, 1)'
 };
