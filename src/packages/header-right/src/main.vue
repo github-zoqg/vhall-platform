@@ -125,6 +125,17 @@
         <span v-html="noDefaultPopAlert.text"></span>
       </main>
     </saas-alert>
+    <!-- 嘉宾上麦前的设备禁用提示 -->
+    <saas-alert
+      :visible="micfrontPopAlert.visible"
+      :isShowClose="false"
+      :knowText="'确定'"
+      @onClose="closeFrontConfirm"
+    >
+      <main slot="content">
+        <span v-html="micfrontPopAlert.text"></span>
+      </main>
+    </saas-alert>
   </div>
 </template>
 
@@ -167,7 +178,12 @@
         },
         deviceStatus: useMediaCheckServer().state.deviceInfo?.device_status,
         countDownTime: Number,
-        countDownTimer: null // 开播倒计时计时器
+        countDownTimer: null, // 开播倒计时计时器
+        micfrontPopAlert: {
+          // 嘉宾上麦前的禁用提示
+          text: '检测到您的设备（摄像头或麦克风）处于关闭状态，上麦后会自动打开。',
+          visible: false
+        }
       };
     },
     computed: {
@@ -332,13 +348,15 @@
       mediaCheckClick() {
         const device_status = useMediaCheckServer().state.deviceInfo.device_status;
         if (device_status == 1) {
-          this.handleApplyClick();
+          // this.handleApplyClick();
+          this.showConfirmPop();
         } else if (device_status == 0) {
           useMediaCheckServer()
             .getMediaInputPermission({ isNeedBroadcast: false })
             .then(flag => {
               if (flag) {
-                this.handleApplyClick();
+                // this.handleApplyClick();
+                this.showConfirmPop();
               } else {
                 this.$message.warning(this.$t('interact.interact_1039'));
               }
@@ -346,6 +364,19 @@
         } else {
           this.$message.warning(this.$t('interact.interact_1039'));
         }
+      },
+      showConfirmPop() {
+        const { videoMuted, audioMuted } = this.interactiveServer.state.localSpeaker;
+        if (videoMuted || audioMuted) {
+          this.micfrontPopAlert.visible = true;
+        } else {
+          this.handleApplyClick();
+        }
+      },
+      closeFrontConfirm() {
+        console.log('closeFrontConfirm-----');
+        this.micfrontPopAlert.visible = false;
+        this.handleApplyClick();
       },
       // 嘉宾点击申请上麦
       handleApplyClick() {
@@ -440,12 +471,15 @@
        *      2、检测麦克风设备
        *          可用 则本地修改deviceStatus值
        *               检测是否在直播中，若在直播中，则liveStep = 3
+       * deviceStatus: 设备检测之后刷新按钮状态
        * @date 2022-03-24
        * @returns {any}
        */
-      async handleRecheck() {
-        await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
-        if (useMediaCheckServer().state.deviceInfo?.device_status == 1) {
+      async handleRecheck(deviceStatus = false) {
+        if (!deviceStatus) {
+          await useMediaCheckServer().getMediaInputPermission({ isNeedBroadcast: false });
+        }
+        if (useMediaCheckServer().state.deviceInfo?.device_status == 1 || deviceStatus) {
           this.deviceStatus = 1;
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickCheckStartPush')
@@ -596,6 +630,7 @@
               this.calculateLiveDuration();
             }
           }
+          window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitStartLiveSuccess'));
         } else {
           this.liveStep = 3;
         }

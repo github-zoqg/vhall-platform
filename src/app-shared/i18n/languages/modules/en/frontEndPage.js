@@ -214,7 +214,7 @@ export default {
     login_1042: '',
     login_1043: '',
     login_1044: 'Please enter phone number',
-    login_1045: 'verification code',
+    login_1045: 'Verification code',
     login_1046: '',
     login_1047: '',
     login_1048: '',
@@ -225,7 +225,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: 'Please enter a valid phone number',
+    login_1056: '',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -569,8 +569,8 @@ export default {
     interact_tools_1093: 'This round of prize "{n}"',
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
-    interact_tools_1096: 'Phone',
-    interact_tools_1097: 'Address'
+    interact_tools_1096: 'Phone Number',
+    interact_tools_1097: 'Adress'
   },
   setting: {
     setting_1002: 'View settings',
@@ -603,7 +603,8 @@ export default {
     setting_1029: 'Help and support',
     setting_1030: 'Setting',
     setting_1031: 'Modifying settings will lead to re streaming. Do you want to continue saving',
-    setting_1032: 'Setting'
+    setting_1032: 'Setting',
+    setting_1033: 'NO Equipment'
   },
   message: {
     message_1001: 'The organizer has encrypted the video. Recommend to use the computer to watch',
@@ -826,7 +827,8 @@ export default {
       'Only after obtaining the permission of camera and microphone can you participate in the connection',
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
-    interact_1041: 'Apply for video interaction'
+    interact_1041: 'Apply for video interaction',
+    interact_1042: 'Check equipment'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -943,7 +945,7 @@ export default {
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
     other_1021:
-      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
@@ -951,7 +953,6 @@ export default {
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
     privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
-    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
-    privacy_1007: 'Please check the agreement first'
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"'
   }
 };

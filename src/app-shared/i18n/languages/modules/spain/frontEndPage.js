@@ -112,7 +112,7 @@ export default {
     appointment_1031: 'Por favor sea paciente',
     appointment_1032: 'Lista blanca',
     appointment_1033: 'The rehearsal has started, please watch it live',
-    appointment_1034: 'Submit and receive SMS'
+    appointment_1034: ''
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -362,7 +362,8 @@ export default {
     chat_1095: '',
     chat_1096: '',
     chat_1097: '',
-    chat_1098: 'Hace clic para ver los detalles'
+    chat_1098: 'Hace clic para ver los detalles',
+    chat_1099: ''
   },
   form: {
     form_1001: 'Nombre',
@@ -609,7 +610,8 @@ export default {
     setting_1029: 'Ayuda y apoyo',
     setting_1030: '',
     setting_1031: '',
-    setting_1032: ''
+    setting_1032: '',
+    setting_1033: ''
   },
   message: {
     message_1001:
@@ -835,7 +837,8 @@ export default {
     interact_1038: '',
     interact_1039: '',
     interact_1040: '',
-    interact_1041: ''
+    interact_1041: '',
+    interact_1042: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',
@@ -950,7 +953,8 @@ export default {
     other_1017: '',
     other_1018: '',
     other_1019: '',
-    other_1020: ''
+    other_1020: '',
+    other_1021: ''
   },
   privacy: {
     privacy_1001: '',
