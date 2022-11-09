@@ -134,7 +134,7 @@
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         childrenComp: [],
         visibleMenuLength: 0,
-        isPortraitLive: webinarData.webinar_show_type == 0, // 竖屏直播
+        isPortraitLive: webinarData.webinar.webinar_show_type == 0, // 竖屏直播
         showGoodsCard: false,
         visibleGood: false
       };
