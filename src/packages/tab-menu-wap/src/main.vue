@@ -547,7 +547,7 @@
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
         let index = 0;
-        if (this.isConcise) {
+        if (this.isConcise || this.isPortraitLive) {
           // 极简风格，菜单顺序：问答>私聊>简介
           index = 0;
         } else {
