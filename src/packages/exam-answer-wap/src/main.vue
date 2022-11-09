@@ -8,7 +8,9 @@
     @close="closeDialog"
     v-if="examAnswerVisible"
   >
-    <div class="vmp-exam-answer-wap__panel">答题</div>
+    <div class="exam-core__container">
+      <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core>
+    </div>
   </van-popup>
 </template>
 <script>
@@ -33,19 +35,37 @@
       async open(examId) {
         this.examAnswerVisible = true;
         this.examId = examId;
+        await this.$nextTick(() => {});
+        this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
       }
     },
     beforeCreate() {}
   };
 </script>
-<style lang="less" scoped>
+<style lang="less">
   .vmp-exam-answer-wap {
+    width: 100%;
     height: 844px;
-    background: transparent;
-    background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+    background: url('../images/gradient_bg.png') repeat-x;
+    background-size: cover;
+    box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
     border-radius: 40px 40px 0px 0px;
-    &__panel {
-      text-align: center;
+    overflow: hidden;
+    .exam-core__container {
+      width: calc(100% - 64px);
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .exam-zdy-progress {
+      &.van-progress {
+        background: var(--theme-exam-progress-bgColor) !important;
+        border-radius: 4px;
+        .van-progress__portion {
+          background: var(--theme-exam-progress-active-bgColor) !important;
+          border-radius: 3px;
+        }
+      }
     }
   }
 </style>
