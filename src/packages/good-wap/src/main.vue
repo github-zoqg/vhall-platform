@@ -260,7 +260,7 @@
       },
       //
       queryGoodsListJson(data) {
-        // console.log(data, 'queryGoodsListJson');
+        console.log(data, 'queryGoodsListJson');
         // 开启自定义菜单
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitShowGoodsTab', [{ type: 5 }])
@@ -274,6 +274,11 @@
             this.goodsListJson = res.goods_list;
             this.total = res.total;
             this.loading = false;
+
+            if (this.num >= this.totalPages) {
+              this.finished = true;
+            }
+
             this.analogPage();
           });
       },

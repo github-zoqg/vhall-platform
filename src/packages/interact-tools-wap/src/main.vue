@@ -10,21 +10,22 @@
         <div class="tool">
           <img class="good-img" src="./img/icon_good.png" @click="openGoods" />
         </div>
-        <van-popup
-          class="goods-van-popup"
-          v-model="showGoodsCard"
-          get-container="#app"
-          safe-area-inset-bottom
-          round
-          position="bottom"
-          :closeable="false"
-        >
-          <div class="goods-content">
-            <!-- good组件-->
-            <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
-          </div>
-        </van-popup>
       </div>
+      <van-popup
+        class="goods-van-popup"
+        v-model="showGoodsCard"
+        get-container="#app"
+        safe-area-inset-bottom
+        round
+        :lazy-render="false"
+        position="bottom"
+        :closeable="false"
+      >
+        <div class="goods-content">
+          <!-- good组件-->
+          <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+        </div>
+      </van-popup>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
         <div class="tool">
           <img class="gift-img" src="./img/icon_gift.png" @click="openGifts" />
