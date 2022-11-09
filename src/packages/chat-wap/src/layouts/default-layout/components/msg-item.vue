@@ -387,15 +387,15 @@
         }
       }
     },
-    components: {
-      ExamMsgItem
-    },
     data() {
       return {
         msgContent: '',
         defaultAvatar: defaultAvatar
         // jiantou: require('../img/jiantou.png')
       };
+    },
+    components: {
+      ExamMsgItem
     },
     filters: {
       //角色标签样式
@@ -810,7 +810,8 @@
         padding: 4px 24px;
         position: relative;
         border-width: 0;
-        height: 48px;
+        min-height: 48px;
+        height: auto;
         line-height: 40px;
         color: var(--theme-chat-msg-font);
 
