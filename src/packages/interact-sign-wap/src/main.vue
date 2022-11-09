@@ -6,6 +6,9 @@
       round
       :closeable="true"
       class="vhall-dialog-wrap"
+      overlay-class="vmp-sign-popup-overlay"
+      :overlay-style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
+      :style="{ zIndex: zIndexServerState.zIndexMap.signIn }"
     >
       <!-- <div class="header">
         {{ $t('interact_tools.interact_tools_1024') }}
@@ -25,7 +28,13 @@
   </div>
 </template>
 <script>
-  import { useSignServer, useChatServer, useGroupServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useSignServer,
+    useChatServer,
+    useGroupServer,
+    useRoomBaseServer,
+    useZIndexServer
+  } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   // import EventBus from '../../utils/Events';
   import CountDown from './countDown.vue';
@@ -33,7 +42,9 @@
     name: 'VmpSignWap',
     components: { CountDown },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         signInVisible: false,
         seconds: 60,
         sign_id: '',
@@ -64,6 +75,17 @@
             this.closeSignIn();
           }
         }
+      },
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.redPacket }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.signIn': {
+        handler(val) {
+          if (document.querySelector('.vmp-sign-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-sign-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
       }
     },
     computed: {
@@ -81,6 +103,7 @@
       this.signServer = useSignServer();
       this.groupServer = useGroupServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.zIndexServer = useZIndexServer();
     },
     async created() {
       this.init();
@@ -98,6 +121,7 @@
         this.changeIconShowNum(true);
         console.log('sign_in_push', e);
         this.signInVisible = true;
+        this.zIndexServer.setDialogZIndex('signIn');
         this.duration = Number(e.data.sign_show_time);
         this.openSignIn(e.data.sign_id, e.data.sign_show_time);
         this.title = this.$tdefault(e.data.title);
@@ -202,6 +226,7 @@
       },
       openSign() {
         this.signInVisible = true;
+        this.zIndexServer.setDialogZIndex('signIn');
       },
       // 签到
       signin() {
