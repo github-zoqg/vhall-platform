@@ -1,5 +1,5 @@
 <template>
-  <!-- 
+  <!--
     推送-快问快答 paper_send
     公布-快问快答-成绩 paper_send_rank
     快问快答-收卷 paper_end
@@ -10,69 +10,67 @@
     <!-- 收到快问快答 -->
     <template v-if="source.type == 'paper_send'">
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        {{ overHidden(source.nickname, 8) }}
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
         </span>
-        {{ source.content.text_content }}
+        {{ overHidden(source.nickname, 8) }}{{ source.content.text_content }}
         <span class="highlight">{{ $t('chat.chat_1093') }}</span>
       </div>
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg exam_title"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        <span class="highlight">{{ source.content.exam_title }}</span>
+        <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
     <!-- 公布-快问快答-成绩 -->
     <template v-else-if="source.type == 'paper_send_rank'">
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        {{ overHidden(source.nickname, 8) }}
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
         </span>
-        {{ source.content.text_content }}
+        {{ overHidden(source.nickname, 8) }}{{ source.content.text_content }}
         <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg exam_title"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        <span class="highlight">{{ source.content.exam_title }}</span>
+        <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
     <!-- 快问快答-收卷 -->
     <template v-else-if="source.type == 'paper_end'">
-      <div class="interact-msg exam_msg_bg">
+      <div class="exam_msg_bg">
         {{ source.content.text_content }}
       </div>
-      <div class="interact-msg exam_msg_bg">
-        <span>{{ source.content.exam_title }}</span>
+      <div class="exam_msg_bg exam_title">
+        <span>《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
     <!-- 快问快答-自动收卷 -->
     <template v-else-if="source.type == 'paper_auto_end'">
-      <div class="interact-msg exam_msg_bg">
+      <div class="exam_msg_bg">
         {{ source.content.text_content }}
       </div>
-      <div class="interact-msg exam_msg_bg">
-        <span>{{ source.content.exam_title }}</span>
+      <div class="exam_msg_bg exam_title">
+        <span>《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
     <!-- 公布-快问快答-自动公布成绩 -->
     <template v-else-if="source.type == 'paper_auto_send_rank'">
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
@@ -80,11 +78,11 @@
         <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
-        class="interact-msg exam_msg_bg"
+        class="exam_msg_bg exam_title"
         @tap="checkExamDetail(source.content.exam_id, source.type)"
         @click="checkExamDetail(source.content.exam_id, source.type)"
       >
-        <span class="highlight">{{ source.content.exam_title }}</span>
+        <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
   </div>
@@ -147,4 +145,56 @@
     }
   };
 </script>
-<style lang="less"></style>
+<style lang="less">
+  .vmp-chat-wap-msg-item {
+    .msg-item {
+      &.interact {
+        &.exam_msg_flex {
+          display: block;
+          text-align: center;
+          background: var(--theme-chat-msg-interact-bg);
+          border-radius: 40px;
+          padding: 4px 25px;
+          margin: 0 auto 38px auto;
+        }
+        > div {
+          background: unset !important;
+          &.exam_msg_bg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 25px;
+            width: 100%;
+            border-radius: 40px;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 32px;
+            text-align: center;
+            color: rgba(0, 0, 0, 0.85);
+            .role {
+              margin-top: 0;
+              line-height: unset;
+            }
+            .highlight {
+              padding-left: 10px;
+              color: rgba(10, 127, 245, 1);
+            }
+            &.exam_title {
+              font-style: normal;
+              font-weight: 400;
+              font-size: 20px;
+              line-height: 24px;
+              text-align: center;
+              color: #595959;
+              margin-top: 4px;
+              .highlight {
+                padding-left: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+</style>

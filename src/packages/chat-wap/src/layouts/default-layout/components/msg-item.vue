@@ -774,8 +774,7 @@
         justify-content: center;
       }
       &.new-gift,
-      &.interact,
-      &.exam_msg_flex {
+      &.interact {
         margin: 0 auto;
         width: fit-content;
         .role {
@@ -855,19 +854,7 @@
           left: 24px;
         }
       }
-      &.exam_msg_flex {
-        display: block;
-        text-align: center;
-        background: var(--theme-chat-msg-interact-bg);
-        border-radius: 40px;
-      }
       .question_msg_bg {
-        &::after {
-          border: 0 !important;
-        }
-      }
-      div.exam_msg_bg {
-        border-radius: 0 !important;
         &::after {
           border: 0 !important;
         }
