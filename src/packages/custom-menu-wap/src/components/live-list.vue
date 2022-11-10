@@ -17,12 +17,12 @@
               </label>
               <div>
                 <span>{{ getLiveTag(item) }}</span>
-                <span
+                <!--    <span
                   v-if="hasDelayPermission && item.no_delay_webinar == 1 && item.webinar_type !== 6"
                 >
                   | {{ $t('common.common_1023') }}
                 </span>
-                <span v-if="item.webinar_show_type == 0">| {{ $t('common.common_1036') }}</span>
+                <span v-if="item.webinar_show_type == 0">| {{ $t('common.common_1036') }}</span> -->
               </div>
             </span>
           </div>
