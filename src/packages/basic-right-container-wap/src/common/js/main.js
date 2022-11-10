@@ -70,7 +70,7 @@ export default {
     useMenuServer().$on('tab-switched', async data => {
       // 需要展示icon tab
       // console.log(data.cuid, 'data.cuid');
-      if (!this.isConcise || !this.isPortraitLive) {
+      if (!(this.isConcise || this.isPortraitLive)) {
         if (['comChatWap', 'comIntroWap'].includes(data.cuid)) {
           this.showIcon = true;
         } else {
