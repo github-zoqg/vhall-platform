@@ -236,6 +236,7 @@
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitInitLocalStream', 'checked')
           );
+          this.mediaCheckServer.setDevice({ status: 1 });
           this.isShow = false;
         }
       },
