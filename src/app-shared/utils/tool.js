@@ -358,5 +358,5 @@ export const getIosSafeArea = data => {
   const h = document.querySelector('.fixIos').clientHeight;
   newElement.remove();
   console.log('是否是IOS小黑条适配', h);
-  return h || 34;
+  return h;
 };
