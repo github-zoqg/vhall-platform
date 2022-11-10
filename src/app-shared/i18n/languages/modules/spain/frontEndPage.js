@@ -962,6 +962,7 @@ export default {
     privacy_1003: '',
     privacy_1004: '',
     privacy_1005: '',
-    privacy_1006: ''
+    privacy_1006: '',
+    privacy_1007: 'Please check the agreement first'
   }
 };
