@@ -206,6 +206,7 @@
         }
       },
       handleSendCode() {
+        if (this.btnDisabled || this.isDownTime) return;
         if (!this.captchaReady) {
           this.$message({
             message: this.$t('login.login_1017'),
