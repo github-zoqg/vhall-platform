@@ -39,13 +39,16 @@
     </div>
     <!-- 进度条 -->
     <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
+    <!-- 分割条 -->
+    <div class="exam-padding-line"></div>
     <!-- 内容区域 -->
     <exam-info
+      class="exam-execute-body"
       ref="examInfoDom"
       :id="examId.id"
       :answerType="answerType"
-      :limit="2"
       v-if="examId && step != 2"
+      :limit="1"
       @change="changeQuestion"
       @examData="previewInfo"
       @examCheckOption="examCheckOption"
@@ -114,10 +117,7 @@
       return {
         examId: null,
         answerType: 'show',
-        pageVo: {
-          total: 0,
-          findIndex: 0
-        },
+        pageVo: null,
         step: 1, // 当前步骤（1--填写步骤；2--得知答案步骤；3--查看填写结果）
         previewVo: null,
         answerTimer: null, // 倒计时-定时器
@@ -133,20 +133,6 @@
         isDisabledSave: true
       };
     },
-    props: {
-      // 界面最大宽度
-      maxWidth: {
-        required: false,
-        type: String,
-        default: '1088px'
-      },
-      // 界面最大宽度
-      maxHeight: {
-        required: false,
-        type: String,
-        default: '500px'
-      }
-    },
     computed: {
       percentage() {
         if (this.pageVo && this.pageVo.total > 0) {
@@ -156,14 +142,6 @@
         } else {
           return 0;
         }
-      },
-      maxSonWidth() {
-        let maxWidthNum = this.maxWidth.substring(0, this.maxWidth.length - 2);
-        return `${Number(maxWidthNum) - 64}px`;
-      },
-      maxSonHeight() {
-        let maxHeightNum = this.maxHeight.substring(0, this.maxHeight.length - 2);
-        return `${Number(maxHeightNum) - 100}px`;
       }
     },
     methods: {
@@ -173,9 +151,10 @@
         this.answerType = answerType || 'show';
         this.step = 1;
         this.timeLoaded = false;
-        await this.$nextTick(() => {});
-        // 初始化预览页效果
-        this.$refs.examInfoDom && this.$refs.examInfoDom.initComp();
+        this.$nextTick(() => {
+          // 初始化预览页效果
+          this.$refs.examInfoDom && this.$refs.examInfoDom.initComp();
+        });
       },
       async nextQuestion() {
         await this.$nextTick(() => {});
@@ -329,14 +308,25 @@
         height: 100%;
       }
     }
+    .exam-padding-line {
+      width: 100%;
+      height: 2px;
+      margin-top: 18px;
+      background: unset;
+    }
+  }
+  .exam-execute-body {
+    height: 632px;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   .exam-execute-footer {
     position: fixed;
     bottom: 0;
     left: 0;
     text-align: center;
+    padding: 24px 32px 0 32px;
     background: #ffffff;
-    padding: 24px 32px;
     z-index: 20;
     width: 100%;
     button {
