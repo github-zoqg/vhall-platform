@@ -92,7 +92,7 @@
       getLiveTag(val) {
         /**
          * webinar_state  1直播 2预约 3结束 4点播 5回放
-         * webinar_type  1音频直播 2视频直播 3互动直播 5定时直播 6分组直播
+         * webinar_type  1音频直播 2视频直播 3互动直播   6分组直播
          */
         const liveTypeMap = new Map([
           [0, ''],
