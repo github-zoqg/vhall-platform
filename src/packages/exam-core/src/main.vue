@@ -177,8 +177,9 @@
         this.answerType = 'show';
         this.step = 3;
         // 初始化预览页效果
-        await this.$nextTick(() => {});
-        this.$refs.examInfoDom && this.$refs.examInfoDom.initComp();
+        this.$nextTick(() => {
+          this.$refs.examInfoDom && this.$refs.examInfoDom.initComp();
+        });
       },
       // 关闭弹窗
       handleClose() {
@@ -192,7 +193,9 @@
         this.previewVo = previewInfo;
         this.answerTimeNum = previewInfo.limit_time_second; // 倒计时（数值单位秒）
         this.timeLoaded = true;
-        this.executeInterval();
+        if (this.answerType != 'show') {
+          this.executeInterval();
+        }
       },
       // 是否允许执行答题
       examCheckOption(status) {

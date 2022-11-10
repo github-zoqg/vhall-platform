@@ -120,16 +120,15 @@
         </div>
         <!-- 答案结果 -->
         <div class="vmp-exam-info--result" v-if="answerType == 'show'">
-          <label>分数：</label>
-          <span>{{ item.score }}</span>
-          <strong>|</strong>
-          <label>正确答案：</label>
-          <span class="success__tag">
-            {{ item.releaseAnswerStr }}
-          </span>
-          <strong>|</strong>
-          <label>您的答案：</label>
-          <span>{{ item.answer }}</span>
+          <h1>答案</h1>
+          <div>
+            <div>正确答案：</div>
+            <div>AaAbAcAABBCAc</div>
+          </div>
+          <div>
+            <div>您的答案：</div>
+            <div>AaAbAcAABBCAc</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1014,19 +1013,6 @@
               }
             }
           }
-        }
-      }
-      /* 预览和答题模式样式 */
-      &.page-show {
-        &.max-width {
-          width: 100%;
-          border: none;
-          padding: 0 0;
-        }
-        &.min-width {
-          width: calc(50% - 16px);
-          border: none;
-          padding: 0 0;
         }
       }
       /* hover、active态 */
