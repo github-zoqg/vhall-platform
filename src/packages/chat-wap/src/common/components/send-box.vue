@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-send-box" :class="[className, `vmp-send-box__${currentTab}`]">
-    <div class="vmp-send-box__content">
+    <div class="vmp-send-box__content" v-show="!showInputModal">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
@@ -98,6 +98,7 @@
       ref="chatWapInput"
       :refName="refName"
       @sendMsg="sendMessage"
+      @getChatModalStatus="getChatModalStatus"
       :showTabType="currentTab"
       :cuid="$parent.cuid"
     ></chat-wap-input>
@@ -220,7 +221,8 @@
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         visibleMenuLength: 0,
         isPortraitLive:
-          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0 // 竖屏直播
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0, // 竖屏直播
+        showInputModal: false
       };
     },
     computed: {
@@ -481,6 +483,10 @@
       },
       setVisibleMenuLength(len) {
         this.visibleMenuLength = len;
+      },
+      //聊天输入框
+      getChatModalStatus(val) {
+        this.showInputModal = val;
       }
     }
   };
