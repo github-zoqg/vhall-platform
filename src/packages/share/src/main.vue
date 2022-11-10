@@ -63,7 +63,7 @@
 </template>
 <script>
   import { useRoomBaseServer } from 'middle-domain';
-  import { getUrl } from '@/app-shared/utils/tool';
+  import { getUrl, doCopy } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpShare',
     data() {
@@ -209,9 +209,10 @@
       },
       // 复制地址
       copy() {
-        const input = document.getElementById('vmp-share-watch');
-        input.select();
-        document.execCommand('copy');
+        // const input = document.getElementById('vmp-share-watch');
+        // input.select();
+        // document.execCommand('copy');
+        doCopy(this.watchWebUrl);
         this.$message({
           message: this.$t('nav.nav_1024'),
           showClose: true,

@@ -18,7 +18,7 @@
           <a class="confirm" href="javascript:;" @click="onSubmit">
             {{ confirmText || $t('message.confirmText') }}
           </a>
-          <a class="cancel" href="javascript:;" @click="onCancel">
+          <a class="cancel" v-if="cancelText" href="javascript:;" @click="onCancel">
             {{ cancelText || $t('message.cancelText') }}
           </a>
         </p>
@@ -32,6 +32,18 @@
             {{ knowText || $t('message.knowText') }}
           </a>
         </p>
+        <el-tooltip class="item" effect="dark" placement="bottom-end">
+          <div class="tooltip-content" slot="content">
+            <p class="content-title">请按以下方法排查：</p>
+            <p>1.请确认网络连接正常</p>
+            <p>2.请确认浏览器已授权摄像头、麦克风使用</p>
+            <p>3.请确认摄像头、麦克风已正确连接并开启</p>
+            <p>4.如果是外置摄像头、麦克风，请拔出重新拆入尝试</p>
+            <p>5.重启您的电脑</p>
+            <p>6.您还可以拨打客服：400-888-9970</p>
+          </div>
+          <span class="qaTip" v-if="showQA">问题排查</span>
+        </el-tooltip>
       </div>
     </div>
   </div>
@@ -64,6 +76,10 @@
       isShowClose: {
         type: Boolean,
         default: true
+      },
+      showQA: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
@@ -174,6 +190,16 @@
             }
           }
         }
+        .qaTip {
+          position: absolute;
+          bottom: 24px;
+          left: 32px;
+          font-size: 14px;
+          cursor: pointer;
+          &:hover {
+            color: #0a7ff5;
+          }
+        }
       }
     }
   }
@@ -190,6 +216,17 @@
     justify-content: center;
     * {
       box-sizing: border-box;
+    }
+  }
+</style>
+<style lang="less">
+  .el-popper .popper__arrow::after {
+    border-bottom-color: #fff !important;
+  }
+  .el-tooltip__popper .tooltip-content {
+    line-height: 24px;
+    .content-title {
+      font-weight: bold;
     }
   }
 </style>

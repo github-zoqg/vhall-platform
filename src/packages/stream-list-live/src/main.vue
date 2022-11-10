@@ -10,15 +10,23 @@
         class="vmp-stream-list__local-container"
         :class="{
           'height-lower': isMainScreenHeightLower && !isShrink,
-          'vmp-stream-list__main-screen': joinInfo.third_party_user_id == mainScreen,
+          'vmp-stream-list__main-screen':
+            joinInfo.third_party_user_id == mainScreen || (initLocalSpeaker && liveStatus != 1),
           'vmp-dom__mini':
-            ['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
-            joinInfo.third_party_user_id == mainScreen,
+            (['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
+              joinInfo.third_party_user_id == mainScreen) ||
+            (initLocalSpeaker && liveStatus != 1),
           'vmp-dom__max':
             !['stream-list', 'insert-video', 'rebroadcast-stream'].includes(miniElement) &&
             joinInfo.third_party_user_id == mainScreen
         }"
-        v-show="localSpeaker.accountId || (isStreamYun && joinInfo.role_name == 1) || isRecord"
+        v-show="
+          localSpeaker.accountId ||
+          (!isThirdStream && joinInfo.role_name == 1) ||
+          (isStreamYun && joinInfo.role_name == 1) ||
+          isRecord ||
+          (initLocalSpeaker && liveStatus != 1)
+        "
       >
         <!-- 云导播活动 -->
         <vmp-air-container
@@ -127,7 +135,7 @@
       isRecord() {
         return this.$domainStore.state.roomBaseServer.clientType == 'record';
       },
-      // 1直播
+      // 直播状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       liveStatus() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type;
       },
@@ -233,6 +241,13 @@
           this.$domainStore.state.roomBaseServer.watchInitData.permissionKey['webinar.director'] ==
             1
         );
+      },
+      // 是否开启第三方推流
+      isThirdStream() {
+        return this.$domainStore.state.roomBaseServer.isThirdStream;
+      },
+      initLocalSpeaker() {
+        return this.$domainStore.state.interactiveServer.localSpeaker;
       }
     },
 

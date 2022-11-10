@@ -11,7 +11,10 @@
       @onClose="closeConfirm"
       @onCancel="closeConfirm"
     >
-      <main slot="content">{{ $t('interact.interact_1031', { n: roleName }) }}</main>
+      <main slot="content" v-if="join_info.role_name != 4">
+        {{ $t('interact.interact_1031', { n: roleName }) }}
+      </main>
+      <main slot="content" v-else>主持人邀请您上麦，上麦后会自动打开摄像头、麦克风。</main>
     </saas-alert>
   </aside>
 </template>
