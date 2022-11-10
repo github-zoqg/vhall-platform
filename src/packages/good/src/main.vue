@@ -327,6 +327,12 @@
           line-height: 20px;
           overflow: hidden;
           text-align: left;
+          text-overflow: ellipsis;
+          word-break: break-all;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          line-clamp: 2;
         }
         .describe {
           width: 200px;
