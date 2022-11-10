@@ -117,7 +117,7 @@
         }
       },
       visible(val) {
-        console.log('....visible', this.cuid);
+        this.$emit('getChatModalStatus', val);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitChangeChatSendBox', [this.visible])
         );
@@ -551,6 +551,14 @@
           color: var(--theme-qa-sendBox-input-max-font-color);
         }
       }
+    }
+  }
+  .isPortraitLive {
+    .chat-input-modal {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
     }
   }
 </style>

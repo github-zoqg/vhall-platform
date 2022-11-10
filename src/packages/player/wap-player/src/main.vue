@@ -180,7 +180,8 @@
           "
           :class="[
             iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
-            docScreen == 'fullscreen' || chatSendBoxVisible ? 'hide' : ''
+            docScreen == 'fullscreen' || chatSendBoxVisible ? 'hide' : '',
+            hasIosSafeArea ? 'hasIosSafeArea' : ''
           ]"
         >
           <div class="vmp-wap-player-control" v-show="docScreen != 'fullscreen'">
@@ -454,7 +455,11 @@
   </div>
 </template>
 <script>
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import {
+    boxEventOpitons,
+    parseImgOssQueryString,
+    getIosSafeArea
+  } from '@/app-shared/utils/tool.js';
   import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
@@ -630,7 +635,8 @@
         showQualityCard: false,
         showSpeedCard: false,
         docScreen: '', //文档全屏
-        chatSendBoxVisible: false
+        chatSendBoxVisible: false,
+        hasIosSafeArea: getIosSafeArea()
       };
     },
     watch: {
@@ -1180,7 +1186,7 @@
       },
       openQuality() {
         // 竖屏直播-回放
-        if (this.isPortraitLive && !this.isLiving && this.isEmbed) {
+        if (this.isPortraitLive && !this.isLiving && !this.isEmbed) {
           if (this.isWapBodyDocSwitchFullScreen) {
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitPlayerOpenQuality', [true])
@@ -1841,6 +1847,12 @@
         z-index: 99;
         &.hide {
           display: none !important;
+        }
+        &.hasIosSafeArea {
+          .vmp-wap-player-control {
+            height: calc(100px + constant(safe-area-inset-bottom));
+            height: calc(100px + env(safe-area-inset-bottom));
+          }
         }
         .vmp-wap-player-control {
           height: 85px;
