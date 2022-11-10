@@ -291,6 +291,9 @@
         this.subscribeStream();
       }
     },
+    destroyed() {
+      this.desktopShareServer.$off('screen_stream_add');
+    },
     watch: {
       // 监听流列表高度变
       ['interactiveServer.state.streamListHeightInWatch']: {

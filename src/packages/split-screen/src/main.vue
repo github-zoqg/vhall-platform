@@ -26,6 +26,19 @@
           <div class="vmp-split-screen__stream-container-box">
             <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
+          <div
+            v-if="
+              $domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
+              localSpeaker.accountId
+            "
+            class="vmp-split-screen__stream-split"
+            :key="localSpeaker.streamId"
+          >
+            <!-- 插播流 -->
+            <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+            <!-- 桌面共享流 -->
+            <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
+          </div>
         </div>
         <!-- 远端流 -->
         <div
@@ -35,6 +48,20 @@
         >
           <div class="vmp-split-screen__stream-container-box">
             <vmp-stream-remote :stream="speaker"></vmp-stream-remote>
+          </div>
+          <!-- 同一流只能初始化一次 否则会失败n-1次 导致时间延迟 -->
+          <div
+            v-if="
+              $domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
+              speaker.accountId
+            "
+            class="vmp-split-screen__stream-split"
+            :key="speaker.streamId"
+          >
+            <!-- 插播流 -->
+            <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+            <!-- 桌面共享流 -->
+            <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
           </div>
         </div>
       </div>
@@ -77,6 +104,9 @@
           ) || []
         );
       }
+      // showInsertFile(){
+      //   return this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission == this.
+      // }
     },
     watch: {
       // 流数量变更，更新视图的布局
@@ -100,6 +130,10 @@
       this.interactiveServer = useInteractiveServer();
     },
     created() {
+      console.log(
+        this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission,
+        'doc_permission'
+      );
       this.childrenCom = window.$serverConfig[this.cuid].children;
     },
     mounted() {
@@ -260,6 +294,11 @@
           display: none;
         }
       }
+    }
+    .vmp-split-screen__stream-split {
+      position: absolute;
+      top: 0;
+      height: 100%;
     }
   }
 </style>

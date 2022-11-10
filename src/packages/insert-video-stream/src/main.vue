@@ -14,7 +14,7 @@
       'vmp-insert-stream__is-watch-full-screen': isWatch && isFullScreen
     }"
   >
-    <div class="vmp-insert-stream-mask">
+    <div class="vmp-insert-stream-mask" v-if="!['SplitScreen'].includes($route.name)">
       <p>
         <span v-show="!isWatch" class="vmp-insert-stream-mask__label">视图</span>
         <el-tooltip
@@ -70,7 +70,11 @@
     ></div>
 
     <!-- 远端视频插播的播放器容器 -->
-    <div id="vmp-insert-remote-stream" class="vmp-insert-remote-stream">
+    <div
+      id="vmp-insert-remote-stream"
+      class="vmp-insert-remote-stream"
+      v-if="!['SplitScreen'].includes($route.name)"
+    >
       <video-preview
         ref="insertStream"
         :videoParam="remoteVideoParam"
@@ -335,6 +339,9 @@
     },
     mounted() {
       this.initEventListener();
+    },
+    destroyed() {
+      this.insertFileServer.$off('INSERT_FILE_STREAM_ADD');
     },
     methods: {
       // 自动退出全屏
