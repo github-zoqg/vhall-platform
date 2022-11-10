@@ -225,7 +225,7 @@ export default {
     login_1053: '',
     login_1054: '',
     login_1055: '',
-    login_1056: '',
+    login_1056: 'Please enter a valid phone number',
     login_1057: '',
     login_1058: '',
     login_1059: '',
@@ -570,7 +570,7 @@ export default {
     interact_tools_1094: 'No winner',
     interact_tools_1095: 'Name',
     interact_tools_1096: 'Phone Number',
-    interact_tools_1097: 'Adress'
+    interact_tools_1097: 'Address'
   },
   setting: {
     setting_1002: 'View settings',
@@ -945,7 +945,7 @@ export default {
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
     other_1021:
-      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
@@ -953,6 +953,7 @@ export default {
     privacy_1003: 'User Protection Agreement',
     privacy_1004: 'Privacy Policy',
     privacy_1005: 'Please read and agree to the Privacy Policy and User Service Agreement first',
-    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"'
+    privacy_1006: 'Submit and agree to the "Privacy Policy" and "User Protection Agreement"',
+    privacy_1007: 'Please check the agreement first'
   }
 };
