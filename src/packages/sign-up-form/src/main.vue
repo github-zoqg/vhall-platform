@@ -20,7 +20,9 @@
           </div>
           <div class="vmp-sign-up-form__content">
             <!--表单名称-->
-            <div class="vmp-sign-up-form__title">{{ formInfo.title }}</div>
+            <div class="vmp-sign-up-form__title">
+              <pre>{{ formInfo.title }}</pre>
+            </div>
             <!--表单简介-->
             <div
               class="vmp-sign-up-form__introduction"
@@ -32,7 +34,7 @@
                   : 'vmp-sign-up-form__introduction-padding'
               ]"
             >
-              {{ formInfo.intro }}
+              <pre>{{ formInfo.intro }}</pre>
               <span
                 v-show="overflowStatus && showToggle"
                 class="vmp-sign-up-form__introduction__detail"
@@ -59,7 +61,7 @@
                     :key="tab.code"
                     @click="switchTab(tab.code)"
                   >
-                    {{ tab.text }}
+                    <pre>{{ tab.text }}</pre>
                   </div>
                 </template>
               </div>
@@ -92,6 +94,15 @@
                           )}`
                     "
                   >
+                    <template slot="label">
+                      <span v-if="question.subject === '隐私声明'"></span>
+                      <pre v-else-if="quesIndex < 9">{{
+                        `0${quesIndex + 1}.${convertLanguage(question.subject, question)}`
+                      }}</pre>
+                      <pre v-else>{{
+                        `${quesIndex + 1}.${convertLanguage(question.subject, question)}`
+                      }}</pre>
+                    </template>
                     <!-- 输入框 -->
                     <template
                       v-if="
@@ -137,7 +148,7 @@
                         <template v-else>
                           <div v-for="radioItem in question.items" :key="radioItem.id">
                             <el-radio :label="radioItem.id" :name="question.id + ''">
-                              {{ radioItem.subject }}
+                              <pre>{{ radioItem.subject }}</pre>
                             </el-radio>
                             <template v-if="radioItem.type === 1">
                               <el-input
@@ -160,7 +171,7 @@
                       <el-checkbox-group v-model="form[question.id]">
                         <div v-for="checkItem in question.items" :key="checkItem.id">
                           <el-checkbox :label="checkItem.id" :name="question.id + ''">
-                            {{ checkItem.subject }}
+                            <pre>{{ checkItem.subject }}</pre>
                           </el-checkbox>
                           <template v-if="checkItem.type === 1">
                             <el-input
@@ -289,7 +300,7 @@
                   >
                     <template>
                       <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                        <p v-html="privacyText"></p>
+                        <pre v-html="privacyText"></pre>
                       </el-checkbox>
                     </template>
                   </el-form-item>
@@ -405,7 +416,9 @@
         </div>
         <div class="vmp-sign-up-form__content">
           <!--表单名称-->
-          <div class="vmp-sign-up-form__title">{{ formInfo.title }}</div>
+          <div class="vmp-sign-up-form__title">
+            <pre>{{ formInfo.title }}</pre>
+          </div>
           <!--表单简介-->
           <div
             class="vmp-sign-up-form__introduction"
@@ -417,7 +430,7 @@
                 : 'vmp-sign-up-form__introduction-padding'
             ]"
           >
-            {{ formInfo.intro }}
+            <pre>{{ formInfo.intro }}</pre>
             <span
               v-show="overflowStatus"
               class="vmp-sign-up-form__introduction__detail"
@@ -476,6 +489,15 @@
                         )}`
                   "
                 >
+                  <template slot="label">
+                    <span v-if="question.subject === '隐私声明'"></span>
+                    <pre v-else-if="quesIndex < 9">{{
+                      `0${quesIndex + 1}.${convertLanguage(question.subject, question)}`
+                    }}</pre>
+                    <pre v-else>{{
+                      `${quesIndex + 1}.${convertLanguage(question.subject, question)}`
+                    }}</pre>
+                  </template>
                   <!-- 输入框 -->
                   <template
                     v-if="
@@ -521,7 +543,7 @@
                       <template v-else>
                         <div v-for="radioItem in question.items" :key="radioItem.id">
                           <el-radio :label="radioItem.id" :name="question.id + ''">
-                            {{ radioItem.subject }}
+                            <pre>{{ radioItem.subject }}</pre>
                           </el-radio>
                           <template v-if="radioItem.type === 1">
                             <el-radio
@@ -544,7 +566,7 @@
                     <el-checkbox-group v-model="form[question.id]">
                       <div v-for="checkItem in question.items" :key="checkItem.id">
                         <el-checkbox :label="checkItem.id" :name="question.id + ''">
-                          {{ checkItem.subject }}
+                          <pre>{{ checkItem.subject }}</pre>
                         </el-checkbox>
                         <template v-if="checkItem.type === 1">
                           <el-input
@@ -574,7 +596,9 @@
                         :key="option.id"
                         :label="option.subject"
                         :value="option.subject"
-                      ></el-option>
+                      >
+                        <pre>{{ option.subject }}</pre>
+                      </el-option>
                     </el-select>
                   </template>
                   <!-- 地域选择 -->
@@ -667,7 +691,7 @@
                 <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
                   <template>
                     <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
-                      <p v-html="privacyText"></p>
+                      <pre v-html="privacyText"></pre>
                     </el-checkbox>
                   </template>
                 </el-form-item>
@@ -2266,6 +2290,19 @@
         border: 1px solid var(--theme-color);
       }
     }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .privacy-checkbox {
+      .el-checkbox__label {
+        padding-left: 22px;
+      }
+      .el-checkbox__input {
+        position: absolute;
+        top: 2px;
+      }
+    }
     .el-dialog {
       margin-top: 0 !important;
       position: absolute;
@@ -2639,5 +2676,14 @@
   }
   .vmp-sign-up-form__entry-form-select {
     max-width: 564px;
+  }
+  .entryForm {
+    .el-form-item__label {
+      pre {
+        display: inline;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
   }
 </style>

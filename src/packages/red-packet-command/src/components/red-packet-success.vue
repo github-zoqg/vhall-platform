@@ -28,6 +28,7 @@
   </div>
 </template>
 <script>
+  import { doCopy } from '@/app-shared/utils/tool.js';
   export default {
     name: 'RedPacketSuccess',
     props: {
@@ -67,8 +68,9 @@
         this.$emit('navTo', 'RedPacketWinners');
       },
       copy() {
-        this.$refs.shareLink.select(); // 选择对象
-        document.execCommand('Copy'); // 执行浏览器复制命令
+        // this.$refs.shareLink.select(); // 选择对象
+        // document.execCommand('Copy'); // 执行浏览器复制命令
+        doCopy(this.red_code);
         this.$message({
           message: this.$t('nav.nav_1024'),
           showClose: true,

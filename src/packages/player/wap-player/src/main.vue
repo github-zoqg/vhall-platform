@@ -1095,7 +1095,7 @@
                 text = '';
               }
             }
-            marqueeText = `${this.marquee.text}-${text}`;
+            marqueeText = `${text}`;
           }
           playerParams.marqueeOption = {
             enable: true,

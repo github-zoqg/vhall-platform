@@ -4,13 +4,16 @@
       <!-- 选择音频输出设备(扬声器) -->
       <div class="vh-media-check-selector">
         <label>扬声器</label>
-        <el-select v-model="selectedId" @change="audioOutputChange">
+        <el-select v-model="selectedId" v-if="devices.length != 0" @change="audioOutputChange">
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
             :value="item.deviceId"
             :label="item.label"
           ></el-option>
+        </el-select>
+        <el-select value="" v-if="devices.length == 0" disabled>
+          <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
         </el-select>
       </div>
 
@@ -157,14 +160,14 @@
         this.speakerReady = true;
       }, 500),
       success() {
-        window?.vhallReport?.report(110008, {
+        window?.vhallReportForProduct?.report(110008, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 扬声器设备检测成功
 
-        this.$emit('next', { result: 'success' });
+        this.$emit('next', { result: 'success', val: this.selectedId });
       },
       fail() {
-        window?.vhallReport?.report(110012, {
+        window?.vhallReportForProduct?.report(110012, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 扬声器设备检测失败
 

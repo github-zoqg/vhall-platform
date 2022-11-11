@@ -200,10 +200,10 @@
        * 缓存设置字段
        */
       saveSelected() {
-        const sessionMap = new Map([['selectedVideoDeviceId', this.mediaState.video || '']]);
+        const localMap = new Map([['media-check.selected.video', this.mediaState.video || '']]);
 
-        for (const [key, value] of sessionMap) {
-          sessionStorage.setItem(key, value);
+        for (const [key, value] of localMap) {
+          localStorage.setItem(key, value);
         }
       },
       /**
@@ -274,15 +274,23 @@
        * @notices 设置默认选中值前，会先请求设备，是异步状态。但在异步请求的过程中如果用户做了新的选择，就优先选中他自身。比如this.mediaState.video = this.mediaState.video。以免数据跳动。
        */
       setDefaultSelected() {
+        const getCurSelect = (devices, id) => {
+          const isExsit = devices.find(item => item.deviceId === id);
+          console.log('devices:', id, devices);
+          if (id && !isExsit) return '';
+
+          return id;
+        };
         return new Promise(resolve => {
           const videoInputDevices = this.devices;
           // 视频
           if (videoInputDevices.length > 0) {
-            const sessionVideoId = sessionStorage.getItem('selectedVideoDeviceId');
-            this.mediaState.video =
-              this.mediaState.video || sessionVideoId || videoInputDevices[0].deviceId;
+            const localVideoId = localStorage.getItem('media-check.selected.video');
+            const lastSelect = this.mediaState.video || localVideoId;
+            const curSelect = getCurSelect(videoInputDevices, lastSelect);
+            this.mediaState.video = curSelect || videoInputDevices[0].deviceId;
           } else {
-            sessionStorage.removeItem('selectedVideoDeviceId');
+            localStorage.removeItem('media-check.selected.video');
           }
           resolve(this.mediaState.video);
         });
