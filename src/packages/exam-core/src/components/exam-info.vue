@@ -42,7 +42,11 @@
               <div
                 :class="[
                   'vmp-exam-info--box',
-                  `${sonItem.answerStatus ? 'text__min__width' : 'text__max__width'}`
+                  `${
+                    ['no', 'yes'].includes(sonItem.answerStatus)
+                      ? 'text__min__width'
+                      : 'text__max__width'
+                  }`
                 ]"
               >
                 <div
@@ -60,18 +64,20 @@
                 </div>
                 <div class="vmp-exam-info--text">
                   <el-radio
-                    v-model="item.answer"
+                    v-model="sonItem.answer"
                     :label="sonItem.key"
                     :name="`radio_no_${item.id}`"
                     v-if="item.type === 'radio'"
                     class="zdy-exam-radio"
+                    :disabled="answerType == 'show'"
                   ></el-radio>
                   <el-checkbox
-                    v-model="item.answer"
+                    v-model="sonItem.answer"
                     :label="sonItem.key"
                     :name="`checkbox_no_${item.id}`"
                     v-if="item.type === 'checkbox'"
                     class="zdy-exam-checkbox"
+                    :disabled="answerType == 'show'"
                   ></el-checkbox>
                   <div
                     :class="[
@@ -80,10 +86,12 @@
                       `position_${sonItem.isMoreHeight || 'normal'}`
                     ]"
                     :ref="`item_${item.id}_option_${sonIndex}`"
+                    v-text="sonItem.key + '、' + sonItem.value"
+                  ></div>
+                  <div
+                    class="text--icon--inline"
+                    v-if="['no', 'yes'].includes(sonItem.answerStatus)"
                   >
-                    {{ sonItem.key + '、' + sonItem.value }}
-                  </div>
-                  <div class="text--icon--inline" v-if="sonItem.answerStatus">
                     <img
                       src="../images/icon_exam_option_close.png"
                       v-show="sonItem.answerStatus == 'no'"
@@ -105,7 +113,7 @@
                   {{ sonItem.isMoreHeight == 'open' ? '收起' : '展开' }}
                 </span>
               </div>
-              <div class="text--icon" v-if="sonItem.answerStatus">
+              <div class="text--icon" v-if="['no', 'yes'].includes(sonItem.answerStatus)">
                 <img
                   src="../images/icon_exam_option_close.png"
                   v-show="sonItem.answerStatus == 'no'"
@@ -119,15 +127,47 @@
           </template>
         </div>
         <!-- 答案结果 -->
-        <div class="vmp-exam-info--result" v-if="answerType == 'show'">
-          <h1>答案</h1>
-          <div>
-            <div>正确答案：</div>
-            <div>AaAbAcAABBCAc</div>
-          </div>
-          <div>
-            <div>您的答案：</div>
-            <div>AaAbAcAABBCAc</div>
+        <div class="vmp-exam-info--question--result" v-if="answerType == 'show'">
+          <h2>答案</h2>
+          <div class="question--result--box">
+            <div class="question--result--left">
+              <p>
+                <strong>正确答案：</strong>
+                {{ item.showReleaseAnswer }}
+              </p>
+            </div>
+            <div class="question--result--center">
+              <p class="answer_yes">
+                <strong>您的答案：</strong>
+                {{ item.showOwnerAnswer }}
+              </p>
+            </div>
+            <div class="question--result--right">
+              <img src="../images/icon_correct.png" alt="" v-if="item.answerRes == 'answer_yes'" />
+              <img
+                src="../images/icon_incorrect.png"
+                alt=""
+                v-else-if="item.answerRes == 'answer_no'"
+              />
+              <img src="../images/icon_no_answer.png" alt="" v-else />
+              <span
+                :class="
+                  item.answerRes == 'answer_yes'
+                    ? 'color-green'
+                    : item.answerRes == 'answer_no'
+                    ? 'color-red'
+                    : 'color-gray'
+                "
+              >
+                {{
+                  item.answerRes == 'answer_yes'
+                    ? '正确'
+                    : item.answerRes == 'answer_no'
+                    ? '错误'
+                    : '未作答'
+                }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -135,6 +175,7 @@
   </div>
 </template>
 <script>
+  import info from 'autoprefixer/lib/info';
   export default {
     name: 'VmpExamInfo',
     data() {
@@ -145,6 +186,7 @@
         isEnd: false, // 是否最后一题
         questionList: [], // 可答题数组
         previewInfo: null
+        // answerType: 'show'
       };
     },
     props: {
@@ -200,8 +242,8 @@
         let questionList = this.questionList;
         let nullList = questionList.filter((item, index) => {
           return (
-            (item.type === 'radio' && item.answer == '') ||
-            (item.type == 'checkbox' && item.answer.length == 0)
+            (item.type === 'radio' && item.questionAnswer == '') ||
+            (item.type == 'checkbox' && item.questionAnswer.split(',').length == 0)
           );
         });
         // 如若存在没有选择的题目，禁用下一题 or 提交按钮
@@ -212,250 +254,416 @@
     },
     beforeCreate() {},
     methods: {
+      // 快问快答详情-mock数据
       mockExamInfo() {
+        let formJson = {
+          id: 731682,
+          title: '标题',
+          description: '问卷简介',
+          publish: 'Y',
+          start_time: null,
+          app_id: 'd317f559',
+          third_party_user_id: null,
+          extension: '扩展信息',
+          created_at: '2022-11-11 15:31:53',
+          updated_at: '2022-11-11 15:31:53',
+          detail: [
+            {
+              id: 2533558,
+              third_party_user_id: null,
+              title:
+                '单选题题目最多50个字单选题题目最多50个字单选题题目最多50个字单选题题目最多50个字单选题题目最',
+              type: 'radio',
+              placeholder: null,
+              verification: 'N',
+              required: 'N',
+              score: 0,
+              style: '',
+              ext: '',
+              created_at: '2022-11-11 15:31:53',
+              updated_at: '2022-11-11 15:31:53',
+              custom_id: null,
+              app_id: 'd317f559',
+              custom_ques: 2,
+              extension: '',
+              analysis: '',
+              detail: {
+                list: [
+                  {
+                    id: 2388718,
+                    is_answer: 0,
+                    key: 'A',
+                    value: '选项单选题题目最多50个字单选题题目最多50个字',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533558,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388719,
+                    is_answer: 0,
+                    key: 'B',
+                    value:
+                      '单选题题目最多50个字单选题题目最多50个字单选题题目最多50个字单选题题目最多50个字单选题题目最',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533558,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388720,
+                    is_answer: 0,
+                    key: 'C',
+                    value: '单选题题目最多50个字',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533558,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388721,
+                    is_answer: 0,
+                    key: 'D',
+                    value: '单选题选项',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533558,
+                    imgUrl: ''
+                  }
+                ],
+                min: null,
+                max: null
+              },
+              imgUrl: ''
+            },
+            {
+              id: 2533559,
+              third_party_user_id: null,
+              title:
+                '多选题名称最多50个字多选题名称最多50个字多选题名称最多50个字多选题名称最多50个字多选题名称最',
+              type: 'checkbox',
+              placeholder: null,
+              verification: 'N',
+              required: 'N',
+              score: 0,
+              style: '',
+              ext: '',
+              created_at: '2022-11-11 15:31:53',
+              updated_at: '2022-11-11 15:31:53',
+              custom_id: null,
+              app_id: 'd317f559',
+              custom_ques: 2,
+              extension: '',
+              analysis: '',
+              detail: {
+                list: [
+                  {
+                    id: 2388722,
+                    is_answer: 0,
+                    key: 'A',
+                    value: '图片答案1111111111111111111111111111111111111111111111',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533559,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111152841/9161555b01dea66ec50f04f9a839226e/origin.jpg'
+                  },
+                  {
+                    id: 2388723,
+                    is_answer: 0,
+                    key: 'B',
+                    value:
+                      '选项2最多50个字选项2最多50个字选项2最多50个字选项2最多50个字选项2最多50个字选项2最多',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533559,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111152938/7c90e80a17388e1c5d0597f133bf4651/origin.jpg'
+                  },
+                  {
+                    id: 2388724,
+                    is_answer: 0,
+                    key: 'C',
+                    value:
+                      '华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533559,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111153019/71f3d1ea1ccfe7302036206c002eead1/origin.jpg'
+                  },
+                  {
+                    id: 2388725,
+                    is_answer: 0,
+                    key: 'D',
+                    value: '黑呵呵呵呵呵',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533559,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111153027/bf2b8f0273e9aeeccc958291ead4d4df/origin.jpg'
+                  }
+                ],
+                min: 2,
+                max: 10
+              },
+              imgUrl: ''
+            },
+            {
+              id: 2533560,
+              third_party_user_id: null,
+              title:
+                '多选题题纯文字，和鹅鹅鹅饿多选题题纯文字，和鹅鹅鹅饿多选题题纯文字，和鹅鹅鹅饿多选题题纯文字，和鹅鹅',
+              type: 'checkbox',
+              placeholder: null,
+              verification: 'N',
+              required: 'N',
+              score: 0,
+              style: '',
+              ext: '',
+              created_at: '2022-11-11 15:31:53',
+              updated_at: '2022-11-11 15:31:53',
+              custom_id: null,
+              app_id: 'd317f559',
+              custom_ques: 2,
+              extension: '',
+              analysis: '',
+              detail: {
+                list: [
+                  {
+                    id: 2388726,
+                    is_answer: 0,
+                    key: 'A',
+                    value: '选项1123123123选项1123123123选项1123123123选项1123123123选项',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533560,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388727,
+                    is_answer: 0,
+                    key: 'B',
+                    value: 'AKSFSDFAKSFSDFAKSFSDFAKSFSDFAKSFSDFAKSFSDFAKSFSDFA',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533560,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388728,
+                    is_answer: 0,
+                    key: 'C',
+                    value: 'WORDKSFAJFLAJSFLSAJDLKFSDAWORDKSFAJFLAJSFLSAJDLKFS',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533560,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388729,
+                    is_answer: 0,
+                    key: 'D',
+                    value: 'WORDKSFAJFLAJSFLSAJDLKFSDA4',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533560,
+                    imgUrl: ''
+                  },
+                  {
+                    id: 2388730,
+                    is_answer: 0,
+                    key: 'E',
+                    value: '选项啊',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533560,
+                    imgUrl: ''
+                  }
+                ],
+                min: 2,
+                max: 10
+              },
+              imgUrl: ''
+            },
+            {
+              id: 2533561,
+              third_party_user_id: null,
+              title:
+                '多选题名称最多50个字多选题名称最多50个字多选题名称最多50个字多选题名称最多50个字多选题名称最',
+              type: 'checkbox',
+              placeholder: null,
+              verification: 'N',
+              required: 'N',
+              score: 0,
+              style: '',
+              ext: '',
+              created_at: '2022-11-11 15:31:53',
+              updated_at: '2022-11-11 15:31:53',
+              custom_id: null,
+              app_id: 'd317f559',
+              custom_ques: 2,
+              extension: '',
+              analysis: '',
+              detail: {
+                list: [
+                  {
+                    id: 2388726,
+                    is_answer: 0,
+                    key: 'A',
+                    value: '图片答案1111111111111111111111111111111111111111111111',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533561,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111152841/9161555b01dea66ec50f04f9a839226e/origin.jpg'
+                  },
+                  {
+                    id: 2388727,
+                    is_answer: 0,
+                    key: 'B',
+                    value:
+                      '选项2最多50个字选项2最多50个字选项2最多50个字选项2最多50个字选项2最多50个字选项2最多',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533561,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111152938/7c90e80a17388e1c5d0597f133bf4651/origin.jpg'
+                  },
+                  {
+                    id: 2388728,
+                    is_answer: 0,
+                    key: 'C',
+                    value:
+                      '华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为合伙人沃尔沃华为',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533561,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111153019/71f3d1ea1ccfe7302036206c002eead1/origin.jpg'
+                  },
+                  {
+                    id: 2388729,
+                    is_answer: 0,
+                    key: 'D',
+                    value: '黑呵呵呵呵呵',
+                    custom_opt: 2,
+                    updated_at: '2022-11-11 15:31:53',
+                    created_at: '2022-11-11 15:31:53',
+                    deleted_at: null,
+                    question_id: 2533561,
+                    imgUrl:
+                      'http://vhallyun-static.oss-cn-beijing.aliyuncs.com/form/20221111153027/bf2b8f0273e9aeeccc958291ead4d4df/origin.jpg'
+                  }
+                ],
+                min: 2,
+                max: 10
+              },
+              imgUrl: ''
+            }
+          ],
+          imgUrl: null,
+          finishTime: null
+        };
         let res = {
           code: 200,
           data: {
             title: '苹果2022年新品发布会，极致体验知识大盘点',
             extension: '扩展字段',
-            question_detail: '',
-            jsonData: [
-              {
-                id: 1,
-                sortNo: 1, // 模拟题号
-                releaseAnswerStr: 'C', // 模拟正确答案
-                subject_type: 'img-text',
-                layout_type: 1,
-                layout_css: 1,
-                title: '图文题 - 单选图文题 - 单选',
-                answer: '',
-                releaseAnswer: 'C',
-                type: 'radio',
-                score: 2,
-                detail: {
-                  list: [
-                    {
-                      id: 2314123,
-                      key: 'A',
-                      value: '选项1212选项1212选项1212选项1212选项1212选项1212',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/users/logo-imgs/ba/e1/bae13a3f7402fded318e89b1b45050b3.jpg'
-                    },
-                    {
-                      id: 2314124,
-                      key: 'B',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202210/dc/1f/dc1f16226003784bc8cdcab2a97c6a06.jpg'
-                    },
-                    {
-                      id: 2314125,
-                      key: 'C',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202205/be/c3/bec3e6189b84c2ceb268e236449a0da6.jpg'
-                    }
-                  ],
-                  min: null,
-                  max: null
-                },
-                imgUrl: ''
-              },
-              {
-                id: 2,
-                sortNo: 2, // 模拟题号
-                releaseAnswerStr: 'C', // 模拟正确答案
-                subject_type: 'img-text',
-                layout_type: 2,
-                layout_css: 1,
-                title: '图文题 - 多选',
-                answer: ['A', 'B'],
-                releaseAnswer: 'C',
-                type: 'checkbox',
-                score: 2,
-                detail: {
-                  list: [
-                    {
-                      id: 23141231,
-                      key: 'A',
-                      value: '选项1212',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202205/0c/b7/0cb718a8c30eff8115a25d575a2909ec.jpg'
-                    },
-                    {
-                      id: 23141241,
-                      key: 'B',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202203/3c/a1/3ca171b039f3c8d98466d82c57009115.png'
-                    },
-                    {
-                      id: 23141243,
-                      key: 'C',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202202/b6/0d/b60da041ef1789c0b3f05ee1f42ed5f0.jpg'
-                    }
-                  ],
-                  min: null,
-                  max: null
-                },
-                imgUrl: ''
-              },
-              {
-                id: 3,
-                sortNo: 3, // 模拟题号
-                releaseAnswerStr: 'C', // 模拟正确答案
-                subject_type: 'img-text',
-                layout_type: 1,
-                layout_css: 2,
-                title: '图文题 - 多选',
-                answer: ['C'],
-                releaseAnswer: ['C'],
-                type: 'checkbox',
-                score: 2,
-                detail: {
-                  list: [
-                    {
-                      id: 23141231,
-                      key: 'A',
-                      value: '选项1212',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202111/3b/5a/3b5aa8434a50def129cda3a68f58fcba.jpg'
-                    },
-                    {
-                      id: 23141241,
-                      key: 'B',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202111/6a/d3/6ad3c1aa1b8271c3949e4b6503b20a15.jpg'
-                    },
-                    {
-                      id: 23141243,
-                      key: 'C',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl:
-                        'https://t-alistatic01.e.vhall.com/upload/interacts/screen-imgs/202110/25/c7/25c7e7b1a8eccad068ba58a60069f8fc.jpg'
-                    }
-                  ],
-                  min: null,
-                  max: null
-                },
-                imgUrl: ''
-              },
-              {
-                id: 4,
-                sortNo: 4, // 模拟题号
-                releaseAnswerStr: 'C', // 模拟正确答案
-                subject_type: 'text',
-                layout_type: 1,
-                layout_css: 1,
-                title:
-                  '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
-                answer: '',
-                releaseAnswer: 'C',
-                type: 'radio',
-                score: 2,
-                detail: {
-                  list: [
-                    {
-                      id: 23141231,
-                      key: 'A',
-                      value:
-                        '选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212',
-                      imgUrl: ''
-                    },
-                    {
-                      id: 23141241,
-                      key: 'B',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl: ''
-                    }
-                  ],
-                  min: null,
-                  max: null
-                },
-                imgUrl: ''
-              },
-              {
-                id: 5,
-                sortNo: 5, // 模拟题号
-                releaseAnswerStr: 'C', // 模拟正确答案
-                subject_type: 'text',
-                layout_type: 2,
-                layout_css: 1,
-                title:
-                  '单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231单选题1231231',
-                answer: ['C'],
-                releaseAnswer: ['C'],
-                type: 'checkbox',
-                score: 2,
-                detail: {
-                  list: [
-                    {
-                      id: 23141231,
-                      key: 'A',
-                      value:
-                        '选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212选项1212',
-                      imgUrl: ''
-                    },
-                    {
-                      id: 23141241,
-                      key: 'B',
-                      value:
-                        '选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123选项123123',
-                      imgUrl: ''
-                    },
-                    {
-                      id: 23141251,
-                      key: 'C',
-                      value: 'SFSAFSDAFSAFDSAFSDFSDF',
-                      imgUrl: ''
-                    }
-                  ],
-                  min: null,
-                  max: null
-                },
-                imgUrl: ''
-              }
-            ],
-            auto_push_switch: 0, // 自动推送 开关 0.否 1.是
+            question_detail: JSON.stringify(formJson),
             limit_time: 60, // 限制时间
-            limit_time_second: 3600, // 限制时间*60，转换为秒
-            limit_time_switch: 1 // 限制时间开关 0.否 1.是
+            limit_time_switch: 1, // 限制时间开关 0.否 1.是
+            push_time: ''
           }
         };
         return res;
       },
+      // 获取快问快答-详情后，数据组装
       renderPreviewInfo(res) {
         let resData = res.data;
-        resData.jsonData = resData.question_detail
-          ? JSON.stringify(resData.question_detail)
-          : resData.jsonData || [];
+        resData.limit_time_second = resData.limit_time > 0 ? Number(resData.limit_time) * 60 : 0; // 限制时间*60，转换为秒
+        resData.form = resData.question_detail
+          ? JSON.parse(resData.question_detail)
+          : { detail: [] };
+        resData.jsonData = resData.form.detail || [];
         resData.jsonData.map((item, index) => {
           item.sortNo = index + 1;
-          item.releaseAnswerStr =
-            item.releaseAnswer && Array.isArray(item.releaseAnswer)
-              ? item.releaseAnswer.join('、')
-              : item.releaseAnswer;
+          if (index == 0) {
+            item.questionAnswer = 'A'; // 题目正确答案
+            item.ownerAnswer = 'A'; // 自己作答内容
+            item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
+            item.layout_type = 1; // 一行一列（1）；一行二列（2）
+            item.layout_css = 1; // 上下布局（1）；左右布局（2）
+          } else if (index == 1) {
+            item.questionAnswer = 'A,B'; // 题目正确答案
+            item.ownerAnswer = 'A'; // 自己作答内容
+            item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
+            item.layout_type = 1; // 一行一列（1）；一行二列（2）
+            item.layout_css = 2; // 上下布局（1）；左右布局（2）
+          } else if (index == 2) {
+            item.questionAnswer = 'A,B'; // 题目正确答案
+            item.ownerAnswer = 'A,B'; // 自己作答内容
+            item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
+            item.layout_type = 1; // 一行一列（1）；一行二列（2）
+            item.layout_css = 2; // 上下布局（1）；左右布局（2）
+          } else if (index == 3) {
+            item.questionAnswer = 'A'; // 题目正确答案
+            item.ownerAnswer = 'B'; // 自己作答内容
+            item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
+            item.layout_type = 2; // 一行一列（1）；一行二列（2）
+            item.layout_css = 1; // 上下布局（1）；左右布局（2）
+          }
           if (this.answerType == 'show') {
-            item.detail.list.forEach((sonItem, sonIndex) => {
-              if (Array.isArray(item.releaseAnswer) && item.releaseAnswer.includes(sonItem.key)) {
-                // 复选框 & 已勾选
-                sonItem.answerStatus = 'yes';
-              } else if (item.releaseAnswer == sonItem.key) {
-                // 单选题 & 已勾选
-                sonItem.answerStatus = 'yes';
-              } else {
-                sonItem.answerStatus = 'none';
-              }
+            // 题目标记答题是否正确等
+            let answerResVo = this.setAnswerResTag(item);
+            item.answerRes = answerResVo.answerRes;
+            item.showReleaseAnswer = answerResVo.showReleaseAnswer;
+            item.showOwnerAnswer = answerResVo.showOwnerAnswer;
+            console.log(
+              '多选' + item.type,
+              item.ownerAnswer,
+              item.questionAnswer,
+              item.answerRes,
+              item.showReleaseAnswer,
+              item.showOwnerAnswer
+            );
+            item.detail.list.map((sonItem, sonIndex) => {
+              // 选项标记区域
+              sonItem.answerStatus = this.setAnswerOptionTag(item, sonItem);
+              // 答题选项v-model绑定变量
+              sonItem.answer = '';
             });
           }
         });
@@ -474,6 +682,83 @@
         });
         // 通知外部题目信息
         this.$emit('examData', this.previewInfo);
+      },
+      // 标记题目答题状态
+      setAnswerResTag(item) {
+        // 若自己作答，比对正确答案；若未作答，不做处理。
+        // 题目-正确答案（item.questionAnswer）
+        // 自己-作答内容（item.ownerAnswer）
+        if (item.type == 'radio') {
+          // 单选题
+          if (item.ownerAnswer && item.questionAnswer == item.ownerAnswer) {
+            // 本题正确作答
+            item.answerRes = 'answer_yes';
+          } else if (item.ownerAnswer && item.questionAnswer != item.ownerAnswer) {
+            // 本题错误作答
+            item.answerRes = 'answer_no';
+          } else {
+            // 本题未作答
+            item.answerRes = 'answer_normal';
+          }
+          // 转换正确答案 和 自己作答答案
+          item.showReleaseAnswer = item.questionAnswer;
+          item.showOwnerAnswer = item.ownerAnswer;
+        } else if (item.type == 'checkbox') {
+          // 多选题 （排序后比对数组是否相等）；
+          let questionAnswer = Array.isArray(item.questionAnswer)
+            ? item.questionAnswer
+            : item.questionAnswer.split(',');
+          let ownerAnswer = Array.isArray(item.ownerAnswer)
+            ? item.ownerAnswer
+            : item.ownerAnswer.split(',');
+          if (
+            ownerAnswer &&
+            JSON.stringify(ownerAnswer.sort()) === JSON.stringify(questionAnswer.sort())
+          ) {
+            // 本题正确作答
+            item.answerRes = 'answer_yes';
+          } else if (
+            ownerAnswer &&
+            JSON.stringify(ownerAnswer.sort()) !== JSON.stringify(questionAnswer.sort())
+          ) {
+            // 本题错误作答（部分正确 or 全错）
+            item.answerRes = 'answer_no';
+          } else {
+            // 本地未作答
+            item.answerRes = 'answer_normal';
+          }
+          // 转换正确答案 和 自己作答答案
+          item.showReleaseAnswer = questionAnswer.join('');
+          item.showOwnerAnswer = ownerAnswer.join('');
+        }
+        return {
+          answerRes: item.answerRes,
+          showReleaseAnswer: item.showReleaseAnswer,
+          showOwnerAnswer: item.showOwnerAnswer
+        };
+      },
+      // 标记题目下-选项答题状态
+      setAnswerOptionTag(item, sonItem) {
+        if (item.answerRes != 'answer_normal') {
+          if (item.type == 'radio') {
+            sonItem.answerStatus =
+              sonItem.key == item.ownerAnswer
+                ? item.answerRes == 'answer_yes'
+                  ? 'yes'
+                  : 'no'
+                : '';
+          } else if (item.type == 'checkbox') {
+            let ownerAnswer = Array.isArray(item.ownerAnswer)
+              ? item.ownerAnswer
+              : item.ownerAnswer.split(',');
+            sonItem.answerStatus = ownerAnswer.includes(item.key)
+              ? item.answerRes == 'answer_yes'
+                ? 'yes'
+                : 'no'
+              : '';
+          }
+        }
+        return sonItem.answerStatus;
       },
       // 活动下预览快问快答
       previewExamInfo() {
@@ -494,17 +779,7 @@
         //     this.previewInfo = {};
         //   });
       },
-      // 页面初始化
-      async initComp() {
-        console.log('触发成绩单查询。。。');
-        this.answerIndex = null;
-        await this.previewExamInfo();
-        this.resetQuestion();
-        await this.$nextTick(() => {});
-        console.log('ak', this.questionList);
-        this.setIsMoreHeight();
-      },
-      // 标记-是否需要 展开or收缩
+      // 标记题目-选项 是否需要 展开or收缩
       setIsMoreHeight() {
         // isMoreHeight: '', // ‘’ 不需要展示收缩；open 开启状态，需要展示，文案“收缩”；close 关闭状态，需要展示，文案“展开”
         this.questionList.map((item, index) => {
@@ -531,7 +806,7 @@
         console.log('当前列表', this.questionList);
         this.$forceUpdate();
       },
-      // 切换收缩 or 展开效果
+      // 切换题目-选项 收缩 or 展开效果
       changeStatus(item) {
         if (item.isMoreHeight == '') return;
         item.isMoreHeight = item.isMoreHeight == 'open' ? 'close' : 'open';
@@ -601,6 +876,16 @@
           isFirst: this.isFirst,
           isEnd: this.isEnd
         });
+      },
+      // 页面初始化
+      async initComp() {
+        console.log('触发成绩单查询。。。');
+        this.answerIndex = null;
+        await this.previewExamInfo();
+        this.resetQuestion();
+        await this.$nextTick(() => {});
+        console.log('ak', this.questionList);
+        this.setIsMoreHeight();
       }
     }
   };
@@ -636,11 +921,103 @@
         color: #fb2626;
         padding: 4px 8px;
       }
+      &--result {
+        padding-top: 16px;
+        padding-bottom: 16px;
+        h2 {
+          font-family: 'PingFang HK';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 28px;
+          line-height: 40px;
+          color: #262626;
+          margin-bottom: 24px;
+        }
+        .question--result--box {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .question--result--left {
+          display: flex;
+          flex-wrap: wrap;
+          margin-right: 32px;
+          p {
+            word-break: break-all;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 28px;
+            line-height: 36px;
+            color: #0fba5a;
+            strong {
+              color: #262626;
+            }
+          }
+          margin-right: 32px;
+        }
+        .question--result--center {
+          display: flex;
+          flex-wrap: wrap;
+          margin-right: 32px;
+          p {
+            word-break: break-all;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 28px;
+            line-height: 36px;
+            &.answer_yes {
+              color: #0fba5a;
+              strong {
+                color: #262626;
+              }
+            }
+            &.answer_no {
+              color: #fb2626;
+              strong {
+                color: #262626;
+              }
+            }
+          }
+        }
+        .question--result--right {
+          margin-right: 12px;
+          padding: 4px 16px;
+          border: 1px solid #ffd1c9;
+          border-radius: 8px;
+          transform: rotate(-5deg);
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          flex-shrink: 0;
+          img {
+            width: 48px;
+            height: 48px;
+            margin-right: 4px;
+            transform: rotate(-5deg);
+          }
+          span {
+            font-style: normal;
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 32px;
+            transform: rotate(-5deg);
+            &.color-green {
+              color: #0fba5a;
+            }
+            &.color-red {
+              color: #fb2626;
+            }
+            &.color-default {
+              color: #262626;
+            }
+          }
+        }
+      }
     }
     &--option {
       background: rgba(0, 0, 0, 0.03);
       border-radius: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       font-style: normal;
       font-weight: 400;
       font-size: 14px;
