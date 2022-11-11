@@ -37,7 +37,7 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <img src="./img/doc_empty.png" style="width: 100px; margin-bottom: 20px" />
+          <img src="./img/doc_empty.png" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
       </div>
@@ -722,15 +722,14 @@
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        i {
-          color: #7c7c7c;
-          font-size: 2rem;
-          margin-bottom: 0.4rem;
+        img {
+          width: 160px;
+          margin-bottom: 24px;
         }
         span {
-          color: #6f6f6f;
-          font-size: 100%;
-          font-weight: normal;
+          color: #8c8c8c;
+          font-size: 28px;
+          line-height: 39px;
         }
       }
     }
