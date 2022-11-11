@@ -1,13 +1,32 @@
 <template>
   <div class="vh-exam-model-panel">
-    <!-- 标题栏 -->
-    <div class="exam-execute-title" v-if="step != 2">
-      <template v-if="answerType != 'show'">
-        <div class="exam-execute--time">
-          <img src="./images/icon_exam_time.png" class="exam_time__icon" alt="" />
-          <div class="exam_time__text">
-            <template v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
-              <ul v-if="previewVo && previewVo.limit_time_switch > 0">
+    <div class="exam-execute-header">
+      <!-- 标题栏 -->
+      <div class="exam-execute-title" v-if="step != 2">
+        <template>
+          <div class="exam-execute--time">
+            <img src="./images/icon_exam_time.png" class="exam_time__icon" alt="" />
+            <div class="exam_time__text" v-if="answerType != 'show'">
+              <!-- 答题（答题倒计时） -->
+              <template v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
+                <ul v-if="previewVo && previewVo.limit_time_switch > 0">
+                  <li class="exam-css-timer" v-if="answerFormat && answerFormat.hour > 0">
+                    {{ answerFormat.hour > 9 ? answerFormat.hour : `0${answerFormat.hour}` }}
+                  </li>
+                  <li class="exam-css-timer" v-else>00</li>
+                  <li class="exam-css-timer">:</li>
+                  <li class="exam-css-timer" v-if="answerFormat && answerFormat.minute > 0">
+                    {{ answerFormat.minute > 9 ? answerFormat.minute : `0${answerFormat.minute}` }}
+                  </li>
+                  <li class="exam-css-timer" v-else>00</li>
+                </ul>
+                <span v-else>不限时</span>
+              </template>
+              <template v-else><span>加载中</span></template>
+            </div>
+            <div class="exam_time__text" v-else>
+              <!-- 查看结果（答题时间） -->
+              <ul v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
                 <li class="exam-css-timer" v-if="answerFormat && answerFormat.hour > 0">
                   {{ answerFormat.hour > 9 ? answerFormat.hour : `0${answerFormat.hour}` }}
                 </li>
@@ -18,29 +37,27 @@
                 </li>
                 <li class="exam-css-timer" v-else>00</li>
               </ul>
-              <span v-else>不限时</span>
-            </template>
-            <template v-else><span>加载中</span></template>
+            </div>
           </div>
+        </template>
+        <div class="exam-execute--status" v-if="isLoadingEnd && pageVo && pageVo.total > 0">
+          <strong>{{ pageVo.findIndex + 1 }}</strong>
+          <span>/{{ pageVo.total }}</span>
         </div>
-      </template>
-      <div class="exam-execute--status" v-if="pageVo && pageVo.total > 0">
-        <strong>{{ pageVo.findIndex + 1 }}</strong>
-        <span>/{{ pageVo.total }}</span>
+        <div class="exam-execute--close">
+          <img
+            src="./images/icon_exam_close.png"
+            class="exam_close__icon"
+            alt=""
+            @click="handleClose"
+          />
+        </div>
       </div>
-      <div class="exam-execute--close">
-        <img
-          src="./images/icon_exam_close.png"
-          class="exam_close__icon"
-          alt=""
-          @click="handleClose"
-        />
-      </div>
+      <!-- 进度条 -->
+      <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
+      <!-- 分割条 -->
+      <div class="exam-padding-line"></div>
     </div>
-    <!-- 进度条 -->
-    <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
-    <!-- 分割条 -->
-    <div class="exam-padding-line"></div>
     <!-- 内容区域 -->
     <exam-info
       class="exam-execute-body"
@@ -52,6 +69,7 @@
       @change="changeQuestion"
       @examData="previewInfo"
       @examCheckOption="examCheckOption"
+      @timerControl="changeTimerIsOpen"
     ></exam-info>
     <!-- 底部 -->
     <div class="exam-execute-footer" v-if="step != 2">
@@ -61,6 +79,7 @@
         round
         @click="lastQuestion"
         v-if="pageVo && !pageVo.isFirst"
+        class="gray--button"
       >
         上一题
       </van-button>
@@ -83,15 +102,6 @@
         :disabled="isDisabledSave"
       >
         提交
-      </van-button>
-      <van-button
-        type="primary"
-        size="medium"
-        round
-        @click="close"
-        v-if="pageVo && pageVo.isEnd && answerType == 'show'"
-      >
-        关闭
       </van-button>
     </div>
     <!-- 查看答案 -->
@@ -117,7 +127,9 @@
       return {
         examId: null,
         answerType: 'show',
-        pageVo: null,
+        pageVo: {
+          total: 0
+        },
         step: 1, // 当前步骤（1--填写步骤；2--得知答案步骤；3--查看填写结果）
         previewVo: null,
         answerTimer: null, // 倒计时-定时器
@@ -142,6 +154,10 @@
         } else {
           return 0;
         }
+      },
+      isLoadingEnd() {
+        // 是否获取到加载所需要的数据
+        return this.previewVo != null && this.pageVo && this.pageVo.total > 0;
       }
     },
     methods: {
@@ -150,7 +166,8 @@
         this.examId = examId;
         this.answerType = answerType || 'show';
         this.step = 1;
-        this.timeLoaded = false;
+        // 每次打开重置计时器 - 启动时间为数据拿取完毕
+        this.changeTimerIsOpen(false);
         this.$nextTick(() => {
           // 初始化预览页效果
           this.$refs.examInfoDom && this.$refs.examInfoDom.initComp();
@@ -166,10 +183,13 @@
       },
       // 题目变更
       changeQuestion(vo) {
+        console.log('当前题目渲染内容', vo);
         this.pageVo = vo;
       },
       // 提交记录后，展示下一个面板
       submit() {
+        // 提交的时候，停止答题倒计时
+        this.changeTimerIsOpen(false);
         this.step = 2;
       },
       // 查看答案
@@ -183,29 +203,39 @@
       },
       // 关闭弹窗
       handleClose() {
-        this.timeLoaded = false;
-        this.initInterval();
+        this.changeTimerIsOpen(false);
         this.step = 1;
         this.$emit('close');
       },
       // 快问快答详情
       previewInfo(previewInfo) {
         this.previewVo = previewInfo;
-        this.answerTimeNum = previewInfo.limit_time_second; // 倒计时（数值单位秒）
-        this.timeLoaded = true;
-        if (this.answerType != 'show') {
-          this.executeInterval();
-        }
+        this.answerTimeNum =
+          this.answerType == 'show' ? previewInfo.number_second : previewInfo.limit_time_second; // 倒计时（数值单位秒）
+        this.changeTimerIsOpen(this.answerType == 'show' ? false : true);
       },
       // 是否允许执行答题
       examCheckOption(status) {
         this.isDisabledSave = status;
       },
+      // 计时器控制
+      changeTimerIsOpen(isOpen = false) {
+        if (isOpen) {
+          // 开启计时器
+          this.executeInterval();
+        } else {
+          // 关闭计时器
+          this.initInterval();
+        }
+      },
       // 倒计时 -- 初始化
       initInterval() {
         clearInterval(this.answerTimer);
         this.answerTimer = null;
-        this.answerTimeNum = this.previewVo?.limit_time_second || 0;
+        this.answerTimeNum =
+          this.answerType == 'show'
+            ? this.previewVo?.number_second || 0
+            : this.previewVo?.limit_time_second || 0;
         this.answerFormat = {
           day: 0, // 天
           hour: 0, // 时
@@ -232,12 +262,8 @@
             this.computeAnswerTime();
           }
           if (this.answerTimeNum === 0) {
-            // 如果是mock模拟的时候，倒计时一停止，直接关闭弹窗
-            if (this.answerType == 'mock' && this.timeLoaded) {
-              this.handleClose();
-            } else {
-              this.initInterval();
-            }
+            // 倒计时一停止，直接关闭弹窗
+            this.handleClose();
           }
         }, 1000);
       }
@@ -318,10 +344,23 @@
       background: unset;
     }
   }
+  .exam-execute-header {
+    width: 100%;
+    min-height: 120px;
+    background: url('./images/bg_header_default.png') no-repeat;
+    background-size: cover;
+    background-color: #ffffff;
+    background-position: top;
+    .exam-execute-title,
+    .exam-zdy-progress {
+      margin: 0 32px;
+    }
+  }
   .exam-execute-body {
     height: 632px;
     overflow-x: hidden;
     overflow-y: auto;
+    padding: 0 32px;
   }
   .exam-execute-footer {
     position: fixed;
@@ -337,6 +376,16 @@
     }
     button + button {
       margin-left: 24px;
+    }
+    button.gray--button {
+      background: #d9d9d9;
+      border-radius: 44px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 32px;
+      line-height: 44px;
+      text-align: center;
+      color: #262626;
     }
   }
   /* 会被重置的样式 */

@@ -154,9 +154,9 @@ export default {
   '--theme-chapter-font-color-active': '#3552EA',
   // 快问快答
   '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
-  '--theme-exam-progress-active-bgColor': '#FB2626',
-  '--theme-exam-question-type-bgColor': 'rgba(251, 38, 38, 0.15)',
-  '--theme-exam-question-type-color': 'rgba(251, 38, 38, 1)',
+  '--theme-exam-progress-active-bgColor': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-question-type-bgColor': 'rgba(53, 82, 234, 0.15)',
+  '--theme-exam-question-type-color': 'rgba(53, 82, 234, 1)',
   '--theme-exam-next-button-bg': 'rgba(53, 82, 234, 1)',
   '--theme-exam-next-button-border': 'rgba(53, 82, 234, 1)',
   '--theme-exam-next-button-color': 'rgba(255, 255, 255, 1)',
