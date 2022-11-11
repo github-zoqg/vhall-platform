@@ -16,6 +16,7 @@
           class="vmp-media-setting-item__content"
           :placeholder="$t('form.form_1018')"
           v-model="mediaState.video"
+          v-if="devices.length != 0"
         >
           <el-option
             v-for="item in devices"
@@ -23,6 +24,14 @@
             :value="item.deviceId"
             :label="item.label"
           ></el-option>
+        </el-select>
+        <el-select
+          class="vmp-media-setting-item__content"
+          value=""
+          v-if="devices.length == 0"
+          disabled
+        >
+          <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
         </el-select>
       </section>
 
@@ -147,6 +156,16 @@
       async createPreview() {
         if (this.isVideoCreating) return; // 创建中则不重复创建，以免多次调用
         if (this.mediaState.videoType !== 'camera') return;
+        if (this.devices.length === 0) {
+          this.isVideoSwitching = false;
+          this.videoLoadingImg = videoFailImg;
+          this.isVideoError = true;
+          this.isVideoCreating = false;
+          this.videoTipsText = this.$t('setting.setting_1033');
+          // this.$message.error(this.$t('message.message_1031'));
+          console.error(this.$t('message.message_1033'));
+          return;
+        }
         if (this.mediaState.video === '') return;
 
         this.isVideoCreating = true;
@@ -225,6 +244,7 @@
 
       img {
         flex: 0 0 auto;
+        width: 74px;
       }
 
       p {

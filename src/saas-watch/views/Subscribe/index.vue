@@ -265,8 +265,8 @@
         window.skins = skins;
       },
       drawBody(theme, skin) {
-        if (skin?.pcBackground) {
-          document.body.style.backgroundImage = `url(${skin?.pcBackground})`;
+        if (skin?.pcBackground || skin?.background) {
+          document.body.style.backgroundImage = `url(${skin?.pcBackground || skin?.background})`;
           const styleMap = imgPositionSizeMap[skin?.backgroundSize?.imageCropMode || 2];
           for (let key in styleMap) {
             document.body.style[key] = styleMap[key];

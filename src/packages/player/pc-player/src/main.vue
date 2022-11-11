@@ -132,6 +132,7 @@
             class="slider_controller"
             v-model="sliderVal"
             :show-tooltip="false"
+            :step="1 / Math.floor(totalTime)"
             @change="changeVideo"
             @mousedown.native="handleSliderMouseDown"
           ></el-slider>
@@ -570,7 +571,7 @@
                   text = '';
                 }
               }
-              marqueeText = `${this.marquee.text}-${text}`;
+              marqueeText = `${text}`;
             }
             params.marqueeOption = {
               enable: true,

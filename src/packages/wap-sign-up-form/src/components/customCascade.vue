@@ -22,7 +22,7 @@
         active-color="#fb3a32"
         :field-names="{ text: 'label' }"
         @finish="onConfirm"
-      />
+      ></van-cascader>
     </van-popup>
   </div>
 </template>

@@ -61,7 +61,12 @@
       </main>
     </el-dialog>
 
-    <pre-dialog ref="pre-dialog" v-if="!showCheckDom" @show="showCheckDialog"></pre-dialog>
+    <pre-dialog
+      ref="pre-dialog"
+      v-if="!showCheckDom"
+      @closeTestEquDialog="closeTestEqu"
+      @show="showCheckDialog"
+    ></pre-dialog>
   </div>
 </template>
 
@@ -77,7 +82,8 @@
   import { STEP_OPTS } from './js/config';
   import { getCheckList } from './js/getCheckListEntity';
 
-  import { setSession, getSession } from './js/setSession';
+  import { setLocal, getLocal } from './js/setLocal';
+  import { boxEventOpitons } from '@/app-shared/utils/tool';
 
   export default {
     name: 'VmpPcMediaCheck',
@@ -133,9 +139,15 @@
     created() {
       const { watchInitData } = useRoomBaseServer().state;
       this.liveMode = watchInitData?.webinar?.mode;
-      this.getSessionSelectedDevice();
+      this.getLocalSelectedDevice();
     },
     methods: {
+      // 监听提示弹窗关闭，发起端初始化本地流
+      closeTestEqu() {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitInitLocalStream', 'closed')
+        );
+      },
       /**
        * 展示pre-dialog 对话框（是否检测的对话框）
        */
@@ -152,18 +164,18 @@
       /**
        * 从session中获取选中的video\audioInput\audioOutput
        */
-      getSessionSelectedDevice() {
-        this.selected.video = getSession('selected.video');
-        this.selected.audioInput = getSession('selected.audioInput');
-        this.selected.audioOutput = getSession('selected.audioOutput');
+      getLocalSelectedDevice() {
+        this.selected.video = getLocal('selected.video');
+        this.selected.audioInput = getLocal('selected.audioInput');
+        this.selected.audioOutput = getLocal('selected.audioOutput');
       },
       /**
        * 将选中项设置进 session中
        */
-      setSessionSelectedDevice() {
-        setSession('selected.video', this.selected.video);
-        setSession('selected.audioInput', this.selected.audioInput);
-        setSession('selected.audioOutput', this.selected.audioOutput);
+      setLocalSelectedDevice() {
+        setLocal('selected.video', this.selected.video);
+        setLocal('selected.audioInput', this.selected.audioInput);
+        setLocal('selected.audioOutput', this.selected.audioOutput);
       },
       async reset() {
         // reset-data
@@ -186,15 +198,28 @@
           this.$message.error(`获取摄像头失败，请检查是否被占用或被禁用`);
         }
       },
-      next({ result }) {
+      next({ result, val }) {
+        if (this.currentStep === STEP_OPTS.VIDEO - this.firstStep) {
+          this.selected.video = val;
+        }
+        if (this.currentStep === STEP_OPTS.AUDIO_INPUT - this.firstStep) {
+          this.selected.audioInput = val;
+        }
+        if (this.currentStep === STEP_OPTS.AUDIO_OUTPUT - this.firstStep) {
+          this.selected.audioOutput = val;
+        }
+        this.setLocalSelectedDevice();
         const step = this.currentStep;
+        if (step === this.checkList.length - 1) {
+          //浏览器首次加载强制检测
+          localStorage.setItem('firstVisit', '1');
+        }
         if (step === this.checkList.length) return this.finish({ result });
 
         this.checkList[step].status = result; // 记录当前步骤的结果（成功/失败）
         if (this.checkList[step + 1]) {
           this.checkList[step + 1].status = 'process'; // 设置下一个步骤进行中
         }
-
         this.currentStep++;
       },
       /**
@@ -205,6 +230,13 @@
         if (result === 'fail') {
           this.reset();
         } else {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitRecheckMedia', [true])
+          );
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitInitLocalStream', 'checked')
+          );
+          this.mediaCheckServer.setDevice({ status: 1 });
           this.isShow = false;
         }
       },
@@ -245,7 +277,9 @@
         );
 
         // 获取扬声器
-        await this.mediaCheckServer.getSpeakers(item => item.label);
+        await this.mediaCheckServer.getSpeakers(
+          d => d.deviceId !== 'default' && d.deviceId !== 'communications' && d.label
+        );
 
         return true;
       },
@@ -253,23 +287,39 @@
        * 获取默认设备
        */
       setDefaultSelected() {
-        // 设置默认选项
+        // 获取缓存中配置
+        this.getLocalSelectedDevice();
+        // 设置默认选项 获取缓存中值否则用设备列表第一个
         if (this.devices.videoInputDevices.length > 0) {
-          this.selected.video = this.devices.videoInputDevices[0].deviceId;
+          const temp = this.devices.videoInputDevices.filter(e => {
+            return e.deviceId == this.selected.video;
+          });
+          if (temp.length == 0) {
+            this.selected.video = this.devices.videoInputDevices[0].deviceId;
+          }
         } else {
-          sessionStorage.removeItem('media-check.selected.video');
+          localStorage.removeItem('media-check.selected.video');
         }
-
         if (this.devices.audioInputDevices.length > 0) {
-          this.selected.audioInput = this.devices.audioInputDevices[0].deviceId;
+          const temp = this.devices.audioInputDevices.filter(e => {
+            return e.deviceId == this.selected.audioInput;
+          });
+          if (temp.length == 0) {
+            this.selected.audioInput = this.devices.audioInputDevices[0].deviceId;
+          }
         } else {
-          sessionStorage.removeItem('media-check.selected.audioInput');
+          localStorage.removeItem('media-check.selected.audioInput');
         }
 
         if (this.devices.audioOutputDevices.length > 0) {
-          this.selected.audioOutput = this.devices.audioOutputDevices[0].deviceId;
+          const temp = this.devices.audioOutputDevices.filter(e => {
+            return e.deviceId == this.selected.audioOutput;
+          });
+          if (temp.length == 0) {
+            this.selected.audioOutput = this.devices.audioOutputDevices[0].deviceId;
+          }
         } else {
-          sessionStorage.removeItem('media-check.selected.audioOutput');
+          localStorage.removeItem('media-check.selected.audioOutput');
         }
       }
     }
