@@ -46,7 +46,6 @@
         </h1>
       </div>
     </div>
-
     <!-- 音频直播 -->
     <div
       class="vmp-wap-player-audie"
@@ -103,7 +102,7 @@
         imageCropperModeLive: 1, //直播结束
         webinarsBgImgLive: '', //直播结束背景图
         audioStatus: false, // 选中清晰度是否是音频模式
-        isAudio: false, //判断是否是音频直播模式
+        // isAudio: false, //判断是否是音频直播模式
         isLivingEnd: false,
         qaZIndex: 302 // 默认问卷推送时，文档吸顶的index
       };
@@ -144,6 +143,10 @@
       // 互动 是否初始化完成
       isInstanceInit() {
         return this.interactiveServer.state.isInstanceInit;
+      },
+      //判断是否是音频直播模式
+      isAudio() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
       }
     },
     watch: {
@@ -235,9 +238,9 @@
       getAudioStatus(val) {
         this.audioStatus = val;
       },
-      getIsAudio(val) {
-        this.IsAudio = val;
-      },
+      // getIsAudio(val) {
+      //   this.IsAudio = val;
+      // },
       getLivingEnd(val) {
         this.isLivingEnd = val;
       },

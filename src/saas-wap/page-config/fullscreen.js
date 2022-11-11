@@ -225,15 +225,15 @@ export default {
         method: 'getAudioStatus',
         args: ['$0']
       }
-    ],
-    emitPlayerIsAudio: [
-      //判断是否是音频直播模式
-      {
-        cuid: 'comWapCenter',
-        method: 'getIsAudio',
-        args: ['$0']
-      }
     ]
+    // emitPlayerIsAudio: [
+    //   //判断是否是音频直播模式
+    //   {
+    //     cuid: 'comWapCenter',
+    //     method: 'getIsAudio',
+    //     args: ['$0']
+    //   }
+    // ]
   },
   comWapStreamList: {
     component: 'VmpWapStreamList',

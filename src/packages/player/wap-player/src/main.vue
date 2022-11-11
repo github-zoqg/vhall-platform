@@ -749,14 +749,14 @@
             boxEventOpitons(this.cuid, 'emitPlayerAudioStatus', [val])
           );
         });
-      },
-      isAudio(val) {
-        this.$nextTick(() => {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerIsAudio', [val])
-          );
-        });
       }
+      // isAudio(val) {
+      //   this.$nextTick(() => {
+      //     window.$middleEventSdk?.event?.send(
+      //       boxEventOpitons(this.cuid, 'emitPlayerIsAudio', [val])
+      //     );
+      //   });
+      // }
     },
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
