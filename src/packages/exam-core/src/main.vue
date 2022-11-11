@@ -1,14 +1,32 @@
 <template>
   <div class="vh-exam-model-panel">
-    <!-- 标题栏 -->
-    <div class="exam-execute-title" v-if="step != 2">
-      <template>
-        <div class="exam-execute--time">
-          <img src="./images/icon_exam_time.png" class="exam_time__icon" alt="" />
-          <div class="exam_time__text" v-if="answerType != 'show'">
-            <!-- 答题（答题倒计时） -->
-            <template v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
-              <ul v-if="previewVo && previewVo.limit_time_switch > 0">
+    <div class="exam-execute-header">
+      <!-- 标题栏 -->
+      <div class="exam-execute-title" v-if="step != 2">
+        <template>
+          <div class="exam-execute--time">
+            <img src="./images/icon_exam_time.png" class="exam_time__icon" alt="" />
+            <div class="exam_time__text" v-if="answerType != 'show'">
+              <!-- 答题（答题倒计时） -->
+              <template v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
+                <ul v-if="previewVo && previewVo.limit_time_switch > 0">
+                  <li class="exam-css-timer" v-if="answerFormat && answerFormat.hour > 0">
+                    {{ answerFormat.hour > 9 ? answerFormat.hour : `0${answerFormat.hour}` }}
+                  </li>
+                  <li class="exam-css-timer" v-else>00</li>
+                  <li class="exam-css-timer">:</li>
+                  <li class="exam-css-timer" v-if="answerFormat && answerFormat.minute > 0">
+                    {{ answerFormat.minute > 9 ? answerFormat.minute : `0${answerFormat.minute}` }}
+                  </li>
+                  <li class="exam-css-timer" v-else>00</li>
+                </ul>
+                <span v-else>不限时</span>
+              </template>
+              <template v-else><span>加载中</span></template>
+            </div>
+            <div class="exam_time__text" v-else>
+              <!-- 查看结果（答题时间） -->
+              <ul v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
                 <li class="exam-css-timer" v-if="answerFormat && answerFormat.hour > 0">
                   {{ answerFormat.hour > 9 ? answerFormat.hour : `0${answerFormat.hour}` }}
                 </li>
@@ -19,43 +37,27 @@
                 </li>
                 <li class="exam-css-timer" v-else>00</li>
               </ul>
-              <span v-else>不限时</span>
-            </template>
-            <template v-else><span>加载中</span></template>
+            </div>
           </div>
-          <div class="exam_time__text" v-else>
-            <!-- 查看结果（答题时间） -->
-            <ul v-if="answerFormat && (answerFormat.hour > 0 || answerFormat.minute > 0)">
-              <li class="exam-css-timer" v-if="answerFormat && answerFormat.hour > 0">
-                {{ answerFormat.hour > 9 ? answerFormat.hour : `0${answerFormat.hour}` }}
-              </li>
-              <li class="exam-css-timer" v-else>00</li>
-              <li class="exam-css-timer">:</li>
-              <li class="exam-css-timer" v-if="answerFormat && answerFormat.minute > 0">
-                {{ answerFormat.minute > 9 ? answerFormat.minute : `0${answerFormat.minute}` }}
-              </li>
-              <li class="exam-css-timer" v-else>00</li>
-            </ul>
-          </div>
+        </template>
+        <div class="exam-execute--status" v-if="isLoadingEnd && pageVo && pageVo.total > 0">
+          <strong>{{ pageVo.findIndex + 1 }}</strong>
+          <span>/{{ pageVo.total }}</span>
         </div>
-      </template>
-      <div class="exam-execute--status" v-if="isLoadingEnd && pageVo && pageVo.total > 0">
-        <strong>{{ pageVo.findIndex + 1 }}</strong>
-        <span>/{{ pageVo.total }}</span>
+        <div class="exam-execute--close">
+          <img
+            src="./images/icon_exam_close.png"
+            class="exam_close__icon"
+            alt=""
+            @click="handleClose"
+          />
+        </div>
       </div>
-      <div class="exam-execute--close">
-        <img
-          src="./images/icon_exam_close.png"
-          class="exam_close__icon"
-          alt=""
-          @click="handleClose"
-        />
-      </div>
+      <!-- 进度条 -->
+      <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
+      <!-- 分割条 -->
+      <div class="exam-padding-line"></div>
     </div>
-    <!-- 进度条 -->
-    <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
-    <!-- 分割条 -->
-    <div class="exam-padding-line"></div>
     <!-- 内容区域 -->
     <exam-info
       class="exam-execute-body"
@@ -342,10 +344,23 @@
       background: unset;
     }
   }
+  .exam-execute-header {
+    width: 100%;
+    min-height: 120px;
+    background: url('./images/bg_header_default.png') no-repeat;
+    background-size: cover;
+    background-color: #ffffff;
+    background-position: top;
+    .exam-execute-title,
+    .exam-zdy-progress {
+      margin: 0 32px;
+    }
+  }
   .exam-execute-body {
     height: 632px;
     overflow-x: hidden;
     overflow-y: auto;
+    padding: 0 32px;
   }
   .exam-execute-footer {
     position: fixed;

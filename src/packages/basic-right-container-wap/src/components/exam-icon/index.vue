@@ -332,10 +332,12 @@
       width: 100%;
       left: 0px;
       bottom: 0;
-      background: url('./images/gradient_bg.png') repeat-x;
-      background-size: cover;
+      background: url('./images/bg_exam_list.png') no-repeat;
       box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
       border-radius: 40px 40px 0px 0px;
+      background-color: #ffffff;
+      background-position: top;
+      background-size: cover;
     }
     .vmp-exam-list_container {
       max-height: 680px;

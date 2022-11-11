@@ -62,13 +62,15 @@
   .vmp-exam-answer-wap {
     width: 100%;
     height: 844px;
-    background: url('../images/gradient_bg.png') repeat-x;
-    background-size: cover;
+    background: url('../images/bg_default.png') no-repeat;
     box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
     border-radius: 40px 40px 0px 0px;
     overflow: hidden;
+    background-color: #ffffff;
+    background-position: top;
+    background-size: cover;
     .exam-core__container {
-      width: calc(100% - 64px);
+      width: 100%;
       margin: 0 auto;
       overflow: hidden;
     }
