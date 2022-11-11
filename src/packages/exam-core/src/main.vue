@@ -77,6 +77,7 @@
         round
         @click="lastQuestion"
         v-if="pageVo && !pageVo.isFirst"
+        class="gray--button"
       >
         上一题
       </van-button>
@@ -99,15 +100,6 @@
         :disabled="isDisabledSave"
       >
         提交
-      </van-button>
-      <van-button
-        type="primary"
-        size="medium"
-        round
-        @click="close"
-        v-if="pageVo && pageVo.isEnd && answerType == 'show'"
-      >
-        关闭
       </van-button>
     </div>
     <!-- 查看答案 -->
@@ -369,6 +361,16 @@
     }
     button + button {
       margin-left: 24px;
+    }
+    button.gray--button {
+      background: #d9d9d9;
+      border-radius: 44px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 32px;
+      line-height: 44px;
+      text-align: center;
+      color: #262626;
     }
   }
   /* 会被重置的样式 */

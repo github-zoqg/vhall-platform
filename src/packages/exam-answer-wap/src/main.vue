@@ -8,7 +8,7 @@
     @close="closeDialog"
     v-if="examAnswerVisible"
   >
-    <div class="exam-core__container">
+    <div :class="`exam-core__container exam-theme--${theme}`">
       <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core>
     </div>
   </van-popup>
@@ -25,6 +25,21 @@
     computed: {
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      theme() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skin_json_wap = {};
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return themeMap[skin_json_wap?.backGroundColor || 3];
       }
     },
     methods: {
@@ -35,6 +50,7 @@
       async open(examId) {
         this.examAnswerVisible = true;
         this.examId = examId;
+
         await this.$nextTick(() => {});
         this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
       }
@@ -56,7 +72,6 @@
       margin: 0 auto;
       overflow: hidden;
     }
-
     .exam-zdy-progress {
       &.van-progress {
         background: var(--theme-exam-progress-bgColor) !important;
@@ -64,6 +79,36 @@
         .van-progress__portion {
           background: var(--theme-exam-progress-active-bgColor) !important;
           border-radius: 3px;
+        }
+      }
+    }
+    .vmp-exam-info--question {
+      .zdy-exam-question-type {
+        background: var(--theme-exam-question-type-bgColor) !important;
+        color: var(--theme-exam-question-type-color) !important;
+      }
+    }
+    .exam-execute-footer {
+      button.van-button--danger {
+        background: var(--theme-exam-next-button-bg) !important ;
+        color: var(--theme-exam-next-button-color) !important ;
+        border: 1px solid var(--theme-exam-next-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-next-button-active-bg) !important ;
+          color: var(--theme-exam-next-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-next-button-active-border) !important;
+        }
+      }
+      button.van-button--default {
+        background: var(--theme-exam-last-button-bg) !important ;
+        color: var(--theme-exam-last-button-color) !important ;
+        border: 1px solid var(--theme-exam-last-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-last-button-active-bg) !important ;
+          color: var(--theme-exam-last-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-last-button-active-border) !important;
         }
       }
     }

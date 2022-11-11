@@ -35,10 +35,12 @@
                 `question_${item.subject_type}`,
                 `page-${answerType}`,
                 `${item.layout_type == 1 ? 'max-width' : 'min-width'}`,
-                `${item.layout_css == 1 ? 'top-bottom' : 'left-right'}`
+                `${item.layout_css == 1 ? 'top-bottom' : 'left-right'}`,
+                `bg_answer__${sonItem.answerStatus}`
               ]"
               v-for="(sonItem, sonIndex) in item.detail.list"
               :key="`qt_${index}_son${sonIndex}`"
+              @click.stop="lineChecked(item, sonItem)"
             >
               <div
                 :class="[
@@ -65,7 +67,7 @@
                 </div>
                 <div class="vmp-exam-info--text">
                   <el-radio
-                    v-model="sonItem.answer"
+                    v-model="item.ownerAnswer"
                     :label="sonItem.key"
                     :name="`radio_no_${item.id}`"
                     v-if="item.type === 'radio'"
@@ -79,6 +81,7 @@
                     v-if="item.type === 'checkbox'"
                     class="zdy-exam-checkbox"
                     :disabled="answerType == 'show'"
+                    @change.prevent.stop="setItemCheckAnswer(sonItem, item)"
                   ></el-checkbox>
                   <div
                     :class="[
@@ -106,7 +109,7 @@
                 <span
                   class="text--content__position"
                   v-if="sonItem && sonItem.isMoreHeight"
-                  @click="
+                  @click.prevent.stop="
                     $forceUpdate();
                     changeStatus(sonItem);
                   "
@@ -253,6 +256,25 @@
     },
     beforeCreate() {},
     methods: {
+      lineChecked(item, sonItem) {
+        if (item.type == 'checkbox') {
+          sonItem.answer = !sonItem.answer;
+          this.setItemCheckAnswer(sonItem, item);
+        } else if (item.type == 'radio') {
+          item.ownerAnswer = sonItem.key;
+        }
+      },
+      // 多选题设置的时候，改动任务项其它内容
+      setItemCheckAnswer(sonItem, item) {
+        let keys = [];
+        item.detail.list.forEach(fItem => {
+          if (fItem.answer && !keys.includes(fItem.answer)) {
+            // 勾中了，并且没在数组里，放入。
+            keys.push(fItem.key);
+          }
+        });
+        item.ownerAnswer = keys.join(',');
+      },
       // 快问快答详情-mock数据
       mockExamInfo() {
         let formJson = {
@@ -609,6 +631,36 @@
         };
         return res;
       },
+      mockDefaultInfo(item, index) {
+        item.score = 10;
+        item.ownerScore = 5; // 自己得分
+        if (index == 0) {
+          item.questionAnswer = 'A'; // 题目正确答案
+          item.ownerAnswer = 'A'; // 自己作答内容
+          item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
+          item.layout_type = 1; // 一行一列（1）；一行二列（2）
+          item.layout_css = 1; // 上下布局（1）；左右布局（2）
+        } else if (index == 1) {
+          item.questionAnswer = 'A,B'; // 题目正确答案
+          item.ownerAnswer = 'A'; // 自己作答内容
+          item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
+          item.layout_type = 1; // 一行一列（1）；一行二列（2）
+          item.layout_css = 2; // 上下布局（1）；左右布局（2）
+        } else if (index == 2) {
+          item.questionAnswer = 'A,B'; // 题目正确答案
+          item.ownerAnswer = 'A,B'; // 自己作答内容
+          item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
+          item.layout_type = 2; // 一行一列（1）；一行二列（2）
+          item.layout_css = 1; // 上下布局（1）；左右布局（2）
+        } else if (index == 3) {
+          item.questionAnswer = 'A'; // 题目正确答案
+          item.ownerAnswer = 'B'; // 自己作答内容
+          item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
+          item.layout_type = 2; // 一行一列（1）；一行二列（2）
+          item.layout_css = 1; // 上下布局（1）；左右布局（2）
+        }
+        return item;
+      },
       // 获取快问快答-详情后，数据组装
       renderPreviewInfo(res) {
         let resData = res.data;
@@ -621,52 +673,31 @@
         resData.jsonData = resData.form.detail || [];
         resData.jsonData.map((item, index) => {
           item.sortNo = index + 1;
-          item.score = 10;
-          item.ownerScore = 5; // 自己得分
-          if (index == 0) {
-            item.questionAnswer = 'A'; // 题目正确答案
-            item.ownerAnswer = 'A'; // 自己作答内容
-            item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
-            item.layout_type = 1; // 一行一列（1）；一行二列（2）
-            item.layout_css = 1; // 上下布局（1）；左右布局（2）
-          } else if (index == 1) {
-            item.questionAnswer = 'A,B'; // 题目正确答案
-            item.ownerAnswer = 'A'; // 自己作答内容
-            item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
-            item.layout_type = 1; // 一行一列（1）；一行二列（2）
-            item.layout_css = 2; // 上下布局（1）；左右布局（2）
-          } else if (index == 2) {
-            item.questionAnswer = 'A,B'; // 题目正确答案
-            item.ownerAnswer = 'A,B'; // 自己作答内容
-            item.subject_type = 'text'; // 图文题（img-text）;文字题（text）
-            item.layout_type = 1; // 一行一列（1）；一行二列（2）
-            item.layout_css = 2; // 上下布局（1）；左右布局（2）
-          } else if (index == 3) {
-            item.questionAnswer = 'A'; // 题目正确答案
-            item.ownerAnswer = 'B'; // 自己作答内容
-            item.subject_type = 'img-text'; // 图文题（img-text）;文字题（text）
-            item.layout_type = 2; // 一行一列（1）；一行二列（2）
-            item.layout_css = 1; // 上下布局（1）；左右布局（2）
-          }
+          item = this.mockDefaultInfo(item, index);
           if (this.answerType == 'show') {
             // 题目标记答题是否正确等
             let answerResVo = this.setAnswerResTag(item);
             item.answerRes = answerResVo.answerRes;
             item.showReleaseAnswer = answerResVo.showReleaseAnswer;
             item.showOwnerAnswer = answerResVo.showOwnerAnswer;
-            console.log(
-              '多选' + item.type,
-              item.ownerAnswer,
-              item.questionAnswer,
-              item.answerRes,
-              item.showReleaseAnswer,
-              item.showOwnerAnswer
-            );
             item.detail.list.map((sonItem, sonIndex) => {
               // 选项标记区域
-              sonItem.answerStatus = this.setAnswerOptionTag(item, sonItem);
-              // 答题选项v-model绑定变量
-              sonItem.answer = '';
+              let sonAnswerVo = this.setAnswerOptionTag(item, sonItem);
+              sonItem.answerStatus = sonAnswerVo.answerStatus;
+              if (item.type == 'checkbox') {
+                // 如果是复选题，绑定一个answer进行勾选
+                sonItem.answer = sonAnswerVo.answer;
+              }
+            });
+          } else {
+            // 答题的时候，绑定值
+            if (item.type == 'radio') {
+              item.ownerAnswer = '';
+            }
+            item.detail.list.map((sonItem, sonIndex) => {
+              if (item.type == 'checkbox') {
+                sonItem.answer = false;
+              }
             });
           }
         });
@@ -750,18 +781,25 @@
                   ? 'yes'
                   : 'no'
                 : '';
+            // 答题选项 - 单选题不用此
+            sonItem.answer = sonItem.answer || '';
           } else if (item.type == 'checkbox') {
             let ownerAnswer = Array.isArray(item.ownerAnswer)
               ? item.ownerAnswer
               : item.ownerAnswer.split(',');
-            sonItem.answerStatus = ownerAnswer.includes(item.key)
+            sonItem.answerStatus = ownerAnswer.includes(sonItem.key)
               ? item.answerRes == 'answer_yes'
                 ? 'yes'
                 : 'no'
               : '';
+            // 答题选项v-model绑定变量
+            sonItem.answer = ownerAnswer.includes(sonItem.key) ? true : false;
           }
         }
-        return sonItem.answerStatus;
+        return {
+          answerStatus: sonItem.answerStatus,
+          answer: sonItem.answer
+        };
       },
       // 活动下预览快问快答
       previewExamInfo() {
@@ -797,7 +835,7 @@
                   : item.layout_css == 2
                   ? parseFloat(domVo['line-height']) * 4
                   : parseFloat(domVo['line-height']) * 3; // 双列的时候，四行；单列的时候，3行高度
-              console.log(parseFloat(domVo.height), maxHeight);
+              console.log(item.id, parseFloat(domVo.height), maxHeight);
               if (parseInt(domVo.height) >= parseInt(maxHeight)) {
                 item.detail.list[sonIndex].isMoreHeight = 'close';
               } else {
@@ -816,7 +854,7 @@
         this.$forceUpdate();
       },
       // 上一题，序号变更
-      lastQuestion() {
+      async lastQuestion() {
         let lastAnswerIndex = this.answerIndex - this.limit;
         if (lastAnswerIndex < 0) {
           this.isFirst = true;
@@ -839,9 +877,11 @@
           isFirst: this.isFirst,
           isEnd: false
         });
+        await this.$nextTick(() => {});
+        this.setIsMoreHeight();
       },
       // 下一题，序号变更
-      nextQuestion() {
+      async nextQuestion() {
         this.isFirst = false;
         let nextAnswerIndex = this.answerIndex + this.limit;
         if (nextAnswerIndex >= this.previewInfo.jsonData.length) {
@@ -867,6 +907,8 @@
           isFirst: this.isFirst,
           isEnd: this.isEnd
         });
+        await this.$nextTick(() => {});
+        this.setIsMoreHeight();
       },
       // 重置答题记录
       resetQuestion() {
@@ -1091,8 +1133,7 @@
           color: rgba(0, 0, 0, 0.85);
           margin-right: auto;
           word-break: break-all;
-          &.position_close,
-          &.position_normal {
+          &.position_close {
             overflow: hidden;
             text-overflow: ellipsis;
             text-overflow: -webkit-ellipsis-lastline;
@@ -1287,7 +1328,7 @@
               &.text__min__width {
                 .vmp-exam-info--text {
                   margin-right: auto;
-                  width: calc(100% - 156px);
+                  width: 100%;
                 }
                 .text--content {
                   width: calc(100% - 114px); /* 减去单选按钮的宽度和一点点小间距 */
@@ -1349,6 +1390,12 @@
               }
             }
           }
+          /* 左右分布 */
+          &.left-right {
+            .text--icon {
+              display: none;
+            }
+          }
         }
         /* 一排双列 */
         &.min-width {
@@ -1406,17 +1453,32 @@
         }
       }
       /* hover、active态 */
-      &:hover,
-      &:active {
-        background: rgba(230, 247, 255, 0.65);
+      &.bg_answer__undefined {
+        &:hover,
+        &:active {
+          background: rgba(230, 247, 255, 0.65);
+        }
       }
-      /* 成功答案 */
-      &.answer__yes {
-        background: rgba(255, 242, 240, 0.65);
-      }
-      /* 错误答案 */
-      &.answer__no {
-        background: rgba(225, 250, 232, 0.65);
+      /* 查看的时候才有 正确 or 错误态 */
+      &.page-show {
+        /* 成功答案 */
+        &.bg_answer__yes {
+          background: rgba(225, 250, 232, 0.65);
+          /deep/.el-radio__input.is-disabled.is-checked .el-radio__inner::after {
+            background-color: #0fba5a;
+          }
+          /deep/.el-radio__input.is-disabled .el-radio__inner,
+          .el-radio__input.is-disabled.is-checked .el-radio__inner {
+            background: #ffffff;
+            border: 2px solid #0fba5a;
+            border-color: #0fba5a;
+            cursor: not-allowed;
+          }
+        }
+        /* 错误答案 */
+        &.bg_answer__no {
+          background: rgba(255, 242, 240, 0.65);
+        }
       }
     }
     &--result {
