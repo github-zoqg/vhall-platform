@@ -336,6 +336,16 @@
               display: none;
             }
           }
+          .vmp-doc-placeholder__inner {
+            img {
+              width: 60px;
+              margin-bottom: 4px;
+            }
+            span {
+              font-size: 16px;
+              line-height: 24px;
+            }
+          }
         }
       }
       &.doc-container__sticktop {

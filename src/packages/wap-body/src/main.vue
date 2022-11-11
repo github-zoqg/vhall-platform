@@ -718,6 +718,7 @@
         .vmp-wap-player {
           video {
             object-fit: contain;
+            background: #000;
           }
           .vmp-wap-player-audie {
             display: block !important;
