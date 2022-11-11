@@ -43,6 +43,8 @@
       };
     },
     async created() {
+      var a = 3;
+      console.log(a);
       try {
         console.log('%c---初始化直播房间 开始', 'color:blue');
         // 检查浏览器版本
