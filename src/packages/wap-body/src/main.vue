@@ -6,12 +6,12 @@
       isShowWapBody ? '' : 'vmp-wap-body__hide',
       isPortraitLive ? 'isPortraitLive' : '',
       isStreamContainerStickTop ? 'vmp-wap-body-container-sticktop' : '',
-      isPortraitLive && !isWapBodyDocSwitchFullScreen && !isEmbed ? 'isMini' : ''
+      isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo ? 'isMini' : ''
     ]"
   >
     <!-- 直播结束 -->
     <div
-      v-if="isLivingEnd && !isPortraitLive && !isEmbed"
+      v-if="isLivingEnd && !isPortraitLive && !embedVideo"
       :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
@@ -26,7 +26,7 @@
     </div>
     <div
       :class="[
-        (mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)) && !isEmbed
+        (mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)) && !embedVideo
           ? 'vmp-wap-body-mini'
           : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
@@ -280,9 +280,9 @@
           this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
         );
       },
-      // 是不是嵌入页
-      isEmbed() {
-        return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      // 是不是单视频嵌入页
+      embedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
       }
     },
     watch: {
