@@ -16,7 +16,8 @@
         <!-- 图片题 （selectType: 1单选；2多选。支持单选 or 多选）-->
         <h1>
           <span class="zdy-exam-question-type">{{ item.type == 'radio' ? '单选' : '多选' }}</span>
-          {{ item.sortNo }}.{{ item.title }}
+          {{ item.sortNo }}.{{ item.title }}：
+          <strong v-if="item.score > 0">({{ item.score }}分)</strong>
         </h1>
         <!-- 非瀑布流[题目-答案区域]
            .page-${answerType}  mock/show/release 作答类别
@@ -175,7 +176,6 @@
   </div>
 </template>
 <script>
-  import info from 'autoprefixer/lib/info';
   export default {
     name: 'VmpExamInfo',
     data() {
@@ -186,7 +186,6 @@
         isEnd: false, // 是否最后一题
         questionList: [], // 可答题数组
         previewInfo: null
-        // answerType: 'show'
       };
     },
     props: {
@@ -614,12 +613,16 @@
       renderPreviewInfo(res) {
         let resData = res.data;
         resData.limit_time_second = resData.limit_time > 0 ? Number(resData.limit_time) * 60 : 0; // 限制时间*60，转换为秒
+        resData.number = 25; // TODO 拼接数据
+        resData.number_second = resData.number > 0 ? Number(resData.number) * 60 : 0; // 限制时间*60，转换为秒
         resData.form = resData.question_detail
           ? JSON.parse(resData.question_detail)
           : { detail: [] };
         resData.jsonData = resData.form.detail || [];
         resData.jsonData.map((item, index) => {
           item.sortNo = index + 1;
+          item.score = 10;
+          item.ownerScore = 5; // 自己得分
           if (index == 0) {
             item.questionAnswer = 'A'; // 题目正确答案
             item.ownerAnswer = 'A'; // 自己作答内容
@@ -881,10 +884,11 @@
       async initComp() {
         console.log('触发成绩单查询。。。');
         this.answerIndex = null;
-        await this.previewExamInfo();
+        // 渲染赋值之前，先清空标记；
         this.resetQuestion();
+        // 获取详情数据
+        await this.previewExamInfo();
         await this.$nextTick(() => {});
-        console.log('ak', this.questionList);
         this.setIsMoreHeight();
       }
     }
@@ -910,6 +914,15 @@
         line-height: 40px;
         color: #262626;
         margin-bottom: 24px;
+        strong {
+          font-family: 'PingFang HK';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 28px;
+          line-height: 40px;
+          color: #262626;
+          margin-bottom: 24px;
+        }
       }
       .zdy-exam-question-type {
         background: rgba(251, 38, 38, 0.15);
