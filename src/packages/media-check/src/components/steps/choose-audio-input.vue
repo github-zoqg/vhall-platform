@@ -4,13 +4,16 @@
       <!-- 选择音频输入设备(话筒) -->
       <section class="vh-media-check-selector">
         <label>麦克风</label>
-        <el-select v-model="selectedId" @change="audioChange">
+        <el-select v-model="selectedId" v-if="devices.length != 0" @change="audioChange">
           <el-option
             v-for="item in devices"
             :key="item.deviceId"
             :value="item.deviceId"
             :label="item.label"
           ></el-option>
+        </el-select>
+        <el-select value="" v-if="devices.length == 0" disabled>
+          <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
         </el-select>
       </section>
 
@@ -70,6 +73,7 @@
         this.audioChange();
       },
       async audioChange() {
+        if (this.devices.length == 0) return;
         const mediaOptions = { audio: { deviceId: this.selectedAudioDeviceId } };
         const stream = await navigator.mediaDevices.getUserMedia(mediaOptions);
         stream.getTracks().forEach(trackInput => {
@@ -80,14 +84,14 @@
       },
 
       success() {
-        window?.vhallReport?.report(110007, {
+        window?.vhallReportForProduct?.report(110007, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 麦克风设备检测成功
 
-        this.$emit('next', { result: 'success' });
+        this.$emit('next', { result: 'success', val: this.selectedId });
       },
       fail() {
-        window?.vhallReport?.report(110011, {
+        window?.vhallReportForProduct?.report(110011, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 麦克风设备检测失败
 

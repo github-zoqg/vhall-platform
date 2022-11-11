@@ -22,12 +22,12 @@
               </label>
               <div class="scale8">
                 <span>{{ getLiveTag(item) }}</span>
-                <span
+                <!-- <span
                   v-if="hasDelayPermission && item.no_delay_webinar == 1 && item.webinar_type !== 6"
                 >
                   | {{ $t('common.common_1023') }}
-                </span>
-                <span v-if="item.webinar_show_type == 0">| {{ $t('common.common_1036') }}</span>
+                </span> -->
+                <!-- <span v-if="item.webinar_show_type == 0">| {{ $t('common.common_1036') }}</span> -->
               </div>
             </span>
           </div>
@@ -92,7 +92,7 @@
       getLiveTag(val) {
         /**
          * webinar_state  1直播 2预约 3结束 4点播 5回放
-         * webinar_type  1音频直播 2视频直播 3互动直播 5定时直播 6分组直播
+         * webinar_type  1音频直播 2视频直播 3互动直播   6分组直播
          */
         const liveTypeMap = new Map([
           [0, ''],
