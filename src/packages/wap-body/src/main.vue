@@ -711,6 +711,7 @@
         bottom: 0 !important;
         z-index: 302;
         overflow: hidden;
+        background-color: #000;
         &__hide {
           z-index: -1;
           opacity: 0;
