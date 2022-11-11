@@ -41,7 +41,8 @@
           v-if="!isDirector && isCheckSuccess"
           @click="finish"
         >
-          {{ roleName == 1 ? '去直播' : '马上互动' }}
+          <!-- {{ roleName == 1 ? '去直播' : '马上互动' }} -->
+          确定
         </el-button>
       </section>
 
@@ -63,18 +64,6 @@
       checkList: {
         type: Array,
         default: () => []
-      },
-      selectedVideoDeviceId: {
-        type: String,
-        default: ''
-      },
-      selectedAudioInputDeviceId: {
-        type: String,
-        default: ''
-      },
-      selectedAudioOutputDeviceId: {
-        type: String,
-        default: ''
       }
     },
     data() {
@@ -100,11 +89,11 @@
     },
     methods: {
       restart() {
-        window?.vhallReport?.report(110013); // 埋点-重新检测
+        window?.vhallReportForProduct?.report(110013); // 埋点-重新检测
         this.$emit('next', { result: 'fail' });
       },
       finish() {
-        window?.vhallReport?.report(110009); // 埋点-去直播
+        window?.vhallReportForProduct?.report(110009); // 埋点-去直播
         this.$emit('next', { result: 'success' });
       }
     }

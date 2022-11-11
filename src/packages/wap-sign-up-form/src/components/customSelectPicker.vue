@@ -22,7 +22,11 @@
         @confirm="onConfirm"
         @change="change"
         :value-key="this.option.label"
-      />
+      >
+        <template #option="item">
+          <pre>{{ item.subject }}</pre>
+        </template>
+      </van-picker>
     </van-popup>
   </div>
 </template>

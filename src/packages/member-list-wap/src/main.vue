@@ -8,10 +8,14 @@
       <van-list v-model="loading" :finished="finished" finished-text="" @load="loadMore">
         <div class="member-list-item" v-for="item in list" :key="item['account_id']">
           <div class="avatar-box">
-            <img :src="item && item['avatar'] ? item['avatar'] : defaultAvatar" alt="" />
+            <img
+              :src="item && item['avatar'] ? item['avatar'] : defaultAvatar"
+              alt=""
+              :class="{ avatar_border: item['avatar'] }"
+            />
             <img
               v-show="[1, '1', 3, '3'].includes(item.device_type)"
-              class="member-list-item__avatar-wrapper__phone"
+              class="vmp-wrapper__phone"
               width="9"
               height="12"
               :src="phoneImg"
@@ -400,8 +404,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      // background: #ffffff;
-      border-radius: 100%;
       position: relative;
       img {
         width: 100%;
@@ -410,16 +412,19 @@
         border-radius: 50%;
         display: block;
       }
-      .member-list-item__avatar-wrapper__phone {
+      .vmp-wrapper__phone {
+        width: 14px;
+        height: 20px;
         position: absolute;
-        width: 12px;
-        height: 17px;
-        right: -2px;
-        bottom: -2px;
+        right: 0;
+        bottom: 0;
+      }
+      .avatar_border {
+        border: 2px solid #e3e3e3;
       }
     }
     .info-name {
-      max-width: 4rem;
+      max-width: 3.3rem;
       margin-left: 16px;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -430,7 +435,7 @@
       font-style: normal;
       font-weight: 400;
       font-size: 28px;
-      line-height: 28px;
+      line-height: 48px;
     }
     .info-role {
       text-align: center;
@@ -466,7 +471,7 @@
       i {
         display: inline-block;
         vertical-align: middle;
-        font-size: 44px;
+        font-size: 36px;
         margin-right: 8px;
       }
       span {
@@ -474,7 +479,7 @@
         vertical-align: middle;
         font-style: normal;
         font-weight: 400;
-        font-size: 32px;
+        font-size: 28px;
         line-height: 45px;
         color: var(--theme-group-color);
       }

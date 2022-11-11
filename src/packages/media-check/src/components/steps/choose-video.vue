@@ -15,13 +15,16 @@
     <!-- 选择摄像头 -->
     <section class="vh-media-check-selector">
       <label>摄像头</label>
-      <el-select v-model="selectedId" @change="videoChange">
+      <el-select v-if="devices.length != 0" v-model="selectedId" @change="videoChange">
         <el-option
           v-for="item in devices"
           :key="item.deviceId"
           :value="item.deviceId"
           :label="item.label"
         ></el-option>
+      </el-select>
+      <el-select value="" v-if="devices.length == 0" disabled>
+        <el-option key="" value="" :label="$t('setting.setting_1033')"></el-option>
       </el-select>
     </section>
 
@@ -88,6 +91,9 @@
         this.setSelectedId(cur);
       }
     },
+    mounted() {
+      // this.startVideoPreview({ action: 'preview' });
+    },
     methods: {
       setSelectedId(id) {
         this.selectedId = this.selectedId || id;
@@ -99,7 +105,6 @@
       async startVideoPreview({ action = 'preview' }) {
         try {
           await this.stopVideoPreview();
-
           const streamId = await this.server.startVideoPreview({
             videoNode: 'vh-device-check-video',
             videoDevice: this.selectedId
@@ -133,14 +138,14 @@
           await this.stopVideoPreview();
         }
 
-        window?.vhallReport.report(110006, {
+        window?.vhallReportForProduct.report(110006, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 摄像头检测成功
 
-        this.$emit('next', { result: 'success' });
+        this.$emit('next', { result: 'success', val: this.selectedId });
       },
       fail() {
-        window?.vhallReport.report(110010, {
+        window?.vhallReportForProduct.report(110010, {
           report_extra: { dn: this.selectedId }
         }); // 埋点 - 摄像头检测失败
 
