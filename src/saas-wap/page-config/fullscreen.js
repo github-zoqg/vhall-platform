@@ -396,10 +396,19 @@ export default {
   // 自定义菜单-简洁mosh
   comWapMenuDialog: {
     component: 'VmpWapMenuDialog',
-    emitComputedMenuWidth: {
-      cuid: ['comTabMenuWap'],
-      method: 'menuDialogComputed'
-    },
+    emitComputedMenuWidth: [
+      {
+        cuid: ['comTabMenuWap'],
+        method: 'menuDialogComputed'
+      }
+    ],
+    emitOpenMenu: [
+      {
+        cuid: ['comWapPlayer'],
+        method: 'changeChatSendBox',
+        args: ['$0']
+      }
+    ],
     children: ['comTabMenuWap'],
     options: {}
   },

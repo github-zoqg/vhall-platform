@@ -33,7 +33,11 @@
         popHeight: 708
       };
     },
-    watch: {},
+    watch: {
+      menuDialogVisible(val) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenMenu', [val]));
+      }
+    },
     computed: {
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
