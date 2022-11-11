@@ -53,18 +53,14 @@
                 ]"
               >
                 <div
-                  class="vmp-exam-info--img"
+                  class="vmp-exam-info--img object_fit_1"
                   v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
-                >
-                  <img
-                    lazy
-                    :src="sonItem.imgUrl"
-                    :preview-src-list="[sonItem.imgUrl]"
-                    width="100%"
-                    height="100%"
-                    class="object_fit_1"
-                  />
-                </div>
+                  @click="previewImg(sonItem.imgUrl, item)"
+                  :style="`backgroundImage: url('${
+                    sonItem.imgUrl + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
+                  }')`"
+                  alt="图片加载失败"
+                ></div>
                 <div class="vmp-exam-info--text">
                   <el-radio
                     v-model="item.ownerAnswer"
@@ -176,9 +172,18 @@
         </div>
       </div>
     </div>
+    <!-- 图片预览 -->
+    <img-preview
+      ref="imgPreview"
+      v-if="imgPreviewVisible"
+      :images="previewImgList"
+      @closeImgPreview="onClosePreviewImg"
+    ></img-preview>
   </div>
 </template>
 <script>
+  import ImgPreview from './img-preview.vue';
+  import { cl_previewImg, cl_join, cl_left } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpExamInfo',
     data() {
@@ -188,8 +193,12 @@
         isFirst: true, // 是否是第一道题
         isEnd: false, // 是否最后一题
         questionList: [], // 可答题数组
-        previewInfo: null
+        previewInfo: null,
+        imgPreviewVisible: false // 图片是否展示
       };
+    },
+    components: {
+      ImgPreview
     },
     props: {
       // 快问快答 - id
@@ -274,6 +283,29 @@
           }
         });
         item.ownerAnswer = keys.join(',');
+      },
+      /**
+       * 聊天图片预览
+       * */
+      // 预览聊天图片
+      previewImg(image, item) {
+        let imageList = item.detail.list.filter(akItem => akItem.imgUrl);
+        let newImageList = imageList.map(akItem => akItem.imgUrl);
+        let index = newImageList.indexOf(image);
+        //处理掉图片携带的查询参数，只保留主要链接
+        this.previewImgList = newImageList.map(akItem => akItem.split('?')[0]);
+        if (this.$route.query.assistantType) {
+          cl_previewImg({ list: this.previewImgList, index });
+          return;
+        }
+        this.imgPreviewVisible = true;
+        this.$nextTick(() => {
+          this.$refs.imgPreview.jumpToTargetImg(index);
+        });
+      },
+      //关闭预览图片弹窗之后的处理
+      onClosePreviewImg() {
+        this.imgPreviewVisible = false;
       },
       // 快问快答详情-mock数据
       mockExamInfo() {
