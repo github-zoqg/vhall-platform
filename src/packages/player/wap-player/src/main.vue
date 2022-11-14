@@ -29,7 +29,8 @@
                 isPortraitLive &&
                 isShowPoster &&
                 webinarType != 5) ||
-              (embedVideo && isPortraitLive))
+              (embedVideo && isPortraitLive) ||
+              (isSubscribe && isPortraitLive))
           "
           class="vmp-wap-player-pause"
         >
@@ -40,7 +41,7 @@
         <!-- 文档播放器互换位置按钮 -->
         <div
           key="vmp-wap-player-trans"
-          v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo"
+          v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo && !isSubscribe"
           class="vmp-wap-player-trans"
           @click.stop="transposition"
         >
@@ -66,7 +67,8 @@
           v-show="
             !isPortraitLive ||
             (!isWapBodyDocSwitchFullScreen && isPortraitLive) ||
-            (embedVideo && isPortraitLive)
+            (embedVideo && isPortraitLive) ||
+            (isSubscribe && isPortraitLive)
           "
           v-if="isAudio || audioStatus"
         >
@@ -76,7 +78,11 @@
         </div>
         <!-- 回放结束（正常回放和试看回放结束） -->
         <div
-          v-show="isVodEnd && !isPlaying && (!isPortraitLive || (embedVideo && isPortraitLive))"
+          v-show="
+            isVodEnd &&
+            !isPlaying &&
+            (!isPortraitLive || (embedVideo && isPortraitLive) || (isSubscribe && isPortraitLive))
+          "
           :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
@@ -113,7 +119,7 @@
             roomBaseState.watchInitData.pv.show &&
             isPlaying &&
             !isSmallPlayer &&
-            (!isPortraitLive || (embedVideo && isPortraitLive))
+            (!isPortraitLive || (embedVideo && isPortraitLive) || (isSubscribe && isPortraitLive))
           "
           :class="[iconShow ? 'opcity-flase' : 'opcity-true']"
         >
@@ -156,7 +162,10 @@
         <!-- 倍速、清晰度切换 -->
         <div
           class="vmp-wap-player-tips"
-          v-if="(isSetSpeed || isSetQuality) && (!isPortraitLive || (embedVideo && isPortraitLive))"
+          v-if="
+            (isSetSpeed || isSetQuality) &&
+            (!isPortraitLive || (embedVideo && isPortraitLive) || (isSubscribe && isPortraitLive))
+          "
         >
           <span v-if="isSetQuality">
             {{ $t('player.player_1009') }}
@@ -176,7 +185,10 @@
           v-show="
             (isPlaying || (isPortraitLive && !isPlaying && isShowPoster)) &&
             !isSmallPlayer &&
-            (!isPortraitLive || (isPortraitLive && !isLiving) || (embedVideo && isPortraitLive))
+            (!isPortraitLive ||
+              (isPortraitLive && !isLiving) ||
+              (embedVideo && isPortraitLive) ||
+              (isSubscribe && isPortraitLive))
           "
           :class="[
             iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
@@ -287,7 +299,9 @@
                       playerOtherOptions.barrage_button &&
                       !isWarnPreview &&
                       !isTryPreview &&
-                      (!isPortraitLive || (embedVideo && isPortraitLive))
+                      (!isPortraitLive ||
+                        (embedVideo && isPortraitLive) ||
+                        (isSubscribe && isPortraitLive))
                     "
                   >
                     <i
@@ -300,7 +314,9 @@
                     v-if="
                       !isAudio &&
                       !isWarnPreview &&
-                      (!isPortraitLive || (embedVideo && isPortraitLive))
+                      (!isPortraitLive ||
+                        (embedVideo && isPortraitLive) ||
+                        (isSubscribe && isPortraitLive))
                     "
                     @click.stop="enterFullscreen"
                   >
@@ -712,7 +728,13 @@
       // },
       isShowPoster: {
         handler(val) {
-          if (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive)) return;
+          if (
+            !this.isPortraitLive ||
+            (this.embedVideo && this.isPortraitLive) ||
+            (this.isSubscribe && this.isPortraitLive)
+          ) {
+            return;
+          }
           if (this.isShowPoster && !this.noDelayWebinar) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
@@ -828,7 +850,7 @@
     },
     methods: {
       clearScreen() {
-        if (this.isPortraitLive && !this.embedVideo) {
+        if (this.isPortraitLive && !this.embedVideo && !this.isSubscribe) {
           this.roomBaseServer.state.isClearScreen = !this.roomBaseServer.state.isClearScreen;
         }
       },
@@ -890,7 +912,11 @@
       },
       // 播放
       play() {
-        if (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive)) {
+        if (
+          !this.isPortraitLive ||
+          (this.embedVideo && this.isPortraitLive) ||
+          (this.isSubscribe && this.isPortraitLive)
+        ) {
           this.iconShow = false;
           this.fiveDown();
         }
@@ -1085,7 +1111,9 @@
         if (
           this.marquee &&
           this.marquee.scrolling_open == 1 &&
-          (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive))
+          (!this.isPortraitLive ||
+            (this.embedVideo && this.isPortraitLive) ||
+            (this.isSubscribe && this.isPortraitLive))
         ) {
           let marqueeText = '';
           if (this.marquee.text_type == 1) {
@@ -1101,7 +1129,7 @@
                 text = '';
               }
             }
-            marqueeText = `${text}`;
+            marqueeText = `${text}1`;
           }
           playerParams.marqueeOption = {
             enable: true,
@@ -1119,7 +1147,9 @@
         if (
           this.water &&
           this.water.watermark_open == 1 &&
-          (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive))
+          (!this.isPortraitLive ||
+            (this.embedVideo && this.isPortraitLive) ||
+            (this.isSubscribe && this.isPortraitLive))
         ) {
           const alianMap = new Map([
             [1, 'tl'],
@@ -1177,7 +1207,7 @@
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitCheckAuth', params));
       },
       openSpeed() {
-        if (this.isPortraitLive && !this.isLiving && !this.embedVideo) {
+        if (this.isPortraitLive && !this.isLiving && !this.embedVideo && !this.isSubscribe) {
           if (this.isWapBodyDocSwitchFullScreen) {
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitPlayerOpenSpeed', [true])
@@ -1192,7 +1222,7 @@
       },
       openQuality() {
         // 竖屏直播-回放
-        if (this.isPortraitLive && !this.isLiving && !this.embedVideo) {
+        if (this.isPortraitLive && !this.isLiving && !this.embedVideo && !this.isSubscribe) {
           if (this.isWapBodyDocSwitchFullScreen) {
             window.$middleEventSdk?.event?.send(
               boxEventOpitons(this.cuid, 'emitPlayerOpenQuality', [true])
@@ -1206,7 +1236,11 @@
         }
       },
       videoShowIcon() {
-        if (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive)) {
+        if (
+          !this.isPortraitLive ||
+          (this.embedVideo && this.isPortraitLive) ||
+          (this.isSubscribe && this.isPortraitLive)
+        ) {
           this.iconShow = false;
           this.isOpenQuality = false;
           this.isOpenSpeed = false;
