@@ -6,16 +6,39 @@
       'vmp-wap-insert-file-main-screen-top': isMergeMode && !isSpeakOn
     }"
     v-show="isOpenInsertFile && !isAudio"
+    @click="openSet"
   >
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      @click.stop="exitFullScreen"
+      v-if="isFull && iconShow"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
+    <!-- 进入全屏 -->
+    <div
+      v-if="!isFull && iconShow"
+      class="vmp-wap-stream-wrap-mask-screen"
+      @click.stop="setFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-fullscreen"></i>
+    </div>
     <!-- 订阅桌面共享容器 -->
   </div>
 </template>
 
 <script>
-  import { useRoomBaseServer, useInsertFileServer } from 'middle-domain';
+  import { useRoomBaseServer, useInsertFileServer, useInteractiveServer } from 'middle-domain';
 
   export default {
     name: 'VmpWapInsertFIle',
+    data() {
+      return {
+        isFull: false,
+        iconShow: false
+      };
+    },
 
     computed: {
       isOpenInsertFile() {
@@ -36,6 +59,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this.addEvents();
@@ -82,6 +106,45 @@
         //     this.$toast('麦克风开启，对方将听到您的声音');
         //   }
         // });
+      },
+      // 全屏
+      setFullScreen() {
+        /*
+         * 布局原因：wap进入全屏仅全屏主屏流， 本地流和远端流都存在被设置为主屏情况
+         *    进入全屏在list内，退出全屏在remote/local内进行退出
+         */
+        this.interactiveServer
+          .setStreamFullscreen({
+            streamId: this.isOpenInsertFile,
+            vNode: `vmp-wap-insert-file`
+          })
+          .then(() => {
+            this.isFull = true;
+          });
+      },
+      // 退出全屏
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.isOpenInsertFile,
+            vNode: `vmp-wap-insert-file`
+          })
+          .then(() => {
+            this.isFull = false;
+          });
+      },
+      openSet() {
+        console.log(12312312321);
+        this.iconShow = true;
+        this.fiveDown();
+      },
+      // 5秒后消失
+      fiveDown() {
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.iconShow = false;
+          this.isOpenlang = false;
+        }, 5000);
       }
     }
   };
