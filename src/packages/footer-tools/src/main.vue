@@ -461,6 +461,7 @@
 </script>
 <style lang="less">
   .vmp-footer-tools {
+    flex-shrink: 0;
     height: 56px;
     background: var(--chat-background-color-base);
     line-height: 56px;

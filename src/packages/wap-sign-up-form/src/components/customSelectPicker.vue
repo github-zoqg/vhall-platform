@@ -125,5 +125,10 @@
 
 <style lang="less">
   .vmp-custom-select-picker {
+    .select-xl {
+      input {
+        padding-right: 45px;
+      }
+    }
   }
 </style>
