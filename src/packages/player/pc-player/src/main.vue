@@ -580,8 +580,8 @@
               marqueeText = `${text}`;
             }
             params.marqueeOption = {
-              enable: true,
-              text: Boolean(marqueeText), // 跑马灯的文字
+              enable: Boolean(marqueeText),
+              text: marqueeText, // 跑马灯的文字
               alpha: this.marquee.alpha, // 透明度,100完全显示,0 隐藏
               size: this.marquee.size, // 文字大小
               color: this.marquee.color, // 文字颜色
