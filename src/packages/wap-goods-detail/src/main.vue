@@ -20,10 +20,10 @@
         </div>
         <div class="vh-goods-wrapper-detail-info">
           <div class="vh-goods-wrapper-detail-info-price">
-            <span class="price-tip">{{ $t('menu.menu_1006') }}</span>
+            <span class="price-tip" v-if="info.discountText">{{ $t('menu.menu_1006') }}</span>
             <i>￥</i>
-            <span class="price" v-html="info.discountText"></span>
-            <span class="price-through">
+            <span class="price" v-html="info.discountText ? info.discountText : info.price"></span>
+            <span class="price-through" v-if="info.discountText">
               <i>￥</i>
               <span v-html="info.priceText"></span>
             </span>
