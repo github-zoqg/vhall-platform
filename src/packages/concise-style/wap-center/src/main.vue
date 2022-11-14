@@ -49,7 +49,9 @@
     <!-- 音频直播 -->
     <div
       class="vmp-wap-player-audie"
-      v-if="(isAudio || audioStatus) && !isVodEnd && isPlaying && isWapBodyDocSwitchFullScreen"
+      v-if="
+        (isAudio || audioStatus) && !isVodEnd && !isShowPosterAudio && isWapBodyDocSwitchFullScreen
+      "
     >
       <p>{{ $t('player.player_1014') }}</p>
     </div>
@@ -104,7 +106,8 @@
         audioStatus: false, // 选中清晰度是否是音频模式
         // isAudio: false, //判断是否是音频直播模式
         isLivingEnd: false,
-        qaZIndex: 302 // 默认问卷推送时，文档吸顶的index
+        qaZIndex: 302, // 默认问卷推送时，文档吸顶的index
+        isShowPosterAudio: false // 音频封面显示 false
       };
     },
     computed: {
@@ -133,7 +136,8 @@
         //直播中 无延迟 且 未初始化完成，使用play的播放状态
         if (
           (this.noDelayWebinar && !this.isInstanceInit && this.webinarType == 1) ||
-          !this.noDelayWebinar
+          !this.noDelayWebinar ||
+          this.webinarType == 5
         ) {
           return this.$domainStore.state.playerServer.isPlaying;
         } else {
@@ -251,6 +255,9 @@
           console.warn('自动播放失败------', e);
           this.$set(this.abortStreams, this.abortStreams.length, e.data);
         });
+      },
+      getAudioPlayerPoster(val) {
+        this.isShowPosterAudio = val;
       }
     }
   };

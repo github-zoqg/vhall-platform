@@ -745,6 +745,15 @@
               );
             });
           }
+          console.log('---=-=-=-=-=----', this.isAudio, this.audioStatus);
+          // 音频模式或者画质为音频
+          if (this.isAudio || this.audioStatus) {
+            this.$nextTick(() => {
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitPlayerPosterAudio', [this.isShowPoster])
+              );
+            });
+          }
         },
         immediate: true
       },
@@ -765,12 +774,18 @@
           );
         });
       },
-      audioStatus(val) {
-        this.$nextTick(() => {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerAudioStatus', [val])
-          );
-        });
+      audioStatus: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerAudioStatus', [val])
+            );
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerPosterAudio', [this.isShowPoster])
+            );
+          });
+        },
+        immediate: true
       }
       // isAudio(val) {
       //   this.$nextTick(() => {

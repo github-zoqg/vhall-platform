@@ -225,6 +225,14 @@ export default {
         method: 'getAudioStatus',
         args: ['$0']
       }
+    ],
+    emitPlayerPosterAudio: [
+      // 音频模式 封面
+      {
+        cuid: 'comWapCenter',
+        method: 'getAudioPlayerPoster',
+        args: ['$0']
+      }
     ]
     // emitPlayerIsAudio: [
     //   //判断是否是音频直播模式
