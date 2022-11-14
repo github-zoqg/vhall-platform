@@ -26,19 +26,6 @@
           <div class="vmp-split-screen__stream-container-box">
             <vmp-air-container :oneself="true" :cuid="childrenCom[0]"></vmp-air-container>
           </div>
-          <div
-            v-if="
-              $domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
-              localSpeaker.accountId
-            "
-            class="vmp-split-screen__stream-split"
-            :key="localSpeaker.streamId"
-          >
-            <!-- 插播流 -->
-            <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
-            <!-- 桌面共享流 -->
-            <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
-          </div>
         </div>
         <!-- 远端流 -->
         <div
@@ -51,15 +38,18 @@
           </div>
           <!-- 同一流只能初始化一次 否则会失败n-1次 导致时间延迟 -->
           <div
-            v-if="
-              $domainStore.state.roomBaseServer.interactToolStatus.doc_permission ==
-              speaker.accountId
-            "
+            v-if="insertStreamInfo.userInfo.accountId == speaker.accountId"
             class="vmp-split-screen__stream-split"
             :key="speaker.streamId"
           >
             <!-- 插播流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+          </div>
+          <div
+            v-if="desktopShareInfo.accountId == speaker.accountId"
+            class="vmp-split-screen__stream-split"
+            :key="speaker.streamId"
+          >
             <!-- 桌面共享流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
           </div>
@@ -103,10 +93,13 @@
               this.$domainStore.state.roomBaseServer.watchInitData.join_info.third_party_user_id
           ) || []
         );
+      },
+      insertStreamInfo() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo;
+      },
+      desktopShareInfo() {
+        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
       }
-      // showInsertFile(){
-      //   return this.$domainStore.state.roomBaseServer.interactToolStatus.doc_permission == this.
-      // }
     },
     watch: {
       // 流数量变更，更新视图的布局
