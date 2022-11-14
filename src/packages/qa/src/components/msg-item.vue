@@ -127,7 +127,7 @@
         if (this.source.answer && this.source.answer.content) {
           if (this.source.answer.content == '直播中回复') {
             this.answerContent = `<span class="msg-item__qa-flag color-e6e">${this.$t(
-              'chat.chat_1039'
+              'chat.chat_1086'
             )}</span>`;
           } else if (this.source.answer.is_open == 0) {
             this.answerContent = `<span class="msg-item__qa-flag">${this.$t(
