@@ -726,6 +726,7 @@
             )
               .then(() => {
                 // 派发推流事件
+                this.roomBaseServer.setThirdPushStream(true);
                 this.clickStartLive();
               })
               .catch(action => {
