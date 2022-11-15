@@ -691,6 +691,7 @@
         right: 16px;
         top: 16px;
         left: auto;
+        position: relative;
       }
       .vmp-wap-body-mini {
         top: 16px;
