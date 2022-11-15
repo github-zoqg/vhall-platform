@@ -48,7 +48,7 @@
     </section>
 
     <!-- 底部流信息 -->
-    <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId">
+    <section class="vmp-stream-local__bottom" v-show="localSpeaker.streamId && !isThirdStream">
       <span
         v-show="showRole"
         class="vmp-stream-local__bottom-role"
@@ -82,7 +82,7 @@
         (initLocalSpeaker.streamId && [1, 4].includes(joinInfo.role_name) && liveStatus != 1)
       "
       class="vmp-stream-local__shadow-box"
-      v-show="isShowShadowBtn || initLocalSpeaker.streamId"
+      v-show="(isShowShadowBtn && !isThirdStream) || initLocalSpeaker.streamId"
     >
       <p class="vmp-stream-local__shadow-first-line">
         <el-tooltip

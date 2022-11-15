@@ -819,8 +819,14 @@
             if (join_info.join_id) {
               text = `${join_info.join_id}-${join_info.nickname}`;
             } else {
-              if (localStorage.getItem('userInfo')) {
-                text = localStorage.getItem('userInfo').nick_name;
+              let userInfo = localStorage.getItem('userInfo');
+              if (userInfo) {
+                try {
+                  userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                  text = `${userInfo?.user_id}-${userInfo?.nick_name}`;
+                } catch (err) {
+                  console.log(err);
+                }
               } else {
                 text = '';
               }
@@ -828,7 +834,7 @@
             marqueeText = `${text}`;
           }
           playerParams.marqueeOption = {
-            enable: true,
+            enable: Boolean(marqueeText),
             text: marqueeText, // 跑马灯的文字
             alpha: this.marquee.alpha, // 透明度,100完全显示,0 隐藏
             size: this.marquee.size, // 文字大小

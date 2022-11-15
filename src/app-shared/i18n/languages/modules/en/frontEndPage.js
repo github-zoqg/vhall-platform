@@ -348,7 +348,7 @@ export default {
     chat_1083: '',
     chat_1084: '',
     chat_1085: '',
-    chat_1086: '',
+    chat_1086: 'Answered this question in the live-streaming',
     chat_1087: '',
     chat_1088: '',
     chat_1089: '',

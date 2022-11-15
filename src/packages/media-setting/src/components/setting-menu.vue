@@ -55,8 +55,10 @@
           } else {
             this.$emit('change', 'video-setting');
           }
+          this.$emit('isShowBasic', false);
           return false;
         } else {
+          this.$emit('isShowBasic', true);
           return true;
         }
       },
