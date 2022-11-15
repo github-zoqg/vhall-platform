@@ -373,10 +373,10 @@
                 continue;
               }
               // 定时直播未开播时，互动工具置灰
-              if (this.roleName == 3 && this.webinarMode == 5 && this.webinarType == 2) {
-                vn.setDisableState(true);
-                continue;
-              }
+              // if (this.roleName == 3 && this.webinarMode == 5 && this.webinarType == 2) {
+              //   vn.setDisableState(true);
+              //   continue;
+              // }
               if (this.isInGroup) {
                 vn.setHiddenState(true);
               } else {
