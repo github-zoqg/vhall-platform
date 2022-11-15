@@ -370,9 +370,9 @@
         height: 100px;
         text-align: center;
         position: relative;
-        background-image: url('./images/bg_exam_list_header.png');
-        background-repeat: no-repeat;
-        background-size: cover;
+        // background-image: url('./images/bg_exam_list_header.png');
+        // background-repeat: no-repeat;
+        // background-size: cover;
         .container-title-text {
           position: absolute;
           top: 36px;

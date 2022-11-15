@@ -54,7 +54,7 @@
         </div>
       </div>
       <!-- 进度条 -->
-      <el-progress :percentage="percentage" :show-text="false" class="exam-zdy-progress" />
+      <van-progress :percentage="percentage" :show-pivot="false" class="exam-zdy-progress" />
       <!-- 分割条 -->
       <div class="exam-padding-line"></div>
     </div>
@@ -73,7 +73,7 @@
     ></exam-info>
     <!-- 底部 -->
     <div class="exam-execute-footer" v-if="step != 2">
-      <el-button
+      <van-button
         type="default"
         size="medium"
         round
@@ -82,8 +82,8 @@
         class="gray--button"
       >
         上一题
-      </el-button>
-      <el-button
+      </van-button>
+      <van-button
         type="danger"
         size="medium"
         round
@@ -92,8 +92,8 @@
         :disabled="isDisabledSave"
       >
         下一题
-      </el-button>
-      <el-button
+      </van-button>
+      <van-button
         type="danger"
         size="medium"
         round
@@ -102,7 +102,7 @@
         :disabled="isDisabledSave"
       >
         提交
-      </el-button>
+      </van-button>
     </div>
     <!-- 查看答案 -->
     <exam-result
@@ -118,7 +118,7 @@
   import ExamInfo from './components/exam-info.vue';
   import ExamResult from './components/exam-result.vue';
   export default {
-    name: 'VmpExamCore',
+    name: 'VmpExamCoreWap',
     components: {
       ExamInfo,
       ExamResult
@@ -279,13 +279,12 @@
       justify-content: space-between;
       align-items: center;
       padding: 32px 0 16px 0;
-      line-height: 8px;
     }
     .exam-execute--time {
       text-align: center;
       .exam_time__icon {
-        width: 17.2px;
-        height: 9.2px;
+        width: 32px;
+        height: 16px;
         img {
           width: 100%;
           height: 100%;
@@ -295,8 +294,8 @@
         font-family: 'Inter';
         font-style: normal;
         font-weight: 500;
-        font-size: 14px;
-        line-height: 1;
+        font-size: 22px;
+        line-height: 27px;
         color: #000000;
         margin-top: 2px;
         ul {
@@ -309,9 +308,9 @@
           font-family: 'Inter';
           font-style: normal;
           font-weight: 500;
-          font-size: 10px;
-          line-height: 8px;
-          transform: scale(0.8);
+          font-size: 22px;
+          line-height: 27px;
+          color: #000000;
         }
       }
     }
@@ -322,16 +321,15 @@
         font-family: 'Inter';
         font-style: normal;
         font-weight: 500;
-        font-size: 14px;
-        line-height: 17px;
+        font-size: 28px;
+        line-height: 34px;
         color: #000000;
       }
     }
     .exam-execute--close {
-      margin-left: 16px;
-      width: 12px;
-      height: 12px;
-      line-height: 12px;
+      margin-left: 32px;
+      width: 28px;
+      height: 28px;
       img {
         width: 100%;
         height: 100%;
@@ -346,14 +344,18 @@
   }
   .exam-execute-header {
     width: 100%;
-    // height: 63px;
+    min-height: 120px;
+    background: url('./images/bg_header_default.png') no-repeat;
+    background-size: cover;
+    background-color: #ffffff;
+    background-position: top;
     .exam-execute-title,
     .exam-zdy-progress {
       margin: 0 32px;
     }
   }
   .exam-execute-body {
-    height: 337px;
+    height: 632px;
     overflow-x: hidden;
     overflow-y: auto;
     padding: 0 32px;
@@ -386,13 +388,11 @@
   }
   /* 会被重置的样式 */
   .exam-zdy-progress {
-    .el-progress-bar__outer {
+    &.van-progress {
       background: rgba(0, 0, 0, 0.06);
-      background-color: rgba(0, 0, 0, 0.06);
       border-radius: 4px;
-      .el-progress-bar__inner {
+      .van-progress__portion {
         background: rgba(251, 38, 38, 1);
-        background-color: rgba(251, 38, 38, 1);
         border-radius: 3px;
       }
     }

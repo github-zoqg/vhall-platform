@@ -107,7 +107,7 @@ import VmpExamCollectWap from '@/packages/exam-collect-wap'; // 用户收集
 import VmpExamPreviewWap from '@/packages/exam-preview-wap'; // 预览答题
 import VmpExamAnswerWap from '@/packages/exam-answer-wap'; // 答题
 import VmpExamScoreWap from '@/packages/exam-score-wap'; // 成绩
-import VmpExamCore from '@/packages/exam-core'; // 快问快答 - 题核心
+import VmpExamCoreWap from '@/packages/exam-core-wap'; // 快问快答 - 题核心
 // ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 Vue.use(VmpContainer);
@@ -172,5 +172,5 @@ Vue.use(VmpExamCollectWap);
 Vue.use(VmpExamPreviewWap);
 Vue.use(VmpExamAnswerWap);
 Vue.use(VmpExamScoreWap);
-Vue.use(VmpExamCore);
+Vue.use(VmpExamCoreWap);
 // ------------------------------【极简风格】注册组件------end----------

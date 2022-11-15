@@ -831,10 +831,10 @@
     }
   };
 </script>
-<style lang="less">
+<style lang="less" scoped>
   /* 答题面板 */
   .vmp-exam-info {
-    margin: 0 auto 32px auto;
+    margin: 32px auto 0 auto;
     padding-bottom: 160px;
     .exam-way__no__waterfallFlow {
       display: flex;
@@ -847,17 +847,18 @@
         font-family: 'PingFang HK';
         font-style: normal;
         font-weight: 400;
-        font-size: 14px;
-        line-height: 20px;
+        font-size: 28px;
+        line-height: 40px;
         color: #262626;
-        margin-bottom: 16px;
+        margin-bottom: 24px;
         strong {
           font-family: 'PingFang HK';
           font-style: normal;
           font-weight: 400;
-          font-size: 14px;
-          line-height: 20px;
+          font-size: 28px;
+          line-height: 40px;
           color: #262626;
+          margin-bottom: 24px;
         }
       }
       .zdy-exam-question-type {
@@ -865,8 +866,8 @@
         font-family: 'Inter';
         font-style: normal;
         font-weight: 500;
-        font-size: 12px;
-        line-height: 18px;
+        font-size: 22px;
+        line-height: 28px;
         color: #fb2626;
         padding: 4px 8px;
       }
@@ -965,8 +966,8 @@
     }
     &--option {
       background: rgba(0, 0, 0, 0.03);
-      border-radius: 4px;
-      margin-bottom: 8px;
+      border-radius: 8px;
+      margin-bottom: 32px;
       font-style: normal;
       font-weight: 400;
       font-size: 14px;
@@ -979,11 +980,10 @@
       }
       .text--content__position {
         position: absolute;
-        font-family: 'PingFang SC';
         font-style: normal;
         font-weight: 400;
-        font-size: 14px;
-        line-height: 20px;
+        font-size: 28px;
+        line-height: 40px;
         color: #0a7ff5;
       }
       .vmp-exam-info--img {
@@ -1007,26 +1007,25 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .zdy-exam-radio,
-        .zdy-exam-checkbox {
-          margin-right: 8px;
+        /deep/.zdy-exam-radio,
+        /deep/.zdy-exam-checkbox {
+          width: 32px;
+          height: 32px;
+          margin-right: 16px;
           align-self: flex-start;
           padding-top: 4px;
         }
-        .el-radio__label,
-        .el-checkbox__label {
-          display: none;
-          padding-left: 8px;
+        /deep/.el-radio__label,
+        /deep/.el-checkbox__label {
           display: none;
         }
         .text--content {
           width: calc(100% - 114px); /* 减去单选按钮的宽度和一点点小间距 */
-          font-family: 'PingFang HK';
           font-style: normal;
           font-weight: 400;
-          font-size: 14px;
-          line-height: 20px;
-          color: #262626;
+          font-size: 28px;
+          line-height: 40px;
+          color: rgba(0, 0, 0, 0.85);
           margin-right: auto;
           word-break: break-all;
           &.position_close {
@@ -1066,10 +1065,10 @@
       }
       /* 图文题 */
       &.question_img-text {
-        padding: 8px 8px;
+        padding: 16px 16px;
         .text--content__position {
           right: 68px;
-          bottom: 8px;
+          bottom: 16px;
         }
         /* 一排一列 */
         &.max-width {
@@ -1098,13 +1097,13 @@
               justify-content: space-between;
               align-items: flex-start;
               .vmp-exam-info--img {
-                width: 70px;
-                height: 70px;
+                width: 140px;
+                height: 140px;
                 margin-bottom: 0;
-                margin-right: 8px;
+                margin-right: 16px;
               }
               .text--content__position {
-                bottom: 8px;
+                bottom: 36px;
               }
               &.text__max__width {
                 .vmp-exam-info--text {
@@ -1115,7 +1114,7 @@
                   width: 100%;
                 }
                 .text--content__position {
-                  right: 8px;
+                  right: 16px;
                 }
               }
               &.text__min__width {
@@ -1185,7 +1184,7 @@
           width: calc(50% - 8px);
           margin-right: 0;
           &:nth-child(2n + 1) {
-            margin-right: 8px;
+            margin-right: 16px;
           }
           /* 上下分布 */
           &.top-bottom {
@@ -1194,9 +1193,9 @@
             }
             .vmp-exam-info--box {
               .vmp-exam-info--img {
-                width: 142px;
-                height: 80px;
-                margin-bottom: 8px;
+                width: 303px;
+                height: 171px;
+                margin-bottom: 16px;
               }
               .vmp-exam-info--text {
                 min-height: calc(100% - 187px);
@@ -1239,10 +1238,10 @@
       }
       /* 文字题 */
       &.question_text {
-        padding: 8px 8px;
+        padding: 20px 16px 20px 20px;
         .text--content__position {
           right: 68px;
-          bottom: 8px;
+          bottom: 20px;
         }
         /* 一排一列 */
         &.max-width {
@@ -1297,10 +1296,10 @@
         &.min-width {
           display: inline-block;
           vertical-align: top;
-          width: calc(50% - 4px);
+          width: calc(50% - 8px);
           margin-right: 0;
           &:nth-child(2n + 1) {
-            margin-right: 8px;
+            margin-right: 16px;
           }
           /* 上下分布 */
           &.top-bottom {
@@ -1336,7 +1335,7 @@
               }
               &.text__max__width {
                 .text--content__position {
-                  right: 8px;
+                  right: 16px;
                 }
               }
               &.text__min__width {
