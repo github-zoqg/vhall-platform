@@ -269,7 +269,7 @@
     position: absolute;
     left: 0px;
     top: -46px;
-    z-index: 100;
+    z-index: 1;
 
     .reward-effect-box {
       height: 40px;
