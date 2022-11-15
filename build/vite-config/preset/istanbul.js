@@ -11,12 +11,13 @@
 export function useIstanbul({ isDev = true }) {
   if (!isDev) return [];
 
-  return [
-    // istanbul({
-    //   include: 'src/*',
-    //   exclude: 'node_modules',
-    //   forceBuildInstrument: true,
-    //   coverageVariable: '__coverage__saas_platform'
-    // })
-  ];
+  return [];
+  // return [
+  // istanbul({
+  //   include: 'src/*',
+  //   exclude: 'node_modules',
+  //   forceBuildInstrument: true,
+  //   coverageVariable: '__coverage__saas_platform'
+  // })
+  // ];
 }

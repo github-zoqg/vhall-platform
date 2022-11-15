@@ -4,14 +4,13 @@ import * as preset from './preset'; // 较重较内聚，不离散的配置逻�
 import * as utils from './vite-config-utils';
 import { DEFAULT_CONF } from './static.js';
 import packageJson from '../../package.json';
-import { getCmdArgs } from '../cli/run-utils';
 
 // plugins---语法类
 import { createVuePlugin } from 'vite-plugin-vue2'; // <VUE2.7 使用。IMPORTANT: 如升级到VUE2.7后要更换插件
 import vueJsx from '@vitejs/plugin-vue-jsx'; // JSX语法支持
 import requireTransform from './plugins/vite-plugin-require-transform'; // 支持require语法，减少业务代码改造
 // plugins---打包类
-import legacy from '@vitejs/plugin-legacy'; // 生成低版本浏览器代码
+// import legacy from '@vitejs/plugin-legacy'; // 生成低版本浏览器代码
 import { ViteEjsPlugin } from 'vite-plugin-ejs'; // HTML-EJS
 // plugins---cdn类
 import externalGlobals from 'rollup-plugin-external-globals'; // build-cdn用
@@ -21,9 +20,10 @@ import createExternal from 'vite-plugin-external'; // server-cdn用
 import mkcert from 'vite-plugin-mkcert'; // https证书，以支持server可用Https
 
 export default defineConfig(async () => {
-  const { VITE_SHELL_CMD_MODE: mode, VITE_SHELL_CMD_MAIN } = utils.getViteShellCmdArgs();
-  const args = getCmdArgs();
-  let DOT_ENV = utils.parseDotEnvFile(mode); // 用户自定义的.env.xxx 环境变量
+  // 获取script命令的配置参数
+  const { VITE_SHELL_CMD_MAIN, VITE_SHELL_CMD_MODE, VITE_SHELL_CMD_HASH, VITE_SHELL_CMD_VERSION } =
+    utils.getViteShellCmdArgs();
+  let DOT_ENV = utils.parseDotEnvFile(VITE_SHELL_CMD_MODE); // 用户自定义的.env.xxx 环境变量
   // --- 动态设置环境变量
   DOT_ENV = preset.mixinDynamicEnvVar(DOT_ENV);
 
@@ -33,7 +33,7 @@ export default defineConfig(async () => {
     merge: true // 合并base.config和someEnv.conf后返回一个合并后对象
   });
 
-  const isDev = VITE_SHELL_CMD_MAIN === 'serve';
+  const isLocalServer = VITE_SHELL_CMD_MAIN === 'serve';
 
   return {
     envPrefix: DEFAULT_CONF.ENV_PREFIX,
@@ -42,29 +42,23 @@ export default defineConfig(async () => {
     define: {
       'process.env': {
         ...DOT_ENV,
-        ROUTER_BASE_URL: isDev ? '/' : DOT_ENV.VUE_APP_ROUTER_BASE_URL,
+        ROUTER_BASE_URL: isLocalServer ? '/' : DOT_ENV.VUE_APP_ROUTER_BASE_URL,
         VUE_APP_IS_WAP: project.isWap
       }
     },
 
-    base: isDev ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
+    // base: isLocalServer ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
 
     // --- 模块解析
     resolve: {
-      alias: [
-        { find: '@', replacement: utils.resolvePathByRoot('/src') },
-        {
-          find: /^~(.*)$/,
-          replacement: 'node_modules/$1'
-        }
-      ],
+      alias: [{ find: '@', replacement: utils.resolvePathByRoot('/src') }],
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.vue', '.less']
     },
 
     // ---  VITE 插件
     plugins: [
       // 本地使用https服务器。启用https2，提高网络IO并发速度
-      // mkcert(),
+      mkcert(),
       // VUE支持
       createVuePlugin(),
       // VUE-JSX特性支持
@@ -80,8 +74,8 @@ export default defineConfig(async () => {
         isWap: project?.isWap, // 手机端
         title: project.title || DEFAULT_CONF.HTML_PAGE_TITLE, // 标题
         env: DOT_ENV.VUE_APP_SAAS_ENV, // 环境
-        version: DOT_ENV.VUE_APP_BUILD_VERSION, // 运维写入version
-        gitlabHash: DOT_ENV.VUE_APP_BUILD_HASH // 运维写入gitlab-hash
+        version: VITE_SHELL_CMD_VERSION, // 运维写入version
+        gitlabHash: VITE_SHELL_CMD_HASH // 运维写入gitlab-hash
       }),
       // legacy({
       //   targets: ['ie >= 11'],
@@ -97,13 +91,13 @@ export default defineConfig(async () => {
       }),
       createExternal({
         externals: { ...cdn.externalsVar }
-      }),
-      ...preset.useIstanbul({ isDev: DOT_ENV.VUE_APP_SAAS_ENV !== 'production' })
+      })
+      // ...preset.useIstanbul({ isDev: DOT_ENV.VUE_APP_SAAS_ENV !== 'production' })
     ],
 
     // --- 开发服务器
     server: {
-      https: false, // 和 vite的plugin mkcert结合使用
+      https: true, // 和 vite的plugin mkcert结合使用
       port: utils.getPortByDevPortFile({ projectName: project.name }),
       proxy: {
         '/mock': {

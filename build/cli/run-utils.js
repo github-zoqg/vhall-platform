@@ -7,4 +7,13 @@ function getCmdArgs() {
   return minimist(cmdArgs, { string: true });
 }
 
-module.exports = { getCmdArgs };
+function parseEnvOption({ env_prefix, cmd_env_list }) {
+  let new_cmd_list = cmd_env_list.map(([key, value]) => {
+    key = `${env_prefix}${key}`;
+    return `${key}=${value}`;
+  });
+
+  return new_cmd_list.join(' ');
+}
+
+module.exports = { getCmdArgs, parseEnvOption };
