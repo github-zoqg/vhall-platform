@@ -70,6 +70,11 @@
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
         <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
+      <li>
+        <!-- 快问快答-->
+        <exam-icon @clickIcon="checkExamIcon" />
+        <vmp-air-container :cuid="childrenCom[5]" :oneself="true"></vmp-air-container>
+      </li>
       <li v-if="isLiving">
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
@@ -455,6 +460,17 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionIcon', [questionnaireId])
         );
+      },
+      checkExamIcon(vo) {
+        if (vo?.type == 'score') {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamIconToScore', [vo.examId])
+          );
+        } else if (vo?.type == 'answer') {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamIconToAnswer', [vo.examId])
+          );
+        }
       }
     }
   };

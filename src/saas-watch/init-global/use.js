@@ -80,7 +80,15 @@ import VmpViewRestriction from '@/packages/view-restriction/index';
 // 专题预览页
 import VmpSubjectBody from '@/packages/subject-body/index';
 import VmpSubjectHeader from '@/packages/subject-header/index';
-
+// ------------------------------ 快问快答-引入组件------start----------
+import VmpExamWap from '@/packages/exam-wap'; // 快问快答-入口
+import VmpExamRankWap from '@/packages/exam-rank-wap'; // 排行榜
+import VmpExamCollectWap from '@/packages/exam-collect-wap'; // 用户收集
+import VmpExamPreviewWap from '@/packages/exam-preview-wap'; // 预览答题
+import VmpExamAnswerWap from '@/packages/exam-answer-wap'; // 答题
+import VmpExamScoreWap from '@/packages/exam-score-wap'; // 成绩
+import VmpExamCore from '@/packages/exam-core'; // 快问快答 - 题核心
+// ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 // Vue.use(ElementUI);
 Vue.use(VmpContainer);
@@ -148,3 +156,12 @@ Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
 Vue.use(VmpPrivacyCompliance);
+// ------------------------------ 快问快答------start----------
+Vue.use(VmpExamWap);
+Vue.use(VmpExamRankWap);
+Vue.use(VmpExamCollectWap);
+Vue.use(VmpExamPreviewWap);
+Vue.use(VmpExamAnswerWap);
+Vue.use(VmpExamScoreWap);
+Vue.use(VmpExamCore);
+// ------------------------------【极简风格】注册组件------end----------
