@@ -151,15 +151,7 @@
   export default {
     name: 'VmpExamCheckbox',
     data() {
-      return {
-        loading: false,
-        answerIndex: null, // 当前答题序号
-        isFirst: true, // 是否是第一道题
-        isEnd: false, // 是否最后一题
-        questionList: [], // 可答题数组
-        previewInfo: null,
-        imgPreviewVisible: false // 图片是否展示
-      };
+      return {};
     },
     components: {},
     props: {

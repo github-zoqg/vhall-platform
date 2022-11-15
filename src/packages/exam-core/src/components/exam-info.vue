@@ -14,13 +14,19 @@
         :data-disabled="isDisabledSave"
       >
         <template v-if="item.type == 'radio'">
-          <exam-radio :item="item" :index="index" :ref="`comp_radio_item_${item.id}`"></exam-radio>
+          <exam-radio
+            :item="item"
+            :index="index"
+            :ref="`comp_radio_item_${item.id}`"
+            @compImgPreview="previewImg"
+          ></exam-radio>
         </template>
         <template v-else-if="item.type == 'checkbox'">
           <exam-checkbox
             :item="item"
             :index="index"
             :ref="`comp_checkbox_item_${item.id}`"
+            @compImgPreview="previewImg"
           ></exam-checkbox>
         </template>
       </div>
@@ -149,19 +155,15 @@
        * 聊天图片预览
        * */
       // 预览聊天图片
-      previewImg(image, item) {
-        let imageList = item.detail.list.filter(akItem => akItem.imgUrl);
-        let newImageList = imageList.map(akItem => akItem.imgUrl);
-        let index = newImageList.indexOf(image);
-        //处理掉图片携带的查询参数，只保留主要链接
-        this.previewImgList = newImageList.map(akItem => akItem.split('?')[0]);
+      previewImg(vo) {
+        this.previewImgList = vo.previewImgList || [];
         if (this.$route.query.assistantType) {
-          cl_previewImg({ list: this.previewImgList, index });
+          cl_previewImg({ list: vo.previewImgList, index: vo.index });
           return;
         }
         this.imgPreviewVisible = true;
         this.$nextTick(() => {
-          this.$refs.imgPreview.jumpToTargetImg(index);
+          this.$refs.imgPreview.jumpToTargetImg(vo.index);
         });
       },
       //关闭预览图片弹窗之后的处理
