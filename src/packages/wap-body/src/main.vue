@@ -688,6 +688,10 @@
         z-index: 300; //互动工具层级＞文档全屏＞小窗层级＞自定义菜单
         width: 0;
         height: 0;
+        right: 16px;
+        top: 16px;
+        left: auto;
+        position: relative;
       }
       .vmp-wap-body-mini {
         top: 16px;
