@@ -690,6 +690,7 @@
         height: 0;
         right: 16px;
         top: 16px;
+        left: auto;
       }
       .vmp-wap-body-mini {
         top: 16px;
