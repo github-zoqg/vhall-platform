@@ -729,6 +729,9 @@
             display: block !important;
           }
         }
+        .vmp-stream-remote .vmp-stream-remote__container__audio {
+          display: block !important;
+        }
         .vmp-wap-stream-wrap {
           .licode_stream {
             object-fit: contain;
