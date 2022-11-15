@@ -9,6 +9,7 @@
       v-model="menuDialogVisible"
       :lazy-render="false"
       round
+      safe-area-inset-bottom
       position="bottom"
       :style="{ height: `${popHeight}px` }"
     >

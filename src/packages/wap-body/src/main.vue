@@ -699,6 +699,7 @@
         left: auto;
         width: 160px;
         height: 284px;
+        border-radius: 8px;
         &.rotate90 {
           transform-origin: center;
           transform: rotate(90deg) !important;
