@@ -1,7 +1,11 @@
 <template>
   <div class="vh-goods-wrapper-detail">
     <!-- 遮罩层 -->
-    <div class="vh-goods-detail-mask" v-if="show && !isPortraitLive"></div>
+    <div
+      class="vh-goods-detail-mask"
+      :class="isPortraitLive ? 'isPortraitLive' : ''"
+      v-if="show"
+    ></div>
     <!-- 商品详情面板 -->
     <div class="vh-goods-detail-layout" v-if="show">
       <div class="vh-goods-wrapper-detail-contents">
@@ -219,6 +223,9 @@
     background: rgba(0, 0, 0, 0.7);
     mix-blend-mode: normal;
     // opacity: 0.7;
+    &.isPortraitLive {
+      background: none;
+    }
   }
   .vh-goods-detail-layout {
     position: fixed;
