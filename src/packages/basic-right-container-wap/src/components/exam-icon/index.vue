@@ -12,6 +12,10 @@
     >
       <div class="vmp-exam-list_container">
         <div class="container-title">
+          <span class="container-title-text">
+            <span class="title_text">{{ $t('exam.exam_1022') }}</span>
+            <i class="container-title-text-line"></i>
+          </span>
           <i class="vh-iconfont vh-line-close" @click="closeExamListDialog"></i>
         </div>
         <van-list
@@ -26,49 +30,69 @@
             <li
               v-for="(item, index) in examList"
               :key="index"
-              class="container-data__item"
+              :class="`container-data__item ${item && item.is_end ? 'button_end_bg' : ''}`"
               @click="checkExamInfo(item)"
             >
-              <div class="container-data__title">{{ item.title }}</div>
-              <div class="container-data__info">
-                <div>
-                  <label>{{ $t('exam.exam_1025') }}:</label>
-                  <span class="color-red">{{ item.score }}</span>
-                </div>
-                <div>
-                  <label>{{ $t('exam.exam_1026') }}:</label>
-                  <span>{{ item.question_num }}</span>
-                </div>
-                <div>
-                  <label>{{ $t('exam.exam_1023') }}:</label>
-                  <span>{{ item.push_time_str }}</span>
-                </div>
-                <div>
-                  <label>{{ $t('exam.exam_1024') }}:</label>
-                  <span>
-                    {{ item.limit_time_switch == 1 ? item.limit_time_str : $t('exam.exam_1006') }}
-                  </span>
+              <div class="container-data__title">
+                <div class="container-data__title__left">{{ item.title }}</div>
+                <div class="container-data__title__right">
+                  <template v-if="item && item.is_end">
+                    <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
+                  </template>
+                  <template v-else-if="item && item.total_score > 0">
+                    <div class="button_text">
+                      <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
+                      <span
+                        class="score"
+                        v-text="
+                          item.total_score > 0
+                            ? item.total_score == item.score
+                              ? $t('exam.exam_1042')
+                              : item.total_score
+                            : item.right_rate
+                        "
+                      ></span>
+                      <span
+                        class="mini-size"
+                        v-if="item.total_score != item.score"
+                        v-text="item.total_score > 0 ? '分' : '%'"
+                      ></span>
+                    </div>
+                  </template>
+                  <div
+                    class="button_answer"
+                    v-if="!(item && item.total_score > 0) && !(item && item.is_end)"
+                  >
+                    <van-button type="danger" size="mini" round>
+                      {{ $t('exam.exam_1027') }}
+                    </van-button>
+                  </div>
                 </div>
               </div>
-              <template v-if="item && item.is_end">
-                <div
-                  class="container-data__position button_text gray"
-                  v-text="$t('exam.exam_1028')"
-                ></div>
-              </template>
-              <template v-else-if="item && item.total_score > 0">
-                <div
-                  class="container-data__position button_text"
-                  v-text="item.total_score == item.score ? $t('exam.exam_1042') : item.total_score"
-                ></div>
-              </template>
-              <template v-else>
-                <div class="container-data__position button_answer">
-                  <van-button type="danger" size="mini" round>
-                    {{ $t('exam.exam_1027') }}
-                  </van-button>
+              <div class="container-data__info">
+                <div>
+                  <label v-text="`${$t('exam.exam_1023')}:`"></label>
+                  <span v-text="item.push_time_str"></span>
                 </div>
-              </template>
+                <div>
+                  <label v-text="`${$t('exam.exam_1024')}:`"></label>
+                  <span
+                    v-text="
+                      `${
+                        item.limit_time_switch == 1 ? item.limit_time_str : $t('exam.exam_1006')
+                      }  `
+                    "
+                  ></span>
+                </div>
+                <div>
+                  <label v-text="`${$t('exam.exam_1025')}:`"></label>
+                  <span class="color-red" v-text="item.score"></span>
+                </div>
+                <div>
+                  <label v-text="`${$t('exam.exam_1026')}:`"></label>
+                  <span v-text="item.question_num"></span>
+                </div>
+              </div>
             </li>
           </ul>
         </van-list>
@@ -346,6 +370,21 @@
         height: 100px;
         text-align: center;
         position: relative;
+        background-image: url('./images/bg_exam_list_header.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        .container-title-text {
+          position: absolute;
+          top: 36px;
+          left: 32px;
+          .title_text {
+            font-style: normal;
+            font-weight: 500;
+            font-size: 28px;
+            line-height: 40px;
+            color: #262626;
+          }
+        }
       }
       .container-data {
         max-height: calc(680px - 210px);
@@ -371,24 +410,52 @@
             border-radius: 16px;
             margin-bottom: 16px;
             .container-data__title {
-              width: 471px;
-              overflow: hidden;
-              word-break: break-all;
-              text-overflow: ellipsis;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
-              font-weight: bold;
               margin-top: 0;
-              font-size: 28px;
-              line-height: 40px;
-              color: #262626;
               margin-bottom: 16px;
+              width: 100%;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              .container-data__title__left {
+                text-align: left;
+                overflow: hidden;
+                word-break: break-all;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                font-weight: bold;
+                font-size: 28px;
+                line-height: 40px;
+                color: #262626;
+                margin-right: auto;
+              }
+              .container-data__title__right {
+                margin-left: 16px;
+                flex-shrink: 0;
+                .button_text {
+                  span {
+                    font-family: 'DINPro';
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 40px;
+                    line-height: 40px;
+                    /* identical to box height, or 100% */
+                    text-align: right;
+                    color: #fb2626;
+                    &.mini-size {
+                      font-size: 20px;
+                      text-align: left;
+                    }
+                  }
+                }
+              }
             }
             .container-data__info {
               display: flex;
               justify-content: flex-start;
               align-items: center;
+              flex-wrap: wrap;
               span,
               label {
                 font-style: normal;
@@ -397,37 +464,23 @@
                 line-height: 28px;
                 color: #595959;
               }
-              span {
-                padding: 0 8px 0 0;
-              }
-            }
-            .container-data__position {
-              position: absolute;
-              top: 0;
-              right: 0;
-              &.button_text {
-                padding: 2px 12px;
-                gap: 10px;
-                min-width: 72px;
-                height: 38px;
-                background: linear-gradient(92.5deg, #ff6725 2.09%, #ffae34 98.46%);
-                border-radius: 0px 16px;
-                font-style: normal;
-                font-weight: 400;
-                font-size: 24px;
-                line-height: 34px;
-                color: #ffffff;
-                text-align: center;
-                &.gray {
-                  background: linear-gradient(91.24deg, #dadada 1.06%, #ededed 99.05%);
-                  border-radius: 0px 16px;
-                  color: #595959;
+              div {
+                span {
+                  padding: 0 16px;
+                }
+                &:last-child {
+                  span {
+                    padding: 0 0 0 16px;
+                  }
                 }
               }
-              &.button_answer {
-                top: calc((100% - 56px) / 2);
-                right: 32px;
-              }
+            }
+            &.button_end_bg {
+              // 结束情况下
+              background-image: url('./images/end.png');
+              background-size: 118px 118px;
+              background-position: right bottom;
+              background-repeat: no-repeat;
             }
           }
         }
