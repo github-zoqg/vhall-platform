@@ -42,8 +42,9 @@
     <div
       class="vmp-desktop-screen-mask"
       v-if="
-        (miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)) ||
-        accountId != desktopShareInfo.accountId
+        ((miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)) ||
+          accountId != desktopShareInfo.accountId) &&
+        !['SplitScreen'].includes($route.name)
       "
     >
       <p>

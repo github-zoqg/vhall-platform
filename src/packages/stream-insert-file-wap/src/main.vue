@@ -83,6 +83,17 @@
         }
       },
       addEvents() {
+        // 监听全屏变化
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            if (!document.fullscreenElement) {
+              this.isFull = false;
+              this.iconShow = false;
+            }
+          },
+          true
+        );
         // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
           this.subscribeInsert();
