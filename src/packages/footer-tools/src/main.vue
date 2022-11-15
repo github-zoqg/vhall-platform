@@ -176,6 +176,7 @@
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
+  import ExamIcon from './component/exam-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
   import { throttle } from 'lodash';
   import alternateStylesheet from 'caniuse-lite/data/features/alternate-stylesheet';
@@ -190,6 +191,7 @@
       Pay,
       RedPacketIcon,
       QuestionnaireIcon,
+      ExamIcon,
       LotteryIcon
     },
     data() {

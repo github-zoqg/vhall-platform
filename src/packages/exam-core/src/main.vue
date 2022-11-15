@@ -183,7 +183,6 @@
       },
       // 题目变更
       changeQuestion(vo) {
-        console.log('当前题目渲染内容', vo);
         this.pageVo = vo;
       },
       // 提交记录后，展示下一个面板
@@ -251,7 +250,6 @@
         let minute = timer - hour * 60;
         this.answerFormat.hour = hour;
         this.answerFormat.minute = minute;
-        console.log(`${hour}时${minute}分钟`);
       },
       // 倒计时 -- 执行
       executeInterval() {
