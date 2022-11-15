@@ -10,166 +10,25 @@
       <div
         class="vmp-exam-info--question"
         v-for="(item, index) in questionList"
-        :key="`qt_${index}`"
+        :key="`qt_${item.id}`"
         :data-disabled="isDisabledSave"
       >
-        <!-- 图片题 （selectType: 1单选；2多选。支持单选 or 多选）-->
-        <h1>
-          <span class="zdy-exam-question-type">{{ item.type == 'radio' ? '单选' : '多选' }}</span>
-          {{ item.sortNo }}.{{ item.title }}：
-          <strong v-if="item.score > 0">({{ item.score }}分)</strong>
-        </h1>
-        <!-- 非瀑布流[题目-答案区域]
-           .page-${answerType}  mock/show/release 作答类别
-           .question_${item.subject_type} 题目类型
-           .max-width  一排一列
-           .min-width  一排双列
-           .top-bottom 上下排布
-           .left-right 左右排布
-        -->
-        <div class="exam-way__no__waterfallFlow">
-          <template v-if="item.detail">
-            <div
-              :class="[
-                'vmp-exam-info--option',
-                `question_${item.subject_type}`,
-                `page-${answerType}`,
-                `${item.layout_type == 1 ? 'max-width' : 'min-width'}`,
-                `${item.layout_css == 1 ? 'top-bottom' : 'left-right'}`,
-                `bg_answer__${sonItem.answerStatus}`
-              ]"
-              v-for="(sonItem, sonIndex) in item.detail.list"
-              :key="`qt_${index}_son${sonIndex}`"
-              @click.stop="lineChecked(item, sonItem)"
-            >
-              <div
-                :class="[
-                  'vmp-exam-info--box',
-                  `${
-                    ['no', 'yes'].includes(sonItem.answerStatus)
-                      ? 'text__min__width'
-                      : 'text__max__width'
-                  }`
-                ]"
-              >
-                <div
-                  class="vmp-exam-info--img object_fit_1"
-                  v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
-                  @click="previewImg(sonItem.imgUrl, item)"
-                  :style="`backgroundImage: url('${
-                    sonItem.imgUrl + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  alt="图片加载失败"
-                ></div>
-                <div class="vmp-exam-info--text">
-                  <el-radio
-                    v-model="item.ownerAnswer"
-                    :label="sonItem.key"
-                    :name="`radio_no_${item.id}`"
-                    v-if="item.type === 'radio'"
-                    class="zdy-exam-radio"
-                    :disabled="answerType == 'show'"
-                  ></el-radio>
-                  <el-checkbox
-                    v-model="sonItem.answer"
-                    :label="sonItem.key"
-                    :name="`checkbox_no_${item.id}`"
-                    v-if="item.type === 'checkbox'"
-                    class="zdy-exam-checkbox"
-                    :disabled="answerType == 'show'"
-                    @change.prevent.stop="setItemCheckAnswer(sonItem, item)"
-                  ></el-checkbox>
-                  <div
-                    :class="[
-                      'text--content',
-                      `item_${item.id}_option_${sonIndex}`,
-                      `position_${sonItem.isMoreHeight || 'normal'}`
-                    ]"
-                    :ref="`item_${item.id}_option_${sonIndex}`"
-                    v-text="sonItem.key + '、' + sonItem.value"
-                  ></div>
-                  <div
-                    class="text--icon--inline"
-                    v-if="['no', 'yes'].includes(sonItem.answerStatus)"
-                  >
-                    <img
-                      src="../images/icon_exam_option_close.png"
-                      v-show="sonItem.answerStatus == 'no'"
-                    />
-                    <img
-                      src="../images/icon_exam_option_yes.png"
-                      v-show="sonItem.answerStatus == 'yes'"
-                    />
-                  </div>
-                </div>
-                <span
-                  class="text--content__position"
-                  v-if="sonItem && sonItem.isMoreHeight"
-                  @click.prevent.stop="
-                    $forceUpdate();
-                    changeStatus(sonItem);
-                  "
-                >
-                  {{ sonItem.isMoreHeight == 'open' ? '收起' : '展开' }}
-                </span>
-              </div>
-              <div class="text--icon" v-if="['no', 'yes'].includes(sonItem.answerStatus)">
-                <img
-                  src="../images/icon_exam_option_close.png"
-                  v-show="sonItem.answerStatus == 'no'"
-                />
-                <img
-                  src="../images/icon_exam_option_yes.png"
-                  v-show="sonItem.answerStatus == 'yes'"
-                />
-              </div>
-            </div>
-          </template>
-        </div>
-        <!-- 答案结果 -->
-        <div class="vmp-exam-info--question--result" v-if="answerType == 'show'">
-          <h2>答案</h2>
-          <div class="question--result--box">
-            <div class="question--result--left">
-              <p>
-                <strong>正确答案：</strong>
-                {{ item.showReleaseAnswer }}
-              </p>
-            </div>
-            <div class="question--result--center">
-              <p class="answer_yes">
-                <strong>您的答案：</strong>
-                {{ item.showOwnerAnswer }}
-              </p>
-            </div>
-            <div class="question--result--right">
-              <img src="../images/icon_correct.png" alt="" v-if="item.answerRes == 'answer_yes'" />
-              <img
-                src="../images/icon_incorrect.png"
-                alt=""
-                v-else-if="item.answerRes == 'answer_no'"
-              />
-              <img src="../images/icon_no_answer.png" alt="" v-else />
-              <span
-                :class="
-                  item.answerRes == 'answer_yes'
-                    ? 'color-green'
-                    : item.answerRes == 'answer_no'
-                    ? 'color-red'
-                    : 'color-gray'
-                "
-              >
-                {{
-                  item.answerRes == 'answer_yes'
-                    ? '正确'
-                    : item.answerRes == 'answer_no'
-                    ? '错误'
-                    : '未作答'
-                }}
-              </span>
-            </div>
-          </div>
-        </div>
+        <template v-if="item.type == 'radio'">
+          <exam-radio
+            :item="item"
+            :index="index"
+            :ref="`comp_radio_item_${item.id}`"
+            @compImgPreview="previewImg"
+          ></exam-radio>
+        </template>
+        <template v-else-if="item.type == 'checkbox'">
+          <exam-checkbox
+            :item="item"
+            :index="index"
+            :ref="`comp_checkbox_item_${item.id}`"
+            @compImgPreview="previewImg"
+          ></exam-checkbox>
+        </template>
       </div>
     </div>
     <!-- 图片预览 -->
@@ -182,6 +41,8 @@
   </div>
 </template>
 <script>
+  import ExamCheckbox from './exam-checkbox.vue';
+  import ExamRadio from './exam-radio.vue';
   import ImgPreview from './img-preview.vue';
   import { cl_previewImg, cl_join, cl_left } from '@/app-shared/client/client-methods.js';
   export default {
@@ -198,6 +59,8 @@
       };
     },
     components: {
+      ExamCheckbox,
+      ExamRadio,
       ImgPreview
     },
     props: {
@@ -240,7 +103,11 @@
                 return index >= lastAnswerIndex && index < nexAnswerIndex;
               }
             });
-            this.questionList = questionList;
+            this.questionList = [];
+            questionList.forEach(item => {
+              this.questionList.push(item);
+            });
+            // this.questionList = questionList;
           }
         },
         immediate: true,
@@ -288,19 +155,15 @@
        * 聊天图片预览
        * */
       // 预览聊天图片
-      previewImg(image, item) {
-        let imageList = item.detail.list.filter(akItem => akItem.imgUrl);
-        let newImageList = imageList.map(akItem => akItem.imgUrl);
-        let index = newImageList.indexOf(image);
-        //处理掉图片携带的查询参数，只保留主要链接
-        this.previewImgList = newImageList.map(akItem => akItem.split('?')[0]);
+      previewImg(vo) {
+        this.previewImgList = vo.previewImgList || [];
         if (this.$route.query.assistantType) {
-          cl_previewImg({ list: this.previewImgList, index });
+          cl_previewImg({ list: vo.previewImgList, index: vo.index });
           return;
         }
         this.imgPreviewVisible = true;
         this.$nextTick(() => {
-          this.$refs.imgPreview.jumpToTargetImg(index);
+          this.$refs.imgPreview.jumpToTargetImg(vo.index);
         });
       },
       //关闭预览图片弹窗之后的处理
