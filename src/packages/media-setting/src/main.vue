@@ -12,7 +12,11 @@
         <div class="vmp-media-setting-main">
           <!-- 左侧菜单 -->
           <aside class="vmp-media-setting-menu">
-            <setting-menu :selected-item="selectedMenuItem" @change="changeSelectedMenuItem" />
+            <setting-menu
+              :selected-item="selectedMenuItem"
+              @isShowBasic="getShowBasic"
+              @change="changeSelectedMenuItem"
+            />
           </aside>
 
           <!-- 右侧面板 -->
@@ -175,7 +179,8 @@
         },
         hostAlertVisible: false,
         alertStatus: false,
-        timeoutCache: 0
+        timeoutCache: 0,
+        isShowBasic: false
       };
     },
     computed: {
@@ -214,13 +219,13 @@
       }
     },
     watch: {
-      selectedMenuItem: {
-        handler(val) {
-          if (val === 'video-setting' && this.timeoutCache) {
-            clearTimeout(this.timeoutCache);
-          }
-        }
-      }
+      // selectedMenuItem: {
+      //   handler(val) {
+      //     if (val === 'video-setting' && this.timeoutCache) {
+      //       clearTimeout(this.timeoutCache);
+      //     }
+      //   }
+      // }
     },
     beforeCreate() {
       this.mediaSettingServer = useMediaSettingServer();
@@ -350,11 +355,17 @@
       async reset() {
         try {
           this.loading = true;
-          this.selectedMenuItem = 'basic-setting';
+
           this.setDefaultVideoType();
           await this.getDevices();
           this.setDefaultSelected();
-          // this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
+          if (this.isShowBasic) {
+            this.selectedMenuItem = 'basic-setting';
+          } else {
+            // this.selectedMenuItem === 'video-setting' && this.$refs['videoSetting'].createPreview();
+            this.selectedMenuItem = 'video-setting';
+            this.$refs['videoSetting'].createPreview();
+          }
           this.getStateCapture();
           this.loading = false;
         } catch (error) {
@@ -695,6 +706,9 @@
           this.mediaState.audioOutput = '';
           localStorage.removeItem('media-check.selected.audioOutput');
         }
+      },
+      getShowBasic(val) {
+        this.isShowBasic = val;
       }
     }
   };
