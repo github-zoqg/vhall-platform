@@ -55,12 +55,9 @@
                 <div
                   class="vmp-exam-info--img object_fit_1"
                   v-if="item.subject_type == 'img-text' && sonItem.imgUrl != undefined"
-                  @click="previewImg(sonItem.imgUrl, item)"
-                  :style="`backgroundImage: url('${
-                    sonItem.imgUrl + '?x-oss-process=image/resize,m_lfit,h_84,w_86'
-                  }')`"
-                  alt="图片加载失败"
-                ></div>
+                >
+                  <img :src="sonItem.imgUrl" alt="" />
+                </div>
                 <div class="vmp-exam-info--text">
                   <el-radio
                     v-model="item.ownerAnswer"
