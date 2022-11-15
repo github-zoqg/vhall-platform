@@ -253,6 +253,14 @@ export default {
         method: 'setDocContainerCovered',
         args: ['$0']
       }
+    ],
+    emitPlayerPosterAudio: [
+      // 音频模式 封面
+      {
+        cuid: 'comWapCenter',
+        method: 'getAudioPlayerPoster',
+        args: ['$0']
+      }
     ]
     // emitStreamShowPlayIcon: [
     //   // 设置流组件显示播放按钮

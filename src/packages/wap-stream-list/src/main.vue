@@ -362,6 +362,10 @@
       // 是否是无延迟活动
       noDelayWebinar() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
+      },
+      //判断是否是音频直播模式
+      isAudio() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
       }
     },
     watch: {
@@ -369,13 +373,25 @@
         handler() {
           // 防止页面初始化报错故添加timeout：目标组件不存在
           setTimeout(() => {
-            if (this.isPortraitLive && this.noDelayWebinar) {
+            if (
+              this.isPortraitLive &&
+              this.noDelayWebinar &&
+              this.$domainStore.state.interactiveServer.isInstanceInit
+            ) {
               if (this.showPlayIcon) {
                 this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
               }
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
               );
+              // 音频模式或者画质为音频
+              if (this.isAudio) {
+                this.$nextTick(() => {
+                  window.$middleEventSdk?.event?.send(
+                    boxEventOpitons(this.cuid, 'emitPlayerPosterAudio', [this.showPlayIcon])
+                  );
+                });
+              }
               // console.log('setStreamFullscreen');
               // window.$middleEventSdk?.event?.send(
               //   boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])

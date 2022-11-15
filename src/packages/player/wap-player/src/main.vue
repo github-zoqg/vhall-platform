@@ -1,7 +1,11 @@
 <template>
   <div
     class="vmp-wap-player"
-    :class="[isAppStartType ? 'vmp-wap-player__app' : '', !isLiving ? 'isVod' : '']"
+    :class="[
+      isAppStartType ? 'vmp-wap-player__app' : '',
+      !isLiving ? 'isVod' : '',
+      isAudio ? 'isAudio' : ''
+    ]"
     @click="clearScreen"
   >
     <template v-if="encrypt">
@@ -592,6 +596,9 @@
       // 播放状态
       isPlaying() {
         return this.$domainStore.state.playerServer.isPlaying;
+      },
+      isInstanceInit() {
+        return this.$domainStore.state.interactiveServer.isInstanceInit;
       }
     },
     data() {
@@ -735,17 +742,19 @@
           ) {
             return;
           }
-          if (this.isShowPoster && !this.noDelayWebinar) {
+          if (
+            this.isShowPoster &&
+            (!this.noDelayWebinar || (!this.isInstanceInit && this.noDelayWebinar))
+          ) {
             this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
-          if (!this.noDelayWebinar) {
+          if (!this.noDelayWebinar || (!this.isInstanceInit && this.noDelayWebinar)) {
             this.$nextTick(() => {
               window.$middleEventSdk?.event?.send(
                 boxEventOpitons(this.cuid, 'emitPlayerPoster', [this.isShowPoster])
               );
             });
           }
-          console.log('---=-=-=-=-=----', this.isAudio, this.audioStatus);
           // 音频模式或者画质为音频
           if (this.isAudio || this.audioStatus) {
             this.$nextTick(() => {
@@ -1126,9 +1135,7 @@
         if (
           this.marquee &&
           this.marquee.scrolling_open == 1 &&
-          (!this.isPortraitLive ||
-            (this.embedVideo && this.isPortraitLive) ||
-            (this.isSubscribe && this.isPortraitLive))
+          (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive))
         ) {
           let marqueeText = '';
           if (this.marquee.text_type == 1) {
@@ -1162,9 +1169,7 @@
         if (
           this.water &&
           this.water.watermark_open == 1 &&
-          (!this.isPortraitLive ||
-            (this.embedVideo && this.isPortraitLive) ||
-            (this.isSubscribe && this.isPortraitLive))
+          (!this.isPortraitLive || (this.embedVideo && this.isPortraitLive))
         ) {
           const alianMap = new Map([
             [1, 'tl'],
@@ -1868,6 +1873,11 @@
             color: #fb2626;
           }
         }
+      }
+    }
+    &.isAudio {
+      .playerBox video {
+        visibility: hidden;
       }
     }
   }
