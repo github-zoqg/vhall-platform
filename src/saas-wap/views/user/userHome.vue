@@ -64,15 +64,6 @@
                     <img src="./img/live.gif" alt="" />
                   </label>
                   {{ liveTag(item) }}
-                  <span
-                    v-if="
-                      item.webinar_type != 6 && item.no_delay_webinar == 1 && hasDelayPermission
-                    "
-                    class="delay-icon"
-                  >
-                    | 无延迟
-                  </span>
-                  <span v-if="item.webinar_show_type == 0">| 竖屏</span>
                 </span>
                 <img
                   :class="`bg-cover bg-cover_${item.itemMode}`"

@@ -52,8 +52,6 @@
               </span>
               <span class="living_liveTag">
                 {{ liveTag(item) }}
-                <span v-if="item.webinar_type != 6 && item.no_delay_webinar == 1">| 无延迟</span>
-                <span v-if="item.webinar_show_type == 0">| 竖屏</span>
               </span>
               <div class="living_box">
                 <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
