@@ -147,7 +147,6 @@
           });
       },
       openSet() {
-        console.log(12312312321);
         this.iconShow = true;
         this.fiveDown();
       },
@@ -182,6 +181,9 @@
       &-top {
         top: 0;
       }
+    }
+    .vh-iconfont {
+      color: white;
     }
   }
 </style>
