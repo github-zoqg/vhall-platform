@@ -84,7 +84,7 @@
             .getElementById('vmp-wap-insert-file')
             .getElementsByTagName('video')[0]
             .addEventListener(
-              'webkitfullscreenchange',
+              'webkitbeginfullscreen',
               () => {
                 console.log('webkitfullscreenchange');
                 if (!document.fullscreenElement) {
@@ -103,6 +103,7 @@
         window.addEventListener(
           'fullscreenchange',
           () => {
+            console.log(document.fullscreenElement, 'document.fullscreenElement');
             if (!document.fullscreenElement) {
               this.isFull = false;
               this.iconShow = false;
