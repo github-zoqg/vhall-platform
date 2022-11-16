@@ -129,14 +129,18 @@
     .like {
       display: flex;
       align-items: flex-end;
-      color: #fb2626;
+      color: #fff;
       position: absolute;
-      top: 0px;
+      top: 12px;
       right: 16px;
-      height: 28px;
-      font-size: 20px;
-      line-height: 20px;
+      font-size: 12px;
+      line-height: 16px;
       font-weight: 400;
+      height: 16px;
+      background: #fb2626;
+      opacity: 0.85;
+      border-radius: 8px;
+      padding: 0px 8px;
       &.single {
         right: 29px;
       }
