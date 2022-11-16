@@ -2,7 +2,6 @@
   <div class="vmp-img-stream">
     <img
       ref="capImage"
-      src=""
       alt="图片源"
       crossorigin="anonymous"
       style="margin-right: 20px; vertical-align: top"
