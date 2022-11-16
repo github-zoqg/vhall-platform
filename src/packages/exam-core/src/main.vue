@@ -76,6 +76,7 @@
       <el-button
         type="default"
         size="medium"
+        plain
         round
         @click="lastQuestion"
         v-if="pageVo && !pageVo.isFirst"
@@ -84,7 +85,7 @@
         上一题
       </el-button>
       <el-button
-        type="danger"
+        type="primary"
         size="medium"
         round
         @click="nextQuestion"
@@ -94,7 +95,7 @@
         下一题
       </el-button>
       <el-button
-        type="danger"
+        type="primary"
         size="medium"
         round
         @click="submit"
@@ -194,6 +195,7 @@
       // 查看答案
       async showExamResultInfo() {
         this.answerType = 'show';
+        this.$forceUpdate();
         this.step = 3;
         // 初始化预览页效果
         this.$nextTick(() => {
@@ -359,29 +361,17 @@
     padding: 0 32px;
   }
   .exam-execute-footer {
-    position: fixed;
+    box-sizing: border-box;
+    position: absolute;
     bottom: 0;
     left: 0;
-    text-align: center;
-    padding: 24px 32px 0 32px;
-    background: #ffffff;
     z-index: 20;
+    text-align: center;
+    padding: 12px 32px 24px 32px;
+    background: #ffffff;
     width: 100%;
-    button {
-      padding: 22px 102px;
-    }
     button + button {
-      margin-left: 24px;
-    }
-    button.gray--button {
-      background: #d9d9d9;
-      border-radius: 44px;
-      font-style: normal;
-      font-weight: 400;
-      font-size: 32px;
-      line-height: 44px;
-      text-align: center;
-      color: #262626;
+      margin-left: 12px;
     }
   }
   /* 会被重置的样式 */

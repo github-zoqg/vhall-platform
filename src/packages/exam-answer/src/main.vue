@@ -66,7 +66,6 @@
     .el-dialog__body {
       padding: 0 0;
     }
-    width: 380px;
     height: 460px;
     background: url('../images/bg_default.png') no-repeat;
     border-radius: 12px;
@@ -95,29 +94,29 @@
         color: var(--theme-exam-question-type-color) !important;
       }
     }
-    .exam-execute-footer {
-      button.el-button--danger {
-        background: var(--theme-exam-next-button-bg) !important ;
-        color: var(--theme-exam-next-button-color) !important ;
-        border: 1px solid var(--theme-exam-next-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-next-button-active-bg) !important ;
-          color: var(--theme-exam-next-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-next-button-active-border) !important;
-        }
-      }
-      button.el-button--default {
-        background: var(--theme-exam-last-button-bg) !important ;
-        color: var(--theme-exam-last-button-color) !important ;
-        border: 1px solid var(--theme-exam-last-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-last-button-active-bg) !important ;
-          color: var(--theme-exam-last-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-last-button-active-border) !important;
-        }
-      }
-    }
+    // .exam-execute-footer {
+    //   button.el-button--primary {
+    //     background: var(--theme-exam-next-button-bg) !important ;
+    //     color: var(--theme-exam-next-button-color) !important ;
+    //     border: 1px solid var(--theme-exam-next-button-border) !important;
+    //     &:hover,
+    //     &.active {
+    //       background: var(--theme-exam-next-button-active-bg) !important ;
+    //       color: var(--theme-exam-next-button-active-color) !important ;
+    //       border: 1px solid var(--theme-exam-next-button-active-border) !important;
+    //     }
+    //   }
+    //   button.el-button--default {
+    //     background: var(--theme-exam-last-button-bg) !important ;
+    //     color: var(--theme-exam-last-button-color) !important ;
+    //     border: 1px solid var(--theme-exam-last-button-border) !important;
+    //     &:hover,
+    //     &.active {
+    //       background: var(--theme-exam-last-button-active-bg) !important ;
+    //       color: var(--theme-exam-last-button-active-color) !important ;
+    //       border: 1px solid var(--theme-exam-last-button-active-border) !important;
+    //     }
+    //   }
+    // }
   }
 </style>

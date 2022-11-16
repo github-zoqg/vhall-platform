@@ -61,7 +61,7 @@
                 v-if="item.type === 'checkbox'"
                 class="zdy-exam-checkbox"
                 :disabled="answerType == 'show'"
-                @change.prevent.stop="setItemCheckAnswer(sonItem, item)"
+                @change="setItemCheckAnswer(sonItem, item)"
               ></el-checkbox>
               <div
                 :class="[
