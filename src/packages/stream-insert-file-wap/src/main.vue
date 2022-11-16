@@ -84,13 +84,9 @@
             .getElementById('vmp-wap-insert-file')
             .getElementsByTagName('video')[0]
             .addEventListener(
-              'webkitbeginfullscreen',
-              () => {
-                console.log('webkitfullscreenchange');
-                if (!document.fullscreenElement) {
-                  this.isFull = false;
-                  this.iconShow = false;
-                }
+              'pause',
+              function () {
+                console.log('webkitfullscreenchange', this);
               },
               true
             );
