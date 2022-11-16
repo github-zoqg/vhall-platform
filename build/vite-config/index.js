@@ -47,7 +47,7 @@ export default defineConfig(async () => {
       }
     },
 
-    // base: isLocalServer ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
+    base: isLocalServer ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
 
     // --- 模块解析
     resolve: {
