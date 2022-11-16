@@ -1,9 +1,35 @@
 <template>
-  <div :class="['vmp-interact-tools-wap', isConcise ? 'vmp-interact-tools-wap__concise' : '']">
+  <div
+    :class="[
+      'vmp-interact-tools-wap',
+      isPortraitLive || isConcise ? 'vmp-interact-tools-wap__concise' : ''
+    ]"
+  >
     <div class="icon-wrapper">
-      <!-- TODO:支付牌照问题 -->
+      <div class="good" v-if="visibleGood && isPortraitLive">
+        <div class="tool">
+          <img class="good-img" src="./img/icon_good.png" @click="openGoods" />
+        </div>
+      </div>
+      <van-popup
+        class="goods-van-popup"
+        v-model="showGoodsCard"
+        get-container="#app"
+        safe-area-inset-bottom
+        round
+        :lazy-render="false"
+        position="bottom"
+        :closeable="false"
+      >
+        <div class="goods-content">
+          <!-- good组件-->
+          <vmp-air-container :cuid="childrenComp[1]" :oneself="true"></vmp-air-container>
+        </div>
+      </van-popup>
       <div class="liwu" auth="{ 'ui.hide_gifts': 0 }" v-if="localRoomInfo.isShowGift && !isInGroup">
-        <img class="tool gift-img" src="./img/icon_gift.png" @click="opneGifts" />
+        <div class="tool">
+          <img class="gift-img" src="./img/icon_gift.png" @click="openGifts" />
+        </div>
         <GiftCard
           @showLogin="showLogin"
           ref="gifts"
@@ -34,7 +60,9 @@
           target="_blank"
           :href="`${location}/lives/invite/${this.$route.params.id}?invite_id=${localRoomInfo.saasJoinId}`"
         >
-          <img class="tool share-img" src="./img/icon_share.png" />
+          <div class="tool">
+            <img class="share-img" src="./img/icon_share.png" />
+          </div>
         </a>
       </div>
       <!-- 极简模式下, 菜单入口 -->
@@ -106,7 +134,10 @@
         qwe: 1,
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
         childrenComp: [],
-        visibleMenuLength: 0
+        visibleMenuLength: 0,
+        isPortraitLive: webinarData.webinar.webinar_show_type == 0, // 竖屏直播
+        showGoodsCard: false,
+        visibleGood: false
       };
     },
     computed: {
@@ -118,14 +149,14 @@
       isShowMenuByConcise() {
         // 进入了小组 & 当前展示成员列表 & 极简模式
         console.log('当前数据', this.visibleMenuLength);
-        return this.isConcise && this.visibleMenuLength > 0;
+        return (this.isPortraitLive || this.isConcise) && this.visibleMenuLength > 0;
       }
     },
     created() {
       if (!this.isInGroup) {
         window.interactTools = this;
       }
-      if (this.isConcise) {
+      if (this.isPortraitLive || this.isConcise) {
         this.childrenComp = window.$serverConfig[this.cuid].children;
       }
     },
@@ -142,7 +173,7 @@
       showLogin() {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitNeedLogin'));
       },
-      opneGifts() {
+      openGifts() {
         this.$refs.gifts.showgift();
       },
       openReward() {
@@ -157,6 +188,12 @@
       setVisibleMenuLength(len = 0) {
         console.log('当前菜单是否进入', len);
         this.visibleMenuLength = len;
+      },
+      openGoods() {
+        this.showGoodsCard = true;
+      },
+      getVisibleGood(val) {
+        this.visibleGood = val;
       }
     }
   };
@@ -168,7 +205,7 @@
       display: flex;
       & > div {
         font-size: 43px;
-        margin-right: 24px;
+        margin-right: 20px;
         display: flex;
         align-items: center;
         &:last-child {
@@ -176,8 +213,18 @@
         }
       }
       .tool {
-        width: 48px;
-        height: 48px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(6, 6, 6, 0.25);
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
     }
     .vh-saas-iconfont,
@@ -188,10 +235,6 @@
     .share-box {
       position: relative;
       top: 2px;
-      .tool {
-        width: 50px;
-        height: 50px;
-      }
     }
     .redpacket-box {
       position: relative;
@@ -212,6 +255,16 @@
             border-right: 1px solid var(--theme-qa-chat-input-space-color) !important;
           }
         }
+      }
+    }
+  }
+  .goods-van-popup {
+    height: 1110px;
+    max-height: 80%;
+    .vh-goods-wrapper {
+      overflow: hidden;
+      .vh-goods_list {
+        overflow: hidden;
       }
     }
   }

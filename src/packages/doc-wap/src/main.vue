@@ -1,13 +1,15 @@
 <template>
   <div
+    @click.stop
     id="docWrapper"
     class="vmp-doc-wap"
     :class="[
-      `vmp-doc-wap--${displayMode}`,
-      `${isPortrait ? 'doc-portrait' : 'doc-landscape'}`,
+      `vmp-doc-wap--${!isDocStickTop ? displayMode : 'normal'}`,
+      `${isPortrait && !isDocStickTop ? 'doc-portrait' : 'doc-landscape'}`,
       `${rotateNum ? 'rotate' + rotateNum : ''}`,
       wapDocClass,
-      `${isDocMainScreen ? 'vmp-doc-wap-main-screen' : ''}`
+      `${isDocMainScreen && !isDocStickTop ? 'vmp-doc-wap-main-screen' : ''}`,
+      isPortraitLive ? 'isPortraitLive' : ''
     ]"
     :style="{
       height:
@@ -35,14 +37,19 @@
       <!-- 没有文档时的占位组件 -->
       <div class="vmp-doc-placeholder" v-show="docLoadComplete && !currentCid">
         <div class="vmp-doc-placeholder__inner">
-          <img src="./img/doc_empty.png" style="width: 100px; margin-bottom: 20px" />
+          <img src="./img/doc_empty.png" />
           <span>主讲人未添加文档，请稍等...</span>
         </div>
       </div>
 
       <!--上一页按钮 -->
       <div
-        v-show="hasPager && pageNum > 1"
+        v-show="
+          hasPager &&
+          pageNum > 1 &&
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive)) &&
+          (isPortraitLive ? showTools : true)
+        "
         @click="handlePage('prev')"
         class="btn-pager btn-pager--prev"
       >
@@ -51,7 +58,12 @@
 
       <!-- 下一页按钮 -->
       <div
-        v-show="hasPager && pageNum < pageTotal"
+        v-show="
+          hasPager &&
+          pageNum < pageTotal &&
+          (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive)) &&
+          (isPortraitLive ? showTools : true)
+        "
         @click="handlePage('next')"
         class="btn-pager btn-pager--next"
       >
@@ -59,10 +71,24 @@
       </div>
     </div>
 
-    <div class="pageGroup" v-if="!!currentCid && !currentCid.startsWith('board')">
+    <div
+      class="pageGroup"
+      v-show="isPortraitLive ? showTools : true"
+      v-if="
+        !!currentCid &&
+        !currentCid.startsWith('board') &&
+        (!isPortraitLive || (!isWapBodyDocSwitchFullScreen && isPortraitLive))
+      "
+    >
       {{ pageNum }}/{{ pageTotal }}
     </div>
-    <div class="tools" v-show="this.displayMode == 'normal' && isDocMainScreen ? showTools : true">
+    <div
+      class="tools"
+      v-show="
+        (this.displayMode == 'normal' && (isDocMainScreen || isPortraitLive) ? showTools : true) ||
+        isShowTransBtn
+      "
+    >
       <!-- 文档横屏 -->
       <div
         v-show="!!currentCid && displayMode == 'fullscreen'"
@@ -85,9 +111,10 @@
       <!-- 文档播放器位置互换 -->
       <div
         v-if="!isDocMainScreen"
-        v-show="!!currentCid && displayMode != 'fullscreen' && !isNotSupportTrans"
+        v-show="isShowTransBtn"
         @click="transposition"
         class="btn-doc-transposition"
+        :class="isPortraitLive ? 'btn-doc-transposition__portrait' : ''"
       >
         <i class="vh-iconfont vh-line-sort1"></i>
       </div>
@@ -125,10 +152,21 @@
         isPortrait: true, // 是否是竖屏  设备
         isNotSupportTrans: ['UCBrowser', 'Quark'].includes(getBrowserType()?.shell),
         timmer: null,
-        showTools: false
+        showTools: false,
+        isDocBeCovered: false,
+        isDocStickTop: false
       };
     },
     computed: {
+      isShowTransBtn() {
+        const result = this.displayMode != 'fullscreen' && !this.isNotSupportTrans;
+
+        return !this.isPortraitLive ? result : this.isWapBodyDocSwitchFullScreen && result;
+      },
+      // 竖屏直播，文档播放器位置切换的状态
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
       wapDocClass() {
         if (this.showHeader && this.isWapBodyDocSwitch) {
           return 'vmp-doc-wap__top';
@@ -197,7 +235,7 @@
           this.currentType === 'document'
         );
       },
-      // 是否开启文档主画面
+      // 是否开启文档云渲染
       isDocMainScreen() {
         return (
           this.$domainStore.state.docServer.switchStatus &&
@@ -205,6 +243,12 @@
           this.webinarType == 1 &&
           !!this.$domainStore.state.docServer.currentCid &&
           this.$domainStore.state.roomBaseServer.interactToolStatus.speakerAndShowLayout == 1
+        );
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
         );
       }
     },
@@ -226,6 +270,10 @@
         this.resize();
         this.docServer.rotate(this.rotateNum);
         this.docServer.zoomReset();
+        // 派发事件：播放器旋转docResize
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitDocRotate', [this.rotateNum])
+        );
       },
       currentCid(newval) {
         //TODO：SDK的zoomreset未生效，这里延迟刷新下各个文档状态
@@ -239,6 +287,22 @@
         this.$nextTick(() => {
           this.resize();
         });
+      },
+      switchStatus: {
+        handler(val) {
+          if (!this.isPortraitLive) return;
+          // 开启文档
+          if (val && !this.isDocBeCovered) {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+          } else {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
+          }
+        },
+        immediate: true
+      },
+      displayMode(val) {
+        // 派发事件：播放器隐藏控制栏
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocScreen', [val]));
       }
     },
     beforeCreate() {
@@ -299,6 +363,13 @@
           });
         });
       },
+      // 消缩放、移动模式。
+      cancelZoom() {
+        if (this.currentCid) {
+          this.restore();
+          this.docServer.cancelZoom();
+        }
+      },
       // 文档移动后还原
       restore() {
         this.docServer.zoomReset();
@@ -306,7 +377,12 @@
 
       // 文档播放器互换位置
       transposition() {
-        this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
+            !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
+        } else {
+          this.roomBaseServer.state.isWapBodyDocSwitch = !this.isWapBodyDocSwitch;
+        }
       },
 
       // 初始化事件
@@ -436,7 +512,11 @@
             h = window.innerWidth;
             w = (16 * h) / 9;
           } else {
-            if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
+            if (this.isPortraitLive) {
+              // 如果是竖屏直播，文档高度根据宽度计算
+              w = this.$refs.docWrapper.parentElement.offsetWidth;
+              h = (9 * w) / 16;
+            } else if (!this.isDocMainScreen || this.displayMode === 'fullscreen') {
               //竖屏的 正常显示
               w = window.innerWidth;
               h = (9 * w) / 16;
@@ -543,6 +623,17 @@
           //设备横向 旋转即退出全屏
           this.fullscreen();
         }
+      },
+      // 设置文档容器是否隐藏
+      setDocContainerCovered(val) {
+        this.isDocBeCovered = val;
+      },
+      // 设置文档容器是否置顶
+      setDocContainerStickTop(val) {
+        if (val) {
+          this.restore();
+        }
+        this.isDocStickTop = val;
       }
     },
     beforeDestroy() {
@@ -585,6 +676,7 @@
         margin-top: -88px !important;
       }
     }
+
     .vmp-doc-une__content {
       flex: 1;
       position: relative;
@@ -630,15 +722,14 @@
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        i {
-          color: #7c7c7c;
-          font-size: 2rem;
-          margin-bottom: 0.4rem;
+        img {
+          width: 160px;
+          margin-bottom: 24px;
         }
         span {
-          color: #6f6f6f;
-          font-size: 100%;
-          font-weight: normal;
+          color: #8c8c8c;
+          font-size: 28px;
+          line-height: 39px;
         }
       }
     }
@@ -682,7 +773,12 @@
         &:nth-last-child(1) {
           margin-right: 32px;
         }
+        &.btn-doc-transposition__portrait {
+          margin-right: 12px;
+          margin-top: 8px;
+        }
       }
+
       .vh-iconfont {
         font-size: 30px;
       }
@@ -720,6 +816,15 @@
         .vh-iconfont {
           margin-left: 6px;
         }
+      }
+    }
+
+    &.isPortraitLive {
+      .pageGroup {
+        margin-top: -64px;
+      }
+      .tools {
+        margin-top: -72px;
       }
     }
 
@@ -870,5 +975,9 @@
         }
       }
     }
+  }
+  // 回放有文档时自动生成的div，用于文档sdk存储回放数据
+  #myVodNode {
+    height: 0 !important;
   }
 </style>

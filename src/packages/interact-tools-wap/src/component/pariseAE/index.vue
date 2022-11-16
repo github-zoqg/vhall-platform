@@ -1,5 +1,5 @@
 <template>
-  <div class="vmp-zan-zone">
+  <div class="vmp-zan-zone" :class="isPortraitVod ? 'isPortraitVod' : ''">
     <span
       v-for="item in eleList"
       :key="item.uuid"
@@ -90,6 +90,13 @@
       return {
         eleList
       };
+    },
+    props: {
+      isPortraitVod: {
+        default: false,
+        type: Boolean,
+        required: false
+      }
     }
   };
 </script>
@@ -104,6 +111,9 @@
     height: 650px;
     pointer-events: none; // 不可点击交互
     z-index: 1000;
+    &.isPortraitVod {
+      bottom: 200px;
+    }
     .vmp-zan-icon-wrapper {
       position: absolute;
       display: block; // 定位需要

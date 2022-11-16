@@ -20,7 +20,8 @@
           class="virtual-list"
           v-if="virtual.showlist"
           ref="chatlist"
-          :style="{ height: chatlistHeight + 'px', overflow: allowScroll ? 'auto' : 'hidden' }"
+          :style="{ height: chatlistHeight + 'px' }"
+          :class="{ overflow: overflow }"
           :keeps="50"
           :estimate-size="100"
           :data-key="'count'"
@@ -34,6 +35,7 @@
           }"
           @totop="onTotop"
           @tobottom="toBottom"
+          @resized="onItemRendered"
         >
           <div
             class="chat_loading"
@@ -57,12 +59,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="overlay"
-      v-show="showSendBox"
-      @click="closeOverlay"
-      @touchstart="closeOverlay"
-    ></div>
+    <div class="overlay" v-show="showSendBox" @click.stop="closeOverlay"></div>
     <send-box
       ref="sendBox"
       :currentTab="3"
@@ -270,6 +267,16 @@
       // wap-body和文档是否切换位置
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     beforeCreate() {
@@ -318,6 +325,8 @@
         const h_neck = document.querySelector('.vmp-basic-neck').clientHeight;
         const h_block = document.querySelector('.vmp-block').clientHeight;
         const h_basic = document.querySelector('.vmp-basic-bd').clientHeight;
+        // TODO: 未知原因获取vmp-basic-jaw的高度是异常  document.querySelector('.vmp-basic-jaw').clientHeight
+        const h_jaw = this.isPortraitLive ? 44 : 0;
         if (h_block == 0) {
           let classname = '.tab-content';
           if (this.isEmbed) {
@@ -325,7 +334,12 @@
           }
           const tabDom = document.querySelector(classname);
           if (tabDom) {
-            tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - 1 + 'px';
+            if (!this.isLiving && this.isPortraitLive) {
+              tabDom.style.height =
+                window.innerHeight - h_header - h_neck - h_basic - h_jaw - 100 + 'px';
+            } else {
+              tabDom.style.height = window.innerHeight - h_header - h_neck - h_basic - h_jaw + 'px';
+            }
           }
         }
       },
@@ -497,19 +511,20 @@
         if ((Array.isArray(list) && !list.length) || index < 0) {
           return;
         }
+        const newList = JSON.parse(JSON.stringify(list));
         const clientW = document.body.clientWidth;
         const clientH = document.body.clientHeight;
         const ratio = 2;
-        for (let i = 0; i < list.length; i++) {
-          if (list[i].indexOf('?x-oss-process=image/resize') < 0) {
-            list[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+        for (let i = 0; i < newList.length; i++) {
+          if (newList[i].indexOf('?x-oss-process=image/resize') < 0) {
+            newList[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
               clientH * ratio
             },m_lfit`;
           }
         }
-        console.log('preview', list);
+        console.log('preview', newList);
         ImagePreview({
-          images: list,
+          images: newList,
           startPosition: index,
           lazyLoad: true
         });
@@ -604,16 +619,18 @@
         const vsl = this.$refs.chatlist;
         console.log(IdList);
         this.$nextTick(() => {
-          const offset = IdList.reduce((previousValue, currentSid) => {
-            const previousSize =
-              typeof previousValue === 'string'
-                ? vsl.getSize(Number(previousValue))
-                : previousValue;
-            console.log(previousValue);
-            console.log(vsl.getSize(Number(currentSid)));
-            return previousSize + vsl.getSize(Number(currentSid));
-          });
-          vsl.scrollToOffset(offset);
+          if (IdList.length != 0) {
+            const offset = IdList.reduce((previousValue, currentSid) => {
+              const previousSize =
+                typeof previousValue === 'string'
+                  ? vsl.getSize(Number(previousValue))
+                  : previousValue;
+              console.log(previousValue);
+              console.log(vsl.getSize(Number(currentSid)));
+              return previousSize + vsl.getSize(Number(currentSid));
+            });
+            vsl.scrollToOffset(offset);
+          }
         });
         setTimeout(() => {
           this.allowScroll = true;
@@ -674,6 +691,17 @@
           ));
         }
         return (this.renderList = this.chatList);
+      },
+      onItemRendered() {
+        if (!this.$refs.chatlist) {
+          return;
+        }
+        // first page items are all mounted, scroll to bottom
+        if (!this.isFirstPageReady && this.$refs.chatlist.getSizes() >= this.pageSize) {
+          this.isFirstPageReady = true;
+          this.scrollBottom();
+        }
+        this.checkOverflow();
       }
     }
   };
@@ -685,7 +713,7 @@
   }
   .vmp-chat-wap-concise {
     height: 100%;
-    overflow: hidden;
+    // overflow: hidden;
     position: relative;
     .virtual-content {
       height: 100%;
@@ -713,7 +741,8 @@
       //   background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.1));
       // }
       // TODO: 首条置底
-      /*     .virtual-list {
+      .virtual-list {
+        position: relative;
         height: 100%;
         overflow-y: auto;
         display: flex;
@@ -721,14 +750,14 @@
         &.overflow {
           flex-direction: column;
         }
-      } */
-
-      .virtual-list {
-        height: 100%;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
       }
+
+      // .virtual-list {
+      //   height: 100%;
+      //   overflow-y: auto;
+      //   display: flex;
+      //   flex-direction: column;
+      // }
 
       > div:first-of-type {
         padding-top: 8px;
@@ -782,6 +811,7 @@
       left: 0;
       top: 0;
       background: transparent;
+      z-index: 1;
     }
   }
 </style>

@@ -48,12 +48,16 @@ shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstati
 
 ./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.woff" --include "*.woff2" --include "*.ttf" -r -u
 
-./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.svga" --include "*.mp3" --include "*.mp4" -r -u
+#全部静态图片资源
+./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=31536000 --include "*.jpg" --include "*.jpeg" --include "*.png" --include "*.gif" --include "*.svg" --include "*.bmp" --include "*.ico" --include "*.woff" --include "*.woff2" --include "*.ttf" --include "*.svga" --include "*.mp3" --include "*.mp4" -r -u
+
 
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-wap Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-watch Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 ./ossutilmac64 set-meta oss://vhallstatic/common-static/saas-live Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 
+#全部资源
+./ossutilmac64 set-meta oss://vhallstatic/common-static Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
 
 
 ./ossutilmac64 set-meta oss://t-vhallsaas-static/common-static/saas-live Cache-Control:max-age=604800 --include "*.js" --include "*.css" -r -u
@@ -62,13 +66,6 @@ shaoyongkaideMacBook-Pro:~ shaoyongkai$ ./ossutilmac64 set-meta oss://vhallstati
 ./ossutilmac64 set-meta oss://vhallstatic/upload/ Cache-Control:max-age=31536000 --include "*.jpg" --include "*.png" --include "*.gif" -r -u
 
 
-./ossutilmac64 set-meta oss://vhallstatic/common-static/images Cache-Control:max-age=2592000 -r -u
+cache-control: max-age=604800
 
-./ossutilmac64 set-meta oss://vhallstatic/common-static/old-questionarie Cache-Control:max-age=2592000 -r -u
-
-./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/element-ui Cache-Control:max-age=2592000 -r -u
-
-./ossutilmac64 set-meta oss://vhallstatic/common-static/middle/vue Cache-Control:max-age=604800 -r -u
-
-
-
+Cache-Control: max-age=604800
