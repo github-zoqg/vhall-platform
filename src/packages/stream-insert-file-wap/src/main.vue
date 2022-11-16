@@ -78,6 +78,22 @@
         };
         try {
           this.insertFileServer.subscribeInsertStream(opt);
+
+          // 监听全屏变化
+          document
+            .getElementById('vmp-wap-insert-file')
+            .getElementsByTagName('video')[0]
+            .addEventListener(
+              'webkitfullscreenchange',
+              () => {
+                console.log('webkitfullscreenchange');
+                if (!document.fullscreenElement) {
+                  this.isFull = false;
+                  this.iconShow = false;
+                }
+              },
+              true
+            );
         } catch (error) {
           console.log('error', error);
         }
@@ -94,22 +110,6 @@
           },
           true
         );
-
-        // 监听全屏变化
-        document
-          .getElementById('vmp-wap-insert-file')
-          .getElementsByTagName('video')[0]
-          .addEventListener(
-            'webkitfullscreenchange',
-            () => {
-              console.log('webkitfullscreenchange');
-              if (!document.fullscreenElement) {
-                this.isFull = false;
-                this.iconShow = false;
-              }
-            },
-            true
-          );
         // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
           this.subscribeInsert();
