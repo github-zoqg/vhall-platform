@@ -38,20 +38,35 @@
           </div>
           <!-- 同一流只能初始化一次 否则会失败n-1次 导致时间延迟 -->
           <div
-            v-if="insertStreamInfo.userInfo.accountId == speaker.accountId"
+            v-if="
+              insertStreamInfo.userInfo.accountId == speaker.accountId && insertStreamInfo.streamId
+            "
             class="vmp-split-screen__stream-split"
             :key="speaker.streamId"
           >
             <!-- 插播流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
+            <div class="stream_info">
+              <span>{{ speaker.nickname }}</span>
+              <span class="signal" :class="`signal__${networkStatus}`"></span>
+              <span class="vh-iconfont audio" :class="`vh-microphone${audioLevel}`"></span>
+            </div>
           </div>
           <div
-            v-if="desktopShareInfo.accountId == speaker.accountId"
+            v-if="
+              desktopShareServerState.desktopShareInfo.accountId == speaker.accountId &&
+              desktopShareServerState.localDesktopStreamId
+            "
             class="vmp-split-screen__stream-split"
             :key="speaker.streamId"
           >
             <!-- 桌面共享流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
+            <div class="stream_info">
+              <span>{{ speaker.nickname }}</span>
+              <span class="signal" :class="`signal__${networkStatus}`"></span>
+              <span class="vh-iconfont audio" :class="`vh-microphone${audioLevel}`"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -60,6 +75,7 @@
 </template>
 
 <script>
+  import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
   import { useSplitScreenServer, useInteractiveServer } from 'middle-domain';
   import screenfull from 'screenfull';
   export default {
@@ -68,7 +84,9 @@
       return {
         childrenCom: [],
         isFullscreen: false, // 是否进入全屏
-        layoutLevel: 1
+        layoutLevel: 1,
+        audioLevel: 0,
+        networkStatus: 0
       };
     },
     computed: {
@@ -97,8 +115,8 @@
       insertStreamInfo() {
         return this.$domainStore.state.insertFileServer.insertStreamInfo;
       },
-      desktopShareInfo() {
-        return this.$domainStore.state.desktopShareServer.desktopShareInfo;
+      desktopShareServerState() {
+        return this.$domainStore.state.desktopShareServer;
       }
     },
     watch: {
@@ -114,6 +132,24 @@
             this.layoutLevel = 3;
           } else if (newVal <= 16) {
             this.layoutLevel = 4;
+          }
+        }
+      },
+      'insertStreamInfo.streamId': {
+        deep: true,
+        immediate: true,
+        handler(val) {
+          if (val) {
+            this.getLevel();
+          }
+        }
+      },
+      'desktopShareServerState.localDesktopStreamId': {
+        deep: true,
+        immediate: true,
+        handler(val) {
+          if (val) {
+            this.getLevel();
           }
         }
       }
@@ -167,6 +203,42 @@
         });
         // 关闭分屏
         this.splitScreenServer.splitCloseSplitProcess(false);
+      },
+      getLevel() {
+        let streamId =
+          this.insertStreamInfo.streamId || this.desktopShareServerState.localDesktopStreamId;
+        // 麦克风音量查询计时器
+        this._audioLeveInterval = setInterval(() => {
+          if (!streamId) return clearInterval(this._audioLeveInterval);
+          // 获取音量
+          this.interactiveServer
+            .getAudioLevel({ streamId })
+            .then(level => {
+              this.audioLevel = calculateAudioLevel(level);
+              console.log(this.audioLevel, 'insertStreamInfo.streamId', 'this.audioLevel');
+            })
+            .catch(() => {
+              clearInterval(this._audioLeveInterval);
+              this.audioLevel = 0;
+            });
+        }, 1000);
+
+        // 网络信号查询计时器
+        this._netWorkStatusInterval = setInterval(() => {
+          if (!streamId) return clearInterval(this._netWorkStatusInterval);
+          // 获取网络状态
+          console.log(this.networkStatus, 'insertStreamInfo.streamId', 'this.networkStatus');
+          this.interactiveServer
+            .getStreamPacketLoss({ streamId })
+            .then(status => {
+              this.networkStatus = calculateNetworkStatus(status);
+            })
+            .catch(() => {
+              clearInterval(this._netWorkStatusInterval);
+              this.networkStatus = 0;
+              console.log(this.networkStatus, 'insertStreamInfo.streamId', 'this.networkStatus');
+            });
+        }, 2000);
       }
     }
   };
@@ -293,6 +365,36 @@
       top: 0;
       height: 100%;
       width: 100%;
+      .stream_info {
+        position: absolute;
+        bottom: 0;
+        color: #fff;
+        padding: 0 5px;
+        width: 100%;
+        box-sizing: border-box;
+        .audio {
+          float: right;
+          margin-left: 5px;
+        }
+        .signal {
+          float: right;
+          font-size: 12px;
+          margin-left: 5px;
+          background-size: contain;
+          height: 16px;
+          width: 16px;
+          background-image: url(../../stream-remote/src/img/network0.png);
+          &__0 {
+            background-image: url(../../stream-remote/src/img/network0.png);
+          }
+          &__1 {
+            background-image: url(../../stream-remote/src/img/network1.png);
+          }
+          &__2 {
+            background-image: url(../../stream-remote/src/img/network2.png);
+          }
+        }
+      }
     }
   }
 </style>
