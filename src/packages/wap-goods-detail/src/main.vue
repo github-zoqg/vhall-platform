@@ -10,7 +10,7 @@
     <div class="vh-goods-detail-layout" v-if="show">
       <div class="vh-goods-wrapper-detail-contents">
         <div class="vh-goods-wrapper-detail-imgs">
-          <van-swipe @change="onChange">
+          <van-swipe :loop="false" @change="onChange">
             <van-swipe-item v-for="(i, index) in info.img_list" :key="index">
               <img :src="i.img_url" alt="" class="has-img" />
             </van-swipe-item>
