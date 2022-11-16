@@ -364,14 +364,14 @@
               }
             } else {
               // 如果问答权限没有，隐藏互动工具栏
-              if (
-                this.roleName == 3 &&
-                this.webinarMode == 5 &&
-                !configList['ui.is_hide_qa_button']
-              ) {
-                vn.setHiddenState(true);
-                continue;
-              }
+              // if (
+              //   this.roleName == 3 &&
+              //   this.webinarMode == 5 &&
+              //   !configList['ui.is_hide_qa_button']
+              // ) {
+              //   vn.setHiddenState(true);
+              //   continue;
+              // }
               // 定时直播未开播时，互动工具置灰
               // if (this.roleName == 3 && this.webinarMode == 5 && this.webinarType == 2) {
               //   vn.setDisableState(true);
