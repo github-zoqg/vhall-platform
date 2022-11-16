@@ -2,7 +2,7 @@
 通用容器组件
 用途：此组件用于实现无根元素的容器.
 -->
-<script type="text/jsx">
+<script type="text/jsx" lang="jsx">
   export default {
     name: 'VmpAirContainer',
     functional: true, //设置为函数式组件
@@ -22,38 +22,35 @@
         }
       }
       return widgets.map(item => {
-        return createElement(
-          item.component,
-          {
-            props: {
-              cuid: item.cuid,
-            },
-            ref:props.cref?props.cref:undefined
-          }
-        )
-      })
+        return createElement(item.component, {
+          props: {
+            cuid: item.cuid
+          },
+          ref: props.cref ? props.cref : undefined
+        });
+      });
     },
     props: {
       // 组件的唯一标识
       cuid: {
         type: String,
         default() {
-          return ''
+          return '';
         }
       },
       // 是否渲染组件本身（默认渲染组件的children）
       oneself: {
         type: Boolean,
         default() {
-          return false
+          return false;
         }
       },
-      cref:{
+      cref: {
         type: String,
         default() {
-          return ''
+          return '';
         }
       }
     }
-  }
+  };
 </script>

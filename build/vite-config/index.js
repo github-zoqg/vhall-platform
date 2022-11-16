@@ -10,6 +10,7 @@ import { createVuePlugin } from 'vite-plugin-vue2'; // <VUE2.7 使用。IMPORTAN
 import vueJsx from '@vitejs/plugin-vue-jsx'; // JSX语法支持
 import requireTransform from './plugins/vite-plugin-require-transform'; // 支持require语法，减少业务代码改造
 // plugins---打包类
+import legacy from '@vitejs/plugin-legacy';
 // import legacy from '@vitejs/plugin-legacy'; // 生成低版本浏览器代码
 import { ViteEjsPlugin } from 'vite-plugin-ejs'; // HTML-EJS
 // plugins---cdn类
@@ -21,8 +22,13 @@ import mkcert from 'vite-plugin-mkcert'; // https证书，以支持server可用H
 
 export default defineConfig(async () => {
   // 获取script命令的配置参数
-  const { VITE_SHELL_CMD_MAIN, VITE_SHELL_CMD_MODE, VITE_SHELL_CMD_HASH, VITE_SHELL_CMD_VERSION } =
-    utils.getViteShellCmdArgs();
+  const {
+    VITE_SHELL_CMD_MAIN, // 主命令，如 build、serve
+    VITE_SHELL_CMD_MODE, // 模式名(环境名)，如test4、test_zt
+    VITE_SHELL_CMD_HASH, // 哈希值，由运维添加
+    VITE_SHELL_CMD_VERSION, // 版本号，读取自package.json
+    VITE_SHELL_CMD_LOCAL // 调试用。是否是本地，一般本地build强制使用local配置，避免使用oss
+  } = utils.getViteShellCmdArgs();
   let DOT_ENV = utils.parseDotEnvFile(VITE_SHELL_CMD_MODE); // 用户自定义的.env.xxx 环境变量
   // --- 动态设置环境变量
   DOT_ENV = preset.mixinDynamicEnvVar(DOT_ENV);
@@ -34,7 +40,8 @@ export default defineConfig(async () => {
   });
 
   const isLocalServer = VITE_SHELL_CMD_MAIN === 'serve';
-
+  const isLocalBuild = VITE_SHELL_CMD_MAIN === 'build' && VITE_SHELL_CMD_LOCAL;
+  const isLocalAction = isLocalServer || isLocalBuild;
   return {
     envPrefix: DEFAULT_CONF.ENV_PREFIX,
 
@@ -47,7 +54,7 @@ export default defineConfig(async () => {
       }
     },
 
-    base: isLocalServer ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
+    base: isLocalAction ? '/' : `${DOT_ENV.VUE_APP_PUBLIC_PATH}/common-static/${project.name}/`,
 
     // --- 模块解析
     resolve: {
@@ -77,13 +84,14 @@ export default defineConfig(async () => {
         version: VITE_SHELL_CMD_VERSION, // 运维写入version
         gitlabHash: VITE_SHELL_CMD_HASH // 运维写入gitlab-hash
       }),
-      // legacy({
-      //   targets: ['ie >= 11'],
-      //   additionalLegacyPolyfills: ['regenerator-runtime/runtime']
-      // }),
+      // 不支持script esm module时，直接切换到兼容旧语法。因此会打包两份代码(esm+commonJs版)
+      legacy({
+        targets: ['ie >= 11'],
+        additionalLegacyPolyfills: ['regenerator-runtime/runtime']
+      }),
       // 支持require语法
       requireTransform({
-        fileRegex: /.ts$|.tsx$|.vue$/,
+        fileRegex: /.vue$/,
         importPathHandler(requirePath) {
           // 该插件考虑不完善，需要重新映射@
           return requirePath.replace(/(\.|\?|-|\/|@)/g, '_');
@@ -91,8 +99,8 @@ export default defineConfig(async () => {
       }),
       createExternal({
         externals: { ...cdn.externalsVar }
-      })
-      // ...preset.useIstanbul({ isDev: DOT_ENV.VUE_APP_SAAS_ENV !== 'production' })
+      }),
+      ...preset.useIstanbul({ isDev: DOT_ENV.VUE_APP_SAAS_ENV !== 'production' })
     ],
 
     // --- 开发服务器

@@ -2,21 +2,21 @@ const { getCmdArgs, parseEnvOption } = require('./run-utils.js');
 const { spawnSync } = require('child_process');
 const { sep } = require('path');
 
-const args = getCmdArgs();
-
 // vite不能使用自定义cmd。 vite serve --project=xxxx会报错。故而使用环境变量做一次转发
 function runCmd() {
-  const { mode, project, hash, version } = args;
+  const args = getCmdArgs();
+  const { mode, project, hash, version, local } = args;
   const main_cmd = args._[0];
 
   const cmd_env_string = parseEnvOption({
     env_prefix: 'VITE_SHELL_CMD_',
     cmd_env_list: [
-      ['MAIN', main_cmd],
-      ['PROJECT', project],
-      ['MODE', mode],
-      ['HASH', hash],
-      ['VERSION', version]
+      ['MAIN', main_cmd], // 主命令如 build、serve
+      ['PROJECT', project], // 项目名，如saas-live、saas-watch
+      ['MODE', mode], // 模式名(环境名)，如test4、test_zt
+      ['HASH', hash], // 哈希值，由运维添加
+      ['VERSION', version], // 版本号，读取自package.json
+      ['LOCAL', local] // 调试用。是否是本地，一般本地build强制使用local配置，避免使用oss
     ]
   });
   const cmd_set_env = `node  & node_modules${sep}.bin${sep}cross-env ${cmd_env_string}`;
