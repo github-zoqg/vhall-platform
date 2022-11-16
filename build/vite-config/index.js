@@ -29,6 +29,7 @@ export default defineConfig(async () => {
     VITE_SHELL_CMD_VERSION, // 版本号，读取自package.json
     VITE_SHELL_CMD_LOCAL // 调试用。是否是本地，一般本地build强制使用local配置，避免使用oss
   } = utils.getViteShellCmdArgs();
+
   let DOT_ENV = utils.parseDotEnvFile(VITE_SHELL_CMD_MODE); // 用户自定义的.env.xxx 环境变量
   // --- 动态设置环境变量
   DOT_ENV = preset.mixinDynamicEnvVar(DOT_ENV);
@@ -39,9 +40,10 @@ export default defineConfig(async () => {
     merge: true // 合并base.config和someEnv.conf后返回一个合并后对象
   });
 
-  const isLocalServer = VITE_SHELL_CMD_MAIN === 'serve';
-  const isLocalBuild = VITE_SHELL_CMD_MAIN === 'build' && VITE_SHELL_CMD_LOCAL;
+  const isLocalServer = VITE_SHELL_CMD_MAIN === 'serve' || VITE_SHELL_CMD_MAIN == 'undefined';
+  const isLocalBuild = VITE_SHELL_CMD_MAIN === 'build' && VITE_SHELL_CMD_LOCAL != 'undefined';
   const isLocalAction = isLocalServer || isLocalBuild;
+
   return {
     envPrefix: DEFAULT_CONF.ENV_PREFIX,
 
