@@ -87,7 +87,9 @@
         window.addEventListener(
           'fullscreenchange',
           () => {
+            console.log('fullscreenchange');
             if (!document.fullscreenElement) {
+              console.log('fullscreenchange', 'document.fullscreenElement');
               this.isFull = false;
               this.iconShow = false;
             }
