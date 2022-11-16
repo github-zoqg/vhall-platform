@@ -180,7 +180,8 @@
         }
         if (
           (this.noDelayWebinar && !this.isInstanceInit && this.webinarType == 1) ||
-          !this.noDelayWebinar
+          !this.noDelayWebinar ||
+          this.webinarType == 5
         ) {
           this.isPlaying ? this.pause() : this.play();
         } else {
@@ -333,6 +334,7 @@
         width: 284px;
         z-index: 302;
         overflow: hidden;
+        border-radius: 8px;
         // 文档小窗的样式
         .vmp-doc-wap {
           .pageGroup {

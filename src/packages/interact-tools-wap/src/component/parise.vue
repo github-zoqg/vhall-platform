@@ -9,7 +9,7 @@
         {{ like | transformWatchPraise }}
       </span>
     </div>
-    <PariseAE />
+    <PariseAE :isPortraitVod="Boolean(isPortraitLive && webinarType == 5)" />
   </div>
 </template>
 <script>
@@ -34,6 +34,18 @@
       },
       localRoomInfo: {
         require: false
+      }
+    },
+    computed: {
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
       }
     },
     beforeCreate() {

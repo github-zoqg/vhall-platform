@@ -244,6 +244,8 @@
                 v-if="!isLiving && playerOtherOptions.progress_bar && !isWarnPreview"
                 v-model="sliderVal"
                 active-color="#fb2626"
+                bar-height="4px"
+                button-size="26px"
                 inactive-color="rgba(255,255,255,.3)"
                 @input="changeSlider"
               >
@@ -1929,7 +1931,7 @@
           height: 85px;
         }
         .vmp-wap-player-control-icons {
-          padding-top: 24px;
+          padding-top: 22px;
         }
         .vmp-wap-player-control-slider {
           margin-top: 0;

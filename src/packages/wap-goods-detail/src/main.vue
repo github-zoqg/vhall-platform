@@ -1,7 +1,11 @@
 <template>
   <div class="vh-goods-wrapper-detail">
     <!-- 遮罩层 -->
-    <div class="vh-goods-detail-mask" v-if="show"></div>
+    <div
+      class="vh-goods-detail-mask"
+      :class="isPortraitLive ? 'isPortraitLive' : ''"
+      v-if="show"
+    ></div>
     <!-- 商品详情面板 -->
     <div class="vh-goods-detail-layout" v-if="show">
       <div class="vh-goods-wrapper-detail-contents">
@@ -68,6 +72,14 @@
     // mounted() {
     //   console.log('mounted wap VmpGoodDetail---------->', this.info);
     // },
+    computed: {
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      }
+    },
     methods: {
       /**
        * 事件驱动api: 输出
@@ -207,23 +219,36 @@
     bottom: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000;
-    background: var(--theme-tab-content-good-detail-mask-bg);
+    z-index: 3000;
+    background: rgba(0, 0, 0, 0.7);
     mix-blend-mode: normal;
-    opacity: 0.7;
+    // opacity: 0.7;
+    &.isPortraitLive {
+      background: none;
+    }
   }
   .vh-goods-detail-layout {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 1114px;
-    z-index: 2101;
+    height: calc(1114px+constant(safe-area-inset-bottom));
+    height: calc(1114px+env(safe-area-inset-bottom));
+    z-index: 3101;
     border-radius: 32px 32px 0 0;
-    padding-bottom: env(safe-area-inset-bottom);
+    // padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: constant(safe-area-inset-bottom); /*兼容IOS<11.2*/
+    padding-bottom: env(safe-area-inset-bottom); /*兼容IOS>11.2*/
+    .vh-goods-wrapper-detail-contents {
+      border-radius: 32px 32px 0 0;
+    }
     .vh-goods-wrapper-detail-imgs {
       height: 720px;
-      border-radius: 32px 32px 0 0;
       position: relative;
+
+      .van-swipe {
+        border-radius: 32px 32px 0 0;
+      }
+
       .btn-close {
         z-index: 99;
         position: absolute;
@@ -245,12 +270,13 @@
         height: 100%;
         object-fit: scale-down;
         transform: translate3d(0, 0, 0);
-        border-radius: 32px 32px 0 0;
+        // border-radius: 32px 32px 0 0;
       }
       .van-swipe-item {
         width: 100%;
         height: 720px;
         display: flex;
+        // border-radius: 36px 36px 0 0;
         background: rgba(0, 0, 0, 1);
       }
       .custom-indicator {

@@ -259,7 +259,7 @@
     }
   }
   .goods-van-popup {
-    height: 1114px;
+    height: 1110px;
     max-height: 80%;
     .vh-goods-wrapper {
       overflow: hidden;
