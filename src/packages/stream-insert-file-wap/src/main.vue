@@ -87,9 +87,7 @@
         window.addEventListener(
           'fullscreenchange',
           () => {
-            console.log('fullscreenchange');
             if (!document.fullscreenElement) {
-              console.log('fullscreenchange', 'document.fullscreenElement');
               this.isFull = false;
               this.iconShow = false;
             }
@@ -132,7 +130,9 @@
             vNode: `vmp-wap-insert-file`
           })
           .then(() => {
-            this.isFull = true;
+            if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+              this.isFull = true;
+            }
           });
       },
       // 退出全屏

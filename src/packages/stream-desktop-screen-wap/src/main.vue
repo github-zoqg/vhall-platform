@@ -140,9 +140,7 @@
         window.addEventListener(
           'fullscreenchange',
           () => {
-            console.log('fullscreenchange');
             if (!document.fullscreenElement) {
-              console.log('fullscreenchange', 'document.fullscreenElement');
               this.isFullscreen = false;
               this.isShowMask = false;
             }
