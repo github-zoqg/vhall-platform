@@ -193,9 +193,9 @@ export default {
       'comQuestionnaire',
       'comLottery',
       'comRedPacketCommand',
-      'comExamWap',
-      'comExamRankWap',
-      'comExamScoreWap'
+      'comExam',
+      'comExamRank',
+      'comExamScore'
     ],
     // 打开媒体设置
     emitClickMediaSetting: {
@@ -247,13 +247,13 @@ export default {
     },
     // 快问快答弹窗 - 查看成绩
     emitClickExamIconToScore: {
-      cuid: ['comExamScoreWap'],
+      cuid: ['comExamScore'],
       method: 'open',
       args: ['$0']
     },
     // 快问快答弹窗 - 答题
     emitClickExamIconToAnswer: {
-      cuid: ['comExamWap'],
+      cuid: ['comExam'],
       method: 'open',
       args: ['$0']
     },
@@ -614,42 +614,42 @@ export default {
     ]
   },
   // 快问快答 - 排行榜
-  comExamRankWap: {
-    component: 'VmpExamRankWap'
+  comExamRank: {
+    component: 'VmpExamRank'
   },
   // 快问快答 - 问答
-  comExamAnswerWap: {
-    component: 'VmpExamAnswerWap'
+  comExamAnswer: {
+    component: 'VmpExamAnswer'
   },
   // 快问快答 - 用户收集
-  comExamCollectWap: {
-    component: 'VmpExamCollectWap'
+  comExamCollect: {
+    component: 'VmpExamCollect'
   },
   // 快问快答 - 成绩
-  comExamScoreWap: {
-    component: 'VmpExamScoreWap'
+  comExamScore: {
+    component: 'VmpExamScore'
   },
   // 快问快答 - 预览
-  comExamPreviewWap: {
-    component: 'VmpExamPreviewWap'
+  comExamPreview: {
+    component: 'VmpExamPreview'
   },
   // 快问快答 - 入口
-  comExamWap: {
-    component: 'VmpExamWap',
-    emitExamAnswerOpenWap: [
+  comExam: {
+    component: 'VmpExamPc',
+    emitExamAnswerOpen: [
       {
-        cuid: 'comExamAnswerWap',
+        cuid: 'comExamAnswer',
         method: 'open',
         args: ['$0']
       }
     ],
-    emitExamCollectOpenWap: [
+    emitExamCollectOpen: [
       {
-        cuid: 'comExamCollectWap',
+        cuid: 'comExamCollect',
         method: 'open',
         args: ['$0']
       }
     ],
-    children: ['comExamCollectWap', 'comExamAnswerWap']
+    children: ['comExamCollect', 'comExamAnswer']
   }
 };

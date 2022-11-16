@@ -1,7 +1,7 @@
-import VmpExamRankWap from './src/main';
+import VmpExamWap from './src/main';
 
-VmpExamRankWap.install = function (Vue) {
-  Vue.component(VmpExamRankWap.name, VmpExamRankWap);
+VmpExamWap.install = function (Vue) {
+  Vue.component(VmpExamWap.name, VmpExamWap);
 };
 
-export default VmpExamRankWap;
+export default VmpExamWap;

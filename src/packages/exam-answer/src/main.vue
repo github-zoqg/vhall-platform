@@ -1,21 +1,21 @@
 <template>
   <!-- 快问快答-答题-->
-  <van-popup
-    get-container="#otherPopupContainer"
-    class="vmp-exam-answer-wap"
-    v-model="examAnswerVisible"
-    position="bottom"
-    @close="closeDialog"
-    v-if="examAnswerVisible"
+  <el-dialog
+    title=""
+    :visible.sync="examAnswerVisible"
+    width="380px"
+    custom-class="vmp-exam-answer"
+    :close-on-click-modal="false"
+    :show-close="false"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
-      <vmp-exam-core-wap ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core-wap>
+      <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core>
     </div>
-  </van-popup>
+  </el-dialog>
 </template>
 <script>
   export default {
-    name: 'VmpExamAnswerWap',
+    name: 'VmpExamAnswer',
     data() {
       return {
         examAnswerVisible: false, // 快问快答 - 答题
@@ -59,12 +59,16 @@
   };
 </script>
 <style lang="less">
-  .vmp-exam-answer-wap {
-    width: 100%;
-    height: 844px;
+  .el-dialog.vmp-exam-answer {
+    .el-dialog__header {
+      padding: 0 0;
+    }
+    .el-dialog__body {
+      padding: 0 0;
+    }
+    height: 460px;
     background: url('../images/bg_default.png') no-repeat;
-    box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
-    border-radius: 40px 40px 0px 0px;
+    border-radius: 12px;
     overflow: hidden;
     background-color: #ffffff;
     background-position: top;
@@ -75,10 +79,10 @@
       overflow: hidden;
     }
     .exam-zdy-progress {
-      &.van-progress {
+      &.el-progress {
         background: var(--theme-exam-progress-bgColor) !important;
         border-radius: 4px;
-        .van-progress__portion {
+        .el-progress__portion {
           background: var(--theme-exam-progress-active-bgColor) !important;
           border-radius: 3px;
         }
@@ -90,29 +94,29 @@
         color: var(--theme-exam-question-type-color) !important;
       }
     }
-    .exam-execute-footer {
-      button.van-button--danger {
-        background: var(--theme-exam-next-button-bg) !important ;
-        color: var(--theme-exam-next-button-color) !important ;
-        border: 1px solid var(--theme-exam-next-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-next-button-active-bg) !important ;
-          color: var(--theme-exam-next-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-next-button-active-border) !important;
-        }
-      }
-      button.van-button--default {
-        background: var(--theme-exam-last-button-bg) !important ;
-        color: var(--theme-exam-last-button-color) !important ;
-        border: 1px solid var(--theme-exam-last-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-last-button-active-bg) !important ;
-          color: var(--theme-exam-last-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-last-button-active-border) !important;
-        }
-      }
-    }
+    // .exam-execute-footer {
+    //   button.el-button--primary {
+    //     background: var(--theme-exam-next-button-bg) !important ;
+    //     color: var(--theme-exam-next-button-color) !important ;
+    //     border: 1px solid var(--theme-exam-next-button-border) !important;
+    //     &:hover,
+    //     &.active {
+    //       background: var(--theme-exam-next-button-active-bg) !important ;
+    //       color: var(--theme-exam-next-button-active-color) !important ;
+    //       border: 1px solid var(--theme-exam-next-button-active-border) !important;
+    //     }
+    //   }
+    //   button.el-button--default {
+    //     background: var(--theme-exam-last-button-bg) !important ;
+    //     color: var(--theme-exam-last-button-color) !important ;
+    //     border: 1px solid var(--theme-exam-last-button-border) !important;
+    //     &:hover,
+    //     &.active {
+    //       background: var(--theme-exam-last-button-active-bg) !important ;
+    //       color: var(--theme-exam-last-button-active-color) !important ;
+    //       border: 1px solid var(--theme-exam-last-button-active-border) !important;
+    //     }
+    //   }
+    // }
   }
 </style>

@@ -986,7 +986,7 @@ export default {
     exam_1022: 'Answer list',
     exam_1023: 'Push time',
     exam_1024: 'Time limit',
-    exam_1025: 'Total score',
+    exam_1025: 'Score',
     exam_1026: 'Number',
     exam_1027: 'Start it',
     exam_1028: 'Closed',
