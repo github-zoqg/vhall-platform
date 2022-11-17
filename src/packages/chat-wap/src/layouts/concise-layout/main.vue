@@ -720,6 +720,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
+
       // background-color: #f7f7f7;
 
       // TODO: 极简风格，聊天渐变色遮罩调研
@@ -814,5 +815,13 @@
       background: transparent;
       z-index: 1;
     }
+  }
+  .isPortraitLive .vmp-chat-wap-concise .vmp-chat-wap-concise__content .virtual-content {
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.65) 15%,
+      rgba(255, 255, 255, 1) 100%
+    );
   }
 </style>
