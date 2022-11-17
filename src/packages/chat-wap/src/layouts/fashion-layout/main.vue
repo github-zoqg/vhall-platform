@@ -59,8 +59,8 @@
     <div
       class="overlay"
       v-show="showSendBox"
-      @touchstart="closeOverlay"
-      @click.stop="closeOverlay"
+      @touchstart="closeOverlay(true)"
+      @click.stop="closeOverlay(false)"
     ></div>
     <send-box
       ref="sendBox"
@@ -609,8 +609,14 @@
         });
       },
       //关闭遮罩层
-      closeOverlay() {
-        EventBus.$emit('showSendBox', false);
+      closeOverlay(isDelay) {
+        if (isDelay) {
+          setTimeout(() => {
+            EventBus.$emit('showSendBox', false);
+          }, 400);
+        } else {
+          EventBus.$emit('showSendBox', false);
+        }
       },
       // 聊天过滤
       filterChat(data) {
