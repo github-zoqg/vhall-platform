@@ -490,7 +490,8 @@
         ImagePreview({
           images: newList,
           startPosition: index,
-          lazyLoad: true
+          lazyLoad: true,
+          loop: false
         });
       },
       //获取目标消息索引

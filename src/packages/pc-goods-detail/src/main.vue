@@ -31,15 +31,14 @@
           <span class="name">{{ info.name }}</span>
           <div class="describe">{{ info.description }}</div>
           <div class="price-info">
-            <template v-if="info.discount_price">
-              <span class="tip">{{ $t('menu.menu_1006') }}</span>
-              <i>￥</i>
-              <span class="price" v-html="info.discoutText"></span>
-            </template>
+            <span class="tip" v-if="info.discoutText">{{ $t('menu.menu_1006') }}</span>
+            <i>￥</i>
+            <span class="price" v-html="info.discoutText ? info.discoutText : info.price"></span>
             <span
               class="dis_count"
+              v-if="info.discoutText"
               :class="{ nodiscount: !info.discount_price }"
-              v-html="info.discount_price ? info.priceText : '￥' + info.priceText"
+              v-html="info.discount_price ? '￥' + info.priceText : '￥' + info.priceText"
             ></span>
           </div>
           <div class="bottom-link">

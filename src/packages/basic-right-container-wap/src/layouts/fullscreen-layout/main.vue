@@ -6,6 +6,7 @@
         :icon-style="iconStyle"
         class="icon-wrap"
         @clickIcon="checkQuestionnaireIcon"
+        @openQa="openQa"
       >
         <span class="icon-name">{{ $t('form.form_1074') }}</span>
       </questionnaire-icon>

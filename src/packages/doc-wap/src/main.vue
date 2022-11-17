@@ -154,7 +154,8 @@
         timmer: null,
         showTools: false,
         isDocBeCovered: false,
-        isDocStickTop: false
+        isDocStickTop: false,
+        chatSendBox: false
       };
     },
     computed: {
@@ -596,23 +597,26 @@
       },
       //监听系统横竖屏
       resizeDoc(e) {
-        window.setTimeout(() => {
-          const newOir = window.innerWidth < window.innerHeight;
-          console.log(
-            '【resizeDoc】:',
-            'window.innerHeight: ' + window.innerHeight,
-            'window.innerWidth: ' + window.innerWidth,
-            '变化前---设备竖屏 isPortrait:' + this.isPortrait,
-            '变化后---当前设备竖屏:' + newOir
-          );
-          if (newOir != this.isPortrait) {
-            //方向发生了变化就重新计算文档大小
-            this.isPortrait = newOir;
-            this.rotateNum = 0;
-            this.resize();
-            this.docServer.zoomReset();
-          }
-        }, 50);
+        // 输入框获焦 部分小机型会误将输入框获焦，响应resize导致判断屏幕横屏
+        if (!this.chatSendBox) {
+          window.setTimeout(() => {
+            const newOir = window.innerWidth < window.innerHeight;
+            console.log(
+              '【resizeDoc】:',
+              'window.innerHeight: ' + window.innerHeight,
+              'window.innerWidth: ' + window.innerWidth,
+              '变化前---设备竖屏 isPortrait:' + this.isPortrait,
+              '变化后---当前设备竖屏:' + newOir
+            );
+            if (newOir != this.isPortrait) {
+              //方向发生了变化就重新计算文档大小
+              this.isPortrait = newOir;
+              this.rotateNum = 0;
+              this.resize();
+              this.docServer.zoomReset();
+            }
+          }, 50);
+        }
       },
       //自定义横竖屏
       doRotate() {
@@ -634,6 +638,10 @@
           this.restore();
         }
         this.isDocStickTop = val;
+      },
+      // 输入框控件响应
+      changeChatSendBox(val) {
+        this.chatSendBox = val;
       }
     },
     beforeDestroy() {

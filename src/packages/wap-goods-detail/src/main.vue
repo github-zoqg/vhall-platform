@@ -10,7 +10,7 @@
     <div class="vh-goods-detail-layout" v-if="show">
       <div class="vh-goods-wrapper-detail-contents">
         <div class="vh-goods-wrapper-detail-imgs">
-          <van-swipe @change="onChange">
+          <van-swipe :loop="false" @change="onChange">
             <van-swipe-item v-for="(i, index) in info.img_list" :key="index">
               <img :src="i.img_url" alt="" class="has-img" />
             </van-swipe-item>
@@ -158,7 +158,7 @@
       background: rgba(255, 255, 255, 1);
       overflow: hidden;
       padding: 40px 44px 42px 44px;
-      z-index: 2102 !important;
+      z-index: 3102 !important;
       .vh-line-close {
         position: absolute;
         right: 36px;
@@ -235,9 +235,11 @@
     height: calc(1114px+env(safe-area-inset-bottom));
     z-index: 3101;
     border-radius: 32px 32px 0 0;
+    overflow: hidden;
     // padding-bottom: env(safe-area-inset-bottom);
     padding-bottom: constant(safe-area-inset-bottom); /*兼容IOS<11.2*/
     padding-bottom: env(safe-area-inset-bottom); /*兼容IOS>11.2*/
+    background: var(--theme-tab-content-good-detail-content-bg);
     .vh-goods-wrapper-detail-contents {
       border-radius: 32px 32px 0 0;
     }

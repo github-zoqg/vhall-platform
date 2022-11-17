@@ -72,10 +72,6 @@
               :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
             >
               {{ liveTag(item) }}
-              <span v-if="hasDelayPermission == 1 && item && item.no_delay_webinar == 1">
-                | 无延迟
-              </span>
-              <span v-if="item.webinar_show_type == 0">| 竖屏</span>
             </span>
             <!-- <span class="item-type">付费</span> -->
           </div>

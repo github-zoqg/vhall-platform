@@ -104,6 +104,11 @@ export default {
       window.$middleEventSdk?.event?.send(
         boxEventOpitons(this.cuid, 'emitClickQuestionnaireIcon', [questionnaireId])
       );
+    },
+    openQa(questionnaireId) {
+      window.$middleEventSdk?.event?.send(
+        boxEventOpitons(this.cuid, 'emitOpenQa', [questionnaireId])
+      );
     }
   }
 };

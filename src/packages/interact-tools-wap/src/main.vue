@@ -259,8 +259,9 @@
     }
   }
   .goods-van-popup {
-    height: 1110px;
-    max-height: 80%;
+    height: 708px;
+    background: url('../../concise-style/wap-menu-dialog/src/images/gradient_bg.png') repeat-x;
+    background-size: cover;
     .vh-goods-wrapper {
       overflow: hidden;
       .vh-goods_list {

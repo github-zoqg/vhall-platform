@@ -154,6 +154,15 @@
       }
     },
     watch: {
+      isDocStickTop(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.$nextTick(() => {
+            if (this.switchDrag) {
+              window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocCancleZoom'));
+            }
+          });
+        }
+      },
       switchDrag(newVal, oldVal) {
         if (newVal != oldVal) {
           this.$nextTick(() => {
