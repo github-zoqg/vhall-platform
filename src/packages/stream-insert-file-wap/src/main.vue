@@ -24,6 +24,9 @@
     >
       <i class="vh-iconfont vh-a-line-fullscreen"></i>
     </div>
+    <div class="pauseButton" v-if="iosPause" @click.stop="startPlay">
+      <i class="vh-iconfont vh-line-video-play"></i>
+    </div>
     <!-- 订阅桌面共享容器 -->
   </div>
 </template>
@@ -36,7 +39,8 @@
     data() {
       return {
         isFull: false,
-        iconShow: false
+        iconShow: false,
+        iosPause: false
       };
     },
 
@@ -78,28 +82,6 @@
         };
         try {
           this.insertFileServer.subscribeInsertStream(opt);
-
-          // 监听全屏变化
-          document
-            .getElementById('vmp-wap-insert-file')
-            .getElementsByTagName('video')[0]
-            .addEventListener(
-              'webkitbeginfullscreen',
-              function () {
-                console.log('webkitfullscreenchange', this);
-              },
-              true
-            );
-          document
-            .getElementById('vmp-wap-insert-file')
-            .getElementsByTagName('video')[0]
-            .addEventListener(
-              'webkitendfullscreen',
-              function () {
-                console.log('退出全屏', this);
-              },
-              true
-            );
         } catch (error) {
           console.log('error', error);
         }
@@ -116,28 +98,6 @@
             }
           },
           true
-        );
-        // 监听全屏变化
-        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(
-          (item, index) => {
-            window.addEventListener(
-              item,
-              () => {
-                let isFullScreen =
-                  document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
-                if (isFullScreen) {
-                  //  进入全屏
-                  console.log('进入全屏+++++++++++++++++++++++++++');
-                } else {
-                  //  退出全屏
-                  console.log('退出全屏-----------------------------');
-                  this.isFull = false;
-                  this.iconShow = false;
-                }
-              },
-              true
-            );
-          }
         );
         // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
@@ -177,6 +137,7 @@
           .then(() => {
             if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
               this.isFull = true;
+              this.iosPause = true;
             }
           });
       },
@@ -202,6 +163,14 @@
           this.iconShow = false;
           this.isOpenlang = false;
         }, 5000);
+      },
+      startPlay() {
+        console.log(
+          document.getElementById('vmp-wap-insert-file').getElementsByTagName('video')[0],
+          'startPlay'
+        );
+        this.iosPause = false;
+        document.getElementById('vmp-wap-insert-file').getElementsByTagName('video')[0].play();
       }
     }
   };
@@ -229,6 +198,20 @@
     }
     .vh-iconfont {
       color: white;
+    }
+    .pauseButton {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 </style>
