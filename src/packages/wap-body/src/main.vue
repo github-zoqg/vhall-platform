@@ -46,6 +46,8 @@
             ? -1
             : isStreamContainerStickTop
             ? playerZIndex
+            : mini && !isPortraitLive
+            ? 5000
             : mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)
             ? 302
             : 'auto'
