@@ -634,6 +634,22 @@
           this.restore();
         }
         this.isDocStickTop = val;
+      },
+      // 输入框控件响应
+      changeChatSendBox(val) {
+        // 输入框获焦 部分小机型会误将输入框获焦，响应resize导致判断屏幕横屏
+        if (val) {
+          window.setTimeout(() => {
+            const newOir = true;
+            if (newOir != this.isPortrait) {
+              //方向发生了变化就重新计算文档大小
+              this.isPortrait = newOir;
+              this.rotateNum = 0;
+              this.resize();
+              this.docServer.zoomReset();
+            }
+          }, 50);
+        }
       }
     },
     beforeDestroy() {

@@ -467,11 +467,18 @@ export default {
       args: ['$0']
     },
     // 聊天输入框是否显示
-    emitChangeChatSendBox: {
-      cuid: ['comWapPlayer'],
-      method: 'changeChatSendBox',
-      args: ['$0']
-    },
+    emitChangeChatSendBox: [
+      {
+        cuid: ['comWapPlayer'],
+        method: 'changeChatSendBox',
+        args: ['$0']
+      },
+      {
+        cuid: ['comDocWap'],
+        method: 'changeChatSendBox',
+        args: ['$0']
+      }
+    ],
     emitSetHideEffect: [
       {
         cuid: 'comWapRewardEffect',
