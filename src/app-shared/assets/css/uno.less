@@ -1,0 +1,114 @@
+/**
+* 使用uno.css规范的通用类, 并非引入 uno.css
+*/
+
+.text-center {
+  text-align: center;
+}
+
+.ma {
+  margin: auto;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+
+//------------------  font-weigh  ------------------------
+
+.loop(@i) when (@i > 0) {
+  .loop((@i - 1)); // 递归调用自身
+  padding: (10px + 5 * @i);
+}
+
+// font-100  ~  font-900
+.genFontWeight(@i: 100) when (@i =< 900) {
+  .font-@{i} {
+    font-weight: (@i);
+  }
+
+  .genFontWeight((@i + 100));
+}
+
+.genFontWeight();
+
+.font-thin {
+  font-weight: 100;
+}
+
+.font-extralight {
+  font-weight: 200;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+.font-black {
+  font-weight: 900;
+}
+
+// 单行文本超出隐藏
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+//------------------  position  ------------------------
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+
+//------------------  display  ------------------------
+
+.inline-block {
+  display: inline-block;
+}
+
+.block {
+  display: block;
+}
+
+
+
+//------------------  background  ------------------------
+.bg-contain {
+  background-size: contain;
+}
+
+.bg-cover {
+  background-size: cover;
+}

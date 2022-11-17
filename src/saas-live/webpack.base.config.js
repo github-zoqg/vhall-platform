@@ -30,6 +30,7 @@ const htmlConfig = {
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.3/index.js',
     MiddleDomain: '', //空值，用于占位,具体环境中需配置覆盖此项
     VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.js', // vhallUI
+    form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js'
   },
   // cdn css
   cdnCss: {

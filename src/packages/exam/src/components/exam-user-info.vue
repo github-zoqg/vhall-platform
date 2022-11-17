@@ -1,5 +1,5 @@
 <template>
-  <div>sdfsdf</div>
+  <div>VmpExamUserPanel</div>
 </template>
 <script>
   export default {
@@ -7,8 +7,13 @@
     data() {
       return {};
     },
+    created() {
+      this.initComp();
+    },
     methods: {
-      initComp() {}
+      initComp() {
+        console.log('🚀 ~ file: exam-user-info.vue ~ line 15 ~ initComp ~ initComp');
+      }
     }
   };
 </script>

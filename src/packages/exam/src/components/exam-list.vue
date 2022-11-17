@@ -1,7 +1,7 @@
 <template>
   <div class="exam-list-panel">
     <!-- 内层嵌套对话框 -->
-    <el-dialog
+    <vh-dialog
       width="400px"
       title="提示"
       :show-close="false"
@@ -12,12 +12,12 @@
       append-to-body
     >
       <p class="tip-text">保存同时共享至资料管理，便于其他活动使用？</p>
-      <p><el-checkbox v-model="isShare">共享到资料管理</el-checkbox></p>
+      <p><vh-checkbox v-model="isShare">共享到资料管理</vh-checkbox></p>
       <div class="dialog-footer">
-        <el-button type="primary" round @click="handleShareSubmit">确 定</el-button>
-        <el-button round @click="handleShareCancel">取 消</el-button>
+        <vh-button type="primary" round @click="handleShareSubmit">确 定</vh-button>
+        <vh-button round @click="handleShareCancel">取 消</vh-button>
       </div>
-    </el-dialog>
+    </vh-dialog>
 
     <!-- 快问快答—列表 -->
     <div>
@@ -27,96 +27,109 @@
         <p>您还没有快问快答，快来创建吧！</p>
         <div>
           <!-- 创建按钮 -->
-          <el-button type="primary" round @click="handleCreateExam">创建</el-button>
+          <vh-button type="primary" round @click="handleCreateExam">创建</vh-button>
         </div>
       </div>
       <!-- 有数据 -->
       <div class="vmp-exam-cur__inner" v-show="examList.length > 0">
         <div class="vmp-exam-cur__hd">
           <!-- 创建按钮 -->
-          <el-button type="primary" round @click="handleCreateExam">创建</el-button>
+          <vh-button type="primary" round @click="handleCreateExam">创建</vh-button>
           <!-- 资料库按钮
-          <el-button round @click="openSelectDialog">
+          <vh-button round @click="openSelectDialog">
             {{ $t('doc.doc_1015') }}
-          </el-button> -->
+          </vh-button> -->
           <!-- 搜索框 -->
-          <el-input
+          <vh-input
             class="input-search"
             placeholder="请输入名称"
-            v-model="queryParams.keyword"
+            v-model="keywordIpt"
             clearable
             @clear="initQueryList"
             @keydown.enter.stop.native="initQueryList()"
           >
-            <i slot="prefix" class="el-input__icon el-icon-search" @click="initQueryList"></i>
-          </el-input>
+            <i slot="prefix" class="vh-input__icon vh-icon-search" @click="initQueryList"></i>
+          </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
-          <el-table
-            :data="examList"
-            style="width: 100%"
-            height="320px"
-            v-loadMore="moreLoadData"
-            @cell-mouse-enter="handleCellMouseEnter"
-            @cell-mouse-leave="handleCellMouseLeave"
-          >
+          <vh-table :data="examList" style="width: 100%" height="295px">
             <!-- 未搜索到数据展示 -->
             <template slot="empty">
               <img src="@/app-shared/assets/img/no-search.png" />
               <p>暂未搜索到您想要的内容</p>
             </template>
             <!-- 表格展示 -->
-            <el-table-column
+            <vh-table-column
               prop="title"
               label="名称"
-              width="220"
+              width="240"
               fixed="left"
-              :show-overflow-tooltip="true"
+              show-overflow-tooltip
             >
               <template slot-scope="scope">
-                <!--  <el-tooltip placement="top" :content="scope.row.title">
-                  <p class="file-name custom-tooltip-content">
-                    <span class="file-name__text">
-                      {{ scope.row.title }}
-                    </span>
-                  </p>
-                </el-tooltip> -->
                 {{ scope.row.title }}
               </template>
-            </el-table-column>
-            <el-table-column label="创建时间" width="170">
+            </vh-table-column>
+            <vh-table-column label="创建时间" width="148">
               <template slot-scope="scope">
                 {{ scope.row.created_at_str }}
               </template>
-            </el-table-column>
-            <el-table-column prop="total_score" label="总分"></el-table-column>
-            <el-table-column prop="questions_count" label="题数"></el-table-column>
-            <el-table-column label="限时(分)" width="170">
+            </vh-table-column>
+            <vh-table-column prop="total_score" width="56" label="总分"></vh-table-column>
+            <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
+            <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
                 {{ scope.row.limit_time_str }}
               </template>
-            </el-table-column>
-            <el-table-column label="状态" width="170">
+            </vh-table-column>
+            <vh-table-column label="状态" width="112">
               <template slot-scope="scope">
                 <span class="statusTag" :class="scope.row.status_css">
                   {{ scope.row.status_str }}
                 </span>
               </template>
-            </el-table-column>
-            <el-table-column label="操作" width="348" fixed="right">
+            </vh-table-column>
+            <vh-table-column label="操作" width="196" fixed="right">
               <template slot-scope="scope">
-                <template v-for="btnItem in scope.row.btnList">
-                  <span
-                    :class="`item ${btnItem.disabled ? 'is-disabled' : ''}`"
-                    :key="`btn${btnItem.type}`"
-                    @click="handleCommand(btnItem, scope.row)"
-                  >
-                    {{ btnItem.name }}
-                  </span>
+                <template>
+                  <div :data-vars="(btnConfig = setBtnConfigByStatus(scope.row.status))">
+                    <span
+                      v-for="item of btnConfig.outsideBtn"
+                      :key="item.type"
+                      :disabled="item.disabled"
+                      class="std-text opt-btn"
+                      @click="handleExamOpt(item.type, scope.row)"
+                    >
+                      {{ item.name }}
+                    </span>
+                    <vh-dropdown @command="handleCommand">
+                      <span class="std-text opt-btn">更多</span>
+                      <vh-dropdown-menu slot="dropdown">
+                        <vh-dropdown-item
+                          v-for="item of btnConfig.moreBtn"
+                          :key="item.type"
+                          :command="[item.type, scope.row]"
+                          :disabled="item.disabled"
+                        >
+                          {{ item.name }}
+                        </vh-dropdown-item>
+                      </vh-dropdown-menu>
+                    </vh-dropdown>
+                  </div>
                 </template>
               </template>
-            </el-table-column>
-          </el-table>
+            </vh-table-column>
+          </vh-table>
+        </div>
+        <div class="m-t-16">
+          <vh-pagination
+            class="ma text-center"
+            background
+            layout="prev, pager, next"
+            :page-size="queryParams.limit"
+            :total="total"
+            @current-change="handleChangePage"
+          ></vh-pagination>
         </div>
       </div>
     </div>
@@ -125,51 +138,46 @@
   </div>
 </template>
 <script>
-  import tableCellTooltip from '@/packages/app-shared/mixins/tableCellTooltip';
+  import changeView from '../common/mixins/changeView.js';
+
+  // 操作按钮
+  const btnMap = {
+    publish: { type: 'publish', name: '公布' },
+    score: { type: 'score', name: '成绩' },
+    push: { type: 'push', name: '推送' },
+    edit: { type: 'edit', name: '编辑' },
+    stop: { type: 'stop', name: '收卷' },
+    copy: { type: 'copy', name: '复制' },
+    prev: { type: 'prev', name: '预览' },
+    del: { type: 'del', name: '删除' }
+  };
+  //操作按钮策略
+  const operateTactics = {
+    publish: 'handleExamPublish',
+    score: 'handleExamScore',
+    push: 'handleExamPush',
+    edit: 'handleExamEdit',
+    stop: 'handleExamStop',
+    copy: 'handleExamCopy',
+    prev: 'handleExamPrev',
+    del: 'handleExamDel'
+  };
+  const noop = () => {}; // 空函数
   export default {
     name: 'VmpExamListPanel',
-    mixins: [tableCellTooltip],
-    directives: {
-      drag(el) {
-        el.onmousedown = function (e) {
-          const disx = e.pageX - el.offsetLeft;
-          const disy = e.pageY - el.offsetTop;
-          document.onmousemove = function (e) {
-            let l = e.pageX - disx;
-            let t = e.pageY - disy;
-            if (l < 230) {
-              l = 230;
-            }
-            if (l > window.innerWidth - 170) {
-              l = window.innerWidth - 170;
-            }
-            if (t < 5) {
-              t = 5;
-            }
-            if (t > window.innerHeight - 240) {
-              t = window.innerHeight - 240;
-            }
-            el.style.left = l + 'px';
-            el.style.top = t + 'px';
-          };
-          document.onmouseup = function () {
-            document.onmousemove = document.onmouseup = null;
-          };
-        };
-      }
-    },
+    mixins: [changeView],
     data() {
       return {
         innerVisible: false,
         isShare: false, // 是否共享到资料库
-        keyword: '', // 搜索关键字
+        keywordIpt: '', // 搜索关键字
         loading: false, // 列表请求加载中
         queryParams: {
           // 快问快答-列表搜索参数
-          limit: 10,
+          limit: 4,
           pos: 0,
           pageNum: 1,
-          keyword: ''
+          keyword: '' // 搜索的关键字
         },
         examList: [],
         totalPages: 0,
@@ -179,7 +187,9 @@
     },
     methods: {
       // 创建快问快答
-      handleCreateExam() {},
+      handleCreateExam() {
+        this.$emit('changeView', 'ExamCreate');
+      },
       // 共享到资料库 —— 确定
       handleShareSubmit() {},
       // 共享到资料库 —— 取消
@@ -187,79 +197,93 @@
       // 点击打开资料库
       openSelectDialog() {},
       // 转换每行可操作的按钮 [设置按钮是否可点击 -> 通过状态过滤是否展示 -> 依据可点击按钮在前进行排序]
-      setBtnList(item) {
-        const baseBtnList = [
-          { type: 'publish', name: '公布', disabled: true },
-          { type: 'score', name: '成绩', disabled: true },
-          { type: 'push', name: '推送', disabled: true },
-          { type: 'edit', name: '编辑', disabled: true },
-          { type: 'close', name: '收卷', disabled: true },
-          { type: 'copy', name: '复制', disabled: true },
-          { type: 'preview', name: '预览', disabled: true },
-          { type: 'del', name: '删除', disabled: true }
-        ];
-        baseBtnList.map(sItem => {
-          // 状态 0.未推送 1.答题中 2.成绩待公布 3.成绩已公布
-          if (item.status == 1) {
-            // 答题中（收卷、复制、预览）可以点击，其余不可点击
-            sItem.disabled = !['close', 'copy', 'preview'].includes(sItem.type);
-          } else if ([2, 3].includes(Number(item.status))) {
-            // 成绩待公布 or 已公布（公布、成绩、推送、复制、预览）可以点击，其余不可点击
-            sItem.disabled = !['publish', 'score', 'push', 'copy', 'preview'].includes(sItem.type);
-          } else {
-            // 默认未推送 （推送、编辑、复制、删除、预览）可以点击，其余不可点击
-            sItem.disabled = !['push', 'edit', 'copy', 'del', 'preview'].includes(sItem.type);
-          }
-        });
-        let filterList = baseBtnList.filter(sItem => {
-          if (item.status == 1) {
-            // 答题中，仅展示（收卷、复制、预览、推送、编辑、删除），不展示（公布、成绩）
-            return !['publish', 'score'].includes(sItem.type);
-          } else if ([2, 3].includes(Number(item.status))) {
-            // 成绩待公布 or 已公布，仅展示（公布、成绩、推送、复制、预览、编辑、删除），不展示（收卷）
-            return sItem.type != 'close';
-          } else {
-            // 默认未推送，仅展示（推送、复制、预览、编辑、删除），不展示（公布、成绩、收卷）
-            return !['publish', 'score', 'close'].includes(sItem.type);
-          }
-        });
-        return filterList.sort((lastVo, nextVo) => {
-          return lastVo.disabled - nextVo.disabled;
-        });
+      setBtnConfigByStatus(status) {
+        const outsideBtn = []; // 在列表显示的
+        const moreBtn = []; // 更多中的
+        switch (status) {
+          case 0: //0.未推送
+            outsideBtn.push(btnMap.push);
+            outsideBtn.push(btnMap.edit);
+            outsideBtn.push(btnMap.copy);
+            moreBtn.push(btnMap.del);
+            moreBtn.push(btnMap.prev);
+            break;
+          case 1: //1.答题中
+            outsideBtn.push(btnMap.stop);
+            outsideBtn.push(btnMap.copy);
+            outsideBtn.push(btnMap.prev);
+            moreBtn.push({
+              ...btnMap.push,
+              disabled: true
+            });
+            moreBtn.push({
+              ...btnMap.edit,
+              disabled: true
+            });
+            moreBtn.push({
+              ...btnMap.del,
+              disabled: true
+            });
+            break;
+          case 2: //2.成绩待公布
+          case 3: //3.成绩已公布
+            outsideBtn.push(btnMap.publish);
+            outsideBtn.push(btnMap.score);
+            outsideBtn.push(btnMap.push);
+            moreBtn.push(btnMap.copy);
+            moreBtn.push(btnMap.prev);
+            moreBtn.push({
+              ...btnMap.edit,
+              disabled: true
+            });
+            moreBtn.push({
+              ...btnMap.del,
+              disabled: true
+            });
+            break;
+        }
+        return { outsideBtn, moreBtn };
       },
       // 更多列表的操作
-      handleCommand(btnVo, selectedExam) {
-        if (!btnVo.type) return;
-        if (selectedExam) {
-          this.selectedExam = selectedExam;
-        }
-        eval(`this.${btnVo.type}(${btnVo.disabled})`);
+      handleCommand(args) {
+        this.handleExamOpt(...args);
       },
-      // 下拉框显示是, 中转当前选中变量
-      dropDownVisibleChange(row) {
-        this.selectedExam = row;
+      // 操作问卷
+      handleExamOpt(type, examObj) {
+        console.log('🚀 ~ file: exam-list.vue ~ line 293 ~ handleExamOpt ~ type', type, examObj);
+        const tactics = operateTactics[type] || '';
+        const fn = this[tactics];
+        fn && fn(examObj);
       },
       // 公布
-      publish(btnIsDisabled) {
+      handleExamPublish(examObj) {
         console.log('公布成绩');
+        // 确认公布
+        const confirmCb = () => {};
         this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        }).then(() => {});
+          roundButton: true,
+          type: 'warning'
+        })
+          .then(confirmCb)
+          .catch(noop);
       },
       // 成绩
       score(btnIsDisabled) {
         console.log('公布成绩');
       },
       // 推送
-      push(btnIsDisabled) {
-        if (btnIsDisabled) {
-          this.$message.error('已推送快问快答不支持再次推送');
-        } else {
-          // 正常编辑
-        }
+      handleExamPush(examObj) {
+        // 确认推送
+        const confirmCb = () => {};
+        this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          roundButton: true
+        })
+          .then(confirmCb)
+          .catch(noop);
       },
       // 编辑
       edit(btnIsDisabled) {
@@ -297,6 +321,7 @@
       },
       // 查询列表接口
       initQueryList() {
+        this.queryParams.keyword = this.keywordIpt;
         this.queryExamList(true);
       },
       /**
@@ -386,9 +411,6 @@
         };
         const dataList = res.data.list || [];
         dataList.map(item => {
-          let btnList = this.setBtnList(item);
-          item.btnList = btnList;
-          console.log(item.btnList.length);
           item.created_at_str = item.created_at.substring(0, 16);
           item.updated_at_str = item.updated_at.substring(0, 16);
           item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
@@ -401,7 +423,6 @@
         this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
       },
       moreLoadData() {
-        console.log('查看是否触发滑动查询');
         if (this.queryParams.pageNum >= this.totalPages) {
           return false;
         }
@@ -412,7 +433,8 @@
       // 初始化界面
       initComp() {
         this.initQueryList();
-      }
+      },
+      handleChangePage() {}
     }
   };
 </script>
@@ -430,10 +452,10 @@
     .tip-text {
       padding-bottom: 10px;
     }
-    .el-checkbox {
+    .vh-checkbox {
       font-weight: 400 !important;
     }
-    .el-checkbox__input.is-checked + .el-checkbox__label {
+    .vh-checkbox__input.is-checked + .vh-checkbox__label {
       color: #606266 !important;
     }
 
@@ -482,7 +504,7 @@
         font-size: 15px;
         color: @font-light-second;
       }
-      .el-button {
+      .vh-button {
         width: 120px;
       }
     }
@@ -495,10 +517,10 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 24px 0;
+      padding: 16px 0 12px;
     }
     .vmp-exam-cur__bd {
-      .el-button.el-button--text {
+      .vh-button.vh-button--text {
         color: #666;
         border: 0;
         margin-left: 0;
@@ -509,14 +531,14 @@
     .input-search {
       width: 180px;
       margin-left: auto;
-      .el-button.is-round {
+      .vh-button.is-round {
         padding: 7px 24px;
       }
-      .el-input__inner {
+      .vh-input__inner {
         border-radius: 20px;
       }
     }
-    .el-table .cell .file-name {
+    .vh-table .cell .file-name {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -524,43 +546,49 @@
         vertical-align: middle;
       }
     }
-    .el-table th > .cell {
+    .vh-table th > .cell {
       font-weight: normal;
     }
-    .el-table th:first-child .cell,
-    .el-table tr td:first-child .cell {
+    .vh-table th:first-child .cell,
+    .vh-table tr td:first-child .cell {
       padding-left: 24px;
     }
 
-    .el-table--enable-row-hover .el-table__body tr:hover > td {
+    .vh-table--enable-row-hover .vh-table__body tr:hover > td {
       background-color: #f7f7f7;
-      .el-button--text {
+      .vh-button--text {
         color: #fb3a32;
       }
     }
-    .item {
-      margin-left: 16px;
-      font-style: normal;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 22px;
-      color: rgba(0, 0, 0, 0.85);
+    // .item {
+    //   margin-left: 16px;
+    //   font-style: normal;
+    //   font-weight: 400;
+    //   font-size: 14px;
+    //   line-height: 22px;
+    //   color: rgba(0, 0, 0, 0.85);
+    //   cursor: pointer;
+    //   &:hover,
+    //   &:active,
+    //   &:focus {
+    //     color: #fb3232;
+    //   }
+    //   &:first-child {
+    //     margin-left: 0;
+    //   }
+    //   &.is-disabled {
+    //     color: rgba(0, 0, 0, 0.25);
+    //     &:hover,
+    //     &:active,
+    //     &:focus {
+    //       color: rgba(0, 0, 0, 0.25);
+    //     }
+    //   }
+    // }
+    .opt-btn {
       cursor: pointer;
-      &:hover,
-      &:active,
-      &:focus {
-        color: #fb3232;
-      }
-      &:first-child {
-        margin-left: 0;
-      }
-      &.is-disabled {
-        color: rgba(0, 0, 0, 0.25);
-        &:hover,
-        &:active,
-        &:focus {
-          color: rgba(0, 0, 0, 0.25);
-        }
+      &:not(:last-child) {
+        margin-right: 8px;
       }
     }
   }

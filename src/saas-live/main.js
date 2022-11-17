@@ -24,6 +24,9 @@ import '@/app-shared/filters/index';
 // 导入样式及皮肤
 import './assets/styles/common.less';
 import './assets/styles/skins/index.less';
+
+import '@/app-shared/assets/css/uno.less';
+import '@/app-shared/assets/css/standard.less';
 // 默认主题
 import skins from '@/app-shared/skins/watch';
 skins.setTheme(skins.themes.theme_default_black);
