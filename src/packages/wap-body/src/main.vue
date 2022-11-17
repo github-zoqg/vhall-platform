@@ -700,7 +700,6 @@
         width: 160px;
         height: 284px;
         border-radius: 8px;
-        transition: all 0.1s;
         &.rotate90 {
           transform-origin: center;
           transform: rotate(90deg) !important;
