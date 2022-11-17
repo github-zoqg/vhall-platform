@@ -153,6 +153,12 @@ export default {
   '--theme-chapter-font-color-time': 'rgba(0, 0, 0, 0.65)',
   '--theme-chapter-font-color-active': '#3552EA',
   // 快问快答
+  '--theme-exam-list-item-button-bg': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-list-item-button-border': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-list-item-button-color': '#ffffff',
+  '--theme-exam-list-item-button-active-bg': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-list-item-button-active-border': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-list-item-button-active-color': '#ffffff',
   '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
   '--theme-exam-progress-active-bgColor': 'rgba(53, 82, 234, 1)',
   '--theme-exam-question-type-bgColor': 'rgba(53, 82, 234, 0.15)',
