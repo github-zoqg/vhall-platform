@@ -6,7 +6,8 @@ import {
   useMediaCheckServer,
   useMediaSettingServer,
   useDesktopShareServer,
-  useSplitScreenServer
+  useSplitScreenServer,
+  useInsertFileServer
 } from 'middle-domain';
 
 export default async function () {
@@ -19,6 +20,7 @@ export default async function () {
   const mediaSettingServer = useMediaSettingServer();
   const splitScreenServer = useSplitScreenServer();
   const desktopShareServer = useDesktopShareServer();
+  const insertFileServer = useInsertFileServer();
 
   const checkSystemResult = await mediaCheckServer.checkSystemRequirements();
   if (!checkSystemResult.result) {
@@ -54,6 +56,8 @@ export default async function () {
 
   await interactiveServer.init();
   console.log('%c------服务初始化 interactiveServer 初始化完成', 'color:blue');
+
+  insertFileServer.init();
 
   mediaSettingServer.init();
 
