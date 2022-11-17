@@ -813,6 +813,7 @@
       this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
+      this.playerState.isPlaying = false;
       this.playerServer.destroy();
     },
     async created() {
