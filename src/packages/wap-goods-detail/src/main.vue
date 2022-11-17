@@ -239,6 +239,7 @@
     // padding-bottom: env(safe-area-inset-bottom);
     padding-bottom: constant(safe-area-inset-bottom); /*兼容IOS<11.2*/
     padding-bottom: env(safe-area-inset-bottom); /*兼容IOS>11.2*/
+    background: var(--theme-tab-content-good-detail-content-bg);
     .vh-goods-wrapper-detail-contents {
       border-radius: 32px 32px 0 0;
     }
