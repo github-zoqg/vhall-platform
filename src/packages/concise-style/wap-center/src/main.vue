@@ -151,6 +151,9 @@
       //判断是否是音频直播模式
       isAudio() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
+      },
+      getQaZindex(val) {
+        return this.zIndexServer.state.zIndexMap.questionnaire;
       }
     },
     watch: {
@@ -173,6 +176,9 @@
             }
           });
         }
+      },
+      getQaZindex(val) {
+        this.qaZIndex = val || 302;
       }
     },
     created() {
@@ -217,9 +223,9 @@
       // 设置文档容器是否置顶
       setDocContainerStickTop(val) {
         this.isDocStickTop = val;
-        if (val) {
-          this.qaZIndex = this.zIndexServer.state.zIndexMap['questionnaire'] || 302;
-        }
+        // if (val) {
+        //   this.qaZIndex = this.getQaZindex || 302;
+        // }
         this.$nextTick(() => {
           // 派发事件：docResize
           window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitDocResize'));
