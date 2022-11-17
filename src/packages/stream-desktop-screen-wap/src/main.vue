@@ -248,6 +248,7 @@
       z-index: 1;
       top: 50%;
       left: 50%;
+      color: #fff;
       transform: translate(-50%, -50%);
     }
   }
