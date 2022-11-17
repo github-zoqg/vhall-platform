@@ -9,7 +9,7 @@
         'player-container__sticktop': isDocStickTop
       }"
       :style="{
-        'z-index': isDocStickTop ? qaZIndex : 12
+        'z-index': isDocStickTop ? zIndexServerState.zIndexMap.questionnaire || 302 : 12
       }"
     >
       <p @click.stop="startPlay">
@@ -70,7 +70,7 @@
           isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
             ? -1
             : isDocStickTop
-            ? qaZIndex
+            ? zIndexServerState.zIndexMap.questionnaire || 302
             : switchDrag
             ? 302
             : 'auto'
@@ -91,7 +91,9 @@
     name: 'VmpConciseCenterWap',
     components: {},
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         // isPlayering: false, // 是否是播放状态
         isSmallPlayer: false,
         isVodEnd: false, // 回放结束
@@ -106,7 +108,6 @@
         audioStatus: false, // 选中清晰度是否是音频模式
         // isAudio: false, //判断是否是音频直播模式
         isLivingEnd: false,
-        qaZIndex: 302, // 默认问卷推送时，文档吸顶的index
         isShowPosterAudio: false // 音频封面显示 false
       };
     },
@@ -151,9 +152,6 @@
       //判断是否是音频直播模式
       isAudio() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
-      },
-      getQaZindex(val) {
-        return this.zIndexServer.state.zIndexMap.questionnaire;
       }
     },
     watch: {
@@ -176,15 +174,14 @@
             }
           });
         }
-      },
-      getQaZindex(val) {
-        this.qaZIndex = val || 302;
       }
+    },
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
     },
     created() {
       this.childrenComp = window.$serverConfig[this.cuid].children;
       this.interactiveServer = useInteractiveServer();
-      this.zIndexServer = useZIndexServer();
       this.addSDKEvents();
     },
     mounted() {},
