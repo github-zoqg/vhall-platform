@@ -1,6 +1,5 @@
 import Vue from 'vue';
 // 瀑布流
-import { VueMasonryPlugin } from 'vue-masonry';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
@@ -64,7 +63,6 @@ import VmpPcPlayerLiveYun from '@/packages/pc-player-live-yun';
 // 隐私合规文案
 import VmpPrivacyCompliance from '@/packages/privacy-compliance';
 // 瀑布流组件
-Vue.use(VueMasonryPlugin);
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
