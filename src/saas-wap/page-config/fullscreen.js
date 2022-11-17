@@ -609,6 +609,12 @@ export default {
       cuid: ['comQuestionnaireWap'],
       method: 'open',
       args: ['$0']
+    },
+    // 打开问卷弹窗
+    emitOpenQa: {
+      cuid: ['comWapPlayer'],
+      method: 'changeQaVisible',
+      args: ['$0']
     }
   },
   comSignWap: {

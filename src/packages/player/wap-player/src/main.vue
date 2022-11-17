@@ -196,7 +196,7 @@
           "
           :class="[
             iconShow ? 'vmp-wap-player-opcity-flase' : 'vmp-wap-player-opcity-true',
-            docScreen == 'fullscreen' || chatSendBoxVisible ? 'hide' : '',
+            docScreen == 'fullscreen' || chatSendBoxVisible || qaVisible ? 'hide' : '',
             hasIosSafeArea ? 'hasIosSafeArea' : ''
           ]"
         >
@@ -667,6 +667,7 @@
         showSpeedCard: false,
         docScreen: '', //文档全屏
         chatSendBoxVisible: false,
+        qaVisible: false,
         hasIosSafeArea: getIosSafeArea()
       };
     },
@@ -1350,6 +1351,9 @@
       },
       changeChatSendBox(val) {
         this.chatSendBoxVisible = val;
+      },
+      changeQaVisible(val) {
+        this.qaVisible = val;
       }
     }
   };
