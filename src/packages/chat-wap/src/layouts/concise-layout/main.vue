@@ -820,7 +820,7 @@
     mask-image: linear-gradient(
       to bottom,
       rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0.65) 15%,
+      rgba(255, 255, 255, 0.55) 15%,
       rgba(255, 255, 255, 1) 100%
     );
   }
