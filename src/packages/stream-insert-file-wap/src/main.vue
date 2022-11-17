@@ -118,12 +118,26 @@
           true
         );
         // 监听全屏变化
-        window.addEventListener(
-          'webkitfullscreenchange',
-          () => {
-            console.log(document.fullscreenElement, 'webkitfullscreenchange');
-          },
-          true
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(
+          (item, index) => {
+            window.addEventListener(
+              item,
+              () => {
+                let isFullScreen =
+                  document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+                if (isFullScreen) {
+                  //  进入全屏
+                  console.log('进入全屏+++++++++++++++++++++++++++');
+                } else {
+                  //  退出全屏
+                  console.log('退出全屏-----------------------------');
+                  this.isFull = false;
+                  this.iconShow = false;
+                }
+              },
+              true
+            );
+          }
         );
         // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
