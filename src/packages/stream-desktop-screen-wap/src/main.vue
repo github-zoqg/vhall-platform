@@ -136,7 +136,9 @@
             .then(() => {
               if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
                 this.isFullscreen = true;
+              } else {
                 this.iosPause = true;
+                this.isShowMask = false;
               }
             });
         }
