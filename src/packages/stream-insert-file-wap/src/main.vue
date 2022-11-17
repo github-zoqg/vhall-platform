@@ -137,6 +137,7 @@
           .then(() => {
             if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
               this.isFull = true;
+            } else {
               this.iosPause = true;
             }
           });
