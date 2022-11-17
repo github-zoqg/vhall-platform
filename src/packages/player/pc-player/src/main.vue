@@ -364,6 +364,7 @@
       this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
+      this.playerState.isPlaying = false;
       this.playerServer.destroy();
     },
     computed: {
