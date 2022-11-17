@@ -24,6 +24,7 @@
     >
       <i class="vh-iconfont vh-a-line-fullscreen"></i>
     </div>
+    <!-- ios 开始按钮 -->
     <div class="pauseButton" v-if="iosPause" @click.stop="startPlay">
       <i class="vh-iconfont vh-line-video-play"></i>
     </div>
@@ -139,6 +140,7 @@
               this.isFull = true;
             } else {
               this.iosPause = true;
+              this.iconShow = false;
             }
           });
       },
@@ -166,10 +168,6 @@
         }, 5000);
       },
       startPlay() {
-        console.log(
-          document.getElementById('vmp-wap-insert-file').getElementsByTagName('video')[0],
-          'startPlay'
-        );
         this.iosPause = false;
         document.getElementById('vmp-wap-insert-file').getElementsByTagName('video')[0].play();
       }

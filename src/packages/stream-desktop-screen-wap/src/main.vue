@@ -22,6 +22,10 @@
         :class="isFullscreen ? 'vh-a-line-exitfullscreen' : 'vh-a-line-fullscreen'"
       ></i>
     </div>
+    <!-- ios 开始按钮 -->
+    <div class="pauseButton" v-if="iosPause" @click.stop="startPlay">
+      <i class="vh-iconfont vh-line-video-play"></i>
+    </div>
   </div>
 </template>
 
@@ -39,7 +43,8 @@
     data() {
       return {
         isFullscreen: false, // 桌面共享是否全屏
-        isShowMask: false // 是否显示遮罩层按钮
+        isShowMask: false, // 是否显示遮罩层按钮
+        iosPause: false
       };
     },
     computed: {
@@ -131,6 +136,7 @@
             .then(() => {
               if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
                 this.isFullscreen = true;
+                this.iosPause = true;
               }
             });
         }
@@ -162,6 +168,13 @@
         //     this.subscribeDesktopScreen();
         //   }
         // });
+      },
+      startPlay() {
+        this.iosPause = false;
+        document
+          .getElementById('vmp-wap-desktop-screen-wrap')
+          .getElementsByTagName('video')[0]
+          .play();
       }
     }
   };
@@ -220,6 +233,20 @@
         font-size: 16px;
         color: #999;
       }
+    }
+    .pauseButton {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
   // 合并模式下，桌面共享只占主画面
