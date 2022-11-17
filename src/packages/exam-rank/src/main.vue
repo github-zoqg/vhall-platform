@@ -1,8 +1,8 @@
 <template>
   <!-- 快问快答-排行榜 -->
-  <el-dialog title="" :visible.sync="examRankVisible" width="500px" custom-class="vmp-exam-rank">
+  <vh-dialog title="" :visible.sync="examRankVisible" width="500px" custom-class="vmp-exam-rank">
     <div class="vmp-exam-rank__panel">排行榜</div>
-  </el-dialog>
+  </vh-dialog>
 </template>
 <script>
   export default {

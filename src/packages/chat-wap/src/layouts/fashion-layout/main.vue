@@ -566,7 +566,7 @@
             boxEventOpitons(this.cuid, 'emitClickExamRankChatItem', [vo.examId])
           );
         } else if ('paper_send' == vo.sourceType) {
-          // 发起端-公布成绩 or 自动推送成绩
+          // 推送-快问快答
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitClickExamChatItem', [vo.examId])
           );

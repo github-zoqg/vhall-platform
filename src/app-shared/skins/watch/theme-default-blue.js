@@ -18,6 +18,7 @@ const color_text_3 = 'rgba(0, 0, 0, 0.85)';
 const color_text_black = 'rgba(38, 38, 38, 1)';
 const color_text_disabled = 'rgba(0, 0, 0, 0.25)';
 const color_text_link = '#3562fa';
+const color_text_chat_exam = 'rgba(38, 38, 38, 1)';
 
 /* 背景颜色
 --------------------- */
@@ -69,6 +70,7 @@ export default {
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(0, 0, 0, 0.45)',
+  '--chat-exam-font-color-msg-text': color_text_chat_exam,
   // 互动工具icon
   '--footer-icon-tip-border-color': '#f0f5ff',
   //footer

@@ -1,13 +1,13 @@
 <template>
   <!-- 快问快答-用户信息收集 -->
-  <el-dialog
+  <vh-dialog
     title=""
     :visible.sync="examCollectVisible"
     width="500px"
     custom-class="vmp-exam-collect"
   >
     <div class="vmp-exam-collect__panel">用户信息收集</div>
-  </el-dialog>
+  </vh-dialog>
 </template>
 <script>
   export default {
