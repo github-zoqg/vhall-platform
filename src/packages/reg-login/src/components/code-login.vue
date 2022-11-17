@@ -182,6 +182,7 @@
       },
       // 发送验证码 - 按钮点击
       handleSendCode() {
+        if (this.btnDisabled || this.isDownTime) return;
         if (!this.captchaReady) {
           this.$message({
             message: this.$t('login.login_1017'),

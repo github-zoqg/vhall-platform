@@ -45,7 +45,8 @@ export default {
     common_1032: 'Número de espectadores',
     common_1033: '我知道了',
     common_1034: '',
-    common_1035: ''
+    common_1035: '',
+    common_1036: ''
   },
   player: {
     player_1001: 'Grado de calor',
@@ -98,7 +99,7 @@ export default {
     appointment_1017: 'Reservar en seguida',
     appointment_1018: 'han sido reservadas {n} personas',
     appointment_1019: 'Está vacío aquí',
-    appointment_1020: 'Verificación de permisos',
+    appointment_1020: 'Watch verification',
     appointment_1021: 'Error de contraseña',
     appointment_1022: 'Por favor, ingrese la contraseña',
     appointment_1023: 'Paga {n} para ver',
@@ -112,7 +113,7 @@ export default {
     appointment_1031: 'Por favor sea paciente',
     appointment_1032: 'Lista blanca',
     appointment_1033: 'The rehearsal has started, please watch it live',
-    appointment_1034: 'Submit and receive SMS'
+    appointment_1034: ''
   },
   nav: {
     nav_1001: 'Patrocinador',
@@ -169,7 +170,10 @@ export default {
     nav_1052: '',
     nav_1053: '',
     nav_1054: 'Share the rehearsal viewing address',
-    nav_1055: ''
+    nav_1055: '',
+    nav_1056: 'Has been off the shelves',
+    nav_1057: '',
+    nav_1058: ''
   },
   login: {
     login_1001: 'Inicio de sesión de cuenta',
@@ -576,7 +580,9 @@ export default {
     interact_tools_1094: '',
     interact_tools_1095: '',
     interact_tools_1096: '',
-    interact_tools_1097: ''
+    interact_tools_1097: '',
+    interact_tools_1098: '',
+    interact_tools_1099: ''
   },
   setting: {
     setting_1002: '',

@@ -1,7 +1,14 @@
 <template>
   <div class="icon-wrap" v-if="redPacketServerState.iconVisible" @click="checkRedPacketIcon">
-    <img src="./images/redPacket_no.png" alt="" v-if="redPacketServerState.dotVisible" />
-    <img src="./images/redPacket.png" alt="" v-else />
+    <template v-if="iconStyle == 1">
+      <img src="./images/redPacket_no.png" alt="" v-if="redPacketServerState.dotVisible" />
+      <img src="./images/redPacket.png" alt="" v-else />
+    </template>
+    <template v-else>
+      <img src="./images/redPacket_no2.png" alt="" v-if="redPacketServerState.dotVisible" />
+      <img src="./images/redPacket2.png" alt="" v-else />
+    </template>
+    <slot></slot>
     <!-- <i class="dot" v-if="redPacketServerState.dotVisible" /> -->
   </div>
 </template>
@@ -12,7 +19,13 @@
   import { useCodeRedPacketServer } from 'middle-domain';
   export default {
     name: 'RedRepacketIcon',
-
+    props: {
+      iconStyle: {
+        default: 1,
+        type: Number,
+        required: false
+      } // 1为传统风格icon，2为新版icon
+    },
     data() {
       const redPacketServerState = this.redPacketServer.state;
       return {

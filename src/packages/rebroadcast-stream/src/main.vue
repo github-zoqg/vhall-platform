@@ -124,7 +124,8 @@
             defaultDefinition: '360p',
             type: 'flv',
             roomId
-          }
+          },
+          isAudio: this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1
         };
         this.isShow = true;
 

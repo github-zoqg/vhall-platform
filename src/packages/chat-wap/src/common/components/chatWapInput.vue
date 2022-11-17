@@ -1,7 +1,10 @@
 <template>
   <div
     class="chat-input-modal"
-    :class="[smFix ? 'smFix' : '', isConcise ? `chat-input-modal__${showTabType}` : '']"
+    :class="[
+      smFix ? 'smFix' : '',
+      isPortraitLive || isConcise ? `chat-input-modal__${showTabType}` : ''
+    ]"
     v-show="visible"
   >
     <div class="input-info">
@@ -45,7 +48,10 @@
     </div>
     <div
       v-if="showEmoji"
-      :class="['send-box__bottom--emoji', isConcise ? `chat-emoji__${showTabType}` : '']"
+      :class="[
+        'send-box__bottom--emoji',
+        isConcise || isPortraitLive ? `chat-emoji__${showTabType}` : ''
+      ]"
     >
       <div class="imgs">
         <img
@@ -74,6 +80,7 @@
   import { getEmojiList } from '@/packages/chat/src/common/js/emoji';
   import { isMse } from '@/app-shared/utils/isMse';
   import EventBus from '../js/Events.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
 
   export default {
     name: 'VmpChatWapInputModal',
@@ -84,6 +91,10 @@
       },
       refName: {
         default: 'chatWap'
+      },
+      cuid: {
+        type: String,
+        default: ''
       }
     },
     data() {
@@ -104,6 +115,12 @@
         if (!this.showEmoji && !this.visible) {
           this.focusoutIOS();
         }
+      },
+      visible(val) {
+        this.$emit('getChatModalStatus', val);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitChangeChatSendBox', [this.visible])
+        );
       }
     },
     computed: {
@@ -130,6 +147,12 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap?.style == 3;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     mounted() {
@@ -194,7 +217,7 @@
         this.inputValue = '';
         this.showEmoji = false;
         this.$nextTick(() => {
-          this.$refs.textareaChat.blur();
+          this.$refs.textareaChat?.blur();
           this.visible = false;
         });
       },
@@ -401,7 +424,7 @@
           color: var(--theme-chat-sendBox-input-placeholder-color);
         }
         .el-textarea__inner {
-          line-height: 50px;
+          line-height: 40px;
         }
       }
     }
@@ -528,6 +551,14 @@
           color: var(--theme-qa-sendBox-input-max-font-color);
         }
       }
+    }
+  }
+  .isPortraitLive {
+    .chat-input-modal {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      margin-top: 0 !important;
     }
   }
 </style>
