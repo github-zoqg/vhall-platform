@@ -21,7 +21,7 @@
       class="overlay"
       v-show="showSendBox"
       @touchstart="closeOverlay"
-      @click="closeOverlay"
+      @click.stop="closeOverlay"
     ></div>
     <send-box
       ref="sendBox"
