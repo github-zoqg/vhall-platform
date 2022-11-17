@@ -5,22 +5,20 @@
     <!-- <img src="./images/questionnaire.png" alt="" @click="throttleCheckExam" />
     <i class="vmp-dot" v-if="dotVisible" /> -->
     <!-- 快问快答-列表弹框 -->
-    <el-dialog
+    <vh-dialog
       custom-class="exam_base"
       :visible.sync="examListDialogVisible"
       :close-on-click-modal="false"
-      :show-close="false"
+      :show-close="true"
       width="420px"
       @close="closeExamListDialog"
     >
+      <div slot="title" class="container-title">
+        <span class="container-title-text">
+          <span class="title_text">{{ $t('exam.exam_1022') }}</span>
+        </span>
+      </div>
       <div class="vmp-exam-list_container">
-        <div class="el-dialog__header container-title">
-          <span class="container-title-text">
-            <span class="title_text">{{ $t('exam.exam_1022') }}</span>
-            <i class="container-title-text-line"></i>
-          </span>
-          <i class="vh-iconfont vh-line-close" @click="closeExamListDialog"></i>
-        </div>
         <div class="container-data">
           <ul v-show="examList && examList.length > 0" v-infinite-scroll="moreLoadData">
             <li
@@ -93,7 +91,7 @@
           </ul>
         </div>
       </div>
-    </el-dialog>
+    </vh-dialog>
   </div>
 </template>
 <script>
@@ -356,51 +354,53 @@
       margin: 0;
     }
   }
-  /deep/.el-dialog.exam_base {
+  /deep/.vh-dialog.exam_base {
     height: 460px;
     width: 100%;
     left: 0px;
     bottom: 0;
     background: url('./images/pc_bg_exam_list.png') no-repeat;
     box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
-    border-radius: 40px 40px 0px 0px;
     background-color: #ffffff;
     background-position: top;
     background-size: cover;
-    .el-dialog__header {
+    border-radius: 12px;
+    .vh-dialog__header {
       padding: 0 0;
     }
-    .el-dialog__body {
+    .vh-dialog__body {
       padding: 0 0;
+      height: calc(100% - 88px);
+    }
+  }
+  .container-title {
+    height: 80px;
+    text-align: center;
+    position: relative;
+    .container-title-text {
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      .title_text {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        color: #262626;
+      }
     }
   }
   .vmp-exam-list_container {
-    .container-title {
-      height: 80px;
-      text-align: center;
-      position: relative;
-      .container-title-text {
-        position: absolute;
-        top: 24px;
-        left: 32px;
-        .title_text {
-          font-style: normal;
-          font-weight: 500;
-          font-size: 16px;
-          line-height: 24px;
-          color: #262626;
-        }
-      }
-    }
+    height: 100%;
+    overflow: hidden;
     .container-data {
-      max-height: calc(460px - 80px);
       padding: 0 16px;
-      margin-bottom: 68px;
       position: relative;
       color: @font-light-normal;
       z-index: 2;
       overflow-x: hidden;
       overflow-y: auto;
+      height: 100%;
       ul {
         width: 388px;
         li {
@@ -456,13 +456,13 @@
                 }
               }
               .exam-answer-btn {
-                border: 1px solid #fb3a32;
-                background: #fb3a32;
-                color: #ffffff;
+                border: 1px solid var(--theme-exam-list-item-button-border);
+                background: var(--theme-exam-list-item-button-bg);
+                color: var(--theme-exam-list-item-button-color);
                 &:hover {
-                  background: #fb3a32;
-                  border: 1px solid #fb3a32;
-                  color: #ffffff;
+                  background: var(--theme-exam-list-item-button-active-bg);
+                  border: 1px solid var(--theme-exam-list-item-button-active-border);
+                  color: var(--theme-exam-list-item-button-active-color);
                 }
               }
             }
