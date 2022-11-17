@@ -11,9 +11,9 @@
 
     <!-- 音频直播的的时候显示流占位图 -->
     <section
+      v-if="isAudio"
       v-show="
         liveMode == 1 &&
-        isAudio &&
         (!isPortraitLive ||
           (!isWapBodyDocSwitchFullScreen && isPortraitLive) ||
           (embedVideo && isPortraitLive) ||
