@@ -47,7 +47,7 @@
             <!-- 插播流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[1]"></vmp-air-container>
             <div class="stream_info">
-              <span>{{ speaker.nickname }}</span>
+              <span class="nickname">{{ speaker.nickname }}</span>
               <span class="signal" :class="`signal__${networkStatus}`"></span>
               <span class="vh-iconfont audio" :class="`vh-microphone${audioLevel}`"></span>
             </div>
@@ -63,7 +63,7 @@
             <!-- 桌面共享流 -->
             <vmp-air-container :oneself="true" :cuid="childrenCom[2]"></vmp-air-container>
             <div class="stream_info">
-              <span>{{ speaker.nickname }}</span>
+              <span class="nickname">{{ speaker.nickname }}</span>
               <span class="signal" :class="`signal__${networkStatus}`"></span>
               <span class="vh-iconfont audio" :class="`vh-microphone${audioLevel}`"></span>
             </div>
@@ -369,12 +369,22 @@
         position: absolute;
         bottom: 0;
         color: #fff;
-        padding: 0 5px;
+        padding: 3px 5px;
         width: 100%;
         box-sizing: border-box;
+        font-size: 12px;
+        .nickname {
+          display: inline-block;
+          width: 80px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .audio {
           float: right;
           margin-left: 5px;
+          font-size: 13px;
+          color: #fff;
         }
         .signal {
           float: right;
