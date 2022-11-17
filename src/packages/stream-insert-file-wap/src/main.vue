@@ -12,13 +12,13 @@
     <div
       class="vmp-stream-remote-exitscreen"
       @click.stop="exitFullScreen"
-      v-if="isFull && iconShow"
+      v-if="isFull && iconShow && !iosPause"
     >
       <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
     </div>
     <!-- 进入全屏 -->
     <div
-      v-if="!isFull && iconShow"
+      v-if="!isFull && iconShow && !iosPause"
       class="vmp-wap-stream-wrap-mask-screen"
       @click.stop="setFullScreen"
     >

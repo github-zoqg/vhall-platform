@@ -14,7 +14,7 @@
     <!-- 全屏切换按钮 -->
     <div
       class="vmp-wap-desktop-screen__full"
-      :class="{ 'vmp-wap-desktop-screen__full-show': isShowMask }"
+      :class="{ 'vmp-wap-desktop-screen__full-show': isShowMask && !iosPause }"
       @click.stop="fullscreen"
     >
       <i
