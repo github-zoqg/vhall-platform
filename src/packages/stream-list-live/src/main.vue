@@ -2,7 +2,11 @@
   <div
     class="vmp-stream-list"
     ref="streamList"
-    :class="{ 'vmp-stream-list-h0': isStreamListH0, shrink: isShrink }"
+    :class="{
+      'vmp-stream-list-h0': isStreamListH0,
+      shrink: isShrink,
+      'vmp-stream-list-height': !isStreamListH0
+    }"
   >
     <div class="vmp-stream-list__stream-wrapper">
       <!-- 本地流容器 -->
@@ -547,5 +551,10 @@
         font-size: 40px;
       }
     }
+  }
+
+  // 有远端流的时候高度
+  .vmp-stream-list-height {
+    min-height: 80px !important;
   }
 </style>
