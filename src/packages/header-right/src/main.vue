@@ -684,6 +684,7 @@
       },
       // 开始直播/录制事件  thirdPullStreamvalidate=>false-未校验   true->无需校验   isRehearsal:是否彩排
       async handleStartClick(event, thirdPullStreamvalidate = false) {
+        const { watchInitData } = this.roomBaseServer.state;
         // 如果是云导播活动 并且没有流
         if (this.isStreamYun && !this.director_stream) return false;
         if (this.isThirdStream) {
@@ -726,7 +727,9 @@
             )
               .then(() => {
                 // 派发推流事件
-                this.roomBaseServer.setThirdPushStream(true);
+                if (watchInitData.webinar.mode == 2) {
+                  this.roomBaseServer.setThirdPushStream(true);
+                }
                 this.clickStartLive();
               })
               .catch(action => {
