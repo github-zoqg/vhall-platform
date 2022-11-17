@@ -235,6 +235,7 @@
     height: calc(1114px+env(safe-area-inset-bottom));
     z-index: 3101;
     border-radius: 32px 32px 0 0;
+    overflow: hidden;
     // padding-bottom: env(safe-area-inset-bottom);
     padding-bottom: constant(safe-area-inset-bottom); /*兼容IOS<11.2*/
     padding-bottom: env(safe-area-inset-bottom); /*兼容IOS>11.2*/
