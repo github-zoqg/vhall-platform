@@ -74,7 +74,7 @@
               this.redPacketServer.state.is_luck = res.data.status;
               this.redPacketServer.state.red_code = res.data.red_code;
               // this.opened = true;
-            } else {
+            } else if (res.code === 110015) {
               await this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid);
             }
           })
