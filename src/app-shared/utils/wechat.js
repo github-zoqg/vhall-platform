@@ -262,9 +262,12 @@ export function authWeixinAjax(to, address, _next) {
         .then(res => {
           if (res && res.code == 200) {
             console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
-            sessionStorage.setItem('weixin_auth_url', res.data.url);
-            _next();
-            // window.location.replace(res.data.url);
+            if (localStorage.getItem('unionid')) {
+              window.location.replace(res.data.url);
+            } else {
+              sessionStorage.setItem('weixin_auth_url', res.data.url);
+              _next();
+            }
           } else {
             Toast({
               message: res.msg || '微信回调失败，请重新扫码',
