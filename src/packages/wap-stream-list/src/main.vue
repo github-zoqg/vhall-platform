@@ -1,6 +1,10 @@
 <template>
   <div
     class="vmp-wap-stream-wrap"
+    :class="{
+      'vmp-wap-stream-wrap__portrait': isPortraitLive,
+      'vmp-wap-stream-wrap__portrait-app': isAppStartType
+    }"
     ref="vmp-wap-stream-wrap"
     :style="{ background: mainBackground }"
     @click.stop.prevent="videoShowIcon"
@@ -51,11 +55,15 @@
       </template>
     </div>
     <!-- wap 蒙层显示信息 -->
-    <div class="vmp-wap-stream-wrap-mask">
+    <div class="vmp-wap-stream-wrap-mask" @click="clearScreen">
       <!-- 热度 -->
       <div
         class="vmp-wap-stream-wrap-mask-heat"
-        v-if="roomBaseServer.state.watchInitData.pv.show && !isInGroup && !isConcise"
+        v-if="
+          roomBaseServer.state.watchInitData.pv.show &&
+          !isInGroup &&
+          !(isConcise || this.isPortraitLive)
+        "
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <p>
@@ -66,14 +74,14 @@
       <!-- 播放 -->
       <div class="vmp-wap-stream-wrap-mask-pause" v-show="showPlayIcon">
         <img :src="coverImgUrl" alt />
-        <p class="preventClick" @click.stop="replayPlay">
+        <p class="preventClick" v-if="!isPortraitLive" @click.stop="replayPlay">
           <i class="vh-iconfont vh-line-video-play"></i>
         </p>
       </div>
       <!-- 多语言入口 -->
       <div
         class="vmp-wap-stream-wrap-mask-lang"
-        v-if="languageList.length > 1 && !isInGroup"
+        v-if="languageList.length > 1 && !isInGroup && !this.isPortraitLive"
         :class="[iconShow ? 'opcity-true' : 'opcity-flase']"
       >
         <span @click.stop.prevent="openLanguage">
@@ -82,12 +90,20 @@
       </div>
       <!-- 进入全屏 -->
       <div
-        v-if="!isDocMainScreen"
+        v-if="!isDocMainScreen & !this.isPortraitLive"
         class="vmp-wap-stream-wrap-mask-screen"
         :class="[iconShow && mainScreenStream.streamId ? 'opcity-true' : 'opcity-flase']"
         @click.stop="setFullScreen"
       >
         <i class="vh-iconfont vh-a-line-fullscreen"></i>
+      </div>
+      <!-- 文档播放器切换位置 -->
+      <div
+        v-if="isPortraitLive && !isWapBodyDocSwitchFullScreen"
+        class="vmp-wap-stream-wrap-mask-trans"
+        @click.stop="transposition"
+      >
+        <i class="vh-iconfont vh-line-sort1"></i>
       </div>
       <div class="vmp-wap-stream-wrap-mask-background" v-show="defaultBg">
         <van-loading color="#ffffff" />
@@ -110,7 +126,7 @@
           v-for="(item, index) in languageList"
           :key="index"
           :class="{ 'popup-active': item.key == lang.key }"
-          @click="changeLang(item.key)"
+          @click.stop="changeLang(item.key)"
         >
           {{ item.label }}
         </li>
@@ -130,6 +146,7 @@
   import { debounce } from 'lodash';
   import BScroll from '@better-scroll/core';
   import { streamInfo } from '@/app-shared/utils/stream-utils';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpWapStreamList',
 
@@ -150,6 +167,19 @@
       };
     },
     computed: {
+      // 是否是app或移动sdk发起
+      isAppStartType() {
+        const startType = this.$domainStore.state.roomBaseServer.watchInitData?.switch?.start_type;
+        return (startType == 2 || startType == 3) && this.isPortraitLive;
+      },
+      // 竖屏直播，文档播放器位置切换的状态
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 是否观众可见
+      switchStatus() {
+        return this.$domainStore.state.docServer.switchStatus;
+      },
       // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
       webinarType() {
         return Number(this.roomBaseServer.state.watchInitData.webinar.type);
@@ -322,9 +352,55 @@
         }
         console.log('w-w', num);
         return num < 6;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      },
+      // 是否是无延迟活动
+      noDelayWebinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
+      },
+      //判断是否是音频直播模式
+      isAudio() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
       }
     },
     watch: {
+      showPlayIcon: {
+        handler() {
+          // 防止页面初始化报错故添加timeout：目标组件不存在
+          setTimeout(() => {
+            if (
+              this.isPortraitLive &&
+              this.noDelayWebinar &&
+              this.$domainStore.state.interactiveServer.isInstanceInit
+            ) {
+              if (this.showPlayIcon) {
+                this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
+              }
+              window.$middleEventSdk?.event?.send(
+                boxEventOpitons(this.cuid, 'emitStreamListPoster', [this.showPlayIcon])
+              );
+              // 音频模式或者画质为音频
+              if (this.isAudio) {
+                this.$nextTick(() => {
+                  window.$middleEventSdk?.event?.send(
+                    boxEventOpitons(this.cuid, 'emitPlayerPosterAudio', [this.showPlayIcon])
+                  );
+                });
+              }
+              // console.log('setStreamFullscreen');
+              // window.$middleEventSdk?.event?.send(
+              //   boxEventOpitons(this.cuid, 'emitStreamShowPlayIcon', [!this.showPlayIcon])
+              // );
+            }
+          });
+        },
+        immediate: true
+      },
       // 设置主画面背景色
       mainBackground: {
         handler(val) {
@@ -396,6 +472,17 @@
     },
 
     methods: {
+      clearScreen(e) {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isClearScreen = !this.roomBaseServer.state.isClearScreen;
+        }
+      },
+      transposition() {
+        if (this.isPortraitLive) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen =
+            !this.roomBaseServer.state.isWapBodyDocSwitchFullScreen;
+        }
+      },
       getIsConcise() {
         let skin_json_wap = {
           style: 1
@@ -432,6 +519,10 @@
           console.warn('自动播放失败------', e);
           this.playAbort.push(e.data);
           this.showPlayIcon = true;
+          // 竖屏直播，并且有文档展示的时候，需要将视频置为大屏
+          if (this.switchStatus && this.isPortraitLive) {
+            this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = true;
+          }
         });
 
         // 接收设为主画面消息  主直播间
@@ -505,6 +596,9 @@
 
       // 恢复播放
       replayPlay() {
+        if (this.isPortraitLive && this.isWapBodyDocSwitchFullScreen && this.switchStatus) {
+          this.roomBaseServer.state.isWapBodyDocSwitchFullScreen = false;
+        }
         console.log('点击了恢复播放------', this.playAbort);
         this.playAbort.forEach(stream => {
           this.interactiveServer
@@ -592,6 +686,28 @@
     height: 422px;
     width: 100%;
     position: relative;
+    // 竖屏直播样式
+    &__portrait {
+      height: 100%;
+      // app发起的竖屏直播
+      &-app {
+        .vmp-stream-list {
+          &__remote-container {
+            // 无延迟竖屏直播，画面铺满屏幕
+            .licode_stream {
+              object-fit: cover;
+            }
+          }
+        }
+      }
+      .vmp-stream-list {
+        &__remote-container {
+          .vmp-stream-local__bottom {
+            display: none;
+          }
+        }
+      }
+    }
     // 小组协作中
     &-group {
       position: absolute;
@@ -704,6 +820,24 @@
         text-align: center;
         transform: translate3d(-32px, -32px, 10px);
         border-radius: 50%;
+      }
+      &-trans {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 7;
+        cursor: pointer;
+        .vh-iconfont {
+          font-size: 30px;
+        }
       }
       &-background {
         position: absolute;
@@ -875,6 +1009,11 @@
         width: 100%;
         height: 100%;
       }
+    }
+  }
+  .isPortraitLive {
+    .vmp-wap-stream-wrap-mask-pause img {
+      object-fit: contain;
     }
   }
 </style>

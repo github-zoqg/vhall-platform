@@ -28,6 +28,13 @@
 
     methods: {
       initComponent() {
+        // 竖屏直播
+        const isPortraitLive =
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0;
+        if (isPortraitLive) {
+          this.layout = 'conciseLayout';
+          return;
+        }
         const layoutMap = {
           1: 'defaultLayout', // 传统风格
           2: 'fashionLayout', // 时尚风格

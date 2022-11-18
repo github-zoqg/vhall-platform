@@ -1,8 +1,17 @@
 <template>
-  <div class="vmp-wap-body" :class="[wapBodyClass, isShowWapBody ? '' : 'vmp-wap-body__hide']">
+  <div
+    class="vmp-wap-body"
+    :class="[
+      wapBodyClass,
+      isShowWapBody ? '' : 'vmp-wap-body__hide',
+      isPortraitLive ? 'isPortraitLive' : '',
+      isStreamContainerStickTop ? 'vmp-wap-body-container-sticktop' : '',
+      isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo ? 'isMini' : ''
+    ]"
+  >
     <!-- 直播结束 -->
     <div
-      v-if="isLivingEnd"
+      v-if="isLivingEnd && !isPortraitLive && !embedVideo"
       :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
@@ -17,13 +26,32 @@
     </div>
     <div
       :class="[
-        mini ? 'vmp-wap-body-mini' : 'vmp-wap-body-nomarl',
+        (mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)) && !embedVideo
+          ? 'vmp-wap-body-mini'
+          : 'vmp-wap-body-nomarl',
         (isShareScreen || (isOpenInsertFile && !isAudio)) && !isMergeMode
           ? 'vmp-wap-body-special__show'
-          : ''
+          : '',
+        isStreamContainerStickTop ? 'vmp-wap-body-sticktop' : '',
+        isStreamContainerStickTop && !isWapBodyDocSwitchFullScreen
+          ? 'vmp-wap-body-sticktop__hide'
+          : '',
+        `${rotateNum ? 'rotate' + rotateNum : ''}`
       ]"
-      @touchstart="touchstart($event)"
-      @touchmove.prevent="touchmove($event)"
+      v-if="!(isLivingEnd && isPortraitLive)"
+      v-drag="{ close: !(mini || !isWapBodyDocSwitchFullScreen) }"
+      :style="{
+        'z-index':
+          isStreamContainerStickTop && !isWapBodyDocSwitchFullScreen
+            ? -1
+            : isStreamContainerStickTop
+            ? playerZIndex
+            : mini && !isPortraitLive
+            ? 5000
+            : mini || (isPortraitLive && !isWapBodyDocSwitchFullScreen)
+            ? 302
+            : 'auto'
+      }"
     >
       <!-- 播放器 -->
       <vmp-air-container
@@ -91,11 +119,12 @@
     useMediaCheckServer,
     useMicServer,
     useInteractiveServer,
-    useMenuServer
+    useMenuServer,
+    useZIndexServer
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   import alertBox from '@/app-shared/components/confirm.vue';
   export default {
@@ -111,7 +140,10 @@
         imageCropperMode: 1,
         isLivingEnd: false,
         mini: false,
-        isShowLiveStartNotice: false
+        isShowLiveStartNotice: false,
+        isStreamContainerStickTop: false, // 视频流容器是否吸顶（问卷弹窗的时候）
+        rotateNum: 0,
+        playerZIndex: 302 // 默认问卷推送时，播放器吸顶的index
       };
     },
     computed: {
@@ -190,6 +222,10 @@
       isWapBodyDocSwitch() {
         return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitch;
       },
+      // 竖屏直播下 文档和播放器是否互换位置。 默认 文档主画面，播放器小屏 false
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
       isInGroup() {
         // 在小组中
         return this.$domainStore.state.groupServer.groupInitData?.isInGroup;
@@ -239,6 +275,38 @@
           !!this.$domainStore.state.docServer.currentCid &&
           this.isMergeMode
         );
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      },
+      // 是不是单视频嵌入页
+      embedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      }
+    },
+    watch: {
+      webinarsBgImg: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerWebinarsBgImg', [val])
+            );
+          });
+        },
+        immediate: true
+      },
+      isLivingEnd: {
+        handler(val) {
+          this.$nextTick(() => {
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons(this.cuid, 'emitPlayerLivingEnd', [val])
+            );
+          });
+        },
+        immediate: true
       }
     },
     beforeCreate() {
@@ -247,6 +315,7 @@
       this.roomBaseServer = useRoomBaseServer();
       this.interactiveServer = useInteractiveServer();
       this.menuServer = useMenuServer();
+      this.zIndexServer = useZIndexServer();
     },
     async created() {
       if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3) {
@@ -277,7 +346,14 @@
         location.reload();
       },
       questionnaireVisible(flag) {
-        this.mini = flag;
+        if (this.isPortraitLive) {
+          this.isStreamContainerStickTop = flag;
+          if (flag) {
+            this.playerZIndex = this.zIndexServer.state.zIndexMap['questionnaire'] || 302;
+          }
+        } else {
+          this.mini = flag;
+        }
       },
       listenEvents() {
         // 开启分组讨论
@@ -337,6 +413,7 @@
           if (msg.data.type == 'live_over') {
             this.isLivingEnd = true;
             this.mini = false;
+            // this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen = true;
           }
           // 分组直播 没有结束讨论 直接结束直播
           if (msg.data.type == 'group_switch_end') {
@@ -366,6 +443,11 @@
       handlerImageInfo(url) {
         let obj = parseImgOssQueryString(url);
         this.imageCropperMode = Number(obj.mode);
+        this.$nextTick(() => {
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
+          );
+        });
       },
       // 重置互动SDK实例
       async resetInteractive() {
@@ -415,6 +497,12 @@
         ) {
           // 此时调用完，设备状态要么是1  要么是2
           await this.checkMediaPermission();
+        }
+      },
+      // 竖屏旋转播放器
+      rotatePlayer(deg) {
+        if (this.isPortraitLive) {
+          this.rotateNum = deg;
         }
       }
     }
@@ -514,7 +602,7 @@
       left: 55%;
       top: 70%;
       width: 300px;
-      z-index: 5000;
+      z-index: 302;
       overflow: hidden;
       .vmp-wap-player-header,
       .vmp-wap-player-footer {
@@ -587,6 +675,75 @@
       }
       &.doc-hidden {
         visibility: hidden;
+      }
+    }
+    &.isPortraitLive {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      &.vmp-wap-body-container-sticktop {
+        position: relative;
+      }
+      &.isMini {
+        z-index: 300; //互动工具层级＞文档全屏＞小窗层级＞自定义菜单
+        width: 0;
+        height: 0;
+        right: 16px;
+        top: 16px;
+        left: auto;
+        position: relative;
+      }
+      .vmp-wap-body-mini {
+        top: 16px;
+        right: 16px;
+        left: auto;
+        width: 160px;
+        height: 284px;
+        border-radius: 8px;
+        .vmp-wap-player video,
+        .vmp-stream-list video {
+          border-radius: 8px;
+        }
+        &.rotate90 {
+          transform-origin: center;
+          transform: rotate(90deg) !important;
+        }
+      }
+      // 吸顶的样式
+      .vmp-wap-body-sticktop {
+        width: 100%;
+        height: 5.62667rem;
+        position: fixed;
+        left: 0 !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 302;
+        overflow: hidden;
+        background-color: #000;
+        &__hide {
+          z-index: -1;
+          opacity: 0;
+        }
+        .vmp-wap-player {
+          video {
+            object-fit: contain;
+            background: #000;
+          }
+          .vmp-wap-player-audie {
+            display: block !important;
+          }
+        }
+        .vmp-stream-remote .vmp-stream-remote__container__audio {
+          display: block !important;
+        }
+        .vmp-wap-stream-wrap {
+          .licode_stream {
+            object-fit: contain;
+          }
+        }
       }
     }
   }

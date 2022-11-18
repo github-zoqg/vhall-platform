@@ -1,6 +1,8 @@
 <template>
   <div class="vmp-wap-menu-dialog">
-    <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
+    <div class="tool">
+      <img class="menu_icon-concise" src="./images/icon_menu.png" @click="openMenusPanel" />
+    </div>
     <!-- <span class="menu_icon-pointer"></span> -->
     <van-popup
       class="wap-menu-van-popup"
@@ -31,10 +33,20 @@
         popHeight: 708
       };
     },
-    watch: {},
+    watch: {
+      menuDialogVisible(val) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenMenu', [val]));
+      }
+    },
     computed: {
       isInGroup() {
         return this.$domainStore.state.groupServer.groupInitData.isInGroup;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     created() {
@@ -53,8 +65,12 @@
         const blockIsOffsetTop = document.getElementsByClassName('vmp-block');
         const baseDomHeight = document.body.clientHeight;
         const offsetTop = blockIsOffsetTop ? blockIsOffsetTop[0].offsetTop : 0;
+        console.log(baseDomHeight, offsetTop, '------------', blockIsOffsetTop);
         if (offsetTop && offsetTop > 0) {
           this.popHeight = Number(baseDomHeight - offsetTop);
+          if (this.isPortraitLive) {
+            this.popHeight = Math.max(this.popHeight, 200);
+          }
         }
       }
     }

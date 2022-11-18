@@ -1,5 +1,5 @@
 <template>
-  <div id="header" class="vh-concise-header-box">
+  <div id="header" class="vh-concise-header-box" :class="isPortraitLive ? 'isPortraitLive' : ''">
     <section class="vh-concise-header-box__rehearsal" v-if="isRehearsal && isLiving">
       <span class="dot"></span>
       {{ $t('nav.nav_1055') }}
@@ -50,26 +50,131 @@
         >
           <i class="vh-saas-iconfont vh-saas-line-public1" @click="showPublic"></i>
         </span>
+        <!-- 更多 -->
+        <span
+          class="vh-concise-header-box__tool-box__btn more"
+          v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
+        >
+          <i class="vh-iconfont vh-full-more" @click="openMore"></i>
+        </span>
       </section>
     </section>
     <!-- 不显示头部，只显示在线人数和热度的情况 -->
     <section class="vh-concise-header-box__2" v-else>
-      <!-- 在线人数\热度 -->
-      <div
-        class="host-user-info__middle-num"
-        v-if="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
+      <section class="host-user-info">
+        <!-- 在线人数\热度 -->
+        <div
+          class="host-user-info__middle-num"
+          v-if="(watchInitData.online.show || watchInitData.pv.show) && !isInGroup"
+        >
+          <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
+          <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
+            <i class="vh-iconfont vh-line-user"></i>
+            <span>{{ personCount | formatHotNum }}</span>
+          </p>
+          <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
+            <i class="vh-saas-iconfont vh-saas-line-heat"></i>
+            <span>{{ hotNum | formatHotNum }}</span>
+          </p>
+        </div>
+      </section>
+      <section
+        class="vh-concise-header-box__tool-box more"
+        v-if="isPortraitLive && (languageList.length > 1 || !noDelayWebinar)"
       >
-        <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
-        <p class="host-user-info__middle-num__online" v-if="watchInitData.online.show">
-          <i class="vh-iconfont vh-line-user"></i>
-          <span>{{ personCount | formatHotNum }}</span>
-        </p>
-        <p class="host-user-info__middle-num__hot" v-if="watchInitData.pv.show">
-          <i class="vh-saas-iconfont vh-saas-line-heat"></i>
-          <span>{{ hotNum | formatHotNum }}</span>
-        </p>
-      </div>
+        <!-- 更多 -->
+        <span class="vh-concise-header-box__tool-box__btn">
+          <i class="vh-iconfont vh-full-more" @click="openMore"></i>
+        </span>
+      </section>
     </section>
+    <van-popup
+      class="more-van-popup"
+      v-model="showMoreCard"
+      get-container="#app"
+      safe-area-inset-bottom
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="more-content">
+        <div class="list">
+          <!--  <div class="item" v-if="playerOtherOptions.barrage_button">
+            <div class="iconGroup" @click="updateBarrage">
+              <span
+                :class="`vh-iconfont ${danmuIsOpen ? 'vh-line-barrage-on' : 'vh-line-barrage-off'}`"
+              ></span>
+            </div>
+            <div class="text">{{ danmuIsOpen ? $t('nav.nav_1057') : $t('nav.nav_1058') }}</div>
+          </div> -->
+          <div class="item" v-if="languageList.length > 1">
+            <div class="iconGroup" @click="updateLang">
+              <span :class="`vh-iconfont ${lang.key == 1 ? 'vh-line_en' : 'vh-line_cn'}`"></span>
+            </div>
+            <div class="text">{{ languageList[lang.key == 1 ? 1 : 0].label }}</div>
+          </div>
+          <div class="item" v-if="!noDelayWebinar">
+            <div
+              class="iconGroup"
+              @click="
+                showQualityCard = true;
+                showMoreCard = false;
+              "
+            >
+              <span class="vh-iconfont vh-line_hd"></span>
+            </div>
+            <div class="text">{{ formatQualityText(currentQualitys.def) }}</div>
+          </div>
+        </div>
+        <div class="cancel" @click="showMoreCard = false">{{ $t('account.account_1063') }}</div>
+      </div>
+    </van-popup>
+    <van-popup
+      class="quality-van-popup"
+      v-model="showQualityCard"
+      get-container="#app"
+      safe-area-inset-bottom
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="quality-content">
+        <div class="list">
+          <div
+            class="item"
+            v-for="item in qualitysList"
+            :key="item.def"
+            :class="{ active: currentQualitys.def == item.def }"
+            @click="changeQualitys(item)"
+          >
+            {{ formatQualityText(item.def) }}
+          </div>
+        </div>
+      </div>
+    </van-popup>
+    <van-popup
+      class="quality-van-popup speed-van-popup"
+      v-model="showSpeedCard"
+      safe-area-inset-bottom
+      get-container="#app"
+      round
+      position="bottom"
+      :closeable="false"
+    >
+      <div class="quality-content speed-content">
+        <div class="list">
+          <div
+            class="item"
+            v-for="item in UsableSpeed"
+            :key="item.def"
+            :class="{ active: currentSpeed == item }"
+            @click.stop="changeSpeed(item)"
+          >
+            {{item.toString().length &lt; 3 ? `${item.toFixed(1)}X` : `${item}X`}}
+          </div>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -87,20 +192,48 @@
         // headInfo: null,
         // showSponsor: true,
         userInfo: {},
-        themeClass: {
-          bgColor: 'light',
-          background: '#cccccc',
-          pageStyle: '' // icon默认色
-        }
+        showMoreCard: false,
+        danmuIsOpen: false, // 弹幕是否开启
+        lang: {
+          key: 1,
+          label: '简体中文',
+          type: 'zh'
+        },
+        // langs: [
+        //   {
+        //     key: 1,
+        //     label: '简体中文',
+        //     type: 'zh'
+        //   },
+        //   {
+        //     key: 2,
+        //     label: 'English',
+        //     type: 'en'
+        //   }
+        // ],
+        currentQualitys: {
+          def: 'same'
+        }, // 当前清晰度
+        qualitysList: [], // 清晰度列表
+        showQualityCard: false,
+        languageList: [],
+        // playerOtherOptions: {
+        //   barrage_button: 0,
+        //   progress_bar: 0,
+        //   speed: 0,
+        //   autoplay: false
+        // },
+        currentSpeed: 1, // 当前倍速
+        UsableSpeed: [], // 视频倍速列表
+        showSpeedCard: false
       };
     },
     mounted() {
       // 关注的domain服务
       this.attentionServer = useAttentionServer();
       this.initUserLoginStatus();
-
-      //设置品牌皮肤
-      this.setSkinInfo(this.skinInfo);
+      this.lang = this.$domainStore.state.roomBaseServer.languages.lang;
+      this.languageList = this.$domainStore.state.roomBaseServer.languages.langList;
     },
     computed: {
       // 直播中
@@ -179,20 +312,19 @@
       // 是否为嵌入页
       embedObj() {
         return this.$domainStore.state.roomBaseServer.embedObj;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      },
+      // 是否是无延迟活动
+      noDelayWebinar() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       }
     },
     methods: {
-      /**
-       * 设置品牌设置信息
-       */
-      setSkinInfo(skin) {
-        if (skin && skin.skin_json_wap && skin.status == 1) {
-          const { bgColor, pageStyle, background } = skin.skin_json_wap || '';
-          this.themeClass.pageStyle = pageStyle;
-          this.themeClass.background = background;
-          this.themeClass.bgColor = bgColor;
-        }
-      },
       /**
        * 初始化登录信息
        */
@@ -265,6 +397,92 @@
               this.attentionStatus = 1;
             });
         }
+      },
+      // 打开更多
+      openMore() {
+        this.showMoreCard = true;
+      },
+      // 开启/关闭弹幕
+      updateBarrage() {
+        this.danmuIsOpen = !this.danmuIsOpen;
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitPlayerDoBarrage'));
+      },
+      // 修改多语言
+      updateLang() {
+        const newLang = this.languageList[this.lang.key == 1 ? 1 : 0];
+        localStorage.setItem('lang', newLang.key);
+        const params = this.$route.query;
+        // 如果地址栏中有语言类型，当切换语言时，对应的地址栏参数要改变
+        if (params.lang) {
+          params.lang = newLang.key;
+          let sourceUrl =
+            window.location.origin + process.env.VUE_APP_ROUTER_BASE_URL + this.$route.path;
+          let queryKeys = '';
+          for (const k in params) {
+            queryKeys += k + '=' + params[k] + '&';
+          }
+          queryKeys = queryKeys.substring(0, queryKeys.length - 1);
+          sourceUrl = sourceUrl + '?' + queryKeys;
+          window.location.href = sourceUrl;
+        } else {
+          window.location.reload();
+        }
+      },
+      formatQualityText(val) {
+        let text;
+        switch (val) {
+          case 'same':
+            text = this.$t('player.player_1002');
+            break;
+          case '720p':
+            text = this.$t('player.player_1005');
+            break;
+          case '480p':
+            text = this.$t('player.player_1003');
+            break;
+          case 'a':
+            text = this.$t('player.player_1006');
+            break;
+          case '360p':
+            text = this.$t('player.player_1004');
+            break;
+          default:
+            text = this.$t('player.player_1004');
+        }
+        return text;
+      },
+      getQualitys(currentQualitys, qualitysList) {
+        this.currentQualitys = currentQualitys;
+        this.qualitysList = qualitysList;
+      },
+      // 修改视频清晰度
+      changeQualitys(item) {
+        this.showQualityCard = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerUpdateQuality', [item])
+        );
+      },
+      // // 获取跑马灯、水印等播放器配置
+      // getPlayerOtherOptions(options) {
+      //   this.playerOtherOptions = options;
+      //   console.log('【playerOtherOptions】', this.playerOtherOptions);
+      // },
+      openQualityCard(val) {
+        this.showQualityCard = val;
+      },
+      getSpeeds(currentSpeed, speedsList) {
+        this.currentSpeed = currentSpeed;
+        this.UsableSpeed = speedsList;
+      },
+      openSpeedCard(val) {
+        this.showSpeedCard = val;
+      },
+      // 修改视频倍速
+      changeSpeed(item) {
+        this.showSpeedCard = false;
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitPlayerUpdateSpeed', [item])
+        );
       }
     }
   };
@@ -302,7 +520,7 @@
       }
       &__attention {
         margin-left: 12px;
-        padding: 8px 16px;
+        padding: 11px 16px;
         border-radius: 30px;
         color: var(--theme-header-attention-color);
         font-size: 24px;
@@ -372,17 +590,94 @@
       }
     }
     &__2 {
-      display: inline-flex;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 6px 16px;
-      font-size: 20px;
-      line-height: 20px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 40px;
-      margin-left: 24px;
-      margin-top: 16px;
-      .host-user-info__middle-num {
-        margin-top: 0;
+      .host-user-info {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 16px;
+        font-size: 20px;
+        line-height: 20px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 40px;
+        margin-left: 24px;
+        margin-top: 16px;
+        .host-user-info__middle-num {
+          margin-top: 0;
+        }
+      }
+    }
+    &.isPortraitLive {
+      .vh-concise-header-box__2 .host-user-info {
+        margin: 0;
+        padding: 18px 0;
+        background: none;
+        border-radius: 0;
+        p {
+          margin-right: 12px;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 7px 16px;
+          border-radius: 40px;
+        }
+      }
+    }
+  }
+  .more-van-popup {
+    .more-content {
+      padding: 67px 0 0;
+      .list {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .item {
+          margin: 0 44px;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          .iconGroup {
+            width: 72px;
+            height: 72px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+          }
+          .text {
+            font-weight: 400;
+            font-size: 24px;
+            margin-top: 8px;
+            text-align: center;
+          }
+        }
+      }
+      .cancel {
+        margin-top: 32px;
+        padding: 39px 0;
+        font-weight: 400;
+        font-size: 32px;
+        text-align: center;
+      }
+    }
+  }
+  .quality-van-popup {
+    .quality-content {
+      .list {
+        .item {
+          width: 100%;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 400;
+          font-size: 32px;
+          color: #262626;
+          &.active {
+            color: #fb2626;
+          }
+        }
       }
     }
   }

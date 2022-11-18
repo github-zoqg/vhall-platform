@@ -1,6 +1,6 @@
 <template>
   <div class="vmp-send-box" :class="[className, `vmp-send-box__${currentTab}`]">
-    <div class="vmp-send-box__content">
+    <div class="vmp-send-box__content" v-show="!showInputModal">
       <!--用户个人信息，提现，修改头像-->
       <div class="user-avatar-wrap" v-if="!isEmbed && isLogin">
         <div class="user-avatar-wrap__avatar" @click="showUserPopup">
@@ -98,7 +98,9 @@
       ref="chatWapInput"
       :refName="refName"
       @sendMsg="sendMessage"
+      @getChatModalStatus="getChatModalStatus"
       :showTabType="currentTab"
+      :cuid="$parent.cuid"
     ></chat-wap-input>
   </div>
 </template>
@@ -195,6 +197,7 @@
       if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
         skin_json_wap = skinInfo.skin_json_wap;
       }
+
       return {
         roomBaseState,
         //定时器
@@ -216,7 +219,10 @@
         isShowMyQA: false,
         childrenCom: [],
         isConcise: skin_json_wap?.style == 3, // 是否极简模式
-        visibleMenuLength: 0
+        visibleMenuLength: 0,
+        isPortraitLive:
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0, // 竖屏直播
+        showInputModal: false
       };
     },
     computed: {
@@ -311,7 +317,11 @@
       // 是否展示自定义菜单组件
       isShowMenuByConcise() {
         // 进入了小组 & 当前展示成员列表 & 极简模式
-        return this.groupInitData.isInGroup && this.currentTab == 3 && this.isConcise;
+        return (
+          this.groupInitData.isInGroup &&
+          this.currentTab == 3 &&
+          (this.isConcise || this.isPortraitLive)
+        );
       }
     },
     watch: {
@@ -473,6 +483,10 @@
       },
       setVisibleMenuLength(len) {
         this.visibleMenuLength = len;
+      },
+      //聊天输入框
+      getChatModalStatus(val) {
+        this.showInputModal = val;
       }
     }
   };
@@ -513,7 +527,9 @@
         flex: 1;
         display: flex;
         align-items: center;
-
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         .content-input__placeholder {
           background-color: var(--theme-chat-input-bg);
           color: var(--theme-chat-input-placeholder-font);
@@ -522,7 +538,9 @@
           height: 60px;
           line-height: 60px;
           padding: 2px 20px;
-
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           .login-btn {
             padding-left: 10px;
             color: #007aff;
@@ -575,7 +593,7 @@
       }
 
       .interact-wrapper {
-        margin-left: 32px;
+        margin-left: 20px;
         text-align: right;
         padding-right: 8px;
 
@@ -675,8 +693,8 @@
   }
 
   .user-avatar-wrap__avatar {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     vertical-align: middle;
     display: inline-flex;
     border-radius: 100%;

@@ -6,16 +6,44 @@
       'vmp-wap-insert-file-main-screen-top': isMergeMode && !isSpeakOn
     }"
     v-show="isOpenInsertFile && !isAudio"
+    @click="openSet"
   >
+    <!-- 退出全屏 -->
+    <div
+      class="vmp-stream-remote-exitscreen"
+      @click.stop="exitFullScreen"
+      v-if="isFull && iconShow && !iosPause"
+    >
+      <i class="vh-iconfont vh-a-line-exitfullscreen"></i>
+    </div>
+    <!-- 进入全屏 -->
+    <div
+      v-if="!isFull && iconShow && !iosPause"
+      class="vmp-wap-stream-wrap-mask-screen"
+      @click.stop="setFullScreen"
+    >
+      <i class="vh-iconfont vh-a-line-fullscreen"></i>
+    </div>
+    <!-- ios 开始按钮 -->
+    <div class="pauseButton" v-if="iosPause" @click.stop="startPlay">
+      <i class="vh-iconfont vh-line-video-play"></i>
+    </div>
     <!-- 订阅桌面共享容器 -->
   </div>
 </template>
 
 <script>
-  import { useRoomBaseServer, useInsertFileServer } from 'middle-domain';
+  import { useRoomBaseServer, useInsertFileServer, useInteractiveServer } from 'middle-domain';
 
   export default {
     name: 'VmpWapInsertFIle',
+    data() {
+      return {
+        isFull: false,
+        iconShow: false,
+        iosPause: false
+      };
+    },
 
     computed: {
       isOpenInsertFile() {
@@ -36,6 +64,7 @@
     beforeCreate() {
       this.roomBaseServer = useRoomBaseServer();
       this.insertFileServer = useInsertFileServer();
+      this.interactiveServer = useInteractiveServer();
     },
     created() {
       this.addEvents();
@@ -59,6 +88,18 @@
         }
       },
       addEvents() {
+        // 监听全屏变化
+        window.addEventListener(
+          'fullscreenchange',
+          () => {
+            console.log(document.fullscreenElement, 'document.fullscreenElement');
+            if (!document.fullscreenElement) {
+              this.isFull = false;
+              this.iconShow = false;
+            }
+          },
+          true
+        );
         // 监听插播流加入
         this.insertFileServer.$on('INSERT_FILE_STREAM_ADD', () => {
           this.subscribeInsert();
@@ -82,6 +123,53 @@
         //     this.$toast('麦克风开启，对方将听到您的声音');
         //   }
         // });
+      },
+      // 全屏
+      setFullScreen() {
+        /*
+         * 布局原因：wap进入全屏仅全屏主屏流， 本地流和远端流都存在被设置为主屏情况
+         *    进入全屏在list内，退出全屏在remote/local内进行退出
+         */
+        this.interactiveServer
+          .setStreamFullscreen({
+            streamId: this.isOpenInsertFile,
+            vNode: `vmp-wap-insert-file`
+          })
+          .then(() => {
+            if (!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)) {
+              this.isFull = true;
+            } else {
+              this.iosPause = true;
+              this.iconShow = false;
+            }
+          });
+      },
+      // 退出全屏
+      exitFullScreen() {
+        this.interactiveServer
+          .exitStreamFullscreen({
+            streamId: this.isOpenInsertFile,
+            vNode: `vmp-wap-insert-file`
+          })
+          .then(() => {
+            this.isFull = false;
+          });
+      },
+      openSet() {
+        this.iconShow = true;
+        this.fiveDown();
+      },
+      // 5秒后消失
+      fiveDown() {
+        clearTimeout(this.setIconTime);
+        this.setIconTime = setTimeout(() => {
+          this.iconShow = false;
+          this.isOpenlang = false;
+        }, 5000);
+      },
+      startPlay() {
+        this.iosPause = false;
+        document.getElementById('vmp-wap-insert-file').getElementsByTagName('video')[0].play();
       }
     }
   };
@@ -106,6 +194,23 @@
       &-top {
         top: 0;
       }
+    }
+    .vh-iconfont {
+      color: white;
+    }
+    .pauseButton {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 </style>

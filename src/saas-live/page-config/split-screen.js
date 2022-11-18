@@ -10,7 +10,7 @@ export default {
   // 分屏组件
   splitScreenContainer: {
     component: 'VmpSplitScreen',
-    children: ['splitScreenStreamLocal']
+    children: ['splitScreenStreamLocal', 'comInsertStream', 'comDesktopScreen']
   },
   // 本地流
   splitScreenStreamLocal: {
@@ -22,5 +22,13 @@ export default {
         method: 'handleUnpublishComplate'
       }
     ]
+  },
+  // 插播流组件
+  comInsertStream: {
+    component: 'VmpInsertStream'
+  },
+  // 桌面共享组件
+  comDesktopScreen: {
+    component: 'VmpStreamDesktopScreen'
   }
 };

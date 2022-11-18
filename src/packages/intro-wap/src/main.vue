@@ -1,5 +1,5 @@
 <template>
-  <section :class="['vmp-intro', isConcise ? ' vmp-intro__concise' : '']">
+  <section :class="['vmp-intro', isConcise || isPortraitLive ? ' vmp-intro__concise' : '']">
     <section class="vmp-intro-main">
       <div :class="{ 'vmp-intor-haveIcon': showIconNum }">
         <section class="vmp-intro-block">
@@ -23,7 +23,7 @@
               </p>
             </template>
             <!-- 在线人数 -->
-            <template v-if="watchInitData.status != 'subscribe' && !isConcise">
+            <template v-if="watchInitData.status != 'subscribe' && !isConcise && !isPortraitLive">
               <!-- 直播中才展示在线人数 但是直播中没通过权限验证 也是不显示的 -->
               <p v-if="watchInitData.online.show">
                 <i class="vh-iconfont vh-line-group"></i>
@@ -158,6 +158,12 @@
       // 展示icon数量
       showIconNum() {
         return this.$domainStore.state.roomBaseServer.showIconNum;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     created() {
