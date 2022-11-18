@@ -263,6 +263,7 @@ export function authWeixinAjax(to, address, _next) {
           if (res && res.code == 200) {
             console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
             sessionStorage.setItem('weixin_auth_url', res.data.url);
+            _next();
             // window.location.replace(res.data.url);
           } else {
             Toast({
