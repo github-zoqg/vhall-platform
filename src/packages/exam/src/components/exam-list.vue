@@ -52,13 +52,11 @@
           </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
-          <vh-table :data="examList" style="width: 100%" height="295px">
-            <!-- 未搜索到数据展示 -->
+          <vh-table :data="[]" style="width: 100%" height="295px">
             <template slot="empty">
               <img src="@/app-shared/assets/img/no-search.png" />
               <p>暂未搜索到您想要的内容</p>
             </template>
-            <!-- 表格展示 -->
             <vh-table-column
               prop="title"
               label="名称"
@@ -91,32 +89,30 @@
             </vh-table-column>
             <vh-table-column label="操作" width="196" fixed="right">
               <template slot-scope="scope">
-                <template>
-                  <div :data-vars="(btnConfig = setBtnConfigByStatus(scope.row.status))">
-                    <span
-                      v-for="item of btnConfig.outsideBtn"
-                      :key="item.type"
-                      :disabled="item.disabled"
-                      class="std-text opt-btn"
-                      @click="handleExamOpt(item.type, scope.row)"
-                    >
-                      {{ item.name }}
-                    </span>
-                    <vh-dropdown @command="handleCommand">
-                      <span class="std-text opt-btn">更多</span>
-                      <vh-dropdown-menu slot="dropdown">
-                        <vh-dropdown-item
-                          v-for="item of btnConfig.moreBtn"
-                          :key="item.type"
-                          :command="[item.type, scope.row]"
-                          :disabled="item.disabled"
-                        >
-                          {{ item.name }}
-                        </vh-dropdown-item>
-                      </vh-dropdown-menu>
-                    </vh-dropdown>
-                  </div>
-                </template>
+                <div :data-vars="(btnConfig = setBtnConfigByStatus(scope.row.status))">
+                  <span
+                    v-for="item of btnConfig.outsideBtn"
+                    :key="item.type"
+                    :disabled="item.disabled"
+                    class="std-text opt-btn"
+                    @click="handleExamOpt(item.type, scope.row)"
+                  >
+                    {{ item.name }}
+                  </span>
+                  <vh-dropdown @command="handleCommand">
+                    <span class="std-text opt-btn">更多</span>
+                    <vh-dropdown-menu slot="dropdown">
+                      <vh-dropdown-item
+                        v-for="item of btnConfig.moreBtn"
+                        :key="item.type"
+                        :command="[item.type, scope.row]"
+                        :disabled="item.disabled"
+                      >
+                        {{ item.name }}
+                      </vh-dropdown-item>
+                    </vh-dropdown-menu>
+                  </vh-dropdown>
+                </div>
               </template>
             </vh-table-column>
           </vh-table>
@@ -338,7 +334,7 @@
           this.examList = [];
         }
         this.loading = true;
-        this.queryParams.keyword = this.keyword;
+        this.queryParams.keyword = this.keywordIpt;
         // TODO 调用查询接口
         this.loading = false;
         let res = {
@@ -410,14 +406,14 @@
           }
         };
         const dataList = res.data.list || [];
-        dataList.map(item => {
-          item.created_at_str = item.created_at.substring(0, 16);
-          item.updated_at_str = item.updated_at.substring(0, 16);
-          item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
-          item.status_css = ['no-push', 'answer', 'no-publish', 'publish'][item.status];
-          item.status_str = ['未推送', '答题中', '成绩待公布', '成绩已公布'][item.status];
-        });
-        this.examList = this.examList.concat(dataList);
+        // dataList.map(item => {
+        //   item.created_at_str = item.created_at.substring(0, 16);
+        //   item.updated_at_str = item.updated_at.substring(0, 16);
+        //   item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
+        //   item.status_css = ['no-push', 'answer', 'no-publish', 'publish'][item.status];
+        //   item.status_str = ['未推送', '答题中', '成绩待公布', '成绩已公布'][item.status];
+        // });
+        this.examList = dataList;
         this.total = res.data.total;
         this.firstLoad = true;
         this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);

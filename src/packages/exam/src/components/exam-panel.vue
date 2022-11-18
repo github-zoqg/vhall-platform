@@ -2,7 +2,7 @@
   <div class="exam-list-panel">
     <!-- tab切换 -->
     <div class="exam-tabs-layout">
-      <vh-tabs v-model="tabType" @tab-click="handleClick" class="live-reset-tabs">
+      <vh-tabs v-model="tabType" class="live-reset-tabs">
         <vh-tab-pane label="列表" name="table">
           <exam-list
             ref="examListPanel"
@@ -56,14 +56,14 @@
           );
         }
       },
-      async initPage() {
-        await this.$nextTick(() => {});
-        if (this.tabType == 'user') {
-          this.$refs.examUserPanel && this.$refs.examUserPanel.initComp();
-        } else {
-          this.$refs.examListPanel && this.$refs.examListPanel.initComp();
-        }
-      },
+      // async initPage() {
+      //   await this.$nextTick(() => {});
+      //   if (this.tabType == 'user') {
+      //     this.$refs.examUserPanel && this.$refs.examUserPanel.initComp();
+      //   } else {
+      //     this.$refs.examListPanel && this.$refs.examListPanel.initComp();
+      //   }
+      // },
       handleChangeView(view) {
         console.log('🚀 ~ file: exam-panel.vue ~ line 68 ~ handleChangeView ~ view', view);
         this.$emit('changeView', view);

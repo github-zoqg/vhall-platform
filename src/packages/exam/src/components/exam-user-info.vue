@@ -7,9 +7,7 @@
     data() {
       return {};
     },
-    created() {
-      this.initComp();
-    },
+    created() {},
     methods: {
       initComp() {
         console.log('🚀 ~ file: exam-user-info.vue ~ line 15 ~ initComp ~ initComp');
