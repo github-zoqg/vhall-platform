@@ -409,6 +409,16 @@ export default {
       cuid: 'comPcRewardEffectFullScreen',
       method: 'setHideEffect',
       args: ['$0']
+    },
+    emitClickExamRankChatItem: {
+      cuid: ['comExamRank'],
+      method: 'open',
+      args: ['$0']
+    },
+    emitClickExamChatItem: {
+      cuid: ['comExam'],
+      method: 'open',
+      args: ['$0']
     }
   },
   // 私聊

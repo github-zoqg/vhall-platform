@@ -80,16 +80,6 @@ function getPlugins() {
         ]
       },
       {
-        dir: `dist/${argv.project}/docker/${argv.version}`,
-        files: ['index.html'],
-        rules: [
-          {
-            search: /@projectName/g,
-            replace: `${argv.project}/${argv.version}`
-          }
-        ]
-      },
-      {
         dir: `dist/${argv.project}/cloud/static`,
         test: /\.js$/,
         rules: [
@@ -100,20 +90,6 @@ function getPlugins() {
           {
             search: /@projectName/g,
             replace: `${argv.project}`
-          }
-        ]
-      },
-      {
-        dir: `dist/${argv.project}/cloud/${argv.version}/static`,
-        test: /\.js$/,
-        rules: [
-          {
-            search: /@routerBaseUrl/g,
-            replace: `${process.env.VUE_APP_ROUTER_BASE_URL}/${argv.version}`
-          },
-          {
-            search: /@projectName/g,
-            replace: `${argv.project}/${argv.version}`
           }
         ]
       }
@@ -134,16 +110,8 @@ function getPlugins() {
                 destination: `dist/${argv.project}/docker/index.html`
               },
               {
-                source: `dist/${argv.project}/index.html`,
-                destination: `dist/${argv.project}/docker/${argv.version}/index.html`
-              },
-              {
                 source: `dist/${argv.project}/static`,
                 destination: `dist/${argv.project}/cloud/static`
-              },
-              {
-                source: `dist/${argv.project}/static`,
-                destination: `dist/${argv.project}/cloud/${argv.version}/static`
               },
               {
                 source: `dist/${argv.project}/static/**/*.js.map`,

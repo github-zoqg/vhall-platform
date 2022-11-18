@@ -1,8 +1,8 @@
 <template>
   <!-- 快问快答-成绩结果 -->
-  <el-dialog title="" :visible.sync="examScoreVisible" width="500px" custom-class="vmp-exam-score">
+  <vh-dialog title="" :visible.sync="examScoreVisible" width="500px" custom-class="vmp-exam-score">
     <div class="vmp-exam-score__panel">成绩结果</div>
-  </el-dialog>
+  </vh-dialog>
 </template>
 <script>
   export default {

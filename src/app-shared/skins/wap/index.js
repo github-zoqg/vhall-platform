@@ -16,6 +16,9 @@ import theme_main_blue from './theme-main-blue';
 import theme_main_black from './theme-main-black';
 import theme_main_golden from './theme-main-golden';
 
+// 竖屏
+import theme_fullScreen_default from './theme-fullScreen-default';
+
 import { setTheme } from '../skins-utils';
 
 export default {
@@ -35,6 +38,7 @@ export default {
     theme_main_white,
     theme_main_blue,
     theme_main_black,
-    theme_main_golden
+    theme_main_golden,
+    theme_fullScreen_default
   }
 };

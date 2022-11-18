@@ -252,6 +252,7 @@
       background: #fff;
       height: 100%;
       overflow: auto;
+      border-radius: 32px 32px 0 0;
       .el-input__inner::placeholder {
         font-size: 28px;
         vertical-align: middle;
@@ -315,7 +316,7 @@
     }
   }
   .close-btn {
-    position: fixed;
+    position: absolute;
     width: 48px;
     height: 48px;
     top: 16px;

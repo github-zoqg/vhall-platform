@@ -42,8 +42,9 @@
     <div
       class="vmp-desktop-screen-mask"
       v-if="
-        (miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)) ||
-        accountId != desktopShareInfo.accountId
+        ((miniElement && ((!isSpeakOn && roleName == 2) || roleName == 3)) ||
+          accountId != desktopShareInfo.accountId) &&
+        !['SplitScreen'].includes($route.name)
       "
     >
       <p>
@@ -290,6 +291,9 @@
       if (this.isShareScreen && this.accountId != this.desktopShareInfo.accountId) {
         this.subscribeStream();
       }
+    },
+    destroyed() {
+      this.desktopShareServer.$off('screen_stream_add');
     },
     watch: {
       // 监听流列表高度变

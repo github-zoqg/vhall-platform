@@ -18,6 +18,7 @@ const color_text_link = '#3562fa';
 const color_text_1 = 'rgba(0, 0, 0, 1)';
 const color_text_2 = 'rgba(255, 255, 255, 0.45)';
 const color_text_3 = 'rgba(0, 0, 0, 0.85)';
+const color_text_chat_exam = 'rgba(38, 38, 38, 1)';
 
 /* 背景颜色
 --------------------- */
@@ -68,6 +69,7 @@ export default {
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(0, 0, 0, 0.45)',
+  '--chat-exam-font-color-msg-text': color_text_chat_exam,
   // 互动工具icon
   '--footer-icon-tip-border-color': '#ffffff',
   //footer
@@ -187,5 +189,28 @@ export default {
   '--chapter-font-color-title': 'rgba(0,0,0,0.85)',
   '--chapter-font-color-time': 'rgba(0,0,0,0.45)',
   '--chapter-list-item-bg-active': 'rgba(0,0,0,0.06)',
-  '--chapter-font-color-active': '#fb2626'
+  '--chapter-font-color-active': '#fb2626',
+  // 快问快答
+  '--theme-exam-list-item-button-bg': '#fb3a32',
+  '--theme-exam-list-item-button-border': '#fb3a32',
+  '--theme-exam-list-item-button-color': '#ffffff',
+  '--theme-exam-list-item-button-active-bg': '#fb3a32',
+  '--theme-exam-list-item-button-active-border': '#fb3a32',
+  '--theme-exam-list-item-button-active-color': '#ffffff',
+  '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
+  '--theme-exam-progress-active-bgColor': '#FB2626',
+  '--theme-exam-question-type-bgColor': 'rgba(251, 38, 38, 0.15)',
+  '--theme-exam-question-type-color': 'rgba(251, 38, 38, 1)',
+  '--theme-exam-next-button-bg': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-next-button-border': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-next-button-color': 'rgba(255, 255, 255, 1)',
+  '--theme-exam-next-button-active-bg': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-next-button-active-border': 'rgba(53, 82, 234, 1)',
+  '--theme-exam-next-button-active-color': 'rgba(255, 255, 255, 1)',
+  '--theme-exam-last-button-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-color': 'rgba(38, 38, 38, 1)',
+  '--theme-exam-last-button-active-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-color': 'rgba(38, 38, 38, 1)'
 };

@@ -151,7 +151,8 @@
     },
     computed: {
       isAudio() {
-        const videoType = this.videoParam.msg_url || this.videoParam.file_type;
+        if (this.videoParam.isAudio) return true;
+        const videoType = this.videoParam.file_type;
         if (!videoType) return false;
         return videoType.toLowerCase() == '.mp3' || videoType.toLowerCase() == '.mav';
       },
