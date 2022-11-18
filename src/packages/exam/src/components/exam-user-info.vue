@@ -1,17 +1,37 @@
 <template>
-  <div>VmpExamUserPanel</div>
+  <div class="exam-user-info">
+    <div ref="ExamUserInfo"></div>
+  </div>
 </template>
 <script>
   export default {
-    name: 'VmpExamUserPanel',
+    name: 'ExamUserInfo',
+    inject: ['examServer'],
     data() {
       return {};
     },
-    created() {},
+    mounted() {
+      this.initComp();
+    },
     methods: {
       initComp() {
-        console.log('🚀 ~ file: exam-user-info.vue ~ line 15 ~ initComp ~ initComp');
+        const el = this.$refs.ExamUserInfo;
+        this.examServer.formServer.mount({
+          type: 'userInfoEdit',
+          id: '12371937',
+          el,
+          props: {
+            id: '12371937',
+            client: 'live'
+          }
+        });
       }
     }
   };
 </script>
+<style lang="less" scoped>
+  .exam-user-info {
+    height: 380px;
+    overflow: auto;
+  }
+</style>

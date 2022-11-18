@@ -52,7 +52,7 @@
           </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
-          <vh-table :data="[]" style="width: 100%" height="295px">
+          <vh-table :data="examList" style="width: 100%" height="295px">
             <template slot="empty">
               <img src="@/app-shared/assets/img/no-search.png" />
               <p>暂未搜索到您想要的内容</p>
@@ -180,6 +180,9 @@
         total: 0,
         selectedExam: null
       };
+    },
+    created() {
+      this.initQueryList();
     },
     methods: {
       // 创建快问快答
@@ -406,29 +409,10 @@
           }
         };
         const dataList = res.data.list || [];
-        // dataList.map(item => {
-        //   item.created_at_str = item.created_at.substring(0, 16);
-        //   item.updated_at_str = item.updated_at.substring(0, 16);
-        //   item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
-        //   item.status_css = ['no-push', 'answer', 'no-publish', 'publish'][item.status];
-        //   item.status_str = ['未推送', '答题中', '成绩待公布', '成绩已公布'][item.status];
-        // });
         this.examList = dataList;
         this.total = res.data.total;
         this.firstLoad = true;
         this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
-      },
-      moreLoadData() {
-        if (this.queryParams.pageNum >= this.totalPages) {
-          return false;
-        }
-        this.queryParams.pageNum++;
-        this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
-        this.queryExamList();
-      },
-      // 初始化界面
-      initComp() {
-        this.initQueryList();
       },
       handleChangePage() {}
     }
