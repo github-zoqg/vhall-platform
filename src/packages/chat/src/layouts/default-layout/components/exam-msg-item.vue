@@ -131,6 +131,8 @@
     /* 默认风格 */
     .msg-item-template__interact {
       &.exam_msg_flex {
+        @font-link: #3562fa;
+        @font-click-detail: #0a7ff5;
         margin-bottom: 8px;
         .msg-item-template__interact-content {
         }
@@ -140,7 +142,7 @@
           color: var(--chat-exam-font-color-msg-text);
           &__highlight {
             padding-left: 8px;
-            color: rgba(53, 98, 250, 1);
+            color: @font-click-detail;
           }
         }
         .msg-item__name {
@@ -153,7 +155,7 @@
           margin-top: 4px;
           .highlight {
             padding-left: 0;
-            color: rgba(53, 98, 250, 1);
+            color: @font-click-detail;
           }
         }
       }

@@ -193,12 +193,6 @@ export default {
   '--chapter-list-item-bg-active': 'rgba(0,0,0,0.06)',
   '--chapter-font-color-active': '#fb2626',
   // 快问快答
-  '--theme-exam-list-item-button-bg': '#fb3a32',
-  '--theme-exam-list-item-button-border': '#fb3a32',
-  '--theme-exam-list-item-button-color': '#ffffff',
-  '--theme-exam-list-item-button-active-bg': '#fb3a32',
-  '--theme-exam-list-item-button-active-border': '#fb3a32',
-  '--theme-exam-list-item-button-active-color': '#ffffff',
   '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
   '--theme-exam-progress-active-bgColor': '#FB2626',
   '--theme-exam-question-type-bgColor': 'rgba(251, 38, 38, 0.15)',
@@ -214,5 +208,18 @@ export default {
   '--theme-exam-last-button-color': 'rgba(38, 38, 38, 1)',
   '--theme-exam-last-button-active-bg': 'rgba(217, 217, 217, 1)',
   '--theme-exam-last-button-active-border': 'rgba(217, 217, 217, 1)',
-  '--theme-exam-last-button-active-color': 'rgba(38, 38, 38, 1)'
+  '--theme-exam-last-button-active-color': 'rgba(38, 38, 38, 1)',
+  // 主题按钮
+  '--theme-more-status-button-bg': 'rgba(251, 38, 38, 1)',
+  '--theme-more-status-button-border': 'rgba(251, 38, 38, 1)',
+  '--theme-more-status-button-color': '#ffffff',
+  '--theme-more-status-button-hover-bg': 'rgba(212, 21, 28, 1)',
+  '--theme-more-status-button-hover-border': 'rgba(212, 21, 28, 1)',
+  '--theme-more-status-button-hover-color': '#ffffff',
+  '--theme-more-status-button-active-bg': 'rgba(173, 9, 20, 1)',
+  '--theme-more-status-button-active-border': 'rgba(173, 9, 20, 1)',
+  '--theme-more-status-button-active-color': '#ffffff',
+  '--theme-more-status-button-disabled-bg': 'rgba(255, 209, 201, 1)',
+  '--theme-more-status-button-disabled-border': 'rgba(255, 209, 201, 1)',
+  '--theme-more-status-button-disabled-color': '#ffffff'
 };
