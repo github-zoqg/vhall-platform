@@ -2,7 +2,11 @@
   <div
     :class="[
       { 'vmp-basic-layout__noHeader': !showHeader },
-      isConcise ? 'vmp-concise-layout' : 'vmp-basic-layout'
+      { 'vmp-basic-layout__clearscreen': isClearScreen },
+      { 'vmp-basic-layout__clearscreen-hide': isClearScreenComplete },
+      isConcise || isPortraitLive ? 'vmp-concise-layout' : 'vmp-basic-layout',
+      isPortraitLive ? 'isPortraitLive' : '',
+      isPortraitLive && webinarType == 5 ? 'isVod' : ''
     ]"
   >
     <van-loading
@@ -20,7 +24,7 @@
     >
       {{ $t('common.common_1001') }}
     </van-loading>
-    <div class="vmp-basic-container" v-if="state === 1">
+    <div class="vmp-basic-container" v-if="state === 1" @click="clearScreen">
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
@@ -28,13 +32,13 @@
 </template>
 
 <script>
-  import { Domain, useRoomBaseServer, useUserServer } from 'middle-domain';
+  import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
   import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import { imgPositionSizeMap } from '@/app-shared/utils/imgModeMap.js';
-  import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
+  import { logRoomInitFailed } from '@/app-shared/utils/report';
   import MsgTip from './MsgTip.vue';
   import { setPage } from '../page-config/index';
   import skins from '@/app-shared/skins/wap';
@@ -51,10 +55,14 @@
     data() {
       return {
         state: 0,
-        liveErrorTip: ''
+        liveErrorTip: '',
+        isClearScreenComplete: false
       };
     },
     computed: {
+      isClearScreen() {
+        return this.$domainStore.state.roomBaseServer.isClearScreen;
+      },
       isConcise() {
         let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
         let skin_json_wap = {
@@ -65,6 +73,12 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap.style == 3;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       },
       /**
        * 是否显示头部
@@ -83,6 +97,26 @@
       // 主办方配置
       webinarTag() {
         return this.$domainStore.state.roomBaseServer.webinarTag;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 活动状态（2-预约 1-直播 3-结束 4-点播 5-回放）
+      webinarType() {
+        return Number(this.$domainStore.state.roomBaseServer.watchInitData.webinar.type);
+      }
+    },
+    watch: {
+      isClearScreen(val) {
+        this._clearScreenTimer && clearTimeout(this._clearScreenTimer);
+        if (val) {
+          this._clearScreenTimer = setTimeout(() => {
+            this.isClearScreenComplete = true;
+          }, 300);
+        } else {
+          this.isClearScreenComplete = false;
+        }
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -356,8 +390,14 @@
         if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
           skin_json_wap = skinInfo.skin_json_wap;
         }
-
-        if (skin_json_wap?.style == 3) {
+        // 竖屏直播
+        if (this.isPortraitLive) {
+          console.log('------竖屏直播------');
+          setPage('fullscreen');
+          skins.setTheme(skins.themes[`theme_fullScreen_default`]);
+          this.drawBody('main', 'black', {});
+          return;
+        } else if (skin_json_wap?.style == 3) {
           // 设置极简风格页面
           setPage('concise');
         }
@@ -389,7 +429,11 @@
         } else {
           if (style == 'main' && (theme == 'black' || theme == 'white')) {
             if (theme == 'black') {
-              document.body.style.background = `#262626`; // 黑色
+              if (this.isPortraitLive) {
+                document.body.style.background = `#000`; // 黑色
+              } else {
+                document.body.style.background = `#262626`; // 黑色
+              }
             }
             if (theme == 'white') {
               app.style.background = `rgba(0, 0, 0, 0.06)`;
@@ -410,6 +454,12 @@
             }
             app.style.backgroundSize = 'cover';
           }
+        }
+      },
+      clearScreen(e) {
+        const roomBaseServer = useRoomBaseServer();
+        if (this.isPortraitLive && e.target === e.currentTarget) {
+          roomBaseServer.state.isClearScreen = !roomBaseServer.state.isClearScreen;
         }
       }
     }

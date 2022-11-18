@@ -10,7 +10,17 @@
     <section v-if="stream.videoMuted" class="vmp-stream-remote__container__mute"></section>
 
     <!-- 音频直播的的时候显示流占位图 -->
-    <section v-if="liveMode == 1" class="vmp-stream-remote__container__audio"></section>
+    <section
+      v-if="isAudio"
+      v-show="
+        liveMode == 1 &&
+        (!isPortraitLive ||
+          (!isWapBodyDocSwitchFullScreen && isPortraitLive) ||
+          (embedVideo && isPortraitLive) ||
+          (isSubscribe && isPortraitLive))
+      "
+      class="vmp-stream-remote__container__audio"
+    ></section>
 
     <!-- 网络异常时占位图，根据是否有streamId判断 -->
     <section
@@ -135,6 +145,28 @@
       // 是否展示退出全屏值     放置domain层原因：由于全屏按钮放置streamlist层，全屏的不知是本地流还是远端流
       exitScreenStatus() {
         return this.$domainStore.state.interactiveServer.fullScreenType;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
+      },
+      // 竖屏直播 wap-body和文档是否切换位置 默认 文档主画面，播放器小屏 false
+      isWapBodyDocSwitchFullScreen() {
+        return this.$domainStore.state.roomBaseServer.isWapBodyDocSwitchFullScreen;
+      },
+      // 是不是单视频嵌入页
+      embedVideo() {
+        return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 是否是预约页
+      isSubscribe() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.status === 'subscribe';
+      },
+      //判断是否是音频直播模式
+      isAudio() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
       }
     },
     beforeCreate() {
@@ -423,5 +455,8 @@
         color: #fff;
       }
     }
+  }
+  .vmp-wap-body-mini .vmp-stream-remote__container__audio {
+    background-size: 100% 100%;
   }
 </style>

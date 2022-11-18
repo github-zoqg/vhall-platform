@@ -113,7 +113,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 120; // 公众号 100 开屏海报 120
+    z-index: 3000; // 公众号 100 开屏海报 3000 海报高于互动工具
     background: #333;
     .vmp-screen-post-wap-img {
       width: 100%;

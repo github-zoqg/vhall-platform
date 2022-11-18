@@ -63,8 +63,8 @@
           <span class="role" :class="source.roleName | roleClassFilter">
             <span>{{ source.roleName | roleFilter }}</span>
           </span>
-          <span class="nickname">{{ overHidden(source.nickname, 5) }}&nbsp;</span>
-          <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
+          <span class="nickname">{{ `${overHidden(source.nickname, 5)} ` }}</span>
+          <span class="chat-text">{{ `${source.content.text_content} ` }}</span>
           <span class="highlight">{{ $t('chat.chat_1093') }}</span>
         </div>
       </div>
@@ -717,9 +717,10 @@
         > .interact-msg {
           padding: 3px 12px;
           border-width: 0;
-          min-height: 44px;
-          height: auto;
+          // height: 44px;
           line-height: 38px;
+          word-break: break-word;
+          max-width: 6.93333rem;
           color: rgba(255, 255, 255, 1);
           &.pwd_red_envelope_ok {
             display: flex;

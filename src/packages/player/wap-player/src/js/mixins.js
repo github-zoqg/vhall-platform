@@ -12,14 +12,14 @@ const playerMixins = {
       //  直播开始
       this.playerServer.$on(VhallPlayer.PLAY, () => {
         // 监听播放状态
-        this.isPlayering = true;
+        this.playerState.isPlaying = true;
         this.isShowPoster = false;
         this.isVodEnd = false;
         console.warn('PLAY');
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
-        this.isPlayering = false;
+        this.playerState.isPlaying = false;
         console.warn('PAUSE');
       });
 
@@ -75,7 +75,7 @@ const playerMixins = {
         // 监听暂停状态
         console.log('wap-播放完毕');
         this.isShowPoster = true;
-        this.isPlayering = false;
+        this.playerState.isPlaying = false;
         // 如果是暖场视频和试看不显示回放结束的标识
         if (this.isTryPreview) return;
         if (this.isWarnPreview) {
@@ -297,8 +297,10 @@ const playerMixins = {
     // 获取清晰度列表和当前清晰度
     getQualitys() {
       const qualityList = this.playerServer ? this.playerServer.getQualitys() : [];
+      console.log('isAudio ???', this.isAudio);
       if (this.isAudio) {
         this.qualitysList = qualityList.filter(item => item.def === 'same');
+        console.log('isAudio 获取清晰度列表和当前清晰度', qualityList, this.qualitysList);
         return;
       } else {
         this.qualitysList = qualityList;
@@ -327,7 +329,7 @@ const playerMixins = {
           this.audioStatus = false;
         }
       });
-      console.log(this.qualitysList, this.currentQualitys, '?????1111111');
+      console.log(this.isAudio, this.qualitysList, this.currentQualitys, '?????1111111');
     },
     // 获取倍速列表和当前倍速
     getInitSpeed() {
