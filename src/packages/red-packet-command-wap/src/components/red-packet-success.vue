@@ -31,12 +31,6 @@
   export default {
     name: 'RedPacketSuccess',
     props: {
-      redPacketInfo: {
-        type: Object,
-        default() {
-          return {};
-        }
-      },
       red_code: {
         type: String,
         default() {
