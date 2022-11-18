@@ -456,13 +456,23 @@
                 }
               }
               .exam-answer-btn {
-                border: 1px solid var(--theme-exam-list-item-button-border);
-                background: var(--theme-exam-list-item-button-bg);
-                color: var(--theme-exam-list-item-button-color);
+                border: 1px solid var(--theme-more-status-button-border);
+                background: var(--theme-more-status-button-bg);
+                color: var(--theme-more-status-button-color);
                 &:hover {
-                  background: var(--theme-exam-list-item-button-active-bg);
-                  border: 1px solid var(--theme-exam-list-item-button-active-border);
-                  color: var(--theme-exam-list-item-button-active-color);
+                  background: var(--theme-more-status-button-hover-bg);
+                  border: 1px solid var(--theme-more-status-button-hover-border);
+                  color: var(--theme-more-status-button-hover-color);
+                }
+                &:active {
+                  background: var(--theme-more-status-button-active-bg);
+                  border: 1px solid var(--theme-more-status-button-active-border);
+                  color: var(--theme-more-status-button-active-color);
+                }
+                &.is-disabled {
+                  background: var(--theme-more-status-button-disabled-bg) !important;
+                  border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+                  color: var(--theme-more-status-button-disabled-color) !important;
                 }
               }
             }

@@ -222,6 +222,7 @@
               'paper_auto_send_rank'
             ].includes(source.type)
           "
+          class="msg-item-template__exam_container"
         >
           <exam-msg-item :source="source" @checkExamDetail="checkExamDetail"></exam-msg-item>
         </div>
@@ -960,10 +961,13 @@
           }
         }
       }
+      &__exam_container {
+        margin: 0 auto;
+      }
     }
     .msg-item__content-body__content-link {
-      color: #3562fa;
-      text-decoration: underline #3562fa !important;
+      color: @font-click-detail;
+      text-decoration: underline @font-click-detail !important;
       word-break: break-all;
     }
   }
