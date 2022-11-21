@@ -1161,7 +1161,7 @@
                 text = '';
               }
             }
-            marqueeText = `${text}1`;
+            marqueeText = `${text}`;
           }
           playerParams.marqueeOption = {
             enable: Boolean(marqueeText),
