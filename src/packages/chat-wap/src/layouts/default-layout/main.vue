@@ -59,8 +59,8 @@
     <div
       class="overlay"
       v-show="showSendBox"
-      @click="closeOverlay"
-      @touchstart="closeOverlay"
+      @touchstart="closeOverlay(true)"
+      @click.stop="closeOverlay(false)"
     ></div>
     <send-box
       ref="sendBox"
@@ -498,7 +498,8 @@
         ImagePreview({
           images: imgList,
           startPosition: index,
-          lazyLoad: true
+          lazyLoad: true,
+          loop: false
         });
       },
       //获取目标消息索引
@@ -616,8 +617,14 @@
         });
       },
       //关闭遮罩层
-      closeOverlay() {
-        EventBus.$emit('showSendBox', false);
+      closeOverlay(isDelay) {
+        if (isDelay) {
+          setTimeout(() => {
+            EventBus.$emit('showSendBox', false);
+          }, 400);
+        } else {
+          EventBus.$emit('showSendBox', false);
+        }
       },
       // 聊天过滤
       filterChat(data) {

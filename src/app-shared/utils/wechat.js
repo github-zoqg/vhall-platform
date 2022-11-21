@@ -103,6 +103,9 @@ export function handleThirdLoginOrPay(_next) {
     if (open_id) {
       sessionStorage.setItem('open_id', open_id);
       sessionStorage.setItem('user_auth_key', user_auth_key);
+      // unionid 不能为会话缓存
+      localStorage.setItem('unionid', user_auth_key);
+      console.log('weixin_auth++++++++++++++++++++++++++', 111);
     }
     handleAuth(params, path, _next);
   } else if (purpose == 'payAuth') {
@@ -259,7 +262,12 @@ export function authWeixinAjax(to, address, _next) {
         .then(res => {
           if (res && res.code == 200) {
             console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
-            window.location.replace(res.data.url);
+            if (localStorage.getItem('unionid')) {
+              window.location.replace(res.data.url);
+            } else {
+              sessionStorage.setItem('weixin_auth_url', res.data.url);
+              _next();
+            }
           } else {
             Toast({
               message: res.msg || '微信回调失败，请重新扫码',

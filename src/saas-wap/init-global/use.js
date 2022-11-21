@@ -2,6 +2,7 @@ import Vue from 'vue';
 // 组件库组件
 import VmpContainer from '@/packages/container';
 import VmpAirContainer from '@/packages/air-container';
+import VmpClearScreen from '@/packages/clear-screen';
 import VmpHeaderWatchWap from '@/packages/header-watch-wap'; //头部box
 import VmpWapPlayer from '@/packages/player/wap-player';
 import VmpDocWap from '@/packages/doc-wap';
@@ -94,6 +95,7 @@ import VmpViewRestrictionWap from '@/packages/view-restriction-wap';
 import VmpSmsVerification from '@/packages/sms-verification';
 // ------------------------------【极简风格】引入组件------start----------
 import VmpConciseBodyBlockWap from '@/packages/concise-style/wap-block';
+import VmpConciseCenterWap from '@/packages/concise-style/wap-center';
 import VmpConciseHeaderWatchWap from '@/packages/concise-style/header-watch-wap';
 // 送礼物飘屏动画
 import VmpConciseWapRewardEffect from '@/packages/concise-style/wap-reward-effect';
@@ -104,6 +106,7 @@ import VmpWapMenuDialog from '@/packages/concise-style/wap-menu-dialog';
 // 全局注册组件
 Vue.use(VmpContainer);
 Vue.use(VmpAirContainer);
+Vue.use(VmpClearScreen);
 Vue.use(VmpHeaderWatchWap);
 Vue.use(VmpWapPlayer);
 Vue.use(VmpDocWap);
@@ -157,3 +160,4 @@ Vue.use(VmpConciseHeaderWatchWap);
 Vue.use(VmpConciseWapRewardEffect);
 Vue.use(VmpWapMenuDialog);
 // ------------------------------【极简风格】注册组件------end----------
+Vue.use(VmpConciseCenterWap);

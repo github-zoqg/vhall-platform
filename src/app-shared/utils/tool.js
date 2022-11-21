@@ -394,3 +394,16 @@ export const doCopy = textString => {
     }
   }
 };
+
+/**
+ * @description 获取当前设备是否支持IOS底部安全区域，高度
+ */
+export const getIosSafeArea = data => {
+  let newElement = document.createElement('div');
+  newElement.className = 'fixIos';
+  document.body.appendChild(newElement);
+  const h = document.querySelector('.fixIos').clientHeight;
+  newElement.remove();
+  console.log('是否是IOS小黑条适配', h);
+  return h;
+};

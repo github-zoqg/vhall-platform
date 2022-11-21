@@ -1,6 +1,6 @@
 <template>
   <section
-    :class="['vmp-tab-menu', isConcise ? ' tab-menu__concise' : '']"
+    :class="['vmp-tab-menu', isConcise || isPortraitLive ? ' tab-menu__concise' : '']"
     v-if="!embedObj.embedVideo"
     v-show="visibleMenu.length > 0"
   >
@@ -60,7 +60,7 @@
     <section class="vmp-tab-menu__main" v-show="visibleMenu.length > 0">
       <tab-content
         ref="tabContent"
-        :menu="isConcise ? conciseMenu : menu"
+        :menu="isConcise || isPortraitLive ? conciseMenu : menu"
         :auth="auth"
         @noticeHint="handleHint"
       />
@@ -156,7 +156,7 @@
           return item.visible === true;
         });
         let conciseVisibleMenu = [];
-        if (this.isConcise) {
+        if (this.isConcise || this.isPortraitLive) {
           conciseVisibleMenu = otherVisibleMenu.filter(item => {
             // 如果是简洁模式，菜单抛开 - 聊天tab
             if (item.type == 3) return false;
@@ -165,12 +165,26 @@
             return item.visible === true;
           });
         }
-        let visibleMenu = this.isConcise ? conciseVisibleMenu : otherVisibleMenu;
+        let visibleMenu =
+          this.isConcise || this.isPortraitLive ? conciseVisibleMenu : otherVisibleMenu;
         console.log('当前菜单个数', visibleMenu.length, this.menu);
-        if (this.isConcise) {
+        if (this.isConcise || this.isPortraitLive) {
           // // 告知外部当前可展示的自定义菜单个数
           window.$middleEventSdk?.event?.send(
             boxEventOpitons(this.cuid, 'emitVisibleMenuLength', [visibleMenu.length])
+          );
+        }
+        if (this.isPortraitLive) {
+          let visibleGood = false;
+          const goods = visibleMenu.filter(e => {
+            return e.type == 5;
+          });
+          if (goods.length != 0) {
+            visibleGood = goods[0].visible;
+          }
+          // // 告知外部是否显示商品
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitVisibleGood', [visibleGood])
           );
         }
         return visibleMenu;
@@ -225,6 +239,12 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return skin_json_wap?.speakerAndShowLayout;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
@@ -298,7 +318,13 @@
        * 计算 设置tab-content高度
        */
       setSetingHeight() {
-        if (this.isSubscribe || this.isConcise || this.isEmbedVideo || this.embedObj.embedVideo)
+        if (
+          this.isSubscribe ||
+          this.isConcise ||
+          this.isPortraitLive ||
+          this.isEmbedVideo ||
+          this.embedObj.embedVideo
+        )
           return;
         let htmlFontSize = document.getElementsByTagName('html')[0].style.fontSize;
         // postcss 换算基数为75 头部+播放器区域高为 522px
@@ -482,7 +508,9 @@
           this.setVisible({ visible: val, type: 2 });
           if (val) {
             const obj = this.getItem({ type: 2 });
-            this.select({ type: obj.type, id: obj.id });
+            if (obj) {
+              this.select({ type: obj.type, id: obj.id });
+            }
           } else {
             this.roomBaseServer.state.isWapBodyDocSwitch = false;
           }
@@ -519,7 +547,7 @@
       addSpecialItem() {
         const roomState = this.$domainStore.state.roomBaseServer;
         let index = 0;
-        if (this.isConcise) {
+        if (this.isConcise || this.isPortraitLive) {
           // 极简风格，菜单顺序：问答>私聊>简介
           index = 0;
         } else {

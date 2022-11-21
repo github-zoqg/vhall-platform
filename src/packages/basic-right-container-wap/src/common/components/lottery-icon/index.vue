@@ -1,13 +1,26 @@
 <template>
   <div class="icon-wrap" v-if="lotteryServerState.iconVisible">
-    <img
-      class="icon"
-      src="./images/icon_no.png"
-      alt=""
-      @click="checkLotteryIcon"
-      v-if="lotteryServerState.docVisible"
-    />
-    <img class="icon" src="./images/icon.png" alt="" @click="checkLotteryIcon" v-else />
+    <template v-if="iconStyle == 1">
+      <img
+        class="icon"
+        src="./images/icon_no.png"
+        alt=""
+        @click="checkLotteryIcon"
+        v-if="lotteryServerState.docVisible"
+      />
+      <img class="icon" src="./images/icon.png" alt="" @click="checkLotteryIcon" v-else />
+    </template>
+    <template v-else>
+      <img
+        class="icon"
+        src="./images/icon2.png"
+        alt=""
+        @click="checkLotteryIcon"
+        v-if="lotteryServerState.docVisible"
+      />
+      <img class="icon" src="./images/icon_no2.png" alt="" @click="checkLotteryIcon" v-else />
+    </template>
+    <slot></slot>
     <!-- <i class="dot" v-if="lotteryServerState.docVisible" /> -->
   </div>
 </template>
@@ -18,6 +31,13 @@
   import { useLotteryServer } from 'middle-domain';
   export default {
     name: 'LotteryIcon',
+    props: {
+      iconStyle: {
+        default: 1,
+        type: Number,
+        required: false
+      } // 1为传统风格icon，2为新版icon
+    },
     data() {
       const lotteryServerState = this.lotteryServer.state;
       return {

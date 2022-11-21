@@ -1,4 +1,5 @@
 import screenfull from 'screenfull';
+
 const playerMixins = {
   data() {
     return {
@@ -94,16 +95,16 @@ const playerMixins = {
       //  直播开始
       this.playerServer.$on(VhallPlayer.PLAY, () => {
         // 监听播放状态
-        this.isPlayering = true;
+        this.$domainStore.state.playerServer.isPlaying = true;
         this.isShowPoster = false;
         if (this.isWarnPreview) {
           this.subscribeServer.state.isPlaying = true;
         }
-        console.warn('PLAY', this.isPlayering, this.isVodEnd);
+        console.warn('PLAY', this.$domainStore.state.playerServer.isPlaying, this.isVodEnd);
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
-        this.isPlayering = false;
+        this.$domainStore.state.playerServer.isPlaying = false;
         console.warn('PAUSE');
       });
       // 视频清晰度发生改变----卡顿切换清晰度时触发
@@ -170,7 +171,7 @@ const playerMixins = {
           // 如果是第一次进入页面，刷新页面导致，就不走下面的逻辑
 
           this.isShowPoster = true;
-          this.isPlayering = false;
+          this.$domainStore.state.playerServer.isPlaying = false;
           if (this.warmUpVideoList.length == 1) {
             // 如果只有一个暖场视频，并且开启了循环播放，就自动调用播放方法
             if (this.roomBaseServer.state.warmUpVideo.warmup_player_type == 2) {
@@ -325,6 +326,7 @@ const playerMixins = {
     },
     // 修改视频清晰度
     changeQualitys(item) {
+      console.log(item);
       let sucess = true;
       this.playerServer.setQuality(item, err => {
         sucess = false;

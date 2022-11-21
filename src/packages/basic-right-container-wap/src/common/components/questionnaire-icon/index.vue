@@ -3,13 +3,25 @@
     class="icon-wrap"
     v-if="questionnaireServerState.iconVisible || (QuestionList && QuestionList.length > 0)"
   >
-    <img
-      src="./images/questionnaire_no.png"
-      alt=""
-      @click="clickQuestionnaireIcon"
-      v-if="questionnaireServerState.dotVisible"
-    />
-    <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" v-else />
+    <template v-if="iconStyle == 1">
+      <img
+        src="./images/questionnaire_no.png"
+        alt=""
+        @click="clickQuestionnaireIcon"
+        v-if="questionnaireServerState.dotVisible"
+      />
+      <img src="./images/questionnaire.png" alt="" @click="clickQuestionnaireIcon" v-else />
+    </template>
+    <template v-else>
+      <img
+        src="./images/questionnaire_no2.png"
+        alt=""
+        @click="clickQuestionnaireIcon"
+        v-if="questionnaireServerState.dotVisible"
+      />
+      <img src="./images/questionnaire2.png" alt="" @click="clickQuestionnaireIcon" v-else />
+    </template>
+    <slot></slot>
     <!-- <i class="dot" v-if="questionnaireServerState.dotVisible" /> -->
     <!-- 问卷列表弹框 -->
     <div class="popup_base" v-if="showQuestionList"></div>
@@ -55,6 +67,13 @@
   import { useQuestionnaireServer } from 'middle-domain';
   export default {
     name: 'QuestionnaireIcon',
+    props: {
+      iconStyle: {
+        default: 1,
+        type: Number,
+        required: false
+      } // 1为传统风格icon，2为新版icon
+    },
     data() {
       const questionnaireServerState = this.questionnaireServer.state;
       return {
@@ -89,6 +108,9 @@
       },
       isSmallPlayer() {
         this.setSetingHeight();
+      },
+      showQuestionList(val) {
+        this.$emit('openQa', val);
       }
     },
     beforeCreate() {
@@ -141,7 +163,7 @@
       },
       // 问卷填写
       writeQ(data) {
-        // console.log(data);
+        console.log(data);
         this.closeQuestionList();
         this.$emit('clickIcon', data.question_id);
       },
