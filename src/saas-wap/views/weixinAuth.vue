@@ -20,6 +20,7 @@
 </template>
 
 <script>
+  import { isWechat } from '@/app-shared/utils/tool';
   export default {
     data() {
       return {
@@ -33,7 +34,7 @@
         window.open(url);
       },
       getUnionid() {
-        this.unionid = localStorage.getItem('unionid') ? false : true;
+        this.unionid = !localStorage.getItem('unionid') && isWechat() ? true : false;
       }
     }
   };
