@@ -28,6 +28,7 @@
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
+    <WeixinAuth />
   </div>
 </template>
 
@@ -47,10 +48,13 @@
   import blueDefaultBg from '@/app-shared/assets/img/wap/theme/default_blue.png';
   import goldenDefaultBg from '@/app-shared/assets/img/wap/theme/default_golden.png';
 
+  import WeixinAuth from './weixinAuth.vue';
+
   export default {
     name: 'Home',
     components: {
-      MsgTip
+      MsgTip,
+      WeixinAuth
     },
     data() {
       return {

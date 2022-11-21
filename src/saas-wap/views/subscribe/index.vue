@@ -8,6 +8,7 @@
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
+    <WeixinAuth />
   </div>
 </template>
 <script>
@@ -19,10 +20,13 @@
   import MsgTip from '../MsgTip.vue';
   import { logRoomInitFailed, generateWatchReportCommonParams } from '@/app-shared/utils/report';
   import skins from '@/app-shared/skins/wap';
+
+  import WeixinAuth from '../weixinAuth.vue';
   export default {
     name: 'Subcribe',
     components: {
-      MsgTip
+      MsgTip,
+      WeixinAuth
     },
     data() {
       return {
