@@ -269,6 +269,9 @@
             return;
           }
           this.state = 1;
+          // 获取缓存 判断是否需要进行授权
+          this.$refs['weixin_auth'].getUnionid();
+
           this.detailInfo = res.data;
           this.detailInfo.intro = handleIntroInfo(this.detailInfo.intro);
           this.getWebinarList();

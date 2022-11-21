@@ -26,14 +26,14 @@
         unionid: false
       };
     },
-    mounted() {
-      this.unionid = localStorage.getItem('unionid') ? false : true;
-    },
     methods: {
       goAuth() {
         let url = sessionStorage.getItem('weixin_auth_url');
         console.log(url, 'goAuth');
         window.open(url);
+      },
+      getUnionid() {
+        this.unionid = localStorage.getItem('unionid') ? false : true;
       }
     }
   };

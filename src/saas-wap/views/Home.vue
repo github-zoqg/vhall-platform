@@ -28,7 +28,7 @@
       <vmp-air-container cuid="layerRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
-    <WeixinAuth />
+    <WeixinAuth ref="weixin_auth" />
   </div>
 </template>
 
@@ -234,6 +234,8 @@
             webinar_id: this.$route.params.id // 活动 id
           });
           this.state = 1;
+          // 获取缓存 判断是否需要进行授权
+          this.$refs['weixin_auth'].getUnionid();
           this.addEventListener();
         } catch (err) {
           //上报日志
