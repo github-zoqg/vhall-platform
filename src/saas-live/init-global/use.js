@@ -40,7 +40,7 @@ import VmpLotteryLive from '@/packages/lottery/live';
 import VmpQuestionnaire from '@/packages/questionnaire';
 import VmpSignLive from '@/packages/sign-module/sign-live';
 import VmpQa from '@/packages/qa';
-import VmpRedPacketLive from '@/packages/red-packet/live';
+import VmpRedPacketLive from '@/packages/red-packet-live';
 import VmpStreamDesktopScreen from '@/packages/stream-desktop-screen';
 import VmpRecordVideoSuccess from '@/packages/record-video-success';
 import VmpPcRewardEffect from '@/packages/pc-reward-effect';
