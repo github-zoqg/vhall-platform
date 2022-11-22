@@ -97,6 +97,7 @@
       <img src="./img/subject_null.png" alt="" />
       <p>专题已下线</p>
     </div>
+    <WeixinAuth ref="weixin_auth" />
     <!-- 登录弹窗 -->
     <login-wap ref="loginWap"></login-wap>
     <!-- 权限弹窗 -->
@@ -135,6 +136,7 @@
   import loginWap from '@/packages/reg-login-wap/src/main.vue';
   import confirmAuth from '@/app-shared/components/confirm.vue';
   import { cropperImage } from '@/app-shared/utils/common';
+  import WeixinAuth from '../weixinAuth.vue';
   export default {
     data() {
       return {
@@ -195,7 +197,8 @@
     },
     components: {
       loginWap,
-      confirmAuth
+      confirmAuth,
+      WeixinAuth
     },
     beforeCreate() {
       this.subjectServer = useSubjectServer();
