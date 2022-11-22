@@ -36,7 +36,7 @@
   import { Domain, useRoomBaseServer } from 'middle-domain';
   import roomState from '../headless/room-state.js';
   import bindWeiXin from '../headless/bindWeixin.js';
-  import { getQueryString, getVhallReportOs, isWechatCom } from '@/app-shared/utils/tool';
+  import { getQueryString, getVhallReportOs, isWechatCom, isWechat } from '@/app-shared/utils/tool';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
   import { imgPositionSizeMap } from '@/app-shared/utils/imgModeMap.js';
   import { logRoomInitFailed } from '@/app-shared/utils/report';
@@ -252,6 +252,16 @@
         if (token) {
           localStorage.setItem('token', token);
         }
+        let stealth = 0;
+        const roomBaseServer = useRoomBaseServer();
+        // 本地没有授权记录&&微信环境&&没有关闭微信授权
+        if (
+          !localStorage.getItem('unionid') &&
+          isWechat() &&
+          roomBaseServer.state.configList['ui.hide_wechat'] == 0
+        ) {
+          stealth = 1;
+        }
         return new Domain({
           plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
           requestHeaders: {
@@ -261,6 +271,7 @@
             webinar_id: id, //活动id
             clientType: clientType, //客户端类型
             live_type: rehearsal == 1 ? 2 : 0, // 2 彩排   0 正式
+            stealth, //是否创建参会记录
             ...this.$route.query // 第三方地址栏传参
           },
           // 日志上报的参数

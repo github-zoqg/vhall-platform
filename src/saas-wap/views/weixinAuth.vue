@@ -34,7 +34,12 @@
         window.open(url);
       },
       getUnionid() {
-        this.unionid = !localStorage.getItem('unionid') && isWechat() ? true : false;
+        this.unionid =
+          !localStorage.getItem('unionid') &&
+          isWechat() &&
+          this.$domainStore.state.roomBaseServer.configList['ui.hide_wechat'] == 0
+            ? true
+            : false;
       }
     }
   };
@@ -45,6 +50,10 @@
     .van-popup {
       padding: 48px;
       height: 470px;
+      z-index: 5000 !important;
+    }
+    .van-overlay {
+      z-index: 5000 !important;
     }
     .auth_header {
       display: flex;
@@ -52,13 +61,13 @@
       span {
         color: #1a1a1a;
         font-weight: 600;
-        font-size: 28px;
+        font-size: 26px;
         line-height: 36px;
         margin-left: 12px;
       }
       img {
-        width: 26px;
-        height: 26px;
+        width: 32px;
+        height: 32px;
       }
     }
     .auth_body {
@@ -66,15 +75,15 @@
         margin-top: 40px;
         color: #262626;
         font-weight: 600;
-        font-size: 32px;
+        font-size: 30px;
         line-height: 44px;
       }
       .tip_content {
         color: #8c8c8c;
         font-weight: 400;
-        font-size: 28px;
+        font-size: 26px;
         line-height: 39px;
-        margin-top: 16px;
+        margin-top: 12px;
       }
     }
     .button_box {
@@ -85,6 +94,7 @@
         height: 80px;
         background: #07c160;
         border: 1px solid #07c160;
+        font-size: 32px;
       }
     }
     .weixin_auth {
