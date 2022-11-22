@@ -18,7 +18,7 @@
       class="exam_base"
       v-model="examListDialogVisible"
       position="bottom"
-      @close="closeExamListDialog"
+      @close="closeDialog"
     >
       <div class="vmp-exam-list_container">
         <div class="container-title">
@@ -30,15 +30,14 @@
         </div>
         <van-list
           class="container-data"
-          @load="moreLoadData"
           :immediate-check="false"
           offset="30"
           :finished="finished"
           finished-text=""
         >
-          <ul v-show="examList && examList.length > 0">
+          <ul v-show="examWatchResult.list && examWatchResult.list.length > 0">
             <li
-              v-for="(item, index) in examList"
+              v-for="(item, index) in examWatchResult.list"
               :key="index"
               :class="`container-data__item ${item && item.is_end ? 'button_end_bg' : ''}`"
               @click="checkExamInfo(item)"
@@ -111,6 +110,7 @@
   </div>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'ExamIcon',
     data() {
@@ -118,7 +118,6 @@
         dotVisible: false,
         examListDialogVisible: false,
         finished: true,
-        examList: [],
         total: 0,
         examNum: 0,
         totalPages: 1, // 总页数
@@ -133,191 +132,65 @@
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
-      // 是否首次答题
-      isFirstAnswer() {
-        return false;
+      examWatchResult() {
+        return this.examServer.state.examWatchResult;
+      },
+      iconExecuteType() {
+        return this.examServer.state.iconExecuteType;
+      },
+      iconExecuteItem() {
+        return this.examServer.state.iconExecuteItem;
       }
     },
     methods: {
+      // 点击图标，触发判断
       async clickExamIcon() {
-        await this.getExamList();
-        // 获取未作答集合
-        let arr = this.examList.filter(item => {
-          if (item.limit_time_switch == 1) {
-            // 未作答 且  答题未超时（开启了限时答题）
-            return item.status == 0 && item.is_end == 0;
-          } else {
-            // 未作答（未开启限时答题）
-            return item.status == 0;
-          }
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        await this.examServer.getExamPublishList({
+          source_id: watchInitData.webinar.id, // 活动ID
+          source_type: 1, // 类型：活动1
+          switch_id: watchInitData.switch.switch_id
         });
-        // 如果只有一份，直接进入到当前答题
-        if (arr.length == 1) {
-          this.toShowExam(arr[0]);
-        } else if (this.examList && this.examList.length == 1) {
-          let item = this.examList[0];
-          if (item.status == 1) {
-            // 已作答，已答题，直接查看个人成绩
-            this.toShowExamRank(item);
-          } else if (item.limit_time_switch == 1 && item.is_end == 1) {
-            // 限时答题 & 已超时 & 未作答，toast提示 “很遗憾，您已错过本次答题机会！”
-            this.$toast(this.$t('exam.exam_1010'));
-            this.examListDialogVisible = false;
-          }
-        } else {
-          this.examListDialogVisible = true;
+        if (['answer', 'score'].includes(this.iconExecuteType)) {
+          // 直接答题 or 查看成绩
+          this.toShowExamRankOrExam();
+        } else if (this.iconExecuteType == 'miss') {
+          // 错过答题机会
+          this.$toast(this.$t('exam.exam_1010'));
         }
-      },
-      moreLoadData() {
-        if (this.pageInfo.pageNum >= this.totalPages) {
-          return false;
-        }
-        this.pageInfo.pageNum++;
-        this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
-        this.getExamList(true);
-      },
-      // 查询 快问快答 - 列表
-      getExamList(flag) {
-        const params = {
-          webinar_id: '活动ID',
-          is_cache: 1,
-          ...this.pageInfo
-        };
-        let result = {
-          code: 200,
-          data: {
-            total: 4,
-            list: [
-              {
-                paper_id: 1,
-                title:
-                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点①',
-                push_time: '2022-11-07 20:10',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '100', // 总得分
-                right_rate: '100', // 正确率
-                status: 1, // 是否作答 0.否 1.是
-                is_end: false
-              },
-              {
-                paper_id: 2,
-                title: 'Apple产品功能知识点②',
-                push_time: '2022-11-07 19:30',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 0, // 限制时间
-                limit_time_switch: 0, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: false
-              },
-              {
-                paper_id: 3,
-                title: 'Apple产品功能知识点③',
-                push_time: '2022-11-07 19:30',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: true
-              },
-              {
-                paper_id: 4,
-                title: 'Apple产品功能知识点④',
-                push_time: '2022-11-07 19:15',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 0, // 限制时间
-                limit_time_switch: 0, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: true
-              },
-              {
-                paper_id: 5,
-                title: 'Apple产品功能知识点①',
-                push_time: '2022-11-07 20:10',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '60', // 总得分
-                right_rate: '60', // 正确率
-                status: 1, // 是否作答 0.否 1.是
-                is_end: false
-              }
-            ]
-          }
-        };
-        // TODO 接口调用
-        this.renderListResult(result?.data || { total: 0, list: [] });
-      },
-      // 渲染列表查询结果
-      renderListResult(resResult) {
-        resResult.list.map(item => {
-          item.push_time_str = dayjs(item.push_time).format('HH:mm');
-          item.limit_time_str =
-            item.limit_time_switch == 1 ? this.formatStrByMinute(item.limit_time) : '';
-        });
-        this.examList = resResult.list;
-        this.total = resResult.total;
-        this.examNum = resResult.total;
-      },
-      // 格式化日期
-      formatStrByMinute(str) {
-        let hour = Math.floor(str / 60);
-        let minute = str - hour * 60;
-        return `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}`;
       },
       // 关闭 快问快答 - 列表弹出框
-      closeExamListDialog() {
-        this.examList = [];
-        this.pageInfo = {
-          pos: 0,
-          limit: 10,
-          pageNum: 1
-        };
+      closeDialog() {
         this.examListDialogVisible = false;
       },
-      // 看成绩
-      toShowExamRank(item) {
-        this.closeExamList();
-        this.$emit('clickIcon', {
-          examId: item.paper_id,
-          type: 'score'
-        });
-      },
-      // 看答题逻辑
-      toShowExam(item) {
-        this.closeExamList();
-        this.$emit('clickIcon', {
-          examId: item.paper_id,
-          type: 'answer'
-        });
+      // 看成绩 还是答题逻辑
+      toShowExamRankOrExam(paper_id = null, executeType = null) {
+        let examVo = {
+          examId: this.iconExecuteItem?.paper_id,
+          type: this.iconExecuteType // score 或者 answer
+        }; // 默认点击icon触发逻辑
+        if (paper_id && executeType) {
+          // 单个点击快问快答-选择触发逻辑
+          examVo = {
+            examId: paper_id,
+            executeType: executeType
+          };
+        }
+        if (examVo && examVo.paper_id) return;
+        this.closeDialog();
+        this.$emit('clickIcon', examVo);
       },
       // 单个验证逻辑
       checkExamInfo(item) {
         if (item && item.is_end) {
-          // 已结束
+          // 已结束(不做任何处理)
         } else if (item && item.total_score == item.score) {
           // 满分，看成绩
-          this.toShowExamRank(item);
+          this.toShowExamRankOrExam(item.paper_id, 'score');
         } else {
           // 进入答题流程
-          this.toShowExam(item);
+          this.toShowExamRankOrExam(item.paper_id, 'answer');
         }
-      },
-      // 关闭问卷面板
-      closeExamList() {
-        this.examListDialogVisible = false;
       },
       initExamEvents() {
         // 事件监听
@@ -325,6 +198,7 @@
     },
     created() {
       // 第一步：检查快问快答 - 图标状态
+      this.examServer = useExamServer();
     },
     mounted() {
       this.initExamEvents();
