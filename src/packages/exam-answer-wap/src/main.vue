@@ -9,11 +9,12 @@
     v-if="examAnswerVisible"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
-      <vmp-exam-core-wap ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core-wap>
+      <div id="examAnswerWap"></div>
     </div>
   </van-popup>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamAnswerWap',
     data() {
@@ -50,9 +51,9 @@
       async open(examId) {
         this.examAnswerVisible = true;
         this.examId = examId;
-
-        await this.$nextTick(() => {});
-        this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
+        this.ExamInstance = useExamServer().ExamInstance;
+        await this.$nextTick();
+        this.ExamInstance.mount({ id: examId, el: '#examAnswerWap', type: 'wap', props: {} });
       }
     },
     beforeCreate() {}

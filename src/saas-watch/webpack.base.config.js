@@ -30,6 +30,7 @@ const htmlConfig = {
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.3/index.js',
     MiddleDomain: '',
     VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.js', // vhallUI
+    form: 'http://localhost:8000/vhall-form-vue.js'
   },
   // cdn css
   cdnCss: {

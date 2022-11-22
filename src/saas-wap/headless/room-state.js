@@ -71,7 +71,8 @@ export default async function () {
         'goods-default',
         'announcement',
         'sign',
-        'timer'
+        'timer',
+        'exam'
       ]
     })
     .then(async () => {

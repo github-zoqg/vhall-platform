@@ -1,56 +1,140 @@
 <template>
-  <!-- 快问快答-鉴权 -->
-  <vmp-air-container
-    :oneself="true"
-    :cuid="childrenCom[0]"
-    v-if="isFirstAnswer"
-  ></vmp-air-container>
-  <vmp-air-container :oneself="true" :cuid="childrenCom[1]" v-else></vmp-air-container>
+  <!-- 快问快答-答题-->
+  <van-popup
+    get-container="#otherPopupContainer"
+    class="vmp-exam-answer-wap"
+    v-model="examAnswerVisible"
+    position="bottom"
+    @close="closeDialog"
+    v-if="examAnswerVisible"
+  >
+    <div :class="`exam-core__container exam-theme--${theme}`">
+      <div id="examAnswerWap" v-show="isFill"></div>
+      <div id="userFormWap" v-show="!isFill"></div>
+    </div>
+  </van-popup>
 </template>
 <script>
-  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamWap',
     data() {
       return {
-        examId: null,
-        isFirstAnswer: true, // 是否首次答题
-        childrenCom: []
+        examAnswerVisible: false, // 快问快答 - 答题
+        examId: null
       };
     },
     computed: {
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      theme() {
+        const themeMap = {
+          1: 'black',
+          2: 'white',
+          3: 'red',
+          4: 'golden',
+          5: 'blue'
+        };
+        let skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        let skin_json_wap = {};
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return themeMap[skin_json_wap?.backGroundColor || 3];
+      },
+      isFill() {
+        return this.examServer?.state?.userCheckVo?.isFill == 1;
       }
     },
     methods: {
+      // 关闭 快问快答 - 答题
+      closeDialog() {
+        this.examAnswerVisible = false;
+      },
       async open(examId) {
         this.examId = examId;
-        // 判断当前是否首次答题，若是跳转首次答题区间；若不是，进入答题区间
-        this.isFirstAnswer = false;
-        await this.$nextTick(() => {});
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(
-            this.cuid,
-            this.isFirstAnswer ? 'emitExamCollectOpenWap' : 'emitExamAnswerOpenWap',
-            [examId]
-          )
-        );
+        this.ExamInstance = this.examServer.ExamInstance;
+        // 答题前置检查
+        await this.examServer.checkExam();
+        this.examAnswerVisible = true;
+        await this.$nextTick();
+        if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
+          // 需要填写表单
+          this.ExamInstance.mount({ id: examId, el: '#userFormWap', type: 'pc', props: {} });
+        } else if (this.examServer?.state?.userCheckVo?.is_answer == 1) {
+          // 已答题，查看个人成绩单结果（可以点击去查看答题结果）
+        } else {
+          // 未答题，直接答题
+          this.ExamInstance.mount({ id: examId, el: '#examAnswerWap', type: 'pc', props: {} });
+        }
       }
     },
     created() {
-      this.childrenCom = window.$serverConfig[this.cuid].children;
-    }
+      this.examServer = useExamServer();
+    },
+    beforeCreate() {}
   };
 </script>
-<style lang="less" scoped>
-  .vmp-exam-wap {
+<style lang="less">
+  .vmp-exam-answer-wap {
+    width: 100%;
     height: 844px;
-    background: transparent;
-    background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+    background: url('../images/bg_default.png') no-repeat;
+    box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
     border-radius: 40px 40px 0px 0px;
-    &__panel {
-      text-align: center;
+    overflow: hidden;
+    background-color: #ffffff;
+    background-position: top;
+    background-size: cover;
+    .exam-execute-body {
+      height: calc(844px - 100px) !important;
+      max-height: calc(844px - 100px) !important;
+    }
+    .exam-core__container {
+      width: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .exam-zdy-progress {
+      &.van-progress {
+        background: var(--theme-exam-progress-bgColor) !important;
+        border-radius: 4px;
+        .van-progress__portion {
+          background: var(--theme-exam-progress-active-bgColor) !important;
+          border-radius: 3px;
+        }
+      }
+    }
+    .vmp-exam-info--question {
+      .zdy-exam-question-type {
+        background: var(--theme-exam-question-type-bgColor) !important;
+        color: var(--theme-exam-question-type-color) !important;
+      }
+    }
+    .exam-execute-footer {
+      button.van-button--danger {
+        background: var(--theme-exam-next-button-bg) !important ;
+        color: var(--theme-exam-next-button-color) !important ;
+        border: 1px solid var(--theme-exam-next-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-next-button-active-bg) !important ;
+          color: var(--theme-exam-next-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-next-button-active-border) !important;
+        }
+      }
+      button.van-button--default {
+        background: var(--theme-exam-last-button-bg) !important ;
+        color: var(--theme-exam-last-button-color) !important ;
+        border: 1px solid var(--theme-exam-last-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-last-button-active-bg) !important ;
+          color: var(--theme-exam-last-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-last-button-active-border) !important;
+        }
+      }
     }
   }
 </style>
