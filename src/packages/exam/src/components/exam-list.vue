@@ -44,7 +44,7 @@
             placeholder="请输入名称"
             v-model="keywordIpt"
             clearable
-            @clear="handleClearKeyWord"
+            @clear="getExamList"
             @keydown.enter.stop.native="queryExamList()"
           >
             <i slot="prefix" class="vh-input__icon vh-icon-search" @click="queryExamList"></i>
@@ -69,20 +69,20 @@
             </vh-table-column>
             <vh-table-column label="创建时间" width="148">
               <template slot-scope="scope">
-                {{ scope.row.created_at_str }}
+                {{ scope.row.created_at | fmtTimeByExp('YYYY-MM-DD HH:mm') }}
               </template>
             </vh-table-column>
             <vh-table-column prop="total_score" width="56" label="总分"></vh-table-column>
             <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
             <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
-                {{ scope.row.limit_time_str }}
+                {{ scope.row.limit_time }}
               </template>
             </vh-table-column>
             <vh-table-column label="状态" width="112">
               <template slot-scope="scope">
                 <span class="statusTag" :class="scope.row.status_css">
-                  {{ scope.row.status_str }}
+                  {{ scope.row.status }}
                 </span>
               </template>
             </vh-table-column>
@@ -123,7 +123,7 @@
             layout="prev, pager, next"
             :page-size="queryParams.limit"
             :total="total"
-            :page-count="queryParams.pageNum"
+            :current-page="queryParams.pageNum"
             @current-change="handleChangePage"
           ></vh-pagination>
         </div>
@@ -135,8 +135,6 @@
 </template>
 <script>
   import changeView from '../common/mixins/changeView.js';
-  import initComp from '../common/mixins/initComp.js';
-  import { useExamServer } from 'middle-domain';
   // 操作按钮
   const btnMap = {
     publish: { type: 'publish', name: '公布' },
@@ -162,7 +160,8 @@
   const noop = () => {}; // 空函数
   export default {
     name: 'VmpExamListPanel',
-    mixins: [changeView, initComp],
+    mixins: [changeView],
+    inject: ['examServer'],
     data() {
       return {
         innerVisible: false,
@@ -171,24 +170,21 @@
         loading: false, // 列表请求加载中
         queryParams: {
           // 快问快答-列表搜索参数
-          limit: 4,
+          limit: 5,
           pageNum: 1,
           keyword: '' // 搜索的关键字
         },
         examList: [],
-        totalPages: 0,
         total: 0,
         selectedExam: null
       };
     },
-    beforeCreate() {
-      this.examServer = useExamServer();
+    created() {
+      this.initComp();
     },
-    created() {},
     mounted() {},
     methods: {
       initComp() {
-        console.log('🚀 ~ file: exam-list.vue ~ line 187 ~ initComp ~ initComp', initComp);
         this.queryExamList();
       },
       // 创建快问快答
@@ -205,6 +201,7 @@
       setBtnConfigByStatus(status) {
         const outsideBtn = []; // 在列表显示的
         const moreBtn = []; // 更多中的
+        status = parseInt(status);
         switch (status) {
           case 0: //0.未推送
             outsideBtn.push(btnMap.push);
@@ -274,6 +271,24 @@
           .then(confirmCb)
           .catch(noop);
       },
+      // 复制
+      handleExamCopy(examObj) {
+        this.examServer?.copyExam(examObj.id).then(res => {
+          this.$message.success('复制成功');
+          this.getExamList();
+        });
+      },
+      // 编辑
+      handleExamEdit(examObj) {
+        this.$emit('changeView', { view: 'ExamCreate', examId: examObj.id });
+      },
+      // 删除
+      handleExamDel(examObj) {
+        this.examServer?.delExam(examObj.id).then(res => {
+          this.$message.success('删除成功');
+          this.getExamList();
+        });
+      },
       // 成绩
       score(btnIsDisabled) {
         console.log('公布成绩');
@@ -281,25 +296,17 @@
       // 推送
       handleExamPush(examObj) {
         // 确认推送
-        const confirmCb = () => {};
-        this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          roundButton: true
-        })
-          .then(confirmCb)
-          .catch(noop);
+        // const confirmCb = () => {};
+        // this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
+        //   confirmButtonText: '确定',
+        //   cancelButtonText: '取消',
+        //   roundButton: true
+        // })
+        //   .then(confirmCb)
+        //   .catch(noop);
+        this.examServer.copyExam();
       },
-      // 编辑
-      edit(examObj) {
-        // if (btnIsDisabled) {
-        //   this.$message.error('已推送的快问快答不支持编辑，建议进行「复制」');
-        // } else {
-        //   // 正常编辑
 
-        // }
-        this.$emit('changeView', { view: 'ExamCreate', examId: examObj.id });
-      },
       // 收卷
       close(btnIsDisabled) {
         this.$confirm('收卷后将不能继续答卷，确定收卷？', '提示', {
@@ -309,8 +316,7 @@
           cancelButtonClass: 'zdy-confirm-cancel'
         }).then(() => {});
       },
-      // 复制
-      copy(btnIsDisabled) {},
+
       // 预览
       preview(btnIsDisabled) {
         this.$emit('examBtnClick', {
@@ -318,17 +324,12 @@
           currentRow: this.selectedExam
         });
       },
-      // 删除
-      del(btnIsDisabled) {
-        if (btnIsDisabled) {
-          this.$message.error('已推送的快问快答不支持删除');
-        } else {
-          // 正常删除
-        }
-      },
-      handleClearKeyWord() {
-        this.keywordIpt = [];
-        this.queryExamList(true);
+
+      // 获取考试成绩列表(清空条件搜索,回到首页)
+      getExamList() {
+        this.queryParams.pageNum = 1;
+        this.keywordIpt = '';
+        this.queryExamList();
       },
       /**
        * @description 条件搜索列表
@@ -337,93 +338,20 @@
         const keyword = (this.queryParams.keyword = this.keywordIpt);
         const params = {
           limit: this.queryParams.limit,
-          pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
+          pos: this.queryParams.pageNum,
+          // pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           keyword
         };
-        // TODO 调用查询接口
         // this.loading = false;
         this.examServer?.getExamList(params).then(res => {
-          console.log(
-            '🚀 ~ file: exam-list.vue ~ line 344 ~ this.examServer?.getExamList ~ res',
-            res
-          );
           this.examList = res.data.list || [];
           this.total = res.data.total;
           this.firstLoad = true;
-          this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
         });
-        // let res = {
-        //   data: {
-        //     list: [
-        //       {
-        //         id: 1,
-        //         title: 'Apple产品功能知识点①',
-        //         created_at: '2022-10-23 00:00:00',
-        //         updated_at: '2022-10-23 00:00:00',
-        //         total_score: 100,
-        //         questions_count: 10,
-        //         limit_time_switch: 1,
-        //         limit_time: 70,
-        //         auto_push_switch: 0,
-        //         status: 0
-        //       },
-        //       {
-        //         id: 2,
-        //         title: 'Apple产品功能知识点2',
-        //         created_at: '2022-10-23 00:00:00',
-        //         updated_at: '2022-10-23 00:00:00',
-        //         total_score: 100,
-        //         questions_count: 10,
-        //         limit_time_switch: 0,
-        //         limit_time: 0,
-        //         auto_push_switch: 0,
-        //         status: 1
-        //       },
-        //       {
-        //         id: 3,
-        //         title: 'Apple产品功能知识点3',
-        //         created_at: '2022-10-23 00:00:00',
-        //         updated_at: '2022-10-23 00:00:00',
-        //         total_score: 100,
-        //         questions_count: 10,
-        //         limit_time_switch: 0,
-        //         limit_time: 0,
-        //         auto_push_switch: 0,
-        //         status: 2
-        //       },
-        //       {
-        //         id: 4,
-        //         title:
-        //           'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
-        //         created_at: '2022-10-23 00:00:00',
-        //         updated_at: '2022-10-23 00:00:00',
-        //         total_score: 100,
-        //         questions_count: 10,
-        //         limit_time_switch: 0,
-        //         limit_time: 0,
-        //         auto_push_switch: 0,
-        //         status: 3
-        //       },
-        //       {
-        //         id: 5,
-        //         title:
-        //           'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
-        //         created_at: '2022-10-23 00:00:00',
-        //         updated_at: '2022-10-23 00:00:00',
-        //         total_score: 100,
-        //         questions_count: 10,
-        //         limit_time_switch: 0,
-        //         limit_time: 0,
-        //         auto_push_switch: 0,
-        //         status: 0
-        //       }
-        //     ]
-        //   }
-        // };
       },
       handleChangePage(page) {
         this.queryParams.pageNum = page;
-        this.getExamList();
+        this.queryExamList();
       }
     }
   };

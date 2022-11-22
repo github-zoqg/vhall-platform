@@ -4,27 +4,34 @@
   </div>
 </template>
 <script>
-  import { useExamServer } from 'middle-domain';
   export default {
     name: 'ExamCreate',
-    data() {
-      return {};
+    inject: ['examServer'],
+    props: {
+      currentExamId: {
+        type: [String, Number],
+        default() {
+          return '';
+        }
+      }
     },
+
     mounted() {
-      this.examServer = useExamServer();
       this.initComp();
     },
     methods: {
       initComp() {
         const el = this.$refs.ExamCreate;
+        console.log('🚀 ~ file: exam-create.vue ~ line 18 ~ currentExamId', this.currentExamId);
         this.examServer.mount({
           componentName: 'examedit',
-          id: '',
+          examId: this.currentExamId,
           el,
           configs: {
             role: 1,
             source_id: 863283088,
-            source_type: 1
+            source_type: 1,
+            client: 'live'
           }
         });
       }

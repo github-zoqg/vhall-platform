@@ -19,22 +19,28 @@
           {{ this.currentExamId ? '编辑' : '创建' }}
         </span>
       </label>
-      <component :is="componentView" @changeView="handleChangeView" />
+      <component
+        :is="componentView"
+        @changeView="handleChangeView"
+        :currentExamId="currentExamId"
+      />
     </vh-dialog>
   </div>
 </template>
 <script>
   import { useExamServer } from 'middle-domain';
+  const examServer = useExamServer();
   export default {
     name: 'VmpExam',
     components: {
       ExamListPanel: () => import('./components/exam-panel.vue'),
       ExamCreate: () => import('./components/exam-create.vue')
     },
+    provide: { examServer },
     data() {
       return {
         // dialogVisible: false,
-        dialogVisible: false,
+        dialogVisible: true,
         componentView: 'ExamListPanel',
         currentExamId: '' // 当前操作的
       };
@@ -43,9 +49,6 @@
       createPanel() {
         return this.componentView === 'ExamCreate';
       }
-    },
-    beforeCreate() {
-      this.examServer = useExamServer();
     },
     methods: {
       /**
