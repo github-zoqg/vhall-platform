@@ -1,18 +1,20 @@
 <template>
   <!-- 快问快答-pc答题-->
-  <el-dialog
+  <vh-dialog
     title=""
     :visible.sync="examAnswerVisible"
     width="380px"
     custom-class="vmp-exam-answer"
     :close-on-click-modal="false"
     :show-close="false"
+    :z-index="20"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
+      <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
       <div id="examAnswer" v-show="isFill"></div>
       <div id="userForm" v-show="!isFill"></div>
     </div>
-  </el-dialog>
+  </vh-dialog>
 </template>
 <script>
   import { useExamServer } from 'middle-domain';
@@ -85,11 +87,11 @@
   };
 </script>
 <style lang="less">
-  .el-dialog.vmp-exam-answer {
-    .el-dialog__header {
+  .vh-dialog.vmp-exam-answer {
+    .vh-dialog__header {
       padding: 0 0;
     }
-    .el-dialog__body {
+    .vh-dialog__body {
       padding: 0 0;
     }
     height: 460px;
@@ -99,6 +101,7 @@
     background-color: #ffffff;
     background-position: top;
     background-size: cover;
+    // 重置内部元素
     .exam-execute-body {
       height: calc(460px - 72px) !important;
       max-height: calc(460px - 72px) !important;
@@ -108,6 +111,16 @@
       height: 100%;
       margin: 0 auto;
       overflow: hidden;
+      position: relative;
+      // 统一定位close
+      .exam-close {
+        position: absolute;
+        right: 32px;
+        top: 22px;
+        font-size: 12px;
+        z-index: 30;
+        cursor: pointer;
+      }
     }
     .exam-zdy-progress {
       &.el-progress {
