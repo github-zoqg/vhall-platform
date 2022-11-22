@@ -9,11 +9,13 @@
     :show-close="false"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
-      <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core>
+      <div id="examanswer"></div>
+      <!-- <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core> -->
     </div>
   </el-dialog>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamAnswer',
     data() {
@@ -50,9 +52,11 @@
       async open(examId) {
         this.examAnswerVisible = true;
         this.examId = examId;
-
-        await this.$nextTick(() => {});
-        this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
+        this.ExamInstance = useExamServer().ExamInstance;
+        await this.$nextTick();
+        this.ExamInstance.mount({ id: examId, el: '#examanswer', type: 'pc', props: {} });
+        // await this.$nextTick(() => {});
+        // this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
       }
     },
     beforeCreate() {}
@@ -75,6 +79,7 @@
     background-size: cover;
     .exam-core__container {
       width: 100%;
+      height: 100%;
       margin: 0 auto;
       overflow: hidden;
     }

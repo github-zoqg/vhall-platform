@@ -9,6 +9,7 @@
 </template>
 <script>
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamPc',
     data() {
@@ -39,6 +40,7 @@
       }
     },
     created() {
+      this.ExamServer = useExamServer();
       this.childrenCom = window.$serverConfig[this.cuid].children;
     }
   };
