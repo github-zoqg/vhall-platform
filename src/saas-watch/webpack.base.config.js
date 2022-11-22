@@ -40,8 +40,7 @@ const htmlConfig = {
     iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
     overlayscrollbarsCss:
       '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css',
-    VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.css', // vhallUI
-    form: 'http://localhost:8000/vhall-form-vue.js'
+    VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.css'
   }
 };
 
