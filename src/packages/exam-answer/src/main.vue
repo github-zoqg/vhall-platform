@@ -54,7 +54,12 @@
         this.examId = examId;
         this.ExamInstance = useExamServer().ExamInstance;
         await this.$nextTick();
-        this.ExamInstance.mount({ id: examId, el: '#examanswer', type: 'pc', props: {} });
+        this.ExamInstance.mount({
+          examId: 17,
+          el: '#examanswer',
+          componentName: 'exampc',
+          config: { pageSize: 1 }
+        });
         // await this.$nextTick(() => {});
         // this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
       }
