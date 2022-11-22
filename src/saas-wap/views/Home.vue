@@ -258,7 +258,8 @@
         if (
           !localStorage.getItem('unionid') &&
           isWechat() &&
-          roomBaseServer.state.configList['ui.hide_wechat'] == 0
+          roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
+          !roomBaseServer.state.embedObj.embed
         ) {
           stealth = 1;
         }
