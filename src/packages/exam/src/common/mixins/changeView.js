@@ -1,7 +1,7 @@
 export default {
   methods: {
-    handleChangeView(view) {
-      this.$emit('changeView', view);
+    handleChangeView(payload) {
+      this.$emit('changeView', payload);
     }
   }
-}
+};
