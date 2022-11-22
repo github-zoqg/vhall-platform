@@ -13,9 +13,11 @@
       <label v-if="createPanel" slot="title">
         <i
           class="vh-iconfont vh-line-arrow-left cursor-pointer std-color-icon"
-          @click="handleChangeView('ExamListPanel')"
+          @click="handleChangeView({ view: 'ExamListPanel' })"
         />
-        <span class="std-panel-title m-l-8">创建</span>
+        <span class="std-panel-title m-l-8">
+          {{ this.currentExamId ? '编辑' : '创建' }}
+        </span>
       </label>
       <component :is="componentView" @changeView="handleChangeView" />
     </vh-dialog>
@@ -38,7 +40,8 @@
       return {
         // dialogVisible: false,
         dialogVisible: true,
-        componentView: 'ExamListPanel'
+        componentView: 'ExamListPanel',
+        currentExamId: '' // 当前操作的
       };
     },
     computed: {
@@ -47,12 +50,8 @@
       }
     },
     beforeCreate() {
-      // this.examServer = useExamServer();
+      examServer.init();
     },
-    created() {
-      // this.childrenComp = window.$serverConfig[this.cuid].children;
-    },
-    mounted() {},
     methods: {
       /**
        * 对话框打开事事件
@@ -63,7 +62,9 @@
       handleClose() {
         this.dialogVisible = false;
       },
-      handleChangeView(view) {
+      handleChangeView(payload) {
+        const { view, examId } = payload;
+        this.currentExamId = examId;
         this.componentView = view;
       }
     }

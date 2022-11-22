@@ -16,7 +16,7 @@
     methods: {
       initComp() {
         const el = this.$refs.ExamCreate;
-        this.examServer.formServer.mount({
+        this.examServer.mount({
           type: 'edit',
           id: '12371937',
           el,

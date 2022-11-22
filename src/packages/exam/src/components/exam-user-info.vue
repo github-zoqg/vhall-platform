@@ -11,12 +11,22 @@
       return {};
     },
     mounted() {
-      this.initComp();
+      this.initEvent();
+    },
+    beforeDestroy() {
+      this.removeEvent();
     },
     methods: {
+      initEvent() {
+        this.examServer.$on('initiated', this.initComp);
+      },
+      removeEvent() {
+        this.examServer.$off('initiated', this.initComp);
+      },
       initComp() {
+        console.log('🚀 ~ file: exam-user-info.vue ~ line 18 ~ initComp ~ initComp');
         const el = this.$refs.ExamUserInfo;
-        this.examServer.formServer.mount({
+        this.examServer.mount({
           type: 'userInfoEdit',
           id: '12371937',
           el,
