@@ -4,13 +4,14 @@
   </div>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'ExamUserInfo',
-    inject: ['examServer'],
     data() {
       return {};
     },
     mounted() {
+      this.examServer = useExamServer();
       this.initEvent();
     },
     beforeDestroy() {

@@ -25,13 +25,8 @@
 </template>
 <script>
   import { useExamServer } from 'middle-domain';
-  const examServer = useExamServer();
   export default {
     name: 'VmpExam',
-    provide: {
-      examServer
-      // examServer: this.examServer
-    },
     components: {
       ExamListPanel: () => import('./components/exam-panel.vue'),
       ExamCreate: () => import('./components/exam-create.vue')
@@ -39,7 +34,7 @@
     data() {
       return {
         // dialogVisible: false,
-        dialogVisible: true,
+        dialogVisible: false,
         componentView: 'ExamListPanel',
         currentExamId: '' // 当前操作的
       };
@@ -50,7 +45,7 @@
       }
     },
     beforeCreate() {
-      examServer.init();
+      this.examServer = useExamServer();
     },
     methods: {
       /**

@@ -4,25 +4,27 @@
   </div>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'ExamCreate',
-    inject: ['examServer'],
     data() {
       return {};
     },
     mounted() {
+      this.examServer = useExamServer();
       this.initComp();
     },
     methods: {
       initComp() {
         const el = this.$refs.ExamCreate;
         this.examServer.mount({
-          type: 'edit',
-          id: '12371937',
+          componentName: 'examedit',
+          id: '',
           el,
-          props: {
-            id: '12371937',
-            client: 'live'
+          configs: {
+            role: 1,
+            source_id: 863283088,
+            source_type: 1
           }
         });
       }

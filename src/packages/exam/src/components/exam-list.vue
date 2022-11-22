@@ -136,7 +136,7 @@
 <script>
   import changeView from '../common/mixins/changeView.js';
   import initComp from '../common/mixins/initComp.js';
-
+  import { useExamServer } from 'middle-domain';
   // 操作按钮
   const btnMap = {
     publish: { type: 'publish', name: '公布' },
@@ -163,7 +163,6 @@
   export default {
     name: 'VmpExamListPanel',
     mixins: [changeView, initComp],
-    inject: ['examServer'],
     data() {
       return {
         innerVisible: false,
@@ -182,7 +181,11 @@
         selectedExam: null
       };
     },
+    beforeCreate() {
+      this.examServer = useExamServer();
+    },
     created() {},
+    mounted() {},
     methods: {
       initComp() {
         console.log('🚀 ~ file: exam-list.vue ~ line 187 ~ initComp ~ initComp', initComp);
