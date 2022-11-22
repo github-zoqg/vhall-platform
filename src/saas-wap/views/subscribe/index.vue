@@ -8,7 +8,7 @@
       <vmp-air-container cuid="subcribeRoot"></vmp-air-container>
     </div>
     <msg-tip v-if="state == 2" :liveErrorTip="liveErrorTip"></msg-tip>
-    <WeixinAuth />
+    <WeixinAuth ref="weixin_auth" />
   </div>
 </template>
 <script>
@@ -132,6 +132,8 @@
           console.log('%c------服务初始化 initVhallReport 初始化完成', 'color:blue');
           // http://wiki.vhallops.com/pages/viewpage.action?pageId=23789619
           this.state = 1;
+          // 获取缓存 判断是否需要进行授权
+          this.$refs['weixin_auth'].getUnionid();
           // 观看端上报
           domain.initVhallReportForWatch({
             env: ['production', 'pre'].includes(process.env.NODE_ENV) ? 'production' : 'test', // 环境，区分上报接口域名
