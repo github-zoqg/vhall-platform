@@ -18,7 +18,6 @@
         <vh-button round @click="handleShareCancel">取 消</vh-button>
       </div>
     </vh-dialog>
-
     <!-- 快问快答—列表 -->
     <div>
       <!-- 无数据 -->
@@ -45,14 +44,14 @@
             placeholder="请输入名称"
             v-model="keywordIpt"
             clearable
-            @clear="initQueryList"
-            @keydown.enter.stop.native="initQueryList()"
+            @clear="handleClearKeyWord"
+            @keydown.enter.stop.native="queryExamList()"
           >
-            <i slot="prefix" class="vh-input__icon vh-icon-search" @click="initQueryList"></i>
+            <i slot="prefix" class="vh-input__icon vh-icon-search" @click="queryExamList"></i>
           </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
-          <vh-table :data="[]" style="width: 100%" height="295px">
+          <vh-table :data="examList" style="width: 100%" height="295px">
             <template slot="empty">
               <img src="@/app-shared/assets/img/no-search.png" />
               <p>暂未搜索到您想要的内容</p>
@@ -124,6 +123,7 @@
             layout="prev, pager, next"
             :page-size="queryParams.limit"
             :total="total"
+            :page-count="queryParams.pageNum"
             @current-change="handleChangePage"
           ></vh-pagination>
         </div>
@@ -135,6 +135,7 @@
 </template>
 <script>
   import changeView from '../common/mixins/changeView.js';
+  import initComp from '../common/mixins/initComp.js';
 
   // 操作按钮
   const btnMap = {
@@ -161,7 +162,8 @@
   const noop = () => {}; // 空函数
   export default {
     name: 'VmpExamListPanel',
-    mixins: [changeView],
+    mixins: [changeView, initComp],
+    inject: ['examServer'],
     data() {
       return {
         innerVisible: false,
@@ -171,7 +173,6 @@
         queryParams: {
           // 快问快答-列表搜索参数
           limit: 4,
-          pos: 0,
           pageNum: 1,
           keyword: '' // 搜索的关键字
         },
@@ -181,10 +182,15 @@
         selectedExam: null
       };
     },
+    created() {},
     methods: {
+      initComp() {
+        console.log('🚀 ~ file: exam-list.vue ~ line 187 ~ initComp ~ initComp', initComp);
+        this.queryExamList();
+      },
       // 创建快问快答
       handleCreateExam() {
-        this.$emit('changeView', 'ExamCreate');
+        this.$emit('changeView', { view: 'ExamCreate' });
       },
       // 共享到资料库 —— 确定
       handleShareSubmit() {},
@@ -282,12 +288,14 @@
           .catch(noop);
       },
       // 编辑
-      edit(btnIsDisabled) {
-        if (btnIsDisabled) {
-          this.$message.error('已推送的快问快答不支持编辑，建议进行「复制」');
-        } else {
-          // 正常编辑
-        }
+      edit(examObj) {
+        // if (btnIsDisabled) {
+        //   this.$message.error('已推送的快问快答不支持编辑，建议进行「复制」');
+        // } else {
+        //   // 正常编辑
+
+        // }
+        this.$emit('changeView', { view: 'ExamCreate', examId: examObj.id });
       },
       // 收卷
       close(btnIsDisabled) {
@@ -315,122 +323,105 @@
           // 正常删除
         }
       },
-      // 查询列表接口
-      initQueryList() {
-        this.queryParams.keyword = this.keywordIpt;
+      handleClearKeyWord() {
+        this.keywordIpt = [];
         this.queryExamList(true);
       },
       /**
        * @description 条件搜索列表
        */
-      queryExamList(refresh = false) {
-        if (refresh) {
-          this.queryParams = {
-            limit: 10,
-            pos: 0,
-            pageNum: 1,
-            keyword: ''
-          };
-          this.examList = [];
-        }
-        this.loading = true;
-        this.queryParams.keyword = this.keywordIpt;
-        // TODO 调用查询接口
-        this.loading = false;
-        let res = {
-          data: {
-            list: [
-              {
-                id: 1,
-                title: 'Apple产品功能知识点①',
-                created_at: '2022-10-23 00:00:00',
-                updated_at: '2022-10-23 00:00:00',
-                total_score: 100,
-                questions_count: 10,
-                limit_time_switch: 1,
-                limit_time: 70,
-                auto_push_switch: 0,
-                status: 0
-              },
-              {
-                id: 2,
-                title: 'Apple产品功能知识点2',
-                created_at: '2022-10-23 00:00:00',
-                updated_at: '2022-10-23 00:00:00',
-                total_score: 100,
-                questions_count: 10,
-                limit_time_switch: 0,
-                limit_time: 0,
-                auto_push_switch: 0,
-                status: 1
-              },
-              {
-                id: 3,
-                title: 'Apple产品功能知识点3',
-                created_at: '2022-10-23 00:00:00',
-                updated_at: '2022-10-23 00:00:00',
-                total_score: 100,
-                questions_count: 10,
-                limit_time_switch: 0,
-                limit_time: 0,
-                auto_push_switch: 0,
-                status: 2
-              },
-              {
-                id: 4,
-                title:
-                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
-                created_at: '2022-10-23 00:00:00',
-                updated_at: '2022-10-23 00:00:00',
-                total_score: 100,
-                questions_count: 10,
-                limit_time_switch: 0,
-                limit_time: 0,
-                auto_push_switch: 0,
-                status: 3
-              },
-              {
-                id: 5,
-                title:
-                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
-                created_at: '2022-10-23 00:00:00',
-                updated_at: '2022-10-23 00:00:00',
-                total_score: 100,
-                questions_count: 10,
-                limit_time_switch: 0,
-                limit_time: 0,
-                auto_push_switch: 0,
-                status: 0
-              }
-            ]
-          }
+      queryExamList() {
+        const keyword = (this.queryParams.keyword = this.keywordIpt);
+        const params = {
+          limit: this.queryParams.limit,
+          pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
+          keyword
         };
-        const dataList = res.data.list || [];
-        // dataList.map(item => {
-        //   item.created_at_str = item.created_at.substring(0, 16);
-        //   item.updated_at_str = item.updated_at.substring(0, 16);
-        //   item.limit_time_str = item.limit_time_switch == 1 ? item.limit_time : '不限时';
-        //   item.status_css = ['no-push', 'answer', 'no-publish', 'publish'][item.status];
-        //   item.status_str = ['未推送', '答题中', '成绩待公布', '成绩已公布'][item.status];
-        // });
-        this.examList = dataList;
-        this.total = res.data.total;
-        this.firstLoad = true;
-        this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
+        // TODO 调用查询接口
+        // this.loading = false;
+        this.examServer?.getExamList(params).then(res => {
+          console.log(
+            '🚀 ~ file: exam-list.vue ~ line 344 ~ this.examServer?.getExamList ~ res',
+            res
+          );
+          this.examList = res.data.list || [];
+          this.total = res.data.total;
+          this.firstLoad = true;
+          this.totalPages = Math.ceil(res.data.total / this.queryParams.limit);
+        });
+        // let res = {
+        //   data: {
+        //     list: [
+        //       {
+        //         id: 1,
+        //         title: 'Apple产品功能知识点①',
+        //         created_at: '2022-10-23 00:00:00',
+        //         updated_at: '2022-10-23 00:00:00',
+        //         total_score: 100,
+        //         questions_count: 10,
+        //         limit_time_switch: 1,
+        //         limit_time: 70,
+        //         auto_push_switch: 0,
+        //         status: 0
+        //       },
+        //       {
+        //         id: 2,
+        //         title: 'Apple产品功能知识点2',
+        //         created_at: '2022-10-23 00:00:00',
+        //         updated_at: '2022-10-23 00:00:00',
+        //         total_score: 100,
+        //         questions_count: 10,
+        //         limit_time_switch: 0,
+        //         limit_time: 0,
+        //         auto_push_switch: 0,
+        //         status: 1
+        //       },
+        //       {
+        //         id: 3,
+        //         title: 'Apple产品功能知识点3',
+        //         created_at: '2022-10-23 00:00:00',
+        //         updated_at: '2022-10-23 00:00:00',
+        //         total_score: 100,
+        //         questions_count: 10,
+        //         limit_time_switch: 0,
+        //         limit_time: 0,
+        //         auto_push_switch: 0,
+        //         status: 2
+        //       },
+        //       {
+        //         id: 4,
+        //         title:
+        //           'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
+        //         created_at: '2022-10-23 00:00:00',
+        //         updated_at: '2022-10-23 00:00:00',
+        //         total_score: 100,
+        //         questions_count: 10,
+        //         limit_time_switch: 0,
+        //         limit_time: 0,
+        //         auto_push_switch: 0,
+        //         status: 3
+        //       },
+        //       {
+        //         id: 5,
+        //         title:
+        //           'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点4',
+        //         created_at: '2022-10-23 00:00:00',
+        //         updated_at: '2022-10-23 00:00:00',
+        //         total_score: 100,
+        //         questions_count: 10,
+        //         limit_time_switch: 0,
+        //         limit_time: 0,
+        //         auto_push_switch: 0,
+        //         status: 0
+        //       }
+        //     ]
+        //   }
+        // };
       },
-      moreLoadData() {
-        if (this.queryParams.pageNum >= this.totalPages) {
-          return false;
-        }
-        this.queryParams.pageNum++;
-        this.queryParams.pos = parseInt((this.queryParams.pageNum - 1) * this.queryParams.limit);
-        this.queryExamList();
-      },
-      // 初始化界面
-      initComp() {
-        this.initQueryList();
-      },
-      handleChangePage() {}
+      handleChangePage(page) {
+        this.queryParams.pageNum = page;
+        this.getExamList();
+      }
     }
   };
 </script>

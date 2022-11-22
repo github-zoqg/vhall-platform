@@ -84,8 +84,13 @@
   "i18n-ally.localesPaths": [
     "src/app-shared/i18n/languages/modules" // 记录你的i18n模块位置
   ],
-  "i18n-ally.enabledParsers": ["json", "js"],
-  "i18n-ally.enabledFrameworks": ["vue"], // 表明支持vue框架，这样vue才能显示，且插入i18n代码时提供this.$t等vue形式
+  "i18n-ally.enabledParsers": [
+    "json",
+    "js"
+  ],
+  "i18n-ally.enabledFrameworks": [
+    "vue"
+  ], // 表明支持vue框架，这样vue才能显示，且插入i18n代码时提供this.$t等vue形式
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
@@ -94,5 +99,8 @@
   "i18n-ally.sortKeys": true,
   "i18n-ally.displayLanguage": "zh", // 显示在代码编辑器(vscode)界面上的语言
   "i18n-ally.frameworks.ruby-rails.scopeRoot": "src/saas-live/languages/",
-  "vue-i18n.i18nPaths": "src/app-shared/i18n"
+  "vue-i18n.i18nPaths": "src/app-shared/i18n",
+  "cSpell.words": [
+    "iconfont"
+  ]
 }
