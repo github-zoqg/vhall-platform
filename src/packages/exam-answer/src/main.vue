@@ -10,7 +10,6 @@
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
       <div id="examanswer"></div>
-      <!-- <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core> -->
     </div>
   </el-dialog>
 </template>
@@ -55,8 +54,6 @@
         this.ExamInstance = useExamServer().ExamInstance;
         await this.$nextTick();
         this.ExamInstance.mount({ id: examId, el: '#examanswer', type: 'pc', props: {} });
-        // await this.$nextTick(() => {});
-        // this.$refs.vmpExamCoreDom && this.$refs.vmpExamCoreDom.open(examId, 'release');
       }
     },
     beforeCreate() {}
