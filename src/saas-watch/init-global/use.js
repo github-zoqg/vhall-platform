@@ -87,7 +87,6 @@ import VmpExamCollect from '@/packages/exam-collect'; // 用户收集
 import VmpExamPreview from '@/packages/exam-preview'; // 预览答题
 import VmpExamAnswer from '@/packages/exam-answer'; // 答题
 import VmpExamScore from '@/packages/exam-score'; // 成绩
-import VmpExamCore from '@/packages/exam-core'; // 快问快答 - 题核心
 // ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 // Vue.use(ElementUI);
@@ -163,5 +162,4 @@ Vue.use(VmpExamCollect);
 Vue.use(VmpExamPreview);
 Vue.use(VmpExamAnswer);
 Vue.use(VmpExamScore);
-Vue.use(VmpExamCore);
 // ------------------------------【极简风格】注册组件------end----------

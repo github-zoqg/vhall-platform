@@ -10,7 +10,6 @@
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
       <div id="examanswer"></div>
-      <!-- <vmp-exam-core ref="vmpExamCoreDom" @close="closeDialog"></vmp-exam-core> -->
     </div>
   </el-dialog>
 </template>
