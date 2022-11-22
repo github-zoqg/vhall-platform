@@ -9,6 +9,7 @@
     v-if="examAnswerVisible"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
+      <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
       <div id="examAnswerWap" v-show="isFill"></div>
       <div id="userFormWap" v-show="!isFill"></div>
     </div>
@@ -61,12 +62,12 @@
         await this.$nextTick();
         if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
           // 需要填写表单
-          this.ExamInstance.mount({ id: examId, el: '#userFormWap', type: 'pc', props: {} });
+          this.ExamInstance.mount({ id: examId, el: '#userFormWap', type: 'wap', props: {} });
         } else if (this.examServer?.state?.userCheckVo?.is_answer == 1) {
           // 已答题，查看个人成绩单结果（可以点击去查看答题结果）
         } else {
           // 未答题，直接答题
-          this.ExamInstance.mount({ id: examId, el: '#examAnswerWap', type: 'pc', props: {} });
+          this.ExamInstance.mount({ id: examId, el: '#examAnswerWap', type: 'wap', props: {} });
         }
       }
     },
@@ -95,6 +96,16 @@
       width: 100%;
       margin: 0 auto;
       overflow: hidden;
+      position: relative;
+      // 统一定位close
+      .exam-close {
+        position: absolute;
+        right: 32px;
+        top: 48px;
+        font-size: 24px;
+        z-index: 30;
+        cursor: pointer;
+      }
     }
     .exam-zdy-progress {
       &.van-progress {
