@@ -1,16 +1,21 @@
 <template>
-  <div class="icon-wrap">
+  <div
+    class="icon-wrap"
+    v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.list.length > 0)"
+  >
+    <!-- 有小红点图标 -->
     <img
       src="https://s3.e.vhall.com/common-static/vhall-form/images/exam_no.png"
       alt=""
-      v-if="dotVisible"
-      @click="clickExamIcon"
+      v-if="examWatchState.dotVisible"
+      @click="clickExamIcon(true)"
     />
+    <!-- 无小红点图标 -->
     <img
       src="https://s3.e.vhall.com/common-static/vhall-form/images/exam.png"
       alt=""
       v-else
-      @click="clickExamIcon"
+      @click="clickExamIcon(true)"
     />
     <!-- 快问快答-列表弹框 -->
     <van-popup
@@ -26,13 +31,13 @@
             <span class="title_text">{{ $t('exam.exam_1022') }}</span>
             <i class="container-title-text-line"></i>
           </span>
-          <i class="vh-iconfont vh-line-close" @click="closeExamListDialog"></i>
+          <i class="vh-iconfont vh-line-close" @click="closeDialog"></i>
         </div>
         <van-list
           class="container-data"
           :immediate-check="false"
           offset="30"
-          :finished="finished"
+          :finished="true"
           finished-text=""
         >
           <ul v-show="examWatchResult.list && examWatchResult.list.length > 0">
@@ -110,22 +115,21 @@
   </div>
 </template>
 <script>
-  import { useExamServer } from 'middle-domain';
+  import { useRoomBaseServer, useExamServer } from 'middle-domain';
   export default {
     name: 'ExamIcon',
+    props: {
+      iconStyle: {
+        default: 1,
+        type: Number,
+        required: false
+      } // 1为传统风格icon，2为新版icon
+    },
     data() {
+      const examWatchState = this.examServer.state;
       return {
-        dotVisible: false,
-        examListDialogVisible: false,
-        finished: true,
-        total: 0,
-        examNum: 0,
-        totalPages: 1, // 总页数
-        pageInfo: {
-          pos: 0,
-          limit: 10,
-          pageNum: 1
-        }
+        examWatchState,
+        examListDialogVisible: false // 快问快答列表-是否展示
       };
     },
     computed: {
@@ -134,29 +138,42 @@
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
-      },
-      iconExecuteType() {
-        return this.examServer.state.iconExecuteType;
-      },
-      iconExecuteItem() {
-        return this.examServer.state.iconExecuteItem;
+      }
+    },
+    watch: {
+      'examWatchResult.list': {
+        handler: function (val) {
+          if (val) {
+            let arr = val.filter(item => item.is_answered == 0);
+            if (arr.length > 0) {
+              this.examServer.setExamWatchDotVisible(true);
+            } else {
+              this.examServer.setExamWatchDotVisible(false);
+            }
+          }
+        },
+        deep: true
       }
     },
     methods: {
       // 点击图标，触发判断
-      async clickExamIcon() {
+      async clickExamIcon(showPanel = false) {
         const { watchInitData = {} } = this.roomBaseServer.state;
         await this.examServer.getExamPublishList({
           source_id: watchInitData.webinar.id, // 活动ID
           source_type: 1, // 类型：活动1
           switch_id: watchInitData.switch.switch_id
         });
-        if (['answer', 'score'].includes(this.iconExecuteType)) {
+        if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
           // 直接答题 or 查看成绩
           this.toShowExamRankOrExam();
-        } else if (this.iconExecuteType == 'miss') {
+        } else if (this.examWatchState.iconExecuteType == 'miss') {
           // 错过答题机会
           this.$toast(this.$t('exam.exam_1010'));
+        }
+        if (showPanel && this.examWatchResult.list && this.examWatchResult.list.length > 0) {
+          // 如果是点击小图标，并且列表数量大于0，展示列表弹出框
+          this.examListDialogVisible = true;
         }
       },
       // 关闭 快问快答 - 列表弹出框
@@ -166,8 +183,8 @@
       // 看成绩 还是答题逻辑
       toShowExamRankOrExam(paper_id = null, executeType = null) {
         let examVo = {
-          examId: this.iconExecuteItem?.paper_id,
-          type: this.iconExecuteType // score 或者 answer
+          examId: this.examWatchState?.iconExecuteItem?.paper_id,
+          type: this.examWatchState?.iconExecuteType // score 或者 answer
         }; // 默认点击icon触发逻辑
         if (paper_id && executeType) {
           // 单个点击快问快答-选择触发逻辑
@@ -176,7 +193,7 @@
             executeType: executeType
           };
         }
-        if (examVo && examVo.paper_id) return;
+        if (!(examVo && examVo.paper_id)) return;
         this.closeDialog();
         this.$emit('clickIcon', examVo);
       },
@@ -194,11 +211,20 @@
       },
       initExamEvents() {
         // 事件监听
+        this.examServer.$on(this.examServer.EVENT_TYPE.EXAM_PAPER_SEND, res => {
+          // 推送问卷
+          if (res.code === 200) {
+            this.examServer.clickExamIcon();
+          }
+        });
       }
     },
+    beforeCreate() {
+      this.roomBaseServer = useRoomBaseServer();
+      this.examServer = useExamServer(false);
+    },
     created() {
-      // 第一步：检查快问快答 - 图标状态
-      this.examServer = useExamServer();
+      this.clickExamIcon();
     },
     mounted() {
       this.initExamEvents();
