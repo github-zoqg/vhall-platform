@@ -247,7 +247,7 @@
       this.examServer = useExamServer(false);
     },
     created() {
-      this.clickExamIcon(true);
+      this.clickExamIcon();
       this.throttleCheckExam = throttle(this.clickExamIcon, 2000, { trailing: false });
       this.initExamEvents();
     },
