@@ -3,8 +3,8 @@
     <img
       :src="
         noticeNum - noticeNumIsWatch
-          ? require(iconStyle == 1 ? './images/icon_num.png' : './images/notice-icon2.png')
-          : require(iconStyle == 1 ? './images/notice-icon.png' : './images/notice-icon2.png')
+          ? imageAssets[iconStyle == 1 ? 'iconNum' : 'noticeIcon2']
+          : imageAssets[iconStyle == 1 ? 'noticeIcon' : 'noticeIcon2']
       "
       alt=""
       @click="getNoticeList()"
@@ -59,6 +59,11 @@
 </template>
 <script>
   import { useNoticeServer, useRoomBaseServer, useGroupServer } from 'middle-domain';
+
+  import iconNum from './images/icon_num.png';
+  import noticeIcon from './images/notice-icon.png';
+  import noticeIcon2 from './images/notice-icon2.png';
+
   export default {
     name: 'QuestionnaireIcon',
     props: {
@@ -79,6 +84,11 @@
           pos: 0,
           limit: 10,
           pageNum: 1
+        },
+        imageAssets: {
+          iconNum,
+          noticeIcon,
+          noticeIcon2
         }
       };
     },
