@@ -38,10 +38,10 @@
               <div class="container-data__title">
                 <div class="container-data__title__left">{{ item.title }}</div>
                 <div class="container-data__title__right">
-                  <template v-if="item && item.is_end">
+                  <template v-if="item && item.is_end == 1">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.status == 1 && item.is_end == 1">
+                  <template v-else-if="item && item.status == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -50,7 +50,7 @@
                           item.total_score > 0
                             ? item.total_score == item.score
                               ? $t('exam.exam_1042')
-                              : item.total_score
+                              : item.score
                             : item.right_rate
                         "
                       ></span>
@@ -61,7 +61,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div class="button_answer" v-if="item && item.status == 0 && item.is_end == 0">
+                  <div class="button_answer" v-else>
                     <el-button type="danger" size="mini" round class="exam-answer-btn">
                       {{ $t('exam.exam_1027') }}
                     </el-button>
@@ -71,21 +71,18 @@
               <div class="container-data__info">
                 <div>
                   <label v-text="`${$t('exam.exam_1023')}:`"></label>
-                  <span v-text="item.push_time_str"></span>
+                  <span>{{ item.push_time | fmtTimeByExp('HH:mm') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1024')}:`"></label>
-                  <span
-                    v-text="
-                      `${
-                        item.limit_time_switch == 1 ? item.limit_time_str : $t('exam.exam_1006')
-                      }  `
-                    "
-                  ></span>
+                  <span v-if="item.limit_time_switch == 1">
+                    {{ item.limit_time | examTimeByMinute }}
+                  </span>
+                  <span v-else>{{ $t('exam.exam_1006') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1025')}:`"></label>
-                  <span class="color-red" v-text="item.score"></span>
+                  <span class="color-red" v-text="item.total_score"></span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1026')}:`"></label>
@@ -178,10 +175,10 @@
           // 单个点击快问快答-选择触发逻辑
           examVo = {
             examId: paper_id,
-            executeType: executeType
+            type: executeType
           };
         }
-        if (!(examVo && examVo.paper_id)) return;
+        if (!(examVo && examVo.examId)) return;
         this.closeDialog();
         this.$emit('clickIcon', examVo);
       },
@@ -206,27 +203,27 @@
           EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
         };
         return {
-          nickname: msg.nick_name,
+          nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
             text_content: text_content[eventType],
-            exam_id: msg.paper_id,
-            exam_title: msg.paper_title || ''
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
           },
-          roleName: msg.room_role,
+          roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
           isCheck: true
         };
       },
       listenExamWatchMsg(msg) {
+        let that = this;
         if (window.ExamTemplateServer) {
           // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
         }
-        useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
+        useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
         if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
-          this.open(msg.paper_id);
         } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
         } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_END) {
