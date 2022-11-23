@@ -128,13 +128,13 @@
         </div>
       </div>
     </div>
-    <!-- <ExamRankLive /> -->
+    <ExamRankLive ref="rank"/>
     <!-- 资料库 -->
   </div>
 </template>
 <script>
   import changeView from '../common/mixins/changeView.js';
-  // import ExamRankLive from '@/packages/exam-rank/src/rank-live.vue';
+  import ExamRankLive from '@/packages/exam-rank/src/rank-live.vue';
   // 操作按钮
   const btnMap = {
     publish: { type: 'publish', name: '公布' },
@@ -163,7 +163,7 @@
     mixins: [changeView],
     inject: ['examServer'],
     components: {
-      // ExamRankLive
+      ExamRankLive
     },
     data() {
       return {
@@ -347,6 +347,10 @@
         })
           .then(confirmCb)
           .catch(noop);
+      },
+      handleExamScore (examObj) {
+        const rankCom = this.$refs.rank
+        rankCom.open(examObj.id)
       },
       // 成绩
       score(btnIsDisabled) {
