@@ -128,12 +128,13 @@
         </div>
       </div>
     </div>
-
+    <!-- <ExamRankLive /> -->
     <!-- 资料库 -->
   </div>
 </template>
 <script>
   import changeView from '../common/mixins/changeView.js';
+  // import ExamRankLive from '@/packages/exam-rank/src/rank-live.vue';
   // 操作按钮
   const btnMap = {
     publish: { type: 'publish', name: '公布' },
@@ -161,6 +162,9 @@
     name: 'VmpExamListPanel',
     mixins: [changeView],
     inject: ['examServer'],
+    components: {
+      // ExamRankLive
+    },
     data() {
       return {
         innerVisible: false,
@@ -275,14 +279,10 @@
         const confirmCb = () => {
           this.examServer.sendPublishExam(examObj.id).then(res => {
             if (res.code === 200) {
-              this.$message.success('收卷成功');
+              this.$message.success('公布成功');
               this.queryExamList(); //仅更新当前页的状态
-              // const st = setTimeout(() => {
-              //   clearTimeout(st);
-              //   this.queryExamList(); //仅更新当前页的状态
-              // }, 1000);
             } else {
-              this.$message.warn(res.msg);
+              this.$message.error(res.msg);
             }
           });
         };
@@ -320,7 +320,7 @@
             this.$message.success('推送成功');
             this.queryExamList(); //仅更新当前页的状态
           } else {
-            this.$message.warn(res.msg);
+            this.$message.error(res.msg);
           }
         });
       },
@@ -335,7 +335,7 @@
                 this.queryExamList(); //仅更新当前页的状态
               }, 1000);
             } else {
-              this.$message.warn(res.msg);
+              this.$message.error(res.msg);
             }
           });
         };
