@@ -12,7 +12,7 @@
       </div>
       <div class="button_box">
         <van-button round type="primary" class="auth_button_wid" @click="goAuth">
-          微信授权
+          {{ $t('other.other_1026') }}
         </van-button>
       </div>
     </van-popup>
