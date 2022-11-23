@@ -55,14 +55,12 @@
       closeDialog() {
         this.examAnswerVisible = false;
       },
-      async open(examId) {
+      async open(examId, answerType) {
         this.examId = examId;
         this.ExamInstance = this.examServer.ExamInstance;
         // 答题前置检查
         await this.examServer.checkExam();
         this.examAnswerVisible = true;
-        await this.$nextTick();
-        this.zIndexServer.setDialogZIndex('exam');
         await this.$nextTick();
         if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
           // 需要填写表单
@@ -72,13 +70,13 @@
         } else {
           // 未答题，直接答题
           this.examServer.mount({
-            examId: 17 || examId,
+            examId: examId,
             el: '#examAnswerWap',
             componentName: 'examwap',
             configs: {
               role: 2,
               pageSize: 1,
-              answerType: 'release'
+              answerType: answerType == 'answer' ? 1 : 2
             }
           });
         }

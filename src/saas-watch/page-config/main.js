@@ -249,13 +249,13 @@ export default {
     emitClickExamIconToScore: {
       cuid: ['comExamScore'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     // 快问快答弹窗 - 答题
     emitClickExamIconToAnswer: {
       cuid: ['comExam'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     // 关闭视频轮训弹窗
     emitClosePollingDialog: {
