@@ -304,7 +304,14 @@
         // })
         //   .then(confirmCb)
         //   .catch(noop);
-        this.examServer.copyExam();
+        this.examServer.sendPushExam(examObj.id).then(res => {
+          if (res.code === 200) {
+            this.$message.success('推送成功');
+            this.queryExamList(); //仅更新当前页的状态
+          } else {
+            this.$message.warn(res.msg);
+          }
+        });
       },
 
       // 收卷
