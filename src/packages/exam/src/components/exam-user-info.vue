@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-  import { useExamServer } from 'middle-domain';
+  // import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'ExamUserInfo',
     inject: ['examServer'],

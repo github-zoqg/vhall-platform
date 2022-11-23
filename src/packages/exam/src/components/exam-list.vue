@@ -21,7 +21,7 @@
     <!-- 快问快答—列表 -->
     <div>
       <!-- 无数据 -->
-      <div class="vmp-exam-cur__empty" v-show="examList.length === 0">
+      <div class="vmp-exam-cur__empty" v-if="noExam">
         <img src="../img/no-file.png" />
         <p>您还没有快问快答，快来创建吧！</p>
         <div>
@@ -30,7 +30,7 @@
         </div>
       </div>
       <!-- 有数据 -->
-      <div class="vmp-exam-cur__inner" v-show="examList.length > 0">
+      <div class="vmp-exam-cur__inner" v-else>
         <div class="vmp-exam-cur__hd">
           <!-- 创建按钮 -->
           <vh-button type="primary" round @click="handleCreateExam">创建</vh-button>
@@ -80,10 +80,9 @@
               </template>
             </vh-table-column>
             <vh-table-column label="状态" width="112">
-              <template slot-scope="scope">
-                <span class="statusTag" :class="scope.row.status_css">
-                  {{ scope.row.status }}
-                </span>
+              <template slot-scope="{ row }">
+                <i :class="['icon-dot', `status-${row.status}`]" />
+                {{ row.status | fmtExamStatus }}
               </template>
             </vh-table-column>
             <vh-table-column label="操作" width="196" fixed="right">
@@ -141,7 +140,7 @@
     score: { type: 'score', name: '成绩' },
     push: { type: 'push', name: '推送' },
     edit: { type: 'edit', name: '编辑' },
-    stop: { type: 'stop', name: '收卷' },
+    collect: { type: 'collect', name: '收卷' },
     copy: { type: 'copy', name: '复制' },
     prev: { type: 'prev', name: '预览' },
     del: { type: 'del', name: '删除' }
@@ -152,7 +151,7 @@
     score: 'handleExamScore',
     push: 'handleExamPush',
     edit: 'handleExamEdit',
-    stop: 'handleExamStop',
+    collect: 'handleExamCollect',
     copy: 'handleExamCopy',
     prev: 'handleExamPrev',
     del: 'handleExamDel'
@@ -178,6 +177,19 @@
         total: 0,
         selectedExam: null
       };
+    },
+    computed: {
+      // 未创建过问卷(非关键字搜索无内容)
+      noExam() {
+        return this.examList.length === 0 && this.queryParams.keyword === '';
+      }
+    },
+    filters: {
+      fmtExamStatus(status) {
+        status = parseInt(status);
+        const statusMap = ['未推送', '答题中', '成绩待公布', '成绩已公布'];
+        return statusMap[status] || '-';
+      }
     },
     created() {
       this.initComp();
@@ -211,7 +223,7 @@
             moreBtn.push(btnMap.prev);
             break;
           case 1: //1.答题中
-            outsideBtn.push(btnMap.stop);
+            outsideBtn.push(btnMap.collect);
             outsideBtn.push(btnMap.copy);
             outsideBtn.push(btnMap.prev);
             moreBtn.push({
@@ -259,9 +271,21 @@
       },
       // 公布
       handleExamPublish(examObj) {
-        console.log('公布成绩');
         // 确认公布
-        const confirmCb = () => {};
+        const confirmCb = () => {
+          this.examServer.sendPublishExam(examObj.id).then(res => {
+            if (res.code === 200) {
+              this.$message.success('收卷成功');
+              this.queryExamList(); //仅更新当前页的状态
+              // const st = setTimeout(() => {
+              //   clearTimeout(st);
+              //   this.queryExamList(); //仅更新当前页的状态
+              // }, 1000);
+            } else {
+              this.$message.warn(res.msg);
+            }
+          });
+        };
         this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -289,21 +313,8 @@
           this.getExamList();
         });
       },
-      // 成绩
-      score(btnIsDisabled) {
-        console.log('公布成绩');
-      },
       // 推送
       handleExamPush(examObj) {
-        // 确认推送
-        // const confirmCb = () => {};
-        // this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
-        //   confirmButtonText: '确定',
-        //   cancelButtonText: '取消',
-        //   roundButton: true
-        // })
-        //   .then(confirmCb)
-        //   .catch(noop);
         this.examServer.sendPushExam(examObj.id).then(res => {
           if (res.code === 200) {
             this.$message.success('推送成功');
@@ -313,17 +324,34 @@
           }
         });
       },
-
       // 收卷
-      close(btnIsDisabled) {
+      handleExamCollect(examObj) {
+        const confirmCb = () => {
+          this.examServer.sendCollectExam(examObj.id).then(res => {
+            if (res.code === 200) {
+              this.$message.success('收卷成功');
+              const st = setTimeout(() => {
+                clearTimeout(st);
+                this.queryExamList(); //仅更新当前页的状态
+              }, 1000);
+            } else {
+              this.$message.warn(res.msg);
+            }
+          });
+        };
         this.$confirm('收卷后将不能继续答卷，确定收卷？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          customClass: 'zdy-message-box',
-          cancelButtonClass: 'zdy-confirm-cancel'
-        }).then(() => {});
+          roundButton: true,
+          type: 'warning'
+        })
+          .then(confirmCb)
+          .catch(noop);
       },
-
+      // 成绩
+      score(btnIsDisabled) {
+        console.log('公布成绩');
+      },
       // 预览
       preview(btnIsDisabled) {
         this.$emit('examBtnClick', {
@@ -342,12 +370,12 @@
        * @description 条件搜索列表
        */
       queryExamList() {
-        const keyword = (this.queryParams.keyword = this.keywordIpt);
+        const keywords = (this.queryParams.keyword = this.keywordIpt);
         const params = {
           limit: this.queryParams.limit,
           pos: this.queryParams.pageNum,
           // pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
-          keyword
+          keywords
         };
         // this.loading = false;
         this.examServer?.getExamList(params).then(res => {
@@ -364,6 +392,25 @@
   };
 </script>
 <style lang="less">
+  .icon-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    line-height: 40px;
+    &.status-0 {
+      background-color: #8c8c8c;
+    }
+    &.status-1 {
+      background-color: #0a7ff5;
+    }
+    &.status-2 {
+      background-color: #fc9600;
+    }
+    &.status-3 {
+      background-color: #0fba5a;
+    }
+  }
   // 内嵌对话框，挂载到body下 【是否共享到资料库】
   .exam-dlg-share-tip {
     width: 400px;
