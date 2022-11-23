@@ -98,12 +98,11 @@
       background-image: url('./img/dialog-watch-bg.png');
       height: 460px;
       overflow: hidden;
-    }
-
-    .vh-dialog__body {
-      margin: 0;
-      padding: 0;
-      height: 386px;
+      .vh-dialog__body {
+        margin: 0;
+        padding: 0;
+        height: 386px;
+      }
     }
   }
 
