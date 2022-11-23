@@ -205,8 +205,8 @@
             this.setSignState({ signInfo: state });
             this.setIntervalAction();
           } else if (res.code == 513204) {
-            // 已经发过签到
-            this.endSignServe();
+            // 当前活动已签到中！
+            this.openSign();
           } else {
             this.$message.error(res.msg);
           }
