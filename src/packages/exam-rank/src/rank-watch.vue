@@ -36,7 +36,7 @@
   import RankItemWatch from './rank-item.vue';
 
   export default {
-    name: 'VmpExamRank',
+    name: 'rank',
     components: {
       RankTitleWatch,
       RankItemWatch
