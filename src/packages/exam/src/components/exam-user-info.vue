@@ -7,32 +7,21 @@
   import { useExamServer } from 'middle-domain';
   export default {
     name: 'ExamUserInfo',
+    inject: ['examServer'],
     data() {
       return {};
     },
     mounted() {
-      this.examServer = useExamServer();
-      this.initEvent();
-    },
-    beforeDestroy() {
-      this.removeEvent();
+      this.initComp();
     },
     methods: {
-      initEvent() {
-        this.examServer.$on('initiated', this.initComp);
-      },
-      removeEvent() {
-        this.examServer.$off('initiated', this.initComp);
-      },
       initComp() {
-        console.log('🚀 ~ file: exam-user-info.vue ~ line 18 ~ initComp ~ initComp');
         const el = this.$refs.ExamUserInfo;
         this.examServer.mount({
-          type: 'userInfoEdit',
+          componentName: 'userInfoEdit',
           id: '12371937',
           el,
-          props: {
-            id: '12371937',
+          configs: {
             client: 'live'
           }
         });

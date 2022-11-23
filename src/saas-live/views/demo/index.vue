@@ -1,14 +1,14 @@
 <template>
-  <Rank />
+  <Exam />
 </template>
 
 <script>
-  // import Exam from '@/packages/exam/src/main.vue';
-  import Rank from '@/packages/exam-rank/src/rank-watch.vue';
+  import Exam from '@/packages/exam/src/main.vue';
+  // import Rank from '@/packages/exam-rank/src/rank-watch.vue';
   export default {
     components: {
-      // Exam,
-      Rank
+      Exam
+      // Rank
     },
     data() {
       return {
