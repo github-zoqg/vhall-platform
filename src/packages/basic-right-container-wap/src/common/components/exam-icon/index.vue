@@ -1,7 +1,7 @@
 <template>
   <div
     class="icon-wrap"
-    v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.list.length > 0)"
+    v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
     <!-- 有小红点图标 -->
     <img
@@ -53,7 +53,7 @@
                   <template v-if="item && item.is_end">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.total_score > 0">
+                  <template v-else-if="item && item.status == 1 && item.is_end == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -73,10 +73,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div
-                    class="button_answer"
-                    v-if="!(item && item.total_score > 0) && !(item && item.is_end)"
-                  >
+                  <div class="button_answer" v-if="item && item.status == 0 && item.is_end == 0">
                     <van-button type="danger" size="mini" round>
                       {{ $t('exam.exam_1027') }}
                     </van-button>
@@ -115,7 +112,13 @@
   </div>
 </template>
 <script>
-  import { useRoomBaseServer, useExamServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useChatServer,
+    useZIndexServer,
+    useExamServer
+  } from 'middle-domain';
   export default {
     name: 'ExamIcon',
     props: {
@@ -127,8 +130,10 @@
     },
     data() {
       const examWatchState = this.examServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
         examWatchState,
+        zIndexServerState,
         examListDialogVisible: false // 快问快答列表-是否展示
       };
     },
@@ -209,26 +214,63 @@
           this.toShowExamRankOrExam(item.paper_id, 'answer');
         }
       },
+      setChatItemData(msg, eventType) {
+        let text_content = {
+          EXAM_PAPER_SEND: this.$t('exam.exam_1001'), // 推送-快问快答
+          EXAM_PAPER_SEND_RANK: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
+          EXAM_PAPER_END: this.$t('exam.exam_1041'), // 快问快答-收卷
+          EXAM_PAPER_AUTO_END: this.$t('exam.exam_1040'), // 快问快答-自动收卷
+          EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
+        };
+        return {
+          nickname: msg.nick_name,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: text_content[eventType],
+            exam_id: msg.paper_id,
+            exam_title: msg.paper_title || ''
+          },
+          roleName: msg.room_role,
+          type: eventType,
+          interactStatus: true,
+          isCheck: true
+        };
+      },
+      listenExamWatchMsg(msg) {
+        if (window.ExamTemplateServer) {
+          // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        }
+        useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
+        if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
+          //  触发自动弹出 - 快问快答答题
+          this.open(msg.paper_id);
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
+          // TODO 快问快答 - 公布成绩
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_END) {
+          // TODO 快问快答 - 收卷
+          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
+          // TODO 快问快答 - 自动收卷
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
+          // TODO 快问快答 - 自动公布成绩
+        }
+      },
       initExamEvents() {
-        // 事件监听
-        this.examServer.$on(this.examServer.EVENT_TYPE.EXAM_PAPER_SEND, res => {
-          // 推送问卷
-          if (res.code === 200) {
-            this.examServer.clickExamIcon();
-          }
-        });
+        // 监听快问快答消息
+        this.msgServer.$onMsg('ROOM_MSG', this.listenExamWatchMsg);
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
       this.examServer = useExamServer(false);
     },
     created() {
-      this.clickExamIcon();
-    },
-    mounted() {
+      this.clickExamIcon(true);
       this.initExamEvents();
-    }
+    },
+    mounted() {}
   };
 </script>
 

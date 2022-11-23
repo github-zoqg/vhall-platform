@@ -1,6 +1,14 @@
 <template>
-  <div class="vmp-exam-icon">
-    <img src="./images/exam_no.png" alt="" v-if="dotVisible" @click="throttleCheckExam" />
+  <div
+    class="vmp-exam-icon"
+    v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
+  >
+    <img
+      src="./images/exam_no.png"
+      alt=""
+      v-if="examWatchState.dotVisible"
+      @click="throttleCheckExam"
+    />
     <img src="./images/exam.png" alt="" v-else @click="throttleCheckExam" />
     <!-- <img src="./images/questionnaire.png" alt="" @click="throttleCheckExam" />
     <i class="vmp-dot" v-if="dotVisible" /> -->
@@ -11,7 +19,7 @@
       :close-on-click-modal="false"
       :show-close="true"
       width="420px"
-      @close="closeExamListDialog"
+      @close="closeDialog"
     >
       <div slot="title" class="container-title">
         <span class="container-title-text">
@@ -20,9 +28,9 @@
       </div>
       <div class="vmp-exam-list_container">
         <div class="container-data">
-          <ul v-show="examList && examList.length > 0" v-infinite-scroll="moreLoadData">
+          <ul v-show="examWatchResult.list && examWatchResult.list.length > 0">
             <li
-              v-for="(item, index) in examList"
+              v-for="(item, index) in examWatchResult.list"
               :key="index"
               :class="`container-data__item ${item && item.is_end ? 'button_end_bg' : ''}`"
               @click="checkExamInfo(item)"
@@ -33,7 +41,7 @@
                   <template v-if="item && item.is_end">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.total_score > 0">
+                  <template v-else-if="item && item.status == 1 && item.is_end == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -53,10 +61,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div
-                    class="button_answer"
-                    v-if="!(item && item.total_score > 0) && !(item && item.is_end)"
-                  >
+                  <div class="button_answer" v-if="item && item.status == 0 && item.is_end == 0">
                     <el-button type="danger" size="mini" round class="exam-answer-btn">
                       {{ $t('exam.exam_1027') }}
                     </el-button>
@@ -95,228 +100,161 @@
   </div>
 </template>
 <script>
-  import { useExamServer } from 'middle-domain';
+  import {
+    useRoomBaseServer,
+    useMsgServer,
+    useChatServer,
+    useZIndexServer,
+    useExamServer
+  } from 'middle-domain';
   import { throttle } from 'lodash';
   export default {
     name: 'ExamIcon',
     data() {
+      const examWatchState = this.examServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        examWatchState,
+        zIndexServerState,
         dotVisible: false,
-        examListDialogVisible: false,
-        finished: true,
-        examList: [],
-        total: 0,
-        examNum: 0,
-        totalPages: 1, // 总页数
-        pageInfo: {
-          pos: 0,
-          limit: 10,
-          pageNum: 1
-        }
+        examListDialogVisible: false
       };
     },
     computed: {
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
-      // 是否首次答题
-      isFirstAnswer() {
-        return false;
+      examWatchResult() {
+        return this.examServer.state.examWatchResult;
+      }
+    },
+    watch: {
+      'examWatchResult.list': {
+        handler: function (val) {
+          if (val) {
+            let arr = val.filter(item => item.is_answered == 0);
+            if (arr.length > 0) {
+              this.examServer.setExamWatchDotVisible(true);
+            } else {
+              this.examServer.setExamWatchDotVisible(false);
+            }
+          }
+        },
+        deep: true
       }
     },
     methods: {
-      async clickExamIcon() {
-        await this.getExamList();
-        // 获取未作答集合
-        let arr = this.examList.filter(item => {
-          if (item.limit_time_switch == 1) {
-            // 未作答 且  答题未超时（开启了限时答题）
-            return item.status == 0 && item.is_end == 0;
-          } else {
-            // 未作答（未开启限时答题）
-            return item.status == 0;
-          }
+      // 点击图标，触发判断
+      async clickExamIcon(showPanel = false) {
+        const { watchInitData = {} } = this.roomBaseServer.state;
+        await this.examServer.getExamPublishList({
+          source_id: watchInitData.webinar.id, // 活动ID
+          source_type: 1, // 类型：活动1
+          switch_id: watchInitData.switch.switch_id
         });
-        // 如果只有一份，直接进入到当前答题
-        if (arr.length == 1) {
-          this.toShowExam(arr[0]);
-        } else if (this.examList && this.examList.length == 1) {
-          let item = this.examList[0];
-          if (item.status == 1) {
-            // 已作答，已答题，直接查看个人成绩
-            this.toShowExamRank(item);
-          } else if (item.limit_time_switch == 1 && item.is_end == 1) {
-            // 限时答题 & 已超时 & 未作答，toast提示 “很遗憾，您已错过本次答题机会！”
-            this.$toast(this.$t('exam.exam_1010'));
-            this.examListDialogVisible = false;
-          }
-        } else {
+        if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
+          // 直接答题 or 查看成绩
+          this.toShowExamRankOrExam();
+        } else if (this.examWatchState.iconExecuteType == 'miss') {
+          // 错过答题机会
+          this.$toast(this.$t('exam.exam_1010'));
+        }
+        if (showPanel && this.examWatchResult.list && this.examWatchResult.list.length > 0) {
+          // 如果是点击小图标，并且列表数量大于0，展示列表弹出框
           this.examListDialogVisible = true;
         }
       },
-      moreLoadData() {
-        if (this.pageInfo.pageNum >= this.totalPages) {
-          return false;
-        }
-        this.pageInfo.pageNum++;
-        this.pageInfo.pos = parseInt((this.pageInfo.pageNum - 1) * this.pageInfo.limit);
-        this.getExamList(true);
-      },
-      // 查询 快问快答 - 列表
-      getExamList(flag) {
-        const params = {
-          webinar_id: '活动ID',
-          is_cache: 1,
-          ...this.pageInfo
-        };
-        let result = {
-          code: 200,
-          data: {
-            total: 4,
-            list: [
-              {
-                paper_id: 1,
-                title:
-                  'Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点Apple产品功能知识点①',
-                push_time: '2022-11-07 20:10',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '100', // 总得分
-                right_rate: '100', // 正确率
-                status: 1, // 是否作答 0.否 1.是
-                is_end: false
-              },
-              {
-                paper_id: 2,
-                title: 'Apple产品功能知识点②',
-                push_time: '2022-11-07 19:30',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 0, // 限制时间
-                limit_time_switch: 0, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: false
-              },
-              {
-                paper_id: 3,
-                title: 'Apple产品功能知识点③',
-                push_time: '2022-11-07 19:30',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: true
-              },
-              {
-                paper_id: 4,
-                title: 'Apple产品功能知识点④',
-                push_time: '2022-11-07 19:15',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 0, // 限制时间
-                limit_time_switch: 0, // 限制时间开关 0.否 1.是
-                total_score: '', // 总得分
-                right_rate: '', // 正确率
-                status: 0, // 是否作答 0.否 1.是
-                is_end: true
-              },
-              {
-                paper_id: 5,
-                title: 'Apple产品功能知识点①',
-                push_time: '2022-11-07 20:10',
-                score: 100, // 试卷总分
-                question_num: 10, // 题目数量
-                limit_time: 5, // 限制时间
-                limit_time_switch: 1, // 限制时间开关 0.否 1.是
-                total_score: '60', // 总得分
-                right_rate: '60', // 正确率
-                status: 1, // 是否作答 0.否 1.是
-                is_end: false
-              }
-            ]
-          }
-        };
-        // TODO 接口调用
-        this.renderListResult(result?.data || { total: 0, list: [] });
-      },
-      // 渲染列表查询结果
-      renderListResult(resResult) {
-        resResult.list.map(item => {
-          item.push_time_str = dayjs(item.push_time).format('HH:mm');
-          item.limit_time_str =
-            item.limit_time_switch == 1 ? this.formatStrByMinute(item.limit_time) : '';
-        });
-        this.examList = resResult.list;
-        this.total = resResult.total;
-        this.examNum = resResult.total;
-      },
-      // 格式化日期
-      formatStrByMinute(str) {
-        let hour = Math.floor(str / 60);
-        let minute = str - hour * 60;
-        return `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}`;
-      },
       // 关闭 快问快答 - 列表弹出框
-      closeExamListDialog() {
-        this.examList = [];
-        this.pageInfo = {
-          pos: 0,
-          limit: 10,
-          pageNum: 1
-        };
+      closeDialog() {
         this.examListDialogVisible = false;
       },
-      // 看成绩
-      toShowExamRank(item) {
-        this.closeExamList();
-        this.$emit('clickIcon', {
-          examId: item.paper_id,
-          type: 'score'
-        });
-      },
-      // 看答题逻辑
-      toShowExam(item) {
-        this.closeExamList();
-        this.$emit('clickIcon', {
-          examId: item.paper_id,
-          type: 'answer'
-        });
+      // 看成绩 还是答题逻辑
+      toShowExamRankOrExam(paper_id = null, executeType = null) {
+        let examVo = {
+          examId: this.examWatchState?.iconExecuteItem?.paper_id,
+          type: this.examWatchState?.iconExecuteType // score 或者 answer
+        }; // 默认点击icon触发逻辑
+        if (paper_id && executeType) {
+          // 单个点击快问快答-选择触发逻辑
+          examVo = {
+            examId: paper_id,
+            executeType: executeType
+          };
+        }
+        if (!(examVo && examVo.paper_id)) return;
+        this.closeDialog();
+        this.$emit('clickIcon', examVo);
       },
       // 单个验证逻辑
       checkExamInfo(item) {
         if (item && item.is_end) {
-          // 已结束
+          // 已结束(不做任何处理)
         } else if (item && item.total_score == item.score) {
           // 满分，看成绩
-          this.toShowExamRank(item);
+          this.toShowExamRankOrExam(item.paper_id, 'score');
         } else {
           // 进入答题流程
-          this.toShowExam(item);
+          this.toShowExamRankOrExam(item.paper_id, 'answer');
         }
       },
-      // 关闭问卷面板
-      closeExamList() {
-        this.examListDialogVisible = false;
+      setChatItemData(msg, eventType) {
+        let text_content = {
+          EXAM_PAPER_SEND: this.$t('exam.exam_1001'), // 推送-快问快答
+          EXAM_PAPER_SEND_RANK: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
+          EXAM_PAPER_END: this.$t('exam.exam_1041'), // 快问快答-收卷
+          EXAM_PAPER_AUTO_END: this.$t('exam.exam_1040'), // 快问快答-自动收卷
+          EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
+        };
+        return {
+          nickname: msg.nick_name,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: text_content[eventType],
+            exam_id: msg.paper_id,
+            exam_title: msg.paper_title || ''
+          },
+          roleName: msg.room_role,
+          type: eventType,
+          interactStatus: true,
+          isCheck: true
+        };
+      },
+      listenExamWatchMsg(msg) {
+        if (window.ExamTemplateServer) {
+          // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        }
+        useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
+        if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
+          //  触发自动弹出 - 快问快答答题
+          this.open(msg.paper_id);
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
+          // TODO 快问快答 - 公布成绩
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_END) {
+          // TODO 快问快答 - 收卷
+          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
+          // TODO 快问快答 - 自动收卷
+        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
+          // TODO 快问快答 - 自动公布成绩
+        }
       },
       initExamEvents() {
-        // 事件监听
+        // 监听快问快答消息
+        this.msgServer.$onMsg('ROOM_MSG', this.listenExamWatchMsg);
       }
     },
-    created() {
-      this.examServer = useExamServer();
-      // 第一步：检查快问快答 - 图标状态
-      this.throttleCheckExam = throttle(this.clickExamIcon, 2000, { trailing: false });
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.msgServer = useMsgServer();
+      this.roomBaseServer = useRoomBaseServer();
+      this.examServer = useExamServer(false);
     },
-    mounted() {
+    created() {
+      this.clickExamIcon(true);
+      this.throttleCheckExam = throttle(this.clickExamIcon, 2000, { trailing: false });
       this.initExamEvents();
-    }
+    },
+    mounted() {}
   };
 </script>
 

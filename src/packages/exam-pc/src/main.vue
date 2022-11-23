@@ -74,7 +74,7 @@
             configs: {
               role: 2,
               pageSize: 1,
-              answerType: 'release'
+              answerType: 1
             }
           });
         }
