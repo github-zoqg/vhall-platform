@@ -3,12 +3,12 @@
     <van-popup v-model="unionid" round position="bottom" :close-on-click-overlay="false">
       <div class="auth_header">
         <img src="../assets/images/vh-logo.png" alt="" />
-        <span>微吼直播</span>
-        <span>申请</span>
+        <span>{{ $t('other.other_1022') }}</span>
+        <span>{{ $t('other.other_1023') }}</span>
       </div>
       <div class="auth_body">
-        <p class="tip_header">获取您的微信昵称、头像信息</p>
-        <p class="tip_content">用于观看直播参与聊天、抽奖、抢红包等互动行为。</p>
+        <p class="tip_header">{{ $t('other.other_1024') }}</p>
+        <p class="tip_content">{{ $t('other.other_1025') }}</p>
       </div>
       <div class="button_box">
         <van-button round type="primary" class="auth_button_wid" @click="goAuth">

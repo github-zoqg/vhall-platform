@@ -131,6 +131,7 @@ export function handleAuth(params, path, _next) {
     .then(res => {
       if (res && res.code == 200) {
         localStorage.setItem('token', res.data.token || '');
+        localStorage.setItem('token_stamp', new Date().getTime());
         localStorage.setItem('userInfo', JSON.stringify(res.data));
 
         sessionStorage.setItem('isLogin', '1');
@@ -299,9 +300,15 @@ export function authWeixinAjax(to, address, _next) {
 // init微信授权跳转逻辑
 export async function wxAuthCheck(to, next) {
   let _next = next;
-
+  let token = localStorage.getItem('token');
+  let token_stamp = Number(localStorage.getItem('token_stamp'));
+  // 如果token存在并且不超过20天 则无需微信再次授权
+  if (token && token_stamp + 20 * 24 * 3600 * 1000 < new Date().getTime()) {
+    token = '';
+    token_stamp = '';
+  }
   // 若当前用户已登录过，直接进入界面。
-  if (sessionStorage.getItem('isLogin') == '1') {
+  if (sessionStorage.getItem('isLogin') == '1' || token) {
     next();
     return;
   }
