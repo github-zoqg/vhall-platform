@@ -68,7 +68,7 @@
         } else {
           // 未答题，直接答题
           this.examServer.mount({
-            examId: 17 || examId,
+            examId: examId,
             el: '#examAnswer',
             componentName: 'exampc',
             configs: {
