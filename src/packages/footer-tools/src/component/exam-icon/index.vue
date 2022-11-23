@@ -95,6 +95,7 @@
   </div>
 </template>
 <script>
+  import { useExamServer } from 'middle-domain';
   import { throttle } from 'lodash';
   export default {
     name: 'ExamIcon',
@@ -309,6 +310,7 @@
       }
     },
     created() {
+      this.examServer = useExamServer();
       // 第一步：检查快问快答 - 图标状态
       this.throttleCheckExam = throttle(this.clickExamIcon, 2000, { trailing: false });
     },

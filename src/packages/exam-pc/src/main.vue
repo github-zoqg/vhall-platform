@@ -56,23 +56,23 @@
       },
       async open(examId) {
         this.examId = examId;
-        this.ExamInstance = this.examServer.ExamInstance;
         // 答题前置检查
         await this.examServer.checkExam();
         this.examAnswerVisible = true;
         await this.$nextTick();
         if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
           // 需要填写表单
-          this.ExamInstance.mount({ examId, el: '#userForm', components: 'pc' });
+          this.examServer.mount({ examId, el: '#userForm', components: 'pc' });
         } else if (this.examServer?.state?.userCheckVo?.is_answer == 1) {
           // 已答题，查看个人成绩单结果（可以点击去查看答题结果）
         } else {
           // 未答题，直接答题
-          this.ExamInstance.mount({
+          this.examServer.mount({
             examId: 17 || examId,
             el: '#examAnswer',
             componentName: 'exampc',
             configs: {
+              role: 2,
               pageSize: 1,
               answerType: 'release'
             }

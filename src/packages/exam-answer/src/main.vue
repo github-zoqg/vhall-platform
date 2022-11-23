@@ -51,7 +51,7 @@
       async open(examId) {
         this.examAnswerVisible = true;
         this.examId = examId;
-        this.ExamInstance = useExamServer().ExamInstance;
+        this.ExamInstance = useExamServer().examInstance;
         await this.$nextTick();
         this.ExamInstance.mount({
           examId: 17,
