@@ -201,10 +201,10 @@
       },
       // 单个验证逻辑
       checkExamInfo(item) {
-        if (item && item.is_end) {
+        if (item && item.is_end == 1) {
           // 已结束(不做任何处理)
-        } else if (item && item.total_score == item.score) {
-          // 满分，看成绩
+        } else if (item && item.status == 1) {
+          // 看成绩
           this.toShowExamRankOrExam(item.paper_id, 'score');
         } else {
           // 进入答题流程
@@ -264,7 +264,7 @@
       this.examServer = useExamServer(false);
     },
     created() {
-      this.clickExamIcon(true);
+      this.clickExamIcon();
       this.initExamEvents();
     },
     mounted() {}

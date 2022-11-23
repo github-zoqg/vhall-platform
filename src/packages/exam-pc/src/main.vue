@@ -54,19 +54,20 @@
       closeDialog() {
         this.examAnswerVisible = false;
       },
-      async open(examId) {
+      async open(examId, answerType) {
+        console.log('answerType', answerType);
         this.examId = examId;
-        // 答题前置检查
-        await this.examServer.checkExam();
+        if (answerType == 'answer') {
+          // 答题前置检查
+          await this.examServer.checkExam();
+        }
         this.examAnswerVisible = true;
         await this.$nextTick();
         if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
           // 需要填写表单
           this.examServer.mount({ examId, el: '#userForm', components: 'pc' });
-        } else if (this.examServer?.state?.userCheckVo?.is_answer == 1) {
-          // 已答题，查看个人成绩单结果（可以点击去查看答题结果）
         } else {
-          // 未答题，直接答题
+          // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
             examId: examId,
             el: '#examAnswer',
@@ -74,7 +75,7 @@
             configs: {
               role: 2,
               pageSize: 1,
-              answerType: 1
+              answerType: answerType == 'answer' ? 1 : 2
             }
           });
         }
