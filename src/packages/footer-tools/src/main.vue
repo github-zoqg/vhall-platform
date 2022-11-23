@@ -466,15 +466,9 @@
         );
       },
       checkExamIcon(vo) {
-        if (vo?.type == 'score') {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickExamIconToScore', [vo.examId, vo.type])
-          );
-        } else if (vo?.type == 'answer') {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickExamIconToAnswer', [vo.examId, vo.type])
-          );
-        }
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type])
+        );
       }
     }
   };

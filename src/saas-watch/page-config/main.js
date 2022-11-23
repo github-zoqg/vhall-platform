@@ -246,13 +246,13 @@ export default {
       args: ['$0']
     },
     // 快问快答弹窗 - 查看成绩
-    emitClickExamIconToScore: {
+    emitClickExamIconScore: {
       cuid: ['comExamScore'],
       method: 'open',
       args: ['$0', '$1']
     },
     // 快问快答弹窗 - 答题
-    emitClickExamIconToAnswer: {
+    emitClickExamIcon: {
       cuid: ['comExam'],
       method: 'open',
       args: ['$0', '$1']
