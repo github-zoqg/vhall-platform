@@ -203,27 +203,27 @@
           EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
         };
         return {
-          nickname: msg.nick_name,
+          nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
             text_content: text_content[eventType],
-            exam_id: msg.paper_id,
-            exam_title: msg.paper_title || ''
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
           },
-          roleName: msg.room_role,
+          roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
           isCheck: true
         };
       },
       listenExamWatchMsg(msg) {
+        let that = this;
         if (window.ExamTemplateServer) {
           // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
         }
-        useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
+        useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
         if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
-          this.open(msg.paper_id);
         } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
         } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_END) {

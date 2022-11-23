@@ -201,7 +201,6 @@
       },
       // 单个验证逻辑
       checkExamInfo(item) {
-        debugger;
         if (item && item.is_end) {
           // 已结束(不做任何处理)
         } else if (item && item.total_score == item.score) {
@@ -221,14 +220,14 @@
           EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
         };
         return {
-          nickname: msg.nick_name,
+          nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
             text_content: text_content[eventType],
-            exam_id: msg.paper_id,
-            exam_title: msg.paper_title || ''
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
           },
-          roleName: msg.room_role,
+          roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
           isCheck: true
