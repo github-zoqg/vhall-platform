@@ -39,8 +39,7 @@
     provide: { examServer },
     data() {
       return {
-        // dialogVisible: false,
-        dialogVisible: true,
+        dialogVisible: false,
         componentView: 'ExamListPanel',
         currentExamId: '' // 当前操作的
       };
