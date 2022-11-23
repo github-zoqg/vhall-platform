@@ -264,7 +264,7 @@
       this.examServer = useExamServer(false);
     },
     created() {
-      this.clickExamIcon(true);
+      this.clickExamIcon();
       this.initExamEvents();
     },
     mounted() {}
