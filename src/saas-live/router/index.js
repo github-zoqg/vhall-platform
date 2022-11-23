@@ -91,12 +91,6 @@ const routes = [
     meta: { title: '系统异常' }
   },
   {
-    path: '/demo', // 统一错误页
-    name: 'demo',
-    component: () => import(/* webpackChunkName: "PageError" */ '../views/demo/index.vue'),
-    meta: { title: '系统异常' }
-  },
-  {
     // 其它没有匹配到的路由都会跳至此模块(404）
     // 该路由为必须路由，不需要权限，必须放在最后
     path: '*',
