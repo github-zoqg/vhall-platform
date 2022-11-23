@@ -178,10 +178,10 @@
           // 单个点击快问快答-选择触发逻辑
           examVo = {
             examId: paper_id,
-            executeType: executeType
+            type: executeType
           };
         }
-        if (!(examVo && examVo.paper_id)) return;
+        if (!(examVo && examVo.examId)) return;
         this.closeDialog();
         this.$emit('clickIcon', examVo);
       },

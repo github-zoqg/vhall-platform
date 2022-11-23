@@ -198,7 +198,7 @@
             executeType: executeType
           };
         }
-        if (!(examVo && examVo.paper_id)) return;
+        if (!(examVo && examVo.examId)) return;
         this.closeDialog();
         this.$emit('clickIcon', examVo);
       },
