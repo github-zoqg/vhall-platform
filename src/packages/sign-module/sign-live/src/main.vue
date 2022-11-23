@@ -205,6 +205,7 @@
             this.setSignState({ signInfo: state });
             this.setIntervalAction();
           } else if (res.code == 513204) {
+            // 已经发过签到
             this.endSignServe();
           } else {
             this.$message.error(res.msg);
