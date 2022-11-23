@@ -117,7 +117,6 @@
       },
       configList() {
         let configList = this.$domainStore.state.roomBaseServer.configList;
-        configList.exam = 1; // TODO 快问快答
         return configList;
       }
     },
