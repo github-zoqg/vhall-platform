@@ -53,7 +53,7 @@
                   <template v-if="item && item.is_end">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.total_score > 0">
+                  <template v-else-if="item && item.status == 1 && item.is_end == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -73,10 +73,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div
-                    class="button_answer"
-                    v-if="!(item && item.total_score > 0) && !(item && item.is_end)"
-                  >
+                  <div class="button_answer" v-if="item && item.status == 0 && item.is_end == 0">
                     <van-button type="danger" size="mini" round>
                       {{ $t('exam.exam_1027') }}
                     </van-button>
@@ -240,12 +237,10 @@
         };
       },
       listenExamWatchMsg(msg) {
-        debugger;
         if (window.ExamTemplateServer) {
           // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
         }
         useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
-        alert('xxxx');
         if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
           this.open(msg.paper_id);
