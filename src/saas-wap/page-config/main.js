@@ -316,13 +316,13 @@ export default {
     emitClickExamIconToScore: {
       cuid: ['comExamScoreWap'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     // 快问快答弹窗 - 答题
     emitClickExamIconToAnswer: {
       cuid: ['comExamWap'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     }
   },
   comSignWap: {
