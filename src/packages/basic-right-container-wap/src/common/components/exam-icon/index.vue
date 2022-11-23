@@ -50,10 +50,10 @@
               <div class="container-data__title">
                 <div class="container-data__title__left">{{ item.title }}</div>
                 <div class="container-data__title__right">
-                  <template v-if="item && item.is_end">
+                  <template v-if="item && item.is_end == 1">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.status == 1 && item.is_end == 1">
+                  <template v-else-if="item && item.status == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -62,7 +62,7 @@
                           item.total_score > 0
                             ? item.total_score == item.score
                               ? $t('exam.exam_1042')
-                              : item.total_score
+                              : item.score
                             : item.right_rate
                         "
                       ></span>
@@ -73,7 +73,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div class="button_answer" v-if="item && item.status == 0 && item.is_end == 0">
+                  <div class="button_answer" v-else>
                     <van-button type="danger" size="mini" round>
                       {{ $t('exam.exam_1027') }}
                     </van-button>
@@ -83,21 +83,18 @@
               <div class="container-data__info">
                 <div>
                   <label v-text="`${$t('exam.exam_1023')}:`"></label>
-                  <span v-text="item.push_time_str"></span>
+                  <span>{{ item.push_time | fmtTimeByExp('HH:mm') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1024')}:`"></label>
-                  <span
-                    v-text="
-                      `${
-                        item.limit_time_switch == 1 ? item.limit_time_str : $t('exam.exam_1006')
-                      }  `
-                    "
-                  ></span>
+                  <span v-if="item.limit_time_switch == 1">
+                    {{ item.limit_time | examTimeByMinute }}
+                  </span>
+                  <span v-else>{{ $t('exam.exam_1006') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1025')}:`"></label>
-                  <span class="color-red" v-text="item.score"></span>
+                  <span class="color-red" v-text="item.total_score"></span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1026')}:`"></label>
@@ -195,7 +192,7 @@
           // 单个点击快问快答-选择触发逻辑
           examVo = {
             examId: paper_id,
-            executeType: executeType
+            type: executeType
           };
         }
         if (!(examVo && examVo.examId)) return;
@@ -223,14 +220,14 @@
           EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
         };
         return {
-          nickname: msg.nick_name,
+          nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
             text_content: text_content[eventType],
-            exam_id: msg.paper_id,
-            exam_title: msg.paper_title || ''
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
           },
-          roleName: msg.room_role,
+          roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
           isCheck: true

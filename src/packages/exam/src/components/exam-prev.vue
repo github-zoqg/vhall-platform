@@ -1,6 +1,15 @@
 <template>
-  <div class="exam-prev">
-    <div ref="ExamCreate"></div>
+  <div class="vmp-exam-prev-live">
+    <vh-dialog
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+      :title="title"
+      width="380px"
+      draggable
+      :modal="false"
+    >
+      <div ref="ExamPrev"></div>
+    </vh-dialog>
   </div>
 </template>
 <script>
@@ -8,33 +17,53 @@
     name: 'ExamCreate',
     inject: ['examServer'],
     props: {
-      prevExamId: {
-        type: [String, Number],
-        default() {
-          return '';
-        }
-      }
+      // prevExamId: {
+      //   type: [String, Number],
+      //   default() {
+      //     return '';
+      //   }
+      // }
     },
-
+    data() {
+      return {
+        dialogVisible: false,
+        prevExamId: '',
+        title: ''
+      };
+    },
     mounted() {
-      this.initComp();
+      // this.initComp();
     },
     methods: {
+      open(examId, examTitle) {
+        this.title = examTitle;
+        this.prevExamId = examId;
+        this.dialogVisible = true;
+        this.$nextTick(() => {
+          this.initComp();
+        });
+      },
       initComp() {
-        const el = this.$refs.ExamCreate;
-        console.log('🚀 ~ file: exam-create.vue ~ line 18 ~ currentExamId', this.currentExamId);
+        const el = this.$refs.ExamPrev;
         this.examServer.mount({
-          componentName: 'examedit',
-          examId: this.currentExamId,
+          examId: this.prevExamId,
           el,
+          componentName: 'exampc',
           configs: {
             role: 1,
-            source_id: 863283088,
-            source_type: 1,
-            client: 'live'
+            pageSize: 1,
+            answerType: '1'
           }
         });
       }
     }
   };
 </script>
+.
+<style lang="less">
+  .vmp-exam-prev-live {
+    .vh-dialog__body {
+      padding: 0;
+    }
+  }
+</style>

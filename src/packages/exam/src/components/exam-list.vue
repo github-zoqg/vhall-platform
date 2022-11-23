@@ -128,13 +128,15 @@
         </div>
       </div>
     </div>
-    <!-- <ExamRankLive /> -->
+    <ExamRankLive ref="rank" />
+    <ExamPrev ref="prev" />
     <!-- 资料库 -->
   </div>
 </template>
 <script>
   import changeView from '../common/mixins/changeView.js';
-  // import ExamRankLive from '@/packages/exam-rank/src/rank-live.vue';
+  import ExamRankLive from '@/packages/exam-rank/src/rank-live.vue';
+  import ExamPrev from './exam-prev.vue';
   // 操作按钮
   const btnMap = {
     publish: { type: 'publish', name: '公布' },
@@ -163,7 +165,8 @@
     mixins: [changeView],
     inject: ['examServer'],
     components: {
-      // ExamRankLive
+      ExamRankLive,
+      ExamPrev
     },
     data() {
       return {
@@ -348,17 +351,22 @@
           .then(confirmCb)
           .catch(noop);
       },
-      // 成绩
-      score(btnIsDisabled) {
-        console.log('公布成绩');
+      handleExamScore(examObj) {
+        const rankCom = this.$refs.rank;
+        rankCom.open(examObj.id);
       },
       // 预览
-      preview(btnIsDisabled) {
-        this.$emit('examBtnClick', {
-          type: 'preview',
-          currentRow: this.selectedExam
-        });
+      handleExamPrev(examObj) {
+        const prevCom = this.$refs.prev;
+        prevCom.open(examObj.id, examObj.title);
       },
+      // 预览
+      // preview(btnIsDisabled) {
+      //   this.$emit('examBtnClick', {
+      //     type: 'preview',
+      //     currentRow: this.selectedExam
+      //   });
+      // },
 
       // 获取考试成绩列表(清空条件搜索,回到首页)
       getExamList() {
