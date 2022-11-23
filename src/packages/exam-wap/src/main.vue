@@ -156,7 +156,7 @@
         });
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
-          this.popupVisible = false;
+          this.examAnswerVisible = false;
         });
       }
     },
