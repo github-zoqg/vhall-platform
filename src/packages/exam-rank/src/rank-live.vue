@@ -2,6 +2,7 @@
   <vh-dialog
     :visible.sync="dialogVisible"
     width="544px"
+    :modal="false"
     custom-class="result"
     class="vmp-rank-live"
   >
@@ -150,7 +151,6 @@
     },
     methods: {
       open(examId) {
-        console.log('🚀 ~ file: rank-live.vue ~ line 156 ~ open ~ open', examId);
         this.examId = examId;
         this.initComp();
         this.dialogVisible = true;
