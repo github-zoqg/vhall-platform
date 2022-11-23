@@ -184,7 +184,7 @@
       },
       // 单个验证逻辑
       checkExamInfo(item) {
-        if (item && item.is_end) {
+        if (item && item.is_end == 1) {
           // 已结束(不做任何处理)
         } else if (item && item.status == 1) {
           // 看成绩
