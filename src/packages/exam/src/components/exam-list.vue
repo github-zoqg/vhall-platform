@@ -128,7 +128,7 @@
         </div>
       </div>
     </div>
-    <ExamRankLive ref="rank"/>
+    <ExamRankLive ref="rank" />
     <!-- 资料库 -->
   </div>
 </template>
@@ -348,9 +348,9 @@
           .then(confirmCb)
           .catch(noop);
       },
-      handleExamScore (examObj) {
-        const rankCom = this.$refs.rank
-        rankCom.open(examObj.id)
+      handleExamScore(examObj) {
+        const rankCom = this.$refs.rank;
+        rankCom.open(examObj.id);
       },
       // 成绩
       score(btnIsDisabled) {
