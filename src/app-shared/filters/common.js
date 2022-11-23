@@ -23,6 +23,12 @@ Vue.filter('chatTime', value => {
   return value.substring(0, 16);
 });
 
+Vue.filter('examTimeByMinute', value => {
+  let hour = Math.floor(value / 60);
+  let minute = value - hour * 60;
+  return `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}`;
+});
+
 /**
  * 字符串截取,超出点点点
  */
