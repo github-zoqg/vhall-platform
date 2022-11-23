@@ -2,9 +2,9 @@
   <vh-dialog
     :visible.sync="dialogVisible"
     width="544px"
+    :modal="false"
     custom-class="result"
     class="vmp-rank-live"
-    :before-close="handleClose"
   >
     <!-- 自定义头部 -->
     <span slot="title">
@@ -13,7 +13,7 @@
       <span class="sub-title">公布成绩</span>
     </span>
     <!-- 内容 -->
-    <div class="dialog-content">
+    <div class="dialog-content" v-loading="loading">
       <div class="summary-panel">
         <div class="title-wrap std-title-lv1 std-border-bottom m-b-12">
           <span class="std-title-lv1 truncate title">
@@ -43,7 +43,7 @@
                   <i class="iconfont-v3 saasicon_help_m" />
                 </el-tooltip>
               </h3>
-              <p class="number">{{ item.value }}</p>
+              <p class="summary-number">{{ item.value }}</p>
             </div>
           </el-col>
         </el-row>
@@ -74,11 +74,15 @@
         <vh-table-column prop="use_time" label="用时" min-width="60"></vh-table-column>
       </vh-table>
       <p class="tip">最多展示前200名成绩，更多数据请查看「控制台-当前活动-互动统计-快问快答」</p>
+
       <vh-pagination
+        class="ma text-center"
         background
-        class="text-center ma m-t-16"
         layout="prev, pager, next"
+        :page-size="queryParams.limit"
         :total="total"
+        :current-page="queryParams.pageNum"
+        @current-change="handleChangePage"
       ></vh-pagination>
     </div>
   </vh-dialog>
@@ -124,63 +128,76 @@
   }, []);
 
   export default {
-    name: 'rank',
+    name: 'VMPRankLive',
+    inject: ['examServer'],
     components: {
       RankAvatar,
       RankNo
     },
     data() {
       return {
-        dialogVisible: true,
+        queryParams: {
+          limit: 5,
+          pageNum: 1
+        },
+        examId: '',
+        dialogVisible: false,
         title: '',
         summaryData,
         rankList: [],
-        total: 25
+        total: 0,
+        loading: false
       };
     },
-    created() {
-      this.initData();
-    },
     methods: {
+      open(examId) {
+        this.examId = examId;
+        this.initComp();
+        this.dialogVisible = true;
+      },
+      initComp() {
+        this.loading = true;
+        this.queryParams.pageNum = 1;
+        this.getSummary()
+          .then(() => {
+            this.getRankData();
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
       // 获取桌面
-      initData() {
-        const data = {
-          title:
-            '行显示超苹果2022年新品发布会极致行显示超苹果2022年新品发布会极致行显示超苹果2022年新品发布会极致',
-          check_num: '123',
-          answer_num: '33',
-          full_score_rate: '4',
-          full_score_count: '12',
-          max_score: '100',
-          min_score: '10',
-          avg_score: '30'
-        };
-        this.title = data.title;
-        summaryDataMap.check.value = data.check_num;
-        summaryDataMap.answer.value = data.answer_num;
-        summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_count}人`;
-        summaryDataMap.max.value = data.max_score;
-        summaryDataMap.min.value = data.min_score;
-        summaryDataMap.avg.value = data.avg_score;
-        this.initRankData();
+      getSummary() {
+        return this.examServer.getExamSummary(this.examId).then(res => {
+          if (res.code !== 200) return;
+          const data = res.data;
+          this.title = data.title;
+          summaryDataMap.check.value = data.check_num;
+          summaryDataMap.answer.value = data.answer_num;
+          summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_num}人`;
+          summaryDataMap.max.value = data.max_score;
+          summaryDataMap.min.value = data.min_score;
+          summaryDataMap.avg.value = data.avg_score;
+        });
       },
-      initRankData() {
-        const mockData = {
-          rank_no: 1,
-          user_name: 'user_name',
-          head_img: '',
-          score: '100',
-          right_rate: '10%',
-          use_time: '90:10'
+      getRankData() {
+        const params = {
+          pos: this.queryParams.pageNum,
+          limit: this.queryParams.limit,
+          paper_id: this.examId
         };
-        const data = {
-          total: 20,
-          list: new Array(5).fill(mockData)
-        };
-        this.total = data.total;
-        this.rankList = data.list;
+        this.examServer.getExamRankList(params).then(res => {
+          if (res.code === 200) {
+            const data = res.data;
+            this.total = data.total;
+            this.rankList = data.list;
+          }
+        });
       },
-      handleClose() {}
+      handleChangePage(page) {
+        this.queryParams.pageNum = page;
+        this.getRankData();
+      }
     }
   };
 </script>
@@ -188,6 +205,10 @@
 <style lang="less">
   @import url('~@/app-shared/assets/css/mixin.less');
   .vmp-rank-live {
+    // reset vhall-ui
+    .vh-table th:first-child .cell {
+      padding-left: 0 !important;
+    }
     .iconfont-v3 {
       font-size: 14px;
     }
@@ -242,7 +263,7 @@
       }
     }
 
-    .number {
+    .summary-number {
       font-weight: 700;
       font-size: 20px;
       line-height: 22px;
