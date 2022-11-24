@@ -3,20 +3,25 @@
     class="icon-wrap"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <!-- 有小红点图标 -->
-    <img
-      src="https://s3.e.vhall.com/common-static/vhall-form/images/exam_no.png"
-      alt=""
-      v-if="examWatchState.dotVisible"
-      @click="clickExamIcon(true)"
-    />
-    <!-- 无小红点图标 -->
-    <img
-      src="https://s3.e.vhall.com/common-static/vhall-form/images/exam.png"
-      alt=""
-      v-else
-      @click="clickExamIcon(true)"
-    />
+    <template v-if="iconStyle == 1">
+      <img
+        src="./images/exam_no.png"
+        alt=""
+        @click="clickExamIcon(true)"
+        v-if="examWatchState.dotVisible"
+      />
+      <img src="./images/exam.png" alt="" @click="clickExamIcon(true)" v-else />
+    </template>
+    <template v-else>
+      <img
+        src="./images/exam_no2.png"
+        alt=""
+        @click="clickExamIcon(true)"
+        v-if="examWatchState.dotVisible"
+      />
+      <img src="./images/exam2.png" alt="" @click="clickExamIcon(true)" v-else />
+    </template>
+    <slot></slot>
     <!-- 快问快答-列表弹框 -->
     <van-popup
       get-container="#otherPopupContainer"
@@ -149,7 +154,7 @@
       'examWatchResult.list': {
         handler: function (val) {
           if (val) {
-            let arr = val.filter(item => item.is_answered == 0);
+            let arr = val.filter(item => item.is_end == 0 && item.status == 0);
             if (arr.length > 0) {
               this.examServer.setExamWatchDotVisible(true);
             } else {

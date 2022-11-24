@@ -3,15 +3,8 @@
     class="vmp-exam-icon"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <img
-      src="./images/exam_no.png"
-      alt=""
-      v-if="examWatchState.dotVisible"
-      @click="throttleCheckExam"
-    />
-    <img src="./images/exam.png" alt="" v-else @click="throttleCheckExam" />
-    <!-- <img src="./images/questionnaire.png" alt="" @click="throttleCheckExam" />
-    <i class="vmp-dot" v-if="dotVisible" /> -->
+    <img src="./images/exam.png" alt="" @click="throttleCheckExam" />
+    <i class="vmp-dot" v-if="examWatchState.dotVisible" />
     <!-- 快问快答-列表弹框 -->
     <vh-dialog
       custom-class="exam_base"
@@ -132,7 +125,7 @@
       'examWatchResult.list': {
         handler: function (val) {
           if (val) {
-            let arr = val.filter(item => item.is_answered == 0);
+            let arr = val.filter(item => item.is_end == 0 && item.status == 0);
             if (arr.length > 0) {
               this.examServer.setExamWatchDotVisible(true);
             } else {
