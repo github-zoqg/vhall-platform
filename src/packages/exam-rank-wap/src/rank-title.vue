@@ -26,5 +26,10 @@
     font-size: 28px;
     line-height: 40px;
     color: #262626;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
   }
 </style>

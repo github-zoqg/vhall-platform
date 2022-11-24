@@ -606,7 +606,7 @@
         if (['paper_auto_send_rank', 'paper_send_rank'].includes(vo.sourceType)) {
           // 发起端-公布成绩 or 自动推送成绩
           window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickExamRankChatItem', [vo.examId])
+            boxEventOpitons(this.cuid, 'emitClickExamRankChatItem', [vo.examId, vo.examTitle])
           );
         } else if ('paper_send' == vo.sourceType) {
           // 发起端 - 推送快问快答
