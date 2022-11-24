@@ -16,7 +16,7 @@
   </van-popup>
 </template>
 <script>
-  import { useMsgServer, useChatServer, useZIndexServer, useExamServer } from 'middle-domain';
+  import { useMsgServer, useZIndexServer, useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamWap',
     data() {
@@ -88,14 +88,36 @@
             }
           });
         }
+      },
+      listenExamWatchMsg(msg, that) {
+        if (window.ExamTemplateServer) {
+          // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
+        }
+        if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
+          // TODO 快问快答 - 收卷
+          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
+          this.closeDialog();
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
+          // TODO 快问快答 - 自动收卷
+          this.closeDialog();
+        }
+      },
+      initExamEvents() {
+        // 监听快问快答消息
+        let that = this;
+        this.msgServer.$onMsg('ROOM_MSG', msg => {
+          this.listenExamWatchMsg(msg, that);
+        });
       }
     },
     beforeCreate() {
       this.zIndexServer = useZIndexServer();
-      this.msgServer = useMsgServer();
       this.examServer = useExamServer();
+      this.msgServer = useMsgServer();
     },
-    created() {}
+    created() {
+      this.initExamEvents();
+    }
   };
 </script>
 <style lang="less">

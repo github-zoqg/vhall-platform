@@ -24,10 +24,10 @@
           </li>
         </ul>
       </div>
+      <div class="self-rank">
+        <RankItemWatch class="ma" />
+      </div>
       <div class="dialog-bottom">
-        <div class="self-rank">
-          <RankItemWatch class="ma" />
-        </div>
         <vh-pagination
           background
           slot="footer"
@@ -38,6 +38,7 @@
           :total="total"
           :current-page="queryParams.pageNum"
           @current-change="handleChangePage"
+          v-if="total > 0"
         ></vh-pagination>
       </div>
     </div>
@@ -67,7 +68,7 @@
           pageNum: 1
         },
         rankList: [],
-        total: 200,
+        total: 0,
         loading: false
       };
     },
@@ -148,6 +149,9 @@
     position: relative;
     .rank-list-wrap {
       padding: 0 24px;
+      padding-top: 52px;
+      overflow-y: auto;
+      height: 226px;
     }
     .rank-list {
       background: #fff;
@@ -179,10 +183,16 @@
       width: 100%;
       left: 0;
       bottom: 0;
+      background: #ffffff;
     }
     .self-rank {
       padding: 0 12px;
-      background: #f5f5f5;
+      background: #ffffff;
+      position: absolute;
+      left: 0;
+      top: 44px;
+      box-sizing: border-box;
+      margin: 0 24px;
     }
     .vh-pagination {
       padding: 16px 0;

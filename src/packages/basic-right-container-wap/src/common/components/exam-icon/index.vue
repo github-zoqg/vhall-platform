@@ -256,11 +256,6 @@
           that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
-          // TODO 快问快答 - 收卷
-          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
-          // TODO 快问快答 - 自动收卷
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
           // TODO 快问快答 - 自动公布成绩
         }
