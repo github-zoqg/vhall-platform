@@ -4,31 +4,31 @@ var __createBinding =
   (this && this.__createBinding) ||
   (Object.create
     ? function (o, m, k, k2) {
-        if (k2 === undefined) k2 = k;
-        var desc = Object.getOwnPropertyDescriptor(m, k);
-        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-          desc = {
-            enumerable: true,
-            get: function () {
-              return m[k];
-            }
-          };
-        }
-        Object.defineProperty(o, k2, desc);
+      if (k2 === undefined) k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+          enumerable: true,
+          get: function () {
+            return m[k];
+          }
+        };
       }
+      Object.defineProperty(o, k2, desc);
+    }
     : function (o, m, k, k2) {
-        if (k2 === undefined) k2 = k;
-        o[k2] = m[k];
-      });
+      if (k2 === undefined) k2 = k;
+      o[k2] = m[k];
+    });
 var __setModuleDefault =
   (this && this.__setModuleDefault) ||
   (Object.create
     ? function (o, v) {
-        Object.defineProperty(o, 'default', { enumerable: true, value: v });
-      }
+      Object.defineProperty(o, 'default', { enumerable: true, value: v });
+    }
     : function (o, v) {
-        o['default'] = v;
-      });
+      o['default'] = v;
+    });
 var __importStar =
   (this && this.__importStar) ||
   function (mod) {
@@ -54,6 +54,7 @@ const t = __importStar(require('@babel/types'));
 function vitePluginRequireTransform(params = {}) {
   const {
     fileRegex = /.ts$|.tsx$/,
+    excludeRegex = /node_modules/,
     importPrefix: prefix = '_vite_plugin_require_transform_',
     importPathHandler
   } = params;
@@ -64,7 +65,9 @@ function vitePluginRequireTransform(params = {}) {
     name: prefix,
     async transform(code, id) {
       let newCode = code;
-      if (fileRegex.test(id)) {
+
+
+      if (!excludeRegex.test(id) && fileRegex.test(id)) {
         let plugins = [];
         const ast = parser.parse(code, {
           sourceType: 'module',
@@ -131,7 +134,7 @@ function vitePluginRequireTransform(params = {}) {
                       (_d =
                         (_c =
                           declaredVariables[
-                            identifier === null || identifier === void 0 ? void 0 : identifier.name
+                          identifier === null || identifier === void 0 ? void 0 : identifier.name
                           ]) === null || _c === void 0
                           ? void 0
                           : _c.init) === null || _d === void 0
@@ -164,7 +167,7 @@ function vitePluginRequireTransform(params = {}) {
                   (_j =
                     (_h =
                       (_g = path === null || path === void 0 ? void 0 : path.parentPath) === null ||
-                      _g === void 0
+                        _g === void 0
                         ? void 0
                         : _g.parentPath) === null || _h === void 0
                       ? void 0
@@ -178,7 +181,7 @@ function vitePluginRequireTransform(params = {}) {
                   (_m =
                     (_l =
                       (_k = path === null || path === void 0 ? void 0 : path.parentPath) === null ||
-                      _k === void 0
+                        _k === void 0
                         ? void 0
                         : _k.parentPath) === null || _l === void 0
                       ? void 0
