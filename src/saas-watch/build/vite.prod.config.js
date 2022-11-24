@@ -13,8 +13,8 @@ module.exports = {
       }
     },
     js: {
-      vue: `${CDN_DOMAIN.T1}/common-static/middle/vue/2.6.14/dist/vue.js`,
-      MiddleDomain: `${CDN_DOMAIN.T1}/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
+      vue: `${CDN_DOMAIN.S1}/common-static/middle/vue/2.6.14/dist/vue.js`,
+      MiddleDomain: `${CDN_DOMAIN.S2}/common-static/middle/middle-domain/${domainVersion}/middle-domain.js`
     }
   }
 };
