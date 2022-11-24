@@ -101,8 +101,12 @@
             interactStatus: true,
             Show: true
           });
-          const uuid = data.red_packet_uuid;
-          this.open(uuid);
+          // const uuid = data.red_packet_uuid;
+          // this.open(uuid);
+          this.redPacketServer.setUUid(data.red_packet_uuid);
+          this.componentsView = 'RedPacketAccept';
+          this.dialogVisible = true;
+          this.zIndexServer.setDialogZIndex('redPacket');
         });
         // 直播结束关闭弹窗
         this.msgServer.$on('live_over', () => {
