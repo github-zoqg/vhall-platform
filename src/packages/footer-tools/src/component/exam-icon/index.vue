@@ -32,16 +32,18 @@
             <li
               v-for="(item, index) in examWatchResult.list"
               :key="index"
-              :class="`container-data__item ${item && item.is_end ? 'button_end_bg' : ''}`"
+              :class="`container-data__item ${
+                item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
+              }`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
                 <div class="container-data__title__left">{{ item.title }}</div>
                 <div class="container-data__title__right">
-                  <template v-if="item && item.is_end == 1">
+                  <template v-if="item && item.is_end == 1 && item.status == 0">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.status == 1">
+                  <template v-else-if="item && item.is_end == 1 && item.status == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -61,7 +63,7 @@
                       ></span>
                     </div>
                   </template>
-                  <div class="button_answer" v-else>
+                  <div class="button_answer" v-else-if="item && item.is_end == 0">
                     <el-button type="danger" size="mini" round class="exam-answer-btn">
                       {{ $t('exam.exam_1027') }}
                     </el-button>
@@ -184,23 +186,23 @@
       },
       // 单个验证逻辑
       checkExamInfo(item) {
-        if (item && item.is_end == 1) {
+        if (item && item.is_end == 1 && item.status == 0) {
           // 已结束(不做任何处理)
-        } else if (item && item.status == 1) {
+        } else if (item && item.is_end == 1 && item.status == 1) {
           // 看成绩
           this.toShowExamRankOrExam(item.paper_id, 'score');
-        } else {
+        } else if (item && item.is_end == 0) {
           // 进入答题流程
           this.toShowExamRankOrExam(item.paper_id, 'answer');
         }
       },
       setChatItemData(msg, eventType) {
         let text_content = {
-          EXAM_PAPER_SEND: this.$t('exam.exam_1001'), // 推送-快问快答
-          EXAM_PAPER_SEND_RANK: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
-          EXAM_PAPER_END: this.$t('exam.exam_1041'), // 快问快答-收卷
-          EXAM_PAPER_AUTO_END: this.$t('exam.exam_1040'), // 快问快答-自动收卷
-          EXAM_PAPER_AUTO_SEND_RANK: this.$t('exam.exam_1032') // 快问
+          paper_send: this.$t('exam.exam_1001'), // 推送-快问快答
+          paper_send_rank: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
+          paper_end: this.$t('exam.exam_1041'), // 快问快答-收卷
+          paper_auto_end: this.$t('exam.exam_1040'), // 快问快答-自动收卷
+          paper_auto_send_rank: this.$t('exam.exam_1032') // 快问
         };
         return {
           nickname: msg.data.nick_name,

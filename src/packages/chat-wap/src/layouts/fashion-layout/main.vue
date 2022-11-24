@@ -570,7 +570,7 @@
         } else if ('paper_send' == vo.sourceType) {
           // 推送-快问快答
           window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitClickExamChatItem', [vo.examId])
+            boxEventOpitons(this.cuid, 'emitClickExamChatItem', [vo.examId, 'answer'])
           );
         }
       },

@@ -54,7 +54,7 @@
         this.ExamInstance = useExamServer().examInstance;
         await this.$nextTick();
         this.ExamInstance.mount({
-          examId: 17,
+          examId: examId,
           el: '#examanswer',
           componentName: 'exampc',
           config: { pageSize: 1 }
