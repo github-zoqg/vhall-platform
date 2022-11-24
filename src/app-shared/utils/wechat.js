@@ -103,6 +103,9 @@ export function handleThirdLoginOrPay(_next) {
     if (open_id) {
       sessionStorage.setItem('open_id', open_id);
       sessionStorage.setItem('user_auth_key', user_auth_key);
+      // unionid 不能为会话缓存
+      localStorage.setItem('unionid', user_auth_key);
+      console.log('weixin_auth++++++++++++++++++++++++++', 111);
     }
     handleAuth(params, path, _next);
   } else if (purpose == 'payAuth') {
@@ -128,6 +131,7 @@ export function handleAuth(params, path, _next) {
     .then(res => {
       if (res && res.code == 200) {
         localStorage.setItem('token', res.data.token || '');
+        localStorage.setItem('token_stamp', new Date().getTime());
         localStorage.setItem('userInfo', JSON.stringify(res.data));
 
         sessionStorage.setItem('isLogin', '1');
@@ -259,7 +263,12 @@ export function authWeixinAjax(to, address, _next) {
         .then(res => {
           if (res && res.code == 200) {
             console.log('wechat 当前authWeChat接口请求后地址结果为：', res.data.url);
-            window.location.replace(res.data.url);
+            if (localStorage.getItem('unionid')) {
+              window.location.replace(res.data.url);
+            } else {
+              sessionStorage.setItem('weixin_auth_url', res.data.url);
+              _next();
+            }
           } else {
             Toast({
               message: res.msg || '微信回调失败，请重新扫码',
@@ -291,9 +300,15 @@ export function authWeixinAjax(to, address, _next) {
 // init微信授权跳转逻辑
 export async function wxAuthCheck(to, next) {
   let _next = next;
-
+  let token = localStorage.getItem('token');
+  let token_stamp = Number(localStorage.getItem('token_stamp'));
+  // 如果token存在并且不超过20天 则无需微信再次授权
+  if (token && token_stamp + 20 * 24 * 3600 * 1000 < new Date().getTime()) {
+    token = '';
+    token_stamp = '';
+  }
   // 若当前用户已登录过，直接进入界面。
-  if (sessionStorage.getItem('isLogin') == '1') {
+  if (sessionStorage.getItem('isLogin') == '1' || token) {
     next();
     return;
   }
