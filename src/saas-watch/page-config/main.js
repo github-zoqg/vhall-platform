@@ -413,7 +413,7 @@ export default {
     emitClickExamRankChatItem: {
       cuid: ['comExamRank'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     emitClickExamChatItem: {
       cuid: ['comExam'],

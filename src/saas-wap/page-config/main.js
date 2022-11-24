@@ -188,7 +188,7 @@ export default {
     emitClickExamRankChatItem: {
       cuid: ['comExamRankWap'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     emitClickExamChatItem: {
       cuid: ['comExamWap'],

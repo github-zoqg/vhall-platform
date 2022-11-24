@@ -8,7 +8,7 @@
     @close="closeDialog"
     v-if="examRankVisible"
   >
-    <RankTitle title="Apple产品功能知识" />
+    <RankTitle :title="examTitle" />
     <div class="vmp-rank-wap">
       <RankLabel />
       <div class="rank-list-wrap">
@@ -48,7 +48,7 @@
     data() {
       return {
         examRankVisible: true,
-        title: '',
+        examTitle: '',
         rankList: [],
         examId: '',
         loading: false,
@@ -74,9 +74,10 @@
       handleClose() {
         this.examRankVisible = false;
       },
-      async open(examId) {
+      async open(examId, examTitle = '') {
         this.examRankVisible = true;
         this.examId = examId;
+        this.examTitle = examTitle;
         this.initData();
       },
       // 获取桌面
