@@ -19,6 +19,9 @@
     mounted() {
       this.initComp();
     },
+    beforeDestroy() {
+      this.examServer.$off(this.examServer.events['SUBMITEDIT'], this.createSuccess);
+    },
     methods: {
       initComp() {
         const el = this.$refs.ExamCreate;
@@ -34,6 +37,14 @@
             client: 'live'
           }
         });
+        console.log(this.examServer);
+        this.examServer.examInstance.$on(
+          this.examServer.examInstance.events['SUBMITEDIT'],
+          this.createSuccess
+        );
+      },
+      createSuccess() {
+        alert('保存成功');
       }
     }
   };

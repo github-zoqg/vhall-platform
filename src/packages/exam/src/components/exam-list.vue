@@ -1,23 +1,5 @@
 <template>
   <div class="exam-list-panel">
-    <!-- 内层嵌套对话框 -->
-    <vh-dialog
-      width="400px"
-      title="提示"
-      :show-close="false"
-      custom-class="exam-dlg-share-tip"
-      :close-on-click-modal="false"
-      :visible.sync="innerVisible"
-      top="30vh"
-      append-to-body
-    >
-      <p class="tip-text">保存同时共享至资料管理，便于其他活动使用？</p>
-      <p><vh-checkbox v-model="isShare">共享到资料管理</vh-checkbox></p>
-      <div class="dialog-footer">
-        <vh-button type="primary" round @click="handleShareSubmit">确 定</vh-button>
-        <vh-button round @click="handleShareCancel">取 消</vh-button>
-      </div>
-    </vh-dialog>
     <!-- 快问快答—列表 -->
     <div>
       <!-- 无数据 -->
