@@ -93,7 +93,8 @@ export default defineConfig(async () => {
       }),
       // 支持require语法
       requireTransform({
-        fileRegex: /.vue$/,
+        fileRegex: /.js$|.vue$/,
+        excludeRegex: /node_modules/,
         importPathHandler(requirePath) {
           // 该插件考虑不完善，需要重新映射@
           return requirePath.replace(/(\.|\?|-|\/|@)/g, '_');

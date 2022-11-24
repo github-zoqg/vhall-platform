@@ -21,5 +21,6 @@ const map = {
 };
 
 export default function getAsset(assetName) {
+  console.log('assetName', assetName);
   return map[assetName] || map['reward'];
 }
