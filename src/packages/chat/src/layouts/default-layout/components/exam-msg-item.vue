@@ -8,8 +8,8 @@
    -->
   <div class="msg-item-template__interact exam_msg_flex">
     <div class="msg-item-template__interact-content">
-      <!-- 收到快问快答 / 公布-快问快答-成绩 -->
-      <template v-if="['paper_send', 'paper_send_rank'].includes(source.type)">
+      <!-- 收到快问快答 / 公布-快问快答-成绩 / 收卷 -->
+      <template v-if="['paper_send', 'paper_send_rank', 'paper_end'].includes(source.type)">
         <div
           class="msg-item__top"
           @tap="checkExamDetail(source.content.exam_id, source.type)"
@@ -26,7 +26,7 @@
             {{ source.nickname | overHidden(4) }}
           </span>
           <span>{{ source.content.text_content }}</span>
-          <span class="msg-item__top__highlight">
+          <span class="msg-item__top__highlight" v-if="source.type != 'paper_end'">
             {{ source.type == 'paper_send' ? $t('chat.chat_1093') : $t('exam.exam_1004') }}
           </span>
         </div>
@@ -35,11 +35,11 @@
           @tap="checkExamDetail(source.content.exam_id, source.type)"
           @click="checkExamDetail(source.content.exam_id, source.type)"
         >
-          <span class="highlight">《{{ overHidden(source.content.exam_title, 23) }}》</span>
+          <span>《{{ overHidden(source.content.exam_title, 23) }}》</span>
         </div>
       </template>
-      <!-- 快问快答-收卷 / 自动收卷 -->
-      <template v-else-if="['paper_end', 'paper_auto_end'].includes(source.type)">
+      <!-- 快问快答-自动收卷 -->
+      <template v-else-if="['paper_auto_end'].includes(source.type)">
         <div class="msg-item__top flex_center">
           {{ source.content.text_content }}
         </div>
@@ -62,7 +62,7 @@
           @tap="checkExamDetail(source.content.exam_id, source.type)"
           @click="checkExamDetail(source.content.exam_id, source.type)"
         >
-          <span class="highlight">《{{ overHidden(source.content.exam_title, 23) }}》</span>
+          <span>《{{ overHidden(source.content.exam_title, 23) }}》</span>
         </div>
       </template>
     </div>

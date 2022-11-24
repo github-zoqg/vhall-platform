@@ -228,7 +228,7 @@ export default {
     emitClickExamChatItem: {
       cuid: ['comExamWap'],
       method: 'open',
-      args: ['$0']
+      args: ['$0', '$1']
     },
     children: [
       'comInteractToolsWap',
