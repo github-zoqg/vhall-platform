@@ -3,10 +3,18 @@
   <vh-dialog
     :visible.sync="examRankVisible"
     width="380px"
-    title="Apple产品功能知识"
     custom-class="result"
     :before-close="handleClose"
   >
+    <vh-tooltip
+      class="vh-dialog__title rank-max-title"
+      slot="title"
+      effect="dark"
+      :content="examTitle"
+      placement="top-end"
+    >
+      <span>{{ examTitle }}</span>
+    </vh-tooltip>
     <div class="vmp-rank-watch">
       <RankTitleWatch />
       <div class="rank-list-wrap">
@@ -25,7 +33,11 @@
           slot="footer"
           class="text-center ma m-t-16 m-b-16"
           layout="prev, pager, next"
+          :page-size="queryParams.limit"
+          :pager-count="5"
           :total="total"
+          :current-page="queryParams.pageNum"
+          @current-change="handleChangePage"
         ></vh-pagination>
       </div>
     </div>
@@ -34,7 +46,7 @@
 <script>
   import RankTitleWatch from './rank-title.vue';
   import RankItemWatch from './rank-item.vue';
-
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRank',
     components: {
@@ -49,41 +61,59 @@
     data() {
       return {
         examRankVisible: false,
-        title: '',
+        examTitle: '',
+        queryParams: {
+          limit: 10,
+          pageNum: 1
+        },
         rankList: [],
-        total: 25
+        total: 200,
+        loading: false
       };
     },
-    created() {},
+    created() {
+      this.examServer = useExamServer();
+    },
     methods: {
       // 关闭 快问快打 - 排行榜手机弹出框
       handleClose() {
         this.examRankVisible = false;
       },
-      async open(examId) {
+      async open(examId, examTitle = '') {
         this.examRankVisible = true;
         this.examId = examId;
+        this.examTitle = examTitle;
         this.initData();
       },
-      // 获取桌面
+      // 获取列表数据
       initData() {
-        this.initRankData();
+        this.loading = true;
+        this.queryParams.pageNum = 1;
+        this.getRankData();
       },
-      initRankData() {
-        const mockData = {
-          rank_no: 1,
-          user_name: 'user_name',
-          head_img: '',
-          score: '100',
-          right_rate: '10%',
-          use_time: '90:10'
+      getRankData() {
+        const params = {
+          pos: this.queryParams.pageNum,
+          limit: this.queryParams.limit,
+          paper_id: this.examId
         };
-        const data = {
-          total: 20,
-          list: new Array(5).fill(mockData)
-        };
-        this.total = data.total;
-        this.rankList = data.list;
+        this.examServer
+          .getExamRankList(params)
+          .then(res => {
+            this.loading = false;
+            if (res.code === 200) {
+              const data = res.data;
+              this.total = data.total;
+              this.rankList = data.list;
+            }
+          })
+          .catch(res => {
+            this.loading = false;
+          });
+      },
+      handleChangePage(page) {
+        this.queryParams.pageNum = page;
+        this.getRankData();
       }
     }
   };
@@ -103,13 +133,19 @@
         padding: 0;
         height: 386px;
       }
+      .rank-max-title {
+        width: 280px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: inline-block;
+      }
     }
   }
 
   .vmp-rank-watch {
     height: 100%;
     position: relative;
-
     .rank-list-wrap {
       padding: 0 24px;
     }
@@ -147,6 +183,21 @@
     .self-rank {
       padding: 0 12px;
       background: #f5f5f5;
+    }
+    .vh-pagination {
+      padding: 16px 0;
+    }
+    .vh-pagination {
+      li {
+        height: 32px;
+        line-height: 32px;
+      }
+      &--small {
+        li {
+          height: 22px;
+          line-height: 22px;
+        }
+      }
     }
   }
 </style>

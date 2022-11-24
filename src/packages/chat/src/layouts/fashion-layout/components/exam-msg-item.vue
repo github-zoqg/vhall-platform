@@ -12,8 +12,8 @@
       <template v-if="['paper_send', 'paper_send_rank', 'paper_end'].includes(source.type)">
         <div
           class="msg-item__top"
-          @tap="checkExamDetail(source.content.exam_id, source.type)"
-          @click="checkExamDetail(source.content.exam_id, source.type)"
+          @tap="checkExamDetail(source.content, source.type)"
+          @click="checkExamDetail(source.content, source.type)"
         >
           <span
             v-show="source.roleName"
@@ -32,8 +32,8 @@
         </div>
         <div
           class="msg-item__name"
-          @tap="checkExamDetail(source.content.exam_id, source.type)"
-          @click="checkExamDetail(source.content.exam_id, source.type)"
+          @tap="checkExamDetail(source.content, source.type)"
+          @click="checkExamDetail(source.content, source.type)"
         >
           <span>《{{ overHidden(source.content.exam_title, 23) }}》</span>
         </div>
@@ -51,16 +51,16 @@
       <template v-else-if="source.type == 'paper_auto_send_rank'">
         <div
           class="msg-item__top"
-          @tap="checkExamDetail(source.content.exam_id, source.type)"
-          @click="checkExamDetail(source.content.exam_id, source.type)"
+          @tap="checkExamDetail(source.content, source.type)"
+          @click="checkExamDetail(source.content, source.type)"
         >
           <span>{{ source.content.text_content }}</span>
           <span class="msg-item__top__highlight">{{ $t('exam.exam_1004') }}</span>
         </div>
         <div
           class="msg-item__name"
-          @tap="checkExamDetail(source.content.exam_id, source.type)"
-          @click="checkExamDetail(source.content.exam_id, source.type)"
+          @tap="checkExamDetail(source.content, source.type)"
+          @click="checkExamDetail(source.content, source.type)"
         >
           <span>《{{ overHidden(source.content.exam_title, 23) }}》</span>
         </div>
@@ -117,9 +117,10 @@
         return value;
       },
       // 点击查看问卷
-      checkExamDetail(exam_id, sourceType) {
+      checkExamDetail(content, sourceType) {
         this.$emit('checkExamDetail', {
-          examId: exam_id,
+          examId: content.exam_id,
+          examTitle: content.exam_title,
           sourceType: sourceType
         });
       }

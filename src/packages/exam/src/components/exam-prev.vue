@@ -35,7 +35,7 @@
       // this.initComp();
     },
     methods: {
-      open(examId, examTitle) {
+      open(examId, examTitle = '') {
         this.title = examTitle;
         this.prevExamId = examId;
         this.dialogVisible = true;

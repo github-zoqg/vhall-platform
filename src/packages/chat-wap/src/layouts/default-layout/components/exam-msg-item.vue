@@ -11,8 +11,8 @@
     <template v-if="source.type == 'paper_send'">
       <div
         class="exam_msg_bg"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
@@ -22,8 +22,8 @@
       </div>
       <div
         class="exam_msg_bg exam_title"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
@@ -32,8 +32,8 @@
     <template v-else-if="source.type == 'paper_send_rank'">
       <div
         class="exam_msg_bg"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         <span class="role" :class="source.roleName | roleClassFilter">
           <span>{{ source.roleName | roleFilter }}</span>
@@ -43,8 +43,8 @@
       </div>
       <div
         class="exam_msg_bg exam_title"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
@@ -71,16 +71,16 @@
     <template v-else-if="source.type == 'paper_auto_send_rank'">
       <div
         class="exam_msg_bg"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         {{ source.content.text_content }}
         <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
         class="exam_msg_bg exam_title"
-        @tap="checkExamDetail(source.content.exam_id, source.type)"
-        @click="checkExamDetail(source.content.exam_id, source.type)"
+        @tap="checkExamDetail(source.content, source.type)"
+        @click="checkExamDetail(source.content, source.type)"
       >
         <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
@@ -136,9 +136,10 @@
         return value;
       },
       // 点击查看问卷
-      checkExamDetail(exam_id, sourceType) {
+      checkExamDetail(content, sourceType) {
         this.$emit('checkExamDetail', {
-          examId: exam_id,
+          examId: content.exam_id,
+          examTitle: content.exam_title,
           sourceType: sourceType
         });
       }
