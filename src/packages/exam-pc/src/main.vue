@@ -58,7 +58,15 @@
         console.log('answerType', answerType);
         this.examId = examId;
         if (answerType == 'answer') {
-          // 答题前置检查
+          // 第一步，判断是否可触发弹窗
+          let result = await this.examServer.getExamPreviewInfo({
+            id: examId
+          });
+          if (result && result.code == 8018009) {
+            this.$message.info(this.$t('exam.exam_1010'));
+            return;
+          }
+          // 第二步，答题前置检查，区分是否需要填写表单
           await this.examServer.checkExam();
         }
         this.examAnswerVisible = true;

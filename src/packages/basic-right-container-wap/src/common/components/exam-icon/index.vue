@@ -44,18 +44,16 @@
             <li
               v-for="(item, index) in examWatchResult.list"
               :key="index"
-              :class="`container-data__item ${
-                item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
-              }`"
+              :class="`container-data__item ${item && item.is_end == 1 ? 'button_end_bg' : ''}`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
                 <div class="container-data__title__left">{{ item.title }}</div>
                 <div class="container-data__title__right">
-                  <template v-if="item && item.is_end == 1 && item.status == 0">
+                  <template v-if="item && item.is_end == 1">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
-                  <template v-else-if="item && item.is_end == 1 && item.status == 1">
+                  <template v-else-if="item && item.status == 1">
                     <div class="button_text">
                       <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
@@ -75,7 +73,10 @@
                       ></span>
                     </div>
                   </template>
-                  <div class="button_answer" v-else-if="item && item.is_end == 0">
+                  <div
+                    class="button_answer"
+                    v-else-if="item && item.is_end == 0 && item.status == 0"
+                  >
                     <van-button type="danger" size="mini" round>
                       {{ $t('exam.exam_1027') }}
                     </van-button>
@@ -173,7 +174,7 @@
           this.toShowExamRankOrExam();
         } else if (this.examWatchState.iconExecuteType == 'miss') {
           // 错过答题机会
-          this.$toast(this.$t('exam.exam_1010'));
+          this.$message.info(this.$t('exam.exam_1010'));
         }
         if (showPanel && this.examWatchResult.list && this.examWatchResult.list.length > 0) {
           // 如果是点击小图标，并且列表数量大于0，展示列表弹出框
@@ -202,13 +203,23 @@
         this.$emit('clickIcon', examVo);
       },
       // 单个验证逻辑
-      checkExamInfo(item) {
-        if (item && item.is_end == 1 && item.status == 0) {
+      async checkExamInfo(item) {
+        if (item.is_end == 0) {
+          // 如果点击的时候，是答题按钮的状态，那么调接口判断一下，是否可以继续答题状态
+          let result = await this.examServer.getExamPreviewInfo({
+            id: item.paper_id
+          });
+          if (result && result.code == 8018009) {
+            this.$message.info(this.$t('exam.exam_1010'));
+            return;
+          }
+        }
+        if (item && item.is_end == 1) {
           // 已结束(不做任何处理)
-        } else if (item && item.is_end == 1 && item.status == 1) {
+        } else if (item && item.status == 1) {
           // 看成绩
           this.toShowExamRankOrExam(item.paper_id, 'score');
-        } else if (item && item.is_end == 0) {
+        } else if (item && item.is_end == 0 && item.status == 0) {
           // 进入答题流程
           this.toShowExamRankOrExam(item.paper_id, 'answer');
         }
@@ -235,28 +246,31 @@
           isCheck: true
         };
       },
-      listenExamWatchMsg(msg) {
+      listenExamWatchMsg(msg, that) {
         if (window.ExamTemplateServer) {
           // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
         }
-        useChatServer().addChatToList(this.setChatItemData(msg, msg.data.type));
-        if (msg.data.type === this.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
+        useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        if (msg.data.type === that.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
-          this.open(msg.paper_id);
-        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
+          that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
-        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_END) {
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
           // TODO 快问快答 - 收卷
           // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
-        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
           // TODO 快问快答 - 自动收卷
-        } else if (msg.data.type == this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
           // TODO 快问快答 - 自动公布成绩
         }
       },
       initExamEvents() {
         // 监听快问快答消息
-        this.msgServer.$onMsg('ROOM_MSG', this.listenExamWatchMsg);
+        let that = this;
+        this.msgServer.$onMsg('ROOM_MSG', msg => {
+          this.listenExamWatchMsg(msg, that);
+        });
       }
     },
     beforeCreate() {
