@@ -79,7 +79,7 @@
                 <div>
                   <label v-text="`${$t('exam.exam_1024')}:`"></label>
                   <span v-if="item.limit_time_switch == 1">
-                    {{ item.limit_time | examTimeByMinute }}
+                    {{ item.limit_time > 9 ? item.limit_time : `0${item.limit_time}:00` }}
                   </span>
                   <span v-else>{{ $t('exam.exam_1006') }}</span>
                 </div>
