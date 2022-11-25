@@ -365,6 +365,7 @@
         }
         const keywords = (this.queryParams.keyword = this.keywordIpt);
         const params = {
+          sort_field: 'updated_at',
           limit: this.queryParams.limit,
           // pos: this.queryParams.pageNum,
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
