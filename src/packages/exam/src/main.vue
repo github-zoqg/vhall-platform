@@ -59,6 +59,9 @@
       handleClose() {
         this.dialogVisible = false;
       },
+      handleExam(flag) {
+        flag ? this.open() : this.handleClose();
+      },
       handleChangeView(payload) {
         const { view, examId } = payload;
         this.currentExamId = examId;
