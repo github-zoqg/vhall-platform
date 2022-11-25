@@ -168,12 +168,7 @@
     methods: {
       // 点击图标，触发判断
       async clickExamIcon(showPanel = false) {
-        const { watchInitData = {} } = this.roomBaseServer.state;
-        await this.examServer.getExamPublishList({
-          source_id: watchInitData.webinar.id, // 活动ID
-          source_type: 1, // 类型：活动1
-          switch_id: watchInitData.switch.switch_id
-        });
+        await this.examServer.getExamPublishList({});
         if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
           // 直接答题 or 查看成绩
           this.toShowExamRankOrExam();
@@ -255,7 +250,9 @@
         if (window.ExamTemplateServer) {
           // 初始化文件PaaS SDK, 使用了单例模式，多次执行不能影响
         }
-        useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        if (that.examServer.EVENT_TYPE[`EXAM_${msg.data.type.toUpperCase()}`] !== undefined) {
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        }
         if (msg.data.type === that.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
           that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
