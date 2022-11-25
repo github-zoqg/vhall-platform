@@ -5,7 +5,15 @@ export default {
   // 客户端嵌入页互动组件
   interactClientRoot: {
     component: 'VmpContainer',
-    children: ['comQuestionnaire', 'comQa', 'comLottery', 'comSignLive', 'comRedPacket'],
+    children: [
+      'comQuestionnaire',
+      'comQa',
+      'comLottery',
+      'comSignLive',
+      'comRedPacket',
+      'comExam',
+      'comExamPreview'
+    ],
     emitQu: [
       {
         cuid: 'comQuestionnaire',
@@ -40,6 +48,13 @@ export default {
         method: 'handleRedPacket',
         args: ['$0']
       }
+    ],
+    emitExam: [
+      {
+        cuid: 'comExam',
+        method: 'handleExam',
+        args: ['$0']
+      }
     ]
   },
   //问卷
@@ -61,5 +76,21 @@ export default {
   //签到
   comSignLive: {
     component: 'VmpSignLive'
+  },
+  //快问快答
+  comExam: {
+    component: 'VmpExam',
+    children: ['comExamPreview'],
+    emitOpenPreview: [
+      {
+        cuid: 'comExamPreview',
+        method: 'openPreview',
+        args: ['$0']
+      }
+    ]
+  },
+  // 快问快答组件 - 预览组件
+  comExamPreview: {
+    component: 'VmpExamPreview'
   }
 };
