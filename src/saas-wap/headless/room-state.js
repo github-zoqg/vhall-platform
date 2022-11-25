@@ -83,6 +83,15 @@ export default async function () {
         });
       }
     });
+  if (
+    // 非嵌入页 微信环境 没有授权 微信授权没有关闭 不能初始化聊天
+    !localStorage.getItem('unionid') &&
+    isWechat() &&
+    roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
+    roomBaseServer.state.embedObj.embed
+  ) {
+    return;
+  }
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
@@ -96,18 +105,9 @@ export default async function () {
   if (window.localStorage.getItem('token')) {
     await userServer.getUserInfo({ scene_id: 2 });
   }
-  if (
-    // 非嵌入页 微信环境 没有授权 微信授权没有关闭 不能初始化聊天
-    !(
-      !localStorage.getItem('unionid') &&
-      isWechat() &&
-      roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
-      roomBaseServer.state.embedObj.embed
-    )
-  ) {
-    await msgServer.init();
-    console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
-  }
+
+  await msgServer.init();
+  console.log('%c------服务初始化 msgServer 初始化完成', 'color:blue');
 
   if (roomBaseServer.state.watchInitData.webinar.type == 1) {
     await interactiveServer.init();
