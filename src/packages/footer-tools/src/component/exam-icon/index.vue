@@ -3,15 +3,8 @@
     class="vmp-exam-icon"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <img
-      src="./images/exam_no.png"
-      alt=""
-      v-if="examWatchState.dotVisible"
-      @click="throttleCheckExam"
-    />
-    <img src="./images/exam.png" alt="" v-else @click="throttleCheckExam" />
-    <!-- <img src="./images/questionnaire.png" alt="" @click="throttleCheckExam" />
-    <i class="vmp-dot" v-if="dotVisible" /> -->
+    <img src="./images/exam.png" alt="" @click="throttleCheckExam" />
+    <i class="vmp-dot" v-if="examWatchState.dotVisible" />
     <!-- 快问快答-列表弹框 -->
     <vh-dialog
       custom-class="exam_base"
@@ -79,7 +72,7 @@
                 <div>
                   <label v-text="`${$t('exam.exam_1024')}:`"></label>
                   <span v-if="item.limit_time_switch == 1">
-                    {{ item.limit_time | examTimeByMinute }}
+                    {{ item.limit_time > 9 ? item.limit_time : `0${item.limit_time}:00` }}
                   </span>
                   <span v-else>{{ $t('exam.exam_1006') }}</span>
                 </div>
@@ -132,7 +125,7 @@
       'examWatchResult.list': {
         handler: function (val) {
           if (val) {
-            let arr = val.filter(item => item.is_answered == 0);
+            let arr = val.filter(item => item.is_end == 0 && item.status == 0);
             if (arr.length > 0) {
               this.examServer.setExamWatchDotVisible(true);
             } else {
@@ -239,11 +232,6 @@
           that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
-          // TODO 快问快答 - 收卷
-          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
-          // TODO 快问快答 - 自动收卷
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
           // TODO 快问快答 - 自动公布成绩
         }

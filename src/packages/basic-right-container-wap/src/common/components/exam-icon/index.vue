@@ -3,20 +3,25 @@
     class="icon-wrap"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <!-- 有小红点图标 -->
-    <img
-      src="https://s3.e.vhall.com/common-static/vhall-form/images/exam_no.png"
-      alt=""
-      v-if="examWatchState.dotVisible"
-      @click="clickExamIcon(true)"
-    />
-    <!-- 无小红点图标 -->
-    <img
-      src="https://s3.e.vhall.com/common-static/vhall-form/images/exam.png"
-      alt=""
-      v-else
-      @click="clickExamIcon(true)"
-    />
+    <template v-if="iconStyle == 1">
+      <img
+        src="./images/exam_no.png"
+        alt=""
+        @click="clickExamIcon(true)"
+        v-if="examWatchState.dotVisible"
+      />
+      <img src="./images/exam.png" alt="" @click="clickExamIcon(true)" v-else />
+    </template>
+    <template v-else>
+      <img
+        src="./images/exam_no2.png"
+        alt=""
+        @click="clickExamIcon(true)"
+        v-if="examWatchState.dotVisible"
+      />
+      <img src="./images/exam2.png" alt="" @click="clickExamIcon(true)" v-else />
+    </template>
+    <slot></slot>
     <!-- 快问快答-列表弹框 -->
     <van-popup
       get-container="#otherPopupContainer"
@@ -91,7 +96,7 @@
                 <div>
                   <label v-text="`${$t('exam.exam_1024')}:`"></label>
                   <span v-if="item.limit_time_switch == 1">
-                    {{ item.limit_time | examTimeByMinute }}
+                    {{ item.limit_time > 9 ? item.limit_time : `0${item.limit_time}:00` }}
                   </span>
                   <span v-else>{{ $t('exam.exam_1006') }}</span>
                 </div>
@@ -149,7 +154,7 @@
       'examWatchResult.list': {
         handler: function (val) {
           if (val) {
-            let arr = val.filter(item => item.is_answered == 0);
+            let arr = val.filter(item => item.is_end == 0 && item.status == 0);
             if (arr.length > 0) {
               this.examServer.setExamWatchDotVisible(true);
             } else {
@@ -256,11 +261,6 @@
           that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
-          // TODO 快问快答 - 收卷
-          // —— 收卷完成（如果正在答题，收卷后，查看列表数据。若大于0，展示列表数据；若不大于0，直接关闭弹窗。）
-        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
-          // TODO 快问快答 - 自动收卷
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
           // TODO 快问快答 - 自动公布成绩
         }

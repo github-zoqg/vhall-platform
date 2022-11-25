@@ -13,12 +13,7 @@
       <RankLabel />
       <div class="rank-list-wrap">
         <ul class="rank-list">
-          <van-list
-            v-model="loading"
-            :finished="finished"
-            finished-text="没有更多了"
-            @load="onLoad"
-          >
+          <van-list v-model="loading" :finished="finished" finished-text="" @load="onLoad">
             <li v-for="item of rankList" :key="item.id" class="rank-item">
               <RankItemWap :item="item" />
             </li>
@@ -37,6 +32,7 @@
   import RankTitle from './rank-title.vue';
   import RankLabel from './rank-label.vue';
   import RankItemWap from './rank-item.vue';
+  import { useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRankWap',
     components: {
@@ -47,8 +43,14 @@
 
     data() {
       return {
-        examRankVisible: true,
+        examRankVisible: false,
         examTitle: '',
+        totalPages: 0, // 总页面
+        targetPage: 0, // 当前目标页数
+        queryParams: {
+          pos: 0,
+          limit: 10
+        },
         rankList: [],
         examId: '',
         loading: false,
@@ -56,7 +58,7 @@
       };
     },
     created() {
-      this.initData();
+      this.examServer = useExamServer();
     },
     computed: {
       isEmbed() {
@@ -64,12 +66,6 @@
       }
     },
     methods: {
-      onLoad() {
-        this.loading = true;
-        this.getRankData();
-        this.loading = false;
-        console.log('🚀 ~ file: main.vue ~ line 68 ~ onLoad ~ onLoad');
-      },
       // 关闭 快问快打 - 排行榜手机弹出框
       handleClose() {
         this.examRankVisible = false;
@@ -84,20 +80,46 @@
       initData() {
         this.getRankData();
       },
+      // 加载更多
+      onLoad() {
+        if (this.targetPage >= this.totalPages) {
+          this.finished = true;
+          this.loading = false;
+          return false;
+        }
+        this.loading = true;
+        this.targetPage++;
+        this.queryParams.pos = parseInt((this.targetPage - 1) * this.queryParams.limit);
+        this.getRankData();
+      },
       getRankData() {
-        const mockData = {
-          rank_no: 1,
-          user_name: 'user_name',
-          head_img: '',
-          score: '100',
-          right_rate: '10%',
-          use_time: '90:10'
+        const params = {
+          pos: this.queryParams.pos,
+          limit: this.queryParams.limit,
+          paper_id: this.examId
         };
-        const data = {
-          total: 20,
-          list: new Array(10).fill(mockData)
-        };
-        this.rankList = this.rankList.concat(data.list);
+        this.loading = true;
+        this.examServer
+          .getExamRankList(params)
+          .then(res => {
+            this.loading = false;
+            if (res.code === 200) {
+              res.data.list = res.data.list || [];
+              this.total = res.data.total || 0;
+              if (this.rankList && this.rankList.length > 0) {
+                this.rankList.concat(res.data.list);
+              } else {
+                this.rankList = res.data.list || [];
+              }
+              this.totalPages = Math.ceil(this.total / this.queryParams.limit);
+              if (this.targetPage >= this.totalPages) {
+                this.finished = true;
+              }
+            }
+          })
+          .catch(res => {
+            this.loading = false;
+          });
       },
       closeDialog() {
         this.examRankVisible = false;
