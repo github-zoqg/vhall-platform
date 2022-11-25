@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-  // import { useRoomBaseServer } from 'middle-domain';
+  import { useRoomBaseServer } from 'middle-domain';
   export default {
     name: 'ExamUserInfo',
     inject: ['examServer'],
@@ -16,12 +16,15 @@
     },
     methods: {
       initComp() {
+        const { watchInitData } = useRoomBaseServer().state;
         const el = this.$refs.ExamUserInfo;
         this.examServer.mount({
           componentName: 'userInfoEdit',
-          id: '12371937',
           el,
           configs: {
+            role: 1,
+            source_id: watchInitData?.webinar?.id,
+            source_type: 1,
             client: 'live'
           }
         });
