@@ -27,9 +27,9 @@
             v-model="keywordIpt"
             clearable
             @clear="getExamList"
-            @keydown.enter.stop.native="queryExamList()"
+            @keydown.enter.stop.native="queryExamList(true)"
           >
-            <i slot="prefix" class="vh-input__icon vh-icon-search" @click="queryExamList"></i>
+            <i slot="prefix" class="vh-input__icon vh-icon-search" @click="queryExamList(true)"></i>
           </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
@@ -58,7 +58,7 @@
             <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
             <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
-                {{ scope.row.limit_time }}
+                {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '不限时' }}
               </template>
             </vh-table-column>
             <vh-table-column label="状态" width="112">
@@ -359,12 +359,15 @@
       /**
        * @description 条件搜索列表
        */
-      queryExamList() {
+      queryExamList(refresh) {
+        if (refresh) {
+          this.queryParams.pageNum = 1;
+        }
         const keywords = (this.queryParams.keyword = this.keywordIpt);
         const params = {
           limit: this.queryParams.limit,
-          pos: this.queryParams.pageNum,
-          // pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
+          // pos: this.queryParams.pageNum,
+          pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           keywords
         };
         // this.loading = false;
