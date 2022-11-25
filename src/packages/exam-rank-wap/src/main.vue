@@ -46,7 +46,7 @@
         examRankVisible: false,
         examTitle: '',
         totalPages: 0, // 总页面
-        targetPage: 0, // 当前目标页数
+        targetPage: 1, // 当前目标页数
         queryParams: {
           pos: 0,
           limit: 10
