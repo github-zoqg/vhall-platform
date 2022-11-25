@@ -88,7 +88,7 @@ export default async function () {
     !localStorage.getItem('unionid') &&
     isWechat() &&
     roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
-    roomBaseServer.state.embedObj.embed
+    !roomBaseServer.state.embedObj.embed
   ) {
     return;
   }
