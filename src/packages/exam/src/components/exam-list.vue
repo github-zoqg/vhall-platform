@@ -321,7 +321,10 @@
             this.$message.success('推送成功');
             this.queryExamList(); //仅更新当前页的状态
           } else {
-            this.$message.error(res.code == 8018015 ? '答题进行中，请结束后再操作' : res.msg);
+            this.$message({
+              type: res.code == 8018015 ? 'warning' : 'error',
+              message: res.code == 8018015 ? '答题进行中，请结束后再操作' : res.msg
+            });
           }
         });
       },
