@@ -28,7 +28,9 @@ const htmlConfig = {
 
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.3/index.js',
-    MiddleDomain: ''
+    MiddleDomain: '',
+    VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.js', // vhallUI
+    form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js'
   },
   // cdn css
   cdnCss: {
@@ -37,7 +39,8 @@ const htmlConfig = {
       '//s3.e.vhall.com/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css',
     iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
     overlayscrollbarsCss:
-      '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css'
+      '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css',
+    VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.css'
   }
 };
 

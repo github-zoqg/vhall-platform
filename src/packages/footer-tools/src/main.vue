@@ -70,6 +70,13 @@
         <questionnaire-icon @clickIcon="checkQuestionIcon" />
         <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
+      <li>
+        <!-- 快问快答-->
+        <exam-icon @clickIcon="checkExamIcon" />
+        <vmp-air-container :cuid="childrenCom[5]" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[6]" :oneself="true"></vmp-air-container>
+        <vmp-air-container :cuid="childrenCom[7]" :oneself="true"></vmp-air-container>
+      </li>
       <li v-if="isLiving">
         <!-- 签到 -->
         <vmp-air-container :cuid="childrenCom[0]" :oneself="true"></vmp-air-container>
@@ -171,6 +178,7 @@
   import Pay from './component/pay/index.vue';
   import RedPacketIcon from './component/red-packet-icon/index.vue';
   import QuestionnaireIcon from './component/questionnaire-icon/index.vue';
+  import ExamIcon from './component/exam-icon/index.vue';
   import LotteryIcon from './component/lottery-icon/index.vue';
   import { throttle } from 'lodash';
   import alternateStylesheet from 'caniuse-lite/data/features/alternate-stylesheet';
@@ -185,6 +193,7 @@
       Pay,
       RedPacketIcon,
       QuestionnaireIcon,
+      ExamIcon,
       LotteryIcon
     },
     data() {
@@ -454,6 +463,11 @@
       checkQuestionIcon(questionnaireId) {
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionIcon', [questionnaireId])
+        );
+      },
+      checkExamIcon(vo) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type])
         );
       }
     }

@@ -36,6 +36,10 @@
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
+        <div class="vmp-interact-menu-list-item" @click="emitOpenExam" v-if="configList['exam']">
+          <i class="vh-iconfont vh-line-questionnaire"></i>
+          <p>快问快答</p>
+        </div>
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
@@ -112,7 +116,8 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar === 1;
       },
       configList() {
-        return this.$domainStore.state.roomBaseServer.configList;
+        let configList = this.$domainStore.state.roomBaseServer.configList;
+        return configList;
       }
     },
     beforeCreate() {
@@ -171,6 +176,10 @@
       emitOpenQuestionnaire() {
         window.vhallReportForProduct && window.vhallReportForProduct.report(110060);
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenQuestionnaire'));
+      },
+      // 打开快问快答弹窗
+      emitOpenExam() {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitOpenExam'));
       },
       // 打开签到弹窗
       openSign() {
@@ -250,7 +259,7 @@
       position: absolute;
       left: 58px;
       top: 0;
-      width: 154px;
+      width: 182px;
       background: #434343;
       z-index: 2;
       border-radius: 4px;
@@ -264,7 +273,7 @@
       flex-wrap: wrap;
       &-item {
         flex-shrink: 0;
-        width: 44px;
+        width: 52px;
         margin-top: 20px;
         font-size: 12px;
         color: #ececec;
