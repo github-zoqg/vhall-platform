@@ -119,10 +119,13 @@
 </script>
 <style lang="less">
   .vh-dialog.vmp-exam-answer {
+    overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
     }
     .vh-dialog__body {
+      height: 100%;
+      overflow: auto;
       padding: 0 0;
     }
     height: 460px;
