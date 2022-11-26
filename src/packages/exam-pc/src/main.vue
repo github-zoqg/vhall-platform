@@ -21,7 +21,9 @@
   export default {
     name: 'VmpExamPc',
     data() {
+      const examWatchState = this.examServer.state;
       return {
+        examWatchState,
         examAnswerVisible: false, // 快问快答 - 答题
         examId: null
       };
@@ -47,6 +49,9 @@
       },
       isFill() {
         return this.examServer?.state?.userCheckVo?.isFill == 1;
+      },
+      examWatchResult() {
+        return this.examServer.state.examWatchResult;
       }
     },
     methods: {
@@ -57,24 +62,32 @@
       async open(examId, answerType) {
         console.log('answerType', answerType);
         this.examId = examId;
-        if (answerType == 'answer') {
-          // 第一步，判断是否可触发弹窗
-          let result = await this.examServer.getExamPreviewInfo({
-            id: examId
-          });
-          if (result && result.code == 8018009) {
-            this.$message.info(this.$t('exam.exam_1010'));
-            return;
-          }
-          // 第二步，答题前置检查，区分是否需要填写表单
-          await this.examServer.checkExam();
+        /**
+         * 验证作用：
+          1、用户未作答，答题过程中，正常作答。
+          1-1、若开启了限时答题，倒计时-已过期，toast提示“很遗憾，您已错过本次答题机会！”
+          1-2、若人工收卷了，用户未作答，toast提示“很遗憾，您已错过本次答题机会！”
+          2、不论是否限时，用户已作答，答题过程中，查看个人成绩。
+          如果答题过程中，问卷已经作答，收卷后，点击聊天区域，应该展示成绩。
+         */
+        await this.examServer.getExamPublishList({});
+        let examItem = this.examWatchResult?.list?.find(item => {
+          if (item.paper_id == examId) return item;
+        });
+        if (examItem && examItem.is_end == 1 && examItem.status == 0) {
+          // 已结束 && 未作答
+          this.$message.info(this.$t('exam.exam_1010'));
+        } else if (examItem && examItem.status == 1) {
+          // 已作答
+          this.viewExamDom(examId, 'show');
+        } else if (examItem && examItem.is_end == 0 && examItem.status == 0) {
+          // 可作答
+          this.viewExamDom(examId, 'answer');
         }
+      },
+      viewExamDom(examId, answerType) {
         this.examAnswerVisible = true;
-        await this.$nextTick();
-        if (this.examServer?.state?.userCheckVo?.is_fill == 1) {
-          // 需要填写表单
-          this.examServer.mount({ examId, el: '#userForm', components: 'pc' });
-        } else {
+        this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
             examId: examId,
@@ -86,7 +99,7 @@
               answerType: answerType == 'answer' ? 1 : 2
             }
           });
-        }
+        });
       },
       listenExamWatchMsg(msg, that) {
         if (window.ExamTemplateServer) {
@@ -99,6 +112,9 @@
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
           // TODO 快问快答 - 自动收卷
           this.closeDialog();
+        } else if (msg.data.type == 'live_over') {
+          // 结束直播
+          this.closeDialog();
         }
       },
       initExamEvents() {
@@ -109,12 +125,13 @@
         });
       }
     },
-    created() {
+    beforeCreate() {
       this.examServer = useExamServer();
       this.msgServer = useMsgServer();
-      this.initExamEvents();
     },
-    beforeCreate() {}
+    created() {
+      this.initExamEvents();
+    }
   };
 </script>
 <style lang="less">

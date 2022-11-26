@@ -36,7 +36,7 @@
           :page-size="queryParams.limit"
           :pager-count="5"
           :total="total"
-          :current-page="queryParams.pageNum"
+          :current-page="targetPage"
           @current-change="handleChangePage"
           v-if="total > 0"
         ></vh-pagination>
@@ -63,6 +63,8 @@
       return {
         examRankVisible: false,
         examTitle: '',
+        totalPages: 0, // 总页面
+        targetPage: 1, // 当前目标页数
         queryParams: {
           limit: 10,
           pageNum: 1
@@ -89,12 +91,12 @@
       // 获取列表数据
       initData() {
         this.loading = true;
-        this.queryParams.pageNum = 1;
+        this.targetPage = 1;
         this.getRankData();
       },
       getRankData() {
         const params = {
-          pos: this.queryParams.pageNum,
+          pos: (this.queryParams.pos = parseInt((this.targetPage - 1) * this.queryParams.limit)),
           limit: this.queryParams.limit,
           paper_id: this.examId
         };
@@ -106,6 +108,7 @@
               const data = res.data;
               this.total = data.total;
               this.rankList = data.list;
+              this.totalPages = Math.ceil(this.total / this.queryParams.limit);
             }
           })
           .catch(res => {
@@ -113,7 +116,7 @@
           });
       },
       handleChangePage(page) {
-        this.queryParams.pageNum = page;
+        this.targetPage = page;
         this.getRankData();
       }
     }

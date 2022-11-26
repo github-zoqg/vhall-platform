@@ -260,6 +260,14 @@
       },
       // 公布
       handleExamPublish(examObj) {
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        const { webinar } = watchInitData;
+        if (webinar.type !== 1) {
+          return this.$message({
+            type: 'warning',
+            message: '请在直播开始后使用'
+          });
+        }
         // 确认公布
         const confirmCb = () => {
           this.examServer.sendPublishExam(examObj.id).then(res => {
@@ -300,6 +308,14 @@
       },
       // 推送
       handleExamPush(examObj) {
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        const { webinar } = watchInitData;
+        if (webinar.type !== 1) {
+          return this.$message({
+            type: 'warning',
+            message: '请在直播开始后使用'
+          });
+        }
         this.examServer.sendPushExam(examObj.id).then(res => {
           if (res.code === 200) {
             this.$message.success('推送成功');
@@ -311,6 +327,14 @@
       },
       // 收卷
       handleExamCollect(examObj) {
+        const watchInitData = this.$domainStore.state.roomBaseServer.watchInitData;
+        const { webinar } = watchInitData;
+        if (webinar.type !== 1) {
+          return this.$message({
+            type: 'warning',
+            message: '请在直播开始后使用'
+          });
+        }
         const confirmCb = () => {
           this.examServer.sendCollectExam(examObj.id).then(res => {
             if (res.code === 200) {
@@ -365,6 +389,7 @@
         }
         const keywords = (this.queryParams.keyword = this.keywordIpt);
         const params = {
+          sort_field: 'updated_at',
           limit: this.queryParams.limit,
           // pos: this.queryParams.pageNum,
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
