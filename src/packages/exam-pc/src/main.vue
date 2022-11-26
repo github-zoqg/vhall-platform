@@ -8,11 +8,11 @@
     :close-on-click-modal="false"
     :show-close="false"
     :z-index="20"
+    v-if="examAnswerVisible"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
       <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
-      <div id="examAnswer" v-show="isFill"></div>
-      <div id="userForm" v-show="!isFill"></div>
+      <div id="examAnswer"></div>
     </div>
   </vh-dialog>
 </template>
@@ -48,9 +48,6 @@
           skin_json_wap = skinInfo.skin_json_wap;
         }
         return themeMap[skin_json_wap?.backGroundColor || 3];
-      },
-      isFill() {
-        return this.examServer?.state?.userCheckVo?.isFill == 1;
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
