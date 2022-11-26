@@ -106,8 +106,8 @@
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              user_name: this.userInfo?.nick_name || '',
-              head_img: this.userInfo?.avatar || defaultAvatar,
+              userName: this.userInfo?.nick_name || '',
+              headImg: this.userInfo?.avatar || defaultAvatar,
               mobile: this.userInfo?.phone || ''
             }
           });
@@ -149,10 +149,13 @@
 </script>
 <style lang="less">
   .vh-dialog.vmp-exam-answer {
+    overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
     }
     .vh-dialog__body {
+      height: 100%;
+      overflow: auto;
       padding: 0 0;
     }
     height: 460px;
