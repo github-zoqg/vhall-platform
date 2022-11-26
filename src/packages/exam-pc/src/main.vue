@@ -17,7 +17,8 @@
   </vh-dialog>
 </template>
 <script>
-  import { useMsgServer, useExamServer } from 'middle-domain';
+  import { useMsgServer, useUserServer, useExamServer } from 'middle-domain';
+  import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpExamPc',
     data() {
@@ -25,7 +26,8 @@
       return {
         examWatchState,
         examAnswerVisible: false, // 快问快答 - 答题
-        examId: null
+        examId: null,
+        defaultAvatar
       };
     },
     computed: {
@@ -52,6 +54,10 @@
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
+      },
+      // 获取用户信息
+      userInfo() {
+        return this.$domainStore.state.userServer.userInfo;
       }
     },
     methods: {
@@ -85,7 +91,10 @@
           this.viewExamDom(examId, 'answer');
         }
       },
-      viewExamDom(examId, answerType) {
+      async viewExamDom(examId, answerType) {
+        if (localStorage.getItem('token')) {
+          await this.userServer.getUserInfo({ scene_id: 2 });
+        }
         this.examAnswerVisible = true;
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
@@ -96,7 +105,10 @@
             configs: {
               role: 2,
               pageSize: 1,
-              answerType: answerType == 'answer' ? 1 : 2
+              answerType: answerType == 'answer' ? 1 : 2,
+              user_name: this.userInfo?.nick_name || '',
+              head_img: this.userInfo?.avatar || defaultAvatar,
+              mobile: this.userInfo?.phone || ''
             }
           });
         });
@@ -128,6 +140,7 @@
     beforeCreate() {
       this.examServer = useExamServer();
       this.msgServer = useMsgServer();
+      this.userServer = useUserServer();
     },
     created() {
       this.initExamEvents();
