@@ -50,7 +50,35 @@
   };
 </script>
 <style lang="less" scoped>
-  @import url('~@/app-shared/assets/css/mixin.less');
+  // @import url('~@/app-shared/assets/css/mixin.less');
+  .mixin clearfix {
+    &:after {
+      content: '';
+      display: table;
+      clear: both;
+    }
+  }
+
+  .mixin relative {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .flex-mixin(@justify: flex-start, @align-items: center, @dir: row, @wrap: nowrap, @align-content: stretch) {
+    display: flex;
+    flex-flow: @dir @wrap;
+    justify-content: @justify;
+    align-items: @align-items;
+    align-content: @align-content;
+  }
+
+  .bg-mixin(@size: contain, @repeat: no-repeat, @position: center, @origin: initial) {
+    background-size: @size;
+    background-repeat: @repeat;
+    background-position: @position;
+    background-origin: @origin;
+  }
 
   .rank-avatar {
     display: inline-block;
