@@ -106,8 +106,8 @@
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              user_name: this.userInfo?.nick_name || '',
-              head_img: this.userInfo?.avatar || defaultAvatar,
+              userName: this.userInfo?.nick_name || '',
+              headImg: this.userInfo?.avatar || defaultAvatar,
               mobile: this.userInfo?.phone || ''
             }
           });
