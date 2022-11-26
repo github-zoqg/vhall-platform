@@ -764,7 +764,7 @@
       },
       // 是否开启视频轮巡
       isVideoPolling() {
-        return this.$domainStore.state.roomBaseServer.configList['video_polling'] == 1;
+        return this.$domainStore.state.roomBaseServer.configList['video_polling'];
       }
     },
     methods: {

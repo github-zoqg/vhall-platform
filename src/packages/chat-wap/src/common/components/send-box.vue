@@ -252,12 +252,12 @@
            * ui.hide_wechat: 0使用微信授权 1不适用微信授权
            */
           if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
-            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+            noChatLogin = this.configList['ui.show_chat_without_login'];
           } else {
             noChatLogin = true;
           }
         } else {
-          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          noChatLogin = this.configList['ui.show_chat_without_login'];
         }
         return noChatLogin;
       },
@@ -295,7 +295,7 @@
       isMuted() {
         return (
           (this.webinar.type == 5 || this.webinar.type == 4) &&
-          this.configList['ui.watch_record_no_chatting'] === 1
+          this.configList['ui.watch_record_no_chatting']
         );
       },
       avatar() {

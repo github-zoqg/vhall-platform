@@ -67,7 +67,7 @@
         return this.watchInitData.join_info.third_party_user_id;
       },
       hasDelayPermission() {
-        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
+        return this.roomBaseServer.state.configList['no.delay.webinar'];
       },
       isSubscribe() {
         return this.roomBaseServer.state.watchInitData.status === 'subscribe';

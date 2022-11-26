@@ -34,15 +34,8 @@ export default async function () {
   }
 
   const promiseList = [
-    // configList 和 黄金链路串行执行
-    roomBaseServer.getConfigList().then(async () => {
-      //黄金链路
-      await roomBaseServer.startGetDegradationInterval({
-        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
-        systemKey: 2
-      });
-    }),
+    // configList
+    roomBaseServer.getConfigList({ scene_id: 1 }),
     //多语言接口
     roomBaseServer.getLangList(),
     roomBaseServer.getCustomRoleName(),

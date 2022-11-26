@@ -171,7 +171,7 @@
       },
       // 是否展示分享
       isShowShare() {
-        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'] == '0';
+        return this.$domainStore.state.roomBaseServer.configList['ui.watch_hide_share'];
       },
       // 当前语言
       languagesInfo() {

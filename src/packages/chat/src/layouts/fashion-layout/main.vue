@@ -477,7 +477,7 @@
         // 控制台配置回放禁言状态
         if (
           (this.playerType == 5 || this.playerType == 4) &&
-          this.configList['ui.watch_record_no_chatting'] == 1
+          this.configList['ui.watch_record_no_chatting']
         ) {
           placeholder = this.$t('chat.chat_1079');
           disable = true;
@@ -502,7 +502,7 @@
       },
       //初始检查是否要登录才可以参与互动
       initChatLoginStatus() {
-        if ([0, '0'].includes(this.configList['ui.show_chat_without_login'])) {
+        if (!this.configList['ui.show_chat_without_login']) {
           //主持人，这时候在发起端
           if ([1, '1'].includes(this.roleName) || this.isEmbed) {
             // 不需要登录
