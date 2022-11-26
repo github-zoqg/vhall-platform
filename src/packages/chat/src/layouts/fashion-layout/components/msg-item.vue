@@ -303,10 +303,7 @@
                 'interact-tools-content__img-scale': source.content.source_status === '0',
                 'interact-tools-content__img-reward': !source.content.gift_url
               }"
-              :src="
-                require('@/app-shared/assets/img/wap/chat/' + source.content.gift_name + '.png') ||
-                require('@/app-shared/assets/img/wap/chat/reward.png')
-              "
+              :src="require('@/app-shared/assets/img/wap/chat/assetsMap')(source.content.gift_name)"
               :alt="$t('interact_tools.interact_tools_1029')"
             />
             <br v-if="source.type === 'reward_pay_ok'" />

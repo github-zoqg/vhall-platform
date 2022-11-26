@@ -950,7 +950,13 @@ export default {
     other_1019: 'got it',
     other_1020: "Unfortunately, we can't continue to serve you. You can close the page manually",
     other_1021:
-      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.'
+      'Attention: Guests and assistants participate in the rehearsal through the official live broadcast address.',
+    other_1022: 'VHALL',
+    other_1023: 'apply for',
+    other_1024: 'Get WeChat nickname and avatar information',
+    other_1025:
+      'Watch the live- streamingt,chat,lottery,grab a red envelope and other interactive behaviors',
+    other_1026: 'Confirm'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- devops.version -->
+  <meta name="version" content="<%= version %>" />
+  <!-- devops.gitlab-hash -->
+  <meta name="gitlab-hash" content="<%= gitlabHash %>" />
+
+  <% if(isWap) { %>
+    <meta name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover" />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="x5-orientation" content="portrait" />
+    <meta name="apple-mobile-web-app-title" content="yeziyuan" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="full-screen" content="yes" />
+    <meta name="x5-fullscreen" content="true" />
+    <% } else { %>
+      <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5" />
+      <% } %>
+
+        <!-- title -->
+        <title>
+          <%= title %>
+        </title>
+
+        <meta name="keywords"
+          content="微吼,微吼直播,在线直播,视频会议,远程培训,直播软件,直播,现场直播,网络直播,视频直播,网络教学平台,视频会议软件,在线教育平台,教育在线互动平台,网络视频直播平台,活动策划直播,多屏互动浏览" />
+        <meta name="description"
+          content="微吼，全球在线商务活动平台专业服务提供商，最大的网络直播平台；提供网络直播、在线教育和视频会议等服务，支持多屏互动浏览；租用热线:400-888-9970。" />
+
+        <!-- CDN-prefetch -->
+        <% if(prefetch && prefetch.isOpen){ %>
+          <% for (const dns of Object.values(prefetch.dns)) { %>
+            <link rel="dns-prefetch" href="<%= dns %>" />
+            <% } %>
+              <% } %>
+
+                <!-- CDN-CSS -->
+                <% for(const css of styles) { %>
+                  <link rel="stylesheet" href="<%= css %>" />
+                  <% } %>
+
+                    <!-- CDN-JS-PRELOAD -->
+                    <% for(const js of scripts) { %>
+                      <link rel="preload" href="<%= js %>" />
+                      <% } %>
+                        <% if( env && env==='production' ){ %>
+                          <script src="https://cdn-go.cn/aegis/aegis-sdk/latest/aegis.min.js"></script>
+                          <script>
+                            window.saas_aegis = new Aegis({
+                              id: 'kw0QbfKrJLLbyL9Yj0', // 上报 id
+                              reportApiSpeed: true, // 接口测速
+                              reportAssetSpeed: true, // 静态资源测速
+                              beforeRequest: function (msg) {
+                                // 屏蔽.ts后缀的请求, 和微吼数据上报接口api请求
+                                if (
+                                  msg.logType == 'speed' &&
+                                  msg.logs.url &&
+                                  (msg.logs.url.indexOf('.ts') != -1 ||
+                                    msg.logs.url.indexOf('.flv') != -1 ||
+                                    msg.logs.url.indexOf('.msg') != -1 ||
+                                    msg.logs.url.indexOf('c.dun.163yun.com') != -1 ||
+                                    msg.logs.url.indexOf('dc.e.vhall.com') != -1)
+                                ) {
+                                  return false;
+                                }
+                                return msg;
+                              }
+                            });
+                          </script>
+                          <% } %>
+</head>
+
+<body>
+  <noscript>
+    <strong>
+      We're sorry but <% title %> doesn't work properly without JavaScript enabled. Please enable
+        it to continue.
+    </strong>
+  </noscript>
+
+  <div id="app"></div>
+  <% for (const js of scripts) { %>
+    <script src="<%= js %>"></script>
+    <% } %>
+      <script type="module" src="/src/<%= projectName %>/main.js"></script>
+</body>
+
+</html>
