@@ -59,6 +59,8 @@
         this.examAnswerVisible = false;
       },
       async open(examId, answerType) {
+        // 每次点开的时候，都先关闭一下弹窗
+        this.closeDialog();
         console.log('answerType', answerType);
         this.examId = examId;
         /**
