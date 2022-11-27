@@ -8,22 +8,16 @@
       draggable
       :modal="false"
     >
-      <div ref="ExamPrev"></div>
+      <div v-if="dialogVisible">
+        <div ref="ExamPrev"></div>
+      </div>
     </vh-dialog>
   </div>
 </template>
 <script>
   export default {
-    name: 'ExamCreate',
+    name: 'ExamPrev',
     inject: ['examServer'],
-    props: {
-      // prevExamId: {
-      //   type: [String, Number],
-      //   default() {
-      //     return '';
-      //   }
-      // }
-    },
     data() {
       return {
         dialogVisible: false,
