@@ -186,14 +186,12 @@
         cursor: pointer;
       }
     }
-    .exam-zdy-progress {
-      &.el-progress {
-        background: var(--theme-exam-progress-bgColor) !important;
-        border-radius: 4px;
-        .el-progress__portion {
-          background: var(--theme-exam-progress-active-bgColor) !important;
-          border-radius: 3px;
-        }
+    .vh-progress-bar__outer {
+      background: var(--theme-exam-progress-bgColor) !important;
+      border-radius: 4px;
+      .vh-progress-bar__inner {
+        background: var(--theme-exam-progress-active-bgColor) !important;
+        border-radius: 3px;
       }
     }
     .vmp-exam-info--question {
@@ -202,29 +200,29 @@
         color: var(--theme-exam-question-type-color) !important;
       }
     }
-    // .exam-execute-footer {
-    //   button.el-button--primary {
-    //     background: var(--theme-exam-next-button-bg) !important ;
-    //     color: var(--theme-exam-next-button-color) !important ;
-    //     border: 1px solid var(--theme-exam-next-button-border) !important;
-    //     &:hover,
-    //     &.active {
-    //       background: var(--theme-exam-next-button-active-bg) !important ;
-    //       color: var(--theme-exam-next-button-active-color) !important ;
-    //       border: 1px solid var(--theme-exam-next-button-active-border) !important;
-    //     }
-    //   }
-    //   button.el-button--default {
-    //     background: var(--theme-exam-last-button-bg) !important ;
-    //     color: var(--theme-exam-last-button-color) !important ;
-    //     border: 1px solid var(--theme-exam-last-button-border) !important;
-    //     &:hover,
-    //     &.active {
-    //       background: var(--theme-exam-last-button-active-bg) !important ;
-    //       color: var(--theme-exam-last-button-active-color) !important ;
-    //       border: 1px solid var(--theme-exam-last-button-active-border) !important;
-    //     }
-    //   }
-    // }
+    .exam-execute-footer {
+      button.vh-button--danger {
+        background: var(--theme-exam-next-button-bg) !important ;
+        color: var(--theme-exam-next-button-color) !important ;
+        border: 1px solid var(--theme-exam-next-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-next-button-active-bg) !important ;
+          color: var(--theme-exam-next-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-next-button-active-border) !important;
+        }
+      }
+      button.vh-button--info {
+        background: var(--theme-exam-last-button-bg) !important ;
+        color: var(--theme-exam-last-button-color) !important ;
+        border: 1px solid var(--theme-exam-last-button-border) !important;
+        &:hover,
+        &.active {
+          background: var(--theme-exam-last-button-active-bg) !important ;
+          color: var(--theme-exam-last-button-active-color) !important ;
+          border: 1px solid var(--theme-exam-last-button-active-border) !important;
+        }
+      }
+    }
   }
 </style>
