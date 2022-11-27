@@ -20,7 +20,10 @@
       this.initComp();
     },
     beforeDestroy() {
-      this.examServer.$off(this.examServer.events['SUBMITEDIT'], this.createSuccess);
+      this.examServer?.examInstance?.$off(
+        this.examServer?.examInstance?.events['SUBMITEDIT'],
+        this.createSuccess
+      );
     },
     methods: {
       initComp() {
@@ -43,8 +46,9 @@
           this.createSuccess
         );
       },
+      // chuangjian
       createSuccess() {
-        alert('保存成功');
+        this.$emit('changeView', { view: 'ExamListPanel', examId: '' });
       }
     }
   };
