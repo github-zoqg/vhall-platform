@@ -184,7 +184,6 @@
       },
       // 单个验证逻辑
       async checkExamInfo(item) {
-        debugger;
         if (item.is_end == 0) {
           // 如果点击的时候，是答题按钮的状态，那么调接口判断一下，是否可以继续答题状态
           let result = await this.examServer.getExamPreviewInfo({
