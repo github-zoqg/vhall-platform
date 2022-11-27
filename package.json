@@ -1,6 +1,6 @@
 {
   "name": "middle-platform",
-  "version": "7.11.26",
+  "version": "7.11.26-test.2.1",
   "domainVersion": "1.5.35-test.2",
   "private": true,
   "scripts": {
