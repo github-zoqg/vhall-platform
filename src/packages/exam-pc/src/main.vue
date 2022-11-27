@@ -62,7 +62,7 @@
       closeDialog() {
         this.examAnswerVisible = false;
       },
-      async open(examId, answerType) {
+      async open(examId, answerType, source = 'default') {
         // 每次打开之前，都先关闭一下
         this.closeDialog();
         console.log('answerType', answerType);
@@ -84,16 +84,17 @@
           this.$message.info(this.$t('exam.exam_1010'));
         } else if (examItem && examItem.status == 1) {
           // 已作答
-          this.viewExamDom(examId, 'show');
+          this.viewExamDom(examId, 'show', source != 'event');
         } else if (examItem && examItem.is_end == 0 && examItem.status == 0) {
           // 可作答
           this.viewExamDom(examId, 'answer');
         }
       },
-      async viewExamDom(examId, answerType) {
+      async viewExamDom(examId, answerType, allowShow = true) {
         if (localStorage.getItem('token')) {
           await this.userServer.getUserInfo({ scene_id: 2 });
         }
+        if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
         this.examAnswerVisible = true;
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');

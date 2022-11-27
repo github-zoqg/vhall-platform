@@ -255,7 +255,7 @@ export default {
     emitClickExamIcon: {
       cuid: ['comExam'],
       method: 'open',
-      args: ['$0', '$1']
+      args: ['$0', '$1', '$2']
     },
     // 关闭视频轮训弹窗
     emitClosePollingDialog: {
