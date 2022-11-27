@@ -138,7 +138,7 @@
     },
     methods: {
       // 点击图标，触发判断
-      async clickExamIcon(showPanel = false) {
+      async clickExamIcon() {
         await this.examServer.getExamPublishList({});
         if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
           // 直接答题 or 查看成绩
@@ -147,9 +147,12 @@
           // 错过答题机会
           this.$toast(this.$t('exam.exam_1010'));
         }
-        if (showPanel && this.examWatchResult.list && this.examWatchResult.list.length > 0) {
-          // 如果是点击小图标，并且列表数量大于0，展示列表弹出框
+        if (this.examWatchResult.list && this.examWatchResult.list.length > 1) {
+          // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
+        } else if (this.examWatchResult.list && this.examWatchResult.list.length == 1) {
+          // 如果是点击小图标，并且列表数量为1，直接弹出渲染框
+          this.checkExamInfo(this.examWatchResult.list[0]);
         }
       },
       // 关闭 快问快答 - 列表弹出框
