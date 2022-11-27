@@ -1038,7 +1038,8 @@
             return;
           }
           if (msg.data.room_join_id == _this.userId) {
-            _this.$message.success({ message: '您已上麦' });
+            // 7.7.4 优化后不再提示
+            // _this.$message.success({ message: '您已上麦' });
           } else {
             msg.data.room_role != 2 &&
               _this.$message.success({ message: `${msg.data.nick_name}已上麦` });

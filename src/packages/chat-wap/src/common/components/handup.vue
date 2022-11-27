@@ -150,17 +150,28 @@
     methods: {
       // 下麦操作
       offConnect() {
-        this.$emit('handupLoading', false);
-        this.closeConnectPop();
-        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
-        useMicServer()
-          .speakOff()
-          .then(res => {
-            window.vhallReportForProduct.toResultsReporting(170003, {
-              event_type: 'interface',
-              failed_reason: res,
-              request_id: res.request_id
-            });
+        this.$dialog
+          .confirm({
+            title: this.$t('account.account_1061'),
+            message: this.$t('interact.interact_1043'),
+            confirmButtonText: this.$t('account.account_1062'),
+            cancelButtonText: this.$t('account.account_1063'),
+            confirmButtonColor: '#fb3a32',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          })
+          .then(() => {
+            this.$emit('handupLoading', false);
+            this.closeConnectPop();
+            window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
+            useMicServer()
+              .speakOff()
+              .then(res => {
+                window.vhallReportForProduct.toResultsReporting(170003, {
+                  event_type: 'interface',
+                  failed_reason: res,
+                  request_id: res.request_id
+                });
+              });
           });
       },
       // 举手上麦

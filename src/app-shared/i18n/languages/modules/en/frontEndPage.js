@@ -933,7 +933,7 @@ export default {
     other_1003: 'Enter the invitation code',
     other_1004: 'Upload image cannot exceed 2M',
     other_1005: '',
-    other_1006: 'The host rejected you to open the microphone',
+    other_1006: 'The host has not responded to your host request！',
     other_1007: 'Try sliding left and right',
     other_1008: 'wait',
     other_1009:
