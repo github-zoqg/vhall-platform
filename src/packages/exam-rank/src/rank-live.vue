@@ -2,18 +2,24 @@
   <vh-dialog
     :visible.sync="dialogVisible"
     width="544px"
+    title="成绩"
     :modal="false"
     custom-class="result"
     class="vmp-rank-live"
   >
     <!-- 自定义头部 -->
-    <span slot="title">
+    <!-- <span slot="title">
       <i class="el-icon-arrow-left" />
       成绩
       <span class="sub-title">公布成绩</span>
-    </span>
+    </span> -->
     <!-- 内容 -->
-    <div class="dialog-content" v-loading="loading">
+    <div
+      class="dialog-content"
+      v-loading="loading"
+      element-loading-text="成绩统计中，请耐心等待，网络恢复后，直接展示数据"
+      element-loading-background="#fff"
+    >
       <div class="summary-panel">
         <div class="title-wrap std-title-lv1 std-border-bottom m-b-12">
           <span class="std-title-lv1 truncate title">
@@ -35,7 +41,12 @@
           </el-tooltip>
         </div>
         <el-row>
-          <el-col :span="8" v-for="(item, idx) of summaryData" :key="idx">
+          <el-col
+            :span="8"
+            v-for="(item, idx) of summaryData"
+            :key="idx"
+            v-show="item.alwaysShow || !noScoreSettings"
+          >
             <div class="summary-item m-b-12">
               <h3 class="std-title-lv3">
                 {{ item.label }}
@@ -64,7 +75,12 @@
             </div>
           </template>
         </vh-table-column>
-        <vh-table-column prop="score" label="得分" min-width="64"></vh-table-column>
+        <vh-table-column
+          v-if="!noScoreSettings"
+          prop="score"
+          label="得分"
+          min-width="64"
+        ></vh-table-column>
         <vh-table-column
           prop="right_rate"
           label="正确率"
@@ -92,20 +108,23 @@
   import RankNo from './rank/rank-no.vue';
 
   const summaryDataMap = {
-    check: {
-      label: '查看人数',
+    unAnswer: {
+      label: '未人数',
       tip: '主办方推送快问快答至观看端，仅查看题目未进行作答的人数，人数排重',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     answer: {
       label: '答题人数',
       tip: '主办方推送快问快答至观看端，参与答题的人数（包含主动交卷、人工及系统收卷），人数排重',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     rate: {
       label: '满分率',
       tip: '（满分人数/提交人数）*100%',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     max: {
       label: '最高分',
@@ -146,12 +165,14 @@
         summaryData,
         rankList: [],
         total: 0,
-        loading: false
+        loading: true,
+        noScoreSettings: false //问卷没有分值
       };
     },
     methods: {
-      open(examId) {
-        this.examId = examId;
+      open(examObj) {
+        this.examId = examObj.id;
+        this.noScoreSettings = !examObj.total_score;
         this.initComp();
         this.dialogVisible = true;
       },
@@ -172,7 +193,8 @@
           if (res.code !== 200) return;
           const data = res.data;
           this.title = data.title;
-          summaryDataMap.check.value = data.check_num;
+          const unAnswer = data.check_num - data.answer_num;
+          summaryDataMap.unAnswer.value = unAnswer > 0 ? unAnswer : 0;
           summaryDataMap.answer.value = data.answer_num;
           summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_num}人`;
           summaryDataMap.max.value = data.max_score;
@@ -182,7 +204,7 @@
       },
       getRankData() {
         const params = {
-          pos: this.queryParams.pageNum,
+          pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           limit: this.queryParams.limit,
           paper_id: this.examId
         };
@@ -305,6 +327,10 @@
         background: #fff;
         border-radius: 8px;
       }
+    }
+    // 覆盖vhall-ui
+    tr td:first-child .cell {
+      padding-left: 0 !important;
     }
   }
 </style>
