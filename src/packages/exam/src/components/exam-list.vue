@@ -54,7 +54,11 @@
                 {{ scope.row.created_at | fmtTimeByExp('YYYY-MM-DD HH:mm') }}
               </template>
             </vh-table-column>
-            <vh-table-column prop="total_score" width="56" label="总分"></vh-table-column>
+            <vh-table-column width="56" label="总分">
+              <template slot-scope="scope">
+                {{ scope.row.total_score || '-' }}
+              </template>
+            </vh-table-column>
             <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
             <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
@@ -362,7 +366,7 @@
       },
       handleExamScore(examObj) {
         const rankCom = this.$refs.rank;
-        rankCom.open(examObj.id);
+        rankCom.open(examObj);
       },
       // 预览
       handleExamPrev(examObj) {

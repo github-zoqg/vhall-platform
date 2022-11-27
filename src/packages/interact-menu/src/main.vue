@@ -36,7 +36,12 @@
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>问卷</p>
         </div>
-        <div class="vmp-interact-menu-list-item" @click="emitOpenExam" v-if="configList['exam']">
+        <div
+          class="vmp-interact-menu-list-item"
+          @click="emitOpenExam"
+          :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
+          v-if="configList['exam']"
+        >
           <i class="vh-iconfont vh-line-questionnaire"></i>
           <p>快问快答</p>
         </div>

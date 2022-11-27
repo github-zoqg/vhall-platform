@@ -35,7 +35,12 @@
           </el-tooltip>
         </div>
         <el-row>
-          <el-col :span="8" v-for="(item, idx) of summaryData" :key="idx">
+          <el-col
+            :span="8"
+            v-for="(item, idx) of summaryData"
+            :key="idx"
+            v-show="item.alwaysShow || !noScoreSettings"
+          >
             <div class="summary-item m-b-12">
               <h3 class="std-title-lv3">
                 {{ item.label }}
@@ -64,7 +69,12 @@
             </div>
           </template>
         </vh-table-column>
-        <vh-table-column prop="score" label="得分" min-width="64"></vh-table-column>
+        <vh-table-column
+          v-if="!noScoreSettings"
+          prop="score"
+          label="得分"
+          min-width="64"
+        ></vh-table-column>
         <vh-table-column
           prop="right_rate"
           label="正确率"
@@ -95,17 +105,20 @@
     check: {
       label: '查看人数',
       tip: '主办方推送快问快答至观看端，仅查看题目未进行作答的人数，人数排重',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     answer: {
       label: '答题人数',
       tip: '主办方推送快问快答至观看端，参与答题的人数（包含主动交卷、人工及系统收卷），人数排重',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     rate: {
       label: '满分率',
       tip: '（满分人数/提交人数）*100%',
-      value: 0
+      value: 0,
+      alwaysShow: true
     },
     max: {
       label: '最高分',
@@ -146,12 +159,15 @@
         summaryData,
         rankList: [],
         total: 0,
-        loading: false
+        loading: false,
+        noScoreSettings: false //问卷没有分值
       };
     },
     methods: {
-      open(examId) {
-        this.examId = examId;
+      open(examObj) {
+        this.examId = examObj.id;
+        this.noScoreSettings = !examObj.total_score;
+        console.log(examObj);
         this.initComp();
         this.dialogVisible = true;
       },
