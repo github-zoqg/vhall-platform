@@ -178,7 +178,7 @@
       checkExamIcon(vo) {
         console.log(vo);
         window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type])
+          boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type, vo.source])
         );
       }
     }

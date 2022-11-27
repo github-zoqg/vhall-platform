@@ -137,8 +137,8 @@
       }
     },
     methods: {
-      // 点击图标，触发判断
-      async clickExamIcon() {
+      // 点击图标，触发判断[isAutoOpen 是否自动弹出]
+      async clickExamIcon(isAutoOpen = false) {
         await this.examServer.getExamPublishList({});
         if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
           // 直接答题 or 查看成绩
@@ -147,10 +147,14 @@
           // 错过答题机会
           this.$toast(this.$t('exam.exam_1010'));
         }
-        if (this.examWatchResult.list && this.examWatchResult.list.length > 1) {
+        if (isAutoOpen && this.examWatchResult.list && this.examWatchResult.list.length > 1) {
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
-        } else if (this.examWatchResult.list && this.examWatchResult.list.length == 1) {
+        } else if (
+          isAutoOpen &&
+          this.examWatchResult.list &&
+          this.examWatchResult.list.length == 1
+        ) {
           // 如果是点击小图标，并且列表数量为1，直接弹出渲染框
           this.checkExamInfo(this.examWatchResult.list[0]);
         }
@@ -160,14 +164,16 @@
         this.examListDialogVisible = false;
       },
       // 看成绩 还是答题逻辑
-      toShowExamRankOrExam(paper_id = null, executeType = null) {
+      toShowExamRankOrExam(paper_id = null, executeType = null, source = 'default') {
         let examVo = {
+          source: source,
           examId: this.examWatchState?.iconExecuteItem?.paper_id,
           type: this.examWatchState?.iconExecuteType // score 或者 answer
         }; // 默认点击icon触发逻辑
         if (paper_id && executeType) {
           // 单个点击快问快答-选择触发逻辑
           examVo = {
+            source: source,
             examId: paper_id,
             type: executeType
           };
@@ -178,6 +184,7 @@
       },
       // 单个验证逻辑
       async checkExamInfo(item) {
+        debugger;
         if (item.is_end == 0) {
           // 如果点击的时候，是答题按钮的状态，那么调接口判断一下，是否可以继续答题状态
           let result = await this.examServer.getExamPreviewInfo({
@@ -229,11 +236,14 @@
         }
         if (msg.data.type === that.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
-          that.toShowExamRankOrExam(msg.data.paper_id, 'answer');
+          that.toShowExamRankOrExam(msg.data.paper_id, 'answer', 'event');
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {
           // TODO 快问快答 - 自动公布成绩
+        } else if (msg.data.type == 'live_over') {
+          // 结束直播
+          this.closeDialog();
         }
       },
       initExamEvents() {
