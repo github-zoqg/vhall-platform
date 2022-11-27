@@ -66,16 +66,16 @@
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
       <li>
-        <!-- 问卷-->
-        <questionnaire-icon @clickIcon="checkQuestionIcon" />
-        <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
-      </li>
-      <li>
         <!-- 快问快答-->
         <exam-icon @clickIcon="checkExamIcon" />
         <vmp-air-container :cuid="childrenCom[5]" :oneself="true"></vmp-air-container>
         <vmp-air-container :cuid="childrenCom[6]" :oneself="true"></vmp-air-container>
         <vmp-air-container :cuid="childrenCom[7]" :oneself="true"></vmp-air-container>
+      </li>
+      <li>
+        <!-- 问卷-->
+        <questionnaire-icon @clickIcon="checkQuestionIcon" />
+        <vmp-air-container :cuid="childrenCom[2]" :oneself="true"></vmp-air-container>
       </li>
       <li v-if="isLiving">
         <!-- 签到 -->
