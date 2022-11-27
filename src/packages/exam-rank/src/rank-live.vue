@@ -193,8 +193,7 @@
           if (res.code !== 200) return;
           const data = res.data;
           this.title = data.title;
-          const unAnswer = data.check_num - data.answer_num;
-          summaryDataMap.unAnswer.value = unAnswer > 0 ? unAnswer : 0;
+          summaryDataMap.unAnswer.value = data.un_answer_num;
           summaryDataMap.answer.value = data.answer_num;
           summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_num}人`;
           summaryDataMap.max.value = data.max_score;
