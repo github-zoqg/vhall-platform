@@ -163,6 +163,7 @@
     background: transparent;
     background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
     border-radius: 40px 40px 0px 0px;
+    overflow: hidden;
 
     .vmp-rank-wap {
       height: calc(100% - 116px);
