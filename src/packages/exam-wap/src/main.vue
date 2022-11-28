@@ -66,9 +66,9 @@
         this.examAnswerVisible = false;
       },
       async open(examId, answerType, source = 'default') {
-        // 每次点开的时候，都先关闭一下弹窗
+        console.log('当时数据变化进入', source, answerType, examId);
         this.closeDialog();
-        console.log('answerType', answerType);
+        // 每次点开的时候，都先关闭一下弹窗
         this.examId = examId;
         /**
          * 验证作用：
@@ -97,8 +97,11 @@
         if (localStorage.getItem('token')) {
           await this.userServer.getUserInfo({ scene_id: 2 });
         }
-        if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
+        console.log('当前进入的流程', examId, answerType, allowShow);
+        if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答消息后，已经做过答案情况）
         this.examAnswerVisible = true;
+
+        console.log('展示弹窗。。。。');
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
