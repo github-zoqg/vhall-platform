@@ -193,7 +193,7 @@ export default {
     emitClickExamChatItem: {
       cuid: ['comExamWap'],
       method: 'open',
-      args: ['$0', '$1']
+      args: ['$0', '$1', '$2']
     },
     children: ['comInteractToolsWap', 'comWapRewardEffect', 'comWapRewardEffectSVGA'],
     options: {}
@@ -509,6 +509,18 @@ export default {
       {
         cuid: 'comExamCollectWap',
         method: 'open',
+        args: ['$0']
+      }
+    ],
+    emitExamVisible: [
+      {
+        cuid: 'comWapBody',
+        method: 'examVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comNoticeWap',
+        method: 'examVisible',
         args: ['$0']
       }
     ],

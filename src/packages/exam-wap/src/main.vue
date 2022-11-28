@@ -17,6 +17,7 @@
 <script>
   import { useMsgServer, useUserServer, useZIndexServer, useExamServer } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpExamWap',
     data() {
@@ -53,15 +54,21 @@
         return this.examServer.state.examWatchResult;
       }
     },
+    watch: {
+      // 打开问卷弹窗(全屏,视频需要改为小窗)
+      examAnswerVisible(val) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitExamVisible', [!!val]));
+      }
+    },
     methods: {
       // 关闭 快问快答 - 答题
       closeDialog() {
         this.examAnswerVisible = false;
       },
       async open(examId, answerType, source = 'default') {
-        // 每次点开的时候，都先关闭一下弹窗
+        console.log('当时数据变化进入', source, answerType, examId);
         this.closeDialog();
-        console.log('answerType', answerType);
+        // 每次点开的时候，都先关闭一下弹窗
         this.examId = examId;
         /**
          * 验证作用：
@@ -77,7 +84,7 @@
         });
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$message.info(this.$t('exam.exam_1010'));
+          this.$toast(this.$t('exam.exam_1010'));
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.viewExamDom(examId, 'show', source != 'event');
@@ -90,8 +97,11 @@
         if (localStorage.getItem('token')) {
           await this.userServer.getUserInfo({ scene_id: 2 });
         }
-        if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
+        console.log('当前进入的流程', examId, answerType, allowShow);
+        if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答消息后，已经做过答案情况）
         this.examAnswerVisible = true;
+
+        console.log('展示弹窗。。。。');
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
@@ -174,14 +184,12 @@
         cursor: pointer;
       }
     }
-    .exam-zdy-progress {
-      &.van-progress {
-        background: var(--theme-exam-progress-bgColor) !important;
-        border-radius: 4px;
-        .van-progress__portion {
-          background: var(--theme-exam-progress-active-bgColor) !important;
-          border-radius: 3px;
-        }
+    .vh-progress-bar__outer {
+      background: var(--theme-exam-progress-bgColor) !important;
+      border-radius: 4px;
+      .vh-progress-bar__inner {
+        background: var(--theme-exam-progress-active-bgColor) !important;
+        border-radius: 3px;
       }
     }
     .vmp-exam-info--question {
@@ -191,7 +199,7 @@
       }
     }
     .exam-execute-footer {
-      button.van-button--danger {
+      button.vh-button--danger {
         background: var(--theme-exam-next-button-bg) !important ;
         color: var(--theme-exam-next-button-color) !important ;
         border: 1px solid var(--theme-exam-next-button-border) !important;
@@ -202,7 +210,7 @@
           border: 1px solid var(--theme-exam-next-button-active-border) !important;
         }
       }
-      button.van-button--default {
+      button.vh-button--info {
         background: var(--theme-exam-last-button-bg) !important ;
         color: var(--theme-exam-last-button-color) !important ;
         border: 1px solid var(--theme-exam-last-button-border) !important;

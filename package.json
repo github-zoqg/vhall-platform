@@ -16,6 +16,7 @@
     "v-serve:saas-wap:test4": "node build/cli serve --project=saas-wap  --mode=test4",
     "v-serve:saas-wap:new_test": "node build/cli serve --project=saas-wap  --mode=new_test ",
     "v-serve:saas-wap:test_zt": "node build/cli serve --project=saas-wap  --mode=test_zt ",
+    "v-serve:saas-wap:test02": "node build/cli serve --project=saas-wap  --mode=test02 ",
     "/---/": "-------------saas业务线相关命令----------------",
     "serve": "npm run serve:saas-live:test",
     "/-----test-----/": "------------基于 test 环境开发启动命令------------------",

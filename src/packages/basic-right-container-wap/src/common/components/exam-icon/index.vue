@@ -49,13 +49,15 @@
             <li
               v-for="(item, index) in examWatchResult.list"
               :key="index"
-              :class="`container-data__item ${item && item.is_end == 1 ? 'button_end_bg' : ''}`"
+              :class="`container-data__item ${
+                item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
+              }`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
                 <div class="container-data__title__left">{{ item.title }}</div>
                 <div class="container-data__title__right">
-                  <template v-if="item && item.is_end == 1">
+                  <template v-if="item && item.is_end == 1 && item.status == 0">
                     <div class="button_text gray" v-text="$t('exam.exam_1028')"></div>
                   </template>
                   <template v-else-if="item && item.status == 1">
@@ -174,7 +176,7 @@
           this.toShowExamRankOrExam();
         } else if (this.examWatchState.iconExecuteType == 'miss') {
           // 错过答题机会
-          this.$message.info(this.$t('exam.exam_1010'));
+          this.$toast(this.$t('exam.exam_1010'));
         }
         if (isAutoOpen && this.examWatchResult.list && this.examWatchResult.list.length > 1) {
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
@@ -219,12 +221,13 @@
             id: item.paper_id
           });
           if (result && result.code == 8018009) {
-            this.$message.info(this.$t('exam.exam_1010'));
+            this.$toast(this.$t('exam.exam_1010'));
             return;
           }
         }
-        if (item && item.is_end == 1) {
-          // 已结束(不做任何处理)
+        if (item && item.is_end == 1 && item.status == 0) {
+          // 已结束
+          this.$toast(this.$t('exam.exam_1010'));
         } else if (item && item.status == 1) {
           // 看成绩
           this.toShowExamRankOrExam(item.paper_id, 'score');

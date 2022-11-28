@@ -78,6 +78,11 @@
       },
       // 获取桌面
       initData() {
+        // 重置数据
+        this.targetPage = 1;
+        this.rankList = [];
+        this.total = 0;
+        // 获取第一页数据
         this.getRankData();
       },
       // 加载更多
@@ -104,13 +109,13 @@
           .then(res => {
             this.loading = false;
             if (res.code === 200) {
-              res.data.list = res.data.list || [];
-              this.total = res.data.total || 0;
+              const data = res.data;
               if (this.rankList && this.rankList.length > 0) {
-                this.rankList.concat(res.data.list);
+                this.rankList.concat(data.list);
               } else {
-                this.rankList = res.data.list || [];
+                this.rankList = data.list || [];
               }
+              this.total = data.total || 0;
               this.totalPages = Math.ceil(this.total / this.queryParams.limit);
               if (this.targetPage >= this.totalPages) {
                 this.finished = true;
@@ -163,6 +168,7 @@
     background: transparent;
     background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
     border-radius: 40px 40px 0px 0px;
+    overflow: hidden;
 
     .vmp-rank-wap {
       height: calc(100% - 116px);

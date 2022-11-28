@@ -355,6 +355,16 @@
           this.mini = flag;
         }
       },
+      examVisible(flag) {
+        if (this.isPortraitLive) {
+          this.isStreamContainerStickTop = flag;
+          if (flag) {
+            this.playerZIndex = this.zIndexServer.state.zIndexMap['exam'] || 302;
+          }
+        } else {
+          this.mini = flag;
+        }
+      },
       listenEvents() {
         // 开启分组讨论
         this.groupServer.$on('GROUP_SWITCH_START', msg => {

@@ -204,6 +204,7 @@
           background: unset !important;
           &.exam_title {
             color: #595959;
+            text-align: left;
           }
         }
       }
