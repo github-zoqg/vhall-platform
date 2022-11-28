@@ -77,7 +77,7 @@
         });
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$message.info(this.$t('exam.exam_1010'));
+          this.$toast(this.$t('exam.exam_1010'));
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.viewExamDom(examId, 'show', source != 'event');
@@ -174,14 +174,12 @@
         cursor: pointer;
       }
     }
-    .exam-zdy-progress {
-      &.van-progress {
-        background: var(--theme-exam-progress-bgColor) !important;
-        border-radius: 4px;
-        .van-progress__portion {
-          background: var(--theme-exam-progress-active-bgColor) !important;
-          border-radius: 3px;
-        }
+    .vh-progress-bar__outer {
+      background: var(--theme-exam-progress-bgColor) !important;
+      border-radius: 4px;
+      .vh-progress-bar__inner {
+        background: var(--theme-exam-progress-active-bgColor) !important;
+        border-radius: 3px;
       }
     }
     .vmp-exam-info--question {
@@ -191,7 +189,7 @@
       }
     }
     .exam-execute-footer {
-      button.van-button--danger {
+      button.vh-button--danger {
         background: var(--theme-exam-next-button-bg) !important ;
         color: var(--theme-exam-next-button-color) !important ;
         border: 1px solid var(--theme-exam-next-button-border) !important;
@@ -202,7 +200,7 @@
           border: 1px solid var(--theme-exam-next-button-active-border) !important;
         }
       }
-      button.van-button--default {
+      button.vh-button--info {
         background: var(--theme-exam-last-button-bg) !important ;
         color: var(--theme-exam-last-button-color) !important ;
         border: 1px solid var(--theme-exam-last-button-border) !important;
