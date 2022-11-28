@@ -552,6 +552,18 @@ export default {
         args: ['$0']
       }
     ],
+    emitExamVisible: [
+      {
+        cuid: 'comWapBody',
+        method: 'examVisible',
+        args: ['$0']
+      },
+      {
+        cuid: 'comNoticeWap',
+        method: 'examVisible',
+        args: ['$0']
+      }
+    ],
     children: ['comExamCollectWap', 'comExamAnswerWap']
   }
 };
