@@ -29,6 +29,13 @@ Vue.filter('examTimeByMinute', value => {
   return `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}`;
 });
 
+Vue.filter('fmtUseTime', time => {
+  time = parseInt(time) || 0;
+  const mm = `${Math.floor(time / 60)}`.padStart(2, '0');
+  const ss = `${Math.floor(time % 60)}`.padStart(2, '0');
+  return `${mm}:${ss}`;
+});
+
 /**
  * 字符串截取,超出点点点
  */
