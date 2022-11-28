@@ -185,7 +185,13 @@
       }
     },
     created() {
+      // 当第一次打开弹窗会调用
       this.initComp();
+      this.initEvent();
+    },
+    beforeDestroy() {
+      // 当切换弹窗视图会调用
+      this.removeEvent();
     },
     mounted() {},
     methods: {
@@ -257,7 +263,6 @@
       },
       // 操作问卷
       handleExamOpt(type, examObj) {
-        console.log('🚀 ~ file: exam-list.vue ~ line 293 ~ handleExamOpt ~ type', type, examObj);
         const tactics = operateTactics[type] || '';
         const fn = this[tactics];
         fn && fn(examObj);
@@ -373,19 +378,11 @@
         const prevCom = this.$refs.prev;
         prevCom.open(examObj.id, examObj.title);
       },
-      // 预览
-      // preview(btnIsDisabled) {
-      //   this.$emit('examBtnClick', {
-      //     type: 'preview',
-      //     currentRow: this.selectedExam
-      //   });
-      // },
-
       // 获取考试成绩列表(清空条件搜索,回到首页)
       getExamList() {
         this.queryParams.pageNum = 1;
         this.keywordIpt = '';
-        this.queryExamList();
+        return this.queryExamList();
       },
       /**
        * @description 条件搜索列表
@@ -398,12 +395,10 @@
         const params = {
           sort_field: 'updated_at',
           limit: this.queryParams.limit,
-          // pos: this.queryParams.pageNum,
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           keywords
         };
-        // this.loading = false;
-        this.examServer?.getExamList(params).then(res => {
+        return this.examServer?.getExamList(params).then(res => {
           this.examList = res.data.list || [];
           this.total = res.data.total;
           this.firstLoad = true;
@@ -412,6 +407,54 @@
       handleChangePage(page) {
         this.queryParams.pageNum = page;
         this.queryExamList();
+      },
+      // 监听消息同步问卷状态
+      initEvent() {
+        this.examServer.$on(this.examServer.EVENT_TYPE.EXAM_PAPER_SEND, this.handlePaperSendEvt);
+        this.examServer.$on(this.examServer.EVENT_TYPE.EXAM_PAPER_END, this.handlePaperEndEvt);
+        this.examServer.$on(this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END, this.handlePaperEndEvt);
+        this.examServer.$on(
+          this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK,
+          this.handlePaperRankEvt
+        );
+        this.examServer.$on(
+          this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK,
+          this.handlePaperRankEvt
+        );
+      },
+      removeEvent() {
+        this.examServer.$off(this.examServer.EVENT_TYPE.EXAM_PAPER_SEND, this.handlePaperSendEvt);
+        this.examServer.$off(this.examServer.EVENT_TYPE.EXAM_PAPER_END, this.handlePaperEndEvt);
+        this.examServer.$off(
+          this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END,
+          this.handlePaperEndEvt
+        );
+        this.examServer.$off(
+          this.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK,
+          this.handlePaperRankEvt
+        );
+        this.examServer.$off(
+          this.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK,
+          this.handlePaperRankEvt
+        );
+      },
+      // 问卷推送回调
+      handlePaperSendEvt(payload) {
+        this.changeExamStatusByEvt(payload, 1);
+      },
+      // 问卷公布回调(自动/手动)
+      handlePaperEndEvt(payload) {
+        this.changeExamStatusByEvt(payload, 2);
+      },
+      handlePaperRankEvt(payload) {
+        this.changeExamStatusByEvt(payload, 3);
+      },
+      changeExamStatusByEvt(payload, status) {
+        const examId = payload?.data?.paper_id;
+        const target = this.examList.find(exam => exam.id == examId);
+        if (target) {
+          target.status = status;
+        }
       }
     }
   };

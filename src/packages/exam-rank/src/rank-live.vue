@@ -63,14 +63,13 @@
       <vh-table :data="rankList" class="m-t-16" size="mini">
         <vh-table-column label="排名" min-width="50">
           <template slot-scope="scope">
-            <!-- <span>{{ scope.row.rank_no }}</span> -->
-            <RankNo :ranking="scope.$index + 1" />
+            <RankNo :ranking="scope.row.rank_no" />
           </template>
         </vh-table-column>
         <vh-table-column label="用户" min-width="174">
           <template slot-scope="scope">
             <div class="avatar-wrap">
-              <RankAvatar :src="scope.row.head_img" :ranking="scope.$index + 1" />
+              <RankAvatar :src="scope.row.head_img" :ranking="scope.row.rank_no" />
               <p class="nickname m-l-12 truncate">{{ scope.row.user_name }}</p>
             </div>
           </template>
@@ -87,7 +86,11 @@
           align="center"
           min-width="58"
         ></vh-table-column>
-        <vh-table-column prop="use_time" label="用时" min-width="60"></vh-table-column>
+        <vh-table-column label="用时" min-width="60">
+          <template slot-scope="scope">
+            {{ scope.row.use_time | fmtUseTime }}
+          </template>
+        </vh-table-column>
       </vh-table>
       <p class="tip">最多展示前200名成绩，更多数据请查看「控制台-当前活动-互动统计-快问快答」</p>
 
@@ -168,6 +171,14 @@
         loading: true,
         noScoreSettings: false //问卷没有分值
       };
+    },
+    filters: {
+      fmtUseTime(time) {
+        time = parseInt(time) || 0;
+        const mm = `${Math.floor(time / 60)}`.padStart(2, '0');
+        const ss = `${Math.floor(time % 60)}`.padStart(2, '0');
+        return `${mm}:${ss}`;
+      }
     },
     methods: {
       open(examObj) {
