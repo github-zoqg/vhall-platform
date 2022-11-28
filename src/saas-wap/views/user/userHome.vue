@@ -1,7 +1,7 @@
 <template>
   <section id="homePage">
     <div class="v-home-bg">
-      <img :src="home_bg_user" :class="`home_img home_bg_${imageBgMode}`" alt="" />
+      <img :src="home_bg_user" v-parseImgOss="{ url: home_bg_user }" :class="`home_img`" alt="" />
     </div>
     <div class="v-content">
       <span class="v-avatar">
@@ -191,6 +191,7 @@
       },
       // 解析图片地址
       handlerImageInfo(url, index) {
+        console.log('----,0--00-0-00-', url, index);
         let obj = parseImgOssQueryString(url);
         if (index == 1) {
           this.imageBgMode = Number(obj.mode);
@@ -544,15 +545,6 @@
     .home_img {
       width: 100%;
       height: 100%;
-      object-fit: fill;
-      &.home_bg_2 {
-        object-fit: cover;
-        object-position: left top;
-      }
-      &.home_bg_3 {
-        object-fit: contain;
-        object-position: center;
-      }
     }
   }
   .v-content {
