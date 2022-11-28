@@ -491,6 +491,11 @@ export default {
         args: ['$0']
       }
     ],
+    emitClickExamChatItem: {
+      cuid: ['comExamWap'],
+      method: 'open',
+      args: ['$0', '$1', '$2']
+    },
     children: [
       'comInteractToolsWap',
       'comWapRewardEffect',
