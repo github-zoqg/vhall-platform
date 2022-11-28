@@ -12,6 +12,7 @@ import {
   useInsertFileServer,
   useVirtualAudienceServer
 } from 'middle-domain';
+import { isWechat } from '@/app-shared/utils/tool';
 
 export default async function () {
   console.log('%c------服务初始化 开始', 'color:blue');
@@ -82,6 +83,15 @@ export default async function () {
         });
       }
     });
+  if (
+    // 非嵌入页 微信环境 没有授权 微信授权没有关闭 不能初始化聊天
+    !localStorage.getItem('unionid') &&
+    isWechat() &&
+    roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
+    !roomBaseServer.state.embedObj.embed
+  ) {
+    return;
+  }
 
   if (roomBaseServer.state.watchInitData.webinar.mode === 6) {
     // 如果是分组直播，初始化分组信息
