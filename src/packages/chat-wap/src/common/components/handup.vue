@@ -122,7 +122,7 @@
 
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        this.$toast(this.$t('interact.interact_1028'));
+        // this.$toast(this.$t('interact.interact_1028'));
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMsgServer().$onMsg('ROOM_MSG', msg => {
