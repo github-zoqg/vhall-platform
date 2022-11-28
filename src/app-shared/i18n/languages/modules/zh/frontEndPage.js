@@ -811,7 +811,7 @@ export default {
     interact_1040: '参与连麦需获取摄像头和麦克风权限，前往浏览器设置中心开启权限',
     interact_1041: '申请连麦',
     interact_1042: '检查设备',
-    interact_1043: '您确定摇下麦吗？'
+    interact_1043: '您确定要下麦吗？'
   },
   doc: {
     doc_1001: '文档加载中',
