@@ -833,7 +833,8 @@ export default {
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
     interact_1041: 'Apply for video interaction',
-    interact_1042: 'Check equipment'
+    interact_1042: 'Check equipment',
+    interact_1043: 'Are you sure you want to microphone off？'
   },
   doc: {
     doc_1001: 'This documentation is loading',
