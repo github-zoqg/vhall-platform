@@ -90,7 +90,6 @@
       },
       // 获取列表数据
       initData() {
-        this.loading = true;
         this.targetPage = 1;
         this.getRankData();
       },
@@ -100,6 +99,7 @@
           limit: this.queryParams.limit,
           paper_id: this.examId
         };
+        this.loading = true;
         this.examServer
           .getExamRankList(params)
           .then(res => {
