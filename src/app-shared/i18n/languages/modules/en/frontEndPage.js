@@ -641,7 +641,7 @@ export default {
     message_1024: 'The event has been watched by the the account on other devices',
     message_1025: 'If you have any questions, please consult the link provider',
     message_1026: 'Information acquisition failed',
-    message_1027: 'The host left the page. Please wait a moment...',
+    message_1027: 'The host refreshed or left the page. Please wait a moment...',
     message_1028: 'Failed to create local preview stream',
     message_1029: '{n} leaves the room',
     message_1030: '{n} enter the room',
