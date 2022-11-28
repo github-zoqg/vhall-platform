@@ -17,6 +17,7 @@
 <script>
   import { useMsgServer, useUserServer, useZIndexServer, useExamServer } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpExamWap',
     data() {
@@ -51,6 +52,12 @@
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
+      }
+    },
+    watch: {
+      // 打开问卷弹窗(全屏,视频需要改为小窗)
+      examAnswerVisible(val) {
+        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitExamVisible', [!!val]));
       }
     },
     methods: {

@@ -230,5 +230,10 @@
       bottom: 0;
       top: auto;
     }
+    .vmp-exam-answer-wap {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+    }
   }
 </style>
