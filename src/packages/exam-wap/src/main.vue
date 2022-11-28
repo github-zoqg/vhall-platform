@@ -77,7 +77,7 @@
         });
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$message.info(this.$t('exam.exam_1010'));
+          this.$toast(this.$t('exam.exam_1010'));
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.viewExamDom(examId, 'show', source != 'event');
