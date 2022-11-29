@@ -19,7 +19,7 @@
   </vh-dialog>
 </template>
 <script>
-  import { useMsgServer, useUserServer, useExamServer } from 'middle-domain';
+  import { useMsgServer, useUserServer, useExamServer, useRoomBaseServer } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpExamPc',
@@ -101,12 +101,14 @@
         }
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
         this.examAnswerVisible = true;
+        const roomBaseState = useRoomBaseServer().state;
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
             examId: examId,
             el: '#examAnswer',
             componentName: 'exampc',
+            lang: roomBaseState?.languages?.lang?.type || 'zh',
             configs: {
               role: 2,
               pageSize: 1,
