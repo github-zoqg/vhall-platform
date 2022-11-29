@@ -142,23 +142,16 @@
       // 点击图标，触发判断[isAutoOpen 是否自动弹出]
       async clickExamIcon(isAutoOpen = false) {
         await this.examServer.getExamPublishList({});
-        if (['answer', 'score'].includes(this.examWatchState.iconExecuteType)) {
-          // 直接答题 or 查看成绩
-          this.toShowExamRankOrExam();
-        } else if (this.examWatchState.iconExecuteType == 'miss') {
-          // 错过答题机会
-          this.$message.warning(this.$t('exam.exam_1010'));
-        }
-        if (isAutoOpen && this.examWatchResult.list && this.examWatchResult.list.length > 1) {
+        let list = this.examWatchResult.list || [];
+        let arr = list.filter(item => item.is_end == 0 && item.status == 0);
+        if (arr.length == 1 && list.length == 1) {
+          // 存在未答题的内容，并且 可答题列表数量只有一个，触发自动弹出逻辑
+          this.checkExamInfo(arr[0], list);
+        } else if (isAutoOpen && list.length == 1) {
+          this.checkExamInfo(list[0], list);
+        } else if (isAutoOpen && list.length > 1) {
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
-        } else if (
-          isAutoOpen &&
-          this.examWatchResult.list &&
-          this.examWatchResult.list.length == 1
-        ) {
-          // 如果是点击小图标，并且列表数量为1，直接弹出渲染框
-          this.checkExamInfo(this.examWatchResult.list[0]);
         }
       },
       // 关闭 快问快答 - 列表弹出框
@@ -185,32 +178,29 @@
         this.$emit('clickIcon', examVo);
       },
       // 单个验证逻辑
-      async checkExamInfo(item) {
-        if (item.is_end == 0) {
-          // 如果点击的时候，是答题按钮的状态，那么调接口判断一下，是否可以继续答题状态
-          let result = await this.examServer.getExamPreviewInfo({
-            id: item.paper_id
-          });
-          if (result && result.code == 8018009) {
-            this.$message.warning(this.$t('exam.exam_1010'));
-            return;
-          }
+      async checkExamInfo(vItem, list = []) {
+        if (list.length <= 0) {
+          await this.examServer.getExamPublishList({});
+          list = this.examWatchResult?.list || [];
         }
+        let examItem = list.find(item => {
+          if (item.paper_id == vItem.paper_id) return item;
+        });
         /**
          * 已结束，部分作答 or 全部作答 is_end == 1、status == 1
          * 已结束，未作答 is_end == 1、status == 0
          * 未结束，已作答 is_end == 0、status == 1
          * 未结束，未作答  is_end == 0、status == 0
          */
-        if (item && item.is_end == 1 && item.status == 0) {
-          // 已结束 - 未作答
-          this.$message.warning(this.$t('exam.exam_1010'));
-        } else if (item && item.status == 1) {
-          // 看成绩
-          this.toShowExamRankOrExam(item.paper_id, 'score');
-        } else if (item && item.is_end == 0 && item.status == 0) {
-          // 进入答题流程
-          this.toShowExamRankOrExam(item.paper_id, 'answer');
+        if (examItem && examItem.is_end == 1 && examItem.status == 0) {
+          // 已结束 && 未作答
+          this.$toast(this.$t('exam.exam_1010'));
+        } else if (examItem && examItem.status == 1) {
+          // 已作答
+          this.toShowExamRankOrExam(examItem.paper_id, 'score');
+        } else if (examItem && examItem.is_end == 0 && examItem.status == 0) {
+          // 可作答
+          this.toShowExamRankOrExam(examItem.paper_id, 'answer');
         }
       },
       setChatItemData(msg, eventType) {

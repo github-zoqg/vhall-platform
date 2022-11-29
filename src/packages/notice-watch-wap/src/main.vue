@@ -126,7 +126,7 @@
         this.mini = flag;
       },
       examVisible(flag) {
-        this.mini = flag;
+        // this.mini = flag;
       },
       closeAnnouncement() {
         this.announcement.isShow = false;
