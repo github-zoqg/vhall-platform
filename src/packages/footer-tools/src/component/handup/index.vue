@@ -319,7 +319,7 @@
 
             let tip = '';
             if (this.isInGroup) {
-              tip = '组长未响应您的上麦请求';
+              tip = '组长未响应您的上麦申请';
             } else {
               tip = this.$t('other.other_1006');
             }
