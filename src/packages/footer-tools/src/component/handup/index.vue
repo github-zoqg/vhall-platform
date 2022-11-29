@@ -104,6 +104,7 @@
       });
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
+        // 7.7.4 优化后不再提示
         // this.$message.warning(this.$t('interact.interact_1028'));
       });
       // 主播端开启 举手按钮
@@ -318,7 +319,7 @@
 
             let tip = '';
             if (this.isInGroup) {
-              tip = '组长拒绝了您的上麦请求';
+              tip = '组长未响应您的上麦请求';
             } else {
               tip = this.$t('other.other_1006');
             }
