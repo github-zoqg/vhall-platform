@@ -1069,7 +1069,7 @@
           }
           if (msg.data.inviter_account_id == _this.userId) {
             _this.$message.warning({
-              message: `${role}${msg.data.nick_name}拒绝了你的上麦邀请`
+              message: `${role}${msg.data.nick_name}拒绝了您的上麦邀请`
             });
           }
         }
