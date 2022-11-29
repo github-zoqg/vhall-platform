@@ -252,7 +252,8 @@
           roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
-          isCheck: true
+          isCheck: true,
+          isLinkBtn: true
         };
       },
       listenExamWatchMsg(msg, that) {

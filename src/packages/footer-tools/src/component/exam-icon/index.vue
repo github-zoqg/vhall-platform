@@ -194,7 +194,7 @@
          */
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$toast(this.$t('exam.exam_1010'));
+          this.$message.warning(this.$t('exam.exam_1010'));
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.toShowExamRankOrExam(examItem.paper_id, 'score');
@@ -222,7 +222,8 @@
           roleName: msg.data.role_name,
           type: eventType,
           interactStatus: true,
-          isCheck: true
+          isCheck: true,
+          isLinkBtn: true
         };
       },
       listenExamWatchMsg(msg, that) {
