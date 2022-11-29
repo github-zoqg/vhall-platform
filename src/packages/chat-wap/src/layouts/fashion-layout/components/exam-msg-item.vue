@@ -7,8 +7,8 @@
     快问快答-自动公布成绩 paper_auto_send_rank
    -->
   <div class="msg-item interact exam_msg_flex">
-    <!-- 收到快问快答 -->
-    <template v-if="source.type == 'paper_send'">
+    <!-- 收到快问快答 / 公布-快问快答-成绩 / 收卷  -->
+    <template v-if="['paper_send', 'paper_send_rank', 'paper_end'].includes(source.type)">
       <div
         class="interact-msg exam_msg_bg"
         @tap="checkExamDetail(source.content, source.type)"
@@ -19,29 +19,9 @@
         </span>
         <span class="nickname">{{ overHidden(source.nickname, 8) }}&nbsp;</span>
         <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
-        <span class="highlight">{{ $t('chat.chat_1093') }}</span>
-      </div>
-      <div
-        class="exam_msg_bg exam_title"
-        @tap="checkExamDetail(source.content, source.type)"
-        @click="checkExamDetail(source.content, source.type)"
-      >
-        <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
-      </div>
-    </template>
-    <!-- 公布-快问快答-成绩 -->
-    <template v-else-if="source.type == 'paper_send_rank'">
-      <div
-        class="interact-msg exam_msg_bg"
-        @tap="checkExamDetail(source.content, source.type)"
-        @click="checkExamDetail(source.content, source.type)"
-      >
-        <span class="role" :class="source.roleName | roleClassFilter">
-          <span>{{ source.roleName | roleFilter }}</span>
+        <span class="highlight" v-if="source.type != 'paper_end'">
+          {{ source.type == 'paper_send' ? $t('chat.chat_1093') : $t('exam.exam_1004') }}
         </span>
-        <span class="nickname">{{ overHidden(source.nickname, 8) }}&nbsp;</span>
-        <span class="chat-text">{{ source.content.text_content }}&nbsp;</span>
-        <span class="highlight">{{ $t('exam.exam_1004') }}</span>
       </div>
       <div
         class="exam_msg_bg exam_title"
@@ -49,15 +29,6 @@
         @click="checkExamDetail(source.content, source.type)"
       >
         <span class="highlight">《{{ overHidden(source.content.exam_title, 22) }}》</span>
-      </div>
-    </template>
-    <!-- 快问快答-收卷 -->
-    <template v-else-if="source.type == 'paper_end'">
-      <div class="interact-msg exam_msg_bg">
-        {{ source.content.text_content }}
-      </div>
-      <div class="exam_msg_bg exam_title">
-        <span>《{{ overHidden(source.content.exam_title, 22) }}》</span>
       </div>
     </template>
     <!-- 快问快答-自动收卷 -->
@@ -163,7 +134,6 @@
           width: calc(100% - 64px);
         }
         > .interact-msg {
-          background: unset !important;
           &.exam_msg_bg {
             display: flex;
             justify-content: flex-start;
@@ -201,7 +171,6 @@
           }
         }
         > div {
-          background: unset !important;
           &.exam_title {
             color: #595959;
           }
