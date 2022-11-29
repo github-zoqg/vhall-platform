@@ -55,7 +55,9 @@
         examId: '',
         loading: false,
         finished: false,
-        ownerData: null
+        ownerData: {
+          rank_no: 0
+        }
       };
     },
     created() {

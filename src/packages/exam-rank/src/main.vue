@@ -1,48 +1,51 @@
 <template>
-  <!-- 快问快答-排行榜 -->
-  <vh-dialog
-    :visible.sync="examRankVisible"
-    width="380px"
-    custom-class="result"
-    :before-close="handleClose"
-  >
-    <vh-tooltip
-      class="vh-dialog__title rank-max-title"
-      slot="title"
-      effect="dark"
-      :content="examTitle"
-      placement="top-end"
+  <div>
+    <!-- 快问快答-排行榜 -->
+    <vh-dialog
+      :visible.sync="examRankVisible"
+      width="380px"
+      custom-class="result"
+      :before-close="handleClose"
+      draggable
     >
-      <span>{{ examTitle }}</span>
-    </vh-tooltip>
-    <div class="vmp-rank-watch">
-      <RankTitleWatch />
-      <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
-        <ul class="rank-list">
-          <li v-for="item of rankList" :key="item.id" class="rank-item">
-            <RankItemWatch :item="item" />
-          </li>
-        </ul>
+      <vh-tooltip
+        class="vh-dialog__title rank-max-title"
+        slot="title"
+        effect="dark"
+        :content="examTitle"
+        placement="top-end"
+      >
+        <span>{{ examTitle }}</span>
+      </vh-tooltip>
+      <div class="vmp-rank-watch">
+        <RankTitleWatch />
+        <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
+          <ul class="rank-list">
+            <li v-for="item of rankList" :key="item.id" class="rank-item">
+              <RankItemWatch :item="item" />
+            </li>
+          </ul>
+        </div>
+        <div class="self-rank">
+          <RankItemWatch class="ma" :item="ownerData" />
+        </div>
+        <div class="dialog-bottom">
+          <vh-pagination
+            background
+            slot="footer"
+            class="text-center ma m-t-16 m-b-16"
+            layout="prev, pager, next"
+            :page-size="queryParams.limit"
+            :pager-count="5"
+            :total="total"
+            :current-page="targetPage"
+            @current-change="handleChangePage"
+            v-if="total > 0"
+          ></vh-pagination>
+        </div>
       </div>
-      <div class="self-rank">
-        <RankItemWatch class="ma" :item="ownerData" />
-      </div>
-      <div class="dialog-bottom">
-        <vh-pagination
-          background
-          slot="footer"
-          class="text-center ma m-t-16 m-b-16"
-          layout="prev, pager, next"
-          :page-size="queryParams.limit"
-          :pager-count="5"
-          :total="total"
-          :current-page="targetPage"
-          @current-change="handleChangePage"
-          v-if="total > 0"
-        ></vh-pagination>
-      </div>
-    </div>
-  </vh-dialog>
+    </vh-dialog>
+  </div>
 </template>
 <script>
   import RankTitleWatch from './rank-title.vue';
@@ -72,7 +75,9 @@
         rankList: [],
         total: 0,
         loading: false,
-        ownerData: null
+        ownerData: {
+          rank_no: 0
+        }
       };
     },
     created() {
