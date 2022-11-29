@@ -17,7 +17,7 @@
     </vh-tooltip>
     <div class="vmp-rank-watch">
       <RankTitleWatch />
-      <div class="rank-list-wrap">
+      <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
         <ul class="rank-list">
           <li v-for="item of rankList" :key="item.id" class="rank-item">
             <RankItemWatch :item="item" />
@@ -197,6 +197,9 @@
     .rank-list-wrap {
       padding: 0 24px;
       padding-top: 52px;
+      &.not-owner {
+        padding-top: 0;
+      }
       overflow-y: auto;
       height: 226px;
     }

@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-  import { useExamServer } from 'middle-domain';
+  import { useExamServer, useChatServer } from 'middle-domain';
   const examServer = useExamServer();
   export default {
     name: 'VmpExam',
@@ -66,7 +66,65 @@
         const { view, examId } = payload;
         this.currentExamId = examId;
         this.componentView = view;
+      },
+      setChatItemData(msg, eventType) {
+        let text = this.$getRoleName(msg.data.room_role);
+        if (msg.room_role != 1) {
+          text = `${text}${msg.data.nick_name}`;
+        }
+        text = '';
+        let text_content = {
+          paper_send: `${text}发起快问快答`, // 推送-快问快答
+          paper_send_rank: `${text}公布成绩排行榜`, // 公布-快问快答-成绩
+          paper_end: `${text}结束快问快答`, // 快问快答-收卷
+          paper_auto_end: '快问快答已结束', // 快问快答-自动收卷
+          paper_auto_send_rank: '快问快答已结束， 公布成绩排行榜' // 快问
+        };
+        return {
+          nickname: msg.data.nick_name,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: text_content[eventType],
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
+          },
+          roleName: msg.data.role_name,
+          type: eventType,
+          interactStatus: true, // 消息样式 - 互动消息样式 还是 系统消息样式
+          isCheck: false, // 消息是否-允许点击
+          isLinkBtn: false // 是否具备点击查看等操作（发起端/PC观看端exam特殊化）
+        };
+      },
+      initExamEvents() {
+        // 监听快问快答消息
+        let that = this;
+        // 推送-快问快答
+        examServer.$on(examServer.EVENT_TYPE.EXAM_PAPER_SEND, msg => {
+          console.log('aaa', msg);
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        });
+        // 公布-快问快答-成绩
+        examServer.$on(examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK, msg => {
+          console.log('ccccc', msg);
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        });
+        // 快问快答-收卷
+        examServer.$on(examServer.EVENT_TYPE.EXAM_PAPER_END, msg => {
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        });
+        // 快问快答-自动收卷
+        examServer.$on(examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END, msg => {
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        });
+        // 快问快答-自动公布成绩
+        examServer.$on(examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK, msg => {
+          console.log('bbbb', msg);
+          useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
+        });
       }
+    },
+    created() {
+      this.initExamEvents();
     }
   };
 </script>
