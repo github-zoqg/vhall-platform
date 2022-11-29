@@ -9,7 +9,9 @@
     :show-close="false"
     :z-index="20"
     v-if="examAnswerVisible"
+    draggable
   >
+    <span slot="title" class="dialog-header take--place">&nbsp;</span>
     <div :class="`exam-core__container exam-theme--${theme}`">
       <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
       <div id="examAnswer"></div>
@@ -155,9 +157,12 @@
     overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
+      .take--place {
+        height: 16px;
+      }
     }
     .vh-dialog__body {
-      height: 100%;
+      height: calc(100% - 16px);
       overflow: auto;
       padding: 0 0;
     }
@@ -170,8 +175,8 @@
     background-size: cover;
     // 重置内部元素
     .exam-execute-body {
-      height: calc(460px - 72px) !important;
-      max-height: calc(460px - 72px) !important;
+      height: calc(460px - 62px) !important;
+      max-height: calc(460px - 62px) !important;
     }
     .exam-core__container {
       width: 100%;
@@ -183,7 +188,7 @@
       .exam-close {
         position: absolute;
         right: 32px;
-        top: 22px;
+        top: 6px;
         font-size: 12px;
         z-index: 30;
         cursor: pointer;

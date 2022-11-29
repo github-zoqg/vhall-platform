@@ -13,6 +13,7 @@
       :show-close="true"
       width="420px"
       @close="closeDialog"
+      draggable
     >
       <div slot="title" class="container-title">
         <span class="container-title-text">
