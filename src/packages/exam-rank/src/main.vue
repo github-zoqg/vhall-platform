@@ -25,7 +25,7 @@
         </ul>
       </div>
       <div class="self-rank">
-        <RankItemWatch class="ma" />
+        <RankItemWatch class="ma" :item="ownerData" />
       </div>
       <div class="dialog-bottom">
         <vh-pagination
@@ -71,7 +71,8 @@
         },
         rankList: [],
         total: 0,
-        loading: false
+        loading: false,
+        ownerData: null
       };
     },
     created() {
@@ -91,7 +92,10 @@
       // 获取列表数据
       initData() {
         this.targetPage = 1;
+        // 获取成绩排名列表
         this.getRankData();
+        // 获取个人成绩
+        this.getOwnerRankData();
       },
       getRankData() {
         const params = {
@@ -114,6 +118,18 @@
           .catch(res => {
             this.loading = false;
           });
+      },
+      getOwnerRankData() {
+        this.examServer
+          .getExamUserScope(this.examId)
+          .then(res => {
+            if (res.code === 200) {
+              let data = res.data;
+              data.rank_no = Number(data.rank) || 0;
+              this.ownerData = data;
+            }
+          })
+          .catch(res => {});
       },
       handleChangePage(page) {
         this.targetPage = page;

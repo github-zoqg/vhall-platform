@@ -362,7 +362,7 @@
             this.playerZIndex = this.zIndexServer.state.zIndexMap['exam'] || 302;
           }
         } else {
-          this.mini = flag;
+          // this.mini = flag;
         }
       },
       listenEvents() {
