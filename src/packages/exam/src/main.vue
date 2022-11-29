@@ -20,6 +20,7 @@
         </span>
       </label>
       <component
+        v-if="dialogVisible"
         :is="componentView"
         @changeView="handleChangeView"
         :currentExamId="currentExamId"
@@ -48,6 +49,10 @@
       createPanel() {
         return this.componentView === 'ExamCreate';
       }
+    },
+    async created() {
+      this.initExamEvents();
+      examServer.init(); // 先执行,防止打开弹窗加载时间太长
     },
     methods: {
       /**
@@ -122,9 +127,6 @@
           useChatServer().addChatToList(that.setChatItemData(msg, msg.data.type));
         });
       }
-    },
-    created() {
-      this.initExamEvents();
     }
   };
 </script>

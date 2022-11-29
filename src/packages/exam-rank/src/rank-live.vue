@@ -41,12 +41,7 @@
           </el-tooltip>
         </div>
         <el-row>
-          <el-col
-            :span="8"
-            v-for="(item, idx) of summaryData"
-            :key="idx"
-            v-show="item.alwaysShow || !noScoreSettings"
-          >
+          <el-col :span="8" v-for="(item, idx) of summaryData" :key="idx">
             <div class="summary-item m-b-12">
               <h3 class="std-title-lv3">
                 {{ item.label }}
@@ -74,12 +69,7 @@
             </div>
           </template>
         </vh-table-column>
-        <vh-table-column
-          v-if="!noScoreSettings"
-          prop="score"
-          label="得分"
-          min-width="64"
-        ></vh-table-column>
+        <vh-table-column prop="score" label="得分" min-width="64"></vh-table-column>
         <vh-table-column
           prop="right_rate"
           label="正确率"
@@ -92,17 +82,20 @@
           </template>
         </vh-table-column>
       </vh-table>
-      <p class="tip">最多展示前200名成绩，更多数据请查看「控制台-当前活动-互动统计-快问快答」</p>
-
-      <vh-pagination
-        class="ma text-center"
-        background
-        layout="prev, pager, next"
-        :page-size="queryParams.limit"
-        :total="total"
-        :current-page="queryParams.pageNum"
-        @current-change="handleChangePage"
-      ></vh-pagination>
+      <p v-if="total > 200" class="tip">
+        最多展示前200名成绩，更多数据请查看「控制台-当前活动-互动统计-快问快答」
+      </p>
+      <div class="m-t-16">
+        <vh-pagination
+          class="ma text-center"
+          background
+          layout="prev, pager, next"
+          :page-size="queryParams.limit"
+          :total="total"
+          :current-page="queryParams.pageNum"
+          @current-change="handleChangePage"
+        ></vh-pagination>
+      </div>
     </div>
   </vh-dialog>
 </template>
@@ -112,22 +105,19 @@
 
   const summaryDataMap = {
     unAnswer: {
-      label: '未人数',
+      label: '未答人数',
       tip: '主办方推送快问快答至观看端，仅查看题目未进行作答的人数，人数排重',
-      value: 0,
-      alwaysShow: true
+      value: 0
     },
     answer: {
       label: '答题人数',
       tip: '主办方推送快问快答至观看端，参与答题的人数（包含主动交卷、人工及系统收卷），人数排重',
-      value: 0,
-      alwaysShow: true
+      value: 0
     },
     rate: {
       label: '满分率',
       tip: '（满分人数/提交人数）*100%',
-      value: 0,
-      alwaysShow: true
+      value: 0
     },
     max: {
       label: '最高分',
@@ -168,8 +158,7 @@
         summaryData,
         rankList: [],
         total: 0,
-        loading: true,
-        noScoreSettings: false //问卷没有分值
+        loading: true
       };
     },
     filters: {
@@ -183,7 +172,6 @@
     methods: {
       open(examObj) {
         this.examId = examObj.id;
-        this.noScoreSettings = !examObj.total_score;
         this.initComp();
         this.dialogVisible = true;
       },
@@ -204,7 +192,7 @@
           if (res.code !== 200) return;
           const data = res.data;
           this.title = data.title;
-          summaryDataMap.unAnswer.value = data.un_answer_num;
+          summaryDataMap.unAnswer.value = data.un_answered_num;
           summaryDataMap.answer.value = data.answer_num;
           summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_num}人`;
           summaryDataMap.max.value = data.max_score;

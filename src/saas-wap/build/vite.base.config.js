@@ -35,7 +35,7 @@ const config = {
       dayjs: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/dayjs.min.js`,
       duration: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/plugins/duration.js`,
       loadLazyWap: `${CDN_DOMAIN.S2}/common-static/middle/loadLazyWap/1.1.0/index.min.js`,
-      VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.js', // vhallUI
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js', // vhallUI
       form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js',
 
       // 其他
@@ -49,7 +49,7 @@ const config = {
       iconfontCommon: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css`,
       iconfont: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css`,
       overlayscrollbarsCss: `${CDN_DOMAIN.S3}/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css`,
-      VhallUI: '//s2.e.vhall.com/common-static/ui/vhall-ui-lib/vh/1.1.1/index.css'
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.css'
     }
   },
   less: {
