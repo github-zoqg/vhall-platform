@@ -2,7 +2,9 @@
   <div class="vmp-container-right-fullscreen-wap" v-if="!isInGroup">
     <div class="base-box" v-show="showIcon">
       <!-- 快问快答 -->
-      <exam-icon :icon-style="iconStyle" class="icon-wrap" @clickIcon="checkExamIcon" />
+      <exam-icon :icon-style="iconStyle" class="icon-wrap" @clickIcon="checkExamIcon">
+        <span class="icon-name">{{ $t('exam.exam_1047') }}</span>
+      </exam-icon>
       <!-- 问卷 -->
       <questionnaire-icon
         :icon-style="iconStyle"
@@ -214,10 +216,14 @@
           bottom: 0px;
           background: rgba(0, 0, 0, 0.45);
           border-radius: 0px 0px 16px 16px;
+          font-family: 'PingFang SC';
+          font-style: normal;
+          font-weight: 400;
           font-size: 14px;
-          text-align: center;
-          line-height: 22px;
+          line-height: 20px;
           color: #ffffff;
+          text-align: center;
+          // line-height: 22px;
           text-shadow: 0px 1px 2px rgba(118, 0, 0, 0.1);
         }
       }
