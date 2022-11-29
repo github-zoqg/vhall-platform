@@ -355,7 +355,8 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
+        // 7.7.4 优化后不再提示
+        // !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
