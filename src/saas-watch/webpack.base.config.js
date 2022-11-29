@@ -31,6 +31,7 @@ const htmlConfig = {
     MiddleDomain: '',
     VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js', // vhallUI
     form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js'
+    // form: 'http://localhost:8000/vhall-form-vue.js'
   },
   // cdn css
   cdnCss: {

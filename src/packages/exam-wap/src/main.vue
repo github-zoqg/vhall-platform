@@ -15,9 +15,16 @@
   </van-popup>
 </template>
 <script>
-  import { useMsgServer, useUserServer, useZIndexServer, useExamServer } from 'middle-domain';
+  import {
+    useMsgServer,
+    useUserServer,
+    useZIndexServer,
+    useExamServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import languages from '@/app-shared/i18n/languages';
   export default {
     name: 'VmpExamWap',
     data() {
@@ -74,13 +81,13 @@
         // 每次点开的时候，都先关闭一下弹窗
         this.examId = examId;
         /**
-         * 验证作用：
-          1、用户未作答，答题过程中，正常作答。
-          1-1、若开启了限时答题，倒计时-已过期，toast提示“很遗憾，您已错过本次答题机会！”
-          1-2、若人工收卷了，用户未作答，toast提示“很遗憾，您已错过本次答题机会！”
-          2、不论是否限时，用户已作答，答题过程中，查看个人成绩。
-          如果答题过程中，问卷已经作答，收卷后，点击聊天区域，应该展示成绩。
-         */
+           * 验证作用：
+            1、用户未作答，答题过程中，正常作答。
+            1-1、若开启了限时答题，倒计时-已过期，toast提示“很遗憾，您已错过本次答题机会！”
+            1-2、若人工收卷了，用户未作答，toast提示“很遗憾，您已错过本次答题机会！”
+            2、不论是否限时，用户已作答，答题过程中，查看个人成绩。
+            如果答题过程中，问卷已经作答，收卷后，点击聊天区域，应该展示成绩。
+           */
         await this.examServer.getExamPublishList({});
         let examItem = this.examWatchResult?.list?.find(item => {
           if (item.paper_id == examId) return item;
@@ -103,7 +110,7 @@
         console.log('当前进入的流程', examId, answerType, allowShow);
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答消息后，已经做过答案情况）
         this.examAnswerVisible = true;
-
+        const roomBaseState = useRoomBaseServer().state;
         console.log('展示弹窗。。。。');
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
@@ -111,6 +118,7 @@
             examId: examId,
             el: '#examAnswerWap',
             componentName: 'examwap',
+            lang: roomBaseState?.languages?.lang?.type || 'zh',
             configs: {
               role: 2,
               pageSize: 1,
