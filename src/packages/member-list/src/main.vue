@@ -1084,14 +1084,15 @@
             },
             'onlineUsers'
           );
+          // 7.7.4 优化后不再有下麦提示
           //提示语
-          if (msg.data.target_id == _this.userId) {
-            _this.timer && clearTimeout(_this.timer);
-            _this.timer = setTimeout(() => {
-              _this.$message.success({ message: _this.$t('interact.interact_1028') });
-            }, 1000);
-            return;
-          }
+          // if (msg.data.target_id == _this.userId) {
+          //   _this.timer && clearTimeout(_this.timer);
+          //   _this.timer = setTimeout(() => {
+          //     _this.$message.success({ message: _this.$t('interact.interact_1028') });
+          //   }, 1000);
+          //   return;
+          // }
 
           // 当前用户ID,解决俩次触发vrtc_connect_success会提示两次下麦消息
           if (_this.LocalCatchTarget_id != msg.data.target_id) {
