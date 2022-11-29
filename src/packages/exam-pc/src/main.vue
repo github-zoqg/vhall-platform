@@ -55,6 +55,9 @@
       // 获取用户信息
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
     },
     methods: {
@@ -106,9 +109,9 @@
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              userName: this.userInfo?.nick_name || '',
-              headImg: this.userInfo?.avatar || defaultAvatar,
-              mobile: this.userInfo?.phone || ''
+              userName: this.userInfo?.nick_name || this.joinInfo?.nickname || '',
+              headImg: this.userInfo?.avatar || this.joinInfo?.avatar || '',
+              mobile: this.userInfo?.phone || this.joinInfo?.phone || ''
             }
           });
         });

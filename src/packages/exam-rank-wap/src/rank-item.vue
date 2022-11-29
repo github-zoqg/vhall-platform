@@ -1,7 +1,8 @@
 <template>
   <div class="vmp-rank-item">
     <div class="order-cell">
-      <RankNo :ranking="item.rank_no" />
+      <RankNo :ranking="item && item.rank_no ? item.rank_no : 0" v-if="item && item.rank_no > 0" />
+      <span v-else>--</span>
     </div>
     <div class="user-cell">
       <div class="avatar-wrap">

@@ -131,6 +131,12 @@ const routes = [
     name: 'appQuestion',
     component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedQuestion'),
     meta: { grayType: '' }
+  },
+  {
+    path: '/lives/exam', // app-sdk内嵌快问快答页
+    name: 'appExam',
+    component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedExam'),
+    meta: { grayType: '' }
   }
 ];
 

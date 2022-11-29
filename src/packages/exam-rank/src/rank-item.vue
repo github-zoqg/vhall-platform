@@ -1,12 +1,13 @@
 <template>
   <div class="vmp-rank-item">
     <div class="order-cell">
-      <RankNo :ranking="item.rank_no" />
+      <RankNo :ranking="item && item.rank_no ? item.rank_no : 0" v-if="item && item.rank_no > 0" />
+      <span v-else>--</span>
     </div>
     <div class="user-cell">
       <div class="avatar-wrap">
         <RankAvatar :ranking="item.rank_no" />
-        <p class="nickname truncate m-l-12">{{ item.user_name }}</p>
+        <p class="nickname truncate m-l-12">{{ item.user_name || '--' }}</p>
       </div>
     </div>
     <div class="score-cell">{{ item.score }}</div>

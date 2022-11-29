@@ -52,6 +52,9 @@
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
     },
     watch: {
@@ -112,9 +115,9 @@
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              user_name: this.userInfo?.nick_name || '',
-              head_img: this.userInfo?.avatar || defaultAvatar,
-              mobile: this.userInfo?.phone || ''
+              userName: this.userInfo?.nick_name || this.joinInfo?.nickname || '',
+              headImg: this.userInfo?.avatar || this.joinInfo?.avatar || '',
+              mobile: this.userInfo?.phone || this.joinInfo?.phone || ''
             }
           });
         });

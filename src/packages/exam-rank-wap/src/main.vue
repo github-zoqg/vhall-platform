@@ -23,7 +23,7 @@
     </div>
     <div class="dialog-bottom">
       <div class="≈">
-        <RankItemWap class="ma" />
+        <RankItemWap class="ma" :item="ownerData" />
       </div>
     </div>
   </van-popup>
@@ -54,7 +54,8 @@
         rankList: [],
         examId: '',
         loading: false,
-        finished: false
+        finished: false,
+        ownerData: null
       };
     },
     created() {
@@ -84,6 +85,8 @@
         this.total = 0;
         // 获取第一页数据
         this.getRankData();
+        // 获取个人成绩
+        this.getOwnerRankData();
       },
       // 加载更多
       onLoad() {
@@ -125,6 +128,18 @@
           .catch(res => {
             this.loading = false;
           });
+      },
+      getOwnerRankData() {
+        this.examServer
+          .getExamUserScope(this.examId)
+          .then(res => {
+            if (res.code === 200) {
+              let data = res.data;
+              data.rank_no = Number(data.rank) || 0;
+              this.ownerData = data;
+            }
+          })
+          .catch(res => {});
       },
       closeDialog() {
         this.examRankVisible = false;
