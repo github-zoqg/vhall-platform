@@ -448,8 +448,8 @@
       // 嘉宾下麦
       handleSpeakOffClick() {
         this.$confirm(this.$t('interact.interact_1043'), this.$t('account.account_1061'), {
-          confirmButtonText: this.$t('account.account_1062'),
-          cancelButtonText: this.$t('account.account_1063'),
+          confirmButtonText: this.$t('other.other_1027'),
+          cancelButtonText: this.$t('other.other_1028'),
           customClass: 'zdy-message-box',
           cancelButtonClass: 'zdy-confirm-cancel'
         }).then(async () => {

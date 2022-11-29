@@ -154,8 +154,8 @@
           .confirm({
             title: this.$t('account.account_1061'),
             message: this.$t('interact.interact_1043'),
-            confirmButtonText: this.$t('account.account_1062'),
-            cancelButtonText: this.$t('account.account_1063'),
+            confirmButtonText: this.$t('other.other_1027'),
+            cancelButtonText: this.$t('other.other_1028'),
             confirmButtonColor: '#fb3a32',
             cancelButtonClass: 'zdy-confirm-cancel'
           })

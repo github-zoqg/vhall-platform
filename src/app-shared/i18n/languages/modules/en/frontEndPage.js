@@ -957,7 +957,9 @@ export default {
     other_1024: 'Get WeChat nickname and avatar information',
     other_1025:
       'Watch the live- streamingt,chat,lottery,grab a red envelope and other interactive behaviors',
-    other_1026: 'Confirm'
+    other_1026: 'Confirm',
+    other_1027: 'Yes',
+    other_1028: 'No'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
