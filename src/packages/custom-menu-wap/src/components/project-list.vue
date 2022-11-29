@@ -9,7 +9,7 @@
         @click="linkSubject(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img :class="`cover_pic box_bg_${item.itemMode}`" :src="item.cover" alt="" />
+          <img class="cover_pic" :src="item.cover" v-parseImgOss="{ url: item.cover }" alt="" />
           <div v-if="item.hide_pv == 1" class="vh-chose-active-item__cover-hots">
             <div class="vh-chose-active-item__cover-hots__content">
               <i class="vh-saas-iconfont vh-saas-line-heat"></i>
@@ -32,8 +32,6 @@
 <script>
   import { useCustomMenuServer } from 'middle-domain';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
-  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -92,23 +90,9 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list.map(item => {
-              let mode = 1;
-              if (cropperImage(item.cover)) {
-                mode = this.handlerImageInfo(item.cover);
-              }
-              return {
-                ...item,
-                itemMode: mode
-              };
-            });
+            this.activeList = res.data.list;
           }
         }
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        return Number(obj.mode);
       }
     }
   };
@@ -154,17 +138,6 @@
         width: 100%;
         height: 100%;
         border-radius: 8px;
-        &.box_bg_1 {
-          object-fit: fill;
-        }
-        &.box_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
-        &.box_bg_3 {
-          object-fit: contain;
-          object-position: center;
-        }
       }
 
       &-status {

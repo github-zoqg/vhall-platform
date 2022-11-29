@@ -4,7 +4,7 @@
       <div class="subscribe-img">
         <template v-if="!showVideo">
           <div class="subscribe-img-box">
-            <img :class="`subscribe-bg subscribe_bg_${imageCropperMode}`" :src="webinarsBgImg" />
+            <img class="subscribe-bg" v-parseImgOss="{ url: webinarsBgImg }" :src="webinarsBgImg" />
           </div>
           <div v-if="isLivingEnd && !isEmbed" class="subscribe-img-box subscribe-img_end">
             <img src="./img/live_start.png" alt="" />
@@ -76,7 +76,7 @@
   import { useRoomBaseServer, useSubscribeServer } from 'middle-domain';
   import BottomTab from './components/bottomTab';
   import EmbedTime from './components/embedTime.vue';
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSubscribeBody',
@@ -91,7 +91,6 @@
         lang: {},
         isLoaderTwoPlayer: false,
         languageList: [],
-        imageCropperMode: 1,
         subOption: {
           startTime: '',
           type: 0,
@@ -121,7 +120,6 @@
         if (webinar.img_url) {
           if (cropperImage(webinar.img_url)) {
             webinarUrl = webinar.img_url;
-            this.handlerImageInfo(webinar.img_url);
           } else {
             webinarUrl = webinar.img_url + '?x-oss-process=image/resize,m_fill,w_1920,h_1080';
           }
@@ -212,12 +210,6 @@
         // this.playerServer.$on(VhallPlayer.ENDED, () => {
         //   this.showBottom = true;
         // });
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        console.log(this.imageCropperMode, '???mode');
       },
       handlerInitInfo() {
         const { webinar, subscribe, join_info, warmup, agreement } =
@@ -446,16 +438,7 @@
         .subscribe-bg {
           width: 100%;
           height: 100%;
-          object-fit: fill;
           border-radius: 4px 4px 0 0;
-          &.subscribe_bg_2 {
-            object-fit: cover;
-            object-position: left top;
-          }
-          &.subscribe_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
         .subscribe-img_end {
           display: flex;

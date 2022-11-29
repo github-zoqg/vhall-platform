@@ -11,7 +11,7 @@
         <div class="vmp-sign-up-form__wrap">
           <!--顶部banner图-->
           <div class="vmp-sign-up-form__banner">
-            <img :class="`form_img form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+            <img class="form_img" v-parseImgOss="{ url: coverPic }" :src="coverPic" alt="" />
             <!-- <el-image
               v-if="formInfo && formInfo.cover != 1"
               :src="formInfo.cover ? coverPic : defaultHeader"
@@ -407,7 +407,7 @@
       <div class="vmp-sign-up-form__wrap">
         <!--顶部banner图-->
         <div class="vmp-sign-up-form__banner">
-          <img :class="`form_img form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+          <img class="form_img" v-parseImgOss="{ url: coverPic }" :src="coverPic" alt="" />
           <!-- <el-image
             v-if="formInfo && formInfo.cover != 1"
             :src="formInfo.cover ? coverPic : defaultHeader"
@@ -799,14 +799,13 @@
 <script>
   // import defaultHeader from './img/formHeader.png';
   import { useRoomBaseServer, useSignUpFormServer, useSubjectServer } from 'middle-domain';
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { debounce } from 'lodash';
   import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpSignUpForm',
     data() {
       return {
-        imageCropperMode: 1,
         //默认的兜底的banner图
         defaultHeader:
           'https://cnstatic01.e.vhall.com/common-static/middle/images/platform-common/form_up.png',
@@ -1151,7 +1150,6 @@
         if (this.formInfo.cover) {
           let cover = `${this.baseUrl}${this.formInfo.cover}`;
           if (cropperImage(cover)) {
-            this.handlerImageInfo(cover);
             return cover;
           } else {
             return cover + '?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0';
@@ -1271,12 +1269,6 @@
           params.subject_id = this.webinarOrSubjectId;
         }
         return params;
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        console.log(this.imageCropperMode, '???mode');
       },
       //打开模态窗
       async openModal(webinarId = null) {
@@ -2374,15 +2366,6 @@
       .form_img {
         width: 100%;
         height: 100%;
-        object-fit: fill;
-        &.form_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
-        &.form_bg_3 {
-          object-fit: contain;
-          object-position: center;
-        }
       }
     }
     &__content {
