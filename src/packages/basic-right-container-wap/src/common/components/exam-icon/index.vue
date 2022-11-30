@@ -29,6 +29,9 @@
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"
+      overlay-class="vmp-exam-list-popup-overlay"
+      :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
+      :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
     >
       <div class="vmp-exam-list_container">
         <div class="container-title">
@@ -165,6 +168,17 @@
           }
         },
         deep: true
+      },
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.examList': {
+        handler(val) {
+          if (document.querySelector('.vmp-exam-list-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-exam-list-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
       }
     },
     methods: {
@@ -182,6 +196,7 @@
         } else if (isAutoOpen && list.length > 1) {
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
+          this.zIndexServer.setDialogZIndex('examList');
         }
       },
       // 关闭 快问快答 - 列表弹出框

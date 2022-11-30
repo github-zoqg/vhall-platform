@@ -7,6 +7,9 @@
     position="bottom"
     @close="closeDialog"
     v-if="examRankVisible"
+    overlay-class="vmp-exam-rank-popup-overlay"
+    :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
+    :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
   >
     <RankTitle :title="examTitle" :showClose="true" @close="closeDialog" />
     <div class="vmp-rank-wap">
@@ -35,7 +38,7 @@
   import RankTitle from './rank-title.vue';
   import RankLabel from './rank-label.vue';
   import RankItemWap from './rank-item.vue';
-  import { useExamServer } from 'middle-domain';
+  import { useZIndexServer, useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRankWap',
     components: {
@@ -45,7 +48,9 @@
     },
 
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         examRankVisible: false,
         examTitle: '',
         totalPages: 0, // 总页面
@@ -71,6 +76,19 @@
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       }
     },
+    watch: {
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.examRank': {
+        handler(val) {
+          if (document.querySelector('.vmp-exam-rank-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-exam-rank-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
+      }
+    },
     methods: {
       // 关闭 快问快打 - 排行榜手机弹出框
       handleClose() {
@@ -78,6 +96,7 @@
       },
       async open(examId, examTitle = '') {
         this.examRankVisible = true;
+        this.zIndexServer.setDialogZIndex('examRank');
         this.examId = examId;
         this.examTitle = examTitle;
         this.initData();
@@ -149,6 +168,9 @@
       closeDialog() {
         this.examRankVisible = false;
       }
+    },
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
     }
   };
 </script>
