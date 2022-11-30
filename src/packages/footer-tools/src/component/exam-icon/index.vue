@@ -14,6 +14,9 @@
       width="420px"
       @close="closeDialog"
       draggable
+      :modal="false"
+      :part-block="true"
+      :z-index="zIndexServerState.zIndexMap.examList"
     >
       <div slot="title" class="container-title">
         <span class="container-title-text">
@@ -151,6 +154,7 @@
         } else if (isAutoOpen && list.length == 1) {
           this.checkExamInfo(list[0], list);
         } else if (isAutoOpen && list.length > 1) {
+          this.zIndexServer.setDialogZIndex('examList');
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
         }
@@ -237,6 +241,12 @@
         if (msg.data.type === that.examServer.EVENT_TYPE.EXAM_PAPER_SEND) {
           //  触发自动弹出 - 快问快答答题
           that.toShowExamRankOrExam(msg.data.paper_id, 'answer', 'event');
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_END) {
+          // TODO 快问快答 - 收卷 —— 更新列表，便于更新小红点
+          that.examServer.getExamPublishList({});
+        } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_END) {
+          // TODO 快问快答 - 自动收卷 —— 更新列表，便于更新小红点
+          that.examServer.getExamPublishList({});
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_SEND_RANK) {
           // TODO 快问快答 - 公布成绩
         } else if (msg.data.type == that.examServer.EVENT_TYPE.EXAM_PAPER_AUTO_SEND_RANK) {

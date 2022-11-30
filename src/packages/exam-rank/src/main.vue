@@ -7,6 +7,9 @@
       custom-class="result"
       :before-close="handleClose"
       draggable
+      :modal="false"
+      :part-block="true"
+      :z-index="zIndexServerState.zIndexMap.examRank"
     >
       <vh-tooltip
         class="vh-dialog__title rank-max-title"
@@ -50,7 +53,7 @@
 <script>
   import RankTitleWatch from './rank-title.vue';
   import RankItemWatch from './rank-item.vue';
-  import { useExamServer } from 'middle-domain';
+  import { useZIndexServer, useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRank',
     components: {
@@ -63,7 +66,9 @@
       }
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         examRankVisible: false,
         examTitle: '',
         totalPages: 0, // 总页面
@@ -80,15 +85,13 @@
         }
       };
     },
-    created() {
-      this.examServer = useExamServer();
-    },
     methods: {
       // 关闭 快问快打 - 排行榜手机弹出框
       handleClose() {
         this.examRankVisible = false;
       },
       async open(examId, examTitle = '') {
+        this.zIndexServer.setDialogZIndex('examRank');
         this.examRankVisible = true;
         this.examId = examId;
         this.examTitle = examTitle;
@@ -140,6 +143,10 @@
         this.targetPage = page;
         this.getRankData();
       }
+    },
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.examServer = useExamServer();
     }
   };
 </script>

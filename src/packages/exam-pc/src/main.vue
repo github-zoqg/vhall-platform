@@ -5,11 +5,13 @@
     :visible.sync="examAnswerVisible"
     width="380px"
     custom-class="vmp-exam-answer"
-    :close-on-click-modal="false"
+    :close-on-click-modal="true"
     :show-close="false"
-    :z-index="20"
     v-if="examAnswerVisible"
     draggable
+    :modal="false"
+    :part-block="true"
+    :z-index="zIndexServerState.zIndexMap.examAnswer"
   >
     <span slot="title" class="dialog-header take--place">&nbsp;</span>
     <div :class="`exam-core__container exam-theme--${theme}`">
@@ -19,13 +21,21 @@
   </vh-dialog>
 </template>
 <script>
-  import { useMsgServer, useUserServer, useExamServer, useRoomBaseServer } from 'middle-domain';
+  import {
+    useZIndexServer,
+    useMsgServer,
+    useUserServer,
+    useExamServer,
+    useRoomBaseServer
+  } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpExamPc',
     data() {
       const examWatchState = this.examServer.state;
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         examWatchState,
         examAnswerVisible: false, // 快问快答 - 答题
         examId: null,
@@ -100,6 +110,7 @@
           await this.userServer.getUserInfo({ scene_id: 2 });
         }
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
+        this.zIndexServer.setDialogZIndex('examAnswer');
         this.examAnswerVisible = true;
         const roomBaseState = useRoomBaseServer().state;
         this.$nextTick(() => {
@@ -145,9 +156,10 @@
       }
     },
     beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.userServer = useUserServer();
       this.examServer = useExamServer();
       this.msgServer = useMsgServer();
-      this.userServer = useUserServer();
     },
     created() {
       this.initExamEvents();
