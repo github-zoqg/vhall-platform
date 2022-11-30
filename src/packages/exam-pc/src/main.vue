@@ -9,7 +9,9 @@
     :show-close="false"
     :z-index="20"
     v-if="examAnswerVisible"
+    draggable
   >
+    <span slot="title" class="dialog-header take--place">&nbsp;</span>
     <div :class="`exam-core__container exam-theme--${theme}`">
       <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
       <div id="examAnswer"></div>
@@ -17,7 +19,7 @@
   </vh-dialog>
 </template>
 <script>
-  import { useMsgServer, useUserServer, useExamServer } from 'middle-domain';
+  import { useMsgServer, useUserServer, useExamServer, useRoomBaseServer } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   export default {
     name: 'VmpExamPc',
@@ -55,6 +57,9 @@
       // 获取用户信息
       userInfo() {
         return this.$domainStore.state.userServer.userInfo;
+      },
+      joinInfo() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
     },
     methods: {
@@ -96,19 +101,21 @@
         }
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答，已经做过答案情况）
         this.examAnswerVisible = true;
+        const roomBaseState = useRoomBaseServer().state;
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
             examId: examId,
             el: '#examAnswer',
             componentName: 'exampc',
+            lang: roomBaseState?.languages?.lang?.type || 'zh',
             configs: {
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              userName: this.userInfo?.nick_name || '',
-              headImg: this.userInfo?.avatar || defaultAvatar,
-              mobile: this.userInfo?.phone || ''
+              userName: this.userInfo?.nick_name || this.joinInfo?.nickname || '',
+              headImg: this.userInfo?.avatar || this.joinInfo?.avatar || '',
+              mobile: this.userInfo?.phone || this.joinInfo?.phone || ''
             }
           });
         });
@@ -152,9 +159,12 @@
     overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
+      .take--place {
+        height: 16px;
+      }
     }
     .vh-dialog__body {
-      height: 100%;
+      height: calc(100% - 16px);
       overflow: auto;
       padding: 0 0;
     }
@@ -167,8 +177,8 @@
     background-size: cover;
     // 重置内部元素
     .exam-execute-body {
-      height: calc(460px - 72px) !important;
-      max-height: calc(460px - 72px) !important;
+      height: calc(460px - 62px) !important;
+      max-height: calc(460px - 62px) !important;
     }
     .exam-core__container {
       width: 100%;
@@ -180,7 +190,7 @@
       .exam-close {
         position: absolute;
         right: 32px;
-        top: 22px;
+        top: 6px;
         font-size: 12px;
         z-index: 30;
         cursor: pointer;

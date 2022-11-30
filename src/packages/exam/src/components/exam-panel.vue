@@ -10,9 +10,9 @@
             @changeView="handleChangeView"
           />
         </vh-tab-pane>
-        <vh-tab-pane label="用户信息" name="user">
+        <!-- <vh-tab-pane label="用户信息" name="user">
           <exam-user-info />
-        </vh-tab-pane>
+        </vh-tab-pane> -->
       </vh-tabs>
     </div>
     <!-- 快问快答 内容区域 -->
@@ -20,7 +20,7 @@
 </template>
 <script>
   import ExamList from './exam-list.vue';
-  import ExamUserInfo from './exam-user-info.vue';
+  // import ExamUserInfo from './exam-user-info.vue';
   import { boxEventOpitons } from '@/app-shared/utils/tool';
   import changeView from '../common/mixins/changeView.js';
 
@@ -28,8 +28,8 @@
     name: 'VmpExamPanel',
     mixins: [changeView],
     components: {
-      ExamList,
-      ExamUserInfo
+      ExamList
+      // ExamUserInfo
     },
     data() {
       return {
@@ -56,16 +56,7 @@
           );
         }
       },
-      // async initPage() {
-      //   await this.$nextTick(() => {});
-      //   if (this.tabType == 'user') {
-      //     this.$refs.examUserPanel && this.$refs.examUserPanel.initComp();
-      //   } else {
-      //     this.$refs.examListPanel && this.$refs.examListPanel.initComp();
-      //   }
-      // },
       handleChangeView(view) {
-        console.log('🚀 ~ file: exam-panel.vue ~ line 68 ~ handleChangeView ~ view', view);
         this.$emit('changeView', view);
       }
     }

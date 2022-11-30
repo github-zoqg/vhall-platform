@@ -49,9 +49,9 @@
                 {{ scope.row.title }}
               </template>
             </vh-table-column>
-            <vh-table-column label="创建时间" width="148">
+            <vh-table-column label="更新时间" width="148">
               <template slot-scope="scope">
-                {{ scope.row.created_at | fmtTimeByExp('YYYY-MM-DD HH:mm') }}
+                {{ scope.row.updated_at }}
               </template>
             </vh-table-column>
             <vh-table-column width="56" label="总分">
@@ -508,6 +508,10 @@
 
   /* 快问快答 - 列表相关 */
   .exam-list-panel {
+    .vh-table th:first-child .cell,
+    .vh-table tr td:first-child .cell {
+      padding-left: 0 !important;
+    }
     .statusTag {
       font-size: 14px;
       &::before {

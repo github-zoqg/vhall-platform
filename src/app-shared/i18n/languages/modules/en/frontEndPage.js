@@ -1011,6 +1011,9 @@ export default {
     exam_1041: 'Finished the answer',
     exam_1042: 'Full score',
     exam_1043: '',
-    exam_1044: 'employee ID'
+    exam_1044: 'employee ID',
+    exam_1045: 'Show the top 200 results',
+    exam_1046: 'Nothing',
+    exam_1047: 'Answer'
   }
 };

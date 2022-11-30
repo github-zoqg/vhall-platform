@@ -26,7 +26,10 @@
             {{ source.nickname | overHidden(4) }}
           </span>
           <span>{{ source.content.text_content }}</span>
-          <span class="msg-item__top__highlight" v-if="source.type != 'paper_end'">
+          <span
+            :class="source.isLinkBtn ? 'msg-item__top__highlight' : ''"
+            v-if="source.isLinkBtn && source.type != 'paper_end'"
+          >
             {{ source.type == 'paper_send' ? $t('chat.chat_1093') : $t('exam.exam_1004') }}
           </span>
         </div>
@@ -55,7 +58,9 @@
           @click="checkExamDetail(source.content, source.type)"
         >
           <span>{{ source.content.text_content }}</span>
-          <span class="msg-item__top__highlight">{{ $t('exam.exam_1004') }}</span>
+          <span v-if="source.isLinkBtn" :class="source.isLinkBtn ? 'msg-item__top__highlight' : ''">
+            {{ $t('exam.exam_1004') }}
+          </span>
         </div>
         <div
           class="msg-item__name"
