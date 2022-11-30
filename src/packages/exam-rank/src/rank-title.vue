@@ -1,9 +1,9 @@
 <template>
   <div class="rank-title">
-    <div class="user-cell">用户</div>
-    <div class="score-cell">得分</div>
-    <div class="rate-cell">正确率</div>
-    <div class="elapsed-time-cell">用时</div>
+    <div class="user-cell">{{ $t('exam.exam_1034') }}</div>
+    <div class="score-cell">{{ $t('exam.exam_1048') }}</div>
+    <div class="rate-cell">{{ $t('exam.exam_1035') }}</div>
+    <div class="elapsed-time-cell">{{ $t('exam.exam_1049') }}</div>
   </div>
 </template>
 <script>
