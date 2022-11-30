@@ -1,53 +1,59 @@
 <template>
-  <!-- 快问快答-排行榜 -->
-  <vh-dialog
-    :visible.sync="examRankVisible"
-    width="380px"
-    custom-class="result"
-    :before-close="handleClose"
-  >
-    <vh-tooltip
-      class="vh-dialog__title rank-max-title"
-      slot="title"
-      effect="dark"
-      :content="examTitle"
-      placement="top-end"
+  <div>
+    <!-- 快问快答-排行榜 -->
+    <vh-dialog
+      :visible.sync="examRankVisible"
+      width="380px"
+      custom-class="result"
+      :before-close="handleClose"
+      draggable
+      :modal="false"
+      :part-block="true"
+      :z-index="zIndexServerState.zIndexMap.examRank"
     >
-      <span>{{ examTitle }}</span>
-    </vh-tooltip>
-    <div class="vmp-rank-watch">
-      <RankTitleWatch />
-      <div class="rank-list-wrap">
-        <ul class="rank-list">
-          <li v-for="item of rankList" :key="item.id" class="rank-item">
-            <RankItemWatch :item="item" />
-          </li>
-        </ul>
+      <vh-tooltip
+        class="vh-dialog__title rank-max-title"
+        slot="title"
+        effect="dark"
+        :content="examTitle"
+        placement="top-end"
+      >
+        <span>{{ examTitle }}</span>
+      </vh-tooltip>
+      <div class="vmp-rank-watch">
+        <RankTitleWatch />
+        <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
+          <ul class="rank-list">
+            <li v-for="item of rankList" :key="item.id" class="rank-item">
+              <RankItemWatch :item="item" />
+            </li>
+          </ul>
+        </div>
+        <div class="self-rank">
+          <RankItemWatch class="ma" :item="ownerData" />
+        </div>
+        <div class="dialog-bottom">
+          <vh-pagination
+            background
+            slot="footer"
+            class="text-center ma m-t-16 m-b-16"
+            layout="prev, pager, next"
+            :page-size="queryParams.limit"
+            :pager-count="5"
+            :total="total"
+            :current-page="targetPage"
+            @current-change="handleChangePage"
+            v-if="total > 0"
+          ></vh-pagination>
+        </div>
       </div>
-      <div class="self-rank">
-        <RankItemWatch class="ma" :item="ownerData" />
-      </div>
-      <div class="dialog-bottom">
-        <vh-pagination
-          background
-          slot="footer"
-          class="text-center ma m-t-16 m-b-16"
-          layout="prev, pager, next"
-          :page-size="queryParams.limit"
-          :pager-count="5"
-          :total="total"
-          :current-page="targetPage"
-          @current-change="handleChangePage"
-          v-if="total > 0"
-        ></vh-pagination>
-      </div>
-    </div>
-  </vh-dialog>
+    </vh-dialog>
+  </div>
 </template>
 <script>
   import RankTitleWatch from './rank-title.vue';
   import RankItemWatch from './rank-item.vue';
-  import { useExamServer } from 'middle-domain';
+  import { useZIndexServer, useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRank',
     components: {
@@ -60,7 +66,9 @@
       }
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         examRankVisible: false,
         examTitle: '',
         totalPages: 0, // 总页面
@@ -72,11 +80,10 @@
         rankList: [],
         total: 0,
         loading: false,
-        ownerData: null
+        ownerData: {
+          rank_no: 0
+        }
       };
-    },
-    created() {
-      this.examServer = useExamServer();
     },
     methods: {
       // 关闭 快问快打 - 排行榜手机弹出框
@@ -84,6 +91,7 @@
         this.examRankVisible = false;
       },
       async open(examId, examTitle = '') {
+        this.zIndexServer.setDialogZIndex('examRank');
         this.examRankVisible = true;
         this.examId = examId;
         this.examTitle = examTitle;
@@ -135,6 +143,10 @@
         this.targetPage = page;
         this.getRankData();
       }
+    },
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.examServer = useExamServer();
     }
   };
 </script>
@@ -197,6 +209,9 @@
     .rank-list-wrap {
       padding: 0 24px;
       padding-top: 52px;
+      &.not-owner {
+        padding-top: 0;
+      }
       overflow-y: auto;
       height: 226px;
     }
