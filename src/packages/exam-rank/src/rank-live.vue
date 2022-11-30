@@ -69,7 +69,11 @@
             </div>
           </template>
         </vh-table-column>
-        <vh-table-column prop="score" label="得分" min-width="64"></vh-table-column>
+        <vh-table-column prop="score" label="得分" min-width="64" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.score | fmtScore }}
+          </template>
+        </vh-table-column>
         <vh-table-column
           prop="right_rate"
           label="正确率"
@@ -138,7 +142,7 @@
     result.push(summaryDataMap[key]);
     return result;
   }, []);
-
+  let noScoreSettings = false;
   export default {
     name: 'VMPRankLive',
     inject: ['examServer'],
@@ -167,11 +171,15 @@
         const mm = `${Math.floor(time / 60)}`.padStart(2, '0');
         const ss = `${Math.floor(time % 60)}`.padStart(2, '0');
         return `${mm}:${ss}`;
+      },
+      fmtScore(score) {
+        return noScoreSettings ? '-' : score;
       }
     },
     methods: {
       open(examObj) {
         this.examId = examObj.id;
+        noScoreSettings = !examObj.total_score;
         this.initComp();
         this.dialogVisible = true;
       },
