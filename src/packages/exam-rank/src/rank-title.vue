@@ -19,16 +19,20 @@
 <style lang="less">
   .rank-title {
     width: 332px;
-    height: 44px;
+    height: 22px;
+    padding: 8px 0;
     margin: 0 auto;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    font-style: normal;
+    font-weight: 400;
     font-size: 12px;
+    line-height: 22px;
     color: #595959;
     .user-cell {
-      width: 148px;
+      width: 156px;
       margin-left: 12px;
     }
     .score-cell {
@@ -37,11 +41,11 @@
     }
     .rate-cell {
       margin-left: 12px;
-      width: 40px;
+      width: 54px;
     }
     .elapsed-time-cell {
       margin-left: 12px;
-      width: 44px;
+      width: 64px;
     }
   }
 </style>

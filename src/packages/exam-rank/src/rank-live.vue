@@ -315,7 +315,7 @@
       .flex-mixin();
       height: 32px;
       .nickname {
-        max-width: 140px;
+        max-width: 70px;
       }
     }
 
