@@ -87,7 +87,7 @@
                     class="button_answer"
                     v-else-if="item && item.is_end == 0 && item.status == 0"
                   >
-                    <van-button type="danger" size="mini" round>
+                    <van-button type="danger" size="mini" round class="exam-answer-btn">
                       {{ $t('exam.exam_1027') }}
                     </van-button>
                   </div>
@@ -488,6 +488,26 @@
         top: 37px;
         right: 30px;
         cursor: pointer;
+      }
+      .exam-answer-btn {
+        border: 1px solid var(--theme-more-status-button-border);
+        background: var(--theme-more-status-button-bg);
+        color: var(--theme-more-status-button-color);
+        &:hover {
+          background: var(--theme-more-status-button-hover-bg);
+          border: 1px solid var(--theme-more-status-button-hover-border);
+          color: var(--theme-more-status-button-hover-color);
+        }
+        &:active {
+          background: var(--theme-more-status-button-active-bg);
+          border: 1px solid var(--theme-more-status-button-active-border);
+          color: var(--theme-more-status-button-active-color);
+        }
+        &.is-disabled {
+          background: var(--theme-more-status-button-disabled-bg) !important;
+          border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+          color: var(--theme-more-status-button-disabled-color) !important;
+        }
       }
     }
   }

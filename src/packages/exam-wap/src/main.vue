@@ -230,14 +230,23 @@
     }
     .exam-execute-footer {
       button.vh-button--danger {
-        background: var(--theme-exam-next-button-bg) !important ;
-        color: var(--theme-exam-next-button-color) !important ;
-        border: 1px solid var(--theme-exam-next-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-next-button-active-bg) !important ;
-          color: var(--theme-exam-next-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-next-button-active-border) !important;
+        border: 1px solid var(--theme-more-status-button-border);
+        background: var(--theme-more-status-button-bg);
+        color: var(--theme-more-status-button-color);
+        &:hover {
+          background: var(--theme-more-status-button-hover-bg);
+          border: 1px solid var(--theme-more-status-button-hover-border);
+          color: var(--theme-more-status-button-hover-color);
+        }
+        &:active {
+          background: var(--theme-more-status-button-active-bg);
+          border: 1px solid var(--theme-more-status-button-active-border);
+          color: var(--theme-more-status-button-active-color);
+        }
+        &.is-disabled {
+          background: var(--theme-more-status-button-disabled-bg) !important;
+          border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+          color: var(--theme-more-status-button-disabled-color) !important;
         }
       }
       button.vh-button--info {
@@ -249,6 +258,28 @@
           background: var(--theme-exam-last-button-active-bg) !important ;
           color: var(--theme-exam-last-button-active-color) !important ;
           border: 1px solid var(--theme-exam-last-button-active-border) !important;
+        }
+      }
+    }
+    .vmp-transcripts {
+      button.vh-button--primary {
+        border: 1px solid var(--theme-more-status-button-border);
+        background: var(--theme-more-status-button-bg);
+        color: var(--theme-more-status-button-color);
+        &:hover {
+          background: var(--theme-more-status-button-hover-bg);
+          border: 1px solid var(--theme-more-status-button-hover-border);
+          color: var(--theme-more-status-button-hover-color);
+        }
+        &:active {
+          background: var(--theme-more-status-button-active-bg);
+          border: 1px solid var(--theme-more-status-button-active-border);
+          color: var(--theme-more-status-button-active-color);
+        }
+        &.is-disabled {
+          background: var(--theme-more-status-button-disabled-bg) !important;
+          border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+          color: var(--theme-more-status-button-disabled-color) !important;
         }
       }
     }
