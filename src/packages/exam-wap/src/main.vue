@@ -60,6 +60,10 @@
       examWatchResult() {
         return this.examServer.state.examWatchResult;
       },
+      // 获取用户信息
+      userInfo() {
+        return this.$domainStore.state.userServer.userInfo;
+      },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
