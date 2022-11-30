@@ -14,9 +14,12 @@
       </div>
     </div>
     <div class="score-cell">{{ item.score || '--' }}</div>
-    <div class="rate-cell">
-      {{ item.right_rate != null && item.right_rate != undefined ? item.right_rate + '%' : '--' }}
-    </div>
+    <div
+      class="rate-cell"
+      v-text="
+        item.right_rate != null && item.right_rate != undefined ? item.right_rate + '%' : '--'
+      "
+    ></div>
     <div class="elapsed-time-cell">{{ item.use_time | fmtUseTime }}</div>
   </div>
 </template>

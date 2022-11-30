@@ -14,9 +14,12 @@
       </div>
     </div>
     <div class="score-cell">{{ item.score || '--' }}</div>
-    <div class="rate-cell">
-      {{ item.right_rate != null && item.right_rate != undefined ? item.right_rate + '%' : '--' }}
-    </div>
+    <div
+      class="rate-cell"
+      v-text="
+        item.right_rate != null && item.right_rate != undefined ? item.right_rate + '%' : '--'
+      "
+    ></div>
     <div class="elapsed-time-cell">{{ item.use_time | fmtUseTime }}</div>
   </div>
 </template>
@@ -95,7 +98,11 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    color: #262626;
     .order-cell {
       width: 20px;
     }
@@ -107,7 +114,7 @@
     .avatar-wrap {
       .flex-mixin();
       .nickname {
-        max-width: 84px;
+        max-width: 70px;
       }
     }
 
@@ -122,7 +129,7 @@
     }
     .rate-cell {
       margin-left: 12px;
-      width: 40px;
+      width: 54px;
     }
     .elapsed-time-cell {
       margin-left: 12px;
