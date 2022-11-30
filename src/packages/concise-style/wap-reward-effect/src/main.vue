@@ -40,9 +40,9 @@
             <template v-if="!!Sources[rewardEffectInfo.data.gift_name]">
               <img
                 :src="
-                  require('@/app-shared/assets/img/wap/chat/' +
-                    rewardEffectInfo.data.gift_name +
-                    '.png')
+                  require('@/app-shared/assets/img/wap/chat/assetsMap')(
+                    rewardEffectInfo.data.gift_name
+                  )
                 "
                 alt=""
               />

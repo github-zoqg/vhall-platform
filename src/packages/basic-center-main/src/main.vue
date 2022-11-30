@@ -1,7 +1,7 @@
 <!--
 此组件用于实现无根元素的容器.
 -->
-<script type="text/jsx">
+<script type="text/jsx" lang="jsx">
   export default {
     name: 'VmpBasicCenterMain',
     functional: true,
@@ -20,26 +20,23 @@
         }
       }
       const renderList = widgets.map(item => {
-        return createElement(
-          item.component,
-          {
-            props: {
-              cuid: item.cuid
-            }
+        return createElement(item.component, {
+          props: {
+            cuid: item.cuid
           }
-        )
-      })
+        });
+      });
       return [
-        (<div class='vmp-basic-center__mainscreen-pos'></div>),
+        <div class="vmp-basic-center__mainscreen-pos"></div>,
         // createElement('div',{class:'vmp-basic-center__mainscreen-pos'}),
         ...renderList
-      ]
+      ];
     },
     props: {
       cuid: {
         type: String,
         default() {
-          return ''
+          return '';
         }
       }
     }

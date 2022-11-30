@@ -30,7 +30,7 @@
                   />
                   <img
                     v-else
-                    :src="require('@/app-shared/assets/img/wap/gift/' + secItem.name + '.png')"
+                    :src="require('@/app-shared/assets/img/wap/chat/assetsMap')(secItem.name)"
                     alt
                   />
                 </div>

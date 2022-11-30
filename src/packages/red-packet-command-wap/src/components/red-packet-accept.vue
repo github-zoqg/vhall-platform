@@ -56,36 +56,35 @@
         if (this.userId == 0) {
           return this.$emit('needLogin');
         }
-        const available = this.redPacketServer.state.available;
-        const getStatus = () => {
-          this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
-            this.opened = true;
-            const st = setTimeout(() => {
-              clearTimeout(st);
-              this.$emit('navTo', 'RedPacketSuccess');
-            }, 1000);
-          });
-        };
+        // const getStatus = () => {
+        //   this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid).then(() => {
+        //     this.opened = true;
+        //     const st = setTimeout(() => {
+        //       clearTimeout(st);
+        //       this.$emit('navTo', 'RedPacketSuccess');
+        //     }, 1000);
+        //   });
+        // };
         this.opening = true; // 打开中
         this.redPacketServer
           .openCodeRedPacket()
-          .then(res => {
+          .then(async res => {
+            //red_code: "xxx" status: 1
             if (res.code === 200) {
-              this.opened = true;
-              const st = setTimeout(() => {
-                clearTimeout(st);
-                this.$emit('navTo', 'RedPacketSuccess');
-              }, 1000);
-            } else {
-              getStatus();
+              this.redPacketServer.state.is_luck = res.data.status;
+              this.redPacketServer.state.red_code = res.data.red_code;
+              // this.opened = true;
+            } else if (res.code === 110015) {
+              await this.redPacketServer.getCodeRedPacketInfo(this.redPacketInfo.red_packet_uuid);
             }
           })
           .catch(() => {
-            getStatus();
+            // getStatus();
           })
           .finally(() => {
-            getStatus();
+            // getStatus();
             this.opening = false;
+            this.$emit('navTo', 'RedPacketSuccess');
           });
         // 更新领取后的状态
         this.redPacketServer.setAvailable(false);

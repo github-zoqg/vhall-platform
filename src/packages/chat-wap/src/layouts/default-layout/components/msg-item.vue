@@ -113,7 +113,7 @@
           <img
             v-else
             class="new-gift-img"
-            :src="require('@/app-shared/assets/img/wap/chat/' + source.content.gift_name + '.png')"
+            :src="require('@/app-shared/assets/img/wap/chat/assetsMap')(source.content.gift_name)"
           />
         </div>
       </div>
