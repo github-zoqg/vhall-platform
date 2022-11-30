@@ -292,7 +292,7 @@
               {{ $t('form.form_1019') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"
@@ -351,7 +351,7 @@
               {{ $t('form.form_1082') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"

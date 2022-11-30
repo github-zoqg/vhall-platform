@@ -318,6 +318,7 @@
                   </div>
                   <!-- 隐私合规（嵌入不支持） -->
                   <vmp-privacy-compliance
+                    v-if="!privacy"
                     scene="signForm"
                     clientType="pc"
                     compType="2"
@@ -392,6 +393,7 @@
                   </div>
                   <!-- 隐私合规（嵌入不支持） -->
                   <vmp-privacy-compliance
+                    v-if="!privacy"
                     scene="signForm"
                     clientType="pc"
                     compType="2"
@@ -709,6 +711,7 @@
                 </div>
                 <!-- 隐私合规（嵌入不支持） -->
                 <vmp-privacy-compliance
+                  v-if="!privacy"
                   scene="signForm"
                   clientType="pc"
                   compType="2"
@@ -783,6 +786,7 @@
                 </div>
                 <!-- 隐私合规（嵌入不支持） -->
                 <vmp-privacy-compliance
+                  v-if="!privacy"
                   scene="signForm"
                   clientType="pc"
                   compType="2"
