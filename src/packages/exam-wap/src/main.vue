@@ -7,6 +7,9 @@
     position="bottom"
     @close="closeDialog"
     v-if="examAnswerVisible"
+    overlay-class="vmp-exam-answer-popup-overlay"
+    :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
+    :style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
   >
     <div :class="`exam-core__container exam-theme--${theme}`">
       <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
@@ -60,6 +63,10 @@
       examWatchResult() {
         return this.examServer.state.examWatchResult;
       },
+      // 获取用户信息
+      userInfo() {
+        return this.$domainStore.state.userServer.userInfo;
+      },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
       }
@@ -68,6 +75,17 @@
       // 打开问卷弹窗(全屏,视频需要改为小窗)
       examAnswerVisible(val) {
         window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitExamVisible', [!!val]));
+      },
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
+      // 无法动态更改zIndex
+      'zIndexServerState.zIndexMap.examAnswer': {
+        handler(val) {
+          if (document.querySelector('.vmp-exam-answer-popup-overlay')) {
+            this.$nextTick(() => {
+              document.querySelector('.vmp-exam-answer-popup-overlay').style.zIndex = val;
+            });
+          }
+        }
       }
     },
     methods: {
@@ -110,6 +128,7 @@
         console.log('当前进入的流程', examId, answerType, allowShow);
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答消息后，已经做过答案情况）
         this.examAnswerVisible = true;
+        this.zIndexServer.setDialogZIndex('examAnser');
         const roomBaseState = useRoomBaseServer().state;
         console.log('展示弹窗。。。。');
         this.$nextTick(() => {
@@ -211,14 +230,23 @@
     }
     .exam-execute-footer {
       button.vh-button--danger {
-        background: var(--theme-exam-next-button-bg) !important ;
-        color: var(--theme-exam-next-button-color) !important ;
-        border: 1px solid var(--theme-exam-next-button-border) !important;
-        &:hover,
-        &.active {
-          background: var(--theme-exam-next-button-active-bg) !important ;
-          color: var(--theme-exam-next-button-active-color) !important ;
-          border: 1px solid var(--theme-exam-next-button-active-border) !important;
+        border: 1px solid var(--theme-more-status-button-border);
+        background: var(--theme-more-status-button-bg);
+        color: var(--theme-more-status-button-color);
+        &:hover {
+          background: var(--theme-more-status-button-hover-bg);
+          border: 1px solid var(--theme-more-status-button-hover-border);
+          color: var(--theme-more-status-button-hover-color);
+        }
+        &:active {
+          background: var(--theme-more-status-button-active-bg);
+          border: 1px solid var(--theme-more-status-button-active-border);
+          color: var(--theme-more-status-button-active-color);
+        }
+        &.is-disabled {
+          background: var(--theme-more-status-button-disabled-bg) !important;
+          border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+          color: var(--theme-more-status-button-disabled-color) !important;
         }
       }
       button.vh-button--info {
@@ -230,6 +258,28 @@
           background: var(--theme-exam-last-button-active-bg) !important ;
           color: var(--theme-exam-last-button-active-color) !important ;
           border: 1px solid var(--theme-exam-last-button-active-border) !important;
+        }
+      }
+    }
+    .vmp-transcripts {
+      button.vh-button--primary {
+        border: 1px solid var(--theme-more-status-button-border);
+        background: var(--theme-more-status-button-bg);
+        color: var(--theme-more-status-button-color);
+        &:hover {
+          background: var(--theme-more-status-button-hover-bg);
+          border: 1px solid var(--theme-more-status-button-hover-border);
+          color: var(--theme-more-status-button-hover-color);
+        }
+        &:active {
+          background: var(--theme-more-status-button-active-bg);
+          border: 1px solid var(--theme-more-status-button-active-border);
+          color: var(--theme-more-status-button-active-color);
+        }
+        &.is-disabled {
+          background: var(--theme-more-status-button-disabled-bg) !important;
+          border: 1px solid var(--theme-more-status-button-disabled-border) !important;
+          color: var(--theme-more-status-button-disabled-color) !important;
         }
       }
     }

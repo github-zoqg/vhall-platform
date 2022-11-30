@@ -22,18 +22,20 @@
       </vh-tooltip>
       <div class="vmp-rank-watch">
         <RankTitleWatch />
-        <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
+        <div
+          :class="['rank-list-wrap', ownerData ? '' : 'not-owner', total >= 200 ? 'max-total' : '']"
+        >
           <ul class="rank-list">
             <li v-for="item of rankList" :key="item.id" class="rank-item">
               <RankItemWatch :item="item" />
             </li>
           </ul>
         </div>
-        <div class="self-rank">
+        <div class="self-rank" v-if="ownerData">
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom">
-          <div class="rank-list-more" v-if="total >= 200">
+          <div class="rank-list-more">
             {{ $t('exam.exam_1045') }}
           </div>
           <vh-pagination
@@ -189,16 +191,26 @@
   .vh-dialog {
     &.result {
       .bg-mixin(@size: cover);
-      height: 460px;
+      height: 468px;
       background: #ffffff;
       background: url('./img/dialog-watch-bg.png') no-repeat;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05), 0px 8px 16px rgba(51, 51, 51, 0.24);
-      border-radius: 4px;
+      border-radius: 12px;
+      background-color: #ffffff;
+      background-position: top;
+      background-size: cover;
+      border-radius: 12px;
       overflow: hidden;
+      .vh-dialog__header {
+        padding: 24px 32px 8px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
       .vh-dialog__body {
         margin: 0;
         padding: 0;
-        height: 386px;
+        height: 412px;
       }
       .rank-max-title {
         width: 280px;
@@ -206,6 +218,12 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         display: inline-block;
+        font-family: 'PingFang SC';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        color: #262626;
       }
     }
   }
@@ -215,12 +233,22 @@
     position: relative;
     .rank-list-wrap {
       padding: 0 24px;
-      padding-top: 52px;
-      &.not-owner {
-        padding-top: 0;
-      }
+      margin-top: 58px;
       overflow-y: auto;
-      height: 226px;
+      height: 248px;
+      &.max-total {
+        height: 226px;
+      }
+      &.not-owner {
+        margin-top: 8px;
+        height: 412px;
+        .rank-item:last-child {
+          padding-bottom: 66px;
+        }
+        &.max-total {
+          height: 280px;
+        }
+      }
     }
     .rank-list {
       background: #fff;
@@ -234,7 +262,7 @@
       .flex-mixin();
       height: 32px;
       .nickname {
-        max-width: 140px;
+        max-width: 70px;
       }
     }
 
@@ -271,7 +299,7 @@
       margin: 0 24px;
     }
     .vh-pagination {
-      padding: 12px 0 16px 0;
+      padding: 16px 0;
     }
     .vh-pagination {
       li {
