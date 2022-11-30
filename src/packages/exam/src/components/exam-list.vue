@@ -508,6 +508,10 @@
 
   /* 快问快答 - 列表相关 */
   .exam-list-panel {
+    .vh-table th:first-child,
+    .vh-table td:first-child {
+      padding-left: 12px !important;
+    }
     .vh-table th:first-child .cell,
     .vh-table tr td:first-child .cell {
       padding-left: 0 !important;

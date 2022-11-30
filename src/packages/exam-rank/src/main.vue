@@ -7,6 +7,9 @@
       custom-class="result"
       :before-close="handleClose"
       draggable
+      :modal="false"
+      :part-block="true"
+      :z-index="zIndexServerState.zIndexMap.examRank"
     >
       <vh-tooltip
         class="vh-dialog__title rank-max-title"
@@ -30,6 +33,9 @@
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom">
+          <div class="rank-list-more" v-if="total >= 200">
+            {{ $t('exam.exam_1045') }}
+          </div>
           <vh-pagination
             background
             slot="footer"
@@ -50,7 +56,7 @@
 <script>
   import RankTitleWatch from './rank-title.vue';
   import RankItemWatch from './rank-item.vue';
-  import { useExamServer } from 'middle-domain';
+  import { useZIndexServer, useExamServer } from 'middle-domain';
   export default {
     name: 'VmpExamRank',
     components: {
@@ -63,14 +69,16 @@
       }
     },
     data() {
+      const zIndexServerState = this.zIndexServer.state;
       return {
+        zIndexServerState,
         examRankVisible: false,
         examTitle: '',
         totalPages: 0, // 总页面
         targetPage: 1, // 当前目标页数
         queryParams: {
           limit: 10,
-          pageNum: 1
+          pos: 0
         },
         rankList: [],
         total: 0,
@@ -80,15 +88,13 @@
         }
       };
     },
-    created() {
-      this.examServer = useExamServer();
-    },
     methods: {
       // 关闭 快问快打 - 排行榜手机弹出框
       handleClose() {
         this.examRankVisible = false;
       },
       async open(examId, examTitle = '') {
+        this.zIndexServer.setDialogZIndex('examRank');
         this.examRankVisible = true;
         this.examId = examId;
         this.examTitle = examTitle;
@@ -103,8 +109,9 @@
         this.getOwnerRankData();
       },
       getRankData() {
+        this.queryParams.pos = (this.targetPage - 1) * this.queryParams.limit;
         const params = {
-          pos: (this.queryParams.pos = parseInt((this.targetPage - 1) * this.queryParams.limit)),
+          pos: this.queryParams.pos,
           limit: this.queryParams.limit,
           paper_id: this.examId
         };
@@ -140,6 +147,10 @@
         this.targetPage = page;
         this.getRankData();
       }
+    },
+    beforeCreate() {
+      this.zIndexServer = useZIndexServer();
+      this.examServer = useExamServer();
     }
   };
 </script>
@@ -178,8 +189,11 @@
   .vh-dialog {
     &.result {
       .bg-mixin(@size: cover);
-      background-image: url('./img/dialog-watch-bg.png');
       height: 460px;
+      background: #ffffff;
+      background: url('./img/dialog-watch-bg.png') no-repeat;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05), 0px 8px 16px rgba(51, 51, 51, 0.24);
+      border-radius: 4px;
       overflow: hidden;
       .vh-dialog__body {
         margin: 0;
@@ -232,7 +246,14 @@
         border-radius: 8px;
       }
     }
-
+    .rank-list-more {
+      text-align: center;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 20px;
+      color: #8c8c8c;
+    }
     .dialog-bottom {
       position: absolute;
       width: 100%;
@@ -250,7 +271,7 @@
       margin: 0 24px;
     }
     .vh-pagination {
-      padding: 16px 0;
+      padding: 12px 0 16px 0;
     }
     .vh-pagination {
       li {
