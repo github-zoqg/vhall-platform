@@ -80,7 +80,7 @@ export default async function () {
     // 非嵌入页 微信环境 没有授权 微信授权没有关闭 不能初始化聊天
     !localStorage.getItem('unionid') &&
     isWechat() &&
-    roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
+    roomBaseServer.state.configList['ui.hide_wechat'] == 1 &&
     !roomBaseServer.state.embedObj.embed
   ) {
     return;

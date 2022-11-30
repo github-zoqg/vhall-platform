@@ -249,9 +249,9 @@
         let noChatLogin = false;
         if (isWechat()) {
           /**
-           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
+           * ui.hide_wechat: 1使用微信授权 0不适用微信授权
            */
-          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
+          if (!this.configList['ui.hide_wechat']) {
             noChatLogin = this.configList['ui.show_chat_without_login'];
           } else {
             noChatLogin = true;
