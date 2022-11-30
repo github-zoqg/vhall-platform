@@ -149,6 +149,7 @@
           &__highlight {
             padding-left: 8px;
             color: @font-click-detail;
+            cursor: pointer;
           }
         }
         .msg-item__name {

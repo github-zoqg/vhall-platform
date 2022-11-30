@@ -22,18 +22,20 @@
       </vh-tooltip>
       <div class="vmp-rank-watch">
         <RankTitleWatch />
-        <div :class="['rank-list-wrap', ownerData ? '' : 'not-owner']">
+        <div
+          :class="['rank-list-wrap', ownerData ? '' : 'not-owner', total >= 200 ? 'max-total' : '']"
+        >
           <ul class="rank-list">
             <li v-for="item of rankList" :key="item.id" class="rank-item">
               <RankItemWatch :item="item" />
             </li>
           </ul>
         </div>
-        <div class="self-rank">
+        <div class="self-rank" v-if="ownerData">
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom">
-          <div class="rank-list-more" v-if="total >= 200">
+          <div class="rank-list-more">
             {{ $t('exam.exam_1045') }}
           </div>
           <vh-pagination
@@ -193,7 +195,11 @@
       background: #ffffff;
       background: url('./img/dialog-watch-bg.png') no-repeat;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05), 0px 8px 16px rgba(51, 51, 51, 0.24);
-      border-radius: 4px;
+      border-radius: 12px;
+      background-color: #ffffff;
+      background-position: top;
+      background-size: cover;
+      border-radius: 12px;
       overflow: hidden;
       .vh-dialog__header {
         padding: 24px 32px 8px 32px;
@@ -227,12 +233,22 @@
     position: relative;
     .rank-list-wrap {
       padding: 0 24px;
-      padding-top: 58px;
-      &.not-owner {
-        padding-top: 0;
-      }
+      margin-top: 58px;
       overflow-y: auto;
-      height: 226px;
+      height: 248px;
+      &.max-total {
+        height: 226px;
+      }
+      &.not-owner {
+        margin-top: 8px;
+        height: 412px;
+        .rank-item:last-child {
+          padding-bottom: 66px;
+        }
+        &.max-total {
+          height: 280px;
+        }
+      }
     }
     .rank-list {
       background: #fff;
