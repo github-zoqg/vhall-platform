@@ -1018,6 +1018,8 @@ export default {
     exam_1044: '',
     exam_1045: '',
     exam_1046: '',
-    exam_1047: ''
+    exam_1047: '',
+    exam_1048: '',
+    exam_1049: ''
   }
 };

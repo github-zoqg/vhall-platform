@@ -8,7 +8,7 @@
     @close="closeDialog"
     v-if="examRankVisible"
   >
-    <RankTitle :title="examTitle" />
+    <RankTitle :title="examTitle" :showClose="true" @close="closeDialog" />
     <div class="vmp-rank-wap">
       <RankLabel />
       <div class="rank-list-wrap">
@@ -19,6 +19,9 @@
             </li>
           </van-list>
         </ul>
+      </div>
+      <div class="rank-list-more" v-if="rankList && rankList.length >= 200">
+        {{ $t('exam.exam_1045') }}
       </div>
     </div>
     <div class="dialog-bottom">
@@ -183,8 +186,12 @@
   .vmp-exam-rank-wap {
     height: 844px;
     background: transparent;
-    background: linear-gradient(54.82deg, #fdf1ed 12.42%, #f3f2ff 104.09%);
+    background: url(https://s3.e.vhall.com/common-static/vhall-form/images/bg_exam_list.png)
+      no-repeat;
     border-radius: 40px 40px 0px 0px;
+    background-color: #ffffff;
+    background-position: top;
+    background-size: cover;
     overflow: hidden;
 
     .vmp-rank-wap {
@@ -194,6 +201,16 @@
 
       .rank-list-wrap {
         padding: 0 32px;
+      }
+      .rank-list-more {
+        font-family: 'PingFang SC';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+        color: #8c8c8c;
+        text-align: center;
+        padding-top: 8px;
       }
       .rank-list {
         background: #fff;
@@ -207,7 +224,7 @@
         .flex-mixin();
         height: 64px;
         .nickname {
-          max-width: 280px;
+          max-width: 140px;
         }
       }
 
