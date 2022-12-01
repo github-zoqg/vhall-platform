@@ -1726,7 +1726,7 @@
       },
       //我已报名--验证
       submitVerify: debounce(function () {
-        if (!this.form[this.privacy.id]) {
+        if (!this.form[this.privacy.id] && this.privacy && this.privacy.is_must) {
           this.$toast(this.$t('form.form_1030'));
           return;
         }
