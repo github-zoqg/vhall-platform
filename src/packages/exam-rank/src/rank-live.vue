@@ -212,7 +212,8 @@
         const params = {
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           limit: this.queryParams.limit,
-          paper_id: this.examId
+          paper_id: this.examId,
+          from_consumer: 1
         };
         this.examServer.getExamRankList(params).then(res => {
           if (res.code === 200) {
