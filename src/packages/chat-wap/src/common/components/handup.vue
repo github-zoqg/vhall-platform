@@ -122,7 +122,7 @@
 
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        this.$toast(this.$t('interact.interact_1028'));
+        // this.$toast(this.$t('interact.interact_1028'));
       });
       // 用户申请被拒绝（客户端有拒绝用户上麦的操作）
       useMsgServer().$onMsg('ROOM_MSG', msg => {
@@ -150,17 +150,28 @@
     methods: {
       // 下麦操作
       offConnect() {
-        this.$emit('handupLoading', false);
-        this.closeConnectPop();
-        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
-        useMicServer()
-          .speakOff()
-          .then(res => {
-            window.vhallReportForProduct.toResultsReporting(170003, {
-              event_type: 'interface',
-              failed_reason: res,
-              request_id: res.request_id
-            });
+        this.$dialog
+          .confirm({
+            title: this.$t('account.account_1061'),
+            message: this.$t('interact.interact_1043'),
+            confirmButtonText: this.$t('other.other_1027'),
+            cancelButtonText: this.$t('other.other_1028'),
+            confirmButtonColor: '#fb3a32',
+            cancelButtonClass: 'zdy-confirm-cancel'
+          })
+          .then(() => {
+            this.$emit('handupLoading', false);
+            this.closeConnectPop();
+            window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
+            useMicServer()
+              .speakOff()
+              .then(res => {
+                window.vhallReportForProduct.toResultsReporting(170003, {
+                  event_type: 'interface',
+                  failed_reason: res,
+                  request_id: res.request_id
+                });
+              });
           });
       },
       // 举手上麦
@@ -252,7 +263,7 @@
                 this.$emit('handupLoading', false);
                 let tip = '';
                 if (this.isInGroup) {
-                  tip = '组长拒绝了您的上麦请求';
+                  tip = '组长未响应您的上麦申请';
                 } else {
                   tip = this.$t('other.other_1006');
                 }

@@ -261,13 +261,14 @@
         if (msg.context?.role_name == 1 || msg.context?.role == 1) {
           this.$message.warning({ message: this.$t('message.message_1027') });
         }
-        if (msg.context?.role_name == 4 || msg.context?.role == 4) {
-          this.$message.warning({
-            message: this.$t('message.message_1029', {
-              n: msg.context.nickname || msg.context.nick_name
-            })
-          });
-        }
+        // 7.7.4 优化后不再提示
+        // if (msg.context?.role_name == 4 || msg.context?.role == 4) {
+        //   this.$message.warning({
+        //     message: this.$t('message.message_1029', {
+        //       n: msg.context.nickname || msg.context.nick_name
+        //     })
+        //   });
+        // }
       },
       handleErrorCode(err) {
         let origin =

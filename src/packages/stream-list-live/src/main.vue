@@ -352,6 +352,17 @@
             }
           }
         });
+        this.msgServer.$onMsg('CUSTOM_MSG', rawMsg => {
+          const { type = '', msg } = rawMsg.data || {};
+          switch (type) {
+            // 主持人需提示用户30秒未同意上麦
+            case 'invite_out_time':
+              this.$message.warning(msg);
+              break;
+            default:
+              break;
+          }
+        });
       },
 
       toggleShrink(flag) {

@@ -281,7 +281,7 @@
       }
       .container-data__shadow {
         height: 8px;
-        box-shadow: 0 8px 0 rgb(51 51 51 / 24%), 0 2px 0 rgb(0 0 0 / 5%);
+        // box-shadow: 0 8px 0 rgb(51 51 51 / 24%), 0 2px 0 rgb(0 0 0 / 5%);
       }
       .container-close {
         position: absolute;

@@ -405,7 +405,7 @@
             this._applyInterval = setInterval(() => {
               this.applyTime = this.applyTime - 1;
               if (this.applyTime == 0 && this._applyInterval) {
-                this.$message.warning({ message: '主持人拒绝了您的上麦请求' });
+                this.$message.warning({ message: this.$t('other.other_1006') });
                 clearInterval(this._applyInterval);
                 this.isApplying = false;
                 window.vhallReportForProduct?.toStartReporting(110160, 110161);
@@ -446,23 +446,30 @@
           });
       },
       // 嘉宾下麦
-      async handleSpeakOffClick() {
-        window.vhallReportForProduct?.toStartReporting(110132, [110156, 170033, 110193, 110185]);
-        // 下麦接口停止推流，成功之后执行下面的逻辑
-        const { code, msg, request_id } = await useMicServer().speakOff();
-        window.vhallReportForProduct?.toResultsReporting(110156, {
-          request_id,
-          event_type: 'interface',
-          code,
-          msg
-        });
-        if (parseInt(this.roleName) !== 4) {
-          if (code !== 200) {
-            this.$message.error(msg);
+      handleSpeakOffClick() {
+        this.$confirm(this.$t('interact.interact_1043'), this.$t('account.account_1061'), {
+          confirmButtonText: this.$t('other.other_1027'),
+          cancelButtonText: this.$t('other.other_1028'),
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(async () => {
+          window.vhallReportForProduct?.toStartReporting(110132, [110156, 170033, 110193, 110185]);
+          // 下麦接口停止推流，成功之后执行下面的逻辑
+          const { code, msg, request_id } = await useMicServer().speakOff();
+          window.vhallReportForProduct?.toResultsReporting(110156, {
+            request_id,
+            event_type: 'interface',
+            code,
+            msg
+          });
+          if (parseInt(this.roleName) !== 4) {
+            if (code !== 200) {
+              this.$message.error(msg);
+            }
           }
-        }
-        this.isApplying = false;
-        this.applyTimerCount = 30;
+          this.isApplying = false;
+          this.applyTimerCount = 30;
+        });
       },
 
       /**
