@@ -156,6 +156,11 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type, vo.source])
         );
+      },
+      setExamVisible(vo) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [vo.examVisible, vo.zIndexType])
+        );
       }
     }
   };

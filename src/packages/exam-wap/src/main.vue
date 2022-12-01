@@ -72,9 +72,11 @@
       }
     },
     watch: {
-      // 打开问卷弹窗(全屏,视频需要改为小窗)
+      // 打开快问快答-答题弹窗(全屏,视频需要改为小窗)
       examAnswerVisible(val) {
-        window.$middleEventSdk?.event?.send(boxEventOpitons(this.cuid, 'emitExamVisible', [!!val]));
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examAnswer'])
+        );
       },
       // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
       // 无法动态更改zIndex
@@ -208,7 +210,7 @@
       .exam-close {
         position: absolute;
         right: 32px;
-        top: 48px;
+        top: 42px;
         font-size: 24px;
         z-index: 30;
         cursor: pointer;

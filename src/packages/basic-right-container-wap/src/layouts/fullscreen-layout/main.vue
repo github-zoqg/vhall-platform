@@ -6,6 +6,7 @@
         :icon-style="iconStyle"
         class="icon-wrap icon-wrap__exam"
         @clickIcon="checkExamIcon"
+        @setVisible="setExamVisible"
       >
         <span class="icon-name">{{ $t('exam.exam_1047') }}</span>
       </exam-icon>
@@ -186,6 +187,11 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type, vo.source])
         );
+      },
+      setExamVisible(vo) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [vo.examVisible, vo.zIndexType])
+        );
       }
     }
   };
@@ -244,7 +250,27 @@
       bottom: 0;
       top: auto;
     }
+    /** 快问快答 - 答题高度 */
+    .exam_base {
+      height: calc(100% - 422px);
+      max-height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+      .vmp-exam-list_container {
+        max-height: 100%;
+        .container-data {
+          max-height: calc(100% - 210px);
+        }
+      }
+    }
+    /** 快问快答 - 排行榜高度 */
     .vmp-exam-answer-wap {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+    }
+    /** 快问快答 - 列表高度 */
+    .vmp-exam-rank-wap {
       height: calc(100% - 422px);
       bottom: 0;
       top: auto;
