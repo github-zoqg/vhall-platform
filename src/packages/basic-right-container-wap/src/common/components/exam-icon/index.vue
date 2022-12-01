@@ -129,6 +129,7 @@
     useZIndexServer,
     useExamServer
   } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'ExamIcon',
     props: {
@@ -144,6 +145,7 @@
       return {
         examWatchState,
         zIndexServerState,
+        popHeight: '680px',
         examListDialogVisible: false // 快问快答列表-是否展示
       };
     },
@@ -197,11 +199,19 @@
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
+          this.$emit('setVisible', {
+            examVisible: !!this.examListDialogVisible,
+            zIndexType: 'examList'
+          });
         }
       },
       // 关闭 快问快答 - 列表弹出框
       closeDialog() {
         this.examListDialogVisible = false;
+        this.$emit('setVisible', {
+          examVisible: !!this.examListDialogVisible,
+          zIndexType: 'examList'
+        });
       },
       // 看成绩 还是答题逻辑
       toShowExamRankOrExam(paper_id = null, executeType = null, source = 'default') {
@@ -384,11 +394,11 @@
         }
       }
       .container-data {
-        max-height: calc(680px - 210px);
+        max-height: calc(100% - 210px);
         padding: 0 32px;
         margin-bottom: 68px;
         position: relative;
-        overflow: auto;
+        overflow: hidden;
         color: @font-light-normal;
         z-index: 2;
         ul {
