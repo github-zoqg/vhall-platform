@@ -17,7 +17,9 @@
     <div
       class="rate-cell"
       v-text="
-        item.right_rate != null && item.right_rate != undefined ? item.right_rate + '%' : '--'
+        item.right_rate != null && item.right_rate != undefined
+          ? Number(item.right_rate).toFixed(1) + '%'
+          : '--'
       "
     ></div>
     <div class="elapsed-time-cell">{{ item.use_time | fmtUseTime }}</div>
