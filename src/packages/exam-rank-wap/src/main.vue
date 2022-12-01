@@ -135,7 +135,8 @@
         const params = {
           pos: this.queryParams.pos,
           limit: this.queryParams.limit,
-          paper_id: this.examId
+          paper_id: this.examId,
+          from_consumer: 1
         };
         this.loading = true;
         this.examServer
