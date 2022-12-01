@@ -7,7 +7,7 @@ const CDN_DOMAIN = {
 
 const DEFAULT_CONF = {
   ENV_PREFIX: 'VUE_',
-  HTML_PAGE_TITLE: '化蝶',
+  HTML_PAGE_TITLE: '',
   PROJECT_NAME: 'saas_live',
   DEV_SERVER_PORT: 8080
 };

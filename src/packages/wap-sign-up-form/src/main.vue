@@ -292,7 +292,7 @@
               {{ $t('form.form_1019') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"
@@ -346,12 +346,22 @@
             </div>
             <p v-show="errCode" class="err-msg">{{ errCode }}</p>
           </li>
+          <li v-if="privacy" class="tab-content-li">
+            <div class="privacy-box clearfix" @click="handleClickPrivacy(privacy)">
+              <i
+                class="privacy-item vh-iconfont vh-line-check"
+                :class="{ active: form[privacy.id] }"
+              ></i>
+              <pre v-html="privacyText"></pre>
+            </div>
+            <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
+          </li>
           <li class="tab-content-li">
             <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1082') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"
@@ -1716,6 +1726,10 @@
       },
       //我已报名--验证
       submitVerify: debounce(function () {
+        if (!this.form[this.privacy.id] && this.privacy && this.privacy.is_must) {
+          this.$toast(this.$t('form.form_1030'));
+          return;
+        }
         this.onValidateVerify(true);
         this.isPhoneValidate && this.onValidateVerify(false);
         if (!this.errPhone && !this.errCode) {
