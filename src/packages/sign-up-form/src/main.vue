@@ -1555,7 +1555,6 @@
             const lastQuestion = this.list[this.list.length - 1];
             if (lastQuestion.subject === '隐私声明') {
               this.privacy = lastQuestion;
-              console.log(this.privacy, 'this.privacy');
               this.privacy && this.privacyFormatter();
             }
             list.some(item => item.type === 5) && this.getAreaList();
