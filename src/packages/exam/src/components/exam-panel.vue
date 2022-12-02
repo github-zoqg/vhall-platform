@@ -2,18 +2,18 @@
   <div class="exam-list-panel">
     <!-- tab切换 -->
     <div class="exam-tabs-layout">
-      <vh-tabs v-model="tabType" class="live-reset-tabs">
+      <exam-list
+        ref="examListPanel"
+        @examBtnClick="handleExamBtnClick"
+        @changeView="handleChangeView"
+      />
+      <!-- <vh-tabs v-model="tabType" class="live-reset-tabs">
         <vh-tab-pane label="列表" name="table">
-          <exam-list
-            ref="examListPanel"
-            @examBtnClick="handleExamBtnClick"
-            @changeView="handleChangeView"
-          />
         </vh-tab-pane>
-        <!-- <vh-tab-pane label="用户信息" name="user">
+      </vh-tabs> -->
+      <!-- <vh-tab-pane label="用户信息" name="user">
           <exam-user-info />
         </vh-tab-pane> -->
-      </vh-tabs>
     </div>
     <!-- 快问快答 内容区域 -->
   </div>
