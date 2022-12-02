@@ -2,11 +2,12 @@
   <!-- 快问快答-答题-->
   <van-popup
     get-container="#otherPopupContainer"
-    class="vmp-exam-answer-wap"
+    :class="['vmp-exam-answer-wap', isExamStickTop ? 'exam-stick-top' : '']"
     v-model="examAnswerVisible"
     position="bottom"
     @close="closeDialog"
     v-if="examAnswerVisible"
+    :overlay="!isExamStickTop"
     overlay-class="vmp-exam-answer-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
@@ -60,6 +61,17 @@
         }
         return themeMap[skin_json_wap?.backGroundColor || 3];
       },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
+      },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
       },
@@ -69,11 +81,20 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
+      },
+      // 快问快答-是否吸顶
+      isExamStickTop() {
+        return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
       }
     },
     watch: {
       // 打开快问快答-答题弹窗(全屏,视频需要改为小窗)
       examAnswerVisible(val) {
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(val);
+          this.roomBaseServer.setStickType(val ? 'examAnswer' : '');
+        }
+        console.log('吸顶之后，触发动作呀');
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examAnswer'])
         );
@@ -82,7 +103,7 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examAnswer': {
         handler(val) {
-          if (document.querySelector('.vmp-exam-answer-popup-overlay')) {
+          if (!this.isExamStickTop && document.querySelector('.vmp-exam-answer-popup-overlay')) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-answer-popup-overlay').style.zIndex = val;
             });
@@ -184,6 +205,7 @@
     },
     beforeCreate() {
       this.zIndexServer = useZIndexServer();
+      this.roomBaseServer = useRoomBaseServer();
       this.examServer = useExamServer();
       this.msgServer = useMsgServer();
       this.userServer = useUserServer();
@@ -210,6 +232,12 @@
     .exam-execute-body {
       height: calc(844px - 100px) !important;
       max-height: calc(844px - 100px) !important;
+    }
+    /** 快问快答 - 排行榜高度 */
+    &.exam-stick-top {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
     }
     .exam-core__container {
       width: 100%;
