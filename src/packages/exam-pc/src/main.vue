@@ -201,6 +201,7 @@
     .exam-execute-body {
       height: calc(460px - 62px) !important;
       max-height: calc(460px - 62px) !important;
+      margin-right: 2px;
     }
     .exam-core__container {
       width: 100%;
