@@ -1019,6 +1019,6 @@ export default {
     exam_1046: 'Nothing',
     exam_1047: 'apply for ',
     exam_1048: 'Sorce',
-    exam_1049: ''
+    exam_1049: 'Time'
   }
 };
