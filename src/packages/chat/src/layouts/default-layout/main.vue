@@ -667,6 +667,37 @@
                 chatServer.addChatToList(data);
                 break;
               }
+
+              // 推送-快问快答 paper_send
+              case 'paper_send': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   公布-快问快答-成绩 paper_send_rank
+              case 'paper_send_rank': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-收卷 paper_end
+              case 'paper_end': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-自动收卷 paper_auto_end
+              case 'paper_auto_end': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-自动公布成绩 paper_auto_send_rank
+              case 'paper_auto_send_rank': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
               default:
                 break;
             }
@@ -680,6 +711,34 @@
             }
           });
         });
+      },
+      setChatItemData(msg, eventType) {
+        let text_content = {
+          paper_send: this.$t('exam.exam_1001'), // 推送-快问快答
+          paper_send_rank: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
+          paper_end: this.$t('exam.exam_1041'), // 快问快答-收卷
+          paper_auto_end: this.$t('exam.exam_1040'), // 快问快答-自动收卷
+          paper_auto_send_rank: this.$t('exam.exam_1032') // 快问
+        };
+        const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
+        let text = this.$getRoleName(msg.data.room_role);
+        if (msg.room_role != 1) {
+          text = `${text}${msg.data.nick_name}`;
+        }
+        return {
+          nickname: msg.data.nick_name,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: text_content[eventType],
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
+          },
+          roleName: join_info.role_name,
+          type: msg.type,
+          interactStatus: true,
+          isCheck: true,
+          isLinkBtn: true
+        };
       },
       //初始化聊天输入框数据
       initInputStatus() {

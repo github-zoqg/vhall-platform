@@ -25,22 +25,23 @@
     <!-- 快问快答-列表弹框 -->
     <van-popup
       get-container="#otherPopupContainer"
-      class="exam_base"
+      :class="['exam_base', isExamStickTop ? 'exam-stick-top' : '']"
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"
+      :overlay="!isExamStickTop"
       overlay-class="vmp-exam-list-popup-overlay"
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
     >
+      <div class="container-title">
+        <span class="container-title-text">
+          <span class="title_text">{{ $t('exam.exam_1022') }}</span>
+          <i class="container-title-text-line"></i>
+        </span>
+        <i class="vh-iconfont vh-line-close" @click="closeDialog"></i>
+      </div>
       <div class="vmp-exam-list_container">
-        <div class="container-title">
-          <span class="container-title-text">
-            <span class="title_text">{{ $t('exam.exam_1022') }}</span>
-            <i class="container-title-text-line"></i>
-          </span>
-          <i class="vh-iconfont vh-line-close" @click="closeDialog"></i>
-        </div>
         <van-list
           class="container-data"
           :immediate-check="false"
@@ -71,7 +72,7 @@
                           item.right_rate == 0
                             ? '0'
                             : item.right_rate == 100
-                            ? '满分'
+                            ? $t('exam.exam_1042')
                             : item.total_score > 0
                             ? item.score
                             : Number(item.right_rate).toFixed(1)
@@ -80,7 +81,9 @@
                       <span
                         class="mini-size"
                         v-if="item.right_rate >= 0 && item.right_rate < 100"
-                        v-text="item.total_score > 0 || item.right_rate == 0 ? '分' : '%'"
+                        v-text="
+                          item.total_score > 0 || item.right_rate == 0 ? $t('exam.exam_1043') : '%'
+                        "
                       ></span>
                     </div>
                   </template>
@@ -154,8 +157,23 @@
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
+      },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
+      },
+      // 快问快答-是否吸顶
+      isExamStickTop() {
+        return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
       }
     },
     watch: {
@@ -176,7 +194,7 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examList': {
         handler(val) {
-          if (document.querySelector('.vmp-exam-list-popup-overlay')) {
+          if (!this.isExamStickTop && document.querySelector('.vmp-exam-list-popup-overlay')) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-list-popup-overlay').style.zIndex = val;
             });
@@ -209,7 +227,7 @@
         let list = this.examWatchResult.list || [];
         // 可答列表
         let arr = list.filter(item => item.is_end == 0 && item.status == 0);
-        if (arr.length == 1 && list.length == 1) {
+        if (isAutoOpen && arr.length == 1 && list.length == 1) {
           // 存在未答题的内容，并且 可答题列表数量只有一个，触发自动弹出逻辑
           this.checkExamInfo(arr[0], list);
         } else if (isAutoOpen && list.length == 1) {
@@ -218,6 +236,10 @@
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
+          if (this.isConcise) {
+            this.roomBaseServer.setIsExamStickTop(true);
+            this.roomBaseServer.setStickType('examList');
+          }
           this.$emit('setVisible', {
             examVisible: !!this.examListDialogVisible,
             zIndexType: 'examList'
@@ -227,6 +249,10 @@
       // 关闭 快问快答 - 列表弹出框
       closeDialog() {
         this.examListDialogVisible = false;
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(false);
+          this.roomBaseServer.setStickType('');
+        }
         this.$emit('setVisible', {
           examVisible: !!this.examListDialogVisible,
           zIndexType: 'examList'
@@ -335,8 +361,8 @@
     },
     beforeCreate() {
       this.zIndexServer = useZIndexServer();
-      this.msgServer = useMsgServer();
       this.roomBaseServer = useRoomBaseServer();
+      this.msgServer = useMsgServer();
       this.examServer = useExamServer(false);
     },
     created() {
@@ -388,10 +414,8 @@
       background-color: #ffffff;
       background-position: top;
       background-size: cover;
-    }
-    .vmp-exam-list_container {
-      max-height: 680px;
-      overflow: auto;
+      overflow: hidden;
+
       .container-title {
         height: 100px;
         text-align: center;
@@ -411,7 +435,18 @@
             color: #262626;
           }
         }
+        .vh-line-close {
+          position: absolute;
+          color: #8c8c8c;
+          top: 37px;
+          right: 30px;
+          cursor: pointer;
+        }
       }
+    }
+    .vmp-exam-list_container {
+      max-height: 680px;
+      overflow: auto;
       .container-data {
         max-height: calc(100% - 210px);
         padding: 0 32px;
@@ -511,13 +546,6 @@
           }
         }
       }
-      .vh-line-close {
-        position: absolute;
-        color: #8c8c8c;
-        top: 37px;
-        right: 30px;
-        cursor: pointer;
-      }
       .exam-answer-btn {
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
@@ -536,6 +564,20 @@
           background: var(--theme-more-status-button-disabled-bg) !important;
           border: 1px solid var(--theme-more-status-button-disabled-border) !important;
           color: var(--theme-more-status-button-disabled-color) !important;
+        }
+      }
+    }
+
+    /** 快问快答 - 答题高度 */
+    .exam_base.exam-stick-top {
+      height: calc(100% - 422px);
+      max-height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+      .vmp-exam-list_container {
+        max-height: 100%;
+        .container-data {
+          max-height: calc(100% - 210px);
         }
       }
     }

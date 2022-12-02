@@ -2,11 +2,12 @@
   <!-- 快问快答-排行榜 -->
   <van-popup
     get-container="#otherPopupContainer"
-    class="vmp-exam-rank-wap"
+    :class="['vmp-exam-rank-wap', isExamStickTop ? 'exam-stick-top' : '']"
     v-model="examRankVisible"
     position="bottom"
     @close="closeDialog"
     v-if="examRankVisible"
+    :overlay="!isExamStickTop"
     overlay-class="vmp-exam-rank-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
@@ -38,7 +39,7 @@
   import RankTitle from './rank-title.vue';
   import RankLabel from './rank-label.vue';
   import RankItemWap from './rank-item.vue';
-  import { useZIndexServer, useExamServer } from 'middle-domain';
+  import { useZIndexServer, useExamServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpExamRankWap',
@@ -73,13 +74,32 @@
       this.examServer = useExamServer();
     },
     computed: {
+      // 是否是手机端 - 简洁模式
+      isConcise() {
+        let skin_json_wap = {
+          style: 1
+        };
+        const skinInfo = this.$domainStore.state.roomBaseServer.skinInfo;
+        if (skinInfo?.skin_json_wap && skinInfo.skin_json_wap != 'null') {
+          skin_json_wap = skinInfo.skin_json_wap;
+        }
+        return !!(skin_json_wap?.style == 3);
+      },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
+      },
+      // 快问快答-是否吸顶
+      isExamStickTop() {
+        return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
       }
     },
     watch: {
       // 打开快问快答-排行榜弹窗(全屏,视频需要改为小窗)
       examRankVisible(val) {
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(val);
+          this.roomBaseServer.setStickType(val ? 'examRank' : '');
+        }
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examRank'])
         );
@@ -88,7 +108,7 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examRank': {
         handler(val) {
-          if (document.querySelector('.vmp-exam-rank-popup-overlay')) {
+          if (!this.isExamStickTop && document.querySelector('.vmp-exam-rank-popup-overlay')) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-rank-popup-overlay').style.zIndex = val;
             });
@@ -179,6 +199,7 @@
     },
     beforeCreate() {
       this.zIndexServer = useZIndexServer();
+      this.roomBaseServer = useRoomBaseServer();
     }
   };
 </script>
@@ -223,7 +244,12 @@
     background-position: top;
     background-size: cover;
     overflow: hidden;
-
+    /** 快问快答 - 列表高度 */
+    &.exam-stick-top {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+    }
     .vmp-rank-wap {
       height: calc(100% - 116px);
       overflow: auto;

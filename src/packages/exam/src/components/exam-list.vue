@@ -33,18 +33,12 @@
           </vh-input>
         </div>
         <div class="vmp-exam-cur__bd">
-          <vh-table :data="examList" style="width: 100%" height="295px">
+          <vh-table :data="examList" style="width: 100%" height="336px" class="no-border">
             <template slot="empty">
               <img src="@/app-shared/assets/img/no-search.png" />
               <p>暂未搜索到您想要的内容</p>
             </template>
-            <vh-table-column
-              prop="title"
-              label="名称"
-              width="240"
-              fixed="left"
-              show-overflow-tooltip
-            >
+            <vh-table-column prop="title" label="名称" width="240" show-overflow-tooltip>
               <template slot-scope="scope">
                 {{ scope.row.title }}
               </template>
@@ -62,7 +56,7 @@
             <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
             <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
-                {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '不限时' }}
+                {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '无' }}
               </template>
             </vh-table-column>
             <vh-table-column label="状态" width="112">
@@ -71,7 +65,7 @@
                 {{ row.status | fmtExamStatus }}
               </template>
             </vh-table-column>
-            <vh-table-column label="操作" width="196" fixed="right">
+            <vh-table-column label="操作" width="196">
               <template slot-scope="scope">
                 <div :data-vars="(btnConfig = setBtnConfigByStatus(scope.row.status))">
                   <span
@@ -110,6 +104,7 @@
             :total="total"
             :current-page="queryParams.pageNum"
             @current-change="handleChangePage"
+            hide-on-single-page
           ></vh-pagination>
         </div>
       </div>
@@ -162,7 +157,7 @@
         loading: false, // 列表请求加载中
         queryParams: {
           // 快问快答-列表搜索参数
-          limit: 5,
+          limit: 6,
           pageNum: 1,
           keyword: '' // 搜索的关键字
         },

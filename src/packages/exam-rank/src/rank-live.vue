@@ -8,11 +8,6 @@
     class="vmp-rank-live"
   >
     <!-- 自定义头部 -->
-    <!-- <span slot="title">
-      <i class="el-icon-arrow-left" />
-      成绩
-      <span class="sub-title">公布成绩</span>
-    </span> -->
     <!-- 内容 -->
     <div
       class="dialog-content"
@@ -74,12 +69,11 @@
             {{ scope.row.score | fmtScore }}
           </template>
         </vh-table-column>
-        <vh-table-column
-          prop="right_rate"
-          label="正确率"
-          align="center"
-          min-width="58"
-        ></vh-table-column>
+        <vh-table-column label="正确率" align="center" min-width="58">
+          <template slot-scope="scope">
+            {{ scope.row.right_rate | fmtRightRate }}
+          </template>
+        </vh-table-column>
         <vh-table-column label="用时" min-width="60">
           <template slot-scope="scope">
             {{ scope.row.use_time | fmtUseTime }}
@@ -106,6 +100,7 @@
 <script>
   import RankAvatar from './rank/avatar.vue';
   import RankNo from './rank/rank-no.vue';
+  import { roundRate } from '@/app-shared/utils/math';
 
   const summaryDataMap = {
     unAnswer: {
@@ -174,6 +169,9 @@
       },
       fmtScore(score) {
         return noScoreSettings ? '-' : score;
+      },
+      fmtRightRate(rate) {
+        return roundRate(rate) + '%';
       }
     },
     methods: {
@@ -202,10 +200,12 @@
           this.title = data.title;
           summaryDataMap.unAnswer.value = data.un_answered_num;
           summaryDataMap.answer.value = data.answer_num;
-          summaryDataMap.rate.value = `${data.full_score_rate}%，${data.full_score_num}人`;
+          summaryDataMap.rate.value = `${roundRate(data.full_score_rate)}%，${
+            data.full_score_num
+          }人`;
           summaryDataMap.max.value = data.max_score;
           summaryDataMap.min.value = data.min_score;
-          summaryDataMap.avg.value = data.avg_score;
+          summaryDataMap.avg.value = roundRate(data.avg_score);
         });
       },
       getRankData() {
