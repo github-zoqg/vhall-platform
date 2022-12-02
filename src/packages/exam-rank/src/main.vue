@@ -35,7 +35,7 @@
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom">
-          <div class="rank-list-more">
+          <div class="rank-list-more" v-if="total >= 200">
             {{ $t('exam.exam_1045') }}
           </div>
           <vh-pagination
