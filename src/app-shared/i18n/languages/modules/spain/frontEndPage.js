@@ -844,7 +844,8 @@ export default {
     interact_1039: '',
     interact_1040: '',
     interact_1041: '',
-    interact_1042: ''
+    interact_1042: '',
+    interact_1043: ''
   },
   doc: {
     doc_1001: 'Este documento en carga',
@@ -960,7 +961,14 @@ export default {
     other_1018: '',
     other_1019: '',
     other_1020: '',
-    other_1021: ''
+    other_1021: '',
+    other_1022: '',
+    other_1023: '',
+    other_1024: '',
+    other_1025: '',
+    other_1026: '',
+    other_1027: '',
+    other_1028: ''
   },
   privacy: {
     privacy_1001: '',
@@ -969,7 +977,7 @@ export default {
     privacy_1004: '',
     privacy_1005: '',
     privacy_1006: '',
-    privacy_1007: 'Please check the agreement first'
+    privacy_1007: ''
   },
   exam: {
     exam_1001: '',
@@ -1018,8 +1026,6 @@ export default {
     exam_1044: '',
     exam_1045: '',
     exam_1046: '',
-    exam_1047: '',
-    exam_1048: '',
-    exam_1049: ''
+    exam_1047: ''
   }
 };

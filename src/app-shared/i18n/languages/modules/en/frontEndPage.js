@@ -641,7 +641,7 @@ export default {
     message_1024: 'The event has been watched by the the account on other devices',
     message_1025: 'If you have any questions, please consult the link provider',
     message_1026: 'Information acquisition failed',
-    message_1027: 'The host left the page. Please wait a moment...',
+    message_1027: 'The host refreshed or left the page. Please wait a moment...',
     message_1028: 'Failed to create local preview stream',
     message_1029: '{n} leaves the room',
     message_1030: '{n} enter the room',
@@ -833,7 +833,8 @@ export default {
     interact_1040:
       'To participate in the connection, you need to obtain the permission of camera and microphone,and go to the browser setting center to open permissions',
     interact_1041: 'Apply for video interaction',
-    interact_1042: 'Check equipment'
+    interact_1042: 'Check equipment',
+    interact_1043: 'Are you sure you want to microphone off?'
   },
   doc: {
     doc_1001: 'This documentation is loading',
@@ -933,7 +934,7 @@ export default {
     other_1003: 'Enter the invitation code',
     other_1004: 'Upload image cannot exceed 2M',
     other_1005: '',
-    other_1006: 'The host rejected you to open the microphone',
+    other_1006: 'The host has not responded to your host request！',
     other_1007: 'Try sliding left and right',
     other_1008: 'wait',
     other_1009:
@@ -956,7 +957,9 @@ export default {
     other_1024: 'Get WeChat nickname and avatar information',
     other_1025:
       'Watch the live- streamingt,chat,lottery,grab a red envelope and other interactive behaviors',
-    other_1026: 'Confirm'
+    other_1026: 'Confirm',
+    other_1027: 'Yes',
+    other_1028: 'No'
   },
   privacy: {
     privacy_1001: 'Read and agree to the "{n}" and "{n1}"',
@@ -1005,7 +1008,7 @@ export default {
     exam_1035: 'Accuracy',
     exam_1036: 'Time',
     exam_1037: 'My ranking',
-    exam_1038: '',
+    exam_1038: '{n}',
     exam_1039: 'Data is loading',
     exam_1040: 'End of Answer',
     exam_1041: 'Finished the answer',
@@ -1014,8 +1017,8 @@ export default {
     exam_1044: 'employee ID',
     exam_1045: 'Show the top 200 results',
     exam_1046: 'Nothing',
-    exam_1047: 'Answer',
-    exam_1048: 'Score',
+    exam_1047: 'apply for ',
+    exam_1048: 'Sorce',
     exam_1049: 'Time'
   }
 };
