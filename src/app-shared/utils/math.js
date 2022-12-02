@@ -13,9 +13,9 @@ export function clamp(number, min, max) {
  * 分率计算转换,保留小数1位
  */
 export function roundRate(number) {
-  if (number === '' || number === null || isNaN(number)) return ''
-  number = parseFloat(number)
-  if (number < 0) return ''
-  number = Math.round(number * 10) / 10
-  return `${number}`
+  if (number === '' || number === null || isNaN(number)) return '';
+  number = parseFloat(number);
+  if (number < 0) return '';
+  number = Math.round(number * 10) / 10;
+  return `${number}`;
 }
