@@ -149,7 +149,7 @@
         await this.examServer.getExamPublishList({});
         let list = this.examWatchResult.list || [];
         let arr = list.filter(item => item.is_end == 0 && item.status == 0);
-        if (arr.length == 1 && list.length == 1) {
+        if (isAutoOpen && arr.length == 1 && list.length == 1) {
           // 存在未答题的内容，并且 可答题列表数量只有一个，触发自动弹出逻辑
           this.checkExamInfo(arr[0], list);
         } else if (isAutoOpen && list.length == 1) {
