@@ -65,21 +65,22 @@
                   </template>
                   <template v-else-if="item && item.status == 1">
                     <div class="button_text">
-                      <!-- 试卷总分>0，展示得分情况；否则展示正确率 -->
                       <span
                         class="score"
                         v-text="
-                          item.total_score > 0
-                            ? item.total_score == item.score
-                              ? $t('exam.exam_1042')
-                              : item.score
-                            : item.right_rate
+                          item.right_rate == 0
+                            ? '0'
+                            : item.right_rate == 100
+                            ? '满分'
+                            : item.total_score > 0
+                            ? item.score
+                            : Number(item.right_rate).toFixed(1)
                         "
                       ></span>
                       <span
                         class="mini-size"
-                        v-if="item.total_score != item.score"
-                        v-text="item.total_score > 0 ? '分' : '%'"
+                        v-if="item.right_rate >= 0 && item.right_rate < 100"
+                        v-text="item.total_score > 0 || item.right_rate == 0 ? '分' : '%'"
                       ></span>
                     </div>
                   </template>
@@ -129,6 +130,7 @@
     useZIndexServer,
     useExamServer
   } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'ExamIcon',
     props: {
@@ -144,6 +146,7 @@
       return {
         examWatchState,
         zIndexServerState,
+        popHeight: '680px',
         examListDialogVisible: false // 快问快答列表-是否展示
       };
     },
@@ -182,6 +185,24 @@
       }
     },
     methods: {
+      htmlScoreOrRate(item) {
+        /**
+         * 满分 、0 分 、正确率 、分数
+         * 整卷分数0 情况下展示 正确率   整卷分数不为0 有得分要展示得分
+         */
+        let rightRate = isNaN(item.right_rate) ? ' ' : Number(item.right_rate).toFixed(1);
+        let scoreStr = `<span class="score">${
+          item.right_rate == 0
+            ? '0'
+            : item.right_rate == 100
+            ? '满分'
+            : item.total_score > 0
+            ? item.score
+            : Number(item.right_rate).toFixed(1)
+        }</span>`;
+        let unitStr = `<span class="mini-size">${item.total_score >= 0 ? '分' : '%'}</span>`;
+        return `${scoreStr}${item.right_rate > 0 && item.right_rate < 100 ? unitStr : ''}`;
+      },
       // 点击图标，触发判断
       async clickExamIcon(isAutoOpen = false) {
         await this.examServer.getExamPublishList({});
@@ -197,11 +218,19 @@
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
+          this.$emit('setVisible', {
+            examVisible: !!this.examListDialogVisible,
+            zIndexType: 'examList'
+          });
         }
       },
       // 关闭 快问快答 - 列表弹出框
       closeDialog() {
         this.examListDialogVisible = false;
+        this.$emit('setVisible', {
+          examVisible: !!this.examListDialogVisible,
+          zIndexType: 'examList'
+        });
       },
       // 看成绩 还是答题逻辑
       toShowExamRankOrExam(paper_id = null, executeType = null, source = 'default') {
@@ -384,11 +413,11 @@
         }
       }
       .container-data {
-        max-height: calc(680px - 210px);
+        max-height: calc(100% - 210px);
         padding: 0 32px;
         margin-bottom: 68px;
         position: relative;
-        overflow: auto;
+        overflow: hidden;
         color: @font-light-normal;
         z-index: 2;
         ul {

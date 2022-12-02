@@ -39,6 +39,7 @@
   import RankLabel from './rank-label.vue';
   import RankItemWap from './rank-item.vue';
   import { useZIndexServer, useExamServer } from 'middle-domain';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpExamRankWap',
     components: {
@@ -77,6 +78,12 @@
       }
     },
     watch: {
+      // 打开快问快答-排行榜弹窗(全屏,视频需要改为小窗)
+      examRankVisible(val) {
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examRank'])
+        );
+      },
       // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examRank': {
@@ -128,7 +135,8 @@
         const params = {
           pos: this.queryParams.pos,
           limit: this.queryParams.limit,
-          paper_id: this.examId
+          paper_id: this.examId,
+          from_consumer: 1
         };
         this.loading = true;
         this.examServer
@@ -223,6 +231,7 @@
 
       .rank-list-wrap {
         padding: 0 32px;
+        padding-bottom: 116px;
       }
       .rank-list-more {
         font-family: 'PingFang SC';

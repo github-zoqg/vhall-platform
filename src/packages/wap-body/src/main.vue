@@ -355,11 +355,11 @@
           this.mini = flag;
         }
       },
-      examVisible(flag) {
+      examVisible(flag, indexKey) {
         if (this.isPortraitLive) {
           this.isStreamContainerStickTop = flag;
           if (flag) {
-            this.playerZIndex = this.zIndexServer.state.zIndexMap['exam'] || 302;
+            this.playerZIndex = this.zIndexServer.state.zIndexMap[indexKey] || 302;
           }
         } else {
           // this.mini = flag;

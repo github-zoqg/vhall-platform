@@ -129,7 +129,14 @@
               mobile: this.userInfo?.phone || this.joinInfo?.phone || ''
             }
           });
+          this.examServer.examInstance.$on(
+            this.examServer.examInstance.events['SUBMITANSWER'],
+            this.changeDotVisible
+          );
         });
+      },
+      changeDotVisible() {
+        this.examServer.getExamPublishList({});
       },
       listenExamWatchMsg(msg, that) {
         if (window.ExamTemplateServer) {
@@ -163,6 +170,9 @@
     },
     created() {
       this.initExamEvents();
+    },
+    beforeDestroy() {
+      this.examServer?.examInstance?.$off(this.examServer?.examInstance?.events['SUBMITANSWER']);
     }
   };
 </script>
