@@ -35,7 +35,7 @@
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom">
-          <div class="rank-list-more">
+          <div class="rank-list-more" v-if="total >= 200">
             {{ $t('exam.exam_1045') }}
           </div>
           <vh-pagination
@@ -115,7 +115,8 @@
         const params = {
           pos: this.queryParams.pos,
           limit: this.queryParams.limit,
-          paper_id: this.examId
+          paper_id: this.examId,
+          from_consumer: 1
         };
         this.loading = true;
         this.examServer

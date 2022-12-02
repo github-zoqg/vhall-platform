@@ -6,7 +6,8 @@
       isShowWapBody ? '' : 'vmp-wap-body__hide',
       isPortraitLive ? 'isPortraitLive' : '',
       isStreamContainerStickTop ? 'vmp-wap-body-container-sticktop' : '',
-      isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo ? 'isMini' : ''
+      isPortraitLive && !isWapBodyDocSwitchFullScreen && !embedVideo ? 'isMini' : '',
+      isExamStickTop ? 'vmp-wap-body-sticktop' : ''
     ]"
   >
     <!-- 直播结束 -->
@@ -285,6 +286,10 @@
       // 是不是单视频嵌入页
       embedVideo() {
         return this.$domainStore.state.roomBaseServer.embedObj.embedVideo;
+      },
+      // 快问快答-是否吸顶
+      isExamStickTop() {
+        return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
       }
     },
     watch: {
@@ -355,11 +360,11 @@
           this.mini = flag;
         }
       },
-      examVisible(flag) {
+      examVisible(flag, indexKey) {
         if (this.isPortraitLive) {
           this.isStreamContainerStickTop = flag;
           if (flag) {
-            this.playerZIndex = this.zIndexServer.state.zIndexMap['exam'] || 302;
+            this.playerZIndex = this.zIndexServer.state.zIndexMap[indexKey] || 302;
           }
         } else {
           // this.mini = flag;
@@ -753,6 +758,39 @@
           .licode_stream {
             object-fit: contain;
           }
+        }
+      }
+    }
+    &.vmp-wap-body-sticktop {
+      width: 100%;
+      height: 5.62667rem;
+      position: fixed;
+      left: 0 !important;
+      top: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 302;
+      overflow: hidden;
+      background-color: #000;
+      &__hide {
+        z-index: -1;
+        opacity: 0;
+      }
+      .vmp-wap-player {
+        video {
+          object-fit: contain;
+          background: #000;
+        }
+        .vmp-wap-player-audie {
+          display: block !important;
+        }
+      }
+      .vmp-stream-remote .vmp-stream-remote__container__audio {
+        display: block !important;
+      }
+      .vmp-wap-stream-wrap {
+        .licode_stream {
+          object-fit: contain;
         }
       }
     }
