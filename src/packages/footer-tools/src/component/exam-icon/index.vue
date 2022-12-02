@@ -365,6 +365,7 @@
       overflow-x: hidden;
       overflow-y: auto;
       height: 100%;
+      margin-right: 2px;
       ul {
         width: 388px;
         li {

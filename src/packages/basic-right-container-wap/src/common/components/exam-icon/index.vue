@@ -34,14 +34,14 @@
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
     >
+      <div class="container-title">
+        <span class="container-title-text">
+          <span class="title_text">{{ $t('exam.exam_1022') }}</span>
+          <i class="container-title-text-line"></i>
+        </span>
+        <i class="vh-iconfont vh-line-close" @click="closeDialog"></i>
+      </div>
       <div class="vmp-exam-list_container">
-        <div class="container-title">
-          <span class="container-title-text">
-            <span class="title_text">{{ $t('exam.exam_1022') }}</span>
-            <i class="container-title-text-line"></i>
-          </span>
-          <i class="vh-iconfont vh-line-close" @click="closeDialog"></i>
-        </div>
         <van-list
           class="container-data"
           :immediate-check="false"
@@ -414,10 +414,8 @@
       background-color: #ffffff;
       background-position: top;
       background-size: cover;
-    }
-    .vmp-exam-list_container {
-      max-height: 680px;
-      overflow: auto;
+      overflow: hidden;
+
       .container-title {
         height: 100px;
         text-align: center;
@@ -437,7 +435,18 @@
             color: #262626;
           }
         }
+        .vh-line-close {
+          position: absolute;
+          color: #8c8c8c;
+          top: 37px;
+          right: 30px;
+          cursor: pointer;
+        }
       }
+    }
+    .vmp-exam-list_container {
+      max-height: 680px;
+      overflow: auto;
       .container-data {
         max-height: calc(100% - 210px);
         padding: 0 32px;
@@ -536,13 +545,6 @@
             }
           }
         }
-      }
-      .vh-line-close {
-        position: absolute;
-        color: #8c8c8c;
-        top: 37px;
-        right: 30px;
-        cursor: pointer;
       }
       .exam-answer-btn {
         border: 1px solid var(--theme-more-status-button-border);
