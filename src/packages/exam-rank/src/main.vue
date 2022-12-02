@@ -23,7 +23,12 @@
       <div class="vmp-rank-watch">
         <RankTitleWatch />
         <div
-          :class="['rank-list-wrap', ownerData ? '' : 'not-owner', total >= 200 ? 'max-total' : '']"
+          :class="[
+            'rank-list-wrap',
+            ownerData ? '' : 'not-owner',
+            total >= 200 ? 'max-total' : '',
+            total <= queryParams.limit ? 'one-page' : ''
+          ]"
         >
           <ul class="rank-list">
             <li v-for="item of rankList" :key="item.id" class="rank-item">
@@ -34,7 +39,7 @@
         <div class="self-rank" v-if="ownerData">
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
-        <div class="dialog-bottom">
+        <div class="dialog-bottom" v-if="total > queryParams.limit">
           <div class="rank-list-more" v-if="total >= 200">
             {{ $t('exam.exam_1045') }}
           </div>
@@ -237,6 +242,9 @@
       margin-top: 58px;
       overflow-y: auto;
       height: 248px;
+      &.one-page {
+        height: 308px;
+      }
       &.max-total {
         height: 226px;
       }

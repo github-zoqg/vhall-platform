@@ -72,7 +72,7 @@
                           item.right_rate == 0
                             ? '0'
                             : item.right_rate == 100
-                            ? '满分'
+                            ? $t('exam.exam_1042')
                             : item.total_score > 0
                             ? item.score
                             : Number(item.right_rate).toFixed(1)
@@ -81,7 +81,9 @@
                       <span
                         class="mini-size"
                         v-if="item.right_rate >= 0 && item.right_rate < 100"
-                        v-text="item.total_score > 0 || item.right_rate == 0 ? '分' : '%'"
+                        v-text="
+                          item.total_score > 0 || item.right_rate == 0 ? $t('exam.exam_1043') : '%'
+                        "
                       ></span>
                     </div>
                   </template>
