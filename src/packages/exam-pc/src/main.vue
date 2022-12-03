@@ -270,13 +270,8 @@
     }
 
     .vmp-transcripts {
-      &.vmp-transcripts-other {
-        // 百分比 or 正确率
-        height: 409px;
-        padding-top: 27px;
-      }
       button.vh-button--primary {
-        margin: 57px auto 64px auto;
+        margin: 24px auto;
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
         color: var(--theme-more-status-button-color);
@@ -294,6 +289,23 @@
           background: var(--theme-more-status-button-disabled-bg) !important;
           border: 1px solid var(--theme-more-status-button-disabled-border) !important;
           color: var(--theme-more-status-button-disabled-color) !important;
+        }
+      }
+      &.vmp-transcripts-other {
+        // 百分比 or 正确率
+        height: 409px;
+        padding-top: 27px;
+        button.vh-button--primary {
+          margin: 57px auto 64px auto;
+        }
+      }
+      &.vmp-transcripts-extreme {
+        // 满分 or 0分
+        button.vh-button--primary {
+          margin: 24px auto 24px auto;
+        }
+        .trophy-wrap {
+          margin-top: 30px;
         }
       }
     }

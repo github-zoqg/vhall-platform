@@ -12,7 +12,13 @@
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
   >
-    <div :class="`exam-core__container exam-theme--${theme}`">
+    <div
+      :class="`exam-core__container exam-theme--${theme} exam-computed-ctx-${
+        examItem && (examItem.right_rate == 0 || examItem.right_rate == 100)
+          ? 'transcript'
+          : 'other'
+      }`"
+    >
       <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
       <div id="examAnswerWap"></div>
     </div>
@@ -143,6 +149,7 @@
         let examItem = this.examWatchResult?.list?.find(item => {
           if (item.paper_id == examId) return item;
         });
+        this.examItem = examItem;
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
           this.$toast(this.$t('exam.exam_1010'));
@@ -311,6 +318,7 @@
         }
       }
     }
+    /* 成绩 */
     .vmp-transcripts {
       button.vh-button--primary {
         border: 1px solid var(--theme-more-status-button-border);
@@ -330,6 +338,19 @@
           background: var(--theme-more-status-button-disabled-bg) !important;
           border: 1px solid var(--theme-more-status-button-disabled-border) !important;
           color: var(--theme-more-status-button-disabled-color) !important;
+        }
+      }
+    }
+    /** wap端成绩居中 */
+    .exam-core__container {
+      &.exam-computed-ctx-transcript {
+        height: 100%;
+        .exam-computed-transcript {
+          display: flex;
+          .vmp-transcripts-extreme {
+            align-self: center;
+            margin: -20px auto 0 auto;
+          }
         }
       }
     }
