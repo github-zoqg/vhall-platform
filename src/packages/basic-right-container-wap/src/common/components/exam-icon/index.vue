@@ -29,7 +29,7 @@
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"
-      :overlay="!isExamStickTop"
+      :overlay="!isExamStickTop && !isPortraitLive"
       overlay-class="vmp-exam-list-popup-overlay"
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
@@ -174,6 +174,12 @@
       // 快问快答-是否吸顶
       isExamStickTop() {
         return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
@@ -194,7 +200,11 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examList': {
         handler(val) {
-          if (!this.isExamStickTop && document.querySelector('.vmp-exam-list-popup-overlay')) {
+          if (
+            !this.isExamStickTop &&
+            !this.isPortraitLive &&
+            document.querySelector('.vmp-exam-list-popup-overlay')
+          ) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-list-popup-overlay').style.zIndex = val;
             });
@@ -472,7 +482,7 @@
             margin-bottom: 16px;
             .container-data__title {
               margin-top: 0;
-              margin-bottom: 16px;
+              margin-bottom: 12px;
               width: 100%;
               display: flex;
               justify-content: space-around;
@@ -485,11 +495,12 @@
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
-                font-weight: bold;
+                margin-right: auto;
+                font-style: normal;
+                font-weight: 400;
                 font-size: 28px;
                 line-height: 40px;
                 color: #262626;
-                margin-right: auto;
               }
               .container-data__title__right {
                 margin-left: 16px;

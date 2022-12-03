@@ -181,12 +181,13 @@
     overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
+      height: 24px;
       .take--place {
         height: 16px;
       }
     }
     .vh-dialog__body {
-      height: calc(100% - 16px);
+      height: calc(100% - 24px);
       overflow: auto;
       padding: 0 0;
     }
@@ -200,8 +201,8 @@
     background-size: cover;
     // 重置内部元素
     .exam-execute-body {
-      height: calc(460px - 62px) !important;
-      max-height: calc(460px - 62px) !important;
+      height: calc(460px - 145px) !important;
+      max-height: calc(460px - 145px) !important;
       margin-right: 2px;
     }
     .exam-core__container {

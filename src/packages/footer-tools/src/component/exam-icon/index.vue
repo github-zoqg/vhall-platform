@@ -3,7 +3,7 @@
     class="vmp-exam-icon"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <img src="./images/exam.png" alt="" @click="throttleCheckExam" />
+    <img src="./images/exam.png" class="show_img" alt="" @click="throttleCheckExam" />
     <i class="vmp-dot" v-if="examWatchState.dotVisible" />
     <!-- 快问快答-列表弹框 -->
     <vh-dialog
@@ -286,19 +286,19 @@
   .vmp-exam-icon {
     color: #fff;
     position: relative;
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-    background: linear-gradient(180deg, #5ac1ff 0%, #2578ff 100%);
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
     border-radius: 16px;
     cursor: pointer;
     margin-left: 16px;
     img.show_img {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       -webkit-transform-origin: left center;
       transform-origin: left center;
       margin: -1px 0 0 0;
+      cursor: pointer;
     }
     .vmp-dot {
       position: absolute;
@@ -310,12 +310,6 @@
       border-radius: 50%;
       right: -3px;
       position: absolute;
-    }
-    img {
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      margin: 0;
     }
   }
   /deep/.vh-dialog.exam_base {
@@ -395,7 +389,8 @@
               display: -webkit-box;
               -webkit-line-clamp: 2;
               -webkit-box-orient: vertical;
-              font-weight: bold;
+              font-style: normal;
+              font-weight: 400;
               font-size: 14px;
               line-height: 22px;
               color: #262626;
