@@ -79,8 +79,8 @@
         height: calc(100% - 77.5px);
       }
       .exam-execute-body {
-        height: calc(100% - 77.5px);
-        max-height: calc(100% - 77.5px);
+        height: calc(100% - 113px);
+        max-height: calc(100% - 113px);
         overflow: auto;
         padding: 0 0;
         overflow-x: hidden;
