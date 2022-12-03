@@ -482,7 +482,7 @@
             margin-bottom: 16px;
             .container-data__title {
               margin-top: 0;
-              margin-bottom: 16px;
+              margin-bottom: 12px;
               width: 100%;
               display: flex;
               justify-content: space-around;
@@ -495,11 +495,12 @@
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
-                font-weight: bold;
+                margin-right: auto;
+                font-style: normal;
+                font-weight: 400;
                 font-size: 28px;
                 line-height: 40px;
                 color: #262626;
-                margin-right: auto;
               }
               .container-data__title__right {
                 margin-left: 16px;
