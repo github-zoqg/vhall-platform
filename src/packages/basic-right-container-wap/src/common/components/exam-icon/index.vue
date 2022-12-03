@@ -29,7 +29,7 @@
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"
-      :overlay="!isExamStickTop"
+      :overlay="!isExamStickTop && !isPortraitLive"
       overlay-class="vmp-exam-list-popup-overlay"
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
@@ -174,6 +174,12 @@
       // 快问快答-是否吸顶
       isExamStickTop() {
         return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
@@ -194,7 +200,11 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examList': {
         handler(val) {
-          if (!this.isExamStickTop && document.querySelector('.vmp-exam-list-popup-overlay')) {
+          if (
+            !this.isExamStickTop &&
+            !this.isPortraitLive &&
+            document.querySelector('.vmp-exam-list-popup-overlay')
+          ) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-list-popup-overlay').style.zIndex = val;
             });

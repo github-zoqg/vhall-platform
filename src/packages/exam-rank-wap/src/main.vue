@@ -7,7 +7,7 @@
     position="bottom"
     @close="closeDialog"
     v-if="examRankVisible"
-    :overlay="!isExamStickTop"
+    :overlay="!isExamStickTop && !isPortraitLive"
     overlay-class="vmp-exam-rank-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
@@ -17,11 +17,13 @@
       <RankLabel />
       <div class="rank-list-wrap">
         <ul class="rank-list">
-          <van-list v-model="loading" :finished="finished" finished-text="" @load="onLoad">
-            <li v-for="item of rankList" :key="item.id" class="rank-item">
-              <RankItemWap :item="item" />
-            </li>
-          </van-list>
+          <van-pull-refresh v-model="refreshing" @refresh="handleRefresh">
+            <van-list v-model="loading" :finished="finished" finished-text="" @load="loadMore">
+              <li v-for="item of rankList" :key="item.id" class="rank-item">
+                <RankItemWap :item="item" />
+              </li>
+            </van-list>
+          </van-pull-refresh>
         </ul>
       </div>
       <div class="rank-list-more" v-if="rankList && rankList.length >= 200">
@@ -41,6 +43,7 @@
   import RankItemWap from './rank-item.vue';
   import { useZIndexServer, useExamServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { uniqBy, throttle } from 'lodash';
   export default {
     name: 'VmpExamRankWap',
     components: {
@@ -55,16 +58,20 @@
         zIndexServerState,
         examRankVisible: false,
         examTitle: '',
-        totalPages: 0, // 总页面
-        targetPage: 1, // 当前目标页数
-        queryParams: {
-          pos: 0,
-          limit: 10
-        },
         rankList: [],
-        examId: '',
+        // 是否正在加载
         loading: false,
+        // 分页配置
+        pageConfig: {
+          page: 0,
+          limit: 10,
+          total: 0
+        },
+        // 是否全部加载完成
         finished: false,
+        // 是否是在刷新
+        refreshing: false,
+        examId: '',
         ownerData: {
           rank_no: 0
         }
@@ -91,6 +98,12 @@
       // 快问快答-是否吸顶
       isExamStickTop() {
         return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
@@ -108,7 +121,11 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examRank': {
         handler(val) {
-          if (!this.isExamStickTop && document.querySelector('.vmp-exam-rank-popup-overlay')) {
+          if (
+            !this.isExamStickTop &&
+            !this.isPortraitLive &&
+            document.querySelector('.vmp-exam-rank-popup-overlay')
+          ) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-rank-popup-overlay').style.zIndex = val;
             });
@@ -130,56 +147,66 @@
       },
       // 获取桌面
       initData() {
-        // 重置数据
-        this.targetPage = 1;
-        this.rankList = [];
-        this.total = 0;
-        // 获取第一页数据
-        this.getRankData();
+        this.initList();
         // 获取个人成绩
         this.getOwnerRankData();
       },
-      // 加载更多
-      onLoad() {
-        if (this.targetPage >= this.totalPages) {
-          this.finished = true;
-          this.loading = false;
-          return false;
-        }
-        this.loading = true;
-        this.targetPage++;
-        this.queryParams.pos = parseInt((this.targetPage - 1) * this.queryParams.limit);
-        this.getRankData();
+      //初始化列表信息，然后重新请求列表数据
+      initList() {
+        this.pageConfig.page = 0;
+        this.list = [];
+        this.getList();
       },
-      getRankData() {
+      // 获取成员列表
+      getList() {
         const params = {
-          pos: this.queryParams.pos,
-          limit: this.queryParams.limit,
+          pos: this.pageConfig.page,
+          limit: this.pageConfig.limit,
           paper_id: this.examId,
           from_consumer: 1
         };
         this.loading = true;
-        this.examServer
+        return this.examServer
           .getExamRankList(params)
           .then(res => {
-            this.loading = false;
-            if (res.code === 200) {
-              const data = res.data;
-              if (this.rankList && this.rankList.length > 0) {
-                this.rankList.concat(data.list);
-              } else {
-                this.rankList = data.list || [];
-              }
-              this.total = data.total || 0;
-              this.totalPages = Math.ceil(this.total / this.queryParams.limit);
-              if (this.targetPage >= this.totalPages) {
-                this.finished = true;
-              }
+            const { list = [], total = 0, code } = res && res.data ? res.data : {};
+            if (this.pageConfig.page === 0) {
+              this.rankList = list;
+            } else {
+              this.rankList.push(...list);
+            }
+            this.pageConfig.total = total;
+            this.finished = this.rankList.length >= total;
+            if (!['200', 200].includes(code) || !list.length) {
+              if (!this.pageConfig.page) return;
+              this.pageConfig.page--;
             }
           })
-          .catch(res => {
+          .catch(error => {
+            console.log(error, '请求排行榜数据错误');
+          })
+          .finally(() => {
             this.loading = false;
           });
+      },
+      // 加载更多
+      loadMore() {
+        if (this.loading || this.finished || this.refreshing) {
+          console.log('呵呵呵呵', this.loading, this.finished, this.refreshing);
+          return;
+        }
+        this.pageConfig.page++;
+        this.getList();
+      },
+      // 下拉刷新处理
+      handleRefresh() {
+        this.refreshing = true;
+        this.pageConfig.total = 0;
+        this.pageConfig.page = 0;
+        this.list = [];
+        this.getList().finally(() => {
+          this.refreshing = false;
+        });
       },
       getOwnerRankData() {
         this.examServer

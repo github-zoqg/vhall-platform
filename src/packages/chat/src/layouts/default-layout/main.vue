@@ -729,15 +729,15 @@
           nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
           content: {
-            text_content: text_content[eventType],
+            text_content: `${text_content[eventType]}`,
             exam_id: msg.data.paper_id,
             exam_title: msg.data.paper_title || ''
           },
           roleName: join_info.role_name,
-          type: msg.type,
+          type: msg.data.type,
           interactStatus: true,
-          isCheck: true,
-          isLinkBtn: true
+          isCheck: false,
+          isLinkBtn: false
         };
       },
       //初始化聊天输入框数据
