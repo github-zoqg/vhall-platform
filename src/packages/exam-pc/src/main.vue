@@ -200,8 +200,8 @@
     background-size: cover;
     // 重置内部元素
     .exam-execute-body {
-      height: calc(460px - 62px) !important;
-      max-height: calc(460px - 62px) !important;
+      height: calc(460px - 134px) !important;
+      max-height: calc(460px - 134px) !important;
       margin-right: 2px;
     }
     .exam-core__container {
