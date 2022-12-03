@@ -491,6 +491,22 @@
         if (type === 'questionnaire_push') {
           this.questionnaireCheck(content.questionnaire_id);
         }
+        // 快问快答查看
+        if (
+          [
+            'paper_send',
+            'paper_send_rank',
+            'paper_end',
+            'paper_auto_end',
+            'paper_auto_send_rank'
+          ].includes(type)
+        ) {
+          this.checkExamDetail({
+            examId: content.exam_id,
+            examTitle: content.exam_title,
+            sourceType: type
+          });
+        }
       },
       //点击查看抽奖信息
       lotteryCheck(msg) {
@@ -850,7 +866,7 @@
           border-radius: 14px;
           font-size: 14px;
           line-height: 22px;
-          padding: 4px 8px;
+          padding: 4px 8px 8px 8px;
           color: var(--chat-font-color-msg-text);
           text-align: center;
           > span {

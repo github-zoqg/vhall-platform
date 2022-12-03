@@ -56,7 +56,7 @@
             <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
             <vh-table-column label="限时(分)" width="78">
               <template slot-scope="scope">
-                {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '不限时' }}
+                {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '无' }}
               </template>
             </vh-table-column>
             <vh-table-column label="状态" width="112">
