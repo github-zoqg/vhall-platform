@@ -850,7 +850,7 @@
           border-radius: 14px;
           font-size: 14px;
           line-height: 22px;
-          padding: 4px 8px;
+          padding: 4px 8px 8px 8px;
           color: var(--chat-font-color-msg-text);
           text-align: center;
           > span {

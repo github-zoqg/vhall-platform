@@ -363,7 +363,24 @@ export default {
       cuid: ['comExamWap'],
       method: 'open',
       args: ['$0', '$1', '$2']
-    }
+    },
+    emitExamVisible: [
+      // {
+      //   cuid: 'comWapCenter',
+      //   method: 'setDocContainerStickTop',
+      //   args: ['$0']
+      // },
+      {
+        cuid: 'comWapBody',
+        method: 'examVisible',
+        args: ['$0', '$1']
+      },
+      {
+        cuid: 'comNoticeWap',
+        method: 'examVisible',
+        args: ['$0']
+      }
+    ]
   },
   comSignWap: {
     component: 'VmpSignWap',
@@ -517,7 +534,24 @@ export default {
   },
   // 快问快答 - 排行榜
   comExamRankWap: {
-    component: 'VmpExamRankWap'
+    component: 'VmpExamRankWap',
+    emitExamVisible: [
+      // {
+      //   cuid: 'comWapCenter',
+      //   method: 'setDocContainerStickTop',
+      //   args: ['$0']
+      // },
+      {
+        cuid: 'comWapBody',
+        method: 'examVisible',
+        args: ['$0', '$1']
+      },
+      {
+        cuid: 'comNoticeWap',
+        method: 'examVisible',
+        args: ['$0']
+      }
+    ]
   },
   // 快问快答 - 问答
   comExamAnswerWap: {
@@ -553,10 +587,15 @@ export default {
       }
     ],
     emitExamVisible: [
+      // {
+      //   cuid: 'comWapCenter',
+      //   method: 'setDocContainerStickTop',
+      //   args: ['$0']
+      // },
       {
         cuid: 'comWapBody',
         method: 'examVisible',
-        args: ['$0']
+        args: ['$0', '$1']
       },
       {
         cuid: 'comNoticeWap',

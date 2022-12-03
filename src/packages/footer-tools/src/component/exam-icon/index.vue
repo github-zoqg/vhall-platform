@@ -48,7 +48,7 @@
                           item.right_rate == 0
                             ? '0'
                             : item.right_rate == 100
-                            ? '满分'
+                            ? $t('exam.exam_1042')
                             : item.total_score > 0
                             ? item.score
                             : Number(item.right_rate).toFixed(1)
@@ -57,7 +57,9 @@
                       <span
                         class="mini-size"
                         v-if="item.right_rate >= 0 && item.right_rate < 100"
-                        v-text="item.total_score > 0 || item.right_rate == 0 ? '分' : '%'"
+                        v-text="
+                          item.total_score > 0 || item.right_rate == 0 ? $t('exam.exam_1043') : '%'
+                        "
                       ></span>
                     </div>
                   </template>
@@ -149,7 +151,7 @@
         await this.examServer.getExamPublishList({});
         let list = this.examWatchResult.list || [];
         let arr = list.filter(item => item.is_end == 0 && item.status == 0);
-        if (arr.length == 1 && list.length == 1) {
+        if (isAutoOpen && arr.length == 1 && list.length == 1) {
           // 存在未答题的内容，并且 可答题列表数量只有一个，触发自动弹出逻辑
           this.checkExamInfo(arr[0], list);
         } else if (isAutoOpen && list.length == 1) {
@@ -363,6 +365,7 @@
       overflow-x: hidden;
       overflow-y: auto;
       height: 100%;
+      margin-right: 2px;
       ul {
         width: 388px;
         li {
