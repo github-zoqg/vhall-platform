@@ -3,11 +3,9 @@
     <vh-dialog
       :visible.sync="dialogVisible"
       :before-close="handleClose"
-      :close-on-click-modal="false"
       title="快问快答"
       @open="open"
       :width="createPanel ? '1030px' : '951px'"
-      draggable
       custom-class="vmp-exam-dialog"
     >
       <label v-if="createPanel" slot="title">
