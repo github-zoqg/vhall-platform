@@ -11,6 +11,7 @@
     overlay-class="vmp-exam-answer-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
+    safe-area-inset-bottom
   >
     <div
       :class="`exam-core__container exam-theme--${theme} exam-computed-ctx-${
