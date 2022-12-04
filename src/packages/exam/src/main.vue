@@ -7,6 +7,7 @@
       @open="open"
       :width="createPanel ? '1030px' : '951px'"
       custom-class="vmp-exam-dialog"
+      append-to-body
     >
       <label v-if="createPanel" slot="title">
         <i
