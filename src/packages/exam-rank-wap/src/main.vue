@@ -11,6 +11,7 @@
     overlay-class="vmp-exam-rank-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
+    safe-area-inset-bottom
   >
     <RankTitle :title="examTitle" :showClose="true" @close="closeDialog" />
     <div class="vmp-rank-wap">
