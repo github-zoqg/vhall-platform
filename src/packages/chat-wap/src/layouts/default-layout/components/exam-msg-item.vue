@@ -137,7 +137,7 @@
             background: unset;
             .exam_msg_bg {
               display: flex;
-              justify-content: flex-start;
+              justify-content: center;
               align-items: top;
               flex-wrap: wrap;
               padding: 0px 0;

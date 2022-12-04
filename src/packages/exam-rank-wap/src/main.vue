@@ -11,14 +11,21 @@
     overlay-class="vmp-exam-rank-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
+    safe-area-inset-bottom
   >
     <RankTitle :title="examTitle" :showClose="true" @close="closeDialog" />
     <div class="vmp-rank-wap">
       <RankLabel />
       <div class="rank-list-wrap">
         <ul class="rank-list">
-          <van-pull-refresh v-model="refreshing" @refresh="handleRefresh">
-            <van-list v-model="loading" :finished="finished" finished-text="" @load="loadMore">
+          <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+            <van-list
+              v-model="loading"
+              :finished="finished"
+              finished-text=""
+              @load="onLoad"
+              :immediate-check="false"
+            >
               <li v-for="item of rankList" :key="item.id" class="rank-item">
                 <RankItemWap :item="item" />
               </li>
@@ -58,19 +65,16 @@
         zIndexServerState,
         examRankVisible: false,
         examTitle: '',
-        rankList: [],
-        // 是否正在加载
         loading: false,
+        finished: false,
+        refreshing: false,
+        rankList: [],
         // 分页配置
         pageConfig: {
           page: 0,
           limit: 10,
           total: 0
         },
-        // 是否全部加载完成
-        finished: false,
-        // 是否是在刷新
-        refreshing: false,
         examId: '',
         ownerData: {
           rank_no: 0
@@ -145,41 +149,53 @@
         this.examTitle = examTitle;
         this.initData();
       },
+      onLoad() {
+        if (this.refreshing) {
+          this.pageConfig.page = 0;
+          this.rankList = [];
+          this.refreshing = false;
+        }
+        this.getList();
+      },
+      onRefresh() {
+        // 清空列表数据
+        this.finished = false;
+        this.pageConfig.page = 0;
+        this.rankList = [];
+        // 重新加载数据
+        // 将 loading 设置为 true，表示处于加载状态
+        this.loading = true;
+        this.onLoad();
+      },
       // 获取桌面
       initData() {
-        this.initList();
+        this.onRefresh();
         // 获取个人成绩
         this.getOwnerRankData();
       },
-      //初始化列表信息，然后重新请求列表数据
-      initList() {
-        this.pageConfig.page = 0;
-        this.list = [];
-        this.getList();
-      },
       // 获取成员列表
       getList() {
+        this.pageConfig.page++;
         const params = {
-          pos: this.pageConfig.page,
+          pos: (this.pageConfig.page - 1) * this.pageConfig.limit,
           limit: this.pageConfig.limit,
           paper_id: this.examId,
           from_consumer: 1
         };
-        this.loading = true;
         return this.examServer
           .getExamRankList(params)
           .then(res => {
-            const { list = [], total = 0, code } = res && res.data ? res.data : {};
-            if (this.pageConfig.page === 0) {
-              this.rankList = list;
-            } else {
-              this.rankList.push(...list);
-            }
-            this.pageConfig.total = total;
-            this.finished = this.rankList.length >= total;
-            if (!['200', 200].includes(code) || !list.length) {
-              if (!this.pageConfig.page) return;
-              this.pageConfig.page--;
+            if (res && res.code == 200) {
+              this.pageConfig.total = res.data.total || 0;
+              if (this.pageConfig.page == 1 && this.pageConfig.total <= 0) {
+                // 第一页加载没数据，停止内容
+                this.finished = true;
+              }
+              let list = res.data.list || [];
+              this.rankList = this.rankList.concat(list);
+              if (this.rankList.length >= this.pageConfig.total) {
+                this.finished = true;
+              }
             }
           })
           .catch(error => {
@@ -188,25 +204,6 @@
           .finally(() => {
             this.loading = false;
           });
-      },
-      // 加载更多
-      loadMore() {
-        if (this.loading || this.finished || this.refreshing) {
-          console.log('呵呵呵呵', this.loading, this.finished, this.refreshing);
-          return;
-        }
-        this.pageConfig.page++;
-        this.getList();
-      },
-      // 下拉刷新处理
-      handleRefresh() {
-        this.refreshing = true;
-        this.pageConfig.total = 0;
-        this.pageConfig.page = 0;
-        this.list = [];
-        this.getList().finally(() => {
-          this.refreshing = false;
-        });
       },
       getOwnerRankData() {
         this.examServer
