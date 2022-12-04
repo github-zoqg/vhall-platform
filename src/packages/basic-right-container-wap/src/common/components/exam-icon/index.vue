@@ -33,6 +33,7 @@
       overlay-class="vmp-exam-list-popup-overlay"
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
+      safe-area-inset-bottom
     >
       <div class="container-title">
         <span class="container-title-text">

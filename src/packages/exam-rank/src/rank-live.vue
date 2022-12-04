@@ -3,7 +3,6 @@
     :visible.sync="dialogVisible"
     width="544px"
     modal
-    dialogCenter
     custom-class="result"
     class="vmp-rank-live"
     :close-on-click-modal="false"
@@ -75,7 +74,7 @@
         </vh-table-column>
         <vh-table-column prop="score" label="得分" min-width="64" align="center">
           <template slot-scope="scope">
-            {{ scope.row.score | fmtScore }}
+            {{ scope.row | fmtScore }}
           </template>
         </vh-table-column>
         <vh-table-column label="正确率" align="center" min-width="58">
@@ -147,7 +146,6 @@
     result.push(summaryDataMap[key]);
     return result;
   }, []);
-  let noScoreSettings = false;
   export default {
     name: 'VMPRankLive',
     inject: ['examServer'],
@@ -177,8 +175,8 @@
         const ss = `${Math.floor(time % 60)}`.padStart(2, '0');
         return `${mm}:${ss}`;
       },
-      fmtScore(score) {
-        return noScoreSettings ? '-' : score;
+      fmtScore(examObj) {
+        return examObj.total_score ? examObj.score : '-';
       },
       fmtRightRate(rate) {
         return roundRate(rate) + '%';
@@ -187,7 +185,6 @@
     methods: {
       open(examObj) {
         this.examId = examObj.id;
-        noScoreSettings = !examObj.total_score;
         this.initComp();
         this.dialogVisible = true;
       },
