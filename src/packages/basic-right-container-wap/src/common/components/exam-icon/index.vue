@@ -244,6 +244,8 @@
         } else if (isAutoOpen && list.length == 1) {
           this.checkExamInfo(list[0], list);
         } else if (isAutoOpen && list.length > 1) {
+          console.log('打开快问快答-列表部分，icon数量++');
+          this.changeIconShowNum(true);
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
@@ -259,6 +261,8 @@
       },
       // 关闭 快问快答 - 列表弹出框
       closeDialog() {
+        console.log('关闭快问快答-列表部分，icon数量--');
+        this.changeIconShowNum(false);
         this.examListDialogVisible = false;
         if (this.isConcise) {
           this.roomBaseServer.setIsExamStickTop(false);
@@ -368,6 +372,10 @@
         this.msgServer.$onMsg('ROOM_MSG', msg => {
           this.listenExamWatchMsg(msg, that);
         });
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
     },
     beforeCreate() {
@@ -483,7 +491,7 @@
             margin-bottom: 16px;
             .container-data__title {
               margin-top: 0;
-              margin-bottom: 12px;
+              margin-bottom: 8px;
               width: 100%;
               display: flex;
               justify-content: space-around;
@@ -562,6 +570,7 @@
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
         color: var(--theme-more-status-button-color);
+        padding: 8px 32px;
         &:hover {
           background: var(--theme-more-status-button-hover-bg);
           border: 1px solid var(--theme-more-status-button-hover-border);

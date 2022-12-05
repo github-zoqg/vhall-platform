@@ -63,6 +63,8 @@
   .vmp-exam-answer-wap {
     width: 100%;
     height: 844px;
+    padding-bottom: constant(safe-area-inset-bottom); /* 兼容IOS<11.2 */
+    padding-bottom: env(safe-area-inset-bottom); /* 兼容IOS>11.2 */
     background: url('../images/bg_default.png') no-repeat;
     box-shadow: 0px -4px 16px rgba(0, 0, 0, 0.25);
     border-radius: 40px 40px 0px 0px;

@@ -138,11 +138,9 @@
       }
     },
     methods: {
-      // 关闭 快问快打 - 排行榜手机弹出框
-      handleClose() {
-        this.examRankVisible = false;
-      },
       async open(examId, examTitle = '') {
+        console.log('展示快问快答-成绩榜单部分，icon数量++');
+        this.changeIconShowNum(true);
         this.examRankVisible = true;
         this.zIndexServer.setDialogZIndex('examRank');
         this.examId = examId;
@@ -218,7 +216,13 @@
           .catch(res => {});
       },
       closeDialog() {
+        console.log('关闭快问快答-成绩榜单部分，icon数量--');
+        this.changeIconShowNum(false);
         this.examRankVisible = false;
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
     },
     beforeCreate() {
