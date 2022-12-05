@@ -44,7 +44,7 @@
             'vmp-stream-list__main-screen':
               speaker.accountId == mainScreen &&
               !isDocMainScreen &&
-              (this.speakerAndShowLayout == 1
+              (speakerAndShowLayout == 1
                 ? !isShareScreen && !isOpenInsertFile && !isInsertAudio
                 : true),
             'vmp-stream-list__main-screen-doubleRow':
