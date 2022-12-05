@@ -2,7 +2,7 @@
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
-        <img :class="`form_cover form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+        <img class="form_cover" :src="coverPic" v-parseImgOss="{ url: coverPic }" alt="" />
         <!-- <img :src="coverPic"/></img> -->
       </header>
       <div class="vmp-wap-sign-up-form__content">
@@ -408,8 +408,7 @@
     validPhone,
     getQueryString,
     replaceHtml,
-    delUrlParams,
-    parseImgOssQueryString
+    delUrlParams
   } from '@/app-shared/utils/tool';
   import { debounce } from 'lodash';
   import {
@@ -552,7 +551,6 @@
         //默认的banner图
         defaultHeader:
           'https://cnstatic01.e.vhall.com/common-static/middle/images/platform-common/form_up.png',
-        imageCropperMode: 1,
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
@@ -573,7 +571,6 @@
         if (this.formInfo.cover) {
           let cover = `${this.defaultImgUrl}${this.formInfo.cover}`;
           if (cropperImage(cover)) {
-            this.handlerImageInfo(cover);
             return cover;
           } else {
             return cover + '?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0';
@@ -932,12 +929,6 @@
           .catch(e => {
             this.ajaxInfoEnd = true;
           });
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        console.log(this.imageCropperMode, '???mode');
       },
       //计算简介文字是否过长
       calculateText() {
@@ -1958,15 +1949,6 @@
         .form_cover {
           width: 100%;
           height: 100%;
-          object-fit: fill;
-          &.form_bg_2 {
-            object-fit: cover;
-            object-position: left top;
-          }
-          &.form_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
       }
     }

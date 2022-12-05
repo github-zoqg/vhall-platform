@@ -9,7 +9,12 @@
         @click="gotoRoom(item.id)"
       >
         <div class="vh-chose-active-item__cover">
-          <img :class="`img_box_bg box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
+          <img
+            class="img_box_bg"
+            :src="item.img_url"
+            v-parseImgOss="{ url: item.img_url }"
+            alt=""
+          />
           <div class="vh-chose-active-item__cover-status">
             <span class="liveTag">
               <label v-if="item.webinar_state == 1" class="live-status">
@@ -47,8 +52,6 @@
 </template>
 <script>
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
-  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -138,23 +141,9 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list.map(item => {
-              let mode = 1;
-              if (cropperImage(item.img_url)) {
-                mode = this.handlerImageInfo(item.img_url);
-              }
-              return {
-                ...item,
-                itemMode: mode
-              };
-            });
+            this.activeList = res.data.list;
           }
         }
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        return Number(obj.mode);
       }
     }
   };
