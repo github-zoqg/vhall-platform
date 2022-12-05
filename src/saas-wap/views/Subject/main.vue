@@ -226,9 +226,6 @@
         let url = this.defaultImages;
         if (this.detailInfo.cover) {
           url = this.detailInfo.cover;
-          if (cropperImage(this.detailInfo.cover)) {
-            this.handlerImageInfo(url);
-          }
         }
         return url;
       }
