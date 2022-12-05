@@ -318,6 +318,7 @@
                   </div>
                   <!-- 隐私合规（嵌入不支持） -->
                   <vmp-privacy-compliance
+                    v-if="!privacy"
                     scene="signForm"
                     clientType="pc"
                     compType="2"
@@ -379,6 +380,14 @@
                       </el-col>
                     </el-row>
                   </el-form-item>
+                  <!-- 隐私声明 -->
+                  <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                    <template>
+                      <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
+                        <pre v-html="privacyText"></pre>
+                      </el-checkbox>
+                    </template>
+                  </el-form-item>
                   <div class="btn-box">
                     <el-button
                       :disabled="isPreview"
@@ -392,6 +401,7 @@
                   </div>
                   <!-- 隐私合规（嵌入不支持） -->
                   <vmp-privacy-compliance
+                    v-if="!privacy"
                     scene="signForm"
                     clientType="pc"
                     compType="2"
@@ -709,6 +719,7 @@
                 </div>
                 <!-- 隐私合规（嵌入不支持） -->
                 <vmp-privacy-compliance
+                  v-if="!privacy"
                   scene="signForm"
                   clientType="pc"
                   compType="2"
@@ -770,6 +781,14 @@
                     </el-col>
                   </el-row>
                 </el-form-item>
+                <!-- 隐私声明 -->
+                <el-form-item v-if="privacy" class="privacy-item" :prop="privacy.id + ''">
+                  <template>
+                    <el-checkbox v-model="form[privacy.id]" class="privacy-checkbox">
+                      <pre v-html="privacyText"></pre>
+                    </el-checkbox>
+                  </template>
+                </el-form-item>
                 <div class="btn-box" v-show="loadingEnd">
                   <el-button
                     :disabled="isPreview"
@@ -783,6 +802,7 @@
                 </div>
                 <!-- 隐私合规（嵌入不支持） -->
                 <vmp-privacy-compliance
+                  v-if="!privacy"
                   scene="signForm"
                   clientType="pc"
                   compType="2"
@@ -2020,6 +2040,10 @@
       }, 1000),
       // 我已报名--验证
       submitVerify: debounce(function () {
+        if (!this.form[this.privacy.id] && this.privacy && this.privacy.is_must) {
+          this.$message.warning(this.$t('form.form_1030'));
+          return;
+        }
         this.$refs.verifyForm.validate(valid => {
           if (valid) {
             const params = {
