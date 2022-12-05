@@ -483,7 +483,7 @@
             margin-bottom: 16px;
             .container-data__title {
               margin-top: 0;
-              margin-bottom: 12px;
+              margin-bottom: 8px;
               width: 100%;
               display: flex;
               justify-content: space-around;

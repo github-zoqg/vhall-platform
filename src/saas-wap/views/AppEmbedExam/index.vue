@@ -31,16 +31,29 @@
             window.sessionStorage.setItem('interact_token', this.params['interact-token']);
           }
         }
-        debugger;
         await new Domain({
-          plugins: ['chat'],
-          isNotInitRoom: true // 不需要初始化房间
+          plugins: ['chat', 'report', 'exam'],
+          requestHeaders: {
+            token: localStorage.getItem('token') || ''
+          },
+          isNotInitRoom: true, // 不需要初始化房间
+          // initRoom: {
+          //   webinar_id: this.params.webinar_id, //动id
+          //   clientType: 'embed', //客户端类型
+          //   live_type: 0, // 2 彩排   0 正式
+          //   stealth: 1, //是否创建参会记录
+          //   ...this.$route.query // 第三方地址栏传参
+          // },
+          // 日志上报的参数
+          devLogOptions: {
+            namespace: 'saas', //业务线
+            env: ['production', 'pre'].includes(process.env.VUE_APP_SAAS_ENV)
+              ? 'production'
+              : 'test', // 环境
+            method: 'post' // 上报方式
+          }
         });
-        debugger;
-        this.examServer = useExamServer();
-        this.$nextTick(() => {
-          this.renderPage(this.params);
-        });
+        this.initExamSdk();
         //上报日志
         // logRoomInitSuccess();
       } catch (e) {
@@ -50,6 +63,20 @@
       }
     },
     methods: {
+      initExamSdk() {
+        this.examServer = useExamServer();
+        this.examServer.init({
+          role: 2,
+          source_id: this.params.webinar_id,
+          source_type: 1,
+          accountInfo: {
+            platform: 10
+          }
+        });
+        this.$nextTick(() => {
+          this.renderPage(this.params);
+        });
+      },
       // 关闭问卷
       close() {
         this.sendToNative();
