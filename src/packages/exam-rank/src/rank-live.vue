@@ -14,7 +14,7 @@
         class="vh-iconfont vh-line-arrow-left cursor-pointer std-color-icon"
         @click="dialogVisible = false"
       />
-      <span class="std-panel-title m-l-8">成绩</span>
+      <span class="std-panvh-title m-l-8">成绩</span>
     </label>
     <!-- 内容 -->
     <div
@@ -28,7 +28,7 @@
           <span class="std-title-lv1 truncate title">
             {{ title }}
           </span>
-          <el-tooltip effect="dark" content="" placement="top-start">
+          <vh-tooltip effect="dark" content="" placement="top-start">
             <div slot="content">
               1.成绩排名按照得分展示，未设置分数时按照正确率展示
               <br />
@@ -41,21 +41,21 @@
               5.主动交卷：用户自己点击提交为主动交卷
             </div>
             <i class="iconfont-v3 saasicon_help_m m-l-6" />
-          </el-tooltip>
+          </vh-tooltip>
         </div>
-        <el-row>
-          <el-col :span="8" v-for="(item, idx) of summaryData" :key="idx">
+        <vh-row>
+          <vh-col :span="8" v-for="(item, idx) of summaryData" :key="idx">
             <div class="summary-item m-b-12">
               <h3 class="std-title-lv3">
                 {{ item.label }}
-                <el-tooltip v-if="item.tip" effect="dark" :content="item.tip" placement="top-start">
+                <vh-tooltip v-if="item.tip" effect="dark" :content="item.tip" placement="top-start">
                   <i class="iconfont-v3 saasicon_help_m" />
-                </el-tooltip>
+                </vh-tooltip>
               </h3>
               <p class="summary-number">{{ item.value }}</p>
             </div>
-          </el-col>
-        </el-row>
+          </vh-col>
+        </vh-row>
       </div>
       <!-- 排行榜列表 -->
       <vh-table :data="rankList" class="m-t-16" size="mini">
@@ -220,7 +220,8 @@
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           limit: this.queryParams.limit,
           paper_id: this.examId,
-          from_consumer: 1
+          from_consumer: 1,
+          is_desensitization: 0
         };
         this.examServer.getExamRankList(params).then(res => {
           if (res.code === 200) {
