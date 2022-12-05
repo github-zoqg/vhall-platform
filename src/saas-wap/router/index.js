@@ -133,7 +133,7 @@ const routes = [
     meta: { grayType: '' }
   },
   {
-    path: '/lives/exam', // app-sdk内嵌快问快答页
+    path: '/lives/embedclient/exam', // app-sdk内嵌快问快答页
     name: 'appExam',
     component: () => import(/* webpackChunkName: "appQuestion" */ '../views/AppEmbedExam'),
     meta: { grayType: '' }

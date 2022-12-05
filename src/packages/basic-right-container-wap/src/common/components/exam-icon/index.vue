@@ -483,7 +483,7 @@
             margin-bottom: 16px;
             .container-data__title {
               margin-top: 0;
-              margin-bottom: 12px;
+              margin-bottom: 8px;
               width: 100%;
               display: flex;
               justify-content: space-around;
@@ -562,6 +562,7 @@
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
         color: var(--theme-more-status-button-color);
+        padding: 8px 32px;
         &:hover {
           background: var(--theme-more-status-button-hover-bg);
           border: 1px solid var(--theme-more-status-button-hover-border);

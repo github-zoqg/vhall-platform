@@ -145,7 +145,7 @@
               border-radius: 40px;
               font-style: normal;
               font-weight: 400;
-              font-size: 24px;
+              font-size: 26px;
               line-height: 32px;
               text-align: center;
               color: rgba(0, 0, 0, 0.85);
