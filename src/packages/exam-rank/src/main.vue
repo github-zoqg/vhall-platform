@@ -242,6 +242,7 @@
       margin-top: 58px;
       overflow-y: auto;
       height: 248px;
+      margin-right: 2px;
       &.one-page {
         height: 308px;
       }

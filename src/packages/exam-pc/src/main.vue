@@ -181,12 +181,13 @@
     overflow: auto;
     .vh-dialog__header {
       padding: 0 0;
+      height: 24px;
       .take--place {
         height: 16px;
       }
     }
     .vh-dialog__body {
-      height: calc(100% - 16px);
+      height: calc(100% - 24px);
       overflow: auto;
       padding: 0 0;
     }
@@ -200,8 +201,8 @@
     background-size: cover;
     // 重置内部元素
     .exam-execute-body {
-      height: calc(460px - 62px) !important;
-      max-height: calc(460px - 62px) !important;
+      height: calc(460px - 145px) !important;
+      max-height: calc(460px - 145px) !important;
       margin-right: 2px;
     }
     .exam-core__container {
@@ -270,6 +271,7 @@
 
     .vmp-transcripts {
       button.vh-button--primary {
+        margin: 24px auto;
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
         color: var(--theme-more-status-button-color);
@@ -287,6 +289,23 @@
           background: var(--theme-more-status-button-disabled-bg) !important;
           border: 1px solid var(--theme-more-status-button-disabled-border) !important;
           color: var(--theme-more-status-button-disabled-color) !important;
+        }
+      }
+      &.vmp-transcripts-other {
+        // 百分比 or 正确率
+        height: 409px;
+        padding-top: 27px;
+        button.vh-button--primary {
+          margin: 57px auto 64px auto;
+        }
+      }
+      &.vmp-transcripts-extreme {
+        // 满分 or 0分
+        button.vh-button--primary {
+          margin: 24px auto 24px auto;
+        }
+        .trophy-wrap {
+          margin-top: 30px;
         }
       }
     }

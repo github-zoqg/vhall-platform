@@ -45,7 +45,7 @@
             </vh-table-column>
             <vh-table-column label="更新时间" width="148">
               <template slot-scope="scope">
-                {{ scope.row.updated_at }}
+                {{ scope.row.paper_edit_time }}
               </template>
             </vh-table-column>
             <vh-table-column width="56" label="总分">
@@ -70,6 +70,7 @@
                 <div :data-vars="(btnConfig = setBtnConfigByStatus(scope.row.status))">
                   <span
                     v-for="item of btnConfig.outsideBtn"
+                    v-stopReClick
                     :key="item.type"
                     :disabled="item.disabled"
                     class="std-text opt-btn"
@@ -355,11 +356,10 @@
             }
           });
         };
-        this.$confirm('收卷后将不能继续答卷，确定收卷？', '提示', {
+        this.$vhConfirm('收卷后将不能继续答卷，确定收卷？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          roundButton: true,
-          type: 'warning'
+          roundButton: true
         })
           .then(confirmCb)
           .catch(noop);
@@ -388,7 +388,7 @@
         }
         const keywords = (this.queryParams.keyword = this.keywordIpt);
         const params = {
-          sort_field: 'updated_at',
+          sort_field: 'paper_edit_time',
           limit: this.queryParams.limit,
           pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
           keywords

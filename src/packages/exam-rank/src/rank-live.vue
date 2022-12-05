@@ -2,12 +2,20 @@
   <vh-dialog
     :visible.sync="dialogVisible"
     width="544px"
-    title="成绩"
-    :modal="false"
+    modal
     custom-class="result"
     class="vmp-rank-live"
+    :close-on-click-modal="false"
+    append-to-body
   >
     <!-- 自定义头部 -->
+    <label slot="title">
+      <i
+        class="vh-iconfont vh-line-arrow-left cursor-pointer std-color-icon"
+        @click="dialogVisible = false"
+      />
+      <span class="std-panel-title m-l-8">成绩</span>
+    </label>
     <!-- 内容 -->
     <div
       class="dialog-content"
@@ -32,7 +40,7 @@
               <br />
               5.主动交卷：用户自己点击提交为主动交卷
             </div>
-            <i class="iconfont-v3 saasicon_help_m" />
+            <i class="iconfont-v3 saasicon_help_m m-l-6" />
           </el-tooltip>
         </div>
         <el-row>
@@ -56,7 +64,7 @@
             <RankNo :ranking="scope.row.rank_no" />
           </template>
         </vh-table-column>
-        <vh-table-column label="用户" min-width="174">
+        <vh-table-column label="用户" width="174">
           <template slot-scope="scope">
             <div class="avatar-wrap">
               <RankAvatar :src="scope.row.head_img" :ranking="scope.row.rank_no" />
@@ -66,7 +74,7 @@
         </vh-table-column>
         <vh-table-column prop="score" label="得分" min-width="64" align="center">
           <template slot-scope="scope">
-            {{ scope.row.score | fmtScore }}
+            {{ scope.row | fmtScore }}
           </template>
         </vh-table-column>
         <vh-table-column label="正确率" align="center" min-width="58">
@@ -74,7 +82,7 @@
             {{ scope.row.right_rate | fmtRightRate }}
           </template>
         </vh-table-column>
-        <vh-table-column label="用时" min-width="60">
+        <vh-table-column label="用时" min-width="65">
           <template slot-scope="scope">
             {{ scope.row.use_time | fmtUseTime }}
           </template>
@@ -90,6 +98,7 @@
           layout="prev, pager, next"
           :page-size="queryParams.limit"
           :total="total"
+          hide-on-single-page
           :current-page="queryParams.pageNum"
           @current-change="handleChangePage"
         ></vh-pagination>
@@ -137,7 +146,6 @@
     result.push(summaryDataMap[key]);
     return result;
   }, []);
-  let noScoreSettings = false;
   export default {
     name: 'VMPRankLive',
     inject: ['examServer'],
@@ -167,8 +175,8 @@
         const ss = `${Math.floor(time % 60)}`.padStart(2, '0');
         return `${mm}:${ss}`;
       },
-      fmtScore(score) {
-        return noScoreSettings ? '-' : score;
+      fmtScore(examObj) {
+        return examObj.total_score ? examObj.score : '-';
       },
       fmtRightRate(rate) {
         return roundRate(rate) + '%';
@@ -177,7 +185,6 @@
     methods: {
       open(examObj) {
         this.examId = examObj.id;
-        noScoreSettings = !examObj.total_score;
         this.initComp();
         this.dialogVisible = true;
       },
@@ -264,7 +271,7 @@
   .vmp-rank-live {
     // reset vhall-ui
     .vh-table th:first-child .cell {
-      padding-left: 0 !important;
+      // padding-left: 0 !important;
     }
     .iconfont-v3 {
       font-size: 14px;
@@ -300,6 +307,7 @@
         .title {
           display: inline-block;
           max-width: 410px;
+          margin-right: 5px;
         }
       }
       &-item {

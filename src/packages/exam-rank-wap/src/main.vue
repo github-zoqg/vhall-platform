@@ -7,21 +7,30 @@
     position="bottom"
     @close="closeDialog"
     v-if="examRankVisible"
-    :overlay="!isExamStickTop"
+    :overlay="!isExamStickTop && !isPortraitLive"
     overlay-class="vmp-exam-rank-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
     :style="{ zIndex: zIndexServerState.zIndexMap.examRank }"
+    safe-area-inset-bottom
   >
     <RankTitle :title="examTitle" :showClose="true" @close="closeDialog" />
     <div class="vmp-rank-wap">
       <RankLabel />
       <div class="rank-list-wrap">
         <ul class="rank-list">
-          <van-list v-model="loading" :finished="finished" finished-text="" @load="onLoad">
-            <li v-for="item of rankList" :key="item.id" class="rank-item">
-              <RankItemWap :item="item" />
-            </li>
-          </van-list>
+          <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+            <van-list
+              v-model="loading"
+              :finished="finished"
+              finished-text=""
+              @load="onLoad"
+              :immediate-check="false"
+            >
+              <li v-for="item of rankList" :key="item.id" class="rank-item">
+                <RankItemWap :item="item" />
+              </li>
+            </van-list>
+          </van-pull-refresh>
         </ul>
       </div>
       <div class="rank-list-more" v-if="rankList && rankList.length >= 200">
@@ -41,6 +50,7 @@
   import RankItemWap from './rank-item.vue';
   import { useZIndexServer, useExamServer, useRoomBaseServer } from 'middle-domain';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
+  import { uniqBy, throttle } from 'lodash';
   export default {
     name: 'VmpExamRankWap',
     components: {
@@ -55,16 +65,17 @@
         zIndexServerState,
         examRankVisible: false,
         examTitle: '',
-        totalPages: 0, // 总页面
-        targetPage: 1, // 当前目标页数
-        queryParams: {
-          pos: 0,
-          limit: 10
-        },
-        rankList: [],
-        examId: '',
         loading: false,
         finished: false,
+        refreshing: false,
+        rankList: [],
+        // 分页配置
+        pageConfig: {
+          page: 0,
+          limit: 10,
+          total: 0
+        },
+        examId: '',
         ownerData: {
           rank_no: 0
         }
@@ -91,6 +102,12 @@
       // 快问快答-是否吸顶
       isExamStickTop() {
         return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
+      },
+      // 竖屏直播
+      isPortraitLive() {
+        return (
+          this.$domainStore.state.roomBaseServer.watchInitData?.webinar?.webinar_show_type == 0
+        );
       }
     },
     watch: {
@@ -108,7 +125,11 @@
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examRank': {
         handler(val) {
-          if (!this.isExamStickTop && document.querySelector('.vmp-exam-rank-popup-overlay')) {
+          if (
+            !this.isExamStickTop &&
+            !this.isPortraitLive &&
+            document.querySelector('.vmp-exam-rank-popup-overlay')
+          ) {
             this.$nextTick(() => {
               document.querySelector('.vmp-exam-rank-popup-overlay').style.zIndex = val;
             });
@@ -128,56 +149,59 @@
         this.examTitle = examTitle;
         this.initData();
       },
+      onLoad() {
+        if (this.refreshing) {
+          this.pageConfig.page = 0;
+          this.rankList = [];
+          this.refreshing = false;
+        }
+        this.getList();
+      },
+      onRefresh() {
+        // 清空列表数据
+        this.finished = false;
+        this.pageConfig.page = 0;
+        this.rankList = [];
+        // 重新加载数据
+        // 将 loading 设置为 true，表示处于加载状态
+        this.loading = true;
+        this.onLoad();
+      },
       // 获取桌面
       initData() {
-        // 重置数据
-        this.targetPage = 1;
-        this.rankList = [];
-        this.total = 0;
-        // 获取第一页数据
-        this.getRankData();
+        this.onRefresh();
         // 获取个人成绩
         this.getOwnerRankData();
       },
-      // 加载更多
-      onLoad() {
-        if (this.targetPage >= this.totalPages) {
-          this.finished = true;
-          this.loading = false;
-          return false;
-        }
-        this.loading = true;
-        this.targetPage++;
-        this.queryParams.pos = parseInt((this.targetPage - 1) * this.queryParams.limit);
-        this.getRankData();
-      },
-      getRankData() {
+      // 获取成员列表
+      getList() {
+        this.pageConfig.page++;
         const params = {
-          pos: this.queryParams.pos,
-          limit: this.queryParams.limit,
+          pos: (this.pageConfig.page - 1) * this.pageConfig.limit,
+          limit: this.pageConfig.limit,
           paper_id: this.examId,
           from_consumer: 1
         };
-        this.loading = true;
-        this.examServer
+        return this.examServer
           .getExamRankList(params)
           .then(res => {
-            this.loading = false;
-            if (res.code === 200) {
-              const data = res.data;
-              if (this.rankList && this.rankList.length > 0) {
-                this.rankList.concat(data.list);
-              } else {
-                this.rankList = data.list || [];
+            if (res && res.code == 200) {
+              this.pageConfig.total = res.data.total || 0;
+              if (this.pageConfig.page == 1 && this.pageConfig.total <= 0) {
+                // 第一页加载没数据，停止内容
+                this.finished = true;
               }
-              this.total = data.total || 0;
-              this.totalPages = Math.ceil(this.total / this.queryParams.limit);
-              if (this.targetPage >= this.totalPages) {
+              let list = res.data.list || [];
+              this.rankList = this.rankList.concat(list);
+              if (this.rankList.length >= this.pageConfig.total) {
                 this.finished = true;
               }
             }
           })
-          .catch(res => {
+          .catch(error => {
+            console.log(error, '请求排行榜数据错误');
+          })
+          .finally(() => {
             this.loading = false;
           });
       },
