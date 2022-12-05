@@ -502,7 +502,7 @@
       },
       //初始检查是否要登录才可以参与互动
       initChatLoginStatus() {
-        if (!this.configList['ui.show_chat_without_login']) {
+        if ([0, '0'].includes(this.configList['ui.show_chat_without_login'])) {
           //主持人，这时候在发起端
           if ([1, '1'].includes(this.roleName) || this.isEmbed) {
             // 不需要登录
