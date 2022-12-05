@@ -31,8 +31,7 @@ module.exports = {
       dayjs: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/dayjs.min.js`,
       duration: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/plugins/duration.js`,
       imageYunDun: `//cstaticdun.126.net/load.min.js?t=201903281201`,
-      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js', // vhallUI
-      form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js'
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js' // vhallUI
     },
     css: {
       ElementUi: `${CDN_DOMAIN.S3}/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css`,

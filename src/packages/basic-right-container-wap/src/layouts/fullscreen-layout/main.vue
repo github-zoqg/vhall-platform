@@ -257,9 +257,10 @@
       bottom: 0;
       top: auto;
       .vmp-exam-list_container {
-        max-height: 100%;
+        max-height: calc(100% - 16px);
         .container-data {
           max-height: calc(100% - 210px);
+          padding-bottom: 16px;
         }
       }
     }
@@ -268,6 +269,10 @@
       height: calc(100% - 422px);
       bottom: 0;
       top: auto;
+      .exam-execute-body {
+        height: calc(100% - 100px) !important;
+        max-height: calc(100% - 100px) !important;
+      }
     }
     /** 快问快答 - 列表高度 */
     .vmp-exam-rank-wap {

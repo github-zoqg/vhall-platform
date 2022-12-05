@@ -136,7 +136,7 @@
     }
     .elapsed-time-cell {
       margin-left: 24px;
-      width: 8px;
+      width: 88px;
     }
   }
 </style>

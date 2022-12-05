@@ -715,16 +715,11 @@
       setChatItemData(msg, eventType) {
         let text_content = {
           paper_send: this.$t('exam.exam_1001'), // 推送-快问快答
-          paper_send_rank: this.$t('exam.exam_1003'), // 公布-快问快答-成绩
+          paper_send_rank: this.$t('exam.exam_1003') + this.$t('exam.exam_1004'), // 公布-快问快答-成绩
           paper_end: this.$t('exam.exam_1041'), // 快问快答-收卷
           paper_auto_end: this.$t('exam.exam_1040'), // 快问快答-自动收卷
-          paper_auto_send_rank: this.$t('exam.exam_1032') // 快问
+          paper_auto_send_rank: '快问快答已结束，公布成绩排行榜' // 快问
         };
-        const join_info = this.$domainStore?.state?.roomBaseServer?.watchInitData?.join_info;
-        let text = this.$getRoleName(msg.data.room_role);
-        if (msg.room_role != 1) {
-          text = `${text}${msg.data.nick_name}`;
-        }
         return {
           nickname: msg.data.nick_name,
           avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
@@ -733,7 +728,7 @@
             exam_id: msg.data.paper_id,
             exam_title: msg.data.paper_title || ''
           },
-          roleName: join_info.role_name,
+          roleName: msg.data.role_name,
           type: msg.data.type,
           interactStatus: true,
           isCheck: false,

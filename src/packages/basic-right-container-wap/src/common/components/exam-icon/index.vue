@@ -508,7 +508,7 @@
                 flex-shrink: 0;
                 .button_text {
                   span {
-                    font-family: 'DINPro';
+                    // font-family: 'DINPro';
                     font-style: normal;
                     font-weight: 400;
                     font-size: 40px;
