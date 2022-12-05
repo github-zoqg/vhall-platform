@@ -70,13 +70,6 @@
       },
       joinInfo() {
         return this.$domainStore.state.roomBaseServer.watchInitData.join_info;
-      },
-      // 是否改变聊天区-昵称/头像(若开启报名表单 或 开启白名单情况下，不改变聊天区等昵称/头像)
-      noChangeChatUserInfo() {
-        const webinarInfo = this.$domainStore.state.roomBaseServer.watchInitData.webinar;
-        // reg_form 是否开启报名表单
-        // verify 验证类别，0 无验证，1 密码，2 白名单，3 付费活动, 4 F码, 6 F码+付费
-        return (webinarInfo.verify == 5 && webinarInfo.reg_form == 1) || webinarInfo.verify == 2;
       }
     },
     methods: {
@@ -122,19 +115,6 @@
         const roomBaseState = useRoomBaseServer().state;
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
-          let userInfo = {
-            userName: this.userInfo?.nick_name || this.joinInfo?.nickname || '',
-            headImg: this.userInfo?.avatar || this.joinInfo?.avatar || '',
-            mobile: this.userInfo?.phone || this.joinInfo?.phone || ''
-          };
-          if (this.noChangeChatUserInfo) {
-            // 白名单 和 报名表单用户，使用joinInfo表里的参会信息
-            userInfo = {
-              userName: this.joinInfo?.nickname || '',
-              headImg: this.joinInfo?.avatar || '',
-              mobile: this.joinInfo?.phone || ''
-            };
-          }
           this.examServer.mount({
             examId: examId,
             el: '#examAnswer',
@@ -144,7 +124,11 @@
               role: 2,
               pageSize: 1,
               answerType: answerType == 'answer' ? 1 : 2,
-              ...userInfo
+              ...{
+                userName: this.joinInfo?.nickname || '',
+                headImg: this.joinInfo?.avatar || '',
+                mobile: this.joinInfo?.phone || ''
+              }
             }
           });
           this.examServer.examInstance.$on(
