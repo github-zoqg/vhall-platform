@@ -171,7 +171,7 @@
           [2, '2'].includes(this.roleName) &&
           !this.isEmbed &&
           (!this.userId || this.userId == 0) &&
-          this.configList['ui.show_chat_without_login'] != 1
+          !this.configList['ui.show_chat_without_login']
         ) {
           this.chatLoginStatus = true;
           this.inputStatus.placeholder = '';
@@ -194,7 +194,7 @@
         const isVod =
           (this.webinar.type == 5 || this.webinar.type == 4) && this.watchInitData.paas_record_id;
         // 判断控制台回放禁言状态
-        if (isVod && this.configList && this.configList['ui.watch_record_no_chatting'] == 1) {
+        if (isVod && this.configList && this.configList['ui.watch_record_no_chatting']) {
           this.inputStatus.disable = true;
           this.inputStatus.placeholder = this.$t('chat.chat_1079');
         }

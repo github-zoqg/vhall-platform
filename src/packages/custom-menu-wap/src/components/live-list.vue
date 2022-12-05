@@ -65,7 +65,7 @@
         return this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe';
       },
       hasDelayPermission() {
-        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
+        return this.roomBaseServer.state.configList['no.delay.webinar'];
       }
     },
     watch: {

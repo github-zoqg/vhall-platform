@@ -37,7 +37,7 @@
         this.unionid =
           !localStorage.getItem('unionid') &&
           isWechat() &&
-          this.$domainStore.state.roomBaseServer.configList['ui.hide_wechat'] == 0 &&
+          this.$domainStore.state.roomBaseServer.configList['ui.hide_wechat'] == 1 &&
           !this.$domainStore.state.roomBaseServer.embedObj.embed
             ? true
             : false;
