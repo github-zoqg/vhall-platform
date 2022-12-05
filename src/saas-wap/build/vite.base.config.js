@@ -36,8 +36,6 @@ const config = {
       duration: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/plugins/duration.js`,
       loadLazyWap: `${CDN_DOMAIN.S2}/common-static/middle/loadLazyWap/1.1.0/index.min.js`,
       VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js', // vhallUI
-      form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js',
-
       // 其他
       imageYunDun: `//cstaticdun.126.net/load.min.js?t=201903281201`,
       MiddleDomain: `http://localhost:10001/lib/middle-domain.js`
