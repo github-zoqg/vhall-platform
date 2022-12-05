@@ -562,6 +562,7 @@
         border: 1px solid var(--theme-more-status-button-border);
         background: var(--theme-more-status-button-bg);
         color: var(--theme-more-status-button-color);
+        padding: 8px 32px;
         &:hover {
           background: var(--theme-more-status-button-hover-bg);
           border: 1px solid var(--theme-more-status-button-hover-border);
