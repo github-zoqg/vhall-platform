@@ -284,11 +284,10 @@
             }
           });
         };
-        this.$confirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
+        this.$vhConfirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          roundButton: true,
-          type: 'warning'
+          roundButton: true
         })
           .then(confirmCb)
           .catch(noop);

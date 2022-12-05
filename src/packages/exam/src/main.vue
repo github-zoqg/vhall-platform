@@ -5,6 +5,8 @@
       :before-close="handleClose"
       title="快问快答"
       @open="open"
+      modal
+      :close-on-click-modal="false"
       :width="createPanel ? '1030px' : '951px'"
       custom-class="vmp-exam-dialog"
       append-to-body
@@ -62,6 +64,7 @@
       },
       handleClose() {
         this.dialogVisible = false;
+        this.componentView = 'ExamListPanel';
       },
       handleExam(flag) {
         flag ? this.open() : this.handleClose();
