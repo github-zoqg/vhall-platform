@@ -2,11 +2,11 @@
   <!-- 快问快答-答题-->
   <van-popup
     get-container="#otherPopupContainer"
-    :class="['vmp-exam-answer-wap', isExamStickTop ? 'exam-stick-top' : '']"
     v-model="examAnswerVisible"
     position="bottom"
     @close="closeDialog"
     v-if="examAnswerVisible"
+    :class="['vmp-exam-answer-wap', isExamStickTop ? 'exam-stick-top' : '']"
     :overlay="!isExamStickTop && !isPortraitLive"
     overlay-class="vmp-exam-answer-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
@@ -112,7 +112,7 @@
           boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examAnswer'])
         );
       },
-      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
+      // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnswer }"
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examAnswer': {
         handler(val) {
@@ -131,6 +131,8 @@
     methods: {
       // 关闭 快问快答 - 答题
       closeDialog() {
+        console.log('关闭快问快答-答题&show部分，icon数量--');
+        this.changeIconShowNum(false);
         this.examAnswerVisible = false;
       },
       async open(examId, answerType, source = 'default') {
@@ -168,10 +170,11 @@
         }
         console.log('当前进入的流程', examId, answerType, allowShow);
         if (!allowShow) return; // 如果不允许弹出，不弹出（比如推送的快问快答消息后，已经做过答案情况）
+        console.log('展示快问快答-答题&show部分，icon数量++');
+        this.changeIconShowNum(true);
         this.examAnswerVisible = true;
         this.zIndexServer.setDialogZIndex('examAnser');
         const roomBaseState = useRoomBaseServer().state;
-        console.log('展示弹窗。。。。');
         this.$nextTick(() => {
           // 未答题，直接答题(answerType == 'answer);已答题，查看个人成绩单结果（可以点击去查看答题结果）(answerType == 'score');
           this.examServer.mount({
@@ -221,6 +224,10 @@
         this.msgServer.$onMsg('ROOM_MSG', msg => {
           this.listenExamWatchMsg(msg, that);
         });
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
     },
     beforeCreate() {

@@ -244,6 +244,8 @@
         } else if (isAutoOpen && list.length == 1) {
           this.checkExamInfo(list[0], list);
         } else if (isAutoOpen && list.length > 1) {
+          console.log('打开快问快答-列表部分，icon数量++');
+          this.changeIconShowNum(true);
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
@@ -259,6 +261,8 @@
       },
       // 关闭 快问快答 - 列表弹出框
       closeDialog() {
+        console.log('关闭快问快答-列表部分，icon数量--');
+        this.changeIconShowNum(false);
         this.examListDialogVisible = false;
         if (this.isConcise) {
           this.roomBaseServer.setIsExamStickTop(false);
@@ -368,6 +372,10 @@
         this.msgServer.$onMsg('ROOM_MSG', msg => {
           this.listenExamWatchMsg(msg, that);
         });
+      },
+      // change icon显示数量
+      changeIconShowNum(status) {
+        this.roomBaseServer.setShowIconNum(status);
       }
     },
     beforeCreate() {
