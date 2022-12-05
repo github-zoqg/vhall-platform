@@ -328,19 +328,11 @@ export async function wxAuthCheck(to, next) {
       await roomBaseServer.getConfigList({
         webinar_id: to.params.id,
         webinar_user_id: window.sessionStorage.getItem('initGrayId'),
-        scene_id: 2 //观看端传2
-      });
-      await roomBaseServer.getDegradationConfig({
-        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
-        systemKey: 2
+        scene_id: 1
       });
 
       // 判断是否admin开启了微信授权开关
-      if (
-        roomBaseServer.state.configList &&
-        roomBaseServer.state.configList['ui.hide_wechat'] == 0
-      ) {
+      if (roomBaseServer.state.configList && roomBaseServer.state.configList['ui.hide_wechat']) {
         let address = buildLoginAddress(to);
         authWeixinAjax(to, address, _next);
       } else {

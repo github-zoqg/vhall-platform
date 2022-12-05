@@ -11,7 +11,8 @@
               <img
                 :src="webinarInfo.showImg"
                 alt
-                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+                v-parseImgOss="{ url: webinarInfo.showImg }"
+                class="invitation__img"
               />
             </div>
             <div class="watch-bg">
@@ -59,7 +60,8 @@
               <img
                 :src="webinarInfo.showImg"
                 alt
-                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+                v-parseImgOss="{ url: webinarInfo.showImg }"
+                class="invitation__img"
               />
             </div>
             <div class="look-header">
@@ -91,8 +93,9 @@
             <div class="hsrc vh-invitation__show-img">
               <img
                 :src="webinarInfo.showImg"
+                v-parseImgOss="{ url: webinarInfo.showImg }"
                 alt
-                :class="`invitation__img invitation_bg_${imageCropperMode}`"
+                class="invitation__img"
               />
             </div>
             <div class="show-img-shadow"></div>
@@ -158,7 +161,7 @@
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { getBase64Image, padStringWhenTooLang, formatDesc } from '../js/utils';
   import { bgImgOptions } from '../js/getOptions';
-  import { sleep, parseImgOssQueryString } from '@/app-shared/utils/tool';
+  import { sleep } from '@/app-shared/utils/tool';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
   import { useInviteServer } from 'middle-domain';
   import { cropperImage } from '@/app-shared/utils/common';
@@ -169,7 +172,6 @@
       return {
         isInviteVisible: false, // 是否开启邀请卡
         inited: false,
-        imageCropperMode: 1,
         // 展示添加封面背景数据
         selectBgDataInit: Object.freeze(bgImgOptions),
         webinarInfo: {
@@ -230,7 +232,6 @@
         if (this.webinarInfo.img_type == 0) {
           // 默认
           if (cropperImage(data.invite_card.img)) {
-            this.handlerImageInfo(data.invite_card.img);
             this.webinarInfo.showImg = data.invite_card.img;
           } else {
             this.webinarInfo.showImg = `${data.invite_card.img}?x-oss-process=image/resize,m_mfit,w_${screen_wid},h_${screen_height}`;
@@ -252,11 +253,6 @@
           });
         }
         this.wxShareInfo();
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
       },
       getWxShareUrl() {
         const protocol = window.location.protocol;
@@ -413,15 +409,6 @@
           .invitation__img {
             width: 100%;
             height: 100%;
-            object-fit: fill;
-            &.invitation_bg_2 {
-              object-fit: cover;
-              object-position: left top;
-            }
-            &.invitation_bg_3 {
-              object-fit: contain;
-              object-position: center;
-            }
           }
         }
         .show-img {

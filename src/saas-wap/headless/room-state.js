@@ -35,15 +35,8 @@ export default async function () {
   }
 
   const promiseList = [
-    // configList 和 黄金链路串行执行
-    roomBaseServer.getConfigList().then(async () => {
-      //黄金链路
-      await roomBaseServer.startGetDegradationInterval({
-        staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-        environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
-        systemKey: 2
-      });
-    }),
+    // configList
+    roomBaseServer.getConfigList({ scene_id: 1 }),
     //多语言接口
     roomBaseServer.getLangList(),
     roomBaseServer.getCustomRoleName(),
@@ -87,7 +80,7 @@ export default async function () {
     // 非嵌入页 微信环境 没有授权 微信授权没有关闭 不能初始化聊天
     !localStorage.getItem('unionid') &&
     isWechat() &&
-    roomBaseServer.state.configList['ui.hide_wechat'] == 0 &&
+    roomBaseServer.state.configList['ui.hide_wechat'] == 1 &&
     !roomBaseServer.state.embedObj.embed
   ) {
     return;
