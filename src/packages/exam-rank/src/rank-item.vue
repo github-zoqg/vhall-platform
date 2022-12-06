@@ -13,21 +13,18 @@
         <p class="nickname truncate m-l-12">{{ item.user_name || '--' }}</p>
       </div>
     </div>
-    <div class="score-cell">{{ item && item.rank_no > 0 ? item.score : '--' }}</div>
+    <div class="score-cell">{{ item.score }}</div>
     <div
       class="rate-cell"
       v-text="
-        item && item.rank_no > 0
-          ? item.right_rate != null && item.right_rate != undefined
-            ? Number(item.right_rate).toFixed(1) + '%'
-            : '--'
+        item.right_rate != null && item.right_rate != undefined
+          ? Number(item.right_rate).toFixed(1) + '%'
           : '--'
       "
     ></div>
-    <div class="elapsed-time-cell" v-if="item && item.rank_no > 0">
+    <div class="elapsed-time-cell">
       {{ item.use_time | fmtUseTime }}
     </div>
-    <div class="elapsed-time-cell" v-else>--</div>
   </div>
 </template>
 <script>
