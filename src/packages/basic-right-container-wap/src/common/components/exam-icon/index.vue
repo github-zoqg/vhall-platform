@@ -25,7 +25,7 @@
     <!-- 快问快答-列表弹框 -->
     <van-popup
       get-container="#otherPopupContainer"
-      :class="['exam_base', isExamStickTop ? 'exam-stick-top' : '']"
+      :class="['exam_base', isExamStickTop || isPortraitLive ? 'exam-stick-top' : '']"
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"

@@ -6,7 +6,7 @@
     position="bottom"
     @close="closeDialog"
     v-if="examAnswerVisible"
-    :class="['vmp-exam-answer-wap', isExamStickTop ? 'exam-stick-top' : '']"
+    :class="['vmp-exam-answer-wap', isExamStickTop || isPortraitLive ? 'exam-stick-top' : '']"
     :overlay="!isExamStickTop && !isPortraitLive"
     overlay-class="vmp-exam-answer-popup-overlay"
     :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examAnser }"
