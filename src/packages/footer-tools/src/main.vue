@@ -65,7 +65,7 @@
         </div>
         <vmp-air-container :cuid="childrenCom[1]" :oneself="true"></vmp-air-container>
       </li>
-      <li v-if="isLiving || isEnding">
+      <li>
         <!-- 快问快答-->
         <exam-icon @clickIcon="checkExamIcon" />
         <vmp-air-container :cuid="childrenCom[5]" :oneself="true"></vmp-air-container>
