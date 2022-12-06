@@ -33,7 +33,7 @@
     display: block;
     height: 116px;
     box-sizing: border-box;
-    padding: 36px 32px 40px 32px;
+    padding: 24px 32px 40px 32px;
     span {
       font-weight: 500;
       font-size: 28px;
