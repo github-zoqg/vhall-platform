@@ -4,6 +4,7 @@
       <!-- 快问快答 -->
       <exam-icon
         :icon-style="iconStyle"
+        v-if="webinarType == 1 || webinarType == 3"
         class="icon-wrap icon-wrap__exam"
         @clickIcon="checkExamIcon"
         @setVisible="setExamVisible"

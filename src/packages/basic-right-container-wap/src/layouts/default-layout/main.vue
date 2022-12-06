@@ -2,7 +2,11 @@
   <div class="vmp-container-right-wap" v-if="!isInGroup">
     <div class="base-box" v-show="showIcon">
       <!-- 快问快答 -->
-      <exam-icon class="icon-wrap" @clickIcon="checkExamIcon" />
+      <exam-icon
+        class="icon-wrap"
+        @clickIcon="checkExamIcon"
+        v-if="webinarType == 1 || webinarType == 3"
+      />
       <!-- 问卷 -->
       <questionnaire-icon class="icon-wrap" @clickIcon="checkQuestionnaireIcon" />
       <!-- 签到 -->
