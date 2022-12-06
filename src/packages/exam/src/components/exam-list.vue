@@ -43,23 +43,28 @@
                 {{ scope.row.title }}
               </template>
             </vh-table-column>
-            <vh-table-column label="更新时间" width="148">
+            <vh-table-column label="更新时间" width="148" show-overflow-tooltip>
               <template slot-scope="scope">
                 {{ scope.row.paper_edit_time }}
               </template>
             </vh-table-column>
-            <vh-table-column width="56" label="总分">
+            <vh-table-column width="56" label="总分" show-overflow-tooltip>
               <template slot-scope="scope">
                 {{ scope.row.total_score || '-' }}
               </template>
             </vh-table-column>
-            <vh-table-column prop="questions_count" width="56" label="题数"></vh-table-column>
-            <vh-table-column label="限时(分)" width="78">
+            <vh-table-column
+              prop="questions_count"
+              width="56"
+              label="题数"
+              show-overflow-tooltip
+            ></vh-table-column>
+            <vh-table-column label="限时(分)" width="78" show-overflow-tooltip>
               <template slot-scope="scope">
                 {{ scope.row.limit_time_switch > 0 ? scope.row.limit_time : '无' }}
               </template>
             </vh-table-column>
-            <vh-table-column label="状态" width="112">
+            <vh-table-column label="状态" width="112" show-overflow-tooltip>
               <template slot-scope="{ row }">
                 <i :class="['icon-dot', `status-${row.status}`]" />
                 {{ row.status | fmtExamStatus }}
