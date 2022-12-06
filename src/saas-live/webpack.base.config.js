@@ -29,7 +29,7 @@ const htmlConfig = {
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.3/index.js',
     MiddleDomain: '', //空值，用于占位,具体环境中需配置覆盖此项
-    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js' // vhallUI
+    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.js' // vhallUI
     // form: 'https://vhallstatic.oss-cn-beijing.aliyuncs.com/common-static/vhall-form/vhall-form-vue.js'
     // form: 'http://localhost:8000/vhall-form-vue.js'
   },
@@ -41,7 +41,7 @@ const htmlConfig = {
     iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
     overlayscrollbarsCss:
       '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css',
-    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.css'
+    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.css'
   }
 };
 

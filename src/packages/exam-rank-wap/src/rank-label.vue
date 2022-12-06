@@ -19,8 +19,8 @@
 <style lang="less">
   .rank-label {
     width: 664px;
-    height: 88px;
-    margin: 0 auto;
+    height: 40px;
+    margin: 0 auto 8px auto;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-预览-->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="body"
     class="vmp-exam-preview-wap"
     v-model="examPreviewVisible"
     position="bottom"
