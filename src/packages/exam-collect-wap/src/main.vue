@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-用户信息收集 -->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="body"
     class="vmp-exam-collect-wap"
     v-model="examCollectVisible"
     position="bottom"
