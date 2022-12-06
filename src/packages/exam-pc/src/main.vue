@@ -261,6 +261,10 @@
         font-size: 12px;
         z-index: 30;
         cursor: pointer;
+        color: #8c8c8c;
+        &:hover {
+          color: #595959;
+        }
       }
     }
     .vh-progress-bar__outer {
