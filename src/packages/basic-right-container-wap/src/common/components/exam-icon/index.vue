@@ -56,7 +56,7 @@
               :key="index"
               :class="`container-data__item ${
                 item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
-              }`"
+              } ${lang > 1 ? 'end_bg_en' : 'end_bg_cn'}`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
@@ -151,7 +151,8 @@
         examWatchState,
         zIndexServerState,
         popHeight: '680px',
-        examListDialogVisible: false // 快问快答列表-是否展示
+        examListDialogVisible: false, // 快问快答列表-是否展示
+        lang: localStorage.getItem('lang')
       };
     },
     computed: {
@@ -562,6 +563,9 @@
               background-size: 118px 118px;
               background-position: right bottom;
               background-repeat: no-repeat;
+              &.end_bg_en {
+                background-image: url('./images/exam_end_en.png');
+              }
             }
           }
         }
