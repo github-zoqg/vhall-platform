@@ -1016,7 +1016,7 @@ export default {
     exam_1043: '',
     exam_1044: 'employee ID',
     exam_1045: 'Show the top 200 results',
-    exam_1046: 'Nothing',
+    exam_1046: 'Unlimited',
     exam_1047: 'Answer',
     exam_1048: 'Sorce',
     exam_1049: 'Time',

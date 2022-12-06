@@ -41,7 +41,7 @@
     }
     .rate-cell {
       margin-left: 12px;
-      width: 54px;
+      width: 56px;
     }
     .elapsed-time-cell {
       margin-left: 12px;
