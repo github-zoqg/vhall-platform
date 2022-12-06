@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-排行榜 -->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="body"
     :class="['vmp-exam-rank-wap', isExamStickTop ? 'exam-stick-top' : '']"
     v-model="examRankVisible"
     position="bottom"

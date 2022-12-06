@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-答题-->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="body"
     v-model="examAnswerVisible"
     position="bottom"
     @close="closeDialog"
@@ -36,6 +36,7 @@
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import languages from '@/app-shared/i18n/languages';
+  import { ImagePreview } from 'vh5-ui';
   export default {
     name: 'VmpExamWap',
     data() {
@@ -198,6 +199,32 @@
             this.examServer.examInstance.events['SUBMITANSWER'],
             this.changeDotVisible
           );
+          this.examServer.examInstance.$on('PREVIEW', this.previewImg);
+        });
+      },
+      //图片预览
+      previewImg(...args) {
+        if ((Array.isArray(args[1]) && !args[1].length) || args[0] < 0) {
+          return;
+        }
+        const newList = JSON.parse(JSON.stringify(args[1]));
+        const clientW = document.body.clientWidth;
+        const clientH = document.body.clientHeight;
+        const ratio = 2;
+        for (let i = 0; i < newList.length; i++) {
+          if (newList[i].indexOf('?x-oss-process=image/resize') < 0) {
+            newList[i] += `?x-oss-process=image/resize,w_${clientW * ratio},h_${
+              clientH * ratio
+            },m_lfit`;
+          }
+        }
+        console.log('preview', newList);
+        ImagePreview({
+          images: newList,
+          startPosition: args[0],
+          lazyLoad: true,
+          loop: false,
+          getContainer: '.vmp-exam-answer-wap'
         });
       },
       changeDotVisible() {
@@ -243,6 +270,7 @@
     },
     beforeDestroy() {
       this.examServer?.examInstance?.$off(this.examServer?.examInstance?.events['SUBMITANSWER']);
+      this.examServer?.examInstance?.$off('PREVIEW');
     }
   };
 </script>
