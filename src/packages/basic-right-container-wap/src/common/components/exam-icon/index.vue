@@ -212,6 +212,17 @@
             });
           }
         }
+      },
+      // 打开快问快答-答题弹窗(全屏,视频需要改为小窗)
+      examAnswerVisible(val) {
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(val);
+          this.roomBaseServer.setStickType(val ? 'examList' : '');
+        }
+        console.log('吸顶之后，触发动作呀');
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examList'])
+        );
       }
     },
     methods: {
@@ -548,7 +559,7 @@
               }
               div {
                 span {
-                  padding: 0 16px;
+                  padding: 0 16px 0 0;
                 }
                 &:last-child {
                   span {
