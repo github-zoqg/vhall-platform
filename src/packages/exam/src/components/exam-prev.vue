@@ -50,7 +50,8 @@
           configs: {
             role: 1,
             pageSize: 1,
-            answerType: '1'
+            answerType: '1',
+            preview: true
           }
         });
       }

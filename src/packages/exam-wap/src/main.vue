@@ -190,7 +190,8 @@
                 userName: this.joinInfo?.nickname || '',
                 headImg: this.joinInfo?.avatar || '',
                 mobile: this.joinInfo?.phone || ''
-              }
+              },
+              preview: true
             }
           });
           this.examServer.examInstance.$on(
