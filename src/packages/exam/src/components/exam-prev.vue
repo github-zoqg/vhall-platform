@@ -146,6 +146,9 @@
     .vh-dialog__body {
       padding: 0 !important;
     }
+    .exam-execute-footer {
+      border-radius: 0 0 12px 12px;
+    }
     .vmp-transcripts {
       &.vmp-transcripts-other {
         // 百分比 or 正确率
