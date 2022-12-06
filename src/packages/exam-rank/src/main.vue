@@ -11,15 +11,7 @@
       :part-block="true"
       :z-index="zIndexServerState.zIndexMap.examRank"
     >
-      <vh-tooltip
-        class="vh-dialog__title rank-max-title"
-        slot="title"
-        effect="dark"
-        :content="examTitle"
-        placement="top-end"
-      >
-        <span>{{ examTitle }}</span>
-      </vh-tooltip>
+      <span class="rank-max-title" slot="title">{{ examTitle }}</span>
       <div class="vmp-rank-watch">
         <RankTitleWatch />
         <div
@@ -36,7 +28,10 @@
             </li>
           </ul>
         </div>
-        <div class="self-rank" v-if="ownerData">
+        <div
+          :class="`self-rank ${rankList && rankList.length > 6 ? 'is-scroll' : ''}`"
+          v-if="ownerData"
+        >
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom" v-if="total > queryParams.limit">
@@ -309,6 +304,9 @@
       margin: 0 24px;
       background: linear-gradient(90.57deg, #eddeff -8.43%, #e9f5ff 118.78%);
       border-radius: 4px;
+      &.is-scroll {
+        max-width: 324px;
+      }
     }
     .vh-pagination {
       padding: 16px 0;
