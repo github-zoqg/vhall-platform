@@ -83,7 +83,7 @@
                   <span v-if="item.limit_time_switch == 1">
                     {{ item.limit_time > 9 ? item.limit_time : `0${item.limit_time}:00` }}
                   </span>
-                  <span v-else>{{ $t('exam.exam_1006') }}</span>
+                  <span v-else>{{ $t('exam.exam_1046') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1025')}:`"></label>
@@ -456,7 +456,7 @@
               }
               &:last-child {
                 span {
-                  padding: 0 0 0 8px;
+                  padding: 0 0;
                 }
               }
             }
