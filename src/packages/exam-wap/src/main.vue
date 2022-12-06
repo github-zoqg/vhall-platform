@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-答题-->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="body"
     v-model="examAnswerVisible"
     position="bottom"
     @close="closeDialog"
@@ -223,7 +223,8 @@
           images: newList,
           startPosition: args[0],
           lazyLoad: true,
-          loop: false
+          loop: false,
+          getContainer: '.vmp-exam-answer-wap'
         });
       },
       changeDotVisible() {

@@ -1,7 +1,7 @@
 <template>
   <!-- 快问快答-成绩结果 -->
   <van-popup
-    get-container="#otherPopupContainer"
+    get-container="app"
     class="vmp-exam-score-wap"
     v-model="examScoreVisible"
     position="bottom"
