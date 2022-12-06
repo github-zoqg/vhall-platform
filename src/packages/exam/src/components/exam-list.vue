@@ -292,7 +292,8 @@
         this.$vhConfirm('公布成绩后观众将会收到成绩排行榜，确定公布？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          roundButton: true
+          roundButton: true,
+          closeOnClickModal: false
         })
           .then(confirmCb)
           .catch(noop);
@@ -363,7 +364,8 @@
         this.$vhConfirm('收卷后将不能继续答卷，确定收卷？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          roundButton: true
+          roundButton: true,
+          closeOnClickModal: false
         })
           .then(confirmCb)
           .catch(noop);
