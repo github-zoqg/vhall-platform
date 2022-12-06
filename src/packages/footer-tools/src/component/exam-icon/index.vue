@@ -3,8 +3,14 @@
     class="vmp-exam-icon"
     v-if="examWatchState.dotVisible || (examWatchResult && examWatchResult.total > 0)"
   >
-    <img src="./images/exam.png" class="show_img" alt="" @click="throttleCheckExam" />
-    <i class="vmp-dot" v-if="examWatchState.dotVisible" />
+    <img
+      src="./images/exam.png"
+      class="show_img"
+      alt=""
+      @click="throttleCheckExam"
+      v-if="isLiving || isEnding"
+    />
+    <i class="vmp-dot" v-if="examWatchState.dotVisible && (isLiving || isEnding)" />
     <!-- 快问快答-列表弹框 -->
     <vh-dialog
       custom-class="exam_base"
@@ -31,7 +37,7 @@
               :key="index"
               :class="`container-data__item ${
                 item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
-              }`"
+              } ${lang > 1 ? 'end_bg_en' : 'end_bg_cn'}`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
@@ -119,7 +125,8 @@
         examWatchState,
         zIndexServerState,
         dotVisible: false,
-        examListDialogVisible: false
+        examListDialogVisible: false,
+        lang: localStorage.getItem('lang')
       };
     },
     computed: {
@@ -128,6 +135,14 @@
       },
       examWatchResult() {
         return this.examServer.state.examWatchResult;
+      },
+      // 是否正在直播
+      isLiving() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 1;
+      },
+      // 是否结束直播
+      isEnding() {
+        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.type == 3;
       }
     },
     watch: {
@@ -467,6 +482,9 @@
             background-size: 35px 35px;
             background-position: right bottom;
             background-repeat: no-repeat;
+            &.end_bg_en {
+              background-image: url('./images/exam_end_en.png');
+            }
           }
           &:last-child {
             margin-bottom: 24px;
