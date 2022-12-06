@@ -233,7 +233,7 @@ export default {
   '--theme-more-status-button-active-bg': 'rgba(148, 110, 58, 1)',
   '--theme-more-status-button-active-border': 'rgba(148, 110, 58, 1)',
   '--theme-more-status-button-active-color': '#ffffff',
-  '--theme-more-status-button-disabled-bg': 'rgba(255, 252, 240, 1)',
-  '--theme-more-status-button-disabled-border': 'rgba(255, 252, 240, 1)',
+  '--theme-more-status-button-disabled-bg': 'rgba(250, 236, 202, 1)',
+  '--theme-more-status-button-disabled-border': 'rgba(250, 236, 202, 1)',
   '--theme-more-status-button-disabled-color': '#ffffff'
 };

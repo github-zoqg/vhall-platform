@@ -56,7 +56,7 @@
               :key="index"
               :class="`container-data__item ${
                 item && item.is_end == 1 && item.status == 0 ? 'button_end_bg' : ''
-              }`"
+              } ${lang > 1 ? 'end_bg_en' : 'end_bg_cn'}`"
               @click="checkExamInfo(item)"
             >
               <div class="container-data__title">
@@ -108,7 +108,7 @@
                   <span v-if="item.limit_time_switch == 1">
                     {{ item.limit_time > 9 ? item.limit_time : `0${item.limit_time}:00` }}
                   </span>
-                  <span v-else>{{ $t('exam.exam_1006') }}</span>
+                  <span v-else>{{ $t('exam.exam_1046') }}</span>
                 </div>
                 <div>
                   <label v-text="`${$t('exam.exam_1025')}:`"></label>
@@ -151,7 +151,8 @@
         examWatchState,
         zIndexServerState,
         popHeight: '680px',
-        examListDialogVisible: false // 快问快答列表-是否展示
+        examListDialogVisible: false, // 快问快答列表-是否展示
+        lang: localStorage.getItem('lang')
       };
     },
     computed: {
@@ -211,6 +212,17 @@
             });
           }
         }
+      },
+      // 打开快问快答-答题弹窗(全屏,视频需要改为小窗)
+      examAnswerVisible(val) {
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(val);
+          this.roomBaseServer.setStickType(val ? 'examList' : '');
+        }
+        console.log('吸顶之后，触发动作呀');
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examList'])
+        );
       }
     },
     methods: {
@@ -547,7 +559,7 @@
               }
               div {
                 span {
-                  padding: 0 16px;
+                  padding: 0 16px 0 0;
                 }
                 &:last-child {
                   span {
@@ -562,6 +574,9 @@
               background-size: 118px 118px;
               background-position: right bottom;
               background-repeat: no-repeat;
+              &.end_bg_en {
+                background-image: url('./images/exam_end_en.png');
+              }
             }
           }
         }

@@ -1,12 +1,15 @@
 <template>
-  <div class="vmp-exam-prev-live">
+  <div>
     <vh-dialog
       v-if="dialogVisible"
       :visible.sync="dialogVisible"
-      :modal="false"
+      :close-on-click-modal="false"
       width="380px"
       draggable
+      modal
+      class="vmp-exam-prev-live"
       custom-class="vmp-exam-prev-live-dialog"
+      append-to-body
     >
       <div class="vh-dialog-title" slot="title"></div>
       <div v-if="dialogVisible" class="content webkit-scrollbar">
