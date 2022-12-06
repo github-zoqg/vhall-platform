@@ -307,6 +307,8 @@
       top: 44px;
       box-sizing: border-box;
       margin: 0 24px;
+      background: linear-gradient(90.57deg, #eddeff -8.43%, #e9f5ff 118.78%);
+      border-radius: 4px;
     }
     .vh-pagination {
       padding: 16px 0;
