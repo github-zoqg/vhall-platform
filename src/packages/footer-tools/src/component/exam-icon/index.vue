@@ -482,6 +482,9 @@
             background-size: 35px 35px;
             background-position: right bottom;
             background-repeat: no-repeat;
+            &.end_bg_en {
+              background-image: url('./images/exam_end_en.png');
+            }
           }
           &:last-child {
             margin-bottom: 24px;
