@@ -1,24 +1,34 @@
 <template>
-  <!-- 快问快答-pc答题-->
-  <vh-dialog
-    title=""
-    :visible.sync="examAnswerVisible"
-    width="380px"
-    custom-class="vmp-exam-answer"
-    :close-on-click-modal="true"
-    :show-close="false"
-    v-if="examAnswerVisible"
-    draggable
-    :modal="false"
-    :part-block="true"
-    :z-index="zIndexServerState.zIndexMap.examAnswer"
-  >
-    <span slot="title" class="dialog-header take--place">&nbsp;</span>
-    <div :class="`exam-core__container exam-theme--${theme}`">
-      <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
-      <div id="examAnswer"></div>
-    </div>
-  </vh-dialog>
+  <div>
+    <!-- 快问快答-pc答题-->
+    <vh-dialog
+      title=""
+      :visible.sync="examAnswerVisible"
+      width="380px"
+      custom-class="vmp-exam-answer"
+      :close-on-click-modal="true"
+      :show-close="false"
+      v-if="examAnswerVisible"
+      draggable
+      :modal="false"
+      :part-block="true"
+      :z-index="zIndexServerState.zIndexMap.examAnswer"
+    >
+      <span slot="title" class="dialog-header take--place">&nbsp;</span>
+      <div :class="`exam-core__container exam-theme--${theme}`">
+        <i class="vh-iconfont vh-line-close exam-close" @click="closeDialog"></i>
+        <div id="examAnswer"></div>
+      </div>
+    </vh-dialog>
+    <!-- 图片预览区域 -->
+    <img-preview
+      ref="imgPreview"
+      v-if="imgPreviewVisible"
+      :images="previewImgList"
+      :zIndex="zIndexServerState.zIndexMap.examAnswer + 1"
+      @closeImgPreview="onClosePreviewImg"
+    ></img-preview>
+  </div>
 </template>
 <script>
   import {
@@ -29,8 +39,13 @@
     useRoomBaseServer
   } from 'middle-domain';
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
+  import ImgPreview from '@/packages/img-preview-pc/main.vue';
+  import { cl_previewImg } from '@/app-shared/client/client-methods.js';
   export default {
     name: 'VmpExamPc',
+    components: {
+      ImgPreview
+    },
     data() {
       const examWatchState = this.examServer.state;
       const zIndexServerState = this.zIndexServer.state;
@@ -39,7 +54,9 @@
         examWatchState,
         examAnswerVisible: false, // 快问快答 - 答题
         examId: null,
-        defaultAvatar
+        defaultAvatar,
+        previewImgList: [], // 预览图片集合
+        imgPreviewVisible: false // 是否打开预览图片弹窗
       };
     },
     computed: {
@@ -136,7 +153,28 @@
             this.examServer.examInstance.events['SUBMITANSWER'],
             this.changeDotVisible
           );
+          this.examServer.examInstance.$on('PREVIEW', this.previewImg);
         });
+      },
+      /**
+       * 聊天图片预览
+       * */
+      // 预览聊天图片
+      previewImg(...args) {
+        // //处理掉图片携带的查询参数，只保留主要链接
+        this.previewImgList = args[1] || [];
+        if (this.$route.query.assistantType) {
+          cl_previewImg({ list: this.previewImgList, index: args[0] });
+          return;
+        }
+        this.imgPreviewVisible = true;
+        this.$nextTick(() => {
+          this.$refs.imgPreview.jumpToTargetImg(args[0]);
+        });
+      },
+      //关闭预览图片弹窗之后的处理
+      onClosePreviewImg() {
+        this.imgPreviewVisible = false;
       },
       changeDotVisible() {
         this.examServer.getExamPublishList({});
@@ -176,6 +214,7 @@
     },
     beforeDestroy() {
       this.examServer?.examInstance?.$off(this.examServer?.examInstance?.events['SUBMITANSWER']);
+      this.examServer?.examInstance?.$off('PREVIEW');
     }
   };
 </script>
