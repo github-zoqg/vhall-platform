@@ -29,7 +29,7 @@ const htmlConfig = {
     // 自开发依赖
     MiddleEventSdk: '//s2.e.vhall.com/common-static/middle/middle-event-sdk/0.3.3/index.js',
     MiddleDomain: '',
-    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.js' // vhallUI
+    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.js' // vhallUI
   },
   // cdn css
   cdnCss: {
@@ -39,7 +39,7 @@ const htmlConfig = {
     iconfont: '//s3.e.vhall.com/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css',
     overlayscrollbarsCss:
       '//s3.e.vhall.com/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css',
-    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2-beta/index.css'
+    VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.css'
   }
 };
 
