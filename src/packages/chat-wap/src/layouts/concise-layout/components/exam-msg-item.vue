@@ -183,4 +183,15 @@
       }
     }
   }
+  .isPortraitLive {
+    .vmp-chat-wap-msg-item-concise {
+      .exam_msg_flex {
+        .exam_msg_bg.exam_title {
+          .highlight {
+            color: rgba(255, 255, 255, 0.65);
+          }
+        }
+      }
+    }
+  }
 </style>
