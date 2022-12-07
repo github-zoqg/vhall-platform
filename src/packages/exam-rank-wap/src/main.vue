@@ -264,6 +264,8 @@
 
   .vmp-exam-rank-wap {
     height: 844px;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
     background: transparent;
     background: url(https://s3.e.vhall.com/common-static/vhall-form/images/bg_exam_list.png)
       no-repeat;
@@ -327,9 +329,16 @@
       width: 100%;
       left: 0;
       bottom: 0;
+      bottom: constant(safe-area-inset-bottom);
+      bottom: env(safe-area-inset-bottom);
       z-index: 2;
       background: #f5f5f5;
     }
+    // @supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)) {
+    //   .dialog-bottom {
+    //     bottom: calc(env(safe-area-inset-bottom) !important;
+    //   }
+    // }
     .self-rank {
       padding: 0 24px;
     }
