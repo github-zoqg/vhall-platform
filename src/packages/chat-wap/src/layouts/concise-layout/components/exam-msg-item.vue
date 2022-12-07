@@ -34,10 +34,10 @@
       </template>
       <!-- 快问快答-自动收卷 -->
       <template v-else-if="source.type == 'paper_auto_end'">
-        <div class="interact-msg exam_msg_bg">
+        <div class="interact-msg exam_msg_bg paper_auto_end">
           {{ source.content.text_content }}
         </div>
-        <div class="exam_msg_bg exam_title">
+        <div class="exam_msg_bg exam_title paper_auto_end">
           <span>《{{ overHidden(source.content.exam_title, 22) }}》</span>
         </div>
       </template>
@@ -188,7 +188,8 @@
       .exam_msg_flex {
         .exam_msg_bg.exam_title {
           color: rgba(255, 255, 255, 0.65);
-          .highlight {
+          .highlight,
+          span {
             color: rgba(255, 255, 255, 0.65);
           }
         }
