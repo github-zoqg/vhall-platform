@@ -27,7 +27,7 @@
             <br />
             4、口令抽奖：开始抽奖后，观众收到抽奖提示，需要输入
             <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;主办方指定的口令后才能参抽奖
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;主办方指定的口令后才能参与抽奖
           </div>
         </el-tooltip>
       </el-form-item>

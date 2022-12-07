@@ -203,7 +203,7 @@
       },
       //是否显示全体禁言复选框
       showBannedCheckbox() {
-        return [1, '1'].includes(this.configList['ui.is_show_estoppel']);
+        return this.configList['ui.is_show_estoppel'];
       }
     },
     props: {

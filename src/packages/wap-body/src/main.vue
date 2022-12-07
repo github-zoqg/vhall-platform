@@ -13,7 +13,8 @@
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd && !isPortraitLive && !embedVideo"
-      :class="`vmp-wap-body-ending ending_bg_${imageCropperMode}`"
+      class="vmp-wap-body-ending"
+      v-parseImgOss="{ type: 'bg', url: home_bg_user }"
       :style="`backgroundImage: url('${webinarsBgImg}')`"
     >
       <div class="vmp-wap-body-ending-box">
@@ -125,7 +126,7 @@
   } from 'middle-domain';
   import move from './js/move';
   import masksliding from './components/mask.vue';
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   import { cropperImage } from '@/app-shared/utils/common';
   import alertBox from '@/app-shared/components/confirm.vue';
   export default {
@@ -138,7 +139,6 @@
     data() {
       return {
         childrenComp: [],
-        imageCropperMode: 1,
         isLivingEnd: false,
         mini: false,
         isShowLiveStartNotice: false,
@@ -244,7 +244,6 @@
         const img_url = this.$domainStore.state.roomBaseServer.watchInitData.webinar.img_url;
         if (img_url) {
           if (cropperImage(img_url)) {
-            this.handlerImageInfo(img_url);
             return img_url;
           } else {
             return `${img_url}?x-oss-process=image/resize,m_fill,w_828,h_466`;
@@ -454,16 +453,6 @@
           this.$toast(this.$t('interact.interact_1040'));
         }
       },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        this.$nextTick(() => {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
-          );
-        });
-      },
       // 重置互动SDK实例
       async resetInteractive() {
         await this.interactiveServer.destroy();
@@ -559,20 +548,12 @@
     }
     &-ending {
       background-repeat: no-repeat;
-      background-size: 100% 100%;
       width: 100%;
       height: 100%;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 20;
-      &.ending_bg_2 {
-        background-size: cover;
-        background-position: left top;
-      }
-      &.ending_bg_3 {
-        background-size: contain;
-      }
       &-box {
         width: 100%;
         height: 100%;

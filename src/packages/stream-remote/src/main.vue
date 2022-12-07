@@ -274,7 +274,7 @@
   import { calculateAudioLevel, calculateNetworkStatus } from '@/app-shared/utils/stream-utils';
   import { cropperImage } from '@/app-shared/utils/common';
   import SaasAlert from '@/packages/pc-alert/src/alert.vue';
-  import { boxEventOpitons, parseImgOssQueryString } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons } from '@/app-shared/utils/tool.js';
   export default {
     name: 'VmpStreamRemote',
     data() {
@@ -453,7 +453,6 @@
           this.isShowNetError = true;
         }
       }, 5000);
-      this.handlerImageInfo();
     },
     mounted() {},
     beforeDestroy() {
@@ -490,15 +489,6 @@
       // 关闭弹窗
       closeConfirm() {
         this.popAlert.visible = false;
-      },
-      // 解析图片地址
-      handlerImageInfo() {
-        if (cropperImage(this.coverImgUrl)) {
-          let obj = parseImgOssQueryString(this.coverImgUrl);
-          this.coverImageMode = Number(obj.mode) || 3;
-        } else {
-          this.coverImageMode = 3;
-        }
       },
       listenEvents() {
         this.micServer.$on('live_over', () => {
@@ -1086,17 +1076,6 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-      }
-      &-1 {
-        object-fit: fill;
-      }
-      &-2 {
-        object-fit: cover;
-        object-position: left top;
-      }
-      &-3 {
-        object-fit: contain;
-        object-position: center;
       }
       p {
         width: 72px;

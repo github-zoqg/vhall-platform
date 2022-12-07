@@ -249,15 +249,15 @@
         let noChatLogin = false;
         if (isWechat()) {
           /**
-           * ui.hide_wechat: 0使用微信授权 1不适用微信授权
+           * ui.hide_wechat: 1使用微信授权 0不适用微信授权
            */
-          if ([1, '1'].includes(this.configList['ui.hide_wechat'])) {
-            noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          if (!this.configList['ui.hide_wechat']) {
+            noChatLogin = this.configList['ui.show_chat_without_login'];
           } else {
             noChatLogin = true;
           }
         } else {
-          noChatLogin = [1, '1'].includes(this.configList['ui.show_chat_without_login']);
+          noChatLogin = this.configList['ui.show_chat_without_login'];
         }
         return noChatLogin;
       },
@@ -295,7 +295,7 @@
       isMuted() {
         return (
           (this.webinar.type == 5 || this.webinar.type == 4) &&
-          this.configList['ui.watch_record_no_chatting'] === 1
+          this.configList['ui.watch_record_no_chatting']
         );
       },
       avatar() {
@@ -355,12 +355,14 @@
       this.eventListener();
 
       useMicServer().$on('vrtc_connect_open', msg => {
-        !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
+        // 7.7.4 优化后不再提示
+        // !this.hideItem && this.$toast(this.$t('interact.interact_1003'));
         this.connectMicShow = true;
       });
 
       useMicServer().$on('vrtc_connect_close', msg => {
-        !this.hideItem && this.$toast(this.$t('interact.interact_1002'));
+        // 7.7.4 优化后不再提示
+        // !this.hideItem && this.$toast(this.$t('interact.interact_1002'));
         this.connectMicShow = false;
       });
       window.chat = this;

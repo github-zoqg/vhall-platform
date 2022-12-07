@@ -104,15 +104,18 @@
       });
       // 用户成功下麦
       useMicServer().$on('vrtc_disconnect_success', msg => {
-        this.$message.warning(this.$t('interact.interact_1028'));
+        // 7.7.4 优化后不再提示
+        // this.$message.warning(this.$t('interact.interact_1028'));
       });
       // 主播端开启 举手按钮
       useMicServer().$on('vrtc_connect_open', msg => {
-        this.$message.success(this.$t('interact.interact_1003'));
+        // 7.7.4 优化后不再提示
+        // this.$message.success(this.$t('interact.interact_1003'));
       });
       // 主播端关闭 举手按钮
       useMicServer().$on('vrtc_connect_close', msg => {
-        this.$message.success(this.$t('interact.interact_1002'));
+        // 7.7.4 优化后不再提示
+        // this.$message.success(this.$t('interact.interact_1002'));
       });
       //监听禁言通知
       useChatServer().$on('banned', res => {
@@ -157,29 +160,36 @@
     },
     methods: {
       // 下麦
-      async speakOff() {
-        // 用户下麦
-        window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
-        this.loading = true;
-        try {
-          const res = await useMicServer().speakOff();
-          if (res.code === 513035) {
-            this.$message.error(res.msg);
+      speakOff() {
+        this.$confirm(this.$t('interact.interact_1043'), this.$t('account.account_1061'), {
+          confirmButtonText: this.$t('other.other_1027'),
+          cancelButtonText: this.$t('other.other_1028'),
+          customClass: 'zdy-message-box',
+          cancelButtonClass: 'zdy-confirm-cancel'
+        }).then(async () => {
+          // 用户下麦
+          window.vhallReportForProduct.toStartReporting(170002, [170003, 170033, 110193, 110185]);
+          this.loading = true;
+          try {
+            const res = await useMicServer().speakOff();
+            if (res.code === 513035) {
+              this.$message.error(res.msg);
+            }
+            this.loading = false;
+            window.vhallReportForProduct.toResultsReporting(170003, {
+              event_type: 'interface',
+              failed_reason: res,
+              request_id: res.request_id
+            });
+          } catch (error) {
+            this.loading = false;
+            window.vhallReportForProduct.toResultsReporting(170003, {
+              event_type: 'interface',
+              failed_reason: error,
+              request_id: error.request_id
+            });
           }
-          this.loading = false;
-          window.vhallReportForProduct.toResultsReporting(170003, {
-            event_type: 'interface',
-            failed_reason: res,
-            request_id: res.request_id
-          });
-        } catch (error) {
-          this.loading = false;
-          window.vhallReportForProduct.toResultsReporting(170003, {
-            event_type: 'interface',
-            failed_reason: error,
-            request_id: error.request_id
-          });
-        }
+        });
       },
       // 举手按钮点击事件
       async handleHandClick() {
@@ -273,12 +283,13 @@
             this.isApplyed = false;
             this.waitInterval && clearInterval(this.waitInterval);
             this.btnText = this.$t('interact.interact_1041');
-            this.$message({
-              message: this.$t('interact.interact_1027'),
-              showClose: true,
-              type: 'success',
-              customClass: 'zdy-info-box'
-            });
+            // 7.7.4 优化后不再提示
+            // this.$message({
+            //   message: this.$t('interact.interact_1027'),
+            //   showClose: true,
+            //   type: 'success',
+            //   customClass: 'zdy-info-box'
+            // });
             // 数据上报，场景：取消连麦邀请上报接口
             window.vhallReportForProduct.toResultsReporting(170007, {
               event_type: 'interface',
@@ -308,7 +319,7 @@
 
             let tip = '';
             if (this.isInGroup) {
-              tip = '组长拒绝了您的上麦请求';
+              tip = '组长未响应您的上麦申请';
             } else {
               tip = this.$t('other.other_1006');
             }

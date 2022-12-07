@@ -527,7 +527,7 @@
 
         // 接收设为主画面消息  主直播间
         this.micServer.$on('vrtc_big_screen_set', msg => {
-          this.setBigScreen(msg);
+          this.joinInfo.role_name != 2 && this.setBigScreen(msg);
         });
 
         // 接收设为主画面消息   组内
@@ -537,7 +537,7 @@
 
         // 接收设为主讲人消息
         this.micServer.$on('vrtc_speaker_switch', msg => {
-          this.setBigScreen(msg);
+          this.joinInfo.role_name != 2 && this.setBigScreen(msg);
         });
 
         // 下麦成功 - 移除BScroll
