@@ -132,8 +132,9 @@
           background: rgba(0, 0, 0, 0.25);
           border-radius: 30px;
           padding: 11px 12px;
-          margin: 0 32px 24px 32px;
+          margin: 0 0 24px 32px;
           width: calc(100% - 64px);
+          max-width: 520px;
         }
         .interact-msg {
           &.exam_msg_bg {
