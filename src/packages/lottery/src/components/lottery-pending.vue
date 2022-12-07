@@ -105,7 +105,7 @@
       },
       // 口令抽奖是否需要登录状态
       needLoginStatus() {
-        if (this.configList && this.configList['ui.show_chat_without_login'] == '0') {
+        if (this.configList && !this.configList['ui.show_chat_without_login']) {
           //
           if (this.joinUserId !== 0 || this.isEmbed) {
             // 当前为嵌入页或已登录

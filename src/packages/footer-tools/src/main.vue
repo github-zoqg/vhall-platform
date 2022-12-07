@@ -91,8 +91,7 @@
         <vmp-air-container :cuid="childrenCom[4]" :oneself="true"></vmp-air-container>
         <!-- 红包 -->
       </li>
-      <!-- TODO:支付牌照问题 -->
-      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts'] == '0'">
+      <li v-if="showGiftIcon && roomBaseState.configList['ui.hide_gifts']">
         <!-- 礼物 -->
         <div class="vh-gifts-wrap">
           <img
@@ -122,7 +121,7 @@
           <reward ref="reward" />
         </div>
       </li> -->
-      <li v-if="roomBaseState.configList['ui.watch_hide_like'] == '0'">
+      <li v-if="roomBaseState.configList['ui.watch_hide_like']">
         <!-- 点赞 -->
         <praise></praise>
       </li>
@@ -249,7 +248,7 @@
       },
       // 是否开启视频轮巡
       isVideoPolling() {
-        return this.roomBaseServer.state.configList['video_polling'] == 1;
+        return this.roomBaseServer.state.configList['video_polling'];
       },
       // 是否开启视频轮巡
       hasVideoPollingStart() {

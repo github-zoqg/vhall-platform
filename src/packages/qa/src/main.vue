@@ -312,7 +312,7 @@
         }
         const isVod =
           (this.watchInitData.webinar.type == 5 || this.watchInitData.webinar.type == 4) &&
-          this.configList['ui.watch_record_no_chatting'] == 1;
+          this.configList['ui.watch_record_no_chatting'];
         // 判断控制台回放禁言状态
         if (isVod) {
           this.inputStatus.disable = true;

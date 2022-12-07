@@ -10,8 +10,8 @@
       >
         <div class="vh-chose-active-item__cover">
           <img
-            class="cover_pic"
-            :class="`img_box_bg box_bg_${item.itemMode}`"
+            class="cover_pic img_box_bg"
+            v-parseImgOss="{ url: item.img_url }"
             :src="item.img_url"
             alt=""
           />
@@ -52,8 +52,6 @@
 </template>
 <script>
   import { useCustomMenuServer, useRoomBaseServer } from 'middle-domain';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool.js';
-  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     props: ['checkedList'],
     data() {
@@ -67,7 +65,7 @@
         return this.watchInitData.join_info.third_party_user_id;
       },
       hasDelayPermission() {
-        return this.roomBaseServer.state.configList['no.delay.webinar'] == 1;
+        return this.roomBaseServer.state.configList['no.delay.webinar'];
       },
       isSubscribe() {
         return this.roomBaseServer.state.watchInitData.status === 'subscribe';
@@ -143,23 +141,9 @@
             this.lock = true;
             this.total = 0;
           } else {
-            this.activeList = res.data.list.map(item => {
-              let mode = 1;
-              if (cropperImage(item.img_url)) {
-                mode = this.handlerImageInfo(item.img_url);
-              }
-              return {
-                ...item,
-                itemMode: mode
-              };
-            });
+            this.activeList = res.data.list;
           }
         }
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        return Number(obj.mode);
       }
     }
   };
@@ -213,13 +197,6 @@
         border-radius: 4px;
         object-fit: contain;
         object-position: center;
-        &.box_bg_1 {
-          object-fit: fill;
-        }
-        &.box_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
       }
       &-status {
         position: absolute;
@@ -368,17 +345,6 @@
         transition: all 0.3s;
         &:hover {
           transform: scale(1.2);
-        }
-        &.box_bg_1 {
-          object-fit: fill;
-        }
-        &.box_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
-        &.box_bg_3 {
-          object-fit: contain;
-          object-position: center;
         }
       }
       &-status {

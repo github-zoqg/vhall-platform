@@ -478,7 +478,7 @@
         // 控制台配置回放禁言状态
         if (
           (this.playerType == 5 || this.playerType == 4) &&
-          this.configList['ui.watch_record_no_chatting'] == 1
+          this.configList['ui.watch_record_no_chatting']
         ) {
           placeholder = this.$t('chat.chat_1079');
           disable = true;
