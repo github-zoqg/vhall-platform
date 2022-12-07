@@ -156,7 +156,11 @@
         this.examItem = examItem;
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$toast(this.$t('exam.exam_1010'));
+          this.$toast({
+            message: this.$t('exam.exam_1010'),
+            // duration: 0,
+            className: 'exam-toast'
+          });
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.viewExamDom(examId, 'show', source != 'event');
@@ -195,11 +199,15 @@
               preview: true
             }
           });
+          // 提交成功，改变小红点
           this.examServer.examInstance.$on(
             this.examServer.examInstance.events['SUBMITANSWER'],
             this.changeDotVisible
           );
+          // 图片预览
           this.examServer.examInstance.$on('PREVIEW', this.previewImg);
+          // 关闭面板
+          this.examServer.examInstance.$on('CLOSEPANNEL', this.closeDialog);
         });
       },
       //图片预览
@@ -271,6 +279,7 @@
     beforeDestroy() {
       this.examServer?.examInstance?.$off(this.examServer?.examInstance?.events['SUBMITANSWER']);
       this.examServer?.examInstance?.$off('PREVIEW');
+      this.examServer?.examInstance?.$off('CLOSEPANNEL');
     }
   };
 </script>
@@ -294,6 +303,10 @@
       height: calc(100% - 422px);
       bottom: 0;
       top: auto;
+      .exam-execute-body {
+        height: calc(100% - 100px) !important;
+        max-height: calc(100% - 100px) !important;
+      }
     }
     .exam-core__container {
       width: 100%;

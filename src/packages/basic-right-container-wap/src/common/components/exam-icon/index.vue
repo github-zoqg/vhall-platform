@@ -25,11 +25,16 @@
     <!-- 快问快答-列表弹框 -->
     <van-popup
       get-container="#otherPopupContainer"
-      :class="['exam_base', isExamStickTop || isPortraitLive ? 'exam-stick-top' : '']"
       v-model="examListDialogVisible"
       position="bottom"
       @close="closeDialog"
-      :overlay="!isExamStickTop && !isPortraitLive"
+      v-if="examListDialogVisible"
+      :class="[
+        'exam_base',
+        isExamStickTop || isPortraitLive ? 'exam-stick-top' : '',
+        `aaa-${isExamStickTop}`
+      ]"
+      :overlay="!isExamStickTop"
       overlay-class="vmp-exam-list-popup-overlay"
       :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       :style="{ zIndex: zIndexServerState.zIndexMap.examList }"
@@ -198,6 +203,18 @@
         },
         deep: true
       },
+      // 打开快问快答-列表弹窗(全屏,视频需要改为小窗)
+      examListDialogVisible(val) {
+        if (this.isConcise) {
+          this.roomBaseServer.setIsExamStickTop(val);
+          this.roomBaseServer.setStickType(val ? 'examList' : '');
+        }
+        console.log('吸顶之后，触发动作呀', val);
+        this.$emit('setVisible', {
+          examVisible: !!this.examListDialogVisible,
+          zIndexType: 'examList'
+        });
+      },
       // :overlay-style="{ zIndex: zIndexServerState.zIndexMap.examList }"
       // 无法动态更改zIndex
       'zIndexServerState.zIndexMap.examList': {
@@ -212,17 +229,6 @@
             });
           }
         }
-      },
-      // 打开快问快答-答题弹窗(全屏,视频需要改为小窗)
-      examAnswerVisible(val) {
-        if (this.isConcise) {
-          this.roomBaseServer.setIsExamStickTop(val);
-          this.roomBaseServer.setStickType(val ? 'examList' : '');
-        }
-        console.log('吸顶之后，触发动作呀');
-        window.$middleEventSdk?.event?.send(
-          boxEventOpitons(this.cuid, 'emitExamVisible', [!!val, 'examList'])
-        );
       }
     },
     methods: {
@@ -261,14 +267,6 @@
           // 如果是点击小图标，并且列表数量大于1，展示列表弹出框
           this.examListDialogVisible = true;
           this.zIndexServer.setDialogZIndex('examList');
-          if (this.isConcise) {
-            this.roomBaseServer.setIsExamStickTop(true);
-            this.roomBaseServer.setStickType('examList');
-          }
-          this.$emit('setVisible', {
-            examVisible: !!this.examListDialogVisible,
-            zIndexType: 'examList'
-          });
         }
       },
       // 关闭 快问快答 - 列表弹出框
@@ -276,14 +274,6 @@
         console.log('关闭快问快答-列表部分，icon数量--');
         this.changeIconShowNum(false);
         this.examListDialogVisible = false;
-        if (this.isConcise) {
-          this.roomBaseServer.setIsExamStickTop(false);
-          this.roomBaseServer.setStickType('');
-        }
-        this.$emit('setVisible', {
-          examVisible: !!this.examListDialogVisible,
-          zIndexType: 'examList'
-        });
       },
       // 看成绩 还是答题逻辑
       toShowExamRankOrExam(paper_id = null, executeType = null, source = 'default') {
@@ -321,7 +311,11 @@
          */
         if (examItem && examItem.is_end == 1 && examItem.status == 0) {
           // 已结束 && 未作答
-          this.$toast(this.$t('exam.exam_1010'));
+          this.$toast({
+            message: this.$t('exam.exam_1010'),
+            // duration: 0,
+            className: 'exam-toast'
+          });
         } else if (examItem && examItem.status == 1) {
           // 已作答
           this.toShowExamRankOrExam(examItem.paper_id, 'score');
@@ -433,6 +427,9 @@
       top: 0;
       left: 0;
       z-index: 30;
+    }
+    .vmp-exam-list-popup-overlay {
+      background-color: transparent !important;
     }
     .exam_base {
       width: 100%;

@@ -162,6 +162,7 @@
         );
       },
       setExamVisible(vo) {
+        console.log('普通模式直播，答题功能触发', vo);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitExamVisible', [vo.examVisible, vo.zIndexType])
         );
