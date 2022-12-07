@@ -108,11 +108,11 @@
     line-height: 22px;
     color: #262626;
     .order-cell {
-      width: 20px;
+      width: 30px;
     }
     .user-cell {
       margin-left: 12px;
-      width: 116px;
+      width: 106px;
     }
 
     .avatar-wrap {

@@ -88,7 +88,7 @@
           </template>
         </vh-table-column>
       </vh-table>
-      <p v-if="total > 200" class="tip">
+      <p v-if="totalLimitTip" class="tip">
         最多展示前200名成绩，更多数据请查看「控制台-当前活动-互动统计-快问快答」
       </p>
       <div class="m-t-16">
@@ -165,7 +165,8 @@
         summaryData,
         rankList: [],
         total: 0,
-        loading: true
+        loading: true,
+        totalLimitTip: false
       };
     },
     filters: {
@@ -216,9 +217,15 @@
         });
       },
       getRankData() {
+        const pos = (this.queryParams.pageNum - 1) * this.queryParams.limit;
+        let limit = this.queryParams.limit;
+        // 前端控制的分页最多显示200条(入口级别限制,前后端逻辑都不是太严谨,好在问题也不严重)
+        if (pos + limit > 200) {
+          limit = Math.abs(200 - (pos + limit));
+        }
         const params = {
-          pos: (this.queryParams.pageNum - 1) * this.queryParams.limit,
-          limit: this.queryParams.limit,
+          pos,
+          limit,
           paper_id: this.examId,
           from_consumer: 1,
           is_desensitization: 0
@@ -226,7 +233,15 @@
         this.examServer.getExamRankList(params).then(res => {
           if (res.code === 200) {
             const data = res.data;
-            this.total = data.total;
+            const originalTotal = data.total;
+            this.total = originalTotal;
+            this.totalLimitTip = false;
+            if (originalTotal > 200) {
+              this.total = 200;
+              if (this.queryParams.pageNum * this.queryParams.limit >= 200) {
+                this.totalLimitTip = true;
+              }
+            }
             this.rankList = data.list;
           }
         });
@@ -319,6 +334,7 @@
       font-size: 12px;
       line-height: 22px;
       color: #8c8c8c;
+      text-align: center;
     }
 
     .avatar-wrap {

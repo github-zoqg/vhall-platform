@@ -33,7 +33,7 @@
           </van-pull-refresh>
         </ul>
       </div>
-      <div class="rank-list-more" v-if="rankList && rankList.length >= 200">
+      <div class="rank-list-more" v-if="rankList && rankList.length >= maxTotal">
         {{ $t('exam.exam_1045') }}
       </div>
     </div>
@@ -75,6 +75,7 @@
           limit: 10,
           total: 0
         },
+        maxTotal: 200,
         examId: '',
         ownerData: {
           rank_no: 0
@@ -185,13 +186,22 @@
           .then(res => {
             if (res && res.code == 200) {
               this.pageConfig.total = res.data.total || 0;
+              let maxTotal = res.data.total || 0;
+              if (this.pageConfig.total >= this.maxTotal) {
+                // 总条数大于或等于200条，最多查询200条
+                maxTotal = this.maxTotal;
+              } else if (this.pageConfig.total < this.maxTotal) {
+                // 总条数小于200条，按照200条去查询
+                maxTotal = this.pageConfig.total;
+              }
               if (this.pageConfig.page == 1 && this.pageConfig.total <= 0) {
                 // 第一页加载没数据，停止内容
                 this.finished = true;
               }
               let list = res.data.list || [];
               this.rankList = this.rankList.concat(list);
-              if (this.rankList.length >= this.pageConfig.total) {
+
+              if (this.rankList.length >= maxTotal) {
                 this.finished = true;
               }
             }
@@ -290,11 +300,10 @@
         padding-bottom: 116px;
       }
       .rank-list-more {
-        font-family: 'PingFang SC';
         font-style: normal;
         font-weight: 400;
-        font-size: 12px;
-        line-height: 16px;
+        font-size: 24px;
+        line-height: 32px;
         color: #8c8c8c;
         text-align: center;
         padding-top: 8px;
