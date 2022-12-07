@@ -71,6 +71,10 @@
           }
         });
         this.examServer.examInstance.$on('PREVIEW', this.previewImg);
+        // 关闭面板
+        this.examServer.examInstance.$on('CLOSEPANNEL', () => {
+          this.dialogVisible = false;
+        });
       },
       /**
        * 聊天图片预览
@@ -98,6 +102,7 @@
     },
     beforeDestroy() {
       this.examServer?.examInstance?.$off('PREVIEW');
+      this.examServer?.examInstance?.$off('CLOSEPANNEL');
     }
   };
 </script>
