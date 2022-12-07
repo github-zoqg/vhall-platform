@@ -17,7 +17,8 @@
         <!-- 播放器背景图片 -->
         <div class="vmp-wap-player-prompt" v-if="isShowPoster && !isSmallPlayer">
           <img
-            :class="`vmp-wap-player-prompt-poster player_bg_${imageCropperMode}`"
+            v-parseImgOss="{ url: webinarsBgImg }"
+            :class="`vmp-wap-player-prompt-poster`"
             :src="webinarsBgImg"
             v-show="!(isVodEnd && !isPlaying && isPortraitLive)"
           />
@@ -592,7 +593,7 @@
       },
       // 播放状态
       isPlaying() {
-        return this.$domainStore.state.playerServer.isPlaying;
+        return this.playerServer.state.isPlaying;
       },
       isInstanceInit() {
         return this.$domainStore.state.interactiveServer.isInstanceInit;
@@ -662,7 +663,8 @@
         docScreen: '', //文档全屏
         chatSendBoxVisible: false,
         qaVisible: false,
-        hasIosSafeArea: getIosSafeArea()
+        hasIosSafeArea: getIosSafeArea(),
+        playerState: {}
       };
     },
     watch: {
@@ -807,7 +809,7 @@
       this.subscribeServer = useSubscribeServer();
     },
     beforeDestroy() {
-      this.playerState.isPlaying = false;
+      this.playerServer.state.isPlaying = false;
       this.playerServer.destroy();
     },
     async created() {
@@ -1472,14 +1474,6 @@
         height: 100%;
         object-fit: fill;
         z-index: 3;
-        &.player_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
-        &.player_bg_3 {
-          object-fit: contain;
-          object-position: center;
-        }
       }
     }
     &-pause {

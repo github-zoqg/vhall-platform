@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "v-serve:saas-live:test": "node build/cli serve --project=saas-live  --mode=dev_test",
+    "v-serve:saas-live:test01": "node build/cli serve --project=saas-wap  --mode=dev_test01",
     "v-serve:saas-live:test4": "node build/cli serve --project=saas-live  --mode=test4",
     "v-serve:saas-live:new_test": "node build/cli serve --project=saas-live  --mode=new_test ",
     "v-serve:saas-live:test_zt": "node build/cli serve --project=saas-live  --mode=test_zt ",
