@@ -13,7 +13,7 @@
         <p class="nickname truncate m-l-12">{{ item.user_name || '--' }}</p>
       </div>
     </div>
-    <div class="score-cell">{{ item.score || '--' }}</div>
+    <div class="score-cell">{{ item.score }}</div>
     <div
       class="rate-cell"
       v-text="

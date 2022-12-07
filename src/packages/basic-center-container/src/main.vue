@@ -20,7 +20,7 @@
       ]"
       v-show="showcoverImg"
     >
-      <img :src="coverImgUrl" :class="`vmp-basic-center__cover-${coverImageMode}`" alt />
+      <img :src="coverImgUrl" v-parseImgOss="{ url: coverImgUrl, default: 3 }" alt />
       <p class="vmp-basic-center__cover-icon" @click.stop="handleAllVideoPlay">
         <i class="vh-iconfont vh-line-video-play"></i>
       </p>
@@ -30,17 +30,12 @@
 
 <script>
   import { useInteractiveServer } from 'middle-domain';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
-  import { cropperImage } from '@/app-shared/utils/common';
   export default {
     name: 'VmpBasicCenterContainer',
     data() {
-      return { showcoverImg: false, coverImageMode: 3 };
+      return { showcoverImg: false };
     },
     computed: {
-      mode() {
-        return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode;
-      },
       isEmbed() {
         return this.$domainStore.state.roomBaseServer.embedObj.embed;
       },
@@ -72,7 +67,6 @@
         }
         this.showcoverImg = true;
       });
-      this.handlerImageInfo();
       // // 如果是当前活动是无延迟直播，后者当前用户在麦上，刷新的时候展示封面图
       // if (this.$domainStore.state.roomBaseServer.watchInitData.webinar.no_delay_webinar) {
       //   this.showcoverImg = true;
@@ -84,15 +78,6 @@
         // document.querySelectorAll('.vmp-stream-remote audio').forEach(audio => audio.play());
         useInteractiveServer().playAbortStreams();
         this.showcoverImg = false;
-      },
-      // 解析图片地址
-      handlerImageInfo() {
-        if (cropperImage(this.coverImgUrl)) {
-          let obj = parseImgOssQueryString(this.coverImgUrl);
-          this.coverImageMode = Number(obj.mode) || 3;
-        } else {
-          this.coverImageMode = 3;
-        }
       }
     }
   };

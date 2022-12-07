@@ -309,12 +309,12 @@
         const params = {
           webinar_id: this.$route.params.id,
           webinar_user_id: id,
-          scene_id: 2
+          scene_id: 1
         };
         return this.keyLoginServer.getConfigList(params).then(res => {
           if ([200, '200'].includes(res.code) && res.data && res.data.permissions) {
             let configList = JSON.parse(res.data.permissions);
-            this.hasDelayPermission = [1, '1'].includes(configList['no.delay.webinar']);
+            this.hasDelayPermission = configList['no.delay.webinar'];
           }
         });
       },

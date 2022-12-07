@@ -190,6 +190,7 @@
         );
       },
       setExamVisible(vo) {
+        console.log('竖屏直播，答题功能触发', vo);
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitExamVisible', [vo.examVisible, vo.zIndexType])
         );

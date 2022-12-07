@@ -262,9 +262,13 @@
             this.roomBaseServer.state.watchInitData.webinar.mode == 6
               ? '主画面'
               : this.$t('interact.interact_1034');
-          this.groupMessage(this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }), {
-            type: 'success'
-          });
+          this.roomBaseServer.state.watchInitData.join_info.role_name != 2 &&
+            this.groupMessage(
+              this.$t('interact.interact_1012', { n: msg.data.nick_name, m: str }),
+              {
+                type: 'success'
+              }
+            );
         });
 
         // 切换小组,小组人员变动

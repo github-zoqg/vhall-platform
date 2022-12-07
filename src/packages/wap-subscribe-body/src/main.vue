@@ -10,7 +10,8 @@
         <template v-if="!showVideo">
           <div class="subscribe-bg">
             <img
-              :class="`subscribe-image subscribe_bg_${imageCropperMode}`"
+              class="subscribe-image"
+              v-parseImgOss="{ url: webinarsBgImg }"
               :src="webinarsBgImg"
               alt=""
             />
@@ -219,8 +220,7 @@
     boxEventOpitons,
     isWechat,
     isWechatCom,
-    getQueryString,
-    parseImgOssQueryString
+    getQueryString
   } from '@/app-shared/utils/tool.js';
   import { authWeixinAjax, buildPayUrl } from '@/app-shared/utils/wechat';
   import TimeDown from './components/timeDown.vue';
@@ -308,7 +308,6 @@
         if (webinar.img_url) {
           if (cropperImage(webinar.img_url)) {
             webinarUrl = webinar.img_url;
-            this.handlerImageInfo(webinar.img_url);
           } else {
             webinarUrl = webinar.img_url + '?x-oss-process=image/resize,m_fill,w_828,h_466';
           }
@@ -553,12 +552,6 @@
       },
       playerAuthCheck(info) {
         this.authCheck(info.type);
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        console.log(this.imageCropperMode, '???mode');
       },
       authCheck(type) {
         if (this.webinarType === 2) {
@@ -936,15 +929,6 @@
         .subscribe-image {
           width: 100%;
           height: 100%;
-          object-fit: fill;
-          &.subscribe_bg_2 {
-            object-fit: cover;
-            object-position: left top;
-          }
-          &.subscribe_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
         .subscribe-type {
           position: absolute;

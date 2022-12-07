@@ -23,7 +23,8 @@
     <!-- 回放结束（正常回放和试看回放结束） -->
     <div
       v-show="isVodEnd && !isPlaying"
-      :class="`vmp-wap-player-ending ending_bg_${imageCropperModeVod}`"
+      class="vmp-wap-player-ending"
+      v-parseImgOss="{ type: 'bg', url: webinarsBgImgVod }"
       :style="`backgroundImage: url('${webinarsBgImgVod}')`"
     >
       <!-- 回放播放结束 -->
@@ -38,7 +39,8 @@
     <!-- 直播结束 -->
     <div
       v-if="isLivingEnd"
-      :class="`vmp-wap-body-ending ending_bg_${imageCropperModeLive}`"
+      class="vmp-wap-body-ending"
+      v-parseImgOss="{ type: 'bg', url: webinarsBgImgLive }"
       :style="`backgroundImage: url('${webinarsBgImgLive}')`"
     >
       <div class="vmp-wap-body-ending-box">
@@ -107,9 +109,7 @@
         abortStreams: [], // 自动播放禁止的stream列表
         isDocBeCovered: false, // 文档是否被封面覆盖，为 true 的时候将文档的层级置为 -1
         isDocStickTop: false, // 文档是否吸顶（问卷弹出的情况）
-        imageCropperModeVod: 1, //回放结束
         webinarsBgImgVod: '', //回放结束背景图
-        imageCropperModeLive: 1, //直播结束
         webinarsBgImgLive: '', //直播结束背景图
         audioStatus: false, // 选中清晰度是否是音频模式
         // isAudio: false, //判断是否是音频直播模式
@@ -249,14 +249,8 @@
           );
         });
       },
-      getImageCropperModeVod(val) {
-        this.imageCropperModeVod = val;
-      },
       getWebinarsBgImgVod(val) {
         this.webinarsBgImgVod = val;
-      },
-      getImageCropperModeLive(val) {
-        this.imageCropperModeLive = val;
       },
       getWebinarsBgImgLive(val) {
         this.webinarsBgImgLive = val;
