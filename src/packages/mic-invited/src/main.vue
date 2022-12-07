@@ -92,7 +92,8 @@
             this.waitTime--;
             this.btnText = `${this.$t('interact.interact_1010')}(${this.waitTime}s)`;
             if (this.waitTime <= 0) {
-              this.$message.warning(this.$t('interact.interact_1025'));
+              // 7.7.4 优化后不再提示
+              // this.$message.warning(this.$t('interact.interact_1025'));
               clearInterval(this.waitInterval);
               this.btnText = this.$t('interact.interact_1010');
               this.isConfirmVisible = false;

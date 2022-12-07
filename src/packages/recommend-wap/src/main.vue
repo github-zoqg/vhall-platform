@@ -15,7 +15,12 @@
       >
         <div class="recommend-item__content">
           <div class="recommend-item__content__cover">
-            <img :src="item.img_url" :class="`ad_img ad_bg_${item.imageMode}`" alt="" />
+            <img
+              :src="item.img_url"
+              v-parseImgOss="{ url: item.img_url, default: 2 }"
+              class="ad_img"
+              alt=""
+            />
           </div>
           <div class="recommend-item__content__info">
             <span class="recommend-item__content__info-title">{{ item.subject }}</span>
@@ -41,8 +46,6 @@
 <script>
   import { useRoomBaseServer, useMenuServer, useRecommendServer } from 'middle-domain';
   import { getBrowserType } from '@/app-shared/utils/getBrowserType.js';
-  import { cropperImage } from '@/app-shared/utils/common';
-  import { parseImgOssQueryString } from '@/app-shared/utils/tool';
   export default {
     name: 'VmpRecommendWap',
     data() {
@@ -80,27 +83,6 @@
         this.advs = [...this.roomBaseServer.state.advDefault.adv_list];
         this.total = this.roomBaseServer.state.advDefault.total;
         this.totalPages = Math.ceil(this.total / this.limit);
-        this.handlerAdvsInfo(this.advs);
-      },
-      handlerAdvsInfo(list) {
-        list.map(item => {
-          if (cropperImage(item.img_url)) {
-            item.imageMode = this.handlerImageInfo(item.img_url);
-          } else {
-            item.imageMode = 2;
-          }
-        });
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        if (Number(obj.mode) == 2) {
-          return 2;
-        } else if (Number(obj.mode) == 3) {
-          return 3;
-        } else {
-          return 1;
-        }
       },
       onLoad() {
         if (this.num >= this.totalPages) {
@@ -122,7 +104,6 @@
             limit: 10
           });
           this.loading = false;
-          this.handlerAdvsInfo(res.data.adv_list);
           const data = this.advs;
           this.advs = data.concat(res.data.adv_list);
         } catch (error) {
@@ -176,18 +157,7 @@
         .ad_img {
           height: 100%;
           width: 100%;
-          -o-object-fit: contain;
-          object-fit: contain;
-          -o-object-position: center;
-          object-position: center;
           border-radius: 4px;
-          &.ad_bg_1 {
-            object-fit: fill;
-          }
-          &.ad_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
       }
       &__info {

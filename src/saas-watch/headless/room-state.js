@@ -34,16 +34,7 @@ export default async function () {
   }
 
   // configList 和 黄金链路串行执行 由于轮巡时，依赖roombase的config字段，故不能将此接口获取与mediaCheck同事使用
-  await roomBaseServer.getConfigList().then(async () => {
-    // 获取视频论巡配置项 TODO:后面观看端权限统一处理之后，这个就不需要调了
-    await roomBaseServer.getVideoPollingConfig();
-    //黄金链路
-    await roomBaseServer.startGetDegradationInterval({
-      staticDomain: process.env.VUE_APP_DEGRADE_STATIC_DOMAIN,
-      environment: process.env.VUE_APP_SAAS_ENV != 'production' ? 'test' : 'product',
-      systemKey: 2
-    });
-  });
+  await roomBaseServer.getConfigList({ scene_id: 1 });
 
   const promiseList = [
     //多语言接口

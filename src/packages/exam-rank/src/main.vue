@@ -16,17 +16,25 @@
         <RankTitleWatch />
         <div
           :class="[
-            'rank-list-wrap',
+            'rank-list-wrap one-page',
             ownerData ? '' : 'not-owner',
-            total >= 200 ? 'max-total' : '',
-            total <= queryParams.limit ? 'one-page' : ''
+            total >= 200 ? 'max-total' : ''
           ]"
+          v-infinite-scroll="loadRank"
+          infinite-scroll-delay="500"
         >
           <ul class="rank-list">
             <li v-for="item of rankList" :key="item.id" class="rank-item">
               <RankItemWatch :item="item" />
             </li>
           </ul>
+          <p class="exam-rank-center" v-if="loading">
+            <span class="load-icon"></span>
+            {{ $t('common.common_1001') }}
+          </p>
+          <p class="exam-rank-center" v-if="total < 200 && rankList.length == total">
+            {{ $t('nav.nav_1043') }}
+          </p>
         </div>
         <div
           :class="`self-rank ${rankList && rankList.length > 6 ? 'is-scroll' : ''}`"
@@ -38,18 +46,6 @@
           <div class="rank-list-more" v-if="total >= 200">
             {{ $t('exam.exam_1045') }}
           </div>
-          <vh-pagination
-            background
-            slot="footer"
-            class="text-center ma m-t-16 m-b-16"
-            layout="prev, pager, next"
-            :page-size="queryParams.limit"
-            :pager-count="5"
-            :total="total"
-            :current-page="targetPage"
-            @current-change="handleChangePage"
-            v-if="total > 0"
-          ></vh-pagination>
         </div>
       </div>
     </vh-dialog>
@@ -84,6 +80,8 @@
         },
         rankList: [],
         total: 0,
+        showBottom: false,
+        bottomText: '',
         loading: false,
         ownerData: {
           rank_no: 0
@@ -100,17 +98,23 @@
         this.examRankVisible = true;
         this.examId = examId;
         this.examTitle = examTitle;
-        this.initData();
-      },
-      // 获取列表数据
-      initData() {
-        this.targetPage = 1;
-        // 获取成绩排名列表
-        this.getRankData();
+        // 从第一页开始查询
+        this.resetQueryRanklist();
         // 获取个人成绩
         this.getOwnerRankData();
       },
+      resetQueryRanklist() {
+        this.targetPage = 1;
+        this.rankList = [];
+        this.totalPages = 0;
+        // 获取成绩排名列表
+        this.getRankData();
+      },
       getRankData() {
+        if (this.targetPage > this.totalPages && this.totalPages > 0) {
+          this.showBottom = true;
+          return;
+        }
         this.queryParams.pos = (this.targetPage - 1) * this.queryParams.limit;
         const params = {
           pos: this.queryParams.pos,
@@ -125,8 +129,13 @@
             this.loading = false;
             if (res.code === 200) {
               const data = res.data;
+              const rankList = data.list || [];
+              if (this.rankList.length > 0) {
+                this.rankList = this.rankList.concat(data.list);
+              } else {
+                this.rankList = data.list;
+              }
               this.total = data.total;
-              this.rankList = data.list;
               this.totalPages = Math.ceil(this.total / this.queryParams.limit);
             }
           })
@@ -146,8 +155,11 @@
           })
           .catch(res => {});
       },
-      handleChangePage(page) {
-        this.targetPage = page;
+      loadRank() {
+        if (this.targetPage > this.totalPages && this.totalPages > 0) {
+          return;
+        }
+        this.targetPage++;
         this.getRankData();
       }
     },
@@ -242,7 +254,7 @@
         height: 308px;
       }
       &.max-total {
-        height: 226px;
+        height: 274px;
       }
       &.not-owner {
         margin-top: 8px;
@@ -253,6 +265,14 @@
         &.max-total {
           height: 280px;
         }
+      }
+      .exam-rank-center {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 20px;
+        color: #8c8c8c;
+        text-align: center;
       }
     }
     .rank-list {
@@ -286,6 +306,7 @@
       font-size: 12px;
       line-height: 20px;
       color: #8c8c8c;
+      padding: 16px 24px;
     }
     .dialog-bottom {
       position: absolute;

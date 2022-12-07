@@ -85,14 +85,6 @@ export default {
   comWapBody: {
     component: 'VmpWapBody',
     children: ['comWapPlayer', 'comWapStreamList', 'comWapDesktopScreen', 'comWapInsertFIle'],
-    emitPlayerImageCropperMode: [
-      // 获取直播结束图片背景
-      {
-        cuid: 'comWapCenter',
-        method: 'getImageCropperModeLive',
-        args: ['$0']
-      }
-    ],
     emitPlayerWebinarsBgImg: [
       // 获取直播结束图片背景
       {
@@ -183,14 +175,6 @@ export default {
       {
         cuid: 'comHeaderWatch',
         method: 'openSpeedCard',
-        args: ['$0']
-      }
-    ],
-    emitPlayerImageCropperMode: [
-      // 获取回放结束图片背景
-      {
-        cuid: 'comWapCenter',
-        method: 'getImageCropperModeVod',
         args: ['$0']
       }
     ],

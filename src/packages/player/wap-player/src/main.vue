@@ -87,7 +87,8 @@
             !isPlaying &&
             (!isPortraitLive || (embedVideo && isPortraitLive) || (isSubscribe && isPortraitLive))
           "
-          :class="`vmp-wap-player-ending ending_bg_${imageCropperMode}`"
+          class="vmp-wap-player-ending"
+          v-parseImgOss="{ type: 'bg', url: webinarsBgImg }"
           :style="`backgroundImage: url('${webinarsBgImg}')`"
         >
           <!-- 试看播放结束 和线上保持一致 -->
@@ -479,11 +480,7 @@
   </div>
 </template>
 <script>
-  import {
-    boxEventOpitons,
-    parseImgOssQueryString,
-    getIosSafeArea
-  } from '@/app-shared/utils/tool.js';
+  import { boxEventOpitons, getIosSafeArea } from '@/app-shared/utils/tool.js';
   import { isMse } from '@/app-shared/utils/isMse';
   import controlEventPoint from './components/control-event-point.vue';
   import { useRoomBaseServer, usePlayerServer, useSubscribeServer } from 'middle-domain';
@@ -514,7 +511,6 @@
         if (webinar.img_url) {
           if (cropperImage(webinar.img_url)) {
             webinarUrl = webinar.img_url;
-            this.handlerImageInfo(webinar.img_url);
           } else {
             webinarUrl = webinar.img_url + ossimg;
           }
@@ -522,7 +518,6 @@
         if (this.warmUpVideoList.length) {
           if (warmup.warmup_img_url) {
             if (cropperImage(warmup.warmup_img_url)) {
-              this.handlerImageInfo(warmup.warmup_img_url);
               webinarUrl = warmup.warmup_img_url;
             } else {
               webinarUrl = warmup.warmup_img_url + ossimg;
@@ -659,7 +654,6 @@
         lang: {},
         languageList: [],
         isSmallPlayer: false,
-        imageCropperMode: 1,
         circleSliderVal: 0,
         initIndex,
         isConcise: false, //判断是否是极简模式
@@ -923,17 +917,6 @@
             document.body.clientHeight - (baseHeight / 75) * parseFloat(htmlFontSize) + 'px';
           tabDom.style.height = popHeight;
         }
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        this.$nextTick(() => {
-          window.$middleEventSdk?.event?.send(
-            boxEventOpitons(this.cuid, 'emitPlayerImageCropperMode', [this.imageCropperMode])
-          );
-        });
-        console.log(this.imageCropperMode, '???mode');
       },
       startPlay() {
         this.isPlaying ? this.pause() : this.play();
@@ -1542,7 +1525,6 @@
     }
     &-ending {
       background-repeat: no-repeat;
-      background-size: 100% 100%;
       background-position: center;
       width: 100%;
       height: 100%;
@@ -1550,13 +1532,6 @@
       top: 0;
       left: 0;
       z-index: 10;
-      &.ending_bg_3 {
-        background-size: contain;
-      }
-      &.ending_bg_2 {
-        background-size: cover;
-        background-position: left top;
-      }
       &-box {
         width: 100%;
         height: 100%;

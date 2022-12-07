@@ -78,7 +78,7 @@ export default function () {
 
     return roomBaseServer.wechatShare({ wx_url: wx_sign_url }).then(res => {
       if (res.code == 200 && res.data) {
-        const hideShare = configList ? configList['ui.watch_hide_share'] : 0;
+        const hideShare = configList ? !configList['ui.watch_hide_share'] : 0;
         const params = {
           appId: res.data.appId,
           timestamp: res.data.timestamp,

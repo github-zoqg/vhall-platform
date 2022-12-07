@@ -2,7 +2,7 @@
   <div class="vmp-wap-sign-up-form">
     <div v-if="formOpenLinkStatus == 1" class="vmp-wap-sign-up-form__wrap">
       <header class="cover-pic">
-        <img :class="`form_cover form_bg_${imageCropperMode}`" :src="coverPic" alt="" />
+        <img class="form_cover" :src="coverPic" v-parseImgOss="{ url: coverPic }" alt="" />
         <!-- <img :src="coverPic"/></img> -->
       </header>
       <div class="vmp-wap-sign-up-form__content">
@@ -292,7 +292,7 @@
               {{ $t('form.form_1019') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"
@@ -346,12 +346,22 @@
             </div>
             <p v-show="errCode" class="err-msg">{{ errCode }}</p>
           </li>
+          <li v-if="privacy" class="tab-content-li">
+            <div class="privacy-box clearfix" @click="handleClickPrivacy(privacy)">
+              <i
+                class="privacy-item vh-iconfont vh-line-check"
+                :class="{ active: form[privacy.id] }"
+              ></i>
+              <pre v-html="privacyText"></pre>
+            </div>
+            <p v-show="!!errMsgMap[privacy.id]" class="err-msg">{{ errMsgMap[privacy.id] }}</p>
+          </li>
           <li class="tab-content-li">
             <button @click="submitVerify" :class="['submit-btn', formInfo.theme_color]">
               {{ $t('form.form_1082') }}
             </button>
           </li>
-          <li v-if="!isEmbed">
+          <li v-if="!isEmbed && !privacy">
             <!-- 隐私合规（嵌入不支持） -->
             <vmp-privacy-compliance
               scene="signForm"
@@ -398,8 +408,7 @@
     validPhone,
     getQueryString,
     replaceHtml,
-    delUrlParams,
-    parseImgOssQueryString
+    delUrlParams
   } from '@/app-shared/utils/tool';
   import { debounce } from 'lodash';
   import {
@@ -542,7 +551,6 @@
         //默认的banner图
         defaultHeader:
           'https://cnstatic01.e.vhall.com/common-static/middle/images/platform-common/form_up.png',
-        imageCropperMode: 1,
         startTime: '',
         queryString: '',
         isSubmitSuccess: false,
@@ -563,7 +571,6 @@
         if (this.formInfo.cover) {
           let cover = `${this.defaultImgUrl}${this.formInfo.cover}`;
           if (cropperImage(cover)) {
-            this.handlerImageInfo(cover);
             return cover;
           } else {
             return cover + '?x-oss-process=image/resize,m_fill,w_750,h_125,limit_0';
@@ -922,12 +929,6 @@
           .catch(e => {
             this.ajaxInfoEnd = true;
           });
-      },
-      // 解析图片地址
-      handlerImageInfo(url) {
-        let obj = parseImgOssQueryString(url);
-        this.imageCropperMode = Number(obj.mode);
-        console.log(this.imageCropperMode, '???mode');
       },
       //计算简介文字是否过长
       calculateText() {
@@ -1716,6 +1717,10 @@
       },
       //我已报名--验证
       submitVerify: debounce(function () {
+        if (!this.form[this.privacy.id] && this.privacy && this.privacy.is_must) {
+          this.$toast(this.$t('form.form_1030'));
+          return;
+        }
         this.onValidateVerify(true);
         this.isPhoneValidate && this.onValidateVerify(false);
         if (!this.errPhone && !this.errCode) {
@@ -1944,15 +1949,6 @@
         .form_cover {
           width: 100%;
           height: 100%;
-          object-fit: fill;
-          &.form_bg_2 {
-            object-fit: cover;
-            object-position: left top;
-          }
-          &.form_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
       }
     }
