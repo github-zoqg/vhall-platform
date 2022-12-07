@@ -18,7 +18,7 @@
           :class="[
             'rank-list-wrap one-page',
             ownerData ? '' : 'not-owner',
-            total >= 200 ? 'max-total' : ''
+            total >= maxTotal ? 'max-total' : ''
           ]"
           v-infinite-scroll="loadRank"
           infinite-scroll-delay="500"
@@ -32,7 +32,7 @@
             <span class="load-icon"></span>
             {{ $t('common.common_1001') }}
           </p>
-          <p class="exam-rank-center" v-if="total < 200 && rankList.length == total">
+          <p class="exam-rank-center" v-if="total < maxTotal && rankList.length == total">
             {{ $t('nav.nav_1043') }}
           </p>
         </div>
@@ -43,7 +43,7 @@
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
         <div class="dialog-bottom" v-if="total > queryParams.limit">
-          <div class="rank-list-more" v-if="total >= 200">
+          <div class="rank-list-more" v-if="total >= maxTotal">
             {{ $t('exam.exam_1045') }}
           </div>
         </div>
@@ -80,6 +80,7 @@
         },
         rankList: [],
         total: 0,
+        maxTotal: 200,
         showBottom: false,
         bottomText: '',
         loading: false,
@@ -131,12 +132,15 @@
               const data = res.data;
               const rankList = data.list || [];
               if (this.rankList.length > 0) {
-                this.rankList = this.rankList.concat(data.list);
+                this.rankList = this.rankList.concat(rankList);
               } else {
                 this.rankList = data.list;
               }
               this.total = data.total;
-              this.totalPages = Math.ceil(this.total / this.queryParams.limit);
+              this.totalPages =
+                this.maxTotal > this.total
+                  ? Math.ceil(this.total / this.queryParams.limit)
+                  : Math.ceil(this.maxTotal / this.queryParams.limit);
             }
           })
           .catch(res => {
