@@ -60,6 +60,7 @@
           isEmbed: true,
           isEmbedVideo: true
         });
+        document.documentElement.style.background = 'initial';
 
         const domain = await this.initReceiveLive(clientType);
         if (this.$domainStore.state.roomBaseServer.watchInitData.status == 'subscribe') {
