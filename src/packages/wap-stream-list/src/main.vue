@@ -41,7 +41,12 @@
           class="vmp-stream-list__remote-container"
           :class="{
             'vmp-stream-list__mini-window__main-screen': speaker.accountId == mainScreen, // 播放器是mini状态的主屏class
-            'vmp-stream-list__main-screen': speaker.accountId == mainScreen && !isDocMainScreen,
+            'vmp-stream-list__main-screen':
+              speaker.accountId == mainScreen &&
+              !isDocMainScreen &&
+              (speakerAndShowLayout == 1
+                ? !isShareScreen && !isOpenInsertFile && !isInsertAudio
+                : true),
             'vmp-stream-list__main-screen-doubleRow':
               speaker.accountId == mainScreen && remoteSpeakers.length > 6,
             'vmp-stream-list__main-screen-threeRow':
@@ -287,6 +292,13 @@
       },
       isShareScreen() {
         return this.$domainStore.state.desktopShareServer.localDesktopStreamId;
+      },
+      isOpenInsertFile() {
+        return this.$domainStore.state.insertFileServer.insertStreamInfo.streamId;
+      },
+      // 是否是音频插播
+      isInsertAudio() {
+        return !this.$domainStore.state.insertFileServer.insertStreamInfo.has_video;
       },
       // 小组协作中
       showGroupMask() {
