@@ -51,7 +51,7 @@
        * 初始化礼物动画队列
        */
       this.taskQueue = new TaskQueue({
-        minTaskTime: 4000
+        minTaskTime: 5000
       });
 
       /*  //测试数据
