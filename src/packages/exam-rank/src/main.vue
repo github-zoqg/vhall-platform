@@ -31,10 +31,7 @@
           <p class="exam-rank-center" v-if="total < maxTotal && rankList.length == total">
             {{ $t('nav.nav_1043') }}
           </p>
-          <div
-            class="exam-rank-center rank-more"
-            v-if="total > queryParams.limit && total >= maxTotal"
-          >
+          <div class="exam-rank-center rank-more" v-if="total >= 200 && rankList.length == 200">
             {{ $t('exam.exam_1045') }}
           </div>
         </div>

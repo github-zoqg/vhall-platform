@@ -30,7 +30,7 @@
                 <RankItemWap :item="item" />
               </li>
             </van-list>
-            <div class="rank-list-more" v-if="rankList && rankList.length >= maxTotal">
+            <div class="rank-list-more" v-if="pageConfig.total >= 200 && rankList.length == 200">
               {{ $t('exam.exam_1045') }}
             </div>
           </van-pull-refresh>
