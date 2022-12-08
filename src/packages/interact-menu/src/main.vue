@@ -37,7 +37,7 @@
           <p>问卷</p>
         </div>
         <div class="vmp-interact-menu-list-item" @click="emitOpenExam" v-if="configList['exam']">
-          <i class="vh-iconfont vh-line-questionnaire"></i>
+          <i class="vh-iconfont vh-a-line-Sentaanswer"></i>
           <p>快问快答</p>
         </div>
         <div
@@ -49,7 +49,7 @@
           <i class="vh-iconfont vh-a-line-qanda"></i>
           <p>问答</p>
         </div>
-        <!-- TODO:支付牌照问题 -->
+        <!-- 支付牌照问题 -->
         <div
           class="vmp-interact-menu-list-item"
           :class="{ 'vmp-interact-menu-list-disable': !isLiving }"
