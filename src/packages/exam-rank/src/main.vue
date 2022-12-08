@@ -28,17 +28,19 @@
             <span class="load-icon"></span>
             {{ $t('common.common_1001') }}
           </p>
-          <p class="exam-rank-center" v-if="total < maxTotal && rankList.length == total">
+          <p
+            class="exam-rank-center"
+            v-if="
+              total < maxTotal && rankList.length == total && rankList.length >= queryParams.limit
+            "
+          >
             {{ $t('nav.nav_1043') }}
           </p>
           <div class="exam-rank-center rank-more" v-if="total >= 200 && rankList.length == 200">
             {{ $t('exam.exam_1045') }}
           </div>
         </div>
-        <div
-          :class="`self-rank ${rankList && rankList.length > 6 ? 'is-scroll' : ''}`"
-          v-if="ownerData"
-        >
+        <div class="self-rank" v-if="ownerData">
           <RankItemWatch class="ma" :item="ownerData" />
         </div>
       </div>
@@ -244,25 +246,16 @@
     position: relative;
     .rank-list-wrap {
       padding: 0 24px;
-      margin-top: 58px;
+      margin-top: 14px;
       overflow-y: auto;
       height: 248px;
       margin-right: 2px;
       &.one-page {
-        height: 308px;
-      }
-      &.max-total {
-        height: 274px;
+        height: 316px;
       }
       &.not-owner {
         margin-top: 8px;
-        height: 412px;
-        .rank-item:last-child {
-          padding-bottom: 66px;
-        }
-        &.max-total {
-          height: 280px;
-        }
+        height: 360px;
       }
       .exam-rank-center {
         font-style: normal;
@@ -271,6 +264,7 @@
         line-height: 20px;
         color: #8c8c8c;
         text-align: center;
+        padding-bottom: 16px;
       }
     }
     .rank-list {
@@ -317,15 +311,17 @@
       background: #ffffff;
     }
     .self-rank {
-      padding: 0 12px;
       background: #ffffff;
       position: absolute;
       left: 0;
-      top: 44px;
+      padding: 0 36px;
+      margin: 0 0;
+      top: unset;
+      bottom: 0;
+      background: #f5f5f5;
+      border-radius: 0 0 4px 4px;
+      width: 100%;
       box-sizing: border-box;
-      margin: 0 24px;
-      background: linear-gradient(90.57deg, #eddeff -8.43%, #e9f5ff 118.78%);
-      border-radius: 4px;
       &.is-scroll {
         max-width: 324px;
       }
