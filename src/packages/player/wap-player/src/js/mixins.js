@@ -12,14 +12,14 @@ const playerMixins = {
       //  直播开始
       this.playerServer.$on(VhallPlayer.PLAY, () => {
         // 监听播放状态
-        this.playerState.isPlaying = true;
+        this.playerServer.state.isPlaying = true;
         this.isShowPoster = false;
         this.isVodEnd = false;
         console.warn('PLAY');
       });
       this.playerServer.$on(VhallPlayer.PAUSE, () => {
         // 监听暂停状态
-        this.playerState.isPlaying = false;
+        this.playerServer.state.isPlaying = false;
         console.warn('PAUSE');
       });
 
@@ -75,7 +75,7 @@ const playerMixins = {
         // 监听暂停状态
         console.log('wap-播放完毕');
         this.isShowPoster = true;
-        this.playerState.isPlaying = false;
+        this.playerServer.state.isPlaying = false;
         // 如果是暖场视频和试看不显示回放结束的标识
         if (this.isTryPreview) return;
         if (this.isWarnPreview) {
