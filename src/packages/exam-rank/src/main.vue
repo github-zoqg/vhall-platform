@@ -15,11 +15,7 @@
       <div class="vmp-rank-watch">
         <RankTitleWatch />
         <div
-          :class="[
-            'rank-list-wrap one-page',
-            ownerData ? '' : 'not-owner',
-            total >= maxTotal ? 'max-total' : ''
-          ]"
+          :class="['rank-list-wrap one-page', ownerData ? '' : 'not-owner']"
           v-infinite-scroll="loadRank"
           infinite-scroll-delay="500"
         >
@@ -35,17 +31,18 @@
           <p class="exam-rank-center" v-if="total < maxTotal && rankList.length == total">
             {{ $t('nav.nav_1043') }}
           </p>
+          <div
+            class="exam-rank-center rank-more"
+            v-if="total > queryParams.limit && total >= maxTotal"
+          >
+            {{ $t('exam.exam_1045') }}
+          </div>
         </div>
         <div
           :class="`self-rank ${rankList && rankList.length > 6 ? 'is-scroll' : ''}`"
           v-if="ownerData"
         >
           <RankItemWatch class="ma" :item="ownerData" />
-        </div>
-        <div class="dialog-bottom" v-if="total > queryParams.limit">
-          <div class="rank-list-more" v-if="total >= maxTotal">
-            {{ $t('exam.exam_1045') }}
-          </div>
         </div>
       </div>
     </vh-dialog>
@@ -310,6 +307,9 @@
       font-size: 12px;
       line-height: 20px;
       color: #8c8c8c;
+      padding: 16px 24px;
+    }
+    .rank-more {
       padding: 16px 24px;
     }
     .dialog-bottom {

@@ -30,11 +30,11 @@
                 <RankItemWap :item="item" />
               </li>
             </van-list>
+            <div class="rank-list-more" v-if="rankList && rankList.length >= maxTotal">
+              {{ $t('exam.exam_1045') }}
+            </div>
           </van-pull-refresh>
         </ul>
-      </div>
-      <div class="rank-list-more" v-if="rankList && rankList.length >= maxTotal">
-        {{ $t('exam.exam_1045') }}
       </div>
     </div>
     <div class="dialog-bottom">
@@ -307,6 +307,7 @@
         color: #8c8c8c;
         text-align: center;
         padding-top: 8px;
+        padding-bottom: 8px;
       }
       .rank-list {
         background: #fff;
