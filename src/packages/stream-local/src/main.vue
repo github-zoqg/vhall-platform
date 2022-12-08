@@ -141,7 +141,7 @@
           ></span>
         </el-tooltip>
       </p>
-      <p class="vmp-stream-local__shadow-second-line">
+      <p class="vmp-stream-local__shadow-second-line" :class="{ 'mini-w': liveStatus != 1 }">
         <span v-if="[1, 3, 4].includes(joinInfo.role_name)" class="vmp-stream-local__shadow-label">
           视图
         </span>
@@ -210,6 +210,7 @@
       <p
         v-if="joinInfo.role_name == 1 || (groupRole == 20 && isInGroup)"
         class="vmp-stream-local__shadow-second-line"
+        :class="{ 'mini-w': liveStatus != 1 }"
       >
         <!-- 设为主讲人 -->
         <el-tooltip content="设为主讲人" v-if="mode != 6" placement="bottom">
@@ -2034,7 +2035,9 @@
       }
       .vmp-stream-local__shadow-second-line {
         line-height: 36px;
-        min-width: 130px;
+        &.mini-w {
+          min-width: 130px;
+        }
       }
       .vmp-stream-local__shadow-label {
         display: inline-block;
