@@ -17,7 +17,12 @@
     </van-loading>
     <div v-if="state === 1">
       <div class="subject-poster">
-        <img :class="`poster-image subject_bg_${imageCropperMode}`" :src="subjectImage" alt="" />
+        <img
+          class="poster-image"
+          :src="subjectImage"
+          v-parseImgOss="{ url: subjectImage }"
+          alt=""
+        />
         <!-- <img class="poster-image" :src="defaultImages" alt="" v-else /> -->
       </div>
       <section class="subject-header">
@@ -66,7 +71,12 @@
           class="subject-menu_item clearfix"
         >
           <div class="subject-menu_item-left">
-            <img :class="`item-poster box_bg_${item.itemMode}`" :src="item.img_url" alt="" />
+            <img
+              class="item-poster"
+              v-parseImgOss="{ url: item.img_url }"
+              :src="item.img_url"
+              alt=""
+            />
             <span
               class="item-status"
               :style="`background: ${stateArr[item.webinar_state - 1].bgcolor}`"
@@ -127,12 +137,7 @@
 <script>
   import { useSubjectServer, useUserServer, setRequestHeaders } from 'middle-domain';
   import { initWeChatSdk } from '@/app-shared/utils/wechat';
-  import {
-    getQueryString,
-    handleIntroInfo,
-    replaceHtml,
-    parseImgOssQueryString
-  } from '@/app-shared/utils/tool.js';
+  import { getQueryString, handleIntroInfo, replaceHtml } from '@/app-shared/utils/tool.js';
   import loginWap from '@/packages/reg-login-wap/src/main.vue';
   import confirmAuth from '@/app-shared/components/confirm.vue';
   import { cropperImage } from '@/app-shared/utils/common';
@@ -186,7 +191,6 @@
           }
         ],
         loading: true,
-        imageCropperMode: 1,
         query: {
           pos: 0,
           limit: 12,
@@ -222,9 +226,6 @@
         let url = this.defaultImages;
         if (this.detailInfo.cover) {
           url = this.detailInfo.cover;
-          if (cropperImage(this.detailInfo.cover)) {
-            this.handlerImageInfo(url);
-          }
         }
         return url;
       }
@@ -246,15 +247,6 @@
           str += ` | ${liveStatusStr[val.webinar_type]}`;
         }
         return str;
-      },
-      // 解析图片地址
-      handlerImageInfo(url, index) {
-        let obj = parseImgOssQueryString(url);
-        if (index == 1) {
-          this.imageCropperMode = Number(obj.mode) || 1;
-        } else {
-          return Number(obj.mode) || 1;
-        }
       },
       async getDetail() {
         try {
@@ -299,16 +291,7 @@
             if (res.code === 200) {
               if (res.data.list.length > 0) {
                 // this.webinarList.unshift(...list)
-                this.webinarList = this.webinarList.concat(res.data.list).map(item => {
-                  let mode = 1;
-                  if (cropperImage(item.img_url)) {
-                    mode = this.handlerImageInfo(item.img_url, 2);
-                  }
-                  return {
-                    ...item,
-                    itemMode: mode
-                  };
-                });
+                this.webinarList = this.webinarList.concat(res.data.list);
                 console.log('每次打印出来的活动个数' + this.webinarList.length);
                 this.isPullingDown = true;
               } else {
@@ -548,15 +531,6 @@
       .poster-image {
         width: 100%;
         height: 100%;
-        object-fit: fill;
-        &.subject_bg_2 {
-          object-fit: cover;
-          object-position: left top;
-        }
-        &.subject_bg_3 {
-          object-fit: contain;
-          object-position: center;
-        }
       }
     }
     .subject-header {
@@ -661,17 +635,6 @@
           height: 100%;
           cursor: pointer;
           border-radius: 4px 4px 0 0;
-          &.box_bg_1 {
-            object-fit: fill;
-          }
-          &.box_bg_2 {
-            object-fit: cover;
-            object-position: left top;
-          }
-          &.box_bg_3 {
-            object-fit: contain;
-            object-position: center;
-          }
         }
         .item-status {
           position: absolute;
