@@ -79,7 +79,14 @@ import VmpViewRestriction from '@/packages/view-restriction/index';
 // 专题预览页
 import VmpSubjectBody from '@/packages/subject-body/index';
 import VmpSubjectHeader from '@/packages/subject-header/index';
-
+// ------------------------------ 快问快答-引入组件------start----------
+import VmpExamPc from '@/packages/exam-pc'; // 快问快答-入口
+import VmpExamRank from '@/packages/exam-rank'; // 排行榜
+import VmpExamCollect from '@/packages/exam-collect'; // 用户收集
+import VmpExamPreview from '@/packages/exam-preview'; // 预览答题
+import VmpExamAnswer from '@/packages/exam-answer'; // 答题
+import VmpExamScore from '@/packages/exam-score'; // 成绩
+// ------------------------------ 快问快答-引入组件------start----------
 // 全局注册组件
 // Vue.use(ElementUI);
 Vue.use(VmpContainer);
@@ -146,3 +153,11 @@ Vue.use(VmpMicInvited);
 Vue.use(VmpCameraCheck);
 Vue.use(VmpViewRestriction);
 Vue.use(VmpPrivacyCompliance);
+// ------------------------------ 快问快答------start----------
+Vue.use(VmpExamPc);
+Vue.use(VmpExamRank);
+Vue.use(VmpExamCollect);
+Vue.use(VmpExamPreview);
+Vue.use(VmpExamAnswer);
+Vue.use(VmpExamScore);
+// ------------------------------【极简风格】注册组件------end----------

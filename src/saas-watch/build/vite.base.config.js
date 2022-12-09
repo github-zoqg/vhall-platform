@@ -30,13 +30,15 @@ module.exports = {
       overlayscrollbars: `${CDN_DOMAIN.S2}/common-static/middle/overlayscrollbars/1.13.1/js/OverlayScrollbars.min.js`,
       dayjs: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/dayjs.min.js`,
       duration: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/plugins/duration.js`,
-      imageYunDun: `//cstaticdun.126.net/load.min.js?t=201903281201`
+      imageYunDun: `//cstaticdun.126.net/load.min.js?t=201903281201`,
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.js' // vhallUI
     },
     css: {
       ElementUi: `${CDN_DOMAIN.S3}/common-static/middle/element-ui/lib/2.6.2/theme-chalk/index.css`,
       iconfontCommon: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css`,
       iconfont: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css`,
-      overlayscrollbarsCss: `${CDN_DOMAIN.S3}/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css`
+      overlayscrollbarsCss: `${CDN_DOMAIN.S3}/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css`,
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.css'
     }
   },
   less: {

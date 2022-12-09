@@ -17,6 +17,7 @@ const color_text_disabled = 'rgba(255, 255, 255, 0.25)';
 const color_text_link = '#3562fa';
 const color_text_regular_2 = 'rgba(0, 0, 0, 0.65)';
 const color_text_1 = 'rgba(255, 255, 255, 0.85)';
+const color_text_chat_exam = '#E6E6E6';
 /* 背景颜色
 --------------------- */
 const color_background_0 = '#1a1a1a';
@@ -85,6 +86,7 @@ export default {
   '--chat-bg-color-checkbox-checked': color_text_custom,
   '--chat-scrollbar-thumb-bg': color_text_disabled,
   '--chat-font-color-reply-name': 'rgba(255, 255, 255, 0.45)',
+  '--chat-exam-font-color-msg-text': color_text_chat_exam,
   // 互动工具icon
   '--footer-icon-tip-border-color': '#23232d',
   //footer
@@ -204,5 +206,35 @@ export default {
   '--chapter-font-color-title': '#ffffff',
   '--chapter-font-color-time': 'rgba(255,255,255,0.45)',
   '--chapter-list-item-bg-active': 'rgba(255,255,255,0.06)',
-  '--chapter-font-color-active': '#c99f67'
+  '--chapter-font-color-active': '#c99f67',
+  // 快问快答
+  '--theme-exam-progress-bgColor': 'rgba(0, 0, 0, 0.06)',
+  '--theme-exam-progress-active-bgColor': 'rgba(224, 185, 110, 1)',
+  '--theme-exam-question-type-bgColor': 'rgba(224, 185, 110, 0.15)',
+  '--theme-exam-question-type-color': 'rgba(224, 185, 110, 1)',
+  // '--theme-exam-next-button-bg': 'rgba(224, 185, 110, 1)',
+  // '--theme-exam-next-button-border': 'rgba(224, 185, 110, 1)',
+  // '--theme-exam-next-button-color': 'rgba(255, 255, 255, 1)',
+  // '--theme-exam-next-button-active-bg': 'rgba(224, 185, 110, 1)',
+  // '--theme-exam-next-button-active-border': 'rgba(224, 185, 110, 1)',
+  // '--theme-exam-next-button-active-color': 'rgba(255, 255, 255, 1)',
+  '--theme-exam-last-button-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-color': 'rgba(38, 38, 38, 1)',
+  '--theme-exam-last-button-active-bg': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-border': 'rgba(217, 217, 217, 1)',
+  '--theme-exam-last-button-active-color': 'rgba(38, 38, 38, 1)',
+  // 主题按钮
+  '--theme-more-status-button-bg': 'rgba(224, 185, 110, 1)',
+  '--theme-more-status-button-border': 'rgba(224, 185, 110, 1)',
+  '--theme-more-status-button-color': '#ffffff',
+  '--theme-more-status-button-hover-bg': 'rgba(186, 146, 82, 1)',
+  '--theme-more-status-button-hover-border': 'rgba(186, 146, 82, 1)',
+  '--theme-more-status-button-hover-color': '#ffffff',
+  '--theme-more-status-button-active-bg': 'rgba(148, 110, 58, 1)',
+  '--theme-more-status-button-active-border': 'rgba(148, 110, 58, 1)',
+  '--theme-more-status-button-active-color': '#ffffff',
+  '--theme-more-status-button-disabled-bg': 'rgba(250, 236, 202, 1)',
+  '--theme-more-status-button-disabled-border': 'rgba(250, 236, 202, 1)',
+  '--theme-more-status-button-disabled-color': '#ffffff'
 };

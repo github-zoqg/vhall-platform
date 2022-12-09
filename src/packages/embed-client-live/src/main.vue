@@ -379,7 +379,7 @@
         if (this.assistantType == 'doc') {
           plugins.push('doc');
         } else if (this.assistantType == 'tools') {
-          plugins.push('interaction', 'questionnaire');
+          plugins.push('interaction', 'questionnaire', 'exam');
         }
         return new Domain({
           plugins,

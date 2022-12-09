@@ -83,7 +83,7 @@
           localStorage.setItem('token', token);
         }
         return new Domain({
-          plugins: ['chat', 'questionnaire'],
+          plugins: ['chat', 'questionnaire', 'exam'],
           requestHeaders: {
             token: localStorage.getItem('token') || ''
           },
@@ -125,7 +125,7 @@
       },
       handleAssitant(type) {
         console.log('客户端调用h5', type);
-        if ([3, 4, 5, 6, 11].includes(type)) {
+        if ([3, 4, 5, 6, 11, 16].includes(type)) {
           this.closeAllModal();
         }
         switch (type) {
@@ -154,6 +154,11 @@
               boxEventOpitons('interactClientRoot', 'emitRedPacket', [true])
             );
             break;
+          case 16: // 打开快问快答
+            window.$middleEventSdk?.event?.send(
+              boxEventOpitons('interactClientRoot', 'emitExam', [true])
+            );
+            break;
         }
       },
       //关闭所有互动弹窗
@@ -172,6 +177,9 @@
         );
         window.$middleEventSdk?.event?.send(
           boxEventOpitons('interactClientRoot', 'emitRedPacket', [false])
+        );
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons('interactClientRoot', 'emitExam', [false])
         );
       }
     }

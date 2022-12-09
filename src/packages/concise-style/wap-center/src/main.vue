@@ -6,10 +6,14 @@
       v-show="isWapBodyDocSwitchFullScreen && !isPlaying && !isVodEnd && !isSmallPlayer"
       class="vmp-wap-player-pause"
       :class="{
-        'player-container__sticktop': isDocStickTop
+        'player-container__sticktop': isDocStickTop || isExamStickTop
       }"
       :style="{
-        'z-index': isDocStickTop ? zIndexServerState.zIndexMap.questionnaire || 302 : 12
+        'z-index': isDocStickTop
+          ? isExamStickTop
+            ? examStickIndex
+            : zIndexServerState.zIndexMap.questionnaire || 302
+          : 12
       }"
     >
       <p @click.stop="startPlay">
@@ -62,7 +66,7 @@
       class="vmp-concise-center-wap__doc-container"
       :class="{
         'doc-container__mini': switchDrag,
-        'doc-container__sticktop': isDocStickTop,
+        'doc-container__sticktop': isDocStickTop || isExamStickTop,
         'doc-container__becovered':
           isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
       }"
@@ -72,7 +76,9 @@
           isDocBeCovered || !switchStatus || (isDocStickTop && isWapBodyDocSwitchFullScreen)
             ? -1
             : isDocStickTop
-            ? zIndexServerState.zIndexMap.questionnaire || 302
+            ? isExamStickTop
+              ? examStickIndex
+              : zIndexServerState.zIndexMap.questionnaire || 302
             : switchDrag
             ? 302
             : 'auto'
@@ -152,6 +158,15 @@
       //判断是否是音频直播模式
       isAudio() {
         return this.$domainStore.state.roomBaseServer.watchInitData.webinar.mode == 1;
+      },
+      // 快问快答-是否吸顶
+      isExamStickTop() {
+        return this.$domainStore.state?.roomBaseServer?.isExamStickTop || false;
+      },
+      // 快问快答-吸顶面板
+      examStickIndex() {
+        let examStickType = this.$domainStore.state?.roomBaseServer?.stickType || null;
+        return this.zIndexServerState.zIndexMap[examStickType] | 303;
       }
     },
     watch: {
