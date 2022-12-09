@@ -2,7 +2,7 @@
 export const preventReClick = {
   name: 'preventReClick',
   option: {
-    inserted: function(el, binding) {
+    inserted: function (el, binding) {
       el.addEventListener('click', () => {
         if (!el.disabled) {
           el.disabled = true;
@@ -11,7 +11,6 @@ export const preventReClick = {
           }, binding.value || 3000);
         }
       });
-
     }
   }
 };
