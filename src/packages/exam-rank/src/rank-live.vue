@@ -20,7 +20,7 @@
     <div
       class="dialog-content"
       v-loading="loading"
-      element-loading-text="成绩统计中，请耐心等待，网络恢复后，直接展示数据"
+      element-loading-text="成绩统计中，请耐心等待.."
       element-loading-background="#fff"
     >
       <div class="summary-panel">
