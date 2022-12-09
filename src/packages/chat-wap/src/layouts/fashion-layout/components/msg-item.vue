@@ -69,6 +69,26 @@
         </div>
       </div>
     </template>
+    <!--
+      收到快问快答 paper_send
+      公布-快问快答-成绩 paper_send_rank
+      快问快答-收卷 paper_end
+      快问快答-自动收卷 paper_auto_end
+      快问快答-自动公布成绩 paper_auto_send_rank
+    -->
+    <template
+      v-else-if="
+        [
+          'paper_send',
+          'paper_send_rank',
+          'paper_end',
+          'paper_auto_end',
+          'paper_auto_send_rank'
+        ].includes(source.type)
+      "
+    >
+      <exam-msg-item :source="source" @checkExamDetail="checkExamDetail"></exam-msg-item>
+    </template>
     <!-- 送礼物 -->
     <template v-else-if="['gift_send_success', 'free_gift_send'].includes(source.type)">
       <div v-if="source.content.gift_name" class="msg-item new-gift">
@@ -301,6 +321,7 @@
 <script>
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
+  import ExamMsgItem from './exam-msg-item.vue';
   export default {
     props: {
       source: {
@@ -320,6 +341,10 @@
         type: Function,
         default: function () {}
       },
+      emitExamEvent: {
+        type: Function,
+        default: function () {}
+      },
       //当前登录人的信息
       joinInfo: {
         type: Object,
@@ -334,6 +359,9 @@
         defaultAvatar: defaultAvatar,
         jiantou: require('../../../common/img/jiantou.png')
       };
+    },
+    components: {
+      ExamMsgItem
     },
     filters: {
       //角色标签样式
@@ -405,6 +433,10 @@
       // 点击查看问卷
       checkQuestionDetail(questionnaire_id) {
         this.emitQuestionnaireEvent(questionnaire_id);
+      },
+      // 点击查看问答相关
+      checkExamDetail(vo) {
+        this.emitExamEvent(vo);
       },
       //处理@消息
       handleAt() {
@@ -749,7 +781,8 @@
         > .interact-msg {
           padding: 11px 12px;
           border-width: 0;
-          height: 60px;
+          min-height: 60px;
+          height: auto;
           line-height: 38px;
           &.pwd_red_envelope_ok {
             display: flex;

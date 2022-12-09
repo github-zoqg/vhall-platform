@@ -1,6 +1,16 @@
 <template>
   <div class="vmp-container-right-fullscreen-wap" v-if="!isInGroup">
     <div class="base-box" v-show="showIcon">
+      <!-- 快问快答 -->
+      <exam-icon
+        :icon-style="iconStyle"
+        v-if="webinarType == 1 || webinarType == 3"
+        class="icon-wrap icon-wrap__exam"
+        @clickIcon="checkExamIcon"
+        @setVisible="setExamVisible"
+      >
+        <span class="icon-name">{{ $t('exam.exam_1047') }}</span>
+      </exam-icon>
       <!-- 问卷 -->
       <questionnaire-icon
         :icon-style="iconStyle"
@@ -63,13 +73,15 @@
   import redPacketIcon from '../../common/components/red-repakcet-icon/index.vue';
   import questionnaireIcon from '../../common/components/questionnaire-icon/index.vue';
   import noticeList from '../../common/components/noticeList/index.vue';
+  import examIcon from '../../common/components/exam-icon/index.vue';
   export default {
     name: 'VmpContainerRightWap',
     components: {
       lotteryIcon,
       redPacketIcon,
       questionnaireIcon,
-      noticeList
+      noticeList,
+      examIcon
     },
     props: {
       iconStyle: {
@@ -170,6 +182,18 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitOpenQa', [questionnaireId])
         );
+      },
+      checkExamIcon(vo) {
+        console.log(vo);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitClickExamIcon', [vo.examId, vo.type, vo.source])
+        );
+      },
+      setExamVisible(vo) {
+        console.log('竖屏直播，答题功能触发', vo);
+        window.$middleEventSdk?.event?.send(
+          boxEventOpitons(this.cuid, 'emitExamVisible', [vo.examVisible, vo.zIndexType])
+        );
       }
     }
   };
@@ -185,6 +209,9 @@
       .icon-wrap {
         width: 72px;
         height: 72px;
+        &.icon-wrap__exam {
+          width: 96px;
+        }
         background: rgba(0, 0, 0, 0.3);
         position: relative;
         border-radius: 16px;
@@ -192,22 +219,27 @@
         justify-content: center;
         align-items: center;
         margin-left: 16px;
+        text-align: center;
         img {
           width: 60px;
           height: 60px;
         }
         .icon-name {
           position: absolute;
-          width: 72px;
+          width: 100%;
           height: 22px;
           left: 0px;
           bottom: 0px;
           background: rgba(0, 0, 0, 0.45);
           border-radius: 0px 0px 16px 16px;
+          font-family: 'PingFang SC';
+          font-style: normal;
+          font-weight: 400;
           font-size: 14px;
-          text-align: center;
-          line-height: 22px;
+          line-height: 20px;
           color: #ffffff;
+          text-align: center;
+          // line-height: 22px;
           text-shadow: 0px 1px 2px rgba(118, 0, 0, 0.1);
         }
       }
@@ -216,6 +248,36 @@
       }
     }
     .vmp-question-wap {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+    }
+    /** 快问快答 - 答题高度 */
+    .exam_base {
+      height: calc(100% - 422px);
+      max-height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+      .vmp-exam-list_container {
+        max-height: calc(100% - 16px);
+        .container-data {
+          max-height: calc(100% - 210px);
+          padding-bottom: 16px;
+        }
+      }
+    }
+    /** 快问快答 - 排行榜高度 */
+    .vmp-exam-answer-wap {
+      height: calc(100% - 422px);
+      bottom: 0;
+      top: auto;
+      .exam-execute-body {
+        height: calc(100% - 100px) !important;
+        max-height: calc(100% - 100px) !important;
+      }
+    }
+    /** 快问快答 - 列表高度 */
+    .vmp-exam-rank-wap {
       height: calc(100% - 422px);
       bottom: 0;
       top: auto;

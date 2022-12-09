@@ -205,7 +205,7 @@
         const { id } = this.$route.params;
         const { rehearsal } = this.$route.query;
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'questionnaire', 'exam'],
           requestHeaders: {
             token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },

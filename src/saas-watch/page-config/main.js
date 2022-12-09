@@ -192,7 +192,10 @@ export default {
       'comWatchTimer',
       'comQuestionnaire',
       'comLottery',
-      'comRedPacketCommand'
+      'comRedPacketCommand',
+      'comExam',
+      'comExamRank',
+      'comExamScore'
     ],
     // 打开媒体设置
     emitClickMediaSetting: {
@@ -241,6 +244,18 @@ export default {
       cuid: ['comQuestionnaire'],
       method: 'open',
       args: ['$0']
+    },
+    // 快问快答弹窗 - 查看成绩
+    emitClickExamIconScore: {
+      cuid: ['comExamScore'],
+      method: 'open',
+      args: ['$0', '$1']
+    },
+    // 快问快答弹窗 - 答题
+    emitClickExamIcon: {
+      cuid: ['comExam'],
+      method: 'open',
+      args: ['$0', '$1', '$2']
     },
     // 关闭视频轮训弹窗
     emitClosePollingDialog: {
@@ -394,6 +409,16 @@ export default {
       cuid: 'comPcRewardEffectFullScreen',
       method: 'setHideEffect',
       args: ['$0']
+    },
+    emitClickExamRankChatItem: {
+      cuid: ['comExamRank'],
+      method: 'open',
+      args: ['$0', '$1']
+    },
+    emitClickExamChatItem: {
+      cuid: ['comExam'],
+      method: 'open',
+      args: ['$0', '$1', '$2']
     }
   },
   // 私聊
@@ -597,5 +622,44 @@ export default {
         method: 'open'
       }
     ]
+  },
+  // 快问快答 - 排行榜
+  comExamRank: {
+    component: 'VmpExamRank'
+  },
+  // 快问快答 - 问答
+  comExamAnswer: {
+    component: 'VmpExamAnswer'
+  },
+  // 快问快答 - 用户收集
+  comExamCollect: {
+    component: 'VmpExamCollect'
+  },
+  // 快问快答 - 成绩
+  comExamScore: {
+    component: 'VmpExamScore'
+  },
+  // 快问快答 - 预览
+  comExamPreview: {
+    component: 'VmpExamPreview'
+  },
+  // 快问快答 - 入口
+  comExam: {
+    component: 'VmpExamPc',
+    emitExamAnswerOpen: [
+      {
+        cuid: 'comExamAnswer',
+        method: 'open',
+        args: ['$0']
+      }
+    ],
+    emitExamCollectOpen: [
+      {
+        cuid: 'comExamCollect',
+        method: 'open',
+        args: ['$0']
+      }
+    ],
+    children: ['comExamCollect', 'comExamAnswer']
   }
 };

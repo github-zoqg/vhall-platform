@@ -1,0 +1,78 @@
+// vhall-ui的设计规范的抽象类
+
+/**
+*   f    ->  font  指字体设置
+*   aux  ->  auxiliary 辅助
+*   lel  ->  label  称谓
+*   fc   ->  font color  字体颜色
+*/
+
+// 弹窗标题
+.std-dialog-title {
+  line-height: 26px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #262626;
+}
+
+// 弹窗副标题
+.std-dialog-sub-title {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+// 正文
+.std-text(@color: #262626) {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: @color;
+}
+
+.std-text {
+  .std-text()
+}
+
+// 次级文字
+.std-text-sub {
+  .std-text(@color: #595959);
+}
+
+// 辅助文字
+.std-text-aux {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  color: #595959;
+}
+
+// 展示文字(多为数字 D-DIN) 
+.std-text-pro {
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 52px;
+  color: #000;
+}
+
+// panel的标题字体
+.std-panel-title {
+  font-size: 18px;
+  line-height: 26px;
+  color: #262626;
+}
+
+.std-title-lv3 {
+  font-size: 14px;
+  line-height: 22px;
+  color: #8c8c8c;
+  font-weight: 400;
+}
+
+.std-border-bottom {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+// 小图标的颜色
+.std-color-icon {
+  color: #8C8C8C;
+}

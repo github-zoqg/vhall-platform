@@ -266,7 +266,7 @@
           stealth = 1;
         }
         return new Domain({
-          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire'],
+          plugins: ['chat', 'player', 'doc', 'interaction', 'report', 'questionnaire', 'exam'],
           requestHeaders: {
             token: clientType === 'embed' ? '' : localStorage.getItem('token') || ''
           },

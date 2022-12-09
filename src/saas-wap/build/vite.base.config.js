@@ -35,7 +35,7 @@ const config = {
       dayjs: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/dayjs.min.js`,
       duration: `${CDN_DOMAIN.S2}/common-static/middle/dayjs/1.10.8/plugins/duration.js`,
       loadLazyWap: `${CDN_DOMAIN.S2}/common-static/middle/loadLazyWap/1.1.0/index.min.js`,
-
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.js', // vhallUI
       // 其他
       imageYunDun: `//cstaticdun.126.net/load.min.js?t=201903281201`,
       MiddleDomain: `http://localhost:10001/lib/middle-domain.js`
@@ -46,7 +46,8 @@ const config = {
       Vh5Ui: `${CDN_DOMAIN.S3}/common-static/middle/vh5-ui/1.0.4/css/vh5-ui.min.css`,
       iconfontCommon: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-saas/v1.0.5/iconfont.min.css`,
       iconfont: `${CDN_DOMAIN.S3}/common-static/middle/iconfont/vh-pc/v1.0.10/iconfont.min.css`,
-      overlayscrollbarsCss: `${CDN_DOMAIN.S3}/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css`
+      overlayscrollbarsCss: `${CDN_DOMAIN.S3}/common-static/middle/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css`,
+      VhallUI: '//cnstatic01.e.vhall.com/common-static/middle/vhall-ui/v2.0.2/index.css'
     }
   },
   less: {
