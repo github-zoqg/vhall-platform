@@ -440,8 +440,8 @@
         } else {
           app = document.body;
         }
-        if (skin?.wapBackground || skin?.background) {
-          app.style.backgroundImage = `url(${skin?.wapBackground || skin?.background})`;
+        if (skin?.wapBackground) {
+          app.style.backgroundImage = `url(${skin?.wapBackground})`;
           const styleMap = imgPositionSizeMap[skin?.backgroundSize?.imageCropMode || 2];
           for (let key in styleMap) {
             app.style[key] = styleMap[key];
