@@ -76,6 +76,7 @@
         },
         rankList: [],
         total: 0,
+        isEnd: false, // 是否已经查询结束
         maxTotal: 200,
         showBottom: false,
         bottomText: '',
@@ -127,6 +128,7 @@
             if (res.code === 200) {
               const data = res.data;
               const rankList = data.list || [];
+              this.isEnd = rankList.length == 0;
               if (this.rankList.length > 0) {
                 this.rankList = this.rankList.concat(rankList);
               } else {
@@ -156,7 +158,7 @@
           .catch(res => {});
       },
       loadRank() {
-        if (this.targetPage > this.totalPages && this.totalPages > 0) {
+        if ((this.targetPage > this.totalPages && this.totalPages > 0) || this.isEnd) {
           return;
         }
         this.targetPage++;
