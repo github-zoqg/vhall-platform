@@ -35,6 +35,12 @@
             </div>
           </van-pull-refresh>
         </ul>
+        <div class="null-page" v-if="!(rankList && rankList.length > 0)">
+          <div class="search">
+            <img src="./img/no-search@2x.png" class="no-search" />
+            <p class="null-info">{{ $t('webinar.webinar_1006') }}</p>
+          </div>
+        </div>
       </div>
     </div>
     <div class="dialog-bottom">
@@ -298,6 +304,24 @@
       .rank-list-wrap {
         padding: 0 32px;
         padding-bottom: 116px;
+        .search {
+          margin: 40px auto;
+          width: 120px;
+          text-align: center;
+          .no-search {
+            width: 112px;
+          }
+          .null-info {
+            margin-top: 8px;
+            font-style: normal;
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 32px;
+            color: #8c8c8c;
+            text-align: center;
+            padding-bottom: 8px;
+          }
+        }
       }
       .rank-list-more {
         font-style: normal;
