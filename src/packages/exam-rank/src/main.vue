@@ -39,6 +39,12 @@
           <div class="exam-rank-center rank-more" v-if="total >= 200 && rankList.length == 200">
             {{ $t('exam.exam_1045') }}
           </div>
+          <div class="null-page" v-if="!(rankList && rankList.length > 0)">
+            <div class="search">
+              <img src="./img/no-search@2x.png" class="no-search" />
+              <p class="null-info">{{ $t('webinar.webinar_1006') }}</p>
+            </div>
+          </div>
         </div>
         <div class="self-rank" v-if="ownerData">
           <RankItemWatch class="ma" :item="ownerData" />
@@ -76,6 +82,7 @@
         },
         rankList: [],
         total: 0,
+        isEnd: false, // 是否已经查询结束
         maxTotal: 200,
         showBottom: false,
         bottomText: '',
@@ -127,6 +134,7 @@
             if (res.code === 200) {
               const data = res.data;
               const rankList = data.list || [];
+              this.isEnd = rankList.length == 0;
               if (this.rankList.length > 0) {
                 this.rankList = this.rankList.concat(rankList);
               } else {
@@ -156,7 +164,7 @@
           .catch(res => {});
       },
       loadRank() {
-        if (this.targetPage > this.totalPages && this.totalPages > 0) {
+        if ((this.targetPage > this.totalPages && this.totalPages > 0) || this.isEnd) {
           return;
         }
         this.targetPage++;
@@ -265,6 +273,24 @@
         color: #8c8c8c;
         text-align: center;
         padding-bottom: 16px;
+      }
+      .search {
+        margin: 70px auto;
+        width: 120px;
+        text-align: center;
+        .no-search {
+          width: 112px;
+        }
+        .null-info {
+          margin-top: 8px;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 20px;
+          color: #8c8c8c;
+          text-align: center;
+          padding-bottom: 16px;
+        }
       }
     }
     .rank-list {

@@ -1,7 +1,7 @@
 {
   "name": "middle-platform",
-  "version": "7.11.30",
-  "domainVersion": "1.5.38",
+  "version": "7.11.30-test02.3",
+  "domainVersion": "1.5.38-test02.4",
   "private": true,
   "scripts": {
     "v-serve:saas-live:test": "node build/cli serve --project=saas-live  --mode=dev_test",
