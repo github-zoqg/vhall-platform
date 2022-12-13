@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "label": "platform",
+      "label": "platform:test02",
       "command": "node -v",
       "dependsOn": [
         "live",
@@ -19,17 +19,17 @@
     {
       "type": "shell",
       "label": "live",
-      "command": "node scripts/cli-service.js serve --project=saas-live --mode=dev_test --port=8080"
+      "command": "node scripts/cli-service.js serve --project=saas-live --mode=dev_test02 --port=8080"
     },
     {
       "type": "shell",
       "label": "watch",
-      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=dev_test --port=8081"
+      "command": "node scripts/cli-service.js serve --project=saas-watch --mode=dev_test02 --port=8081"
     },
     {
       "type": "shell",
       "label": "wap",
-      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=dev_test --port=8082"
+      "command": "node scripts/cli-service.js serve --project=saas-wap --mode=dev_test02 --port=8082"
     },
     {
       "type": "shell",

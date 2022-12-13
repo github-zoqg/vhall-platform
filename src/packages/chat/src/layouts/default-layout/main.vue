@@ -40,7 +40,8 @@
           previewImg: previewImg.bind(this),
           isWatch: isWatch,
           emitLotteryEvent,
-          emitQuestionnaireEvent
+          emitQuestionnaireEvent,
+          emitExamEvent
         }"
         @tobottom="toBottom"
         @totop="onTotop"
@@ -666,6 +667,37 @@
                 chatServer.addChatToList(data);
                 break;
               }
+
+              // 推送-快问快答 paper_send
+              case 'paper_send': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   公布-快问快答-成绩 paper_send_rank
+              case 'paper_send_rank': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-收卷 paper_end
+              case 'paper_end': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-自动收卷 paper_auto_end
+              case 'paper_auto_end': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
+              //   快问快答-自动公布成绩 paper_auto_send_rank
+              case 'paper_auto_send_rank': {
+                let data = this.setChatItemData(msg, msg.data.type);
+                chatServer.addChatToList(data);
+                break;
+              }
               default:
                 break;
             }
@@ -679,6 +711,29 @@
             }
           });
         });
+      },
+      setChatItemData(msg, eventType) {
+        let text_content = {
+          paper_send: this.$t('exam.exam_1001'), // 推送-快问快答
+          paper_send_rank: this.$t('exam.exam_1003') + this.$t('exam.exam_1004'), // 公布-快问快答-成绩
+          paper_end: this.$t('exam.exam_1041'), // 快问快答-收卷
+          paper_auto_end: this.$t('exam.exam_1040'), // 快问快答-自动收卷
+          paper_auto_send_rank: '快问快答已结束，公布成绩排行榜' // 快问
+        };
+        return {
+          nickname: msg.data.nick_name,
+          avatar: '//cnstatic01.e.vhall.com/static/images/watch/system.png',
+          content: {
+            text_content: `${text_content[eventType]}`,
+            exam_id: msg.data.paper_id,
+            exam_title: msg.data.paper_title || ''
+          },
+          roleName: msg.data.role_name,
+          type: msg.data.type,
+          interactStatus: true,
+          isCheck: false,
+          isLinkBtn: false
+        };
       },
       //初始化聊天输入框数据
       initInputStatus() {
@@ -766,6 +821,20 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      //快问快答情况检查
+      emitExamEvent(vo) {
+        if (['paper_auto_send_rank', 'paper_send_rank'].includes(vo.sourceType)) {
+          // 发起端-公布成绩 or 自动推送成绩
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamRankChatItem', [vo.examId, vo.examTitle])
+          );
+        } else if ('paper_send' == vo.sourceType) {
+          // 发起端-推送快问快答
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamChatItem', [vo.examId, 'answer'])
+          );
+        }
       },
       /**
        * 聊天图片预览

@@ -92,7 +92,7 @@ function getPlugins() {
             replace: `${argv.project}`
           }
         ]
-      },
+      }
     ];
 
     plugins.push(

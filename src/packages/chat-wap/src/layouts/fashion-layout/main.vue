@@ -29,6 +29,7 @@
             previewImg: previewImg.bind(this),
             emitLotteryEvent,
             emitQuestionnaireEvent,
+            emitExamEvent,
             joinInfo
           }"
           @totop="onTotop"
@@ -558,6 +559,20 @@
         window.$middleEventSdk?.event?.send(
           boxEventOpitons(this.cuid, 'emitClickQuestionnaireChatItem', [questionnaireId])
         );
+      },
+      //快问快答情况检查
+      emitExamEvent(vo) {
+        if (['paper_auto_send_rank', 'paper_send_rank'].includes(vo.sourceType)) {
+          // 发起端-公布成绩 or 自动推送成绩
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamRankChatItem', [vo.examId, vo.examTitle])
+          );
+        } else if ('paper_send' == vo.sourceType) {
+          // 推送-快问快答
+          window.$middleEventSdk?.event?.send(
+            boxEventOpitons(this.cuid, 'emitClickExamChatItem', [vo.examId, 'answer'])
+          );
+        }
       },
       // 音频模式播放器大小变动 高度重新计算
       changeChatHeight(data) {

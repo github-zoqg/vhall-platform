@@ -209,10 +209,36 @@
             </div>
           </div>
         </div>
-
+        <!-- 快问快答 -->
+        <div
+          v-if="
+            source.interactStatus &&
+            !(source.type == 'pwd_red_envelope_ok' && isEmbed) &&
+            [
+              'paper_send',
+              'paper_send_rank',
+              'paper_end',
+              'paper_auto_end',
+              'paper_auto_send_rank'
+            ].includes(source.type)
+          "
+          class="msg-item-template__exam_container"
+        >
+          <exam-msg-item :source="source" @checkExamDetail="checkExamDetail"></exam-msg-item>
+        </div>
         <!-- 抽奖、问答、签到、问卷、红包 -->
         <div
-          v-if="source.interactStatus && !(source.type == 'pwd_red_envelope_ok' && isEmbed)"
+          v-if="
+            source.interactStatus &&
+            !(source.type == 'pwd_red_envelope_ok' && isEmbed) &&
+            ![
+              'paper_send',
+              'paper_send_rank',
+              'paper_end',
+              'paper_auto_end',
+              'paper_auto_send_rank'
+            ].includes(source.type)
+          "
           class="msg-item-template__interact"
         >
           <div class="msg-item-template__interact-content">
@@ -295,6 +321,7 @@
   import { defaultAvatar } from '@/app-shared/utils/ossImgConfig';
   import phoneImg from '@/app-shared/assets/img/phone.png';
   import { handleChatShowTime } from '@/app-shared/utils/handle-time.js';
+  import ExamMsgItem from './exam-msg-item.vue';
   export default {
     name: 'msgItem',
     props: {
@@ -344,6 +371,10 @@
         type: Function,
         default: function () {}
       },
+      emitExamEvent: {
+        type: Function,
+        default: function () {}
+      },
       // 是否观看端
       isWatch: {
         type: Boolean,
@@ -361,6 +392,9 @@
         //手机端icon标识
         phoneImg: phoneImg
       };
+    },
+    components: {
+      ExamMsgItem
     },
     computed: {
       isShowRoleTag() {
@@ -460,6 +494,22 @@
         if (type === 'questionnaire_push') {
           this.questionnaireCheck(content.questionnaire_id);
         }
+        // 快问快答查看
+        if (
+          [
+            'paper_send',
+            'paper_send_rank',
+            'paper_end',
+            'paper_auto_end',
+            'paper_auto_send_rank'
+          ].includes(type)
+        ) {
+          this.checkExamDetail({
+            examId: content.exam_id,
+            examTitle: content.exam_title,
+            sourceType: type
+          });
+        }
       },
       //点击查看抽奖信息
       lotteryCheck(msg) {
@@ -468,6 +518,10 @@
       //点击查看问卷信息
       questionnaireCheck(questionnaire_id) {
         this.emitQuestionnaireEvent(questionnaire_id);
+      },
+      //点击查看快问快答信息
+      checkExamDetail(vo) {
+        this.emitExamEvent(vo);
       },
       //处理@消息
       handleAt() {
@@ -822,7 +876,7 @@
           border-radius: 14px;
           font-size: 14px;
           line-height: 22px;
-          padding: 4px 8px;
+          padding: 6px 8px;
           color: var(--chat-font-color-msg-text);
           text-align: center;
           > span {
@@ -920,10 +974,13 @@
           }
         }
       }
+      &__exam_container {
+        margin: 0 auto;
+      }
     }
     .msg-item__content-body__content-link {
-      color: #3562fa;
-      text-decoration: underline #3562fa !important;
+      color: @font-click-detail;
+      text-decoration: underline @font-click-detail !important;
       word-break: break-all;
     }
   }
